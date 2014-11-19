@@ -315,7 +315,7 @@ public class HostBrowser extends Browser {
         final Map<NetInterface, NetInfo> netInterfaces = new HashMap<NetInterface, NetInfo>();
         mNetInfosReadLock.lock();
         try {
-            for (final Info info : treeMenuController.nodesToInfos(netInterfacesNode.children())) {
+            for (final Object info : treeMenuController.nodesToInfos(netInterfacesNode.children())) {
                 final NetInfo netInfo = (NetInfo) info;
                 netInterfaces.put(netInfo.getNetInterface(), netInfo);
             }
@@ -329,7 +329,7 @@ public class HostBrowser extends Browser {
         final Map<String, FSInfo> filesystems = new HashMap<String, FSInfo>();
         mFileSystemsReadLock.lock();
         try {
-            for (final Info info : treeMenuController.nodesToInfos(fileSystemsNode.children())) {
+            for (final Object info : treeMenuController.nodesToInfos(fileSystemsNode.children())) {
                 final FSInfo fsInfo = (FSInfo) info;
                 filesystems.put(fsInfo.getName(), fsInfo);
             }

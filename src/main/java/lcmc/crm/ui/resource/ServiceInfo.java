@@ -3774,7 +3774,7 @@ public class ServiceInfo extends EditableInfo {
         if (index > 0) {
             @SuppressWarnings("unchecked")
             final List<String> newOrder = new ArrayList<String>();
-            for (final Info child : treeMenuController.nodesToInfos(giNode.children())) {
+            for (final Object child : treeMenuController.nodesToInfos(giNode.children())) {
                 newOrder.add(((ServiceInfo) child).getHeartbeatId(runMode));
             }
             final String el = newOrder.remove(index);
@@ -3802,7 +3802,7 @@ public class ServiceInfo extends EditableInfo {
             @SuppressWarnings("unchecked")
             final Enumeration<DefaultMutableTreeNode> e = giNode.children();
             final List<String> newOrder = new ArrayList<String>();
-            for (final Info info : treeMenuController.nodesToInfos(giNode.children())) {
+            for (final Object info : treeMenuController.nodesToInfos(giNode.children())) {
                 final ServiceInfo child = (ServiceInfo) info;
                 newOrder.add(child.getHeartbeatId(runMode));
             }
@@ -3920,7 +3920,7 @@ public class ServiceInfo extends EditableInfo {
                         final String group = gi.getHeartbeatId(runMode);
                         final DefaultMutableTreeNode giNode = gi.getNode();
                         if (giNode != null) {
-                            for (final Info info : treeMenuController.nodesToInfos(giNode.children())) {
+                            for (final Object info : treeMenuController.nodesToInfos(giNode.children())) {
                                 final ServiceInfo child = (ServiceInfo) info;
                                 child.getService().setModified(true);
                                 child.getService().doneModifying();

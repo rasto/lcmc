@@ -155,10 +155,10 @@ public class Cluster implements Comparable<Cluster> {
      * The block devices, that are already in the CRM or are used by
      * drbd are not returned.
      */
-    public Collection<String> getCommonBlockDevices() {
-        final Collection<String> namesIntersection = blockDeviceService.getCommonBlockDeviceNames(hosts);
+    public List<String> getCommonBlockDevices() {
+        final List<String> namesIntersection = blockDeviceService.getCommonBlockDeviceNames(hosts);
 
-        final Collection<String> commonBlockDevices = new ArrayList<String>();
+        final List<String> commonBlockDevices = new ArrayList<String>();
         for (final String i : namesIntersection) {
             commonBlockDevices.add(i);
         }

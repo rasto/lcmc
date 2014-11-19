@@ -24,8 +24,10 @@ import com.google.common.base.Optional;
 import com.google.common.eventbus.Subscribe;
 import lcmc.ClusterEventBus;
 import lcmc.HwEventBus;
+import lcmc.cluster.domain.Cluster;
 import lcmc.drbd.domain.BlockDevice;
 import lcmc.event.BlockDevicesChangedEvent;
+import lcmc.event.CommonBlockDevicesChangedEvent;
 import lcmc.event.HwBlockDevicesChangedEvent;
 import lcmc.event.HwBlockDevicesDiskSpaceEvent;
 import lcmc.event.HwDrbdStatusChangedEvent;
@@ -38,7 +40,9 @@ import javax.inject.Singleton;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Named
@@ -49,6 +53,7 @@ public class BlockDeviceService {
     @Inject
     private ClusterEventBus clusterEventBus;
     private Map<Host, HostBlockDevices> hostBlockDevicesByHost = new ConcurrentHashMap<Host, HostBlockDevices>();
+    private Map<Cluster, List<String>> commonBlockDevicesByCluster = new ConcurrentHashMap<Cluster, List<String>>();
 
     public void init() {
         hwEventBus.register(this);
@@ -59,6 +64,7 @@ public class BlockDeviceService {
         final HostBlockDevices hostBlockDevices = new HostBlockDevices();
         hostBlockDevices.setBlockDevices(event.getBlockDevices());
         hostBlockDevicesByHost.put(event.getHost(), hostBlockDevices);
+        updateCommonBlockDeviceNames(Optional.fromNullable(event.getHost().getCluster()));
         clusterEventBus.post(new BlockDevicesChangedEvent(event.getHost(), hostBlockDevices.getBlockDevices()));
     }
 
@@ -89,8 +95,16 @@ public class BlockDeviceService {
         }
     }
 
-    public Collection<String> getCommonBlockDeviceNames(final Iterable<Host> hosts) {
-        Optional<Collection<String>> namesIntersection = Optional.absent();
+    public Optional<BlockDevice> getBlockDeviceByName(final Host host, final String name) {
+        final HostBlockDevices hostBlockDevices = hostBlockDevicesByHost.get(host);
+        if (hostBlockDevices != null) {
+            return hostBlockDevices.getBlockDeviceByName(name);
+        }
+        return Optional.absent();
+    }
+
+    public List<String> getCommonBlockDeviceNames(final Set<Host> hosts) {
+        Optional<List<String>> namesIntersection = Optional.absent();
         for (final Host host : hosts) {
             final HostBlockDevices hostBlockDevices = hostBlockDevicesByHost.get(host);
             if (hostBlockDevices != null) {
@@ -100,11 +114,29 @@ public class BlockDeviceService {
         return namesIntersection.or(new ArrayList<String>());
     }
 
-    public Optional<BlockDevice> getBlockDeviceByName(final Host host, final String name) {
-        final HostBlockDevices hostBlockDevices = hostBlockDevicesByHost.get(host);
-        if (hostBlockDevices != null) {
-            return hostBlockDevices.getBlockDeviceByName(name);
+    private void updateCommonBlockDeviceNames(final Optional<Cluster> cluster) {
+        if (!cluster.isPresent()) {
+            return;
         }
-        return Optional.absent();
+        final List<String> commonBlockDeviceNames = getCommonBlockDeviceNames(cluster.get().getHosts());
+        final List<String> oldCommonBlockDeviceNames = commonBlockDevicesByCluster.get(cluster.get());
+        commonBlockDevicesByCluster.put(cluster.get(), commonBlockDeviceNames);
+        if (oldCommonBlockDeviceNames == null
+                || oldCommonBlockDeviceNames.isEmpty()
+                || !equalCollections(commonBlockDeviceNames, oldCommonBlockDeviceNames)) {
+            clusterEventBus.post(new CommonBlockDevicesChangedEvent(cluster.get(), commonBlockDeviceNames));
+        }
+    }
+
+    private boolean equalCollections(final List<?> collection1, final List<?> collection2) {
+        if (collection1.size() != collection2.size()) {
+            return false;
+        }
+        for (int i = 0; i < collection1.size(); i++) {
+            if (!collection1.get(i).equals(collection2.get(i))) {
+                return false;
+            }
+        }
+        return true;
     }
 }

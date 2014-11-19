@@ -1592,7 +1592,7 @@ public class Host implements Comparable<Host>, Value {
                 }
             } else if (BRIDGE_INFO_DELIM.equals(type)) {
                 newBridges.add(new StringValue(line));
-            } else if ("disk-info".equals(type)) {
+            } else if (DISK_INFO_DELIM.equals(type)) {
                 final Optional<BlockDevice> blockDevice = createBlockDevice(line);
                 if (!blockDevice.isPresent()) {
                     continue;

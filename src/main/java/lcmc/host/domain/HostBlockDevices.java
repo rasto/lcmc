@@ -60,8 +60,8 @@ public class HostBlockDevices {
      * Returns blockDevices as array list of device names. Removes the
      * ones that are in the drbd and are already used in CRM.
      */
-    public Collection<String> getBlockDevicesNames() {
-        final Collection<String> blockDevicesNames = new ArrayList<String>();
+    public List<String> getBlockDevicesNames() {
+        final List<String> blockDevicesNames = new ArrayList<String>();
         for (final String bdName : byName.keySet()) {
             final BlockDevice bd = byName.get(bdName);
             if (!bd.isDrbd() && !bd.isUsedByCRM()) {
@@ -79,12 +79,11 @@ public class HostBlockDevices {
      *          block devices of this host is made.
      *
      */
-    public Optional<Collection<String>> getBlockDevicesNamesIntersection(
-            final Optional<Collection<String>> otherBlockDevices) {
+    public Optional<List<String>> getBlockDevicesNamesIntersection(final Optional<List<String>> otherBlockDevices) {
         if (!otherBlockDevices.isPresent()) {
             return Optional.of(getBlockDevicesNames());
         }
-        final Collection<String> blockDevicesIntersection = new ArrayList<String>();
+        final List<String> blockDevicesIntersection = new ArrayList<String>();
         for (final String otherBlockDevice : otherBlockDevices.get()) {
             final BlockDevice blockDevice = byName.get(otherBlockDevice);
             if (blockDevice != null && !blockDevice.isDrbd()) {

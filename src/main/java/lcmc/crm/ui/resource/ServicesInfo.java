@@ -704,10 +704,10 @@ public class ServicesInfo extends EditableInfo {
             }
         }
 
-        for (final Info info : treeMenuController.nodesToInfos(getNode().children())) {
+        for (final Object info : treeMenuController.nodesToInfos(getNode().children())) {
             final ServiceInfo group = (ServiceInfo) info;
             if (group.getResourceAgent().isGroup() || group.getResourceAgent().isClone()) {
-                for (final Info groupInfo : treeMenuController.nodesToInfos(group.getNode().children())) {
+                for (final Object groupInfo : treeMenuController.nodesToInfos(group.getNode().children())) {
                     final ServiceInfo groupService = (ServiceInfo) groupInfo;
                     if (!groupServiceIsPresent.contains(groupService) && !groupService.getService().isNew()) {
                         /* remove the group service from the menu
@@ -1173,7 +1173,7 @@ public class ServicesInfo extends EditableInfo {
                     application.invokeInEdt(new Runnable() {
                         @Override
                         public void run() {
-                            for (final Info info : treeMenuController.nodesToInfos(oldGi.getNode().children())) {
+                            for (final Object info : treeMenuController.nodesToInfos(oldGi.getNode().children())) {
                                 final ServiceInfo oldChild = (ServiceInfo) info;
                                 oldChild.getInfoPanel();
                                 final ServiceInfo newChild =

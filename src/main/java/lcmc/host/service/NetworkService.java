@@ -32,6 +32,7 @@ import lcmc.drbd.domain.NetInterface;
 import lcmc.event.HwBridgesChangedEvent;
 import lcmc.event.HwNetInterfacesChangedEvent;
 import lcmc.event.NetInterfacesChangedEvent;
+import lcmc.event.NetworkChangedEvent;
 import lcmc.host.domain.Host;
 import lcmc.host.domain.HostNetworks;
 
@@ -55,10 +56,11 @@ public class NetworkService {
     @Inject
     private ClusterEventBus clusterEventBus;
     private Map<Host, HostNetworks> hostNetInterfacesByHost = new ConcurrentHashMap<Host, HostNetworks>();
-    private Map<Cluster, Collection<Network>> networksByCluster = new ConcurrentHashMap<Cluster, Collection<Network>>();
+    private Map<Cluster, List<Network>> networksByCluster = new ConcurrentHashMap<Cluster, List<Network>>();
 
     public void init() {
         hwEventBus.register(this);
+        clusterEventBus.register(this);
     }
 
     @Subscribe
@@ -132,7 +134,7 @@ public class NetworkService {
     }
 
 
-    private Collection<Network> getCommonNetworks(final Set<Host> hosts) {
+    private List<Network> getCommonNetworks(final Set<Host> hosts) {
         final Map<String, Integer> networksIntersection = getNetworksIntersection(hosts);
 
         final List<Network> commonNetworks = new ArrayList<Network>();
@@ -153,6 +155,25 @@ public class NetworkService {
         if (!cluster.isPresent()) {
             return;
         }
-        networksByCluster.put(cluster.get(), getCommonNetworks(cluster.get().getHosts()));
+        final List<Network> commonNetworks = getCommonNetworks(cluster.get().getHosts());
+        final List<Network> oldCommonNetworks = networksByCluster.get(cluster.get());
+        networksByCluster.put(cluster.get(), commonNetworks);
+        if (oldCommonNetworks == null
+                || oldCommonNetworks.isEmpty()
+                || !equalCollections(commonNetworks, oldCommonNetworks)) {
+            clusterEventBus.post(new NetworkChangedEvent(cluster.get(), commonNetworks));
+        }
+    }
+
+    private boolean equalCollections(final List<Network> collection1, final List<Network> collection2) {
+        if (collection1.size() != collection2.size()) {
+            return false;
+        }
+        for (int i = 0; i < collection1.size(); i++) {
+            if (!collection1.get(i).equals(collection2.get(i))) {
+                return false;
+            }
+        }
+        return true;
     }
 }

@@ -35,7 +35,7 @@ public class NetworkModelTest {
 
     @Before
     public void initTable() {
-        model.initTable();
+        model.updateTable();
 
     }
 

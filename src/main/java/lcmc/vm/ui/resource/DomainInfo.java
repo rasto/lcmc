@@ -674,7 +674,7 @@ public class DomainInfo extends EditableInfo {
         }
         final Collection<DefaultMutableTreeNode> nodesToRemove = new ArrayList<DefaultMutableTreeNode>();
         boolean nodeChanged = false;
-        for (final Info info : treeMenuController.nodesToInfos(thisNode.children())) {
+        for (final Object info : treeMenuController.nodesToInfos(thisNode.children())) {
             if (!(info instanceof DiskInfo)) {
                 continue;
             }
@@ -699,7 +699,7 @@ public class DomainInfo extends EditableInfo {
                 } finally {
                     mDiskToInfoLock.unlock();
                 }
-                nodesToRemove.add(info.getNode());
+                nodesToRemove.add(diskInfo.getNode());
                 nodeChanged = true;
             }
         }
@@ -710,7 +710,7 @@ public class DomainInfo extends EditableInfo {
 
         for (final String disk : diskNames) {
             int i = 0;
-            for (final Info info : treeMenuController.nodesToInfos(thisNode.children())) {
+            for (final Object info : treeMenuController.nodesToInfos(thisNode.children())) {
                 if (!(info instanceof DiskInfo)) {
                     continue;
                 }
@@ -752,7 +752,7 @@ public class DomainInfo extends EditableInfo {
         }
         final Collection<DefaultMutableTreeNode> nodesToRemove = new ArrayList<DefaultMutableTreeNode>();
         boolean nodeChanged = false;
-        for (final Info info : treeMenuController.nodesToInfos(thisNode.children())) {
+        for (final Object info : treeMenuController.nodesToInfos(thisNode.children())) {
             if (!(info instanceof FilesystemInfo)) {
                 continue;
             }
@@ -777,7 +777,7 @@ public class DomainInfo extends EditableInfo {
                 } finally {
                     mFilesystemToInfoLock.unlock();
                 }
-                nodesToRemove.add(info.getNode());
+                nodesToRemove.add(filesystemInfo.getNode());
                 nodeChanged = true;
             }
         }
@@ -788,7 +788,7 @@ public class DomainInfo extends EditableInfo {
 
         for (final String filesystem : filesystemNames) {
             int i = 0;
-            for (final Info info : treeMenuController.nodesToInfos(thisNode.children())) {
+            for (final Object info : treeMenuController.nodesToInfos(thisNode.children())) {
                 if (!(info instanceof FilesystemInfo)) {
                     continue;
                 }
@@ -831,7 +831,7 @@ public class DomainInfo extends EditableInfo {
         final Collection<DefaultMutableTreeNode> nodesToRemove = new ArrayList<DefaultMutableTreeNode>();
         boolean nodeChanged = false;
         InterfaceInfo emptySlot = null; /* for generated mac address. */
-        for (final Info info : treeMenuController.nodesToInfos(thisNode.children())) {
+        for (final Object info : treeMenuController.nodesToInfos(thisNode.children())) {
             if (!(info instanceof InterfaceInfo)) {
                 continue;
             }
@@ -865,7 +865,7 @@ public class DomainInfo extends EditableInfo {
             final InterfaceInfo interfaceInfo;
             if (emptySlot == null) {
                 int i = 0;
-                for (final Info info : treeMenuController.nodesToInfos(thisNode.children())) {
+                for (final Object info : treeMenuController.nodesToInfos(thisNode.children())) {
                     if (!(info instanceof InterfaceInfo)) {
                         if (info instanceof DiskInfo || info instanceof FilesystemInfo) {
                             i++;
@@ -916,7 +916,7 @@ public class DomainInfo extends EditableInfo {
         }
         final Collection<DefaultMutableTreeNode> nodesToRemove = new ArrayList<DefaultMutableTreeNode>();
         boolean nodeChanged = false;
-        for (final Info info : treeMenuController.nodesToInfos(thisNode.children())) {
+        for (final Object info : treeMenuController.nodesToInfos(thisNode.children())) {
             if (!(info instanceof InputDevInfo)) {
                 continue;
             }
@@ -946,7 +946,7 @@ public class DomainInfo extends EditableInfo {
 
         for (final String inputDev : inputDevNames) {
             int i = 0;
-            for (final Info info : treeMenuController.nodesToInfos(thisNode.children())) {
+            for (final Object info : treeMenuController.nodesToInfos(thisNode.children())) {
                 if (!(info instanceof InputDevInfo)) {
                     if (info instanceof DiskInfo || info instanceof FilesystemInfo || info instanceof InterfaceInfo) {
                         i++;
@@ -993,7 +993,7 @@ public class DomainInfo extends EditableInfo {
         }
         final Collection<DefaultMutableTreeNode> nodesToRemove = new ArrayList<DefaultMutableTreeNode>();
         boolean nodeChanged = false;
-        for (final Info info : treeMenuController.nodesToInfos(thisNode.children())) {
+        for (final Object info : treeMenuController.nodesToInfos(thisNode.children())) {
             if (!(info instanceof GraphicsInfo)) {
                 continue;
             }
@@ -1029,7 +1029,7 @@ public class DomainInfo extends EditableInfo {
 
         for (final String graphicDisplay : graphicsNames) {
             int i = 0;
-            for (final Info info : treeMenuController.nodesToInfos(thisNode.children())) {
+            for (final Object info : treeMenuController.nodesToInfos(thisNode.children())) {
                 if (!(info instanceof GraphicsInfo)) {
                     if (info instanceof DiskInfo
                         || info instanceof FilesystemInfo
@@ -1077,7 +1077,7 @@ public class DomainInfo extends EditableInfo {
         }
         final Collection<DefaultMutableTreeNode> nodesToRemove = new ArrayList<DefaultMutableTreeNode>();
         boolean nodeChanged = false;
-        for (final Info info : treeMenuController.nodesToInfos(thisNode.children())) {
+        for (final Object info : treeMenuController.nodesToInfos(thisNode.children())) {
             if (!(info instanceof SoundInfo)) {
                 continue;
             }
@@ -1113,7 +1113,7 @@ public class DomainInfo extends EditableInfo {
 
         for (final String sound : soundNames) {
             int i = 0;
-            for (final Info info : treeMenuController.nodesToInfos(thisNode.children())) {
+            for (final Object info : treeMenuController.nodesToInfos(thisNode.children())) {
                 if (!(info instanceof SoundInfo)) {
                     if (info instanceof DiskInfo
                         || info instanceof FilesystemInfo
@@ -1163,7 +1163,7 @@ public class DomainInfo extends EditableInfo {
         final Collection<DefaultMutableTreeNode> nodesToRemove = new ArrayList<DefaultMutableTreeNode>();
         boolean nodeChanged = false;
         SerialInfo emptySlot = null; /* for generated target port. */
-        for (final Info info : treeMenuController.nodesToInfos(thisNode.children())) {
+        for (final Object info : treeMenuController.nodesToInfos(thisNode.children())) {
             if (!(info instanceof SerialInfo)) {
                 continue;
             }
@@ -1197,7 +1197,7 @@ public class DomainInfo extends EditableInfo {
             final SerialInfo serialInfo;
             if (emptySlot == null) {
                 int i = 0;
-                for (final Info info : treeMenuController.nodesToInfos(thisNode.children())) {
+                for (final Object info : treeMenuController.nodesToInfos(thisNode.children())) {
                     if (!(info instanceof SerialInfo)) {
                         if (info instanceof DiskInfo
                             || info instanceof FilesystemInfo
@@ -1253,7 +1253,7 @@ public class DomainInfo extends EditableInfo {
         final Collection<DefaultMutableTreeNode> nodesToRemove = new ArrayList<DefaultMutableTreeNode>();
         boolean nodeChanged = false;
         ParallelInfo emptySlot = null; /* for generated target port. */
-        for (final Info info : treeMenuController.nodesToInfos(thisNode.children())) {
+        for (final Object info : treeMenuController.nodesToInfos(thisNode.children())) {
             if (!(info instanceof ParallelInfo)) {
                 continue;
             }
@@ -1287,7 +1287,7 @@ public class DomainInfo extends EditableInfo {
             final ParallelInfo parallelInfo;
             if (emptySlot == null) {
                 int i = 0;
-                for (final Info info : treeMenuController.nodesToInfos(thisNode.children())) {
+                for (final Object info : treeMenuController.nodesToInfos(thisNode.children())) {
                     if (!(info instanceof ParallelInfo)) {
                         if (info instanceof DiskInfo
                             || info instanceof FilesystemInfo
@@ -1343,7 +1343,7 @@ public class DomainInfo extends EditableInfo {
         }
         final Collection<DefaultMutableTreeNode> nodesToRemove = new ArrayList<DefaultMutableTreeNode>();
         boolean nodeChanged = false;
-        for (final Info info : treeMenuController.nodesToInfos(thisNode.children())) {
+        for (final Object info : treeMenuController.nodesToInfos(thisNode.children())) {
             if (!(info instanceof VideoInfo)) {
                 continue;
             }
@@ -1379,7 +1379,7 @@ public class DomainInfo extends EditableInfo {
 
         for (final String video : videoNames) {
             int i = 0;
-            for (final Info info : treeMenuController.nodesToInfos(thisNode.children())) {
+            for (final Object info : treeMenuController.nodesToInfos(thisNode.children())) {
                 if (!(info instanceof VideoInfo)) {
                     if (info instanceof DiskInfo
                         || info instanceof FilesystemInfo
@@ -2090,7 +2090,7 @@ public class DomainInfo extends EditableInfo {
             return diskInfo;
         }
         int i = 0;
-        for (final Info info : treeMenuController.nodesToInfos(thisNode.children())) {
+        for (final Object info : treeMenuController.nodesToInfos(thisNode.children())) {
             if (info instanceof DiskInfo) {
                 i++;
                 continue;
@@ -2112,7 +2112,7 @@ public class DomainInfo extends EditableInfo {
             return filesystemInfo;
         }
         int i = 0;
-        for (final Info info : treeMenuController.nodesToInfos(thisNode.children())) {
+        for (final Object info : treeMenuController.nodesToInfos(thisNode.children())) {
             if (info instanceof FilesystemInfo) {
                 i++;
                 continue;
@@ -2135,7 +2135,7 @@ public class DomainInfo extends EditableInfo {
             return interfaceInfo;
         }
         int i = 0;
-        for (final Info info : treeMenuController.nodesToInfos(thisNode.children())) {
+        for (final Object info : treeMenuController.nodesToInfos(thisNode.children())) {
             if (info instanceof DiskInfo
                 || info instanceof FilesystemInfo
                 || info instanceof InterfaceInfo) {
@@ -2161,7 +2161,7 @@ public class DomainInfo extends EditableInfo {
             return;
         }
         int i = 0;
-        for (final Info info : treeMenuController.nodesToInfos(thisNode.children())) {
+        for (final Object info : treeMenuController.nodesToInfos(thisNode.children())) {
             if (info instanceof DiskInfo
                 || info instanceof FilesystemInfo
                 || info instanceof InterfaceInfo
@@ -2187,7 +2187,7 @@ public class DomainInfo extends EditableInfo {
             return graphicsInfo;
         }
         int i = 0;
-        for (final Info info : treeMenuController.nodesToInfos(thisNode.children())) {
+        for (final Object info : treeMenuController.nodesToInfos(thisNode.children())) {
             if (info instanceof DiskInfo
                 || info instanceof FilesystemInfo
                 || info instanceof InterfaceInfo
@@ -2213,7 +2213,7 @@ public class DomainInfo extends EditableInfo {
             return;
         }
         int i = 0;
-        for (final Info info : treeMenuController.nodesToInfos(thisNode.children())) {
+        for (final Object info : treeMenuController.nodesToInfos(thisNode.children())) {
             if (info instanceof DiskInfo
                 || info instanceof FilesystemInfo
                 || info instanceof InterfaceInfo
@@ -2240,7 +2240,7 @@ public class DomainInfo extends EditableInfo {
             return;
         }
         int i = 0;
-        for (final Info info : treeMenuController.nodesToInfos(thisNode.children())) {
+        for (final Object info : treeMenuController.nodesToInfos(thisNode.children())) {
             if (info instanceof DiskInfo
                 || info instanceof FilesystemInfo
                 || info instanceof InterfaceInfo
@@ -2269,7 +2269,7 @@ public class DomainInfo extends EditableInfo {
             return;
         }
         int i = 0;
-        for (final Info info : treeMenuController.nodesToInfos(thisNode.children())) {
+        for (final Object info : treeMenuController.nodesToInfos(thisNode.children())) {
             if (info instanceof DiskInfo
                 || info instanceof FilesystemInfo
                 || info instanceof InterfaceInfo
@@ -2678,7 +2678,7 @@ public class DomainInfo extends EditableInfo {
         if (getResource().isNew()) {
             final DefaultMutableTreeNode thisNode = getNode();
             if (thisNode != null) {
-                for (final Info info : treeMenuController.nodesToInfos(thisNode.children())) {
+                for (final Object info : treeMenuController.nodesToInfos(thisNode.children())) {
                     final HardwareInfo hardwareInfo = (HardwareInfo) info;
                     if (hardwareInfo != null) {
                         final MyButton applyButton = hardwareInfo.getApplyButton();
@@ -2722,7 +2722,7 @@ public class DomainInfo extends EditableInfo {
         if (thisNode == null) {
             return allParamaters;
         }
-        for (final Info info : treeMenuController.nodesToInfos(thisNode.children())) {
+        for (final Object info : treeMenuController.nodesToInfos(thisNode.children())) {
             final HardwareInfo hardwareInfo = (HardwareInfo) info;
             allParamaters.put(hardwareInfo, hardwareInfo.getHWParameters(allParams));
         }
@@ -3786,7 +3786,7 @@ public class DomainInfo extends EditableInfo {
         @SuppressWarnings("unchecked")
         final Check check = new Check(incorrect, changed);
         check.addCheck(super.checkResourceFields(param, params));
-        for (final Info info : treeMenuController.nodesToInfos(thisNode.children())) {
+        for (final Object info : treeMenuController.nodesToInfos(thisNode.children())) {
             final HardwareInfo hardwareInfo = (HardwareInfo) info;
             check.addCheck(hardwareInfo.checkResourceFields(null, hardwareInfo.getRealParametersFromXML(), true));
         }
@@ -4037,7 +4037,7 @@ public class DomainInfo extends EditableInfo {
             }
             hostWi.setValue(savedValue);
         }
-        for (final Info info : treeMenuController.nodesToInfos(thisNode.children())) {
+        for (final Object info : treeMenuController.nodesToInfos(thisNode.children())) {
             final HardwareInfo hardwareInfo = (HardwareInfo) info;
             if (hardwareInfo.checkResourceFields(null, hardwareInfo.getRealParametersFromXML(), true).isChanged()) {
                 hardwareInfo.revert();

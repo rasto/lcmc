@@ -68,7 +68,9 @@ import lcmc.drbd.domain.DRBDtestData;
 import lcmc.drbd.domain.DrbdXml;
 import lcmc.drbd.ui.DrbdGraph;
 import lcmc.event.BlockDevicesChangedEvent;
-import lcmc.event.NetInterfacesChangedEvent;
+import lcmc.event.CommonBlockDevicesChangedEvent;
+import lcmc.event.NetworkChangedEvent;
+import lcmc.host.service.BlockDeviceService;
 import lcmc.host.service.NetworkService;
 import lcmc.host.ui.HostBrowser;
 import lcmc.host.domain.Host;
@@ -239,6 +241,8 @@ public class ClusterBrowser extends Browser {
     private NetworkService networkService;
     @Inject
     private NetworkFactory networkFactory;
+    @Inject
+    private BlockDeviceService blockDeviceService;
 
     public static String getClassMenuName(final String cl) {
         final String name = CRM_CLASS_MENU.get(cl);
@@ -325,11 +329,11 @@ public class ClusterBrowser extends Browser {
 
     public void init(final Cluster cluster) {
         this.cluster = cluster;
+        clusterEventBus.register(this);
         crmGraph.initGraph(this);
         drbdGraph.initGraph(this);
         globalInfo.init(Tools.getString("ClusterBrowser.Drbd"), this);
         treeTop = treeMenuController.createMenuTreeTop();
-        clusterEventBus.register(this);
     }
 
     private void initOperations() {
@@ -497,6 +501,7 @@ public class ClusterBrowser extends Browser {
         /* networks */
         networksCategory.init(Tools.getString("ClusterBrowser.Networks"), this);
         networksNode = treeMenuController.createMenuItem(treeTop, networksCategory);
+        updateCommonNetworks(networkService.getCommonNetworks(cluster));
 
         /* drbd */
         drbdNode = treeMenuController.createMenuItem(treeTop, globalInfo);
@@ -513,6 +518,7 @@ public class ClusterBrowser extends Browser {
         /* block devices / shared disks, TODO: */
         commonBlockDevicesCategory.init(Tools.getString("ClusterBrowser.CommonBlockDevices"), this);
         commonBlockDevicesNode = treeMenuController.createMenuItem(commonBlockDevicesCategory);
+        updateCommonBlockDevices(blockDeviceService.getCommonBlockDeviceNames(cluster.getHosts()));
 
         /* resource defaults */
         rscDefaultsInfo = rscDefaultsInfoProvider.get();
@@ -1237,7 +1243,7 @@ public class ClusterBrowser extends Browser {
         mVmsUpdateLock.lock();
         boolean nodeChanged = false;
         if (vmsNode != null) {
-            for (final Info info : treeMenuController.nodesToInfos(vmsNode.children())) {
+            for (final Object info : treeMenuController.nodesToInfos(vmsNode.children())) {
                 final DomainInfo domainInfo = (DomainInfo) info;
                 if (domainNames.contains(domainInfo.toString())) {
                     /* keeping */
@@ -1262,7 +1268,7 @@ public class ClusterBrowser extends Browser {
         }
         for (final String domainName : domainNames) {
             int i = 0;
-            for (final Info info : treeMenuController.nodesToInfos(vmsNode.children())) {
+            for (final Object info : treeMenuController.nodesToInfos(vmsNode.children())) {
                 final DomainInfo domainInfo = (DomainInfo) info;
                 final String name = domainInfo.getName();
                 if (domainName != null && name != null && domainName.compareTo(domainInfo.getName()) < 0) {
@@ -1400,38 +1406,41 @@ public class ClusterBrowser extends Browser {
     }
 
     @Subscribe
-    public void updateCommonNetworks(final NetInterfacesChangedEvent event) {
-        if (!cluster.getHosts().contains(event.getHost())) {
+    public void onUpdateCommonNetworks(final NetworkChangedEvent event) {
+        if (cluster != event.getCluster()) {
             return;
         }
-        if (networksNode != null) {
-            final Collection<Network> networks = networkService.getCommonNetworks(cluster);
-            treeMenuController.removeChildren(networksNode);
-            for (final Network network : networks) {
-                final NetworkPresenter networkPresenter = networkFactory.createPresenter(cluster, network);
-                treeMenuController.createMenuItem(networksNode, networkPresenter);
-            }
-            treeMenuController.reloadNode(networksNode, false);
-        }
+        updateCommonNetworks(event.getCommonNetworks());
     }
 
     @Subscribe
-    public void updateCommonBlockDevices(final BlockDevicesChangedEvent event) {
-        if (!cluster.getHosts().contains(event.getHost())) {
+    public void onUpdateCommonBlockDevices(final CommonBlockDevicesChangedEvent event) {
+        if (cluster != event.getCluster()) {
             return;
         }
-        if (commonBlockDevicesNode != null) {
-            final Collection<String> commonBlockDevices = cluster.getCommonBlockDevices();
-            treeMenuController.removeChildren(commonBlockDevicesNode);
-            for (final String commonBlockDevice : commonBlockDevices) {
-                final CommonBlockDevInfo commonBlockDevInfo = commonBlockDevInfoProvider.get();
-                commonBlockDevInfo.init(commonBlockDevice, cluster.getHostBlockDevices(commonBlockDevice), this);
-                treeMenuController.createMenuItem(commonBlockDevicesNode, commonBlockDevInfo);
+        updateCommonBlockDevices(event.getCommonBlockDevices());
+    }
 
-            }
-            treeMenuController.reloadNode(commonBlockDevicesNode, false);
-            reloadAllComboBoxes(null);
+    private void updateCommonNetworks(final Collection<Network> networks) {
+        treeMenuController.removeChildren(networksNode);
+        for (final Network network : networks) {
+            final NetworkPresenter networkPresenter = networkFactory.createPresenter(cluster, network);
+            treeMenuController.createMenuItem(networksNode, networkPresenter);
         }
+        treeMenuController.reloadNode(networksNode, false);
+    }
+
+
+    private void updateCommonBlockDevices(Collection<String> commonBlockDevices) {
+        treeMenuController.removeChildren(commonBlockDevicesNode);
+        for (final String commonBlockDevice : commonBlockDevices) {
+            final CommonBlockDevInfo commonBlockDevInfo = commonBlockDevInfoProvider.get();
+            commonBlockDevInfo.init(commonBlockDevice, cluster.getHostBlockDevices(commonBlockDevice), this);
+            treeMenuController.createMenuItem(commonBlockDevicesNode, commonBlockDevInfo);
+
+        }
+        treeMenuController.reloadNode(commonBlockDevicesNode, false);
+        reloadAllComboBoxes(null);
     }
 
     /**
@@ -2043,7 +2052,7 @@ public class ClusterBrowser extends Browser {
      */
     public DomainInfo findVMSVirtualDomainInfo(final String name) {
         if (vmsNode != null && name != null) {
-            for (final Info info : treeMenuController.nodesToInfos(vmsNode.children())) {
+            for (final Object info : treeMenuController.nodesToInfos(vmsNode.children())) {
                 final DomainInfo domainInfo = (DomainInfo) info;
                 if (name.equals(domainInfo.getName())) {
                     return domainInfo;
@@ -2092,11 +2101,11 @@ public class ClusterBrowser extends Browser {
         }
 
         if (vmsNode != null) {
-            for (final Info info : treeMenuController.nodesToInfos(vmsNode.children())) {
+            for (final Object info : treeMenuController.nodesToInfos(vmsNode.children())) {
                 final DomainInfo domainInfo = (DomainInfo) info;
                 domainInfo.checkResourceFields(null, domainInfo.getParametersFromXML());
                 domainInfo.updateAdvancedPanels();
-                for (final Info grandChild : treeMenuController.nodesToInfos(domainInfo.getNode().children())) {
+                for (final Object grandChild : treeMenuController.nodesToInfos(domainInfo.getNode().children())) {
                     final HardwareInfo hardwareInfo = (HardwareInfo) grandChild;
                     hardwareInfo.checkResourceFields(null, hardwareInfo.getParametersFromXML());
                     hardwareInfo.updateAdvancedPanels();

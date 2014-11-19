@@ -117,6 +117,6 @@ public class NetworkPresenter implements InfoPresenter {
 
     private void initModel() {
         updateNetwork();
-        model.initTable();
+        model.updateTable();
     }
 }

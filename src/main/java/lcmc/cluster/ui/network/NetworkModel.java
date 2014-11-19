@@ -20,11 +20,7 @@
 
 package lcmc.cluster.ui.network;
 
-import javafx.beans.property.Property;
-import javafx.beans.property.SimpleIntegerProperty;
-import javafx.beans.property.SimpleStringProperty;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
+import lcmc.common.domain.util.Tools;
 
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
@@ -32,9 +28,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class NetworkModel {
-    final SimpleStringProperty network = new SimpleStringProperty();
-    final SimpleStringProperty ips = new SimpleStringProperty();
-    final SimpleIntegerProperty cidr = new SimpleIntegerProperty();
+    String network;
+    String ips;
+    Integer cidr;
 
     final DefaultTableModel tableModel = new DefaultTableModel() {
         @Override
@@ -43,15 +39,14 @@ public class NetworkModel {
         }
     };
 
-    public void initTable() {
+    public void updateTable() {
         final List<Object[]> rows = new ArrayList<Object[]>();
-        rows.add(new Object[]{"Network", network.get()});
-        rows.add(new Object[]{"IPs", ips.get()});
-        rows.add(new Object[]{"CIDR", cidr.get()});
-        tableModel.setDataVector(rows.toArray(new Object[rows.size()][]), new Object[2]);
-        addTableListener(network);
-        addTableListener(cidr);
-        addTableListener(ips);
+        rows.add(new Object[]{"Network", network});
+        rows.add(new Object[]{"IPs", ips});
+        rows.add(new Object[]{"CIDR", cidr});
+        synchronized (this) {
+            tableModel.setDataVector(rows.toArray(new Object[rows.size()][]), new Object[2]);
+        }
     }
 
     public TableModel getTableModel() {
@@ -59,23 +54,23 @@ public class NetworkModel {
     }
 
     public void setNetwork(final String network) {
-        this.network.set(network);
+        if (!Tools.areEqual(this.network, network)) {
+            this.network = network;
+            updateTable();
+        }
     }
 
     public void setIps(final String ips) {
-        this.ips.set(ips);
+        if (!Tools.areEqual(this.ips, ips)) {
+            this.ips = ips;
+            updateTable();
+        }
     }
 
     public void setCidr(final Integer cidr) {
-        this.cidr.set(cidr);
-    }
-
-    private void addTableListener(final Property property) {
-        property.addListener(new ChangeListener<String>() {
-            @Override
-            public void changed(ObservableValue<? extends String> obs, String oldValue, String newValue) {
-                initTable();
-            }
-        });
+        if (!Tools.areEqual(this.cidr, cidr)) {
+            this.cidr = cidr;
+            updateTable();
+        }
     }
 }

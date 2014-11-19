@@ -1432,8 +1432,8 @@ public class ResourceInfo extends AbstractDrbdInfo {
             throw new RuntimeException("getNetInterfaces: hostBrowser is null");
         }
         if (hostBrowser.getNetInterfacesNode() != null) {
-            for (final Info netInterfaceInfo : treeMenuController.nodesToInfos(hostBrowser.getNetInterfacesNode().children())) {
-                list.add(netInterfaceInfo);
+            for (final Object netInterfaceInfo : treeMenuController.nodesToInfos(hostBrowser.getNetInterfacesNode().children())) {
+                list.add((Info) netInterfaceInfo);
             }
         }
         return list.toArray(new Value[list.size()]);
@@ -1443,12 +1443,12 @@ public class ResourceInfo extends AbstractDrbdInfo {
         final List<Value> list = new ArrayList<Value>();
 
         list.add(new StringValue());
-        for (final Info netInterfaces : treeMenuController.nodesToInfos(hostBrowser.getNetInterfacesNode().children())) {
-            list.add(netInterfaces);
+        for (final Object netInterfaces : treeMenuController.nodesToInfos(hostBrowser.getNetInterfacesNode().children())) {
+            list.add((Info) netInterfaces);
         }
 
         /* the same host */
-        for (final Info info: treeMenuController.nodesToInfos(hostBrowser.getNetInterfacesNode().children())) {
+        for (final Object info: treeMenuController.nodesToInfos(hostBrowser.getNetInterfacesNode().children())) {
             final NetInfo netInfo = (NetInfo) info;
             final ProxyNetInfo proxyNetInfo = proxyNetInfoProvider.get();
             proxyNetInfo.init(netInfo, hostBrowser, hostBrowser.getHost());
@@ -1460,7 +1460,7 @@ public class ResourceInfo extends AbstractDrbdInfo {
             if (h == hostBrowser.getHost()) {
                 continue;
             }
-            for (final Info info :  treeMenuController.nodesToInfos(hostBrowser.getNetInterfacesNode().children())) {
+            for (final Object info :  treeMenuController.nodesToInfos(hostBrowser.getNetInterfacesNode().children())) {
                 final NetInfo netInfo = (NetInfo) info;
                 if (netInfo.isLocalHost()) {
                     continue;
