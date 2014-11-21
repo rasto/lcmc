@@ -101,8 +101,9 @@ final class IPaddrInfo extends ServiceInfo {
             @SuppressWarnings("unchecked")
             final Collection<Network> networks = networkService.getCommonNetworks(getBrowser().getCluster());
 
-            final Value[] networkValues = new Value[networks.size()];
-            int i = 0;
+            final Value[] networkValues = new Value[networks.size() + 1];
+            networkValues[0] = defaultValue;
+            int i = 1;
             for (final Network network : networks) {
                 networkValues[i] = new StringValue(network.getName());
                 i++;
