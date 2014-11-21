@@ -1433,11 +1433,11 @@ public final class CrmXml extends XML {
      * is called in the cluster manager and value how it is stored in the GUI.
      */
     public Map<String, String> getRscDefaultsParameters() {
-        if (host == null || resourceDefaultsMetaAttrs != null) {
+        if (resourceDefaultsMetaAttrs != null) {
             return resourceDefaultsMetaAttrs;
         }
         resourceDefaultsMetaAttrs = new LinkedHashMap<String, String>();
-        if (Tools.versionBeforePacemaker(host)) {
+        if (host == null || Tools.versionBeforePacemaker(host)) {
             /* no rsc defaults in older versions. */
             return resourceDefaultsMetaAttrs;
         }
