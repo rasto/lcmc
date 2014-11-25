@@ -1100,10 +1100,11 @@ sub get_resource_status {
 	my %unmanaged;
 	my %resources;
 	my @fenced_nodes;
+	my $crm_simulate_prog = "/usr/sbin/crm_simulate";
 	my $prog = "crm_simulate -s -S -VVVVV -L 2>&1";
 	my $errors = ""; # TODO: error handling
 	my $ptest_prog = "/usr/sbin/ptest";
-	if (-e $ptest_prog) {
+	if (!-e $crm_simulate_prog && -e $ptest_prog) {
 		if ($hb_version
 		    && (compare_versions($hb_version, "2.1.4") <= 0)) {
 			$prog = "$ptest_prog -S -VVVVV -L 2>&1";
@@ -1113,7 +1114,7 @@ sub get_resource_status {
 		# default, because crm_simulate
 		# crashes sometimes
 		# older ptest versions don't have -s option
-	} elsif (!-e $prog) {
+	} elsif (!-e $ptest_prog) {
 		$errors .= "could not find $prog\n";
 	}
 	my %allocation_scores;
