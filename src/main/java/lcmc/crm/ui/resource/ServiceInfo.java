@@ -3098,10 +3098,10 @@ public class ServiceInfo extends EditableInfo {
                     }
                 }
             }
-            String command = "-C";
+            String command = CRM.CIB_OP_CREATE;
             if ((gInfo != null && !gInfo.getService().isNew())
                 || (clInfo != null && !clInfo.getService().isNew())) {
-                command = "-U";
+                command = CRM.CIB_OP_MODIFY;
             }
             CRM.setParameters(dcHost,
                               command,
@@ -3227,7 +3227,7 @@ public class ServiceInfo extends EditableInfo {
             //changed.
             final ClusterStatus cs = getBrowser().getClusterStatus();
             CRM.setParameters(dcHost,
-                              "-R",
+                              CRM.CIB_OP_REPLACE,
                               heartbeatId,
                               cloneId,
                               master,

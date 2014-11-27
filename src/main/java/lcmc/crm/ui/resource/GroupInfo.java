@@ -331,7 +331,7 @@ public class GroupInfo extends ServiceInfo {
                 }
             }
             CRM.setParameters(dcHost,
-                              "-R",
+                              CRM.CIB_OP_REPLACE,
                               null,  /* crm id */
                               null,  /* TODO: clone id */
                               false, /* master */

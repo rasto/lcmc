@@ -50,6 +50,9 @@ import lcmc.cluster.service.ssh.SshOutput;
  */
 public final class CRM {
     private static final Logger LOG = LoggerFactory.getLogger(CRM.class);
+    public static final String CIB_OP_MODIFY = "-M";
+    public static final String CIB_OP_CREATE = "-C";
+    public static final String CIB_OP_REPLACE = "-R";
     /** Output of the ptest. */
     private static volatile String ptestOutput = null;
     private static final ReadWriteLock M_PTEST_LOCK = new ReentrantReadWriteLock();
@@ -417,9 +420,9 @@ public final class CRM {
 
         final String cibadminOpt;
         if (createGroup) {
-            cibadminOpt = "-C";
+            cibadminOpt = CIB_OP_CREATE;
         } else {
-            cibadminOpt = "-R";
+            cibadminOpt = CIB_OP_REPLACE;
         }
 
         final SshOutput ret = execCommand(host, getCibCommand(cibadminOpt, "resources", xml.toString()), runMode);
@@ -505,9 +508,9 @@ public final class CRM {
             }
             final String cibadminOpt;
             if (createCol) {
-                cibadminOpt = "-C";
+                cibadminOpt = CIB_OP_CREATE;
             } else {
-                cibadminOpt = "-R";
+                cibadminOpt = CIB_OP_REPLACE;
             }
             final boolean ret = setRscSetConstraint(host, "rsc_colocation",
                                                     colId,
@@ -525,9 +528,9 @@ public final class CRM {
             }
             final String cibadminOpt;
             if (createOrd) {
-                cibadminOpt = "-C";
+                cibadminOpt = CIB_OP_CREATE;
             } else {
-                cibadminOpt = "-R";
+                cibadminOpt = CIB_OP_REPLACE;
             }
             return setRscSetConstraint(host,
                                        "rsc_order",
@@ -647,16 +650,16 @@ public final class CRM {
                                       final HostLocation hostLocation,
                                       String locationId,
                                       final Application.RunMode runMode) {
-        String command = "-U";
+        String command = CIB_OP_MODIFY;
         if (locationId == null) {
             locationId = "loc_" + resId + '_' + onHost;
-            command = "-C";
+            command = CIB_OP_CREATE;
         } else if ("migration".equals(locationId)) {
             locationId = "cli-standby-" + resId;
-            command = "-C";
+            command = CIB_OP_CREATE;
         } else if ("remigration".equals(locationId)) {
             locationId = "cli-standby-" + resId;
-            command = "-U";
+            command = CIB_OP_MODIFY;
         }
         String score = null;
         String op = null;
@@ -691,10 +694,10 @@ public final class CRM {
             value = "0";
             idPart = "exclude";
         }
-        String command = "-U";
+        String command = CIB_OP_MODIFY;
         if (locationId == null) {
             locationId = "loc_" + resId + "-ping-" + idPart;
-            command = "-C";
+            command = CIB_OP_CREATE;
         }
         final String attribute = "pingd";
         final String xml = getLocationXML(resId, value, attribute, score, scoreAttribute, op, null, locationId);
@@ -951,12 +954,12 @@ public final class CRM {
             xml.append("</attributes>");
         }
         xml.append("</cluster_property_set></crm_config>'");
-        final StringBuilder command = new StringBuilder(getCibCommand("-R", "crm_config", xml.toString()));
+        final StringBuilder command = new StringBuilder(getCibCommand(CIB_OP_REPLACE, "crm_config", xml.toString()));
         if (rdiMetaArgs != null && !Tools.versionBeforePacemaker(host)) {
-            String updateOrReplace = "-R";
+            String updateOrReplace = CIB_OP_REPLACE;
             if (rscDefaultsId == null) {
                 rscDefaultsId = "rsc-options";
-                updateOrReplace = "-U";
+                updateOrReplace = CIB_OP_MODIFY;
             }
             final StringBuilder rscdXML = new StringBuilder(360);
             rscdXML.append("'<rsc_defaults><meta_attributes id=\"");
@@ -1004,14 +1007,14 @@ public final class CRM {
         final String colocationId;
         final String cibadminOpt;
         if (colId == null) {
-            cibadminOpt = "-C"; /* create */
+            cibadminOpt = CIB_OP_CREATE;
             if (parentHbId.compareTo(resId) < 0) {
                 colocationId = "col_" + resId + '_' + parentHbId;
             } else {
                 colocationId = "col_" + parentHbId + '_' + resId;
             }
         } else {
-            cibadminOpt = "-R"; /* replace */
+            cibadminOpt = CIB_OP_REPLACE;
             colocationId = colId;
         }
         if (attrs == null) {
@@ -1066,10 +1069,10 @@ public final class CRM {
         final String orderId;
         final String cibadminOpt;
         if (ordId == null) {
-            cibadminOpt = "-C"; /* create */
+            cibadminOpt = CIB_OP_CREATE;
             orderId = "ord_" + parentHbId + '_' + resId;
         } else {
-            cibadminOpt = "-R"; /* replace */
+            cibadminOpt = CIB_OP_REPLACE;
             orderId = ordId;
         }
         if (attrs == null) {
