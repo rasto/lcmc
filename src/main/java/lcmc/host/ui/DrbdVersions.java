@@ -57,12 +57,7 @@ public class DrbdVersions implements Value {
 
     @Override
     public String getValueForGui() {
-        final StringBuilder value = new StringBuilder(moduleVersion);
-        if (utilVersion != null) {
-            value.append('/');
-            value.append(utilVersion);
-        }
-        return value.toString();
+        return getValueForConfig();
     }
 
     @Override
@@ -72,7 +67,12 @@ public class DrbdVersions implements Value {
 
     @Override
     public String getValueForConfig() {
-        return null;
+        final StringBuilder value = new StringBuilder(moduleVersion);
+        if (utilVersion != null) {
+            value.append('/');
+            value.append(utilVersion);
+        }
+        return value.toString();
     }
 
     @Override

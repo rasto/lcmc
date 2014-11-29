@@ -930,12 +930,12 @@ public final class Tools {
         }
     }
 
-    public static  boolean areEqual(final Value v1, final Value v2) {
+    public static boolean areEqual(final Value v1, final Value v2) {
         if (v1 != null) {
             if (v2 == null) {
                 return v1.isNothingSelected();
             } else {
-                return v1.equals(v2);
+                return Tools.areEqual(v1.getValueForConfig(), v2.getValueForConfig());
             }
         } else if (v2 == null) {
             return true;
