@@ -1810,7 +1810,10 @@ public final class CrmXml extends XML {
                     final Node contentParamNode = getChildNode(parameterNode, "content");
                     if (contentParamNode != null) {
                         final String type = getAttribute(contentParamNode, "type");
-                        final String dv = getAttribute(contentParamNode, "default");
+                        String dv = getAttribute(contentParamNode, "default");
+                        if ("(null)".equals(dv)) {
+                            dv = null;
+                        }
                         globalTypeMap.put(param, type);
                         if (!"expected-quorum-votes".equals(param)) {
                             final Value defaultValue;
