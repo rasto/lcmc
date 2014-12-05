@@ -248,6 +248,7 @@ public class HostBrowser extends Browser {
                 final BlockDevInfo blockDevInfo;
                 if (oldBlockDevices.containsKey(blockDevice)) {
                     blockDevInfo = oldBlockDevices.get(blockDevice);
+                    ((BlockDevice) blockDevInfo.getResource()).updateFrom(blockDevice);
                     blockDevInfo.updateInfo();
                 } else {
                     changed = true;
