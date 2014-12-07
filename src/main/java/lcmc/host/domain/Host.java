@@ -1704,11 +1704,11 @@ public class Host implements Comparable<Host>, Value {
         }
 
         if (changedTypes.contains(DISK_INFO_DELIM)) {
-            hwEventBus.post(new HwBlockDevicesChangedEvent(this, newBlockDevices.values()));
             drbdBlockDevices = newDrbdBlockDevices;
             physicalVolumes = newPhysicalVolumes;
             volumeGroupsWithLvs = newVolumeGroupsLVS;
         }
+
         if (changedTypes.contains(DISK_SPACE_DELIM)) {
             hwEventBus.post(new HwBlockDevicesDiskSpaceEvent(this, diskSpaces));
         }
@@ -1751,6 +1751,10 @@ public class Host implements Comparable<Host>, Value {
 
         if (changedTypes.contains(DRBD_PROXY_INFO_DELIM)) {
             drbdResourcesWithProxy = newDrbdResProxy;
+        }
+
+        if (changedTypes.contains(DISK_INFO_DELIM) || changedTypes.contains(VG_INFO_DELIM)) {
+            hwEventBus.post(new HwBlockDevicesChangedEvent(this, newBlockDevices.values()));
         }
 
         getBrowser().updateHWResources(

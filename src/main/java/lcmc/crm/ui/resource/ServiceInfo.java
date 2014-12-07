@@ -1216,44 +1216,6 @@ public class ServiceInfo extends EditableInfo {
         return getBrowser().globalGetAddServiceList(cl);
     }
 
-    /**
-     * Returns info object of all block devices on all hosts that have the
-     * same names and other attributes.
-     */
-    Value[] getCommonBlockDevInfos(final Value defaultValue, final String serviceName) {
-        final List<Value> list = new ArrayList<Value>();
-
-        /* drbd resources */
-        @SuppressWarnings("unchecked")
-        final Enumeration<DefaultMutableTreeNode> drbdResources = getBrowser().getDrbdNode().children();
-
-        if (defaultValue != null) {
-            list.add(defaultValue);
-        }
-        for (final Info drbdRes : treeMenuController.nodesToInfos(drbdResources)) {
-            if (!(drbdRes instanceof ResourceInfo)) {
-                continue;
-            }
-            final DefaultMutableTreeNode drbdResNode = drbdRes.getNode();
-            if (drbdResNode != null) {
-                @SuppressWarnings("unchecked")
-                final Enumeration<DefaultMutableTreeNode> drbdVolumes = drbdResNode.children();
-                for (final Value drbdVol : treeMenuController.nodesToInfos(drbdVolumes)) {
-                    list.add(drbdVol);
-                }
-            }
-        }
-
-        /* block devices that are the same on all hosts */
-        @SuppressWarnings("unchecked")
-        final Enumeration<DefaultMutableTreeNode> commonBlockDevices = getBrowser().getCommonBlockDevicesNode().children();
-        for (Value commonBlockDevice : treeMenuController.nodesToInfos(commonBlockDevices)) {
-            list.add(commonBlockDevice);
-        }
-
-        return list.toArray(new Value[list.size()]);
-    }
-
     protected void addCloneFields(
             final JPanel optionsPanel,
             final int leftWidth,

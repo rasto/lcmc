@@ -22,6 +22,7 @@
 package lcmc.crm.ui.resource;
 
 import java.util.ArrayList;
+import java.util.Enumeration;
 import java.util.List;
 import java.util.Set;
 
@@ -30,11 +31,14 @@ import com.google.common.eventbus.Subscribe;
 import lcmc.ClusterEventBus;
 import lcmc.cluster.service.BlockDeviceService;
 import lcmc.common.ui.Browser;
+import lcmc.common.ui.treemenu.TreeMenuController;
 import lcmc.configs.DistResource;
 import lcmc.common.domain.AccessMode;
 import lcmc.common.domain.Application;
 import lcmc.crm.domain.ResourceAgent;
 import lcmc.crm.service.Openais;
+import lcmc.drbd.ui.resource.ResourceInfo;
+import lcmc.event.CommonBlockDevicesChangedEvent;
 import lcmc.event.CommonMountPointsEvent;
 import lcmc.host.domain.Host;
 import lcmc.common.domain.StringValue;
@@ -52,6 +56,7 @@ import lcmc.cluster.service.ssh.SshOutput;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.swing.tree.DefaultMutableTreeNode;
 
 /**
  * This class holds info about Filesystem service. It is treated in special
@@ -77,6 +82,8 @@ public final class FilesystemRaInfo extends ServiceInfo {
     private BlockDeviceService blockDeviceService;
     @Inject
     private ClusterEventBus clusterEventBus;
+    @Inject
+    private TreeMenuController treeMenuController;
 
     @Override
     public void init(final String name, final ResourceAgent resourceAgent, final Browser browser) {
@@ -207,27 +214,10 @@ public final class FilesystemRaInfo extends ServiceInfo {
     protected Widget createWidget(final String param, final String prefix, final int width) {
         final Widget paramWi;
         if (FS_RES_PARAM_DEV.equals(param)) {
-            Value selectedValue = getPreviouslySelected(param, prefix);
-            if (selectedValue == null) {
-                selectedValue = getParamSaved(param);
-            }
-            final VolumeInfo selectedInfo = getBrowser().getDrbdVolumeFromDev(selectedValue.getValueForConfig());
-            if (selectedInfo != null) {
-                selectedValue = selectedInfo;
-            }
-            Value defaultValue = null;
-            if (selectedValue.isNothingSelected()) {
-                defaultValue =  new StringValue() {
-                                   @Override
-                                   public String getNothingSelected() {
-                                       return Tools.getString("ClusterBrowser.SelectBlockDevice");
-                                   }
-                               };
-            }
-            final Value[] commonBlockDevInfos = getCommonBlockDevInfos(defaultValue, getName());
+            final Value[] commonBlockDevInfos = getCommonBlockDevices(prefix);
             blockDeviceParamWidget = widgetFactory.createInstance(
                                    Widget.GUESS_TYPE,
-                                   selectedValue,
+                                   commonBlockDevInfos[0],
                                    commonBlockDevInfos,
                                    Widget.NO_REGEXP,
                                    width,
@@ -432,27 +422,9 @@ public final class FilesystemRaInfo extends ServiceInfo {
         this.drbddiskIsPreferred = drbddiskIsPreferred;
     }
 
-    @Override
-    public void reloadComboBoxes() {
-        super.reloadComboBoxes();
-        final VolumeInfo selectedInfo = getBrowser().getDrbdVolumeFromDev(
-                                                          getParamSaved(FS_RES_PARAM_DEV).getValueForConfig());
-        final Value selectedValue;
-        if (selectedInfo == null) {
-            selectedValue = getParamSaved(FS_RES_PARAM_DEV);
-        } else {
-            selectedValue = selectedInfo;
-        }
-        Value defaultValue = null;
-        if (selectedValue == null || selectedValue.isNothingSelected()) {
-            defaultValue = new StringValue() {
-                              @Override
-                              public String getNothingSelected() {
-                                  return Tools.getString("ClusterBrowser.SelectBlockDevice");
-                              }
-                          };
-        }
-        final Value[] commonBlockDevInfos = getCommonBlockDevInfos(defaultValue, getName());
+    @Subscribe
+    public void onCommonBlockDevicesChanged(final CommonBlockDevicesChangedEvent event) {
+        final Value[] commonBlockDevInfos = getCommonBlockDevices(null);
         if (blockDeviceParamWidget != null) {
             final Value value = blockDeviceParamWidget.getValue();
             blockDeviceParamWidget.reloadComboBox(value, commonBlockDevInfos);
@@ -488,6 +460,66 @@ public final class FilesystemRaInfo extends ServiceInfo {
             i++;
         }
         return items;
+    }
+
+    private Value[] getCommonBlockDevices(final String prefix) {
+        Value selectedValue = getPreviouslySelected(FS_RES_PARAM_DEV, prefix);
+        if (selectedValue == null) {
+            selectedValue = getParamSaved(FS_RES_PARAM_DEV);
+        }
+        final VolumeInfo selectedInfo = getBrowser().getDrbdVolumeFromDev(selectedValue.getValueForConfig());
+        if (selectedInfo != null) {
+            selectedValue = selectedInfo;
+        }
+        Value defaultValue = null;
+        if (selectedValue.isNothingSelected()) {
+            defaultValue =  new StringValue() {
+                @Override
+                public String getNothingSelected() {
+                    return Tools.getString("ClusterBrowser.SelectBlockDevice");
+                }
+            };
+        }
+        final Value[] commonBlockDevInfos = getCommonBlockDevInfos(defaultValue, getName());
+        return commonBlockDevInfos;
+    }
+
+    /**
+     * Returns info object of all block devices on all hosts that have the
+     * same names and other attributes.
+     */
+    private Value[] getCommonBlockDevInfos(final Value defaultValue, final String serviceName) {
+        final List<Value> list = new ArrayList<Value>();
+
+        /* drbd resources */
+        @SuppressWarnings("unchecked")
+        final Enumeration<DefaultMutableTreeNode> drbdResources = getBrowser().getDrbdNode().children();
+
+        if (defaultValue != null) {
+            list.add(defaultValue);
+        }
+        for (final Info drbdRes : treeMenuController.nodesToInfos(drbdResources)) {
+            if (!(drbdRes instanceof ResourceInfo)) {
+                continue;
+            }
+            final DefaultMutableTreeNode drbdResNode = drbdRes.getNode();
+            if (drbdResNode != null) {
+                @SuppressWarnings("unchecked")
+                final Enumeration<DefaultMutableTreeNode> drbdVolumes = drbdResNode.children();
+                for (final Value drbdVol : treeMenuController.nodesToInfos(drbdVolumes)) {
+                    list.add(drbdVol);
+                }
+            }
+        }
+
+        /* block devices that are the same on all hosts */
+        @SuppressWarnings("unchecked")
+        final Enumeration<DefaultMutableTreeNode> commonBlockDevices = getBrowser().getCommonBlockDevicesNode().children();
+        for (Value commonBlockDevice : treeMenuController.nodesToInfos(commonBlockDevices)) {
+            list.add(commonBlockDevice);
+        }
+
+        return list.toArray(new Value[list.size()]);
     }
 }
 
