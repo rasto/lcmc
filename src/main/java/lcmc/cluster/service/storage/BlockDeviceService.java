@@ -18,7 +18,7 @@
  * the Free Software Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-package lcmc.cluster.service;
+package lcmc.cluster.service.storage;
 
 import com.google.common.base.Optional;
 import com.google.common.eventbus.Subscribe;

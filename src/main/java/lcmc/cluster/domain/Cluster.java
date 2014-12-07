@@ -39,7 +39,7 @@ import lcmc.drbd.domain.BlockDevice;
 import lcmc.cluster.ui.ClusterBrowser;
 import lcmc.cluster.ui.ClusterTab;
 import lcmc.cluster.ui.SSHGui;
-import lcmc.cluster.service.BlockDeviceService;
+import lcmc.cluster.service.storage.BlockDeviceService;
 import lcmc.cluster.service.NetworkService;
 import lcmc.logger.Logger;
 import lcmc.logger.LoggerFactory;

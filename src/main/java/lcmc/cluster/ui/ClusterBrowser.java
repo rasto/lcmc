@@ -69,7 +69,7 @@ import lcmc.drbd.domain.DrbdXml;
 import lcmc.drbd.ui.DrbdGraph;
 import lcmc.event.CommonBlockDevicesChangedEvent;
 import lcmc.event.NetworkChangedEvent;
-import lcmc.cluster.service.BlockDeviceService;
+import lcmc.cluster.service.storage.BlockDeviceService;
 import lcmc.cluster.service.NetworkService;
 import lcmc.host.ui.HostBrowser;
 import lcmc.host.domain.Host;

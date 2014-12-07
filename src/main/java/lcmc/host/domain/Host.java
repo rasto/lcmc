@@ -61,7 +61,7 @@ import lcmc.event.HwBridgesChangedEvent;
 import lcmc.event.HwDrbdStatusChangedEvent;
 import lcmc.event.HwMountPointsChangedEvent;
 import lcmc.event.HwNetInterfacesChangedEvent;
-import lcmc.cluster.service.BlockDeviceService;
+import lcmc.cluster.service.storage.BlockDeviceService;
 import lcmc.cluster.service.NetworkService;
 import lcmc.host.ui.HostBrowser;
 import lcmc.common.ui.ProgressBar;
@@ -1688,12 +1688,12 @@ public class Host implements Comparable<Host>, Value {
         }
 
         LOG.debug1("parseHostInfo: "
-                   + getName()
-                   + ", pacemaker: "   + pacemakerVersion
-                   + ", corosync: "    + corosyncVersion
-                   + ", heartbeat: "   + heartbeatVersion
-                   + ", drbd: "        + drbdHost.getDrbdUtilVersion()
-                   + ", drbd module: " + drbdHost.getDrbdModuleVersion());
+                + getName()
+                + ", pacemaker: " + pacemakerVersion
+                + ", corosync: " + corosyncVersion
+                + ", heartbeat: " + heartbeatVersion
+                + ", drbd: " + drbdHost.getDrbdUtilVersion()
+                + ", drbd module: " + drbdHost.getDrbdModuleVersion());
 
         if (changedTypes.contains(NET_INFO_DELIM)) {
             hwEventBus.post(new HwNetInterfacesChangedEvent(this, newNetInterfaces));

@@ -53,7 +53,7 @@ import lcmc.common.ui.MainMenu;
 import lcmc.common.domain.Application;
 import lcmc.common.ui.MainPanel;
 import lcmc.common.ui.ProgressIndicatorPanel;
-import lcmc.cluster.service.BlockDeviceService;
+import lcmc.cluster.service.storage.BlockDeviceService;
 import lcmc.cluster.service.NetworkService;
 import lcmc.logger.Logger;
 import lcmc.logger.LoggerFactory;
