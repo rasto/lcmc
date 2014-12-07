@@ -58,8 +58,7 @@ public class ClusterViewPanel extends ViewPanel implements AllHostsUpdatable {
     /** This is called when there was added a new host. */
     @Override
     public void allHostsUpdate() {
-        cluster.getBrowser().updateClusterResources(cluster.getHostsArray(),
-                                                    cluster.getCommonFileSystems());
+        cluster.getBrowser().updateClusterResources(cluster.getHostsArray());
     }
 
     Cluster getCluster() {

@@ -79,6 +79,7 @@ import javax.swing.text.html.HTMLDocument;
 import com.google.common.base.Optional;
 import lcmc.Exceptions;
 import lcmc.common.domain.ConvertCmdCallback;
+import lcmc.common.domain.StringValue;
 import lcmc.configs.DistResource;
 import lcmc.cluster.domain.Cluster;
 import lcmc.host.domain.Host;
@@ -1434,6 +1435,22 @@ public final class Tools {
             }
         }
         return true;
+    }
+
+    /**
+     * Returns common file systems on all nodes as StringValue array.
+     * The defaultValue is stored as the first item in the array.
+     */
+    public static Value[] getCommonFileSystemsWithDefault(final Set<String> commonFileSystems, final Value defaultValue) {
+        final Value[] commonFileSystemItems =  new Value[commonFileSystems.size() + 2];
+        commonFileSystemItems[0] = defaultValue;
+        int i = 1;
+        for (final String commonFileSystem : commonFileSystems) {
+            commonFileSystemItems[i] = new StringValue(commonFileSystem);
+            i++;
+        }
+        commonFileSystemItems[i] = new StringValue("none");
+        return commonFileSystemItems;
     }
 
     private Tools() {

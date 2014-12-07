@@ -52,6 +52,8 @@ import lcmc.common.ui.GUIData;
 import lcmc.common.ui.treemenu.TreeMenuController;
 import lcmc.drbd.ui.DrbdGraph;
 import lcmc.event.BlockDevicesChangedEvent;
+import lcmc.event.CommonFileSystemsChangedEvent;
+import lcmc.event.FileSystemsChangedEvent;
 import lcmc.event.HwBlockDevicesChangedEvent;
 import lcmc.event.HwNetInterfacesChangedEvent;
 import lcmc.event.NetInterfacesChangedEvent;
@@ -205,24 +207,26 @@ public class HostBrowser extends Browser {
         return c.getBrowser();
     }
 
-    public void updateHWResources(
-            final String[] fileSystems) {
-        /* file systems */
+    @Subscribe
+    public void updateFileSystemsNode(final FileSystemsChangedEvent event) {
+        if (event.getHost() != host) {
+            return;
+        }
+        final Set<String> fileSystems = event.getFileSystems();
+        final Map<String, FSInfo> oldFileSystems = getFilesystemsMap();
         final HostBrowser thisClass = this;
-        final Map<String, FSInfo> oldFilesystems = getFilesystemsMap();
         mFileSystemsWriteLock.lock();
         try {
             treeMenuController.removeChildren(fileSystemsNode);
-            for (final String fs : fileSystems) {
-                final FSInfo fsi;
-                if (oldFilesystems.containsKey(fs)) {
-                    fsi = oldFilesystems.get(fs);
+            for (final String fileSystem : fileSystems) {
+                final FSInfo fileSystemInfo;
+                if (oldFileSystems.containsKey(fileSystem)) {
+                    fileSystemInfo = oldFileSystems.get(fileSystem);
                 } else {
-
-                    fsi = fsInfoProvider.get();
-                    fsi.init(fs, thisClass);
+                    fileSystemInfo = fsInfoProvider.get();
+                    fileSystemInfo.init(fileSystem, thisClass);
                 }
-                treeMenuController.addChild(fileSystemsNode,  treeMenuController.createMenuItem(fsi));
+                treeMenuController.createMenuItem(fileSystemsNode, fileSystemInfo);
             }
             treeMenuController.reloadNode(fileSystemsNode, false);
         } finally {

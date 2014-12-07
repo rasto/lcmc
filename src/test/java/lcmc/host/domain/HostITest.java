@@ -31,6 +31,7 @@ import java.util.Set;
 import lcmc.AppContext;
 import lcmc.cluster.domain.Cluster;
 import lcmc.cluster.service.NetworkService;
+import lcmc.cluster.service.storage.FileSystemService;
 import lcmc.testutils.IntegrationTestLauncher;
 import lcmc.testutils.annotation.type.IntegrationTest;
 import lcmc.common.domain.util.Tools;
@@ -47,12 +48,14 @@ import org.junit.experimental.categories.Category;
 public final class HostITest {
     private IntegrationTestLauncher integrationTestLauncher;
     private NetworkService networkService;
+    private FileSystemService fileSystemService;
 
     @Before
     public void setUp() {
         integrationTestLauncher = AppContext.getBean(IntegrationTestLauncher.class);
         integrationTestLauncher.initTestCluster();
         networkService = integrationTestLauncher.getNetworkService();
+        fileSystemService = integrationTestLauncher.getFileSystemService();
     }
 
     @Test
@@ -168,11 +171,11 @@ public final class HostITest {
     @Test
     public void testGetFileSystems() {
         for (final Host host : integrationTestLauncher.getHosts()) {
-            assertTrue(host.getAvailableFileSystems().length > 0);
-            assertTrue(noValueIsNull(host.getAvailableFileSystems()));
+            assertTrue(fileSystemService.getFileSystems(host).size() > 0);
+            assertTrue(noValueIsNull(fileSystemService.getFileSystems(host)));
 
-            assertTrue(host.getFileSystemsList().size() > 0);
-            assertTrue(noValueIsNull(host.getFileSystemsList()));
+            assertTrue(fileSystemService.getFileSystems(host).size() > 0);
+            assertTrue(noValueIsNull(fileSystemService.getFileSystems(host)));
         }
     }
 

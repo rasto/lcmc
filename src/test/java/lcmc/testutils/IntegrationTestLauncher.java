@@ -29,6 +29,7 @@ import java.util.Collections;
 import java.util.List;
 
 import lcmc.LCMC;
+import lcmc.cluster.service.storage.FileSystemService;
 import lcmc.common.ui.GUIData;
 import lcmc.common.ui.ProgressIndicatorPanel;
 import lcmc.common.domain.Application;
@@ -76,6 +77,8 @@ public class IntegrationTestLauncher {
     private ClusterTabFactory clusterTabFactory;
     @Inject
     private NetworkService networkService;
+    @Inject
+    private FileSystemService fileSystemService;
 
     public void initTestCluster() {
         initCluster();
@@ -204,6 +207,10 @@ public class IntegrationTestLauncher {
             timeoutLeft -= interval;
         }
         return timeoutLeft >= 0;
+    }
+
+    public FileSystemService getFileSystemService() {
+        return fileSystemService;
     }
 
     /** Specify a condition to be passed to the waitForCondition function. */

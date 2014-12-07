@@ -59,6 +59,7 @@ import lcmc.event.HwBlockDevicesChangedEvent;
 import lcmc.event.HwBlockDevicesDiskSpaceEvent;
 import lcmc.event.HwBridgesChangedEvent;
 import lcmc.event.HwDrbdStatusChangedEvent;
+import lcmc.event.HwFileSystemsChangedEvent;
 import lcmc.event.HwMountPointsChangedEvent;
 import lcmc.event.HwNetInterfacesChangedEvent;
 import lcmc.cluster.service.storage.BlockDeviceService;
@@ -181,7 +182,6 @@ public class Host implements Comparable<Host>, Value {
     private String distributionVersionString = "";
     private String kernelVersion = "";
     private String arch = "";
-    private Set<String> availableFileSystems = new TreeSet<String>();
     private Set<String> availableCryptoModules = new TreeSet<String>();
     private Set<Value> availableQemuKeymaps = new TreeSet<Value>();
     private Set<Value> availableCpuMapModels = new TreeSet<Value>();
@@ -452,18 +452,6 @@ public class Host implements Comparable<Host>, Value {
 
     public void setIps(final int hop, final String[] ipsForHop) {
         allIps.put(hop, ipsForHop);
-    }
-
-    public void removeFileSystems() {
-        availableFileSystems.clear();
-    }
-
-    public String[] getAvailableFileSystems() {
-        return availableFileSystems.toArray(new String[availableFileSystems.size()]);
-    }
-
-    public Set<String> getFileSystemsList() {
-        return availableFileSystems;
     }
 
     public Set<String> getAvailableCryptoModules() {
@@ -1546,7 +1534,7 @@ public class Host implements Comparable<Host>, Value {
         final Map<String, Long> newVolumeGroups = new LinkedHashMap<String, Long>();
         final Map<String, Set<String>> newVolumeGroupsLVS = new HashMap<String, Set<String>>();
         final List<BlockDevice> newPhysicalVolumes = new ArrayList<BlockDevice>();
-        final Set<String> newFileSystems = new TreeSet<String>();
+        final Set<String> fileSystems = new TreeSet<String>();
         final Set<String> newCryptoModules = new TreeSet<String>();
         final Set<Value> newQemuKeymaps = new TreeSet<Value>();
         final Set<Value> newCpuMapModels = new TreeSet<Value>();
@@ -1641,7 +1629,7 @@ public class Host implements Comparable<Host>, Value {
                     LOG.appWarning("parseHostInfo: could not parse volume info: " + line);
                 }
             } else if ("filesystems-info".equals(type)) {
-                newFileSystems.add(line);
+                fileSystems.add(line);
             } else if ("crypto-info".equals(type)) {
                 newCryptoModules.add(line);
             } else if ("qemu-keymaps-info".equals(type)) {
@@ -1718,7 +1706,7 @@ public class Host implements Comparable<Host>, Value {
         }
 
         if (changedTypes.contains(FILESYSTEMS_INFO_DELIM)) {
-            availableFileSystems = newFileSystems;
+            hwEventBus.post(new HwFileSystemsChangedEvent(this, fileSystems));
         }
 
         if (changedTypes.contains(CRYPTO_INFO_DELIM)) {
@@ -1756,9 +1744,6 @@ public class Host implements Comparable<Host>, Value {
         if (changedTypes.contains(DISK_INFO_DELIM) || changedTypes.contains(VG_INFO_DELIM)) {
             hwEventBus.post(new HwBlockDevicesChangedEvent(this, newBlockDevices.values()));
         }
-
-        getBrowser().updateHWResources(
-                getAvailableFileSystems());
     }
 
     /** Parses the gui info, with drbd and heartbeat graph positions. */

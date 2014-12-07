@@ -621,11 +621,6 @@ public class ResourceInfo extends AbstractDrbdInfo {
         return "drbd: " + name;
     }
 
-    /** Returns common file systems. */
-    public Value[] getCommonFileSystems(final Value defaultValue) {
-        return getBrowser().getCommonFileSystems(defaultValue);
-    }
-
     /** Returns whether the specified host has this drbd resource. */
     boolean resourceInHost(final Host host) {
         for (final VolumeInfo dvi : drbdVolumes) {

@@ -186,14 +186,6 @@ public class Cluster implements Comparable<Cluster> {
         return false;
     }
 
-    public String[] getCommonFileSystems() {
-        Set<String> intersection = null;
-        for (final Host host : hosts) {
-            intersection = Tools.getIntersection(host.getFileSystemsList(), intersection);
-        }
-        return intersection.toArray(new String[intersection.size()]);
-    }
-
     public List<Color> getHostColorsInGraphs(final Collection<String> nodes) {
         final List<Color> colors = new ArrayList<Color>();
         if (nodes == null || nodes.isEmpty()) {

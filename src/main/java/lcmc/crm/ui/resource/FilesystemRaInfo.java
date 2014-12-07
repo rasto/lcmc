@@ -24,12 +24,14 @@ package lcmc.crm.ui.resource;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import com.google.common.base.Optional;
 import com.google.common.eventbus.Subscribe;
 import lcmc.ClusterEventBus;
 import lcmc.cluster.service.storage.BlockDeviceService;
+import lcmc.cluster.service.storage.FileSystemService;
 import lcmc.cluster.service.storage.MountPointService;
 import lcmc.common.ui.Browser;
 import lcmc.common.ui.treemenu.TreeMenuController;
@@ -68,6 +70,7 @@ public final class FilesystemRaInfo extends ServiceInfo {
     /** Name of the device parameter in the file system. */
     private static final String FS_RES_PARAM_DEV = "device";
     private static final String FS_RES_PARAM_DIRECTORY = "directory";
+    private static final String FS_RES_PARAM_FS_TYPE = "fstype";
     private LinbitDrbdInfo linbitDrbdInfo = null;
     private DrbddiskInfo drbddiskInfo = null;
     private Widget blockDeviceParamWidget = null;
@@ -86,10 +89,23 @@ public final class FilesystemRaInfo extends ServiceInfo {
     private ClusterEventBus clusterEventBus;
     @Inject
     private TreeMenuController treeMenuController;
+    @Inject
+    private FileSystemService fileSystemService;
 
     @Override
     public void init(final String name, final ResourceAgent resourceAgent, final Browser browser) {
         super.init(name, resourceAgent, browser);
+        clusterEventBus.register(this);
+    }
+
+    @Override
+    public void init(
+            final String name,
+            final ResourceAgent resourceAgent,
+            final String heartbeatId,
+            final Map<String, String> resourceNode,
+            final Browser browser) {
+        super.init(name, resourceAgent, heartbeatId, resourceNode, browser);
         clusterEventBus.register(this);
     }
     /**
@@ -196,7 +212,7 @@ public final class FilesystemRaInfo extends ServiceInfo {
                                          if (value.isNothingSelected()) {
                                              return;
                                          }
-                                         final String selectedValue = getParamSaved("fstype").getValueForConfig();
+                                         final String selectedValue = getParamSaved(FS_RES_PARAM_FS_TYPE).getValueForConfig();
                                          final String createdFs;
                                          if (selectedValue == null || selectedValue.isEmpty()) {
                                              final CommonDeviceInterface cdi = (CommonDeviceInterface) value;
@@ -230,7 +246,7 @@ public final class FilesystemRaInfo extends ServiceInfo {
             paramWi = blockDeviceParamWidget;
             addParamComboListeners(paramWi);
             widgetAdd(param, prefix, paramWi);
-        } else if ("fstype".equals(param)) {
+        } else if (FS_RES_PARAM_FS_TYPE.equals(param)) {
             final Value defaultValue =
               new StringValue() {
                   @Override
@@ -247,10 +263,11 @@ public final class FilesystemRaInfo extends ServiceInfo {
                 selectedValue = defaultValue;
             }
 
+            final Set<String> commonFileSystems = fileSystemService.getCommonFileSystems(getBrowser().getCluster());
             paramWi = widgetFactory.createInstance(
                               Widget.GUESS_TYPE,
                               selectedValue,
-                              getBrowser().getCommonFileSystems(defaultValue),
+                              Tools.getCommonFileSystemsWithDefault(commonFileSystems, defaultValue),
                               Widget.NO_REGEXP,
                               width,
                               Widget.NO_ABBRV,
@@ -320,7 +337,6 @@ public final class FilesystemRaInfo extends ServiceInfo {
     /** Removes the service without confirmation dialog. */
     @Override
     protected void removeMyselfNoConfirm(final Host dcHost, final Application.RunMode runMode) {
-        clusterEventBus.unregister(this);
         final VolumeInfo oldDvi = getBrowser().getDrbdVolumeFromDev(
                                             getParamSaved(FS_RES_PARAM_DEV).getValueForConfig());
         super.removeMyselfNoConfirm(dcHost, runMode);
@@ -332,6 +348,9 @@ public final class FilesystemRaInfo extends ServiceInfo {
                 }
             });
             t.start();
+        }
+        if (runMode == Application.RunMode.LIVE) {
+            clusterEventBus.unregister(this);
         }
     }
 

@@ -25,6 +25,7 @@ package lcmc.drbd.ui.configdialog;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.Set;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.swing.JComponent;
@@ -32,6 +33,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SpringLayout;
 import lcmc.Exceptions;
+import lcmc.cluster.service.storage.FileSystemService;
 import lcmc.common.domain.AccessMode;
 import lcmc.common.domain.Application;
 import lcmc.host.domain.Host;
@@ -74,6 +76,8 @@ final class CreateFS extends DrbdConfig {
     private Application application;
     @Inject
     private WidgetFactory widgetFactory;
+    @Inject
+    private FileSystemService fileSystemService;
     private MyButton makeFileSystemButton;
 
     /**
@@ -271,7 +275,10 @@ final class CreateFS extends DrbdConfig {
         /* Filesystem */
         final JLabel filesystemLabel = new JLabel(Tools.getString("Dialog.DrbdConfig.CreateFS.Filesystem"));
         final Value defaultValue = NO_FILESYSTEM_STRING;
-        final Value[] filesystems = getDrbdVolumeInfo().getDrbdResourceInfo().getCommonFileSystems( defaultValue);
+
+        final Set<String> fileSystems =
+                fileSystemService.getCommonFileSystems(getDrbdVolumeInfo().getBrowser().getCluster());
+        final Value[] filesystems = Tools.getCommonFileSystemsWithDefault(fileSystems, defaultValue);
 
         filesystemWidget = widgetFactory.createInstance(Widget.Type.COMBOBOX,
                                                         defaultValue,

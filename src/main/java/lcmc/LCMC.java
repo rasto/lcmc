@@ -47,6 +47,7 @@ import javax.swing.plaf.ColorUIResource;
 import javax.swing.plaf.metal.MetalLookAndFeel;
 import javax.swing.plaf.metal.OceanTheme;
 
+import lcmc.cluster.service.storage.FileSystemService;
 import lcmc.cluster.service.storage.MountPointService;
 import lcmc.configs.AppDefaults;
 import lcmc.cluster.ui.ClusterBrowser;
@@ -89,6 +90,8 @@ public final class LCMC extends JPanel {
     private BlockDeviceService blockDeviceService;
     @Inject
     private MountPointService mountPointService;
+    @Inject
+    private FileSystemService fileSystemService;
     @Inject
     private NetworkService networkService;
 
@@ -313,6 +316,7 @@ public final class LCMC extends JPanel {
     private void setupServices() {
         blockDeviceService.init();
         mountPointService.init();
+        fileSystemService.init();
         networkService.init();
     }
 }

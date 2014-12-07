@@ -52,6 +52,7 @@ import javax.swing.tree.TreeNode;
 
 import com.google.common.eventbus.Subscribe;
 import lcmc.ClusterEventBus;
+import lcmc.cluster.service.storage.FileSystemService;
 import lcmc.cluster.ui.network.NetworkFactory;
 import lcmc.cluster.ui.network.NetworkPresenter;
 import lcmc.common.domain.Application;
@@ -68,6 +69,7 @@ import lcmc.drbd.domain.DRBDtestData;
 import lcmc.drbd.domain.DrbdXml;
 import lcmc.drbd.ui.DrbdGraph;
 import lcmc.event.CommonBlockDevicesChangedEvent;
+import lcmc.event.CommonFileSystemsChangedEvent;
 import lcmc.event.NetworkChangedEvent;
 import lcmc.cluster.service.storage.BlockDeviceService;
 import lcmc.cluster.service.NetworkService;
@@ -242,6 +244,8 @@ public class ClusterBrowser extends Browser {
     private NetworkFactory networkFactory;
     @Inject
     private BlockDeviceService blockDeviceService;
+    @Inject
+    private FileSystemService fileSystemService;
 
     public static String getClassMenuName(final String cl) {
         final String name = CRM_CLASS_MENU.get(cl);
@@ -260,7 +264,6 @@ public class ClusterBrowser extends Browser {
     private DefaultMutableTreeNode servicesNode;
     private DefaultMutableTreeNode drbdNode;
     private DefaultMutableTreeNode vmsNode = null;
-    private String[] commonFileSystems;
 
     /** name (hb type) + id to service info hash. */
     private final Map<String, Map<String, ServiceInfo>> nameToServiceInfoHash =
@@ -369,7 +372,7 @@ public class ClusterBrowser extends Browser {
                                                                        CRM_START_DELAY_PARAMETER)));
         }
         crmOperationParams.put(CRM_PROMOTE_OPERATOR,
-                               new ArrayList<String>(Arrays.asList(CRM_TIMEOUT_PARAMETER, CRM_INTERVAL_PARAMETER)));
+                new ArrayList<String>(Arrays.asList(CRM_TIMEOUT_PARAMETER, CRM_INTERVAL_PARAMETER)));
         crmOperationParams.put(CRM_DEMOTE_OPERATOR,
                                new ArrayList<String>(Arrays.asList(CRM_TIMEOUT_PARAMETER, CRM_INTERVAL_PARAMETER)));
     }
@@ -539,10 +542,8 @@ public class ClusterBrowser extends Browser {
         }
     }
 
-    void updateClusterResources(final Host[] clusterHosts,
-                                final String[] commonFileSystems) {
+    void updateClusterResources(final Host[] clusterHosts) {
         LOG.debug1("start: update cluster resources");
-        this.commonFileSystems = commonFileSystems.clone();
 
         /* cluster hosts */
         treeMenuController.removeChildren(clusterHostsNode);
@@ -1397,6 +1398,7 @@ public class ClusterBrowser extends Browser {
         }
     }
 
+
     @Subscribe
     public void onUpdateCommonNetworks(final NetworkChangedEvent event) {
         if (cluster != event.getCluster()) {
@@ -1714,6 +1716,7 @@ public class ClusterBrowser extends Browser {
      * Deletes caches of all Filesystem infoPanels.
      * This is useful if something have changed.
      */
+    @Deprecated
     public void resetFilesystems() {
         mHeartbeatIdToServiceLock();
         for (final String hbId : heartbeatIdToServiceInfo.keySet()) {
@@ -1857,21 +1860,6 @@ public class ClusterBrowser extends Browser {
         }
     }
 
-    /**
-     * Returns common file systems on all nodes as StringValue array.
-     * The defaultValue is stored as the first item in the array.
-     */
-    public Value[] getCommonFileSystems(final Value defaultValue) {
-        final Value[] cfs =  new Value[commonFileSystems.length + 2];
-        cfs[0] = defaultValue;
-        int i = 1;
-        for (final String cf : commonFileSystems) {
-            cfs[i] = new StringValue(cf);
-            i++;
-        }
-        cfs[i] = new StringValue("none");
-        return cfs;
-    }
     /**
      * This is called from crm graph.
      */
