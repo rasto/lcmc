@@ -24,7 +24,7 @@ import com.google.common.base.Optional;
 import lcmc.ClusterEventBus;
 import lcmc.cluster.domain.Cluster;
 import lcmc.cluster.domain.Network;
-import lcmc.host.service.NetworkService;
+import lcmc.cluster.service.NetworkService;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;

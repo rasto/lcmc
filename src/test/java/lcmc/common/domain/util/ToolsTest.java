@@ -485,7 +485,7 @@ public final class ToolsTest {
 
     @Test
     public void nullIntersectionShouldBeNull() {
-        assertEquals(null, Tools.getIntersection(null, null));
+        assertEquals(null, Tools.getIntersection((Set<String>) null, (Set<String>) null));
     }
 
     @SuppressWarnings("unused")

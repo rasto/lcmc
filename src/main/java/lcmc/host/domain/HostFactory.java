@@ -20,7 +20,7 @@
 
 package lcmc.host.domain;
 
-import lcmc.host.service.BlockDeviceService;
+import lcmc.cluster.service.BlockDeviceService;
 
 import javax.inject.Inject;
 import javax.inject.Named;

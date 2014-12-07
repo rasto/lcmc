@@ -67,11 +67,10 @@ import lcmc.crm.ui.CrmGraph;
 import lcmc.drbd.domain.DRBDtestData;
 import lcmc.drbd.domain.DrbdXml;
 import lcmc.drbd.ui.DrbdGraph;
-import lcmc.event.BlockDevicesChangedEvent;
 import lcmc.event.CommonBlockDevicesChangedEvent;
 import lcmc.event.NetworkChangedEvent;
-import lcmc.host.service.BlockDeviceService;
-import lcmc.host.service.NetworkService;
+import lcmc.cluster.service.BlockDeviceService;
+import lcmc.cluster.service.NetworkService;
 import lcmc.host.ui.HostBrowser;
 import lcmc.host.domain.Host;
 import lcmc.crm.domain.PtestData;
@@ -262,7 +261,6 @@ public class ClusterBrowser extends Browser {
     private DefaultMutableTreeNode drbdNode;
     private DefaultMutableTreeNode vmsNode = null;
     private String[] commonFileSystems;
-    private String[] commonMountPoints;
 
     /** name (hb type) + id to service info hash. */
     private final Map<String, Map<String, ServiceInfo>> nameToServiceInfoHash =
@@ -542,11 +540,9 @@ public class ClusterBrowser extends Browser {
     }
 
     void updateClusterResources(final Host[] clusterHosts,
-                                final String[] commonFileSystems,
-                                final String[] commonMountPoints) {
+                                final String[] commonFileSystems) {
         LOG.debug1("start: update cluster resources");
         this.commonFileSystems = commonFileSystems.clone();
-        this.commonMountPoints = commonMountPoints.clone();
 
         /* cluster hosts */
         treeMenuController.removeChildren(clusterHostsNode);
@@ -567,10 +563,6 @@ public class ClusterBrowser extends Browser {
         });
         updateHeartbeatDrbdThread();
         LOG.debug1("end: update cluster resources");
-    }
-
-    public String[] getCommonMountPoints() {
-        return commonMountPoints.clone();
     }
 
     /** Starts everything. */

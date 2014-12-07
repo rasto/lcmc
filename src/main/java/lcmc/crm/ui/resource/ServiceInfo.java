@@ -213,7 +213,7 @@ public class ServiceInfo extends EditableInfo {
     @Inject
     private CrmServiceFactory crmServiceFactory;
 
-    protected void init(final String name, final ResourceAgent resourceAgent, final Browser browser) {
+    public void init(final String name, final ResourceAgent resourceAgent, final Browser browser) {
         super.init(name, browser);
         this.resourceAgent = resourceAgent;
         if (resourceAgent != null && resourceAgent.isStonith()) {
@@ -230,11 +230,12 @@ public class ServiceInfo extends EditableInfo {
      * new service object. It also initializes parameters along with
      * heartbeat id with values from xml stored in resourceNode.
      */
-    protected void init(final String name,
-                        final ResourceAgent resourceAgent,
-                        final String heartbeatId,
-                        final Map<String, String> resourceNode,
-                        final Browser browser) {
+    public void init(
+            final String name,
+            final ResourceAgent resourceAgent,
+            final String heartbeatId,
+            final Map<String, String> resourceNode,
+            final Browser browser) {
         init(name, resourceAgent, browser);
         getService().setCrmId(heartbeatId);
         /* TODO: cannot call setParameters here, only after it is

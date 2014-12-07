@@ -59,9 +59,10 @@ import lcmc.event.HwBlockDevicesChangedEvent;
 import lcmc.event.HwBlockDevicesDiskSpaceEvent;
 import lcmc.event.HwBridgesChangedEvent;
 import lcmc.event.HwDrbdStatusChangedEvent;
+import lcmc.event.HwMountPointsChangedEvent;
 import lcmc.event.HwNetInterfacesChangedEvent;
-import lcmc.host.service.BlockDeviceService;
-import lcmc.host.service.NetworkService;
+import lcmc.cluster.service.BlockDeviceService;
+import lcmc.cluster.service.NetworkService;
 import lcmc.host.ui.HostBrowser;
 import lcmc.common.ui.ProgressBar;
 import lcmc.common.ui.ResourceGraph;
@@ -185,7 +186,6 @@ public class Host implements Comparable<Host>, Value {
     private Set<Value> availableQemuKeymaps = new TreeSet<Value>();
     private Set<Value> availableCpuMapModels = new TreeSet<Value>();
     private Set<Value> availableCpuMapVendors = new TreeSet<Value>();
-    private Set<String> mountPoints = new TreeSet<String>();
     private Map<String, BlockDevice> drbdBlockDevices = new LinkedHashMap<String, BlockDevice>();
     /** Options for GUI drop down lists. */
     private Map<String, List<String>> guiOptions = new HashMap<String, List<String>>();
@@ -289,8 +289,6 @@ public class Host implements Comparable<Host>, Value {
         if (allHosts.size() == 1) {
             enteredHostOrIp = Tools.getDefault("SSH.SecHost");
         }
-        mountPoints.add("/mnt/");
-
         hostBrowser.init(this);
         terminalPanel.initWithHost(this);
         hwEventBus.register(this);
@@ -482,10 +480,6 @@ public class Host implements Comparable<Host>, Value {
 
     public Set<Value> getCPUMapVendors() {
         return availableCpuMapVendors;
-    }
-
-    public Set<String> getMountPointsList() {
-        return mountPoints;
     }
 
     public String[] getIps(final int hop) {
@@ -1557,7 +1551,7 @@ public class Host implements Comparable<Host>, Value {
         final Set<Value> newQemuKeymaps = new TreeSet<Value>();
         final Set<Value> newCpuMapModels = new TreeSet<Value>();
         final Set<Value> newCpuMapVendors = new TreeSet<Value>();
-        final Set<String> newMountPoints = new TreeSet<String>();
+        final Set<String> mountPoints = new TreeSet<String>();
 
         final Map<String, List<String>> newGuiOptions = new HashMap<String, List<String>>();
         final Set<String> newDrbdResProxy = new HashSet<String>();
@@ -1566,7 +1560,7 @@ public class Host implements Comparable<Host>, Value {
 
         final Map<String, String> diskSpaces = new HashMap<String, String>();
 
-        newMountPoints.add("/mnt/");
+        mountPoints.add("/mnt/");
         String guiOptionName = null;
 
         String type = "";
@@ -1657,7 +1651,7 @@ public class Host implements Comparable<Host>, Value {
             } else if ("cpu-map-vendor-info".equals(type)) {
                 newCpuMapVendors.add(new StringValue(line));
             } else if ("mount-points-info".equals(type)) {
-                newMountPoints.add(line);
+                mountPoints.add(line);
             } else if ("gui-info".equals(type)) {
                 parseGuiInfo(line);
             } else if ("installation-info".equals(type)) {
@@ -1744,7 +1738,7 @@ public class Host implements Comparable<Host>, Value {
         }
 
         if (changedTypes.contains(MOUNT_POINTS_INFO_DELIM)) {
-            mountPoints = newMountPoints;
+            hwEventBus.post(new HwMountPointsChangedEvent(this, mountPoints));
         }
 
         if (changedTypes.contains(VERSION_INFO_DELIM)) {

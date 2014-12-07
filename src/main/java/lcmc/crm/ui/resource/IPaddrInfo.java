@@ -33,7 +33,7 @@ import lcmc.cluster.ui.widget.Check;
 import lcmc.cluster.ui.widget.Widget;
 import lcmc.cluster.ui.widget.WidgetFactory;
 import lcmc.common.domain.util.Tools;
-import lcmc.host.service.NetworkService;
+import lcmc.cluster.service.NetworkService;
 
 import javax.inject.Inject;
 import javax.inject.Named;

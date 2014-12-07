@@ -40,7 +40,7 @@ import lcmc.common.domain.Application;
 import lcmc.common.ui.treemenu.TreeMenuController;
 import lcmc.host.domain.Host;
 import lcmc.common.domain.StringValue;
-import lcmc.host.service.NetworkService;
+import lcmc.cluster.service.NetworkService;
 import lcmc.vm.domain.VmsXml;
 import lcmc.vm.domain.InterfaceData;
 import lcmc.common.domain.Value;

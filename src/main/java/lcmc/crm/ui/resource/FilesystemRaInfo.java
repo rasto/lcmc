@@ -23,10 +23,19 @@ package lcmc.crm.ui.resource;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
+import com.google.common.base.Optional;
+import com.google.common.eventbus.Subscribe;
+import lcmc.ClusterEventBus;
+import lcmc.cluster.service.BlockDeviceService;
+import lcmc.common.ui.Browser;
 import lcmc.configs.DistResource;
 import lcmc.common.domain.AccessMode;
 import lcmc.common.domain.Application;
+import lcmc.crm.domain.ResourceAgent;
+import lcmc.crm.service.Openais;
+import lcmc.event.CommonMountPointsEvent;
 import lcmc.host.domain.Host;
 import lcmc.common.domain.StringValue;
 import lcmc.common.domain.Value;
@@ -53,16 +62,27 @@ import javax.inject.Named;
 public final class FilesystemRaInfo extends ServiceInfo {
     /** Name of the device parameter in the file system. */
     private static final String FS_RES_PARAM_DEV = "device";
+    private static final String FS_RES_PARAM_DIRECTORY = "directory";
     private LinbitDrbdInfo linbitDrbdInfo = null;
     private DrbddiskInfo drbddiskInfo = null;
     private Widget blockDeviceParamWidget = null;
     private Widget fstypeParamWidget = null;
+    private Optional<Widget> directoryParamWidget = Optional.absent();
     private boolean drbddiskIsPreferred = false;
     @Inject
     private Application application;
     @Inject
     private WidgetFactory widgetFactory;
+    @Inject
+    private BlockDeviceService blockDeviceService;
+    @Inject
+    private ClusterEventBus clusterEventBus;
 
+    @Override
+    public void init(final String name, final ResourceAgent resourceAgent, final Browser browser) {
+        super.init(name, resourceAgent, browser);
+        clusterEventBus.register(this);
+    }
     /**
      * Sets Linbit::drbd info object for this Filesystem service if it uses
      * drbd block device.
@@ -123,7 +143,7 @@ public final class FilesystemRaInfo extends ServiceInfo {
             });
             getInfoPanel();
             waitForInfoPanel();
-            final String dir = getComboBoxValue("directory").getValueForConfig();
+            final String dir = getComboBoxValue(FS_RES_PARAM_DIRECTORY).getValueForConfig();
             boolean confirm = false; /* confirm only once */
             for (final Host host : getBrowser().getClusterHosts()) {
                 final String statCmd = DistResource.SUDO + "stat -c \"%F\" " + dir + "||true";
@@ -131,7 +151,7 @@ public final class FilesystemRaInfo extends ServiceInfo {
                 final SshOutput ret = host.captureCommandProgressIndicator(text,
                                                                            new ExecCommandConfig().command(statCmd));
 
-                if (ret == null || !"directory".equals(ret.getOutput().trim())) {
+                if (ret == null || !FS_RES_PARAM_DIRECTORY.equals(ret.getOutput().trim())) {
                     String title = Tools.getString("ClusterBrowser.CreateDir.Title");
                     String desc  = Tools.getString("ClusterBrowser.CreateDir.Description");
                     title = title.replaceAll("@DIR@", dir);
@@ -248,29 +268,16 @@ public final class FilesystemRaInfo extends ServiceInfo {
 
             widgetAdd(param, prefix, paramWi);
             paramWi.setEditable(false);
-        } else if ("directory".equals(param)) {
-            final String[] cmp = getBrowser().getCommonMountPoints();
-            final Value[] items = new Value[cmp.length + 1];
-            final Value defaultValue = new StringValue() {
-                              @Override
-                              public String getNothingSelected() {
-                                  return Tools.getString("ClusterBrowser.SelectMountPoint");
-                              }
-                          };
-            items[0] = defaultValue;
-            int i = 1;
-            for (final String c : cmp) {
-                items[i] = new StringValue(c);
-                i++;
-            }
-
+        } else if (FS_RES_PARAM_DIRECTORY.equals(param)) {
+            final Set<String> commonMountPoints = blockDeviceService.getCommonMountPoints(getBrowser().getCluster());
+            final Value[] items = getCommonMountPointValues(commonMountPoints);
             getResource().setPossibleChoices(param, items);
             Value selectedValue = getPreviouslySelected(param, prefix);
             if (selectedValue == null) {
                 selectedValue = getParamSaved(param);
             }
             if (selectedValue == null || selectedValue.isNothingSelected()) {
-                selectedValue = defaultValue;
+                selectedValue = items[0];
             }
             final String regexp = "^.+$";
             paramWi = widgetFactory.createInstance(
@@ -284,6 +291,7 @@ public final class FilesystemRaInfo extends ServiceInfo {
                                  Widget.NO_BUTTON);
             widgetAdd(param, prefix, paramWi);
             paramWi.setAlwaysEditable(true);
+            directoryParamWidget = Optional.of(paramWi);
         } else {
             paramWi = super.createWidget(param, prefix, width);
         }
@@ -320,6 +328,7 @@ public final class FilesystemRaInfo extends ServiceInfo {
     /** Removes the service without confirmation dialog. */
     @Override
     protected void removeMyselfNoConfirm(final Host dcHost, final Application.RunMode runMode) {
+        clusterEventBus.unregister(this);
         final VolumeInfo oldDvi = getBrowser().getDrbdVolumeFromDev(
                                             getParamSaved(FS_RES_PARAM_DEV).getValueForConfig());
         super.removeMyselfNoConfirm(dcHost, runMode);
@@ -449,4 +458,36 @@ public final class FilesystemRaInfo extends ServiceInfo {
             blockDeviceParamWidget.reloadComboBox(value, commonBlockDevInfos);
         }
     }
+
+    @Subscribe
+    public void onCommonMountPointsChanged(final CommonMountPointsEvent event) {
+        if (event.getCluster() != getBrowser().getCluster()) {
+            return;
+        }
+        final Set<String> mountPoints = event.getCommonMountPoints();
+        if (directoryParamWidget.isPresent()) {
+            final Value selectedValue = directoryParamWidget.get().getValue();
+            final Value[] items = getCommonMountPointValues(mountPoints);
+            getResource().setPossibleChoices(FS_RES_PARAM_DIRECTORY, items);
+            directoryParamWidget.get().reloadComboBox(selectedValue, items);
+        }
+    }
+
+    private Value[] getCommonMountPointValues(final Set<String> commonMountPoints) {
+        final Value[] items = new Value[commonMountPoints.size() + 1];
+        final Value defaultValue = new StringValue() {
+            @Override
+            public String getNothingSelected() {
+                return Tools.getString("ClusterBrowser.SelectMountPoint");
+            }
+        };
+        items[0] = defaultValue;
+        int i = 1;
+        for (final String c : commonMountPoints) {
+            items[i] = new StringValue(c);
+            i++;
+        }
+        return items;
+    }
 }
+

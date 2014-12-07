@@ -59,8 +59,7 @@ public class ClusterViewPanel extends ViewPanel implements AllHostsUpdatable {
     @Override
     public void allHostsUpdate() {
         cluster.getBrowser().updateClusterResources(cluster.getHostsArray(),
-                                                    cluster.getCommonFileSystems(),
-                                                    cluster.getCommonMountPoints());
+                                                    cluster.getCommonFileSystems());
     }
 
     Cluster getCluster() {

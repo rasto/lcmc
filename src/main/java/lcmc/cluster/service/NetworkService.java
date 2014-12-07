@@ -18,7 +18,7 @@
  * the Free Software Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-package lcmc.host.service;
+package lcmc.cluster.service;
 
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
@@ -136,7 +136,6 @@ public class NetworkService {
         }
         return Optional.absent();
     }
-
 
     private List<Network> getCommonNetworks(final Set<Host> hosts) {
         final Map<String, Integer> networksIntersection = getNetworksIntersection(hosts);

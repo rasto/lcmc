@@ -18,32 +18,27 @@
  * the Free Software Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-package lcmc.cluster.ui.network;
+package lcmc.event;
 
-import lcmc.ClusterEventBus;
 import lcmc.cluster.domain.Cluster;
-import lcmc.cluster.domain.Network;
-import lcmc.cluster.service.NetworkService;
 
-import javax.inject.Inject;
-import javax.inject.Named;
+import java.util.List;
+import java.util.Set;
 
-@Named
-public class NetworkFactory {
-    @Inject
-    private ClusterEventBus clusterEventBus;
-    @Inject
-    private NetworkService networkService;
+public class CommonMountPointsEvent {
+    private final Cluster cluster;
+    private final Set<String> commonMountPoints;
 
-    public NetworkPresenter createPresenter(final Cluster cluster, final Network network) {
-        final NetworkModel model = new NetworkModel();
-        final NetworkView view = new NetworkView(model);
-        return new NetworkPresenter(
-                network,
-                model,
-                view,
-                clusterEventBus,
-                cluster,
-                networkService);
+    public CommonMountPointsEvent(final Cluster cluster, final Set<String> commonMountPoints) {
+        this.cluster = cluster;
+        this.commonMountPoints = commonMountPoints;
+    }
+
+    public Cluster getCluster() {
+        return cluster;
+    }
+
+    public Set<String> getCommonMountPoints() {
+        return commonMountPoints;
     }
 }

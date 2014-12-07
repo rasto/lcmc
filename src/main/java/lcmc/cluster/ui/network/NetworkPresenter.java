@@ -28,7 +28,7 @@ import lcmc.cluster.domain.Network;
 import lcmc.common.domain.Application;
 import lcmc.common.domain.util.Tools;
 import lcmc.event.NetInterfacesChangedEvent;
-import lcmc.host.service.NetworkService;
+import lcmc.cluster.service.NetworkService;
 
 import javax.swing.ImageIcon;
 import javax.swing.JComponent;

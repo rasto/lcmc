@@ -39,8 +39,8 @@ import lcmc.drbd.domain.BlockDevice;
 import lcmc.cluster.ui.ClusterBrowser;
 import lcmc.cluster.ui.ClusterTab;
 import lcmc.cluster.ui.SSHGui;
-import lcmc.host.service.BlockDeviceService;
-import lcmc.host.service.NetworkService;
+import lcmc.cluster.service.BlockDeviceService;
+import lcmc.cluster.service.NetworkService;
 import lcmc.logger.Logger;
 import lcmc.logger.LoggerFactory;
 import lcmc.common.domain.util.Tools;
@@ -190,15 +190,6 @@ public class Cluster implements Comparable<Cluster> {
         Set<String> intersection = null;
         for (final Host host : hosts) {
             intersection = Tools.getIntersection(host.getFileSystemsList(), intersection);
-        }
-        return intersection.toArray(new String[intersection.size()]);
-    }
-
-    public String[] getCommonMountPoints() {
-        Set<String> intersection = null;
-
-        for (final Host host : hosts) {
-            intersection = Tools.getIntersection(host.getMountPointsList(), intersection);
         }
         return intersection.toArray(new String[intersection.size()]);
     }

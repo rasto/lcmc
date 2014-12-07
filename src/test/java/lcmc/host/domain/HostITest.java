@@ -30,7 +30,7 @@ import java.util.Set;
 
 import lcmc.AppContext;
 import lcmc.cluster.domain.Cluster;
-import lcmc.host.service.NetworkService;
+import lcmc.cluster.service.NetworkService;
 import lcmc.testutils.IntegrationTestLauncher;
 import lcmc.testutils.annotation.type.IntegrationTest;
 import lcmc.common.domain.util.Tools;
@@ -205,14 +205,6 @@ public final class HostITest {
         for (final Host host : integrationTestLauncher.getHosts()) {
             assertTrue(host.getCPUMapVendors().size() > 0);
             assertTrue(noValueIsNull(host.getCPUMapVendors()));
-        }
-    }
-
-    @Test
-    public void testGetMountPointsList() {
-        for (final Host host : integrationTestLauncher.getHosts()) {
-            assertTrue(host.getMountPointsList().size() > 0);
-            assertTrue(noValueIsNull(host.getMountPointsList()));
         }
     }
 

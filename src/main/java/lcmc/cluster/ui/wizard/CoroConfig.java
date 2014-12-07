@@ -67,7 +67,7 @@ import lcmc.cluster.ui.widget.Widget;
 import lcmc.cluster.ui.widget.WidgetFactory;
 import lcmc.crm.service.Corosync;
 import lcmc.common.domain.ExecCallback;
-import lcmc.host.service.NetworkService;
+import lcmc.cluster.service.NetworkService;
 import lcmc.logger.Logger;
 import lcmc.logger.LoggerFactory;
 import lcmc.common.ui.utils.MyButton;

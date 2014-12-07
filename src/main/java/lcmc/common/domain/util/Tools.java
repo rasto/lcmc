@@ -75,6 +75,7 @@ import javax.swing.table.TableColumn;
 import javax.swing.table.TableColumnModel;
 import javax.swing.text.html.HTMLDocument;
 
+import com.google.common.base.Optional;
 import lcmc.Exceptions;
 import lcmc.common.domain.ConvertCmdCallback;
 import lcmc.configs.DistResource;
@@ -593,6 +594,7 @@ public final class Tools {
     /**
      * Returns intersection of two string lists as List of string.
      */
+    @Deprecated
     public static Set<String> getIntersection(final Set<String> setA, final Set<String> setB) {
         final Set<String> resultSet = new TreeSet<String>();
         if (setB == null) {
@@ -607,6 +609,27 @@ public final class Tools {
             }
         }
         return resultSet;
+    }
+
+    /**
+     * Returns intersection of two string lists as List of string.
+     */
+    public static Optional<Set<String>> getIntersection(
+            final Optional<Set<String>> setA,
+            final Optional<Set<String>> setB) {
+        final Set<String> resultSet = new TreeSet<String>();
+        if (!setB.isPresent()) {
+            return setA;
+        }
+        if (!setA.isPresent()) {
+            return setB;
+        }
+        for (final String item : setA.get()) {
+            if (setB.get().contains(item)) {
+                resultSet.add(item);
+            }
+        }
+        return Optional.of(resultSet);
     }
 
     /**

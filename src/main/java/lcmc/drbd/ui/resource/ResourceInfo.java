@@ -65,7 +65,7 @@ import lcmc.drbd.domain.DrbdResource;
 import lcmc.drbd.domain.NetInterface;
 import lcmc.common.ui.Browser;
 import lcmc.cluster.ui.ClusterBrowser;
-import lcmc.host.service.NetworkService;
+import lcmc.cluster.service.NetworkService;
 import lcmc.host.ui.HostBrowser;
 import lcmc.common.ui.SpringUtilities;
 import lcmc.common.ui.Info;
