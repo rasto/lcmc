@@ -244,7 +244,7 @@ public class HostBrowser extends Browser {
         boolean changed = false;
         try {
             final Map<BlockDevice, BlockDevInfo> oldBlockDevices = new HashMap<BlockDevice, BlockDevInfo>(blockDevInfos);
-            if (oldBlockDevices.size() != blockDevInfos.size()) {
+            if (oldBlockDevices.size() != blockDevices.size()) {
                 changed = true;
             }
             blockDevInfos.clear();
@@ -270,7 +270,7 @@ public class HostBrowser extends Browser {
                 treeMenuController.removeChildren(blockDevicesNode);
                 for (final Map.Entry<BlockDevice, BlockDevInfo> bdEntry : blockDevInfos.entrySet()) {
                     final BlockDevInfo bdi = bdEntry.getValue();
-                    final MutableTreeNode resource = treeMenuController.createMenuItem(blockDevicesNode, bdi);
+                    treeMenuController.createMenuItem(blockDevicesNode, bdi);
                 }
                 treeMenuController.reloadNode(blockDevicesNode, false);
             } finally {
