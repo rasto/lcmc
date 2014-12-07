@@ -3,9 +3,11 @@ package lcmc.common.domain.util;
 import java.awt.Dimension;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.TreeSet;
 import java.util.Vector;
 import javax.swing.JPanel;
 import junitparams.JUnitParamsRunner;
@@ -993,5 +995,46 @@ public final class ToolsTest {
     @Parameters(method="parametersForNameOneShouldBeGreater")
     public void nameOneShouldBeGreater(final String nameOne, final String nameTwo) {
         assertTrue(Tools.compareNames(nameOne, nameTwo) > 0);
+    }
+
+    private Object[] equalCollections() {
+        return $(
+                $(new ArrayList<String>(), new ArrayList<String>()),
+                $(new ArrayList<String>(Arrays.asList("a", "b")), new ArrayList<String>(Arrays.asList("a", "b"))),
+                $(new TreeSet<String>(), new TreeSet<String>()),
+                $(new TreeSet<String>(Arrays.asList("a", "b")), new TreeSet<String>(Arrays.asList("a", "b"))),
+                $(new TreeSet<String>(Arrays.asList("b", "a")), new TreeSet<String>(Arrays.asList("a", "b"))));
+    }
+
+    @Test
+    @Parameters(method="equalCollections")
+    public void collectionsShouldBeEqual(final Collection<String> collection1, Collection<String> collection2) {
+        assertTrue(
+                "" + collection1 + " != " + collection2,
+                Tools.equalCollections(collection1, collection2));
+    }
+
+    private Object[] unequalCollections() {
+        return $(
+                $(new ArrayList<String>(), new ArrayList<String>(Arrays.asList("a"))),
+                $(new ArrayList<String>(Arrays.asList("a")), new ArrayList<String>()),
+                $(new ArrayList<String>(Arrays.asList("a")), new ArrayList<String>(Arrays.asList("a", "b"))),
+                $(new ArrayList<String>(Arrays.asList("a", "b")), new ArrayList<String>(Arrays.asList("b"))),
+                $(new ArrayList<String>(Arrays.asList("a", "a")), new ArrayList<String>(Arrays.asList("a", "b"))),
+                $(new ArrayList<String>(Arrays.asList("b", "b")), new ArrayList<String>(Arrays.asList("a", "b"))),
+                $(new TreeSet<String>(), new TreeSet<String>(Arrays.asList("a"))),
+                $(new TreeSet<String>(Arrays.asList("a")), new TreeSet<String>()),
+                $(new TreeSet<String>(Arrays.asList("a")), new TreeSet<String>(Arrays.asList("a", "b"))),
+                $(new TreeSet<String>(Arrays.asList("a", "b")), new TreeSet<String>(Arrays.asList("b"))),
+                $(new TreeSet<String>(Arrays.asList("a", "a")), new TreeSet<String>(Arrays.asList("a", "b"))),
+                $(new TreeSet<String>(Arrays.asList("b", "b")), new TreeSet<String>(Arrays.asList("a", "b"))));
+    }
+
+    @Test
+    @Parameters(method="unequalCollections")
+    public void collectionsShouldNotBeEqual(final Collection<String> collection1, Collection<String> collection2) {
+        assertTrue(
+                "" + collection1 + " == " + collection2,
+                !Tools.equalCollections(collection1, collection2));
     }
 }

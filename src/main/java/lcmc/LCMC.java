@@ -46,6 +46,8 @@ import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.plaf.ColorUIResource;
 import javax.swing.plaf.metal.MetalLookAndFeel;
 import javax.swing.plaf.metal.OceanTheme;
+
+import lcmc.cluster.service.storage.MountPointService;
 import lcmc.configs.AppDefaults;
 import lcmc.cluster.ui.ClusterBrowser;
 import lcmc.common.ui.GUIData;
@@ -84,7 +86,9 @@ public final class LCMC extends JPanel {
     @Inject
     private GUIData guiData;
     @Inject
-    private BlockDeviceService blockDevicesService;
+    private BlockDeviceService blockDeviceService;
+    @Inject
+    private MountPointService mountPointService;
     @Inject
     private NetworkService networkService;
 
@@ -307,7 +311,8 @@ public final class LCMC extends JPanel {
     }
 
     private void setupServices() {
-        blockDevicesService.init();
+        blockDeviceService.init();
+        mountPointService.init();
         networkService.init();
     }
 }

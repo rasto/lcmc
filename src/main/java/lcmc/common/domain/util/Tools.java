@@ -45,6 +45,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
@@ -1421,7 +1422,22 @@ public final class Tools {
         return -1;
     }
 
+    public static boolean equalCollections(final Collection<?> collection1, final Collection<?> collection2) {
+        if (collection1.size() != collection2.size()) {
+            return false;
+        }
+        final Iterator<?> iterator1 = collection1.iterator();
+        final Iterator<?> iterator2 = collection2.iterator();
+        while (iterator1.hasNext()) {
+            if (!iterator1.next().equals(iterator2.next())) {
+                return false;
+            }
+        }
+        return true;
+    }
+
     private Tools() {
         /* no instantiation possible. */
     }
+
 }

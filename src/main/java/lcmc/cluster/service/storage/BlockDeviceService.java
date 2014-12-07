@@ -29,11 +29,9 @@ import lcmc.common.domain.util.Tools;
 import lcmc.drbd.domain.BlockDevice;
 import lcmc.event.BlockDevicesChangedEvent;
 import lcmc.event.CommonBlockDevicesChangedEvent;
-import lcmc.event.CommonMountPointsEvent;
 import lcmc.event.HwBlockDevicesChangedEvent;
 import lcmc.event.HwBlockDevicesDiskSpaceEvent;
 import lcmc.event.HwDrbdStatusChangedEvent;
-import lcmc.event.HwMountPointsChangedEvent;
 import lcmc.host.domain.Host;
 import lcmc.host.domain.HostBlockDevices;
 
@@ -43,11 +41,9 @@ import javax.inject.Singleton;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.TreeSet;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Named
@@ -59,8 +55,6 @@ public class BlockDeviceService {
     private ClusterEventBus clusterEventBus;
     private Map<Host, HostBlockDevices> hostBlockDevicesByHost = new ConcurrentHashMap<Host, HostBlockDevices>();
     private Map<Cluster, List<String>> commonBlockDevicesByCluster = new ConcurrentHashMap<Cluster, List<String>>();
-    private Map<Host, Set<String>> mountPointsByHost = new ConcurrentHashMap<Host, Set<String>>();
-    private Map<Cluster, Set<String>> commonMountPointsByCluster = new ConcurrentHashMap<Cluster, Set<String>>();
 
     public void init() {
         hwEventBus.register(this);
@@ -92,47 +86,6 @@ public class BlockDeviceService {
             clusterEventBus.post(new BlockDevicesChangedEvent(event.getHost(), hostBlockDevices.getBlockDevices()));
         }
     }
-
-    @Subscribe
-    public void mountPointsChanged(final HwMountPointsChangedEvent event) {
-        mountPointsByHost.put(event.getHost(), event.getMountPoints());
-        updateCommonMountPoints(Optional.fromNullable(event.getHost().getCluster()));
-    }
-
-    public Set<String> getCommonMountPoints(final Cluster cluster) {
-        final Set<String> mountPoints = commonMountPointsByCluster.get(cluster);
-        if (mountPoints == null) {
-            return new TreeSet<String>();
-        }
-        return mountPoints;
-    }
-
-    private Set<String> getCommonMountPoints(final Collection<Host> hosts) {
-        Optional<Set<String>> mountPointsIntersection = Optional.absent();
-
-        for (final Host host : hosts) {
-            final Set<String> mountPoints = mountPointsByHost.get(host);
-            mountPointsIntersection = Tools.getIntersection(
-                    Optional.fromNullable(mountPoints),
-                    mountPointsIntersection);
-        }
-        return mountPointsIntersection.or(new TreeSet<String>());
-    }
-
-    private void updateCommonMountPoints(final Optional<Cluster> cluster) {
-        if (!cluster.isPresent()) {
-            return;
-        }
-        final Set<String> commonMountPoints = getCommonMountPoints(cluster.get().getHosts());
-        final Set<String> oldCommonMountPoints = commonMountPointsByCluster.get(cluster.get());
-        commonMountPointsByCluster.put(cluster.get(), commonMountPoints);
-        if (oldCommonMountPoints == null
-                || oldCommonMountPoints.isEmpty()
-                || !equalCollections(commonMountPoints, oldCommonMountPoints)) {
-            clusterEventBus.post(new CommonMountPointsEvent(cluster.get(), commonMountPoints));
-        }
-    }
-
 
     public Collection<BlockDevice> getBlockDevices(final Host host) {
         final HostBlockDevices hostBlockDevices = hostBlockDevicesByHost.get(host);
@@ -171,22 +124,8 @@ public class BlockDeviceService {
         commonBlockDevicesByCluster.put(cluster.get(), commonBlockDeviceNames);
         if (oldCommonBlockDeviceNames == null
                 || oldCommonBlockDeviceNames.isEmpty()
-                || !equalCollections(commonBlockDeviceNames, oldCommonBlockDeviceNames)) {
+                || !Tools.equalCollections(commonBlockDeviceNames, oldCommonBlockDeviceNames)) {
             clusterEventBus.post(new CommonBlockDevicesChangedEvent(cluster.get(), commonBlockDeviceNames));
         }
-    }
-
-    public boolean equalCollections(final Collection<?> collection1, final Collection<?> collection2) {
-        if (collection1.size() != collection2.size()) {
-            return false;
-        }
-        final Iterator<?> iterator1 = collection1.iterator();
-        final Iterator<?> iterator2 = collection2.iterator();
-        while (iterator1.hasNext()) {
-            if (!iterator1.next().equals(iterator2.next())) {
-                return false;
-            }
-        }
-        return true;
     }
 }

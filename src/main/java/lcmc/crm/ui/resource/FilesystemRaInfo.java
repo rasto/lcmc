@@ -30,6 +30,7 @@ import com.google.common.base.Optional;
 import com.google.common.eventbus.Subscribe;
 import lcmc.ClusterEventBus;
 import lcmc.cluster.service.storage.BlockDeviceService;
+import lcmc.cluster.service.storage.MountPointService;
 import lcmc.common.ui.Browser;
 import lcmc.common.ui.treemenu.TreeMenuController;
 import lcmc.configs.DistResource;
@@ -79,6 +80,8 @@ public final class FilesystemRaInfo extends ServiceInfo {
     private WidgetFactory widgetFactory;
     @Inject
     private BlockDeviceService blockDeviceService;
+    @Inject
+    private MountPointService mountPointService;
     @Inject
     private ClusterEventBus clusterEventBus;
     @Inject
@@ -258,7 +261,7 @@ public final class FilesystemRaInfo extends ServiceInfo {
             widgetAdd(param, prefix, paramWi);
             paramWi.setEditable(false);
         } else if (FS_RES_PARAM_DIRECTORY.equals(param)) {
-            final Set<String> commonMountPoints = blockDeviceService.getCommonMountPoints(getBrowser().getCluster());
+            final Set<String> commonMountPoints = mountPointService.getCommonMountPoints(getBrowser().getCluster());
             final Value[] items = getCommonMountPointValues(commonMountPoints);
             getResource().setPossibleChoices(param, items);
             Value selectedValue = getPreviouslySelected(param, prefix);
