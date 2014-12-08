@@ -580,20 +580,6 @@ public final class Tools {
     }
 
     /**
-     * Converts enumeration to the string array.
-     */
-    public static String[] enumToStringArray(final Enumeration<String> e) {
-        if (e == null) {
-            return null;
-        }
-        final List<String> list = new ArrayList<String>();
-        while (e.hasMoreElements()) {
-            list.add(e.nextElement());
-        }
-        return list.toArray(new String[list.size()]);
-    }
-
-    /**
      * Returns intersection of two string lists as List of string.
      */
     @Deprecated

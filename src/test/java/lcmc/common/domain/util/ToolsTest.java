@@ -430,15 +430,6 @@ public final class ToolsTest {
         assertEquals("", Tools.ucfirst(""));
     }
 
-    @Test
-    public void testEnumToStringArray() {
-        assertNull(Tools.enumToStringArray(null));
-        @SuppressWarnings("UseOfObsoleteCollectionType")
-        final String[] testString = Tools.enumToStringArray(
-                new Vector<String>(Arrays.asList("a", "b", "c")).elements());
-        Assert.assertArrayEquals(new String[]{"a", "b", "c"}, testString);
-    }
-
     @SuppressWarnings("unused")
     private Object[] parametersForTestIntersections() {
         return $( 
