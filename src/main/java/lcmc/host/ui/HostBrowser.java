@@ -44,6 +44,7 @@ import javax.swing.tree.TreeNode;
 import com.google.common.eventbus.Subscribe;
 import lcmc.ClusterEventBus;
 import lcmc.cluster.ui.ClusterBrowser;
+import lcmc.cluster.ui.resource.ClusterViewFactory;
 import lcmc.common.domain.AccessMode;
 import lcmc.common.domain.Application;
 import lcmc.cluster.domain.Cluster;
@@ -146,15 +147,12 @@ public class HostBrowser extends Browser {
     private CategoryInfo blockDevicesCategory;
     @Resource(name="categoryInfo")
     private CategoryInfo fileSystemsCategory;
-
-    @Inject @Named("netInfo")
-    private Provider<NetInfo> netInfoProvider;
-    @Inject
-    private Provider<FSInfo> fsInfoProvider;
     @Inject
     private TreeMenuController treeMenuController;
     @Inject
     private ClusterEventBus clusterEventBus;
+    @Inject
+    private ClusterViewFactory clusterViewFactory;
 
     public void init(final Host host) {
         this.host = host;
@@ -214,7 +212,6 @@ public class HostBrowser extends Browser {
         }
         final Set<String> fileSystems = event.getFileSystems();
         final Map<String, FSInfo> oldFileSystems = getFilesystemsMap();
-        final HostBrowser thisClass = this;
         mFileSystemsWriteLock.lock();
         try {
             treeMenuController.removeChildren(fileSystemsNode);
@@ -223,8 +220,7 @@ public class HostBrowser extends Browser {
                 if (oldFileSystems.containsKey(fileSystem)) {
                     fileSystemInfo = oldFileSystems.get(fileSystem);
                 } else {
-                    fileSystemInfo = fsInfoProvider.get();
-                    fileSystemInfo.init(fileSystem, thisClass);
+                    fileSystemInfo = clusterViewFactory.createFileSystemView(fileSystem, this);
                 }
                 treeMenuController.createMenuItem(fileSystemsNode, fileSystemInfo);
             }
@@ -286,7 +282,6 @@ public class HostBrowser extends Browser {
         }
         final Collection<NetInterface> netInterfaces = event.getNetInterfaces();
         final Map<NetInterface, NetInfo> oldNetInterfaces = getNetInterfacesMap();
-        final HostBrowser thisClass = this;
         mNetInfosWriteLock.lock();
         try {
             treeMenuController.removeChildren(netInterfacesNode);
@@ -295,8 +290,7 @@ public class HostBrowser extends Browser {
                 if (oldNetInterfaces.containsKey(netInterface)) {
                     netInfo = oldNetInterfaces.get(netInterface);
                 } else {
-                    netInfo = netInfoProvider.get();
-                    netInfo.init(netInterface.getName(), netInterface, thisClass);
+                    netInfo = clusterViewFactory.createNetView(netInterface, this);
                 }
                 final DefaultMutableTreeNode resource = treeMenuController.createMenuItem(netInterfacesNode, netInfo);
             }

@@ -50,6 +50,7 @@ import javax.swing.JScrollPane;
 import javax.swing.SpringLayout;
 
 import lcmc.Exceptions;
+import lcmc.cluster.ui.resource.ClusterViewFactory;
 import lcmc.common.ui.treemenu.TreeMenuController;
 import lcmc.configs.AppDefaults;
 import lcmc.common.domain.AccessMode;
@@ -153,6 +154,8 @@ public class ResourceInfo extends AbstractDrbdInfo {
     private TreeMenuController treeMenuController;
     @Inject
     private NetworkService networkService;
+    @Inject
+    private ClusterViewFactory clusterViewFactory;
 
     public void init(final String name, final Set<Host> hosts, final Browser browser) {
         super.init(name, browser);
@@ -1423,13 +1426,8 @@ public class ResourceInfo extends AbstractDrbdInfo {
         final List<Value> list = new ArrayList<Value>();
 
         list.add(null);
-        if (hostBrowser == null) {
-            throw new RuntimeException("getNetInterfaces: hostBrowser is null");
-        }
-        if (hostBrowser.getNetInterfacesNode() != null) {
-            for (final Object netInterfaceInfo : treeMenuController.nodesToInfos(hostBrowser.getNetInterfacesNode().children())) {
-                list.add((Info) netInterfaceInfo);
-            }
+        for (final NetInterface netInterface : networkService.getNetInterfacesWithBridges(hostBrowser.getHost())) {
+            list.add(clusterViewFactory.getNetView(netInterface));
         }
         return list.toArray(new Value[list.size()]);
     }
@@ -1438,13 +1436,13 @@ public class ResourceInfo extends AbstractDrbdInfo {
         final List<Value> list = new ArrayList<Value>();
 
         list.add(new StringValue());
-        for (final Object netInterfaces : treeMenuController.nodesToInfos(hostBrowser.getNetInterfacesNode().children())) {
-            list.add((Info) netInterfaces);
+        for (final NetInterface netInterface : networkService.getNetInterfacesWithBridges(hostBrowser.getHost())) {
+            list.add(clusterViewFactory.getNetView(netInterface));
         }
 
         /* the same host */
-        for (final Object info: treeMenuController.nodesToInfos(hostBrowser.getNetInterfacesNode().children())) {
-            final NetInfo netInfo = (NetInfo) info;
+        for (final NetInterface netInterface : networkService.getNetInterfacesWithBridges(hostBrowser.getHost())) {
+            final NetInfo netInfo = (NetInfo) clusterViewFactory.getNetView(netInterface);
             final ProxyNetInfo proxyNetInfo = proxyNetInfoProvider.get();
             proxyNetInfo.init(netInfo, hostBrowser, hostBrowser.getHost());
             list.add(proxyNetInfo);
@@ -1455,8 +1453,8 @@ public class ResourceInfo extends AbstractDrbdInfo {
             if (h == hostBrowser.getHost()) {
                 continue;
             }
-            for (final Object info :  treeMenuController.nodesToInfos(hostBrowser.getNetInterfacesNode().children())) {
-                final NetInfo netInfo = (NetInfo) info;
+            for (final NetInterface netInterface : networkService.getNetInterfacesWithBridges(hostBrowser.getHost())) {
+                final NetInfo netInfo = (NetInfo) clusterViewFactory.getNetView(netInterface);
                 if (netInfo.isLocalHost()) {
                     continue;
                 }
