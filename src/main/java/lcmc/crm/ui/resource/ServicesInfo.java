@@ -947,8 +947,10 @@ public class ServicesInfo extends EditableInfo {
                                        final String heartbeatId,
                                        final CloneInfo newCi,
                                        final Application.RunMode runMode) {
-        final ServiceInfo newServiceInfo =
-                crmServiceFactory.createFromResourceAgent(newResourceAgent, newResourceAgent.isClone(), getBrowser());
+        final ServiceInfo newServiceInfo = crmServiceFactory.createFromResourceAgent(
+                newResourceAgent,
+                getBrowser().getClusterStatus().isMaster(heartbeatId),
+                getBrowser());
         if (heartbeatId != null) {
             newServiceInfo.getService().setCrmId(heartbeatId);
             getBrowser().addToHeartbeatIdList(newServiceInfo);
