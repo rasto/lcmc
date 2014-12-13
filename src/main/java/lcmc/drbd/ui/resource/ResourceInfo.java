@@ -1427,7 +1427,7 @@ public class ResourceInfo extends AbstractDrbdInfo {
 
         list.add(null);
         for (final NetInterface netInterface : networkService.getNetInterfacesWithBridges(hostBrowser.getHost())) {
-            list.add(clusterViewFactory.getNetView(netInterface));
+            list.add(clusterViewFactory.getNetView(netInterface, hostBrowser));
         }
         return list.toArray(new Value[list.size()]);
     }
@@ -1437,12 +1437,12 @@ public class ResourceInfo extends AbstractDrbdInfo {
 
         list.add(new StringValue());
         for (final NetInterface netInterface : networkService.getNetInterfacesWithBridges(hostBrowser.getHost())) {
-            list.add(clusterViewFactory.getNetView(netInterface));
+            list.add(clusterViewFactory.getNetView(netInterface, hostBrowser));
         }
 
         /* the same host */
         for (final NetInterface netInterface : networkService.getNetInterfacesWithBridges(hostBrowser.getHost())) {
-            final NetInfo netInfo = (NetInfo) clusterViewFactory.getNetView(netInterface);
+            final NetInfo netInfo = (NetInfo) clusterViewFactory.getNetView(netInterface, hostBrowser);
             final ProxyNetInfo proxyNetInfo = proxyNetInfoProvider.get();
             proxyNetInfo.init(netInfo, hostBrowser, hostBrowser.getHost());
             list.add(proxyNetInfo);
@@ -1454,7 +1454,7 @@ public class ResourceInfo extends AbstractDrbdInfo {
                 continue;
             }
             for (final NetInterface netInterface : networkService.getNetInterfacesWithBridges(hostBrowser.getHost())) {
-                final NetInfo netInfo = (NetInfo) clusterViewFactory.getNetView(netInterface);
+                final NetInfo netInfo = (NetInfo) clusterViewFactory.getNetView(netInterface, hostBrowser);
                 if (netInfo.isLocalHost()) {
                     continue;
                 }

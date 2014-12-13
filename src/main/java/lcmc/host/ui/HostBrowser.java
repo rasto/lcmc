@@ -286,11 +286,11 @@ public class HostBrowser extends Browser {
         try {
             treeMenuController.removeChildren(netInterfacesNode);
             for (final NetInterface netInterface : netInterfaces) {
-                final NetInfo netInfo;
+                final Info netInfo;
                 if (oldNetInterfaces.containsKey(netInterface)) {
                     netInfo = oldNetInterfaces.get(netInterface);
                 } else {
-                    netInfo = clusterViewFactory.createNetView(netInterface, this);
+                    netInfo = clusterViewFactory.getNetView(netInterface, this);
                 }
                 final DefaultMutableTreeNode resource = treeMenuController.createMenuItem(netInterfacesNode, netInfo);
             }
