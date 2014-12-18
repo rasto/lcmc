@@ -180,7 +180,6 @@ final class PcmkTest2 {
             roboTest.rightClick();
             roboTest.moveTo(Tools.getString("ConstraintPHInfo.Remove"));
             roboTest.leftClick();
-            roboTest.confirmRemove();
         }
         roboTest.checkTest("test2", 16);
     }
