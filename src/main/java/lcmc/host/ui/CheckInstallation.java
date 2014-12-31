@@ -105,13 +105,9 @@ final class CheckInstallation extends DialogHost {
     @Inject
     private HostFinish hostFinishDialog;
     @Inject
-    private DrbdLinbitAvailPackages drbdLinbitAvailPackagesDialog;
-    @Inject
     private DrbdAvailSourceFiles drbdAvailSourceFilesDialog;
     @Inject
     private DrbdCommandInst drbdCommandInstDialog;
-    @Inject
-    private LinbitLogin linbitLoginDialog;
     @Inject
     private HeartbeatInst heartbeatInstDialog;
     @Inject
@@ -169,24 +165,13 @@ final class CheckInstallation extends DialogHost {
                     final String button = e.getActionCommand();
                     if (!drbdInstallationOk || button.equals(Tools.getString(
                                                     "Dialog.Host.CheckInstallation.DrbdCheckForUpgradeButton"))) {
-                        if (im.isLinbitMethod()) {
-                            nextDialogObject = drbdLinbitAvailPackagesDialog;
-                        } else if (im.isSourceMethod()) {
+                        if (im.isSourceMethod()) {
                             nextDialogObject = drbdAvailSourceFilesDialog;
                         } else {
                             // TODO: this only when there is no drbd installed
                             nextDialogObject = drbdCommandInstDialog;
                             getDrbdInstallation().setDrbdInstallMethodIndex(im.getIndex());
                         }
-                        nextDialogObject.init(thisClass, getHost(), getDrbdInstallation());
-                        application.invokeLater(new Runnable() {
-                            @Override
-                            public void run() {
-                                buttonClass(nextButton()).pressButton();
-                            }
-                        });
-                    } else {
-                        nextDialogObject = linbitLoginDialog;
                         nextDialogObject.init(thisClass, getHost(), getDrbdInstallation());
                         application.invokeLater(new Runnable() {
                             @Override

@@ -276,10 +276,6 @@ public abstract class DialogHost extends WizardDialog {
             return "source".equals(method);
         }
 
-        boolean isLinbitMethod() {
-            return "linbit".equals(method);
-        }
-
         @Override
         public String getValueForGui() {
             return name;
