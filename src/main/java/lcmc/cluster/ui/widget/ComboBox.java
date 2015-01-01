@@ -191,7 +191,7 @@ public final class ComboBox extends GenericWidget<MComboBox<Value>> {
     public void setEditable(final boolean editable) {
         super.setEditable(editable);
         final JComponent comp = getInternalComponent();
-        application.invokeLater(new Runnable() {
+        application.invokeInEdt(new Runnable() {
             @Override
             public void run() {
                 final Value v = getValue();
