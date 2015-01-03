@@ -20,6 +20,7 @@
 
 package lcmc.cluster.ui.resource;
 
+import lcmc.cluster.domain.Cluster;
 import lcmc.common.domain.Resource;
 import lcmc.common.domain.Value;
 import lcmc.common.ui.Browser;
@@ -50,6 +51,8 @@ public class ClusterViewFactory {
     private final ConcurrentMap<String, Info> viewByFileSystemName = new ConcurrentHashMap<String, Info>();
 
     private final Lock viewLock = new ReentrantLock();
+    @Inject
+    private Provider<CommonBlockDevInfo> commonBlockDevInfoProvider;
 
     public FSInfo createFileSystemView(final String fileSystem, final Browser browser) {
         final FSInfo fsInfo = fsInfoProvider.get();
@@ -69,6 +72,15 @@ public class ClusterViewFactory {
         } finally {
              viewLock.unlock();
         }
+    }
+
+    public CommonBlockDevInfo createCommonBlockDevView(final Cluster cluster, final String commonBlockDevice) {
+        final CommonBlockDevInfo commonBlockDevInfo = commonBlockDevInfoProvider.get();
+        commonBlockDevInfo.init(
+                commonBlockDevice,
+                cluster.getHostBlockDevices(commonBlockDevice),
+                cluster.getBrowser());
+        return commonBlockDevInfo;
     }
 
     private Info createNetView(final NetInterface netInterface, final Browser browser) {

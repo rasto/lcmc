@@ -21,23 +21,27 @@
 package lcmc.event;
 
 import lcmc.cluster.domain.Cluster;
+import lcmc.cluster.ui.resource.CommonBlockDevInfo;
 
+import java.util.Collection;
 import java.util.List;
 
 public class CommonBlockDevicesChangedEvent {
     private final Cluster cluster;
-    private final List<String> commonBlockDevices;
+    private final Collection<CommonBlockDevInfo> commonBlockDevViews;
 
-    public CommonBlockDevicesChangedEvent(final Cluster cluster, final List<String> commonBlockDevices) {
+    public CommonBlockDevicesChangedEvent(
+            final Cluster cluster,
+            final Collection<CommonBlockDevInfo> commonBlockDevViews) {
         this.cluster = cluster;
-        this.commonBlockDevices = commonBlockDevices;
+        this.commonBlockDevViews = commonBlockDevViews;
     }
 
     public Cluster getCluster() {
         return cluster;
     }
 
-    public List<String> getCommonBlockDevices() {
-        return commonBlockDevices;
+    public Collection<CommonBlockDevInfo> getCommonBlockDevViews() {
+        return commonBlockDevViews;
     }
 }

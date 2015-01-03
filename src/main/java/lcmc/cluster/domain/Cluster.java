@@ -150,21 +150,6 @@ public class Cluster implements Comparable<Cluster> {
         return clusterTab;
     }
 
-    /**
-     * Gets block devices that are common on all hosts in the cluster.
-     * The block devices, that are already in the CRM or are used by
-     * drbd are not returned.
-     */
-    public List<String> getCommonBlockDevices() {
-        final List<String> namesIntersection = blockDeviceService.getCommonBlockDeviceNames(hosts);
-
-        final List<String> commonBlockDevices = new ArrayList<String>();
-        for (final String i : namesIntersection) {
-            commonBlockDevices.add(i);
-        }
-        return commonBlockDevices;
-    }
-
     /** Returns block device objects of all hosts. */
     public BlockDevice[] getHostBlockDevices(final String device) {
         final List<BlockDevice> list = new ArrayList<BlockDevice>();

@@ -533,13 +533,9 @@ public final class FilesystemRaInfo extends ServiceInfo {
             }
         }
 
-        /* block devices that are the same on all hosts */
-        @SuppressWarnings("unchecked")
-        final Enumeration<DefaultMutableTreeNode> commonBlockDevices = getBrowser().getCommonBlockDevicesNode().children();
-        for (Value commonBlockDevice : treeMenuController.nodesToInfos(commonBlockDevices)) {
+        for (Value commonBlockDevice : blockDeviceService.getCommonBlockDevViews()) {
             list.add(commonBlockDevice);
         }
-
         return list.toArray(new Value[list.size()]);
     }
 }

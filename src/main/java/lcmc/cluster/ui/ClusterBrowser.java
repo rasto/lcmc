@@ -237,8 +237,6 @@ public class ClusterBrowser extends Browser {
     @Inject
     private ClusterEventBus clusterEventBus;
     @Inject
-    private Provider<CommonBlockDevInfo> commonBlockDevInfoProvider;
-    @Inject
     private NetworkService networkService;
     @Inject
     private NetworkFactory networkFactory;
@@ -258,7 +256,6 @@ public class ClusterBrowser extends Browser {
     private Cluster cluster;
     private DefaultMutableTreeNode clusterHostsNode;
     private DefaultMutableTreeNode networksNode;
-    private DefaultMutableTreeNode commonBlockDevicesNode;
     private DefaultMutableTreeNode availableServicesNode;
     private DefaultMutableTreeNode crmNode;
     private DefaultMutableTreeNode servicesNode;
@@ -515,11 +512,6 @@ public class ClusterBrowser extends Browser {
         /* available services */
         availableServicesInfo.init(Tools.getString("ClusterBrowser.availableServices"), this);
         availableServicesNode = treeMenuController.createMenuItem(crmNode, availableServicesInfo);
-
-        /* block devices / shared disks, TODO: */
-        commonBlockDevicesCategory.init(Tools.getString("ClusterBrowser.CommonBlockDevices"), this);
-        commonBlockDevicesNode = treeMenuController.createMenuItem(commonBlockDevicesCategory);
-        updateCommonBlockDevices(blockDeviceService.getCommonBlockDeviceNames(cluster.getHosts()));
 
         /* resource defaults */
         rscDefaultsInfo = rscDefaultsInfoProvider.get();
@@ -1407,14 +1399,6 @@ public class ClusterBrowser extends Browser {
         updateCommonNetworks(event.getCommonNetworks());
     }
 
-    @Subscribe
-    public void onUpdateCommonBlockDevices(final CommonBlockDevicesChangedEvent event) {
-        if (cluster != event.getCluster()) {
-            return;
-        }
-        updateCommonBlockDevices(event.getCommonBlockDevices());
-    }
-
     private void updateCommonNetworks(final Collection<Network> networks) {
         treeMenuController.removeChildren(networksNode);
         for (final Network network : networks) {
@@ -1422,19 +1406,6 @@ public class ClusterBrowser extends Browser {
             treeMenuController.createMenuItem(networksNode, networkPresenter);
         }
         treeMenuController.reloadNode(networksNode, false);
-    }
-
-
-    private void updateCommonBlockDevices(Collection<String> commonBlockDevices) {
-        treeMenuController.removeChildren(commonBlockDevicesNode);
-        for (final String commonBlockDevice : commonBlockDevices) {
-            final CommonBlockDevInfo commonBlockDevInfo = commonBlockDevInfoProvider.get();
-            commonBlockDevInfo.init(commonBlockDevice, cluster.getHostBlockDevices(commonBlockDevice), this);
-            treeMenuController.createMenuItem(commonBlockDevicesNode, commonBlockDevInfo);
-
-        }
-        treeMenuController.reloadNode(commonBlockDevicesNode, false);
-        reloadAllComboBoxes(null);
     }
 
     /**
@@ -1918,10 +1889,6 @@ public class ClusterBrowser extends Browser {
 
     public DefaultMutableTreeNode getDrbdNode() {
         return drbdNode;
-    }
-
-    public TreeNode getCommonBlockDevicesNode() {
-        return commonBlockDevicesNode;
     }
 
     public TreeNode getClusterHostsNode() {

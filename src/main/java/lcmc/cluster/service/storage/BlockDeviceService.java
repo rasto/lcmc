@@ -23,9 +23,12 @@ package lcmc.cluster.service.storage;
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
 import com.google.common.eventbus.Subscribe;
+import jdk.nashorn.internal.ir.annotations.Immutable;
 import lcmc.ClusterEventBus;
 import lcmc.HwEventBus;
 import lcmc.cluster.domain.Cluster;
+import lcmc.cluster.ui.resource.ClusterViewFactory;
+import lcmc.cluster.ui.resource.CommonBlockDevInfo;
 import lcmc.common.domain.util.Tools;
 import lcmc.drbd.domain.BlockDevice;
 import lcmc.event.BlockDevicesChangedEvent;
@@ -38,6 +41,7 @@ import lcmc.host.domain.HostBlockDevices;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Provider;
 import javax.inject.Singleton;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -56,6 +60,10 @@ public class BlockDeviceService {
     private ClusterEventBus clusterEventBus;
     private Map<Host, HostBlockDevices> hostBlockDevicesByHost = new ConcurrentHashMap<Host, HostBlockDevices>();
     private Map<Cluster, List<String>> commonBlockDevicesByCluster = new ConcurrentHashMap<Cluster, List<String>>();
+    @Inject
+    private ClusterViewFactory clusterViewFactory;
+
+    private Collection<CommonBlockDevInfo> commonBlockDevViews;
 
     public void init() {
         hwEventBus.register(this);
@@ -105,7 +113,29 @@ public class BlockDeviceService {
         return Optional.absent();
     }
 
-    public List<String> getCommonBlockDeviceNames(final Set<Host> hosts) {
+    public Collection<CommonBlockDevInfo> getCommonBlockDevViews() {
+        return ImmutableList.copyOf(commonBlockDevViews);
+    }
+
+    private void updateCommonBlockDeviceNames(final Optional<Cluster> cluster) {
+        if (!cluster.isPresent()) {
+            return;
+        }
+        final List<String> commonBlockDeviceNames = getCommonBlockDeviceNames(cluster.get().getHosts());
+        final List<String> oldCommonBlockDeviceNames = commonBlockDevicesByCluster.get(cluster.get());
+        commonBlockDevicesByCluster.put(cluster.get(), commonBlockDeviceNames);
+
+        if (oldCommonBlockDeviceNames == null
+                || oldCommonBlockDeviceNames.isEmpty()
+                || !Tools.equalCollections(commonBlockDeviceNames, oldCommonBlockDeviceNames)) {
+            final Collection<CommonBlockDevInfo> commonBlockDevViews =
+                    createCommonBlockDevViews(cluster.get(), commonBlockDeviceNames);
+            this.commonBlockDevViews = commonBlockDevViews;
+            clusterEventBus.post(new CommonBlockDevicesChangedEvent(cluster.get(), commonBlockDevViews));
+        }
+    }
+
+    private List<String> getCommonBlockDeviceNames(final Set<Host> hosts) {
         Optional<List<String>> namesIntersection = Optional.absent();
         for (final Host host : hosts) {
             final HostBlockDevices hostBlockDevices = hostBlockDevicesByHost.get(host);
@@ -116,17 +146,16 @@ public class BlockDeviceService {
         return namesIntersection.or(new ArrayList<String>());
     }
 
-    private void updateCommonBlockDeviceNames(final Optional<Cluster> cluster) {
-        if (!cluster.isPresent()) {
-            return;
+
+    private Collection<CommonBlockDevInfo> createCommonBlockDevViews(
+            final Cluster cluster,
+            final List<String> commonBlockDevicesNames) {
+        final List<CommonBlockDevInfo> commonBlockDevViews = new ArrayList<CommonBlockDevInfo>();
+        for (final String commonBlockDevice : commonBlockDevicesNames) {
+            final CommonBlockDevInfo commonBlockDevInfo =
+                    clusterViewFactory.createCommonBlockDevView(cluster, commonBlockDevice);
+            commonBlockDevViews.add(commonBlockDevInfo);
         }
-        final List<String> commonBlockDeviceNames = getCommonBlockDeviceNames(cluster.get().getHosts());
-        final List<String> oldCommonBlockDeviceNames = commonBlockDevicesByCluster.get(cluster.get());
-        commonBlockDevicesByCluster.put(cluster.get(), commonBlockDeviceNames);
-        if (oldCommonBlockDeviceNames == null
-                || oldCommonBlockDeviceNames.isEmpty()
-                || !Tools.equalCollections(commonBlockDeviceNames, oldCommonBlockDeviceNames)) {
-            clusterEventBus.post(new CommonBlockDevicesChangedEvent(cluster.get(), commonBlockDeviceNames));
-        }
+        return commonBlockDevViews;
     }
 }
