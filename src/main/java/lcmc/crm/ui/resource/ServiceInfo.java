@@ -31,7 +31,6 @@ import java.awt.event.MouseListener;
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -77,7 +76,6 @@ import lcmc.cluster.ui.ClusterBrowser;
 import lcmc.common.ui.SpringUtilities;
 import lcmc.common.ui.EditableInfo;
 import lcmc.common.ui.Info;
-import lcmc.drbd.ui.resource.ResourceInfo;
 import lcmc.vm.ui.resource.DomainInfo;
 import lcmc.cluster.ui.widget.Check;
 import lcmc.cluster.ui.widget.Widget;
@@ -1036,23 +1034,6 @@ public class ServiceInfo extends EditableInfo {
                 return SERVICE_STARTED_ICON_SMALL;
             }
         }
-    }
-
-    protected Value[] nodesToServiceInfos(
-            final Value defaultValue,
-            final String serviceName,
-            final Enumeration<DefaultMutableTreeNode> e) {
-        final List<Value> list = new ArrayList<Value>();
-        if (defaultValue != null) {
-            list.add(defaultValue);
-        }
-        for (final Info info : treeMenuController.nodesToInfos(e)) {
-            final ServiceInfo si = getBrowser().getServiceInfoFromId(serviceName, info.getName());
-            if (si == null && !Tools.areEqual(info, defaultValue)) {
-                list.add(info);
-            }
-        }
-        return list.toArray(new Value[list.size()]);
     }
 
     private void storeHostLocations() {
@@ -3725,22 +3706,11 @@ public class ServiceInfo extends EditableInfo {
     /** Puts a resource up in a group. */
     void upResource(final Host dcHost, final Application.RunMode runMode) {
         final GroupInfo gi = groupInfo;
-        final DefaultMutableTreeNode giNode = gi.getNode();
-        if (giNode == null) {
-            return;
-        }
-        final DefaultMutableTreeNode node = getNode();
-        if (node == null) {
-            return;
-        }
-        final int index = giNode.getIndex(node);
+        final List<ServiceInfo> groupServices = gi.getSubServices();
+        final int index = groupServices.indexOf(this);
         if (index > 0) {
-            @SuppressWarnings("unchecked")
-            final List<String> newOrder = new ArrayList<String>();
-            for (final Object child : treeMenuController.nodesToInfos(giNode.children())) {
-                newOrder.add(((ServiceInfo) child).getHeartbeatId(runMode));
-            }
-            final String el = newOrder.remove(index);
+            final List<ServiceInfo> newOrder = new ArrayList<ServiceInfo>(groupServices);
+            final ServiceInfo el = newOrder.remove(index);
             newOrder.add(index - 1,  el);
             if (Application.isLive(runMode)) {
                 setUpdated(true);
@@ -3752,24 +3722,11 @@ public class ServiceInfo extends EditableInfo {
     /** Puts a resource down in a group. */
     void downResource(final Host dcHost, final Application.RunMode runMode) {
         final GroupInfo gi = groupInfo;
-        final DefaultMutableTreeNode giNode = gi.getNode();
-        if (giNode == null) {
-            return;
-        }
-        final DefaultMutableTreeNode node = getNode();
-        if (node == null) {
-            return;
-        }
-        final int index = giNode.getIndex(node);
-        if (index < giNode.getChildCount() - 1) {
-            @SuppressWarnings("unchecked")
-            final Enumeration<DefaultMutableTreeNode> e = giNode.children();
-            final List<String> newOrder = new ArrayList<String>();
-            for (final Object info : treeMenuController.nodesToInfos(giNode.children())) {
-                final ServiceInfo child = (ServiceInfo) info;
-                newOrder.add(child.getHeartbeatId(runMode));
-            }
-            final String el = newOrder.remove(index);
+        final List<ServiceInfo> groupServices = groupInfo.getSubServices();
+        final int index = groupServices.indexOf(this);
+        if (index < groupServices.size() - 1) {
+            final List<ServiceInfo> newOrder = new ArrayList<ServiceInfo>(groupServices);
+            final ServiceInfo el = newOrder.remove(index);
             newOrder.add(index + 1,  el);
             if (Application.isLive(runMode)) {
                 setUpdated(true);
@@ -3883,8 +3840,7 @@ public class ServiceInfo extends EditableInfo {
                         final String group = gi.getHeartbeatId(runMode);
                         final DefaultMutableTreeNode giNode = gi.getNode();
                         if (giNode != null) {
-                            for (final Object info : treeMenuController.nodesToInfos(giNode.children())) {
-                                final ServiceInfo child = (ServiceInfo) info;
+                            for (final ServiceInfo child : gi.getSubServices()) {
                                 child.getService().setModified(true);
                                 child.getService().doneModifying();
                             }
@@ -4359,5 +4315,9 @@ public class ServiceInfo extends EditableInfo {
 
     public final Widget getSameAsOperationsWi() {
         return sameAsOperationsWi;
+    }
+
+    public List<ServiceInfo> getSubServices() {
+        return new ArrayList<ServiceInfo>();
     }
 }

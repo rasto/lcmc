@@ -604,4 +604,10 @@ public class CloneInfo extends ServiceInfo {
     void setContainedService(final ServiceInfo containedService) {
         this.containedService = containedService;
     }
+
+    public List<ServiceInfo> getSubServices() {
+        final List<ServiceInfo> services = new ArrayList<ServiceInfo>();
+        services.add(containedService);
+        return services;
+    }
 }

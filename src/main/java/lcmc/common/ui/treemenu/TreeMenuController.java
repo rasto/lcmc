@@ -242,7 +242,7 @@ public class TreeMenuController {
         });
     }
 
-//    @Deprecated TODO
+    @Deprecated //TODO
     public List<Info> nodesToInfos(final Enumeration<DefaultMutableTreeNode> e) {
         final List<Info> list = new ArrayList<Info>();
         application.invokeAndWait(new Runnable() {

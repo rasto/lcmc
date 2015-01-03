@@ -96,7 +96,7 @@ public class GroupInfo extends ServiceInfo {
     /** Applies the the whole group if for example an order has changed. */
     void applyWhole(final Host dcHost,
                     final boolean createGroup,
-                    final Iterable<String> newOrder,
+                    final List<ServiceInfo> servicesInNewOrder,
                     final Application.RunMode runMode) {
         final String[] params = getParametersFromXML();
         if (Application.isLive(runMode)) {
@@ -143,8 +143,7 @@ public class GroupInfo extends ServiceInfo {
         final Map<String, Boolean> stonith = new HashMap<String, Boolean>();
 
         final ClusterStatus cs = getBrowser().getClusterStatus();
-        for (final String resId : newOrder) {
-            final ServiceInfo gsi = getBrowser().getServiceInfoFromCRMId(resId);
+        for (final ServiceInfo gsi : servicesInNewOrder) {
             if (gsi == null) {
                 continue;
             }
@@ -156,11 +155,11 @@ public class GroupInfo extends ServiceInfo {
             });
         }
         application.waitForSwing();
-        for (final String resId : newOrder) {
-            final ServiceInfo gsi = getBrowser().getServiceInfoFromCRMId(resId);
+        for (final ServiceInfo gsi : servicesInNewOrder) {
             if (gsi == null) {
                 continue;
             }
+            final String resId = gsi.getHeartbeatId(runMode);
             pacemakerResAttrs.put(resId, gsi.getPacemakerResAttrs(runMode));
             pacemakerResArgs.put(resId, gsi.getPacemakerResArgs());
             pacemakerMetaArgs.put(resId, gsi.getPacemakerMetaArgs());
@@ -195,13 +194,17 @@ public class GroupInfo extends ServiceInfo {
                 }
             }
         }
+        final List<String> servicesCrmIds = new ArrayList<String>();
+        for (final ServiceInfo gsi : servicesInNewOrder) {
+            servicesCrmIds.add(gsi.getHeartbeatId(runMode));
+        }
         CRM.replaceGroup(createGroup,
                          dcHost,
                          cloneId,
                          master,
                          cloneMetaArgs,
                          cloneMetaAttrsRefIds,
-                         newOrder,
+                         servicesCrmIds,
                          groupMetaArgs,
                          getHeartbeatId(runMode),
                          pacemakerResAttrs,
@@ -219,6 +222,13 @@ public class GroupInfo extends ServiceInfo {
         if (Application.isLive(runMode)) {
             storeComboBoxValues(params);
             treeMenuController.reloadNode(getNode(), false);
+        }
+        mGroupServiceWriteLock.lock();
+        try {
+            groupServices.clear();
+            groupServices.addAll(servicesInNewOrder);
+        } finally {
+            mGroupServiceWriteLock.unlock();
         }
         getBrowser().getCrmGraph().repaint();
     }
@@ -303,10 +313,7 @@ public class GroupInfo extends ServiceInfo {
                                       ordAttrsList,
                                       runMode);
             final Collection<String> newOrder = new ArrayList<String>();
-            for (final ServiceInfo child : getGroupServices()) {
-                newOrder.add(child.getHeartbeatId(runMode));
-            }
-            applyWhole(dcHost, true, newOrder, runMode);
+            applyWhole(dcHost, true, getSubServices(), runMode);
             if (Application.isLive(runMode)) {
                 setApplyButtons(null, params);
             }
@@ -363,7 +370,7 @@ public class GroupInfo extends ServiceInfo {
             storeComboBoxValues(params);
             treeMenuController.reloadNode(getNode(), false);
         }
-        for (final ServiceInfo child : getGroupServices()) {
+        for (final ServiceInfo child : getSubServices()) {
             final Check childCheck = child.checkResourceFields(null,
                                                                child.getParametersFromXML(),
                                                                false,
@@ -489,7 +496,7 @@ public class GroupInfo extends ServiceInfo {
         if (Application.isLive(runMode)) {
             setUpdated(true);
         }
-        for (final ServiceInfo child : getGroupServices()) {
+        for (final ServiceInfo child : getSubServices()) {
             CRM.startResource(dcHost, child.getHeartbeatId(runMode), runMode);
         }
     }
@@ -500,7 +507,7 @@ public class GroupInfo extends ServiceInfo {
         if (Application.isLive(runMode)) {
             setUpdated(true);
         }
-        for (final ServiceInfo child : getGroupServices()) {
+        for (final ServiceInfo child : getSubServices()) {
             CRM.stopResource(dcHost, child.getHeartbeatId(runMode), runMode);
         }
     }
@@ -511,7 +518,7 @@ public class GroupInfo extends ServiceInfo {
         if (Application.isLive(runMode)) {
             setUpdated(true);
         }
-        for (final ServiceInfo child : getGroupServices()) {
+        for (final ServiceInfo child : getSubServices()) {
             child.cleanupResource(dcHost, runMode);
         }
     }
@@ -522,7 +529,7 @@ public class GroupInfo extends ServiceInfo {
         if (Application.isLive(runMode)) {
             setUpdated(true);
         }
-        for (final ServiceInfo child : getGroupServices()) {
+        for (final ServiceInfo child : getSubServices()) {
             CRM.setManaged(dcHost, child.getHeartbeatId(runMode), isManaged, runMode);
         }
     }
@@ -547,7 +554,7 @@ public class GroupInfo extends ServiceInfo {
         final StringBuilder services = new StringBuilder();
 
         boolean first = true;
-        for (final ServiceInfo child : getGroupServices()) {
+        for (final ServiceInfo child : getSubServices()) {
             if (!first) {
                 services.append(", ");
             }
@@ -573,7 +580,7 @@ public class GroupInfo extends ServiceInfo {
 
     @Override
     public void removeInfo() {
-        for (final ServiceInfo child : getGroupServices()) {
+        for (final ServiceInfo child : getSubServices()) {
             child.removeInfo();
         }
         super.removeInfo();
@@ -584,7 +591,7 @@ public class GroupInfo extends ServiceInfo {
     public void removeMyselfNoConfirm(final Host dcHost, final Application.RunMode runMode) {
         final Collection<ServiceInfo> children = new ArrayList<ServiceInfo>();
         if (Application.isLive(runMode)) {
-            for (final ServiceInfo child : getGroupServices()) {
+            for (final ServiceInfo child : getSubServices()) {
                 child.getService().setRemoved(true);
                 children.add(child);
             }
@@ -648,7 +655,7 @@ public class GroupInfo extends ServiceInfo {
         }
         sb.append("</b>");
 
-        for (final ServiceInfo child : getGroupServices()) {
+        for (final ServiceInfo child : getSubServices()) {
             sb.append("\n&nbsp;&nbsp;&nbsp;");
             sb.append(child.getToolTipText(runMode));
         }
@@ -658,7 +665,7 @@ public class GroupInfo extends ServiceInfo {
 
     @Override
     boolean isOneFailed(final Application.RunMode runMode) {
-        for (final ServiceInfo child : getGroupServices()) {
+        for (final ServiceInfo child : getSubServices()) {
             if (child.isOneFailed(runMode)) {
                 return true;
             }
@@ -668,7 +675,7 @@ public class GroupInfo extends ServiceInfo {
 
     @Override
     boolean isOneFailedCount(final Application.RunMode runMode) {
-        for (final ServiceInfo child : getGroupServices()) {
+        for (final ServiceInfo child : getSubServices()) {
             if (child.isOneFailedCount(runMode)) {
                 return true;
             }
@@ -679,7 +686,7 @@ public class GroupInfo extends ServiceInfo {
     /** Returns whether one of the services failed to start. */
     @Override
     public boolean isFailed(final Application.RunMode runMode) {
-        for (final ServiceInfo child : getGroupServices()) {
+        for (final ServiceInfo child : getSubServices()) {
             if (child.isFailed(runMode)) {
                 return true;
             }
@@ -693,7 +700,7 @@ public class GroupInfo extends ServiceInfo {
         final List<ColorText> texts = new ArrayList<ColorText>();
         ColorText prevColorText = null;
 
-        for (final ServiceInfo child : getGroupServices()) {
+        for (final ServiceInfo child : getSubServices()) {
             final ColorText[] colorTexts = child.getSubtextsForGraph(runMode);
 
             if (colorTexts == null || colorTexts.length == 0) {
@@ -768,7 +775,7 @@ public class GroupInfo extends ServiceInfo {
     @Override
     public List<Host> getMigratedFrom(final Application.RunMode runMode) {
         List<Host> hosts = super.getMigratedFrom(runMode);
-        final List<ServiceInfo> gs = getGroupServices();
+        final List<ServiceInfo> gs = getSubServices();
         if (gs.isEmpty()) {
             return null;
         }
@@ -787,7 +794,7 @@ public class GroupInfo extends ServiceInfo {
     /** Returns whether at least one service is unmanaged. */
     @Override
     public boolean isManaged(final Application.RunMode runMode) {
-        final List<ServiceInfo> gs = getGroupServices();
+        final List<ServiceInfo> gs = getSubServices();
         if (gs.isEmpty()) {
             return true;
         }
@@ -802,7 +809,7 @@ public class GroupInfo extends ServiceInfo {
     /** Returns whether all of the services are started. */
     @Override
     boolean isStarted(final Application.RunMode runMode) {
-        for (final ServiceInfo child : getGroupServices()) {
+        for (final ServiceInfo child : getSubServices()) {
             if (!child.isStarted(runMode)) {
                 return false;
             }
@@ -813,7 +820,7 @@ public class GroupInfo extends ServiceInfo {
     /** Returns whether one of the services is stopped. */
     @Override
     public boolean isStopped(final Application.RunMode runMode) {
-        for (final ServiceInfo child : getGroupServices()) {
+        for (final ServiceInfo child : getSubServices()) {
             if (child.isStopped(runMode)) {
                 return true;
             }
@@ -829,7 +836,7 @@ public class GroupInfo extends ServiceInfo {
 
     /** Returns true if at least one service in the group are running. */
     boolean isOneRunning(final Application.RunMode runMode) {
-        for (final ServiceInfo child : getGroupServices()) {
+        for (final ServiceInfo child : getSubServices()) {
             if (child.isRunning(runMode)) {
                 return true;
             }
@@ -840,7 +847,7 @@ public class GroupInfo extends ServiceInfo {
     /** Returns true if all services in the group are running. */
     @Override
     public boolean isRunning(final Application.RunMode runMode) {
-        for (final ServiceInfo child : getGroupServices()) {
+        for (final ServiceInfo child : getSubServices()) {
             if (!child.isRunning(runMode)) {
                 return false;
             }
@@ -873,7 +880,7 @@ public class GroupInfo extends ServiceInfo {
         final Check check = new Check(incorrect, changed);
         check.addCheck(super.checkResourceFields(param, params, fromServicesInfo, fromCloneInfo, true));
         boolean hasSevices = false;
-        for (final ServiceInfo child : getGroupServices()) {
+        for (final ServiceInfo child : getSubServices()) {
             check.addCheck(child.checkResourceFields(null,
                                                      child.getParametersFromXML(),
                                                      fromServicesInfo,
@@ -892,7 +899,7 @@ public class GroupInfo extends ServiceInfo {
     public void updateMenus(final Point2D pos) {
         super.updateMenus(pos);
         if (!application.isSlow()) {
-            for (final ServiceInfo child : getGroupServices()) {
+            for (final ServiceInfo child : getSubServices()) {
                 child.updateMenus(pos);
             }
         }
@@ -910,7 +917,7 @@ public class GroupInfo extends ServiceInfo {
     @Override
     public void revert() {
         super.revert();
-        for (final ServiceInfo child : getGroupServices()) {
+        for (final ServiceInfo child : getSubServices()) {
             if (child.checkResourceFields(null, child.getParametersFromXML(), true, false, false).isChanged()) {
                 child.revert();
             }
@@ -918,7 +925,8 @@ public class GroupInfo extends ServiceInfo {
     }
 
     /** Return copy of the group services. */
-    public List<ServiceInfo> getGroupServices() {
+    @Override
+    public List<ServiceInfo> getSubServices() {
         mGroupServiceReadLock.lock();
         try {
             return Collections.unmodifiableList(new ArrayList<ServiceInfo>(groupServices));

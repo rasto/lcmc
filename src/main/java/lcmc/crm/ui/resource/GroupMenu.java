@@ -148,7 +148,7 @@ public class GroupMenu extends ServiceMenu {
 
         /* group services */
         if (!application.isSlow()) {
-            for (final ServiceInfo child : groupInfo.getGroupServices()) {
+            for (final ServiceInfo child : groupInfo.getSubServices()) {
                 final MyMenu groupServicesMenu = menuFactory.createMenu(
                         child.toString(),
                         new AccessMode(AccessMode.RO, AccessMode.NORMAL),
@@ -188,7 +188,7 @@ public class GroupMenu extends ServiceMenu {
                         final JCheckBox orderWi,
                         final List<JDialog> popups,
                         final Application.RunMode runMode) {
-        for (final ServiceInfo child : ((GroupInfo) existingService).getGroupServices()) {
+        for (final ServiceInfo child : ((GroupInfo) existingService).getSubServices()) {
             final ServiceMenu subServiceMenu = serviceMenuProvider.get();
             subServiceMenu.addExistingServiceMenuItem(serviceInfo,
                                                       "         " + child,
