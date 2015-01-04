@@ -23,7 +23,6 @@ package lcmc.cluster.service.storage;
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
 import com.google.common.eventbus.Subscribe;
-import jdk.nashorn.internal.ir.annotations.Immutable;
 import lcmc.ClusterEventBus;
 import lcmc.HwEventBus;
 import lcmc.cluster.domain.Cluster;
@@ -41,7 +40,6 @@ import lcmc.host.domain.HostBlockDevices;
 
 import javax.inject.Inject;
 import javax.inject.Named;
-import javax.inject.Provider;
 import javax.inject.Singleton;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -128,10 +126,10 @@ public class BlockDeviceService {
         if (oldCommonBlockDeviceNames == null
                 || oldCommonBlockDeviceNames.isEmpty()
                 || !Tools.equalCollections(commonBlockDeviceNames, oldCommonBlockDeviceNames)) {
-            final Collection<CommonBlockDevInfo> commonBlockDevViews =
+            final Collection<CommonBlockDevInfo> newCommonBlockDevViews =
                     createCommonBlockDevViews(cluster.get(), commonBlockDeviceNames);
-            this.commonBlockDevViews = commonBlockDevViews;
-            clusterEventBus.post(new CommonBlockDevicesChangedEvent(cluster.get(), commonBlockDevViews));
+            this.commonBlockDevViews = newCommonBlockDevViews;
+            clusterEventBus.post(new CommonBlockDevicesChangedEvent(cluster.get(), newCommonBlockDevViews));
         }
     }
 
@@ -150,12 +148,12 @@ public class BlockDeviceService {
     private Collection<CommonBlockDevInfo> createCommonBlockDevViews(
             final Cluster cluster,
             final List<String> commonBlockDevicesNames) {
-        final List<CommonBlockDevInfo> commonBlockDevViews = new ArrayList<CommonBlockDevInfo>();
+        final List<CommonBlockDevInfo> newCommonBlockDevViews = new ArrayList<CommonBlockDevInfo>();
         for (final String commonBlockDevice : commonBlockDevicesNames) {
             final CommonBlockDevInfo commonBlockDevInfo =
                     clusterViewFactory.createCommonBlockDevView(cluster, commonBlockDevice);
-            commonBlockDevViews.add(commonBlockDevInfo);
+            newCommonBlockDevViews.add(commonBlockDevInfo);
         }
-        return commonBlockDevViews;
+        return newCommonBlockDevViews;
     }
 }

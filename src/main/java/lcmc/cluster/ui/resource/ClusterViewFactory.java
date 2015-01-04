@@ -22,7 +22,6 @@ package lcmc.cluster.ui.resource;
 
 import lcmc.cluster.domain.Cluster;
 import lcmc.common.domain.Resource;
-import lcmc.common.domain.Value;
 import lcmc.common.ui.Browser;
 import lcmc.common.ui.Info;
 import lcmc.drbd.domain.NetInterface;
@@ -34,9 +33,7 @@ import javax.inject.Singleton;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantLock;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 @Named
 @Singleton
