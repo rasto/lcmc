@@ -236,6 +236,7 @@ public class ArgumentParser {
 
             final String idDsaPath = cmd.getOptionValue(ID_DSA_OP, pwd + "/.ssh/id_dsa");
             final String idRsaPath = cmd.getOptionValue(ID_RSA_OP, pwd + "/.ssh/id_rsa");
+            LOG.debug(pwd + "/.ssh/id_dsa");
             final String knownHostsPath = cmd.getOptionValue(KNOWN_HOSTS_OP, pwd + "/.ssh/known_hosts");
             application.setIdDSAPath(idDsaPath);
             application.setIdRSAPath(idRsaPath);

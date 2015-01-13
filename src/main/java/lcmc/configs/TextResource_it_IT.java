@@ -1842,25 +1842,25 @@ public final class TextResource_it_IT extends ListResourceBundle {
          "Commnad Log Dialog"},
 
         {"CRMXML.GlobalRequiredOptions",
-         "Global Required Options"},
+         "Impostazioni Globali Obbligatorie"},
 
         {"CRMXML.GlobalOptionalOptions",
-         "Global Options"},
+         "Impostazioni Globali"},
 
         {"CRMXML.RscDefaultsSection",
          "Global Resource Defaults"},
 
         {"CRMXML.RequiredOptions",
-         "Required Options"},
+         "Impostazioni obbligatorie"},
 
         {"CRMXML.MetaAttrOptions",
          "Meta Attributes"},
 
         {"CRMXML.OptionalOptions",
-         "Advanced Options"},
+         "Impostazioni avanzate"},
 
         {"CRMXML.OtherOptions",
-         "Other Options"},
+         "Altre impostazioni"},
 
         {"CRMXML.GetRAMetaData",
          "Loading resource agents..."},

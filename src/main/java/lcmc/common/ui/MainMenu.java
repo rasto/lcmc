@@ -156,7 +156,7 @@ public final class MainMenu extends JPanel implements ActionListener {
                                                KeyEvent.VK_L,
                                                loadActionListener(),
                                                null);
-        guiData.addToEnabledInAccessType(loadItem, new AccessMode(AccessMode.GOD, AccessMode.NORMAL));
+        //guiData.addToEnabledInAccessType(loadItem, new AccessMode(AccessMode.GOD, AccessMode.NORMAL));
 
         final JMenuItem item = addMenuItem(Tools.getString("MainMenu.RemoveEverything"),
                                            submenu,
@@ -247,7 +247,7 @@ public final class MainMenu extends JPanel implements ActionListener {
         /* Operating mode */
         operatingModesCB = createOperationModeCb();
         final JPanel opModePanel = new JPanel(new FlowLayout(FlowLayout.TRAILING, 0, 0));
-        menuBar.add(getInfoTextField());
+        //menuBar.add(getInfoTextField());
         opModePanel.add(getUpgradeTextField());
         opModePanel.add(operatingModesCB);
         opModePanel.add(advancedModeCB);
@@ -331,6 +331,7 @@ public final class MainMenu extends JPanel implements ActionListener {
         if (xml == null) {
             return;
         }
+        LOG.debug(xml);
         userConfig.startClusters(null);
         guiData.allHostsUpdate();
     }
