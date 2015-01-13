@@ -30,6 +30,7 @@ import edu.uci.ics.jung.graph.util.Pair;
 import edu.uci.ics.jung.visualization.GraphZoomScrollPane;
 import edu.uci.ics.jung.visualization.Layer;
 import edu.uci.ics.jung.visualization.RenderContext;
+import edu.uci.ics.jung.visualization.VisualizationImageServer;
 import edu.uci.ics.jung.visualization.VisualizationServer;
 import edu.uci.ics.jung.visualization.VisualizationViewer;
 import edu.uci.ics.jung.visualization.control.AbstractPopupGraphMousePlugin;
@@ -42,6 +43,7 @@ import edu.uci.ics.jung.visualization.decorators.AbstractEdgeShapeTransformer;
 import edu.uci.ics.jung.visualization.decorators.AbstractVertexShapeTransformer;
 import edu.uci.ics.jung.visualization.decorators.ConstantDirectionalEdgeValueTransformer;
 import edu.uci.ics.jung.visualization.decorators.DirectionalEdgeArrowTransformer;
+import edu.uci.ics.jung.visualization.decorators.EdgeShape;
 import edu.uci.ics.jung.visualization.decorators.PickableEdgePaintTransformer;
 import edu.uci.ics.jung.visualization.decorators.PickableVertexPaintTransformer;
 import edu.uci.ics.jung.visualization.decorators.ToStringLabeller;
@@ -51,6 +53,7 @@ import edu.uci.ics.jung.visualization.picking.ShapePickSupport;
 import edu.uci.ics.jung.visualization.renderers.BasicVertexRenderer;
 import edu.uci.ics.jung.visualization.renderers.Renderer;
 import edu.uci.ics.jung.visualization.util.VertexShapeFactory;
+
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
@@ -68,6 +71,9 @@ import java.awt.geom.Line2D;
 import java.awt.geom.Path2D;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.ConcurrentModificationException;
@@ -78,6 +84,8 @@ import java.util.Map;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
+
+import javax.imageio.ImageIO;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.swing.ImageIcon;
@@ -94,6 +102,7 @@ import lcmc.logger.Logger;
 import lcmc.logger.LoggerFactory;
 import lcmc.common.ui.utils.MyMenuItem;
 import lcmc.common.domain.util.Tools;
+
 import org.apache.commons.collections15.Transformer;
 import org.apache.commons.collections15.TransformerUtils;
 
@@ -334,11 +343,13 @@ public abstract class ResourceGraph {
         this.clusterBrowser = clusterBrowser;
 
     }
-
+    
+    final Transformer<Vertex, Point2D> vlf = TransformerUtils.mapTransformer(getVertexLocations());
+    
     protected final void initGraph(final Graph<Vertex, Edge> graph) {
         this.graph = graph;
 
-        final Transformer<Vertex, Point2D> vlf = TransformerUtils.mapTransformer(getVertexLocations());
+        
         putVertexLocations();
 
         layout = new StaticLayout<Vertex, Edge>(graph, vlf) {
@@ -1742,4 +1753,72 @@ public abstract class ResourceGraph {
     protected ClusterBrowser getClusterBrowser() {
         return clusterBrowser;
     }
+    
+    public void saveAsPNG(String filename) {
+    	VisualizationViewer<Vertex, Edge> vv = visualizationViewer;
+    	
+
+                
+    
+        VisualizationImageServer<Vertex, Edge> vis =
+        	    new VisualizationImageServer<Vertex, Edge>(vv.getGraphLayout(),
+        	        vv.getGraphLayout().getSize());
+
+        
+
+    	// Configure the VisualizationImageServer the same way
+    	// you did your VisualizationViewer. In my case e.g.
+
+    	
+    	vis.getRenderContext().setEdgeArrowTransformer(new MyEdgeArrowFunction<Vertex, Edge>());
+    	vis.getRenderContext().setEdgeLabelClosenessTransformer(
+                                                new ConstantDirectionalEdgeValueTransformer<Vertex, Edge>(0.5, 0.5));
+    	vis.getRenderContext().setVertexShapeTransformer(
+                                                    new MyVertexShapeSize<Vertex, Edge>(graph, vlf));
+    	vis.getRenderContext().setVertexFillPaintTransformer(
+                new MyPickableVertexPaintFunction<Vertex>(vv.getPickedVertexState(), false));
+    	vis.getRenderContext().setVertexDrawPaintTransformer(
+                        new MyPickableVertexPaintFunction<Vertex>(vv.getPickedVertexState(), true));
+    	vis.getRenderer().setVertexRenderer(pluggableRenderer);
+
+    	vis.getRenderContext().setEdgeLabelTransformer(new ToStringLabeller<Edge>());
+    	vis.setBackground(Tools.getDefaultColor("ResourceGraph.Background"));
+
+        vis.getRenderContext().setEdgeShapeTransformer(new MyLine<Vertex, Edge>());
+        vis.getRenderContext().setEdgeDrawPaintTransformer(
+                                    new MyPickableEdgePaintFunction<Edge>(vv.getPickedEdgeState(),
+                                                                          EDGE_DRAW_PAINT,
+                                                                          EDGE_PICKED_PAINT));
+        vis.getRenderContext().setEdgeFillPaintTransformer(
+                                    new MyPickableEdgePaintFunction<Edge>(vv.getPickedEdgeState(),
+                                                                          EDGE_DRAW_PAINT,
+                                                                          EDGE_PICKED_PAINT));
+        vis.getRenderContext().setArrowDrawPaintTransformer(
+                                    new MyPickableEdgePaintFunction<Edge>(vv.getPickedEdgeState(),
+                                                                          EDGE_DRAW_PAINT,
+                                                                          EDGE_PICKED_PAINT));
+        vis.getRenderContext().setArrowFillPaintTransformer(
+                                    new MyPickableArrowEdgePaintFunction<Edge>(
+                                                                          vv.getPickedEdgeState(),
+                                                                          EDGE_DRAW_PAINT,
+                                                                          EDGE_PICKED_PAINT));
+  
+    	
+        BufferedImage image = (BufferedImage) vis.getImage(
+        	    new Point2D.Double(vv.getGraphLayout().getSize().getWidth() / 2,
+        	    		vv.getGraphLayout().getSize().getHeight() / 2),
+        	    new Dimension(vv.getGraphLayout().getSize()));
+            
+    	// Write image to a png file
+    	File outputfile = new File(filename);
+
+    	try {
+    	    ImageIO.write(image, "PNG", outputfile);
+    	    
+    	} catch (Exception e) {
+    	    // Exception handling
+    		e.printStackTrace();
+    	}
+    }
+    
 }

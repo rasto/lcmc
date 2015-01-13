@@ -1362,6 +1362,10 @@ public final class TextResource extends ListResourceBundle {
 
         {"ClusterBrowser.Hb.ViewServiceLog",
          "View Service Log"},
+         
+         {"ClusterBrowser.Hb.ExportGraph",
+        	 "Export Graph"
+         },
 
         {"ClusterBrowser.Hb.RemoveEdge",
          "Remove Colocation and Order"},

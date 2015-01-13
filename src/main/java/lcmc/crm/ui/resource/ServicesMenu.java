@@ -21,13 +21,18 @@
 package lcmc.crm.ui.resource;
 
 import java.awt.geom.Point2D;
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Provider;
 import javax.swing.JDialog;
+import javax.swing.JFileChooser;
+import javax.swing.JOptionPane;
+import javax.swing.filechooser.FileFilter;
 
 import lcmc.cluster.ui.wizard.EditClusterDialog;
 import lcmc.Exceptions;
@@ -109,6 +114,7 @@ public class ServicesMenu {
                         null,
                         runMode);
                 servicesInfo.getBrowser().getCrmGraph().repaint();
+                
             }
         });
         items.add(addGroupMenuItem);
@@ -601,6 +607,7 @@ public class ServicesMenu {
         items.add(clusterWizardItem);
 
         /* view logs */
+        
         final UpdatableItem viewLogsItem =
                 menuFactory.createMenuItem(Tools.getString("ClusterBrowser.Hb.ViewLogs"),
                         ServicesInfo.LOGFILE_ICON,
@@ -613,9 +620,84 @@ public class ServicesMenu {
                                 final ClusterLogs clusterLogs = clusterLogsProvider.get();
                                 clusterLogs.init(servicesInfo.getBrowser().getCluster());
                                 clusterLogs.showDialog();
+                                //servicesInfo.getBrowser().getCrmGraph().saveAsJPEG("");
                             }
                         });
         items.add(viewLogsItem);
+        
+        /* Save As JPEG */
+        
+        final UpdatableItem saveJPEGItem =  
+        		menuFactory.createMenuItem(Tools.getString("ClusterBrowser.Hb.ExportGraph"),        				
+        				null,
+        				new AccessMode(AccessMode.RO, AccessMode.NORMAL),
+        				new AccessMode(AccessMode.RO, AccessMode.NORMAL)).addAction( new MenuAction() {        					
+        						@Override
+        							public void run(String text) {
+        							JFileChooser chooser = new JFileChooser(){
+        							    /**
+										 * 
+										 */
+										private static final long serialVersionUID = 123124898943983489L;
+
+										@Override
+        							    public void approveSelection(){
+        							        File f = getSelectedFile();
+        							        if(f.exists() && getDialogType() == SAVE_DIALOG){
+        							            int result = JOptionPane.showConfirmDialog(this,"The file exists, overwrite?","Existing file",JOptionPane.YES_NO_CANCEL_OPTION);
+        							            switch(result){
+        							                case JOptionPane.YES_OPTION:
+        							                    super.approveSelection();
+        							                    return;
+        							                case JOptionPane.NO_OPTION:
+        							                    return;
+        							                case JOptionPane.CLOSED_OPTION:
+        							                    return;
+        							                case JOptionPane.CANCEL_OPTION:
+        							                    cancelSelection();
+        							                    return;
+        							            }
+        							        }
+        							        super.approveSelection();
+        							    }        
+        							};
+        							chooser.setDialogType(JFileChooser.SAVE_DIALOG);
+        								chooser.setAcceptAllFileFilterUsed(true);
+        								chooser.setCurrentDirectory(new File("."));
+        								chooser.addChoosableFileFilter(new FileFilter() {
+        									 
+        								    public String getDescription() {
+        								        return "PNG Images (*.png)";
+        								    }
+        								 
+        								    public boolean accept(File f) {
+        								        if (f.isDirectory()) {
+        								            return true;
+        								        } else {
+        								            return f.getName().toLowerCase().endsWith(".png");
+        								        }
+        								    }
+        								});
+        								
+        								int r = chooser.showSaveDialog(guiData.getClustersPanel());
+        								if (r != JFileChooser.APPROVE_OPTION) return;
+        									try {
+        										        										
+        										final String savePath =chooser.getSelectedFile().getAbsolutePath(); 
+        										(new Thread() {
+        											  public void run() {
+        												  servicesInfo.getBrowser().getCrmGraph().saveAsPNG(savePath);
+        											  }
+        											 }).start();
+        										
+        										
+        									} catch (Exception e) {
+        											//TODO Auto-generated catch block
+        										e.printStackTrace();
+        									}
+        						}                	
+        				});
+        items.add(saveJPEGItem);
         return items;
     }
 }
