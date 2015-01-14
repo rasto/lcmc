@@ -26,9 +26,10 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import com.google.common.collect.HashBasedTable;
+import com.google.common.collect.Table;
 import lcmc.host.domain.Host;
 import lcmc.common.domain.util.Tools;
-import org.apache.commons.collections15.map.MultiKeyMap;
 
 /**
  * This class holds data that were retrieved while running drbdadm -d commands.
@@ -37,10 +38,10 @@ public final class DRBDtestData {
     /** Pattern for dry run output: drbdsetup 0 disconnect. */
     private static final Pattern DRBDSETUP_PATTERN = Pattern.compile(".*drbdsetup\\s+(\\S+)\\s+(\\S+).*");
     private final String toolTip;
-    private final MultiKeyMap<String, Integer> hostResConnected = new MultiKeyMap<String, Integer>();
-    private final MultiKeyMap<String, Integer> hostResDisconnected = new MultiKeyMap<String, Integer>();
-    private final MultiKeyMap<String, Integer> hostResAttached = new MultiKeyMap<String, Integer>();
-    private final MultiKeyMap<String, Integer> hostResDiskless = new MultiKeyMap<String, Integer>();
+    private final Table<String, String, Integer> hostResConnected = HashBasedTable.create();
+    private final Table<String, String, Integer> hostResDisconnected = HashBasedTable.create();
+    private final Table<String, String, Integer> hostResAttached = HashBasedTable.create();
+    private final Table<String, String, Integer> hostResDiskless = HashBasedTable.create();
 
     public DRBDtestData(final Map<Host, String> testOutput) {
         if (testOutput == null) {

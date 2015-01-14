@@ -44,6 +44,9 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SpringLayout;
 import javax.swing.border.TitledBorder;
+
+import com.google.common.collect.HashBasedTable;
+import com.google.common.collect.Table;
 import lcmc.common.domain.AccessMode;
 import lcmc.common.domain.Application;
 import lcmc.crm.domain.CrmXml;
@@ -72,7 +75,7 @@ public abstract class EditableInfo extends Info {
     public static final boolean WIZARD = true;
     /** Hash from parameter to boolean value if the last entered value was correct. */
     private final Map<String, Boolean> paramCorrectValueMap = new ConcurrentHashMap<String, Boolean>();
-    private final MultiKeyMap<String, JPanel> sectionPanels = new MultiKeyMap<String, JPanel>();
+    private final Table<String, String, JPanel> sectionPanels = HashBasedTable.create();
     /** Old apply button, is used for wizards. */
     private MyButton oldApplyButton = null;
     private MyButton applyButton;

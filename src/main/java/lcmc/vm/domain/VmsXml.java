@@ -52,6 +52,8 @@ import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 
+import com.google.common.collect.HashBasedTable;
+import com.google.common.collect.Table;
 import lcmc.host.domain.Host;
 import lcmc.common.domain.StringValue;
 import lcmc.common.domain.Value;
@@ -65,7 +67,6 @@ import lcmc.vm.service.VIRSH;
 import lcmc.cluster.service.ssh.ExecCommandConfig;
 import lcmc.cluster.service.ssh.SshOutput;
 
-import org.apache.commons.collections15.map.MultiKeyMap;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -377,7 +378,7 @@ public final class VmsXml extends XML {
     private final Map<String, String> namesToConfigs = new HashMap<String, String>();
     private final Map<String, String> netToConfigs = new HashMap<String, String>();
     private final Map<String, String> netNamesConfigsMap = new HashMap<String, String>();
-    private final MultiKeyMap<String, String> parameterValues = new MultiKeyMap<String, String>();
+    private final Table<String, String, String> parameterValues = HashBasedTable.create();
     private final Map<String, Integer> domainRemotePorts = new HashMap<String, Integer>();
     private final Map<String, Boolean> domainAutoports = new HashMap<String, Boolean>();
     private final Map<String, Boolean> domainRunningMap = new HashMap<String, Boolean>();

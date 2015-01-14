@@ -40,6 +40,8 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import com.google.common.collect.HashBasedTable;
+import com.google.common.collect.Table;
 import lcmc.Exceptions;
 import lcmc.common.domain.AccessMode;
 import lcmc.common.ui.GUIData;
@@ -78,7 +80,7 @@ import javax.inject.Named;
 @Named
 public final class CrmXml extends XML {
     private static final Logger LOG = LoggerFactory.getLogger(CrmXml.class);
-    private static final MultiKeyMap<String, String> RA_NON_ADVANCED_PARAM = new MultiKeyMap<String, String>();
+    private static final Table<String, String, String> RA_NON_ADVANCED_PARAM = HashBasedTable.create();
     static final Value PCMK_TRUE_VALUE = new StringValue("true");
     static final Value PCMK_FALSE_VALUE = new StringValue("false");
 
@@ -1081,7 +1083,7 @@ public final class CrmXml extends XML {
             }
             return !META_ATTR_NOT_ADVANCED.contains(param);
         }
-        if (RA_NON_ADVANCED_PARAM.containsKey(resourceAgent.getServiceName(), param)) {
+        if (RA_NON_ADVANCED_PARAM.contains(resourceAgent.getServiceName(), param)) {
             return false;
         }
         return !isRequired(resourceAgent, param);
@@ -2299,8 +2301,8 @@ public final class CrmXml extends XML {
 
     private void parseTransientAttributes(final String uname,
                                           final Node transientAttrNode,
-                                          final MultiKeyMap<String, String> failedMap,
-                                          final MultiKeyMap<String, Set<String>> failedClonesMap,
+                                          final Table<String, String, String> failedMap,
+                                          final Table<String, String, Set<String>> failedClonesMap,
                                           final Map<String, String> pingCountMap) {
         /* <instance_attributes> */
         final Node instanceAttrNode = getChildNode(transientAttrNode, "instance_attributes");
@@ -2345,7 +2347,7 @@ public final class CrmXml extends XML {
     }
 
     /** Parses node, to get info like if it is in stand by. */
-    void parseNode(final String node, final Node nodeNode, final MultiKeyMap<String, String> nodeParametersMap) {
+    void parseNode(final String node, final Node nodeNode, final Table<String ,String, String> nodeParametersMap) {
         /* <instance_attributes> */
         final Node instanceAttrNode = getChildNode(nodeNode, "instance_attributes");
         /* <nvpair...> */
@@ -2533,7 +2535,7 @@ public final class CrmXml extends XML {
         /* xml node with cluster node make stupid variable names, but let's
         * keep the convention. */
         String dc = null;
-        final MultiKeyMap<String, String> nodeParametersMap = new MultiKeyMap<String, String>();
+        final Table<String, String, String> nodeParametersMap = HashBasedTable.create();
         final Node nodesNode = getChildNode(confNode, "nodes");
         final Map<String, String> nodeOnline = new HashMap<String, String>();
         final Map<String, String> nodeID = new HashMap<String, String>();
@@ -2584,8 +2586,8 @@ public final class CrmXml extends XML {
         final Map<String, List<String>> groupsToResourcesMap = new LinkedHashMap<String, List<String>>();
         final Map<String, String> cloneToResourceMap = new HashMap<String, String>();
         final List<String> masterList = new ArrayList<String>();
-        final MultiKeyMap<String, String> failedMap = new MultiKeyMap<String, String>();
-        final MultiKeyMap<String, Set<String>> failedClonesMap = new MultiKeyMap<String, Set<String>>();
+        final Table<String, String, String> failedMap = HashBasedTable.create();
+        final Table<String, String, Set<String>> failedClonesMap = HashBasedTable.create();
         final Map<String, String> pingCountMap = new HashMap<String, String>();
         groupsToResourcesMap.put("none", new ArrayList<String>());
 
@@ -2720,7 +2722,7 @@ public final class CrmXml extends XML {
         final Map<String, Map<String, HostLocation>> locationMap = new HashMap<String, Map<String, HostLocation>>();
         final Map<String, HostLocation> pingLocationMap = new HashMap<String, HostLocation>();
         final Map<String, List<String>> locationsIdMap = new HashMap<String, List<String>>();
-        final MultiKeyMap<String, String> resHostToLocIdMap = new MultiKeyMap<String, String>();
+        final Table<String, String, String> resHostToLocIdMap = HashBasedTable.create();
         
         final Map<String, String> resPingToLocIdMap = new HashMap<String, String>();
         final Node constraintsNode = getChildNode(confNode, "constraints");
@@ -3232,7 +3234,7 @@ public final class CrmXml extends XML {
                            final Map<String, Map<String, String>> parametersMap,
                            final Map<String, Set<String>> inLRMList,
                            final Collection<String> orphanedList,
-                           final MultiKeyMap<String, Set<String>> failedClonesMap) {
+                           final Table<String, String, Set<String>> failedClonesMap) {
         final Node lrmResourcesNode = getChildNode(lrmNode, "lrm_resources");
         final NodeList lrmResources = lrmResourcesNode.getChildNodes();
         for (int j = 0; j < lrmResources.getLength(); j++) {

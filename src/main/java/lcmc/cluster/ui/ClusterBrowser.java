@@ -50,6 +50,7 @@ import javax.swing.JComponent;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreeNode;
 
+import com.google.common.collect.Table;
 import com.google.common.eventbus.Subscribe;
 import lcmc.ClusterEventBus;
 import lcmc.cluster.service.storage.FileSystemService;
@@ -1303,10 +1304,11 @@ public class ClusterBrowser extends Browser {
         }
         final Application.RunMode runMode = Application.RunMode.LIVE;
         boolean atLeastOneAdded = false;
-        for (final Object k : dxml.getResourceDeviceMap().keySet()) {
-            final String resName = (String) ((MultiKey) k).getKey(0);
-            final String volumeNr = (String) ((MultiKey) k).getKey(1);
-            final String drbdDev = dxml.getDrbdDevice(resName, volumeNr);
+        for (final Table.Cell<String, String, String> cell : dxml.getResourceDeviceMap().cellSet()) {
+            final String resName = cell.getRowKey();
+            final String volumeNr = cell.getColumnKey();
+            final String drbdDev = cell.getValue();
+
             final Map<String, String> hostDiskMap = dxml.getHostDiskMap(resName, volumeNr);
             if (hostDiskMap == null) {
                 continue;

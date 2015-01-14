@@ -30,6 +30,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
+import com.google.common.collect.Table;
 import lcmc.common.domain.Application;
 import lcmc.host.domain.Host;
 import lcmc.common.domain.Value;
@@ -39,8 +40,6 @@ import lcmc.logger.LoggerFactory;
 import lcmc.common.domain.util.Tools;
 import lcmc.cluster.service.ssh.ExecCommandConfig;
 import lcmc.cluster.service.ssh.SshOutput;
-
-import org.apache.commons.collections15.map.MultiKeyMap;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -430,7 +429,7 @@ public final class ClusterStatus {
     }
 
     public String getNodeParameter(final String node, final String param, final Application.RunMode runMode) {
-        final MultiKeyMap<String, String> nodeParams;
+        final Table<String, String, String> nodeParams;
         if (ptestResult != null && Application.isTest(runMode)) {
             nodeParams = shadowCibQuery.getNodeParameters();
         } else {

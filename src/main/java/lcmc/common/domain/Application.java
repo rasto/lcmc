@@ -35,6 +35,8 @@ import java.util.Enumeration;
 import java.util.List;
 import java.util.regex.Matcher;
 
+import com.google.common.collect.HashBasedTable;
+import com.google.common.collect.Table;
 import lcmc.cluster.domain.Cluster;
 import lcmc.cluster.domain.Clusters;
 import lcmc.cluster.ui.ClusterBrowser;
@@ -46,7 +48,6 @@ import lcmc.robotest.Test;
 import lcmc.logger.Logger;
 import lcmc.logger.LoggerFactory;
 import lcmc.common.domain.util.Tools;
-import org.apache.commons.collections15.map.MultiKeyMap;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -103,7 +104,7 @@ public class Application {
     private final List<String> autoHosts = new ArrayList<String>();
     private final List<String> autoClusters = new ArrayList<String>();
     /** Auto options, that make automatic actions in the gui. */
-    private final MultiKeyMap<String, String> autoOptions = new MultiKeyMap<String, String>();
+    private final Table<String, String, String> autoOptions = HashBasedTable.create();
     private int vncPortOffset = 0;
     private boolean useTightvnc = false;
     private boolean useUltravnc = false;

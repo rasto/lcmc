@@ -35,6 +35,9 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import com.google.common.collect.HashBasedTable;
+import com.google.common.collect.Table;
+import com.google.common.collect.TreeBasedTable;
 import lcmc.Exceptions;
 import lcmc.common.domain.AccessMode;
 import lcmc.common.ui.GUIData;
@@ -54,9 +57,6 @@ import lcmc.common.domain.Unit;
 import lcmc.cluster.service.ssh.ExecCommandConfig;
 import lcmc.cluster.service.ssh.SshOutput;
 
-import org.apache.commons.collections15.keyvalue.MultiKey;
-import org.apache.commons.collections15.map.LinkedMap;
-import org.apache.commons.collections15.map.MultiKeyMap;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -303,16 +303,14 @@ public class DrbdXml extends XML {
     /** List with drbd resources. */
     private final List<String> resourceList = new ArrayList<String>();
     /** Map from drbd resource name to the drbd device. */
-    private final MultiKeyMap<String, String> resourceDeviceMap =
-                                                    MultiKeyMap.decorate(new LinkedMap<MultiKey<String>, String>());
+    private final Table<String, String, String> resourceDeviceMap = TreeBasedTable.create();
     /** Map from drbd device to the drbd resource name. */
     private final Map<String, String> deviceResourceMap = new HashMap<String, String>();
     /** Map from drbd device to the drbd volume. */
     private final Map<String, String> deviceVolumeMap = new HashMap<String, String>();
 
     /** Map from drbd resource name and the host to the block device. */
-    private final MultiKeyMap<String, Map<String, String>> resourceHostDiskMap =
-                                                                    new MultiKeyMap<String, Map<String, String>>();
+    private final Table<String, String, Map<String, String>> resourceHostDiskMap = HashBasedTable.create();
     /** Map from drbd resource name and the host to the ip. */
     private final Map<String, Map<String, String>> resourceHostIpMap = new HashMap<String, Map<String, String>>();
     /** Map from drbd resource name and the host to the port. */
@@ -320,13 +318,11 @@ public class DrbdXml extends XML {
     /** Map from drbd resource name and the host to the family. */
     private final Map<String, Map<String, String>> resourceHostFamilyMap = new HashMap<String, Map<String, String>>();
     /** Map from drbd resource name and the host to the meta disk. */
-    private final MultiKeyMap<String, Map<String, String>> resourceHostMetaDiskMap =
-                                                                    new MultiKeyMap<String, Map<String, String>>();
+    private final Table<String, String, Map<String, String>> resourceHostMetaDiskMap = HashBasedTable.create();
     /** Map from drbd resource name and the host to the meta disk index. */
-    private final MultiKeyMap<String, Map<String, String>> resourceHostMetaDiskIndexMap =
-                                                                    new MultiKeyMap<String, Map<String, String>>();
+    private final Table<String, String, Map<String, String>> resourceHostMetaDiskIndexMap = HashBasedTable.create();
     /** Map from resource and host to the proxy information. */
-    private final MultiKeyMap<String, HostProxy> resourceHostProxyMap = new MultiKeyMap<String, HostProxy>();
+    private final Table<String, String, HostProxy> resourceHostProxyMap = HashBasedTable.create();
     /** Set of all proxy hosts. */
     private final Collection<String> proxyHostNames = new LinkedHashSet<String>();
     /** Map from host to the boolean value if drbd is loaded on this host. */
@@ -1210,7 +1206,7 @@ public class DrbdXml extends XML {
     }
 
     /** Returns map from res and volume to drbd device. */
-    public MultiKeyMap<String, String> getResourceDeviceMap() {
+    public Table<String, String, String> getResourceDeviceMap() {
         return resourceDeviceMap;
     }
 

@@ -57,6 +57,8 @@ import javax.swing.JScrollPane;
 import javax.swing.SpringLayout;
 import javax.swing.tree.DefaultMutableTreeNode;
 
+import com.google.common.collect.HashBasedTable;
+import com.google.common.collect.Table;
 import lcmc.common.ui.GUIData;
 import lcmc.common.domain.AccessMode;
 import lcmc.common.domain.Application;
@@ -89,7 +91,6 @@ import lcmc.common.domain.util.Tools;
 import lcmc.common.domain.Unit;
 import lcmc.common.ui.utils.UpdatableItem;
 import lcmc.common.ui.utils.WidgetListener;
-import org.apache.commons.collections15.map.MultiKeyMap;
 
 /**
  * This class holds info data for one hearteat service and allows to enter
@@ -172,7 +173,7 @@ public class ServiceInfo extends EditableInfo {
     /** A map from operation to the stored value. First key is
      * operation name like "start" and second key is parameter like
      * "timeout". */
-    private final MultiKeyMap<String, Value> savedOperation = new MultiKeyMap<String, Value>();
+    private final Table<String, String, Value> savedOperation = HashBasedTable.create();
     /** Whether id-ref for meta-attributes is used. */
     private ServiceInfo savedMetaAttrInfoRef = null;
     /** Combo box with same as operations option. */
@@ -185,7 +186,7 @@ public class ServiceInfo extends EditableInfo {
     private final ReadWriteLock mOperationsComboBoxHashLock = new ReentrantReadWriteLock();
     private final Lock mOperationsComboBoxHashReadLock = mOperationsComboBoxHashLock.readLock();
     private final Lock mOperationsComboBoxHashWriteLock = mOperationsComboBoxHashLock.writeLock();
-    private final MultiKeyMap<String, Widget> operationsComboBoxHash = new MultiKeyMap<String, Widget>();
+    private final Table<String, String, Widget> operationsComboBoxHash = HashBasedTable.create();
     private JComponent infoPanel = null;
     /** Group info object of the group this service is in or null, if it is
      * not in any group. */
@@ -1603,7 +1604,7 @@ public class ServiceInfo extends EditableInfo {
                 if (!nothingSelected) {
                     if (sameAs) {
                         /* same as some other service */
-                        defaultValue = ((ServiceInfo) info).getSavedOperation().get(op, param);
+                        defaultValue = ((ServiceInfo) info).getSavedOperation(op, param);
                     }
                     final Value newValue = defaultValue;
                     if (!Tools.areEqual(oldValue, newValue)) {
@@ -4195,8 +4196,8 @@ public class ServiceInfo extends EditableInfo {
     }
 
     /** Returns hash with saved operations. */
-    MultiKeyMap<String, Value> getSavedOperation() {
-        return savedOperation;
+    Value getSavedOperation(final String op, final String param) {
+        return savedOperation.get(op, param);
     }
 
     @Override

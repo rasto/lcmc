@@ -31,6 +31,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import com.google.common.collect.HashBasedTable;
+import com.google.common.collect.Table;
 import lcmc.common.domain.Value;
 import org.apache.commons.collections15.map.MultiKeyMap;
 
@@ -54,12 +56,12 @@ final class CibQuery {
     private Map<String, List<CrmXml.RscSet>> orderIdRscSets = new LinkedHashMap<String, List<CrmXml.RscSet>>();
     private Map<String, List<CrmXml.RscSet>> colocationIdRscSets = new LinkedHashMap<String, List<CrmXml.RscSet>>();
     private List<CrmXml.RscSetConnectionData> rscSetConnections = new ArrayList<CrmXml.RscSetConnectionData>();
-    private MultiKeyMap<String, String> nodeParameters;
+    private Table<String, String, String> nodeParameters;
     private Map<String, Map<String, HostLocation>> locations = new HashMap<String, Map<String, HostLocation>>();
     private Map<String, HostLocation> pingLocations = new HashMap<String, HostLocation>();
     private Map<String, List<String>> locationsId = new HashMap<String, List<String>>();
     private Map<String, HostLocation> idToLocation = new HashMap<String, HostLocation>();
-    private MultiKeyMap<String, String> resHostToLocId = new MultiKeyMap<String, String>();
+    private Table<String, String, String> resHostToLocId = HashBasedTable.create();
     private Map<String, String> resPingToLocId = new HashMap<String, String>();
     private MultiKeyMap<String, Value> operations = new MultiKeyMap<String, Value>();
     private Map<String, String> operationsRefs = new HashMap<String, String>();
@@ -74,9 +76,9 @@ final class CibQuery {
     private Map<String, String> cloneToResource = new HashMap<String, String>();
     private List<String> masterList = new ArrayList<String>();
     private String designatedCoOrdinator = null;
-    private MultiKeyMap<String, String> nodeFailedCount = new MultiKeyMap<String, String>();
+    private Table<String, String, String> nodeFailedCount = HashBasedTable.create();
     /** Map from rsc id to list of clone ids for failed clones. */
-    private MultiKeyMap<String, Set<String>> resourceFailedCloneIds = new MultiKeyMap<String, Set<String>>();
+    private Table<String, String, Set<String>> resourceFailedCloneIds = HashBasedTable.create();
     private Map<String, String> nodePingCount = new HashMap<String, String>();
     private String rscDefaultsId = null;
     private Map<String, String> rscDefaultsParams = new HashMap<String, String>();
@@ -219,11 +221,11 @@ final class CibQuery {
         return orderIdRscSets;
     }
 
-    void setNodeParameters(final MultiKeyMap<String, String> nodeParameters) {
+    void setNodeParameters(final Table<String, String, String> nodeParameters) {
         this.nodeParameters = nodeParameters;
     }
 
-    MultiKeyMap<String, String> getNodeParameters() {
+    Table<String, String, String> getNodeParameters() {
         return nodeParameters;
     }
 
@@ -259,11 +261,11 @@ final class CibQuery {
         return idToLocation;
     }
 
-    void setResHostToLocId(final MultiKeyMap<String, String> resHostToLocId) {
+    void setResHostToLocId(final Table<String, String, String> resHostToLocId) {
         this.resHostToLocId = resHostToLocId;
     }
 
-    MultiKeyMap<String, String> getResHostToLocId() {
+    Table<String, String, String> getResHostToLocId() {
         return resHostToLocId;
     }
 
@@ -379,11 +381,11 @@ final class CibQuery {
         return designatedCoOrdinator;
     }
 
-    void setNodeFailedCount(final MultiKeyMap<String, String> nodeFailedCount) {
+    void setNodeFailedCount(final Table<String, String, String> nodeFailedCount) {
         this.nodeFailedCount = nodeFailedCount;
     }
 
-    MultiKeyMap<String, String> getNodeFailedCount() {
+    Table<String, String, String> getNodeFailedCount() {
         return nodeFailedCount;
     }
 
@@ -395,11 +397,11 @@ final class CibQuery {
         return nodePingCount;
     }
 
-    void setResourceFailedCloneIds(final MultiKeyMap<String, Set<String>> resourceFailedCloneIds) {
+    void setResourceFailedCloneIds(final Table<String ,String, Set<String>> resourceFailedCloneIds) {
         this.resourceFailedCloneIds = resourceFailedCloneIds;
     }
 
-    MultiKeyMap<String, Set<String>> getResourceFailedCloneIds() {
+    Table<String ,String, Set<String>> getResourceFailedCloneIds() {
         return resourceFailedCloneIds;
     }
 

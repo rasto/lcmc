@@ -31,6 +31,8 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 
+import com.google.common.collect.HashBasedTable;
+import com.google.common.collect.Table;
 import lcmc.common.domain.Application;
 import lcmc.common.domain.Value;
 import lcmc.cluster.ui.ClusterBrowser;
@@ -38,7 +40,6 @@ import lcmc.crm.ui.resource.ServiceInfo;
 import lcmc.cluster.ui.widget.Widget;
 import lcmc.logger.Logger;
 import lcmc.logger.LoggerFactory;
-import org.apache.commons.collections15.map.MultiKeyMap;
 
 /**
  * This class describes a resource agent with its name and class.
@@ -88,7 +89,7 @@ public final class ResourceAgent {
     private final Map<String, Value[]> paramPossibleChoices = new HashMap<String, Value[]>();
     private final Map<String, Value[]> paramPossibleChoicesMS = new HashMap<String, Value[]>();
     private final String pullDownMenuName;
-    private final MultiKeyMap<String, Value> nameParameterToDefaultOperations = new MultiKeyMap<String, Value>();
+    private final Table<String ,String, Value> nameParameterToDefaultOperations = HashBasedTable.create();
     private final Collection<String> operationNames = new LinkedHashSet<String>();
     private boolean probablyMasterSlave = false;
     private boolean probablyClone = false;
