@@ -674,7 +674,9 @@ public class ServiceInfo extends EditableInfo {
                         value = getOpDefaultsDefault(param);
                     }
                     if (!Tools.areEqual(value, savedOperation.get(op, param))) {
-                        savedOperation.put(op, param, value);
+                        if (value != null) {
+                            savedOperation.put(op, param, value);
+                        }
                         if (infoPanelOk) {
                             mOperationsComboBoxHashReadLock.lock();
                             final Widget wi;

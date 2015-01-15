@@ -1759,11 +1759,13 @@ public final class VmsXml extends XML {
         final String domainName = getAttribute(vmNode, VM_PARAM_NAME);
         final String autostart = getAttribute(vmNode, VM_PARAM_AUTOSTART);
         final String virshOptions = getAttribute(vmNode, VM_PARAM_VIRSH_OPTIONS);
-        parameterValues.put(domainName, VM_PARAM_VIRSH_OPTIONS, virshOptions);
+        if (virshOptions != null) {
+            parameterValues.put(domainName, VM_PARAM_VIRSH_OPTIONS, virshOptions);
+        }
         if (autostart != null && "True".equals(autostart)) {
             parameterValues.put(domainName, VM_PARAM_AUTOSTART, definedOnHost.getName());
         } else {
-            parameterValues.put(domainName, VM_PARAM_AUTOSTART, null);
+            parameterValues.remove(domainName, VM_PARAM_AUTOSTART);
         }
         if (infoNode != null) {
             parseInfo(domainName, getText(infoNode));

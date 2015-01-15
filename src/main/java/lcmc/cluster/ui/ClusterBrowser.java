@@ -1369,30 +1369,6 @@ public class ClusterBrowser extends Browser {
         }
     }
 
-    /**
-     * Kill removed volumes. (removed outside of GUI)
-     * TODO: not used at the moment
-     */
-    private void killRemovedVolumes(final MultiKeyMap<String, String> deviceMap) {
-        for (final VolumeInfo dvi : getDrbdGraph().getDrbdVolumeToEdgeMap().keySet()) {
-            if (!deviceMap.containsKey(dvi.getDrbdResourceInfo().getName(), dvi.getName())) {
-                getDrbdXml().removeVolume(dvi.getDrbdResourceInfo().getName(), dvi.getDevice(), dvi.getName());
-                getDrbdGraph().removeDrbdVolume(dvi);
-                final boolean lastVolume = dvi.getDrbdResourceInfo().removeDrbdVolume(dvi);
-                getDrbdDeviceHash().remove(dvi.getDevice());
-                putDrbdDevHash();
-                for (final BlockDevInfo bdi : dvi.getBlockDevInfos()) {
-                    bdi.removeFromDrbd();
-                    bdi.removeMyself(Application.RunMode.LIVE);
-                }
-                if (lastVolume) {
-                    dvi.getDrbdResourceInfo().removeMyself(Application.RunMode.LIVE);
-                }
-            }
-        }
-    }
-
-
     @Subscribe
     public void onUpdateCommonNetworks(final NetworkChangedEvent event) {
         if (cluster != event.getCluster()) {

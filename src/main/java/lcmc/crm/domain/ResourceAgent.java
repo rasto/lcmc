@@ -415,7 +415,9 @@ public final class ResourceAgent {
      * to the hash.
      */
     void addOperationDefault(final String name, final String param, final Value defaultValue) {
-        nameParameterToDefaultOperations.put(name, param, defaultValue);
+        if (defaultValue != null) {
+            nameParameterToDefaultOperations.put(name, param, defaultValue);
+        }
         operationNames.add(name);
     }
 
