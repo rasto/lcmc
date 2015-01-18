@@ -99,10 +99,10 @@ public class ServicesMenuTest {
         verify(menuItemStub, never()).predicate((Predicate) anyObject());
         verify(menuItemStub).visiblePredicate((VisiblePredicate) anyObject());
         verify(menuItemStub, times(5)).enablePredicate((EnablePredicate) anyObject());
-        verify(menuItemStub, times(8)).addAction((MenuAction) anyObject());
+        verify(menuItemStub, times(9)).addAction((MenuAction) anyObject());
         verify(menuStub, times(1)).enablePredicate((EnablePredicate) anyObject());
         verify(menuStub, times(1)).onUpdate((Runnable) anyObject());
-        assertEquals(9, items.size());
+        assertEquals(10, items.size());
     }
 
 }
