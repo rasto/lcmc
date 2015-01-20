@@ -27,28 +27,27 @@ import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.geom.Point2D;
+import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.CountDownLatch;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Provider;
-import javax.swing.BoxLayout;
-import javax.swing.ImageIcon;
-import javax.swing.JComponent;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
+import javax.swing.*;
 import javax.swing.tree.DefaultMutableTreeNode;
 
 import lcmc.common.domain.AccessMode;
 import lcmc.common.ui.GUIData;
 import lcmc.common.domain.Application;
 import lcmc.common.ui.treemenu.TreeMenuController;
+import lcmc.common.ui.utils.Dialogs;
 import lcmc.crm.domain.CrmXml;
 import lcmc.crm.domain.ClusterStatus;
 import lcmc.host.domain.Host;
@@ -97,6 +96,8 @@ public class ServicesInfo extends EditableInfo {
     private TreeMenuController treeMenuController;
     @Inject
     private CrmServiceFactory crmServiceFactory;
+    @Inject
+    private Dialogs dialogs;
 
     @Override
     public void init(final String name, final Browser browser) {
@@ -1188,5 +1189,17 @@ public class ServicesInfo extends EditableInfo {
         guiData.stopProgressIndicator(cn, "paste");
         otherBrowser.getClusterViewPanel().setDisabledDuringLoad(false);
         getBrowser().getClusterViewPanel().setDisabledDuringLoad(false);
+    }
+
+    public void exportGraphAsPng() {
+        final Optional<String> savePath = dialogs.getFileName("lcmc-pcmk-");
+        if (savePath.isPresent()) {
+            new Thread() {
+                public void run() {
+                    BufferedImage image = getBrowser().getCrmGraph().createImage();
+                    Tools.writeImage(savePath.get(), image, "PNG");
+                }
+            }.start();
+        }
     }
 }

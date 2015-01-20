@@ -27,6 +27,7 @@ import edu.uci.ics.jung.algorithms.layout.StaticLayout;
 import edu.uci.ics.jung.graph.Graph;
 import edu.uci.ics.jung.graph.util.Context;
 import edu.uci.ics.jung.graph.util.Pair;
+import edu.uci.ics.jung.visualization.BasicVisualizationServer;
 import edu.uci.ics.jung.visualization.GraphZoomScrollPane;
 import edu.uci.ics.jung.visualization.Layer;
 import edu.uci.ics.jung.visualization.RenderContext;
@@ -43,7 +44,6 @@ import edu.uci.ics.jung.visualization.decorators.AbstractEdgeShapeTransformer;
 import edu.uci.ics.jung.visualization.decorators.AbstractVertexShapeTransformer;
 import edu.uci.ics.jung.visualization.decorators.ConstantDirectionalEdgeValueTransformer;
 import edu.uci.ics.jung.visualization.decorators.DirectionalEdgeArrowTransformer;
-import edu.uci.ics.jung.visualization.decorators.EdgeShape;
 import edu.uci.ics.jung.visualization.decorators.PickableEdgePaintTransformer;
 import edu.uci.ics.jung.visualization.decorators.PickableVertexPaintTransformer;
 import edu.uci.ics.jung.visualization.decorators.ToStringLabeller;
@@ -73,7 +73,6 @@ import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.ConcurrentModificationException;
@@ -344,12 +343,10 @@ public abstract class ResourceGraph {
 
     }
     
-    final Transformer<Vertex, Point2D> vlf = TransformerUtils.mapTransformer(getVertexLocations());
-    
     protected final void initGraph(final Graph<Vertex, Edge> graph) {
         this.graph = graph;
 
-        
+        final Transformer<Vertex, Point2D> vlf = TransformerUtils.mapTransformer(getVertexLocations());
         putVertexLocations();
 
         layout = new StaticLayout<Vertex, Edge>(graph, vlf) {
@@ -363,39 +360,9 @@ public abstract class ResourceGraph {
             }
         };
         visualizationViewer = new VisualizationViewer<Vertex, Edge>(layout);
-        visualizationViewer.getRenderContext().setEdgeArrowTransformer(new MyEdgeArrowFunction<Vertex, Edge>());
-        visualizationViewer.getRenderContext().setEdgeLabelClosenessTransformer(
-                                                new ConstantDirectionalEdgeValueTransformer<Vertex, Edge>(0.5, 0.5));
-        visualizationViewer.getRenderContext().setVertexShapeTransformer(
-                                                    new MyVertexShapeSize<Vertex, Edge>(graph, vlf));
-        visualizationViewer.getRenderContext().setVertexFillPaintTransformer(
-                new MyPickableVertexPaintFunction<Vertex>(visualizationViewer.getPickedVertexState(), false));
-        visualizationViewer.getRenderContext().setVertexDrawPaintTransformer(
-                        new MyPickableVertexPaintFunction<Vertex>(visualizationViewer.getPickedVertexState(), true));
-        visualizationViewer.getRenderer().setVertexRenderer(pluggableRenderer);
-
-        visualizationViewer.getRenderContext().setEdgeLabelTransformer(new ToStringLabeller<Edge>());
-        visualizationViewer.setBackground(Tools.getDefaultColor("ResourceGraph.Background"));
         visualizationViewer.setVertexToolTipTransformer(new MyVertexToolTipFunction<Vertex>());
         visualizationViewer.setEdgeToolTipTransformer(new MyEdgeToolTipFunction<Edge>());
-        visualizationViewer.getRenderContext().setEdgeShapeTransformer(new MyLine<Vertex, Edge>());
-        visualizationViewer.getRenderContext().setEdgeDrawPaintTransformer(
-                                    new MyPickableEdgePaintFunction<Edge>(visualizationViewer.getPickedEdgeState(),
-                                                                          EDGE_DRAW_PAINT,
-                                                                          EDGE_PICKED_PAINT));
-        visualizationViewer.getRenderContext().setEdgeFillPaintTransformer(
-                                    new MyPickableEdgePaintFunction<Edge>(visualizationViewer.getPickedEdgeState(),
-                                                                          EDGE_DRAW_PAINT,
-                                                                          EDGE_PICKED_PAINT));
-        visualizationViewer.getRenderContext().setArrowDrawPaintTransformer(
-                                    new MyPickableEdgePaintFunction<Edge>(visualizationViewer.getPickedEdgeState(),
-                                                                          EDGE_DRAW_PAINT,
-                                                                          EDGE_PICKED_PAINT));
-        visualizationViewer.getRenderContext().setArrowFillPaintTransformer(
-                                    new MyPickableArrowEdgePaintFunction<Edge>(
-                                                                          visualizationViewer.getPickedEdgeState(),
-                                                                          EDGE_DRAW_PAINT,
-                                                                          EDGE_PICKED_PAINT));
+        initializeRendering(visualizationViewer);
 
         /* scaling */
         /* overwriting scaler so that zooming starts from point (0, 0) */
@@ -434,6 +401,43 @@ public abstract class ResourceGraph {
                     }
                 }
             });
+    }
+
+    private void initializeRendering(final BasicVisualizationServer visualizationServer) {
+        final Transformer<Vertex, Point2D> vlf = TransformerUtils.mapTransformer(getVertexLocations());
+        putVertexLocations();
+        final RenderContext renderContext = visualizationServer.getRenderContext();
+        renderContext.setEdgeArrowTransformer(new MyEdgeArrowFunction<Vertex, Edge>());
+        renderContext.setEdgeLabelClosenessTransformer(
+                new ConstantDirectionalEdgeValueTransformer<Vertex, Edge>(0.5, 0.5));
+        renderContext.setVertexShapeTransformer(
+                new MyVertexShapeSize<Vertex, Edge>(graph, vlf));
+        renderContext.setVertexFillPaintTransformer(
+                new MyPickableVertexPaintFunction<Vertex>(visualizationViewer.getPickedVertexState(), false));
+        renderContext.setVertexDrawPaintTransformer(
+                new MyPickableVertexPaintFunction<Vertex>(visualizationViewer.getPickedVertexState(), true));
+        visualizationServer.getRenderer().setVertexRenderer(pluggableRenderer);
+
+        renderContext.setEdgeLabelTransformer(new ToStringLabeller<Edge>());
+        visualizationServer.setBackground(Tools.getDefaultColor("ResourceGraph.Background"));
+        renderContext.setEdgeShapeTransformer(new MyLine<Vertex, Edge>());
+        renderContext.setEdgeDrawPaintTransformer(
+                new MyPickableEdgePaintFunction<Edge>(visualizationViewer.getPickedEdgeState(),
+                        EDGE_DRAW_PAINT,
+                        EDGE_PICKED_PAINT));
+        renderContext.setEdgeFillPaintTransformer(
+                new MyPickableEdgePaintFunction<Edge>(visualizationViewer.getPickedEdgeState(),
+                        EDGE_DRAW_PAINT,
+                        EDGE_PICKED_PAINT));
+        renderContext.setArrowDrawPaintTransformer(
+                new MyPickableEdgePaintFunction<Edge>(visualizationViewer.getPickedEdgeState(),
+                        EDGE_DRAW_PAINT,
+                        EDGE_PICKED_PAINT));
+        renderContext.setArrowFillPaintTransformer(
+                new MyPickableArrowEdgePaintFunction<Edge>(
+                        visualizationViewer.getPickedEdgeState(),
+                        EDGE_DRAW_PAINT,
+                        EDGE_PICKED_PAINT));
     }
 
     /** Repaints the graph. */
@@ -1753,72 +1757,17 @@ public abstract class ResourceGraph {
     protected ClusterBrowser getClusterBrowser() {
         return clusterBrowser;
     }
-    
-    public void saveAsPNG(String filename) {
-    	VisualizationViewer<Vertex, Edge> vv = visualizationViewer;
-    	
 
-                
-    
+    public BufferedImage createImage() {
         VisualizationImageServer<Vertex, Edge> vis =
-        	    new VisualizationImageServer<Vertex, Edge>(vv.getGraphLayout(),
-        	        vv.getGraphLayout().getSize());
+                new VisualizationImageServer<Vertex, Edge>(visualizationViewer.getGraphLayout(),
+                    visualizationViewer.getGraphLayout().getSize());
 
-        
+        initializeRendering(vis);
 
-    	// Configure the VisualizationImageServer the same way
-    	// you did your VisualizationViewer. In my case e.g.
-
-    	
-    	vis.getRenderContext().setEdgeArrowTransformer(new MyEdgeArrowFunction<Vertex, Edge>());
-    	vis.getRenderContext().setEdgeLabelClosenessTransformer(
-                                                new ConstantDirectionalEdgeValueTransformer<Vertex, Edge>(0.5, 0.5));
-    	vis.getRenderContext().setVertexShapeTransformer(
-                                                    new MyVertexShapeSize<Vertex, Edge>(graph, vlf));
-    	vis.getRenderContext().setVertexFillPaintTransformer(
-                new MyPickableVertexPaintFunction<Vertex>(vv.getPickedVertexState(), false));
-    	vis.getRenderContext().setVertexDrawPaintTransformer(
-                        new MyPickableVertexPaintFunction<Vertex>(vv.getPickedVertexState(), true));
-    	vis.getRenderer().setVertexRenderer(pluggableRenderer);
-
-    	vis.getRenderContext().setEdgeLabelTransformer(new ToStringLabeller<Edge>());
-    	vis.setBackground(Tools.getDefaultColor("ResourceGraph.Background"));
-
-        vis.getRenderContext().setEdgeShapeTransformer(new MyLine<Vertex, Edge>());
-        vis.getRenderContext().setEdgeDrawPaintTransformer(
-                                    new MyPickableEdgePaintFunction<Edge>(vv.getPickedEdgeState(),
-                                                                          EDGE_DRAW_PAINT,
-                                                                          EDGE_PICKED_PAINT));
-        vis.getRenderContext().setEdgeFillPaintTransformer(
-                                    new MyPickableEdgePaintFunction<Edge>(vv.getPickedEdgeState(),
-                                                                          EDGE_DRAW_PAINT,
-                                                                          EDGE_PICKED_PAINT));
-        vis.getRenderContext().setArrowDrawPaintTransformer(
-                                    new MyPickableEdgePaintFunction<Edge>(vv.getPickedEdgeState(),
-                                                                          EDGE_DRAW_PAINT,
-                                                                          EDGE_PICKED_PAINT));
-        vis.getRenderContext().setArrowFillPaintTransformer(
-                                    new MyPickableArrowEdgePaintFunction<Edge>(
-                                                                          vv.getPickedEdgeState(),
-                                                                          EDGE_DRAW_PAINT,
-                                                                          EDGE_PICKED_PAINT));
-  
-    	
-        BufferedImage image = (BufferedImage) vis.getImage(
-        	    new Point2D.Double(vv.getGraphLayout().getSize().getWidth() / 2,
-        	    		vv.getGraphLayout().getSize().getHeight() / 2),
-        	    new Dimension(vv.getGraphLayout().getSize()));
-            
-    	// Write image to a png file
-    	File outputfile = new File(filename);
-
-    	try {
-    	    ImageIO.write(image, "PNG", outputfile);
-    	    
-    	} catch (Exception e) {
-    	    // Exception handling
-    		e.printStackTrace();
-    	}
+        return (BufferedImage) vis.getImage(
+                new Point2D.Double(visualizationViewer.getGraphLayout().getSize().getWidth() / 2,
+                        visualizationViewer.getGraphLayout().getSize().getHeight() / 2),
+                new Dimension(visualizationViewer.getGraphLayout().getSize()));
     }
-    
 }

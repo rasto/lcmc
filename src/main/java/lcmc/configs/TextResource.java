@@ -1364,7 +1364,7 @@ public final class TextResource extends ListResourceBundle {
          "View Service Log"},
          
          {"ClusterBrowser.Hb.ExportGraph",
-        	 "Export Graph"
+        	 "Export Graph as PNG"
          },
 
         {"ClusterBrowser.Hb.RemoveEdge",

@@ -77,7 +77,7 @@ public class GlobalMenuITest {
         verify(menuItemStub, never()).predicate((Predicate) anyObject());
         verify(menuItemStub, never()).visiblePredicate((VisiblePredicate) anyObject());
         verify(menuItemStub, never()).enablePredicate((EnablePredicate) anyObject());
-        verify(menuItemStub, times(4)).addAction((MenuAction) anyObject());
-        assertEquals(4, items.size());
+        verify(menuItemStub, times(5)).addAction((MenuAction) anyObject());
+        assertEquals(5, items.size());
     }
 }

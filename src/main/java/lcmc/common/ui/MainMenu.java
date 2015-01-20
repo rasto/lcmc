@@ -32,6 +32,7 @@ import java.awt.event.KeyEvent;
 import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Provider;
@@ -59,6 +60,7 @@ import javax.swing.event.HyperlinkListener;
 import javax.swing.filechooser.FileFilter;
 import lcmc.cluster.ui.wizard.AddClusterDialog;
 import lcmc.cluster.ui.ClusterBrowser;
+import lcmc.common.ui.utils.Dialogs;
 import lcmc.host.ui.AddHostDialog;
 import lcmc.Exceptions;
 import lcmc.common.domain.AccessMode;
@@ -112,6 +114,8 @@ public final class MainMenu extends JPanel implements ActionListener {
     private BugReport bugReport;
     @Inject
     private About aboutDialog;
+    @Inject
+    private Dialogs dialogs;
 
     public void init() {
         if (application.isUpgradeCheckEnabled()) {
@@ -311,36 +315,10 @@ public final class MainMenu extends JPanel implements ActionListener {
                      return;
                  }
                  LOG.debug1("actionPerformed: MENU ACTION: load");
-                 final JFileChooser fc = new JFileChooser();
-                 fc.setSelectedFile(new File(application.getDefaultSaveFile()));
-                 final FileFilter filter = new FileFilter() {
-                     @Override
-                     public boolean accept(final File f) {
-                         if (f.isDirectory()) {
-                            return true;
-                         }
-                         final String name = f.getName();
-                         final int i = name.lastIndexOf('.');
-                         if (i > 0 && i < name.length() - 1) {
-                             final String ext = name.substring(i + 1);
-                             if (ext.equals(Tools.getDefault("MainMenu.DrbdGuiFiles.Extension"))) {
-                                 return true;
-                             }
-                         }
-                         return false;
-                     }
-
-                     @Override
-                     public String getDescription() {
-                         return Tools.getString("MainMenu.DrbdGuiFiles");
-                     }
-                 };
-                 fc.setFileFilter(filter);
-                 final int ret = fc.showOpenDialog(guiData.getMainFrame());
-                 if (ret == JFileChooser.APPROVE_OPTION) {
-                     final String name = fc.getSelectedFile().getAbsolutePath();
-                     application.setDefaultSaveFile(name);
-                     loadConfigData(name);
+                 final Optional<String> name = dialogs.getLcmcConfFilename();
+                 if (name.isPresent()) {
+                     application.setDefaultSaveFile(name.get());
+                     loadConfigData(name.get());
                  }
              }
         };

@@ -30,7 +30,9 @@ import java.awt.GraphicsConfiguration;
 import java.awt.Insets;
 import java.awt.Rectangle;
 import java.awt.Toolkit;
+import java.awt.image.BufferedImage;
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -59,6 +61,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
+import javax.imageio.ImageIO;
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import javax.swing.JCheckBox;
@@ -1437,6 +1440,15 @@ public final class Tools {
         }
         commonFileSystemItems[i] = new StringValue("none");
         return commonFileSystemItems;
+    }
+
+    public static void writeImage(final String filename, final BufferedImage image, final String imageType) {
+        File outputfile = new File(filename);
+        try {
+            ImageIO.write(image, imageType, outputfile);
+        } catch (Exception e) {
+            LOG.appError("writeImage: failed", e);
+        }
     }
 
     private Tools() {
