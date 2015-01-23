@@ -101,6 +101,20 @@ public class GlobalMenu {
                 });
         items.add(rescanLvmItem);
 
+        /* export image  */
+        final UpdatableItem savePNGItem =
+                menuFactory.createMenuItem(Tools.getString("ClusterBrowser.Hb.ExportGraph"),
+                        null,
+                        null,
+                        new AccessMode(AccessMode.RO, AccessMode.NORMAL),
+                        new AccessMode(AccessMode.RO, AccessMode.NORMAL)).addAction(new MenuAction() {
+                    @Override
+                    public void run(String text) {
+                        globalInfo.exportGraphAsPng();
+                    }
+                });
+        items.add(savePNGItem);
+
         /* view log */
         final UpdatableItem viewLogMenu = menuFactory.createMenuItem(
                 Tools.getString("ClusterBrowser.Drbd.ViewLogs"),

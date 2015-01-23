@@ -34,7 +34,6 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.CountDownLatch;
 import javax.inject.Inject;
@@ -43,6 +42,7 @@ import javax.inject.Provider;
 import javax.swing.*;
 import javax.swing.tree.DefaultMutableTreeNode;
 
+import com.google.common.base.Optional;
 import lcmc.common.domain.AccessMode;
 import lcmc.common.ui.GUIData;
 import lcmc.common.domain.Application;
@@ -1192,7 +1192,7 @@ public class ServicesInfo extends EditableInfo {
     }
 
     public void exportGraphAsPng() {
-        final Optional<String> savePath = dialogs.getFileName("lcmc-pcmk-");
+        final Optional<String> savePath = dialogs.getFileName("lcmc-pcmk");
         if (savePath.isPresent()) {
             new Thread() {
                 public void run() {

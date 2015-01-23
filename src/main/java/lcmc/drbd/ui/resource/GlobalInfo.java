@@ -26,6 +26,7 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.image.BufferedImage;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -49,7 +50,9 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.tree.DefaultMutableTreeNode;
 
+import com.google.common.base.Optional;
 import lcmc.common.ui.treemenu.TreeMenuController;
+import lcmc.common.ui.utils.Dialogs;
 import lcmc.drbd.ui.AddDrbdConfigDialog;
 import lcmc.Exceptions;
 import lcmc.configs.AppDefaults;
@@ -112,6 +115,8 @@ public class GlobalInfo extends AbstractDrbdInfo {
     private Application application;
     @Inject
     private TreeMenuController treeMenuController;
+    @Inject
+    private Dialogs dialogs;
 
     public void init(final String name, final Browser browser) {
         super.init(name, browser);
@@ -967,6 +972,18 @@ public class GlobalInfo extends AbstractDrbdInfo {
                                + "rm -rf /etc/drbd.d.temp/");
                                /* all this is to stay atomic. */
             }
+        }
+    }
+
+    public void exportGraphAsPng() {
+        final Optional<String> savePath = dialogs.getFileName("lcmc-drbd");
+        if (savePath.isPresent()) {
+            new Thread() {
+                public void run() {
+                    BufferedImage image = getBrowser().getDrbdGraph().createImage();
+                    Tools.writeImage(savePath.get(), image, "PNG");
+                }
+            }.start();
         }
     }
 }

@@ -32,7 +32,6 @@ import java.awt.event.KeyEvent;
 import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Optional;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Provider;
@@ -58,6 +57,8 @@ import javax.swing.border.LineBorder;
 import javax.swing.event.HyperlinkEvent;
 import javax.swing.event.HyperlinkListener;
 import javax.swing.filechooser.FileFilter;
+
+import com.google.common.base.Optional;
 import lcmc.cluster.ui.wizard.AddClusterDialog;
 import lcmc.cluster.ui.ClusterBrowser;
 import lcmc.common.ui.utils.Dialogs;
