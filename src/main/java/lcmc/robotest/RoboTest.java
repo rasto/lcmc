@@ -378,7 +378,7 @@ public final class RoboTest {
     void stopEverything() {
         moveTo(Tools.getString("Browser.AdvancedMode"));
         leftClick();
-        moveTo(700, 520);
+        moveTo(700, 470);
         rightClick(); /* popup */
         moveTo(Tools.getString("ClusterBrowser.Hb.StopAllServices"));
         leftClick();
@@ -391,7 +391,7 @@ public final class RoboTest {
     void removeEverything() {
         moveTo(Tools.getString("Browser.AdvancedMode"));
         leftClick();
-        moveTo(700, 520);
+        moveTo(700, 470);
         rightClick(); /* popup */
         moveTo(Tools.getString("ClusterBrowser.Hb.RemoveAllServices"));
         leftClick();
