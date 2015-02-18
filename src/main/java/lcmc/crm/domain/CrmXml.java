@@ -1484,7 +1484,10 @@ public final class CrmXml extends XML {
                 /* <shortdesc lang="en"> */
                 final Node shortdescParamNode = getChildNode(parameterNode, "shortdesc");
                 if (shortdescParamNode != null) {
-                    final String shortDesc = getText(shortdescParamNode);
+                    String shortDesc = getText(shortdescParamNode);
+                    if (shortDesc.trim().equals("")) {
+                        shortDesc = param;
+                    }
                     resourceAgent.setParamShortDesc(param, shortDesc);
                 }
 
