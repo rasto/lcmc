@@ -36,6 +36,7 @@ import java.util.Map;
 import java.util.Set;
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Provider;
 import javax.swing.ImageIcon;
 import javax.swing.JPopupMenu;
 
@@ -98,7 +99,8 @@ public class DrbdGraph extends ResourceGraph {
     private final Map<VolumeInfo, Edge> drbdVolumeToEdgeMap = new LinkedHashMap<VolumeInfo, Edge>();
 
     @Inject
-    private MultiSelectionInfo multiSelectionInfo = null;
+    private Provider<MultiSelectionInfo> multiSelectionInfoProvider;
+    private MultiSelectionInfo multiSelectionInfo;
 
     /** The first X position of the host. */
     private int hostDefaultXPos = 10;
@@ -1021,6 +1023,7 @@ public class DrbdGraph extends ResourceGraph {
                 selectedInfos.add(i);
             }
         }
+        multiSelectionInfo = multiSelectionInfoProvider.get();
         multiSelectionInfo.init(selectedInfos, getClusterBrowser());
         getClusterBrowser().setRightComponentInView(multiSelectionInfo);
     }
