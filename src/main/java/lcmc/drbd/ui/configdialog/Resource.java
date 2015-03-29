@@ -72,8 +72,7 @@ public final class Resource extends DrbdConfig {
     private static final String PROXY_PLUGIN_ZLIB_PARAM = "plugin-zlib";
     private static final String PROXY_PLUGIN_LZMA_PARAM = "plugin-lzma";
 
-    private static final String[] COMMON_PARAMS = {DrbdXml.PROTOCOL_PARAM,
-                                                   DrbdXml.PING_TIMEOUT_PARAM,
+    private static final String[] COMMON_PARAMS = {DrbdXml.PING_TIMEOUT_PARAM,
                                                    CRAM_HMAC_ALG_PARAM,
                                                    SHARED_SECRET_PARAM,
                                                    WFC_TIMEOUT_PARAM,
