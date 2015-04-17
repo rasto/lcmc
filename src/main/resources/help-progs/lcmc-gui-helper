@@ -944,7 +944,7 @@ sub do_drbd_events {
 		return;
 	} else {
 		while (<EVENTS>) {
-			if ($_ && $_ !~ /\d+\s+ZZ/) {
+			if ($_ && $_ !~ /\d+\s+(ZZ|\?\?)/) {
 				my $drbd_info = get_drbd_dump_xml();
 				if ($drbd_info ne $prev_drbd_info) {
 					print "--drbd-info-start--"
