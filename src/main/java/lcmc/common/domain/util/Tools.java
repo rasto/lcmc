@@ -585,26 +585,6 @@ public final class Tools {
     /**
      * Returns intersection of two string lists as List of string.
      */
-    @Deprecated
-    public static Set<String> getIntersection(final Set<String> setA, final Set<String> setB) {
-        final Set<String> resultSet = new TreeSet<String>();
-        if (setB == null) {
-            return setA;
-        }
-        if (setA == null) {
-            return setB;
-        }
-        for (final String item : setA) {
-            if (setB.contains(item)) {
-                resultSet.add(item);
-            }
-        }
-        return resultSet;
-    }
-
-    /**
-     * Returns intersection of two string lists as List of string.
-     */
     public static Optional<Set<String>> getIntersection(
             final Optional<Set<String>> setA,
             final Optional<Set<String>> setB) {
@@ -958,24 +938,6 @@ public final class Tools {
         }
     }
 
-    /**
-     * Returns value unit pair extracting from string. E.g. "10min" becomes 10
-     * and "min" pair.
-     */
-    @Deprecated
-    public static String[] extractUnit(final CharSequence time) {
-        final String[] o = new String[]{null, null};
-        if (time == null) {
-            return o;
-        }
-        final Matcher m = UNIT_PATTERN.matcher(time);
-        if (m.matches()) {
-            o[0] = m.group(1);
-            o[1] = m.group(2);
-        }
-        return o;
-    }
-
     /** Returns random secret of the specified lenght. */
     public static String getRandomSecret(final int len) {
         final Random rand = new Random();
@@ -1006,32 +968,6 @@ public final class Tools {
         } catch (final java.net.UnknownHostException e) {
             return false;
         }
-    }
-
-    /** Converts value with units. */
-    @Deprecated
-    public static long convertUnits(final CharSequence value) {
-        final String[] v = Tools.extractUnit(value);
-        if (v.length == 2 && Tools.isNumber(v[0])) {
-            long num = Long.parseLong(v[0]);
-            final String unit = v[1];
-            if ("P".equalsIgnoreCase(unit)) {
-                num = num * 1024 * 1024 * 1024 * 1024 * 1024;
-            } else if ("T".equalsIgnoreCase(unit)) {
-                num = num * 1024 * 1024 * 1024 * 1024;
-            } else if ("G".equalsIgnoreCase(unit)) {
-                num = num * 1024 * 1024 * 1024;
-            } else if ("M".equalsIgnoreCase(unit)) {
-                num = num * 1024 * 1024;
-            } else if ("K".equalsIgnoreCase(unit)) {
-                num *= 1024;
-            } else if ("".equalsIgnoreCase(unit)) {
-            } else {
-                return -1;
-            }
-            return num;
-        }
-        return -1;
     }
 
     /** Resize table. */

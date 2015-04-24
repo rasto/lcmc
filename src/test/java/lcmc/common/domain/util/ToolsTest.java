@@ -430,56 +430,6 @@ public final class ToolsTest {
         assertEquals("", Tools.ucfirst(""));
     }
 
-    @SuppressWarnings("unused")
-    private Object[] parametersForTestIntersections() {
-        return $( 
-            $(new HashSet<String>(Arrays.asList("b")),
-              new HashSet<String>(Arrays.asList("a", "b")),
-              new HashSet<String>(Arrays.asList("b", "c"))),
-
-            $(new HashSet<String>(Arrays.asList("a", "b")),
-              new HashSet<String>(Arrays.asList("a", "b")),
-              new HashSet<String>(Arrays.asList("a", "b"))),
-
-            $(new HashSet<String>(Arrays.asList("a", "b")),
-              new HashSet<String>(Arrays.asList("a", "b")),
-              new HashSet<String>(Arrays.asList("b", "a"))),
-
-            $(new HashSet<String>(),
-              new HashSet<String>(Arrays.asList("a", "b")),
-              new HashSet<String>(Arrays.asList("c", "d"))),
-
-            $(new HashSet<String>(Arrays.asList("a")),
-              new HashSet<String>(Arrays.asList("a", "a")),
-              new HashSet<String>(Arrays.asList("a", "a"))),
-
-            $(new HashSet<String>(Arrays.asList("a", "c")),
-              new HashSet<String>(Arrays.asList("a", "b", "c")),
-              new HashSet<String>(Arrays.asList("a", "d", "c"))),
-
-            $(new HashSet<String>(Arrays.asList("a", "b", "c")),
-              new HashSet<String>(Arrays.asList("a", "b", "c")),
-              null),
-
-            $(new HashSet<String>(Arrays.asList("a", "b", "c")),
-              null,
-              new HashSet<String>(Arrays.asList("a", "b", "c"))),
-
-            $(null, null, null)
-        );
-    }
-
-
-    @Test
-    @Parameters(method="parametersForTestIntersections")
-    public void testIntersections(final Set<String> expected, final Set<String> arrayOne, final Set<String> arrayTwo) {
-        assertEquals(expected, Tools.getIntersection(arrayOne, arrayTwo));
-    }
-
-    @Test
-    public void nullIntersectionShouldBeNull() {
-        assertEquals(null, Tools.getIntersection((Set<String>) null, (Set<String>) null));
-    }
 
     @SuppressWarnings("unused")
     private Object[] parametersForHtmlShouldBeCreated() {
@@ -777,12 +727,6 @@ public final class ToolsTest {
             $("",   "s",   "s"),
             $(null, null,  null)
         );
-    }
-
-    @Test
-    @Parameters(method="parametersForUnitShouldBeExtracted")
-    public void unitShouldBeExtracted(final String value, final String unit, final String valueWithUnit) {
-        Assert.assertArrayEquals(new Object[]{value, unit}, Tools.extractUnit(valueWithUnit));
     }
 
     @Test

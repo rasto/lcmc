@@ -36,9 +36,8 @@ import javax.annotation.Resource;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Provider;
-import javax.swing.*;
+import javax.swing.ImageIcon;
 import javax.swing.tree.DefaultMutableTreeNode;
-import javax.swing.tree.MutableTreeNode;
 import javax.swing.tree.TreeNode;
 
 import com.google.common.eventbus.Subscribe;
@@ -53,10 +52,7 @@ import lcmc.common.ui.GUIData;
 import lcmc.common.ui.treemenu.TreeMenuController;
 import lcmc.drbd.ui.DrbdGraph;
 import lcmc.event.BlockDevicesChangedEvent;
-import lcmc.event.CommonFileSystemsChangedEvent;
 import lcmc.event.FileSystemsChangedEvent;
-import lcmc.event.HwBlockDevicesChangedEvent;
-import lcmc.event.HwNetInterfacesChangedEvent;
 import lcmc.event.NetInterfacesChangedEvent;
 import lcmc.host.domain.Host;
 import lcmc.drbd.domain.BlockDevice;
@@ -65,7 +61,6 @@ import lcmc.common.ui.CmdLog;
 import lcmc.common.ui.CategoryInfo;
 import lcmc.cluster.ui.resource.FSInfo;
 import lcmc.common.ui.Info;
-import lcmc.cluster.ui.resource.NetInfo;
 import lcmc.crm.ui.resource.HostInfo;
 import lcmc.drbd.ui.resource.BlockDevInfo;
 import lcmc.drbd.ui.resource.HostDrbdInfo;
@@ -124,12 +119,6 @@ public class HostBrowser extends Browser {
     private final ReadWriteLock mBlockDevInfosLock = new ReentrantReadWriteLock();
     private final Lock mBlockDevInfosReadLock = mBlockDevInfosLock.readLock();
     private final Lock mBlockDevInfosWriteLock = mBlockDevInfosLock.writeLock();
-    private final ReadWriteLock mNetInfosLock = new ReentrantReadWriteLock();
-    private final Lock mNetInfosReadLock = mNetInfosLock.readLock();
-    private final Lock mNetInfosWriteLock = mNetInfosLock.writeLock();
-    private final ReadWriteLock mFileSystemsLock = new ReentrantReadWriteLock();
-    private final Lock mFileSystemsReadLock = mFileSystemsLock.readLock();
-    private final Lock mFileSystemsWriteLock = mFileSystemsLock.writeLock();
     private DefaultMutableTreeNode treeTop;
     @Inject
     private GUIData guiData;
@@ -211,23 +200,12 @@ public class HostBrowser extends Browser {
             return;
         }
         final Set<String> fileSystems = event.getFileSystems();
-        final Map<String, FSInfo> oldFileSystems = getFilesystemsMap();
-        mFileSystemsWriteLock.lock();
-        try {
-            treeMenuController.removeChildren(fileSystemsNode);
-            for (final String fileSystem : fileSystems) {
-                final FSInfo fileSystemInfo;
-                if (oldFileSystems.containsKey(fileSystem)) {
-                    fileSystemInfo = oldFileSystems.get(fileSystem);
-                } else {
-                    fileSystemInfo = clusterViewFactory.createFileSystemView(fileSystem, this);
-                }
-                treeMenuController.createMenuItem(fileSystemsNode, fileSystemInfo);
-            }
-            treeMenuController.reloadNode(fileSystemsNode, false);
-        } finally {
-            mFileSystemsWriteLock.unlock();
+        treeMenuController.removeChildren(fileSystemsNode);
+        for (final String fileSystem : fileSystems) {
+            final FSInfo fileSystemInfo = clusterViewFactory.createFileSystemView(fileSystem, this);
+            treeMenuController.createMenuItem(fileSystemsNode, fileSystemInfo);
         }
+        treeMenuController.reloadNode(fileSystemsNode, false);
     }
 
     @Subscribe
@@ -281,23 +259,12 @@ public class HostBrowser extends Browser {
             return;
         }
         final Collection<NetInterface> netInterfaces = event.getNetInterfaces();
-        final Map<NetInterface, NetInfo> oldNetInterfaces = getNetInterfacesMap();
-        mNetInfosWriteLock.lock();
-        try {
-            treeMenuController.removeChildren(netInterfacesNode);
-            for (final NetInterface netInterface : netInterfaces) {
-                final Info netInfo;
-                if (oldNetInterfaces.containsKey(netInterface)) {
-                    netInfo = oldNetInterfaces.get(netInterface);
-                } else {
-                    netInfo = clusterViewFactory.getNetView(netInterface, this);
-                }
-                final DefaultMutableTreeNode resource = treeMenuController.createMenuItem(netInterfacesNode, netInfo);
-            }
-            treeMenuController.reloadNode(netInterfacesNode, false);
-        } finally {
-            mNetInfosWriteLock.unlock();
+        treeMenuController.removeChildren(netInterfacesNode);
+        for (final NetInterface netInterface : netInterfaces) {
+            final Info netInfo = clusterViewFactory.getNetView(netInterface, this);
+            treeMenuController.createMenuItem(netInterfacesNode, netInfo);
         }
+        treeMenuController.reloadNode(netInterfacesNode, false);
     }
 
 
@@ -308,34 +275,6 @@ public class HostBrowser extends Browser {
         } finally {
             mBlockDevInfosReadLock.unlock();
         }
-    }
-
-    Map<NetInterface, NetInfo> getNetInterfacesMap() {
-        final Map<NetInterface, NetInfo> netInterfaces = new HashMap<NetInterface, NetInfo>();
-        mNetInfosReadLock.lock();
-        try {
-            for (final Object info : treeMenuController.nodesToInfos(netInterfacesNode.children())) {
-                final NetInfo netInfo = (NetInfo) info;
-                netInterfaces.put(netInfo.getNetInterface(), netInfo);
-            }
-        } finally {
-            mNetInfosReadLock.unlock();
-        }
-        return netInterfaces;
-    }
-
-    Map<String, FSInfo> getFilesystemsMap() {
-        final Map<String, FSInfo> filesystems = new HashMap<String, FSInfo>();
-        mFileSystemsReadLock.lock();
-        try {
-            for (final Object info : treeMenuController.nodesToInfos(fileSystemsNode.children())) {
-                final FSInfo fsInfo = (FSInfo) info;
-                filesystems.put(fsInfo.getName(), fsInfo);
-            }
-        } finally {
-            mFileSystemsReadLock.unlock();
-        }
-        return filesystems;
     }
 
     /**
@@ -557,9 +496,5 @@ public class HostBrowser extends Browser {
 
     public void unlockBlockDevInfosRead() {
         mBlockDevInfosReadLock.unlock();
-    }
-
-    public TreeNode getNetInterfacesNode() {
-        return netInterfacesNode;
     }
 }
