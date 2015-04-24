@@ -57,7 +57,7 @@ import com.google.common.collect.Table;
 import lcmc.host.domain.Host;
 import lcmc.common.domain.StringValue;
 import lcmc.common.domain.Value;
-import lcmc.common.domain.XML;
+import lcmc.common.domain.XMLTools;
 import lcmc.common.domain.ConvertCmdCallback;
 import lcmc.logger.Logger;
 import lcmc.logger.LoggerFactory;
@@ -78,7 +78,7 @@ import org.w3c.dom.NodeList;
  * information.
  * The xml is obtained with drbdsetp xml command and drbdadm dump-xml.
  */
-public final class VmsXml extends XML {
+public final class VmsXml {
     private static final Logger LOG = LoggerFactory.getLogger(VmsXml.class);
     /** Pattern that maches display e.g. :4. */
     private static final Pattern DISPLAY_PATTERN = Pattern.compile(".*:(\\d+)$");
@@ -764,7 +764,7 @@ public final class VmsXml extends XML {
                 } else if (VM_PARAM_CPUMATCH_TOPOLOGY_THREADS.equals(param)) {
                     node.setAttribute("threads", value);
                 } else {
-                    final Node n = getChildNode(node, "#text");
+                    final Node n = XMLTools.getChildNode(node, "#text");
                     if (n == null) {
                         node.appendChild(doc.createTextNode(value));
                     } else {
@@ -825,7 +825,7 @@ public final class VmsXml extends XML {
             pNode = hwNode;
         }
 
-        Element node = (Element) getChildNode(pNode, tag, pos);
+        Element node = (Element) XMLTools.getChildNode(pNode, tag, pos);
         if ((attribute != null || "True".equals(value))
             && node == null) {
             node = (Element) pNode.appendChild(domainNode.getOwnerDocument().createElement(tag));
@@ -873,7 +873,7 @@ public final class VmsXml extends XML {
 
         Element node;
         do {
-            node = (Element) getChildNode(pNode, tag, pos);
+            node = (Element) XMLTools.getChildNode(pNode, tag, pos);
             if (node != null) {
                 pNode.removeChild(node);
                 pos++;
@@ -925,7 +925,7 @@ public final class VmsXml extends XML {
                     removeXMLOption(hwNode, pos, tag, parentNodes);
                 }
             }
-            final Node hwAddressNode = getChildNode(hwNode, HW_ADDRESS);
+            final Node hwAddressNode = XMLTools.getChildNode(hwNode, HW_ADDRESS);
             if (hwAddressNode != null) {
                 hwNode.removeChild(hwAddressNode);
             }
@@ -1157,7 +1157,7 @@ public final class VmsXml extends XML {
 
     public boolean update(final String output) {
         oldConfig = output;
-        final Document document = getXMLDocument(output);
+        final Document document = XMLTools.getXMLDocument(output);
         mXMLDocumentWriteLock.lock();
         try {
             xmlDocument = document;
@@ -1167,8 +1167,8 @@ public final class VmsXml extends XML {
         if (document == null) {
             return false;
         }
-        final Node vmsNode = getChildNode(document, "vms");
-        final String md5 = getAttribute(vmsNode, "md5");
+        final Node vmsNode = XMLTools.getChildNode(document, "vms");
+        final String md5 = XMLTools.getAttribute(vmsNode, "md5");
         if (md5 == null || md5.equals(definedOnHost.getVMInfoMD5())) {
             return false;
         }
@@ -1181,7 +1181,7 @@ public final class VmsXml extends XML {
             } else if ("vm".equals(node.getNodeName())) {
                 updateVM(node);
             } else if ("version".equals(node.getNodeName())) {
-                definedOnHost.setLibvirtVersion(getText(node));
+                definedOnHost.setLibvirtVersion(XMLTools.getText(node));
             }
         }
         return true;
@@ -1192,12 +1192,12 @@ public final class VmsXml extends XML {
         if (netNode == null) {
             return;
         }
-        final String name = getAttribute(netNode, VM_PARAM_NAME);
-        final String config = getAttribute(netNode, "config");
+        final String name = XMLTools.getAttribute(netNode, VM_PARAM_NAME);
+        final String config = XMLTools.getAttribute(netNode, "config");
         netToConfigs.put(config, name);
         netNamesConfigsMap.put(name, config);
-        final String autostartString = getAttribute(netNode, NET_PARAM_AUTOSTART);
-        parseNetConfig(getChildNode(netNode, "network"), name, autostartString);
+        final String autostartString = XMLTools.getAttribute(netNode, NET_PARAM_AUTOSTART);
+        parseNetConfig(XMLTools.getChildNode(netNode, "network"), name, autostartString);
     }
 
     /** Parses the libvirt network config file. */
@@ -1221,20 +1221,20 @@ public final class VmsXml extends XML {
             final Node optionNode = options.item(i);
             final String nodeName = optionNode.getNodeName();
             if (NET_PARAM_NAME.equals(nodeName)) {
-                name = getText(optionNode);
+                name = XMLTools.getText(optionNode);
                 if (!name.equals(nameInFilename)) {
                     LOG.appWarning("parseNetConfig: unexpected name: " + name + " != " + nameInFilename);
                     return;
                 }
             } else if (NET_PARAM_UUID.equals(nodeName)) {
-                uuid = getText(optionNode);
+                uuid = XMLTools.getText(optionNode);
             } else if ("forward".equals(nodeName)) {
-                forwardMode = getAttribute(optionNode, "mode");
+                forwardMode = XMLTools.getAttribute(optionNode, "mode");
             } else if ("bridge".equals(nodeName)) {
-                bridgeName = getAttribute(optionNode, "name");
-                bridgeSTP = getAttribute(optionNode, "stp");
-                bridgeDelay = getAttribute(optionNode, "delay");
-                bridgeForwardDelay = getAttribute(optionNode, "forwardDelay");
+                bridgeName = XMLTools.getAttribute(optionNode, "name");
+                bridgeSTP = XMLTools.getAttribute(optionNode, "stp");
+                bridgeDelay = XMLTools.getAttribute(optionNode, "delay");
+                bridgeForwardDelay = XMLTools.getAttribute(optionNode, "forwardDelay");
             } else if ("mac".equals(nodeName)) {
                 /* skip */
             } else if ("ip".equals(nodeName)) {
@@ -1265,16 +1265,16 @@ public final class VmsXml extends XML {
         for (int i = 0; i < nodes.getLength(); i++) {
             final Node hostN = nodes.item(i);
             if ("host".equals(hostN.getNodeName())) {
-                names.add(getAttribute(hostN, "name"));
-                ports.add(getAttribute(hostN, "port"));
+                names.add(XMLTools.getAttribute(hostN, "name"));
+                ports.add(XMLTools.getAttribute(hostN, "port"));
             }
         }
     }
 
     /** Parse disk xml and populate the devMap. */
     private void parseDiskNode(final Node diskNode, final Map<String, DiskData> devMap) {
-        final String type = getAttribute(diskNode, "type");
-        final String device = getAttribute(diskNode, "device");
+        final String type = XMLTools.getAttribute(diskNode, "type");
+        final String device = XMLTools.getAttribute(diskNode, "device");
         final NodeList opts = diskNode.getChildNodes();
         String sourceFile = null;
         String sourceDev = null;
@@ -1296,30 +1296,30 @@ public final class VmsXml extends XML {
             final Node optionNode = opts.item(k);
             final String nodeName = optionNode.getNodeName();
             if ("source".equals(nodeName)) {
-                sourceFile = getAttribute(optionNode, "file");
+                sourceFile = XMLTools.getAttribute(optionNode, "file");
                 final String dir = Tools.getDirectoryPart(sourceFile);
                 if (dir != null) {
                     sourceFileDirs.add(dir);
                 }
-                sourceDev = getAttribute(optionNode, "dev");
-                sourceProtocol = getAttribute(optionNode, "protocol");
-                sourceName = getAttribute(optionNode, "name");
+                sourceDev = XMLTools.getAttribute(optionNode, "dev");
+                sourceProtocol = XMLTools.getAttribute(optionNode, "protocol");
+                sourceName = XMLTools.getAttribute(optionNode, "name");
                 getHostNodes(optionNode, sourceHostNames, sourceHostPorts);
             } else if ("auth".equals(nodeName)) {
-                authUsername = getAttribute(optionNode, "username");
-                final Node secretN = getChildNode(optionNode, "secret");
+                authUsername = XMLTools.getAttribute(optionNode, "username");
+                final Node secretN = XMLTools.getChildNode(optionNode, "secret");
                 if (secretN != null) {
-                    authSecretType = getAttribute(secretN, "type");
-                    authSecretUuid = getAttribute(secretN, "uuid");
+                    authSecretType = XMLTools.getAttribute(secretN, "type");
+                    authSecretUuid = XMLTools.getAttribute(secretN, "uuid");
                 }
 
             } else if ("target".equals(nodeName)) {
-                targetDev = getAttribute(optionNode, "dev");
-                targetBus = getAttribute(optionNode, "bus");
+                targetDev = XMLTools.getAttribute(optionNode, "dev");
+                targetBus = XMLTools.getAttribute(optionNode, "bus");
             } else if ("driver".equals(nodeName)) {
-                driverName = getAttribute(optionNode, "name");
-                driverType = getAttribute(optionNode, "type");
-                driverCache = getAttribute(optionNode, "cache");
+                driverName = XMLTools.getAttribute(optionNode, "name");
+                driverType = XMLTools.getAttribute(optionNode, "type");
+                driverCache = XMLTools.getAttribute(optionNode, "cache");
             } else if ("readonly".equals(nodeName)) {
                 readonly = true;
             } else if ("shareable".equals(nodeName)) {
@@ -1357,18 +1357,18 @@ public final class VmsXml extends XML {
         if (configNode == null) {
             return null;
         }
-        final Node domainNode = getChildNode(configNode, "domain");
+        final Node domainNode = XMLTools.getChildNode(configNode, "domain");
         if (domainNode == null) {
             return null;
         }
-        final String domainType = getAttribute(domainNode, "type");
+        final String domainType = XMLTools.getAttribute(domainNode, "type");
         final NodeList options = domainNode.getChildNodes();
         boolean tabletOk = false;
         String name = null;
         for (int i = 0; i < options.getLength(); i++) {
             final Node option = options.item(i);
             if (VM_PARAM_NAME.equals(option.getNodeName())) {
-                name = getText(option);
+                name = XMLTools.getText(option);
                 if (!domainNames.contains(name)) {
                     domainNames.add(name);
                 }
@@ -1379,15 +1379,15 @@ public final class VmsXml extends XML {
                     return domainType;
                 }
             } else if (VM_PARAM_UUID.equals(option.getNodeName())) {
-                parameterValues.put(name, VM_PARAM_UUID, getText(option));
+                parameterValues.put(name, VM_PARAM_UUID, XMLTools.getText(option));
             } else if (VM_PARAM_VCPU.equals(option.getNodeName())) {
-                parameterValues.put(name, VM_PARAM_VCPU, getText(option));
+                parameterValues.put(name, VM_PARAM_VCPU, XMLTools.getText(option));
             } else if (VM_PARAM_BOOTLOADER.equals(option.getNodeName())) {
-                parameterValues.put(name, VM_PARAM_BOOTLOADER, getText(option));
+                parameterValues.put(name, VM_PARAM_BOOTLOADER, XMLTools.getText(option));
             } else if (VM_PARAM_CURRENTMEMORY.equals(option.getNodeName())) {
-                parameterValues.put(name, VM_PARAM_CURRENTMEMORY, getText(option));
+                parameterValues.put(name, VM_PARAM_CURRENTMEMORY, XMLTools.getText(option));
             } else if (VM_PARAM_MEMORY.equals(option.getNodeName())) {
-                parameterValues.put(name, VM_PARAM_MEMORY, getText(option));
+                parameterValues.put(name, VM_PARAM_MEMORY, XMLTools.getText(option));
             } else if ("os".equals(option.getNodeName())) {
                 final NodeList osOptions = option.getChildNodes();
                 int bootOption = 0;
@@ -1395,21 +1395,21 @@ public final class VmsXml extends XML {
                     final Node osOption = osOptions.item(j);
                     if (OS_BOOT_NODE.equals(osOption.getNodeName())) {
                         if (bootOption == 0) {
-                            parameterValues.put(name, VM_PARAM_BOOT, getAttribute(osOption, OS_BOOT_NODE_DEV));
+                            parameterValues.put(name, VM_PARAM_BOOT, XMLTools.getAttribute(osOption, OS_BOOT_NODE_DEV));
                         } else {
-                            parameterValues.put(name, VM_PARAM_BOOT_2, getAttribute(osOption, OS_BOOT_NODE_DEV));
+                            parameterValues.put(name, VM_PARAM_BOOT_2, XMLTools.getAttribute(osOption, OS_BOOT_NODE_DEV));
                         }
                         bootOption++;
                     } else if (VM_PARAM_LOADER.equals(osOption.getNodeName())) {
-                        parameterValues.put(name, VM_PARAM_LOADER, getText(osOption));
+                        parameterValues.put(name, VM_PARAM_LOADER, XMLTools.getText(osOption));
                     } else if (VM_PARAM_TYPE.equals(osOption.getNodeName())) {
-                        parameterValues.put(name, VM_PARAM_TYPE, getText(osOption));
-                        parameterValues.put(name, VM_PARAM_TYPE_ARCH, getAttribute(osOption, "arch"));
-                        parameterValues.put(name, VM_PARAM_TYPE_MACHINE, getAttribute(osOption, "machine"));
+                        parameterValues.put(name, VM_PARAM_TYPE, XMLTools.getText(osOption));
+                        parameterValues.put(name, VM_PARAM_TYPE_ARCH, XMLTools.getAttribute(osOption, "arch"));
+                        parameterValues.put(name, VM_PARAM_TYPE_MACHINE, XMLTools.getAttribute(osOption, "machine"));
                     } else if (VM_PARAM_INIT.equals(osOption.getNodeName())) {
-                        parameterValues.put(name, VM_PARAM_INIT, getText(osOption));
+                        parameterValues.put(name, VM_PARAM_INIT, XMLTools.getText(osOption));
                     } else {
-                        parameterValues.put(name, osOption.getNodeName(), getText(osOption));
+                        parameterValues.put(name, osOption.getNodeName(), XMLTools.getText(osOption));
                     }
                 }
             } else if ("features".equals(option.getNodeName())) {
@@ -1427,10 +1427,10 @@ public final class VmsXml extends XML {
                     }
                 }
             } else if ("clock".equals(option.getNodeName())) {
-                final String offset = getAttribute(option, "offset");
+                final String offset = XMLTools.getAttribute(option, "offset");
                 parameterValues.put(name, VM_PARAM_CLOCK_OFFSET, offset);
             } else if ("cpu".equals(option.getNodeName())) {
-                final String match = getAttribute(option, "match");
+                final String match = XMLTools.getAttribute(option, "match");
                 if (!"".equals(match)) {
                     parameterValues.put(name, VM_PARAM_CPU_MATCH, match);
                     final NodeList cpuMatchOptions = option.getChildNodes();
@@ -1442,19 +1442,19 @@ public final class VmsXml extends XML {
                         if ("topology".equals(op)) {
                             parameterValues.put(name,
                                                 VM_PARAM_CPUMATCH_TOPOLOGY_SOCKETS,
-                                                getAttribute(cpuMatchOption, VM_PARAM_CPUMATCH_TOPOLOGY_SOCKETS));
+                                                XMLTools.getAttribute(cpuMatchOption, VM_PARAM_CPUMATCH_TOPOLOGY_SOCKETS));
                             parameterValues.put(name,
                                                 VM_PARAM_CPUMATCH_TOPOLOGY_CORES,
-                                                getAttribute(cpuMatchOption, VM_PARAM_CPUMATCH_TOPOLOGY_CORES));
+                                                XMLTools.getAttribute(cpuMatchOption, VM_PARAM_CPUMATCH_TOPOLOGY_CORES));
                             parameterValues.put(name,
                                                 VM_PARAM_CPUMATCH_TOPOLOGY_THREADS,
-                                                getAttribute(cpuMatchOption, VM_PARAM_CPUMATCH_TOPOLOGY_THREADS));
+                                                XMLTools.getAttribute(cpuMatchOption, VM_PARAM_CPUMATCH_TOPOLOGY_THREADS));
                         } else if ("feature".equals(op)) {
                             /* asuming the same policy for all */
-                            policy = getAttribute(cpuMatchOption, VM_PARAM_CPUMATCH_FEATURE_POLICY);
-                            features.add(getAttribute(cpuMatchOption, "name"));
+                            policy = XMLTools.getAttribute(cpuMatchOption, VM_PARAM_CPUMATCH_FEATURE_POLICY);
+                            features.add(XMLTools.getAttribute(cpuMatchOption, "name"));
                         } else {
-                            parameterValues.put(name, op, getText(cpuMatchOption));
+                            parameterValues.put(name, op, XMLTools.getText(cpuMatchOption));
                         }
                     }
                     if (!"".equals(policy) && !features.isEmpty()) {
@@ -1463,11 +1463,11 @@ public final class VmsXml extends XML {
                     }
                 }
             } else if (VM_PARAM_ON_POWEROFF.equals(option.getNodeName())) {
-                parameterValues.put(name, VM_PARAM_ON_POWEROFF, getText(option));
+                parameterValues.put(name, VM_PARAM_ON_POWEROFF, XMLTools.getText(option));
             } else if (VM_PARAM_ON_REBOOT.equals(option.getNodeName())) {
-                parameterValues.put(name, VM_PARAM_ON_REBOOT, getText(option));
+                parameterValues.put(name, VM_PARAM_ON_REBOOT, XMLTools.getText(option));
             } else if (VM_PARAM_ON_CRASH.equals(option.getNodeName())) {
-                parameterValues.put(name, VM_PARAM_ON_CRASH, getText(option));
+                parameterValues.put(name, VM_PARAM_ON_CRASH, XMLTools.getText(option));
             } else if ("devices".equals(option.getNodeName())) {
                 final Map<String, DiskData> devMap = new LinkedHashMap<String, DiskData>();
                 final Map<String, FilesystemData> fsMap = new LinkedHashMap<String, FilesystemData>();
@@ -1482,10 +1482,10 @@ public final class VmsXml extends XML {
                 for (int j = 0; j < devices.getLength(); j++) {
                     final Node deviceNode = devices.item(j);
                     if ("emulator".equals(deviceNode.getNodeName())) {
-                        parameterValues.put(name, VM_PARAM_EMULATOR, getText(deviceNode));
+                        parameterValues.put(name, VM_PARAM_EMULATOR, XMLTools.getText(deviceNode));
                     } else if ("input".equals(deviceNode.getNodeName())) {
-                        final String type = getAttribute(deviceNode, "type");
-                        final String bus = getAttribute(deviceNode, "bus");
+                        final String type = XMLTools.getAttribute(deviceNode, "type");
+                        final String bus = XMLTools.getAttribute(deviceNode, "bus");
                         if ("tablet".equals(type)) {
                             tabletOk = true;
                         }
@@ -1493,14 +1493,14 @@ public final class VmsXml extends XML {
                         inputMap.put(type + " : " + bus, inputDevData);
                     } else if ("graphics".equals(deviceNode.getNodeName())) {
                         /** remotePort will be overwritten with virsh output */
-                        final String type = getAttribute(deviceNode, "type");
-                        final String port = getAttribute(deviceNode, "port");
-                        final String autoport = getAttribute(deviceNode, "autoport");
-                        final String listen = getAttribute(deviceNode, "listen");
-                        final String passwd = getAttribute(deviceNode, "passwd");
-                        final String keymap = getAttribute(deviceNode, "keymap");
-                        final String display = getAttribute(deviceNode, "display");
-                        final String xauth = getAttribute(deviceNode, "xauth");
+                        final String type = XMLTools.getAttribute(deviceNode, "type");
+                        final String port = XMLTools.getAttribute(deviceNode, "port");
+                        final String autoport = XMLTools.getAttribute(deviceNode, "autoport");
+                        final String listen = XMLTools.getAttribute(deviceNode, "listen");
+                        final String passwd = XMLTools.getAttribute(deviceNode, "passwd");
+                        final String keymap = XMLTools.getAttribute(deviceNode, "keymap");
+                        final String display = XMLTools.getAttribute(deviceNode, "display");
+                        final String xauth = XMLTools.getAttribute(deviceNode, "xauth");
                         LOG.debug2("parseConfig: type: " + type);
                         LOG.debug2("parseConfig: port: " + port);
                         LOG.debug2("parseConfig: autoport: " + autoport);
@@ -1520,7 +1520,7 @@ public final class VmsXml extends XML {
                     } else if ("disk".equals(deviceNode.getNodeName())) {
                         parseDiskNode(deviceNode, devMap);
                     } else if ("filesystem".equals(deviceNode.getNodeName())) {
-                        final String type = getAttribute(deviceNode, "type");
+                        final String type = XMLTools.getAttribute(deviceNode, "type");
                         final NodeList opts = deviceNode.getChildNodes();
                         String sourceDir = null;
                         String sourceName = null;
@@ -1529,10 +1529,10 @@ public final class VmsXml extends XML {
                             final Node optionNode = opts.item(k);
                             final String nodeName = optionNode.getNodeName();
                             if ("source".equals(nodeName)) {
-                                sourceDir = getAttribute(optionNode, "dir");
-                                sourceName = getAttribute(optionNode, "name");
+                                sourceDir = XMLTools.getAttribute(optionNode, "dir");
+                                sourceName = XMLTools.getAttribute(optionNode, "name");
                             } else if ("target".equals(nodeName)) {
-                                targetDir = getAttribute(optionNode, "dir");
+                                targetDir = XMLTools.getAttribute(optionNode, "dir");
                             } else if (!"#text".equals(nodeName)) {
                                 LOG.appWarning("parseConfig: unknown fs option: " + nodeName);
                             }
@@ -1543,7 +1543,7 @@ public final class VmsXml extends XML {
                             fsMap.put(targetDir, filesystemData);
                         }
                     } else if ("interface".equals(deviceNode.getNodeName())) {
-                        final String type = getAttribute(deviceNode, "type");
+                        final String type = XMLTools.getAttribute(deviceNode, "type");
                         String macAddress = null;
                         String sourceNetwork = null;
                         String sourceBridge = null;
@@ -1555,16 +1555,16 @@ public final class VmsXml extends XML {
                             final Node optionNode = opts.item(k);
                             final String nodeName = optionNode.getNodeName();
                             if ("source".equals(nodeName)) {
-                                sourceBridge = getAttribute(optionNode, "bridge");
-                                sourceNetwork = getAttribute(optionNode, "network");
+                                sourceBridge = XMLTools.getAttribute(optionNode, "bridge");
+                                sourceNetwork = XMLTools.getAttribute(optionNode, "network");
                             } else if ("target".equals(nodeName)) {
-                                targetDev = getAttribute(optionNode, "dev");
+                                targetDev = XMLTools.getAttribute(optionNode, "dev");
                             } else if ("mac".equals(nodeName)) {
-                                macAddress = getAttribute(optionNode, "address");
+                                macAddress = XMLTools.getAttribute(optionNode, "address");
                             } else if ("model".equals(nodeName)) {
-                                modelType = getAttribute(optionNode, "type");
+                                modelType = XMLTools.getAttribute(optionNode, "type");
                             } else if ("script".equals(nodeName)) {
-                                scriptPath = getAttribute(optionNode, "path");
+                                scriptPath = XMLTools.getAttribute(optionNode, "path");
                             } else if (HW_ADDRESS.equals(nodeName)) {
                                 /* it's generated, ignoring. */
                             } else if (!"#text".equals(nodeName)) {
@@ -1583,7 +1583,7 @@ public final class VmsXml extends XML {
                             usedMacAddresses.add(macAddress);
                         }
                     } else if ("sound".equals(deviceNode.getNodeName())) {
-                        final String model = getAttribute(deviceNode, "model");
+                        final String model = XMLTools.getAttribute(deviceNode, "model");
                         final NodeList opts = deviceNode.getChildNodes();
                         for (int k = 0; k < opts.getLength(); k++) {
                             final Node optionNode = opts.item(k);
@@ -1599,7 +1599,7 @@ public final class VmsXml extends XML {
                             soundMap.put(model, soundData);
                         }
                     } else if ("serial".equals(deviceNode.getNodeName())) {
-                        final String type = getAttribute(deviceNode, "type");
+                        final String type = XMLTools.getAttribute(deviceNode, "type");
                         final NodeList opts = deviceNode.getChildNodes();
                         String sourcePath = null;
                         String bindSourceMode = null;
@@ -1614,23 +1614,23 @@ public final class VmsXml extends XML {
                             final Node optionNode = opts.item(k);
                             final String nodeName = optionNode.getNodeName();
                             if ("source".equals(nodeName)) {
-                                sourcePath = getAttribute(optionNode, "path");
-                                final String sourceMode = getAttribute(optionNode, "mode");
+                                sourcePath = XMLTools.getAttribute(optionNode, "path");
+                                final String sourceMode = XMLTools.getAttribute(optionNode, "mode");
                                 if ("bind".equals(sourceMode)) {
                                     bindSourceMode = sourceMode;
-                                    bindSourceHost = getAttribute(optionNode, "host");
-                                    bindSourceService = getAttribute(optionNode, "service");
+                                    bindSourceHost = XMLTools.getAttribute(optionNode, "host");
+                                    bindSourceService = XMLTools.getAttribute(optionNode, "service");
                                 } else if ("connect".equals(sourceMode)) {
                                     connectSourceMode = sourceMode;
-                                    connectSourceHost = getAttribute(optionNode, "host");
-                                    connectSourceService = getAttribute(optionNode, "service");
+                                    connectSourceHost = XMLTools.getAttribute(optionNode, "host");
+                                    connectSourceService = XMLTools.getAttribute(optionNode, "service");
                                 } else {
                                     LOG.appWarning("parseConfig: uknown source mode: " + sourceMode);
                                 }
                             } else if ("protocol".equals(nodeName)) {
-                                protocolType = getAttribute(optionNode, "type");
+                                protocolType = XMLTools.getAttribute(optionNode, "type");
                             } else if ("target".equals(nodeName)) {
-                                targetPort = getAttribute(optionNode, "port");
+                                targetPort = XMLTools.getAttribute(optionNode, "port");
                             } else if (HW_ADDRESS.equals(nodeName)) {
                                 /* it's generated, ignoring. */
                             } else if (!"#text".equals(nodeName)) {
@@ -1651,7 +1651,7 @@ public final class VmsXml extends XML {
                             serialMap.put("serial " + targetPort + " / " + type, serialData);
                         }
                     } else if ("parallel".equals(deviceNode.getNodeName())) {
-                        final String type = getAttribute(deviceNode, "type");
+                        final String type = XMLTools.getAttribute(deviceNode, "type");
                         final NodeList opts = deviceNode.getChildNodes();
                         String sourcePath = null;
                         String bindSourceMode = null;
@@ -1666,23 +1666,23 @@ public final class VmsXml extends XML {
                             final Node optionNode = opts.item(k);
                             final String nodeName = optionNode.getNodeName();
                             if ("source".equals(nodeName)) {
-                                sourcePath = getAttribute(optionNode, "path");
-                                final String sourceMode = getAttribute(optionNode, "mode");
+                                sourcePath = XMLTools.getAttribute(optionNode, "path");
+                                final String sourceMode = XMLTools.getAttribute(optionNode, "mode");
                                 if ("bind".equals(sourceMode)) {
                                     bindSourceMode = sourceMode;
-                                    bindSourceHost = getAttribute(optionNode, "host");
-                                    bindSourceService = getAttribute(optionNode, "service");
+                                    bindSourceHost = XMLTools.getAttribute(optionNode, "host");
+                                    bindSourceService = XMLTools.getAttribute(optionNode, "service");
                                 } else if ("connect".equals(sourceMode)) {
                                     connectSourceMode = sourceMode;
-                                    connectSourceHost = getAttribute(optionNode, "host");
-                                    connectSourceService = getAttribute(optionNode, "service");
+                                    connectSourceHost = XMLTools.getAttribute(optionNode, "host");
+                                    connectSourceService = XMLTools.getAttribute(optionNode, "service");
                                 } else {
                                     LOG.appWarning("parseConfig: unknown source mode: " + sourceMode);
                                 }
                             } else if ("protocol".equals(nodeName)) {
-                                protocolType = getAttribute(optionNode, "type");
+                                protocolType = XMLTools.getAttribute(optionNode, "type");
                             } else if ("target".equals(nodeName)) {
-                                targetPort = getAttribute(optionNode, "port");
+                                targetPort = XMLTools.getAttribute(optionNode, "port");
                             } else if (HW_ADDRESS.equals(nodeName)) {
                                 /* it's generated, ignoring. */
                             } else if (!"#text".equals(nodeName)) {
@@ -1711,9 +1711,9 @@ public final class VmsXml extends XML {
                             final Node optionNode = opts.item(k);
                             final String nodeName = optionNode.getNodeName();
                             if ("model".equals(nodeName)) {
-                                modelType = getAttribute(optionNode, "type");
-                                modelVRAM = getAttribute(optionNode, "vram");
-                                modelHeads = getAttribute(optionNode, "heads");
+                                modelType = XMLTools.getAttribute(optionNode, "type");
+                                modelVRAM = XMLTools.getAttribute(optionNode, "vram");
+                                modelHeads = XMLTools.getAttribute(optionNode, "heads");
                             } else if (HW_ADDRESS.equals(nodeName)) {
                                 /* it's generated, ignoring. */
                             } else if (!"#text".equals(nodeName)) {
@@ -1755,10 +1755,10 @@ public final class VmsXml extends XML {
         if (vmNode == null) {
             return;
         }
-        final Node infoNode = getChildNode(vmNode, "info");
-        final String domainName = getAttribute(vmNode, VM_PARAM_NAME);
-        final String autostart = getAttribute(vmNode, VM_PARAM_AUTOSTART);
-        final String virshOptions = getAttribute(vmNode, VM_PARAM_VIRSH_OPTIONS);
+        final Node infoNode = XMLTools.getChildNode(vmNode, "info");
+        final String domainName = XMLTools.getAttribute(vmNode, VM_PARAM_NAME);
+        final String autostart = XMLTools.getAttribute(vmNode, VM_PARAM_AUTOSTART);
+        final String virshOptions = XMLTools.getAttribute(vmNode, VM_PARAM_VIRSH_OPTIONS);
         if (virshOptions != null) {
             parameterValues.put(domainName, VM_PARAM_VIRSH_OPTIONS, virshOptions);
         }
@@ -1768,18 +1768,18 @@ public final class VmsXml extends XML {
             parameterValues.remove(domainName, VM_PARAM_AUTOSTART);
         }
         if (infoNode != null) {
-            parseInfo(domainName, getText(infoNode));
+            parseInfo(domainName, XMLTools.getText(infoNode));
         }
-        final Node vncdisplayNode = getChildNode(vmNode, "vncdisplay");
+        final Node vncdisplayNode = XMLTools.getChildNode(vmNode, "vncdisplay");
         domainRemotePorts.put(domainName, -1);
         if (vncdisplayNode != null) {
-            final String vncdisplay = getText(vncdisplayNode).trim();
+            final String vncdisplay = XMLTools.getText(vncdisplayNode).trim();
             final Matcher m = DISPLAY_PATTERN.matcher(vncdisplay);
             if (m.matches()) {
                 domainRemotePorts.put(domainName, Integer.parseInt(m.group(1)) + 5900);
             }
         }
-        final Node configNode = getChildNode(vmNode, "config");
+        final Node configNode = XMLTools.getChildNode(vmNode, "config");
         final String type = parseConfig(configNode, domainName);
         final String configName = getConfigName(type, domainName);
         configsToNames.put(new StringValue(configName), domainName);
@@ -1907,8 +1907,8 @@ public final class VmsXml extends XML {
                 final String targetDev = parameters.get(DiskData.SAVED_TARGET_DEVICE);
                 if (targetDev != null) {
                     for (int i = 0; i < nodes.getLength(); i++) {
-                        final Node mn = getChildNode(nodes.item(i), "target");
-                        if (targetDev.equals(getAttribute(mn, "dev"))) {
+                        final Node mn = XMLTools.getChildNode(nodes.item(i), "target");
+                        if (targetDev.equals(XMLTools.getAttribute(mn, "dev"))) {
                             el = (Element) nodes.item(i);
                         }
                     }
@@ -1927,8 +1927,8 @@ public final class VmsXml extends XML {
                 final String targetDev = parameters.get(FilesystemData.SAVED_TARGET_DIR);
                 if (targetDev != null) {
                     for (int i = 0; i < nodes.getLength(); i++) {
-                        final Node mn = getChildNode(nodes.item(i), "target");
-                        if (targetDev.equals(getAttribute(mn, "dir"))) {
+                        final Node mn = XMLTools.getChildNode(nodes.item(i), "target");
+                        if (targetDev.equals(XMLTools.getAttribute(mn, "dir"))) {
                             el = (Element) nodes.item(i);
                         }
                     }
@@ -1947,8 +1947,8 @@ public final class VmsXml extends XML {
                 Element el = null;
                 if (macAddress != null) {
                     for (int i = 0; i < nodes.getLength(); i++) {
-                        final Node mn = getChildNode(nodes.item(i), "mac");
-                        if (macAddress.equals(getAttribute(mn, "address"))) {
+                        final Node mn = XMLTools.getChildNode(nodes.item(i), "mac");
+                        if (macAddress.equals(XMLTools.getAttribute(mn, "address"))) {
                             el = (Element) nodes.item(i);
                             break;
                         }
@@ -1970,7 +1970,7 @@ public final class VmsXml extends XML {
                 if (type != null && bus != null) {
                     for (int i = 0; i < nodes.getLength(); i++) {
                         final Node mn = nodes.item(i);
-                        if (type.equals(getAttribute(mn, "type")) && bus.equals(getAttribute(mn, "bus"))) {
+                        if (type.equals(XMLTools.getAttribute(mn, "type")) && bus.equals(XMLTools.getAttribute(mn, "bus"))) {
                             el = (Element) nodes.item(i);
                             break;
                         }
@@ -1991,7 +1991,7 @@ public final class VmsXml extends XML {
                 if (type != null) {
                     for (int i = 0; i < nodes.getLength(); i++) {
                         final Node mn = nodes.item(i);
-                        if (type.equals(getAttribute(mn, "type"))) {
+                        if (type.equals(XMLTools.getAttribute(mn, "type"))) {
                             el = (Element) nodes.item(i);
                             break;
                         }
@@ -2012,7 +2012,7 @@ public final class VmsXml extends XML {
                 if (model != null) {
                     for (int i = 0; i < nodes.getLength(); i++) {
                         final Node mn = nodes.item(i);
-                        if (model.equals(getAttribute(mn, "model"))) {
+                        if (model.equals(XMLTools.getAttribute(mn, "model"))) {
                             el = (Element) nodes.item(i);
                             break;
                         }
@@ -2033,7 +2033,7 @@ public final class VmsXml extends XML {
                 if (type != null) {
                     for (int i = 0; i < nodes.getLength(); i++) {
                         final Node mn = nodes.item(i);
-                        if (type.equals(getAttribute(mn, "type"))) {
+                        if (type.equals(XMLTools.getAttribute(mn, "type"))) {
                             el = (Element) nodes.item(i);
                             break;
                         }
@@ -2054,7 +2054,7 @@ public final class VmsXml extends XML {
                 if (type != null) {
                     for (int i = 0; i < nodes.getLength(); i++) {
                         final Node mn = nodes.item(i);
-                        if (type.equals(getAttribute(mn, "type"))) {
+                        if (type.equals(XMLTools.getAttribute(mn, "type"))) {
                             el = (Element) nodes.item(i);
                             break;
                         }
@@ -2074,8 +2074,8 @@ public final class VmsXml extends XML {
                 final String modelType = parameters.get(VideoData.SAVED_MODEL_TYPE);
                 if (modelType != null) {
                     for (int i = 0; i < nodes.getLength(); i++) {
-                        final Node mn = getChildNode(nodes.item(i), "model");
-                        if (modelType.equals(getAttribute(mn, "type"))) {
+                        final Node mn = XMLTools.getChildNode(nodes.item(i), "model");
+                        if (modelType.equals(XMLTools.getAttribute(mn, "type"))) {
                             el = (Element) nodes.item(i);
                         }
                     }

@@ -37,10 +37,10 @@ import org.xml.sax.SAXException;
 /**
  * This class parses xml.
  */
-public abstract class XML {
-    private static final Logger LOG = LoggerFactory.getLogger(XML.class);
+public class XMLTools {
+    private static final Logger LOG = LoggerFactory.getLogger(XMLTools.class);
 
-    protected final Node getChildNode(final Node node, final String tag) {
+    public static Node getChildNode(final Node node, final String tag) {
         final NodeList nodeList = node.getChildNodes();
         for (int i = 0; i < nodeList.getLength(); i++) {
             final Node n = nodeList.item(i);
@@ -51,7 +51,7 @@ public abstract class XML {
         return null;
     }
 
-    protected final Node getChildNode(final Node node, final String tag, final int pos) {
+    public static Node getChildNode(final Node node, final String tag, final int pos) {
         final NodeList nodeList = node.getChildNodes();
         int foundPos = 0;
         for (int i = 0; i < nodeList.getLength(); i++) {
@@ -66,7 +66,7 @@ public abstract class XML {
         return null;
     }
 
-    protected final String getAttribute(final Node node, final String name) {
+    public static String getAttribute(final Node node, final String name) {
         if (node.getAttributes().getNamedItem(name) == null) {
             return null;
         } else {
@@ -74,7 +74,7 @@ public abstract class XML {
         }
     }
 
-    protected final String getText(final Node node) {
+    public static String getText(final Node node) {
         final Node ch = getChildNode(node, "#text");
         if (ch == null) {
             return "";
@@ -82,7 +82,7 @@ public abstract class XML {
         return ch.getNodeValue();
     }
 
-    protected final Document getXMLDocument(final String xmlraw) {
+    public static Document getXMLDocument(final String xmlraw) {
         if (xmlraw == null) {
             return null;
         }
