@@ -52,7 +52,7 @@ import lcmc.common.domain.Application;
 import lcmc.host.domain.Host;
 import lcmc.common.domain.StringValue;
 import lcmc.common.domain.Value;
-import lcmc.common.domain.XML;
+import lcmc.common.domain.XMLTools;
 import lcmc.robotest.StartTests;
 import lcmc.robotest.Test;
 import lcmc.common.domain.ConvertCmdCallback;
@@ -78,7 +78,7 @@ import javax.inject.Named;
  * information.
  */
 @Named
-public final class CrmXml extends XML {
+public final class CrmXml {
     private static final Logger LOG = LoggerFactory.getLogger(CrmXml.class);
     private static final Table<String, String, String> RA_NON_ADVANCED_PARAM = HashBasedTable.create();
     static final Value PCMK_TRUE_VALUE = new StringValue("true");
@@ -1466,8 +1466,8 @@ public final class CrmXml extends XML {
         for (int i = 0; i < parameters.getLength(); i++) {
             final Node parameterNode = parameters.item(i);
             if (parameterNode.getNodeName().equals("parameter")) {
-                final String param = getAttribute(parameterNode, "name");
-                final String required = getAttribute(parameterNode, "required");
+                final String param = XMLTools.getAttribute(parameterNode, "name");
+                final String required = XMLTools.getAttribute(parameterNode, "required");
                 resourceAgent.addParameter(param);
 
                 if (required != null && required.equals("1")) {
@@ -1475,16 +1475,16 @@ public final class CrmXml extends XML {
                 }
 
                 /* <longdesc lang="en"> */
-                final Node longdescParamNode = getChildNode(parameterNode, "longdesc");
+                final Node longdescParamNode = XMLTools.getChildNode(parameterNode, "longdesc");
                 if (longdescParamNode != null) {
-                    final String longDesc = getText(longdescParamNode);
+                    final String longDesc = XMLTools.getText(longdescParamNode);
                     resourceAgent.setParamLongDesc(param, Tools.trimText(longDesc));
                 }
 
                 /* <shortdesc lang="en"> */
-                final Node shortdescParamNode = getChildNode(parameterNode, "shortdesc");
+                final Node shortdescParamNode = XMLTools.getChildNode(parameterNode, "shortdesc");
                 if (shortdescParamNode != null) {
-                    String shortDesc = getText(shortdescParamNode);
+                    String shortDesc = XMLTools.getText(shortdescParamNode);
                     if (shortDesc.trim().equals("")) {
                         shortDesc = param;
                     }
@@ -1492,10 +1492,10 @@ public final class CrmXml extends XML {
                 }
 
                 /* <content> */
-                final Node contentParamNode = getChildNode(parameterNode, "content");
+                final Node contentParamNode = XMLTools.getChildNode(parameterNode, "content");
                 if (contentParamNode != null) {
-                    final String type = getAttribute(contentParamNode, "type");
-                    String defaultValue = getAttribute(contentParamNode, "default");
+                    final String type = XMLTools.getAttribute(contentParamNode, "type");
+                    String defaultValue = XMLTools.getAttribute(contentParamNode, "default");
                     if (defaultValue == null && resourceAgent.isStonith()
                         && PARAM_TYPE_BOOLEAN.equals(type)) {
                         defaultValue = PCMK_FALSE_VALUE.getValueForConfig();
@@ -1603,23 +1603,23 @@ public final class CrmXml extends XML {
         for (int i = 0; i < actions.getLength(); i++) {
             final Node actionNode = actions.item(i);
             if (actionNode.getNodeName().equals("action")) {
-                final String name = getAttribute(actionNode, "name");
+                final String name = XMLTools.getAttribute(actionNode, "name");
                 if ("status ".equals(name)) {
                     /* workaround for iSCSITarget RA */
                     continue;
                 }
-                final String depth = getAttribute(actionNode, "depth");
+                final String depth = XMLTools.getAttribute(actionNode, "depth");
 
                 final Value timeout = parseValue(resourceAgent + ": " + name + " timeout",
-                                                 getAttribute(actionNode, "timeout"));
+                                                 XMLTools.getAttribute(actionNode, "timeout"));
 
                 final Value interval = parseValue(resourceAgent + ": " + name + " interval",
-                                                  getAttribute(actionNode, "interval"));
+                                                  XMLTools.getAttribute(actionNode, "interval"));
 
                 final Value startDelay = parseValue(resourceAgent + ": " + name + " start-delay",
-                        getAttribute(actionNode, "start-delay"));
+                        XMLTools.getAttribute(actionNode, "start-delay"));
 
-                final String role = getAttribute(actionNode, "role");
+                final String role = XMLTools.getAttribute(actionNode, "role");
                 resourceAgent.addOperationDefault(name, "depth", new StringValue(depth));
                 resourceAgent.addOperationDefault(name, "timeout", timeout);
                 resourceAgent.addOperationDefault(name, "interval", interval);
@@ -1637,7 +1637,7 @@ public final class CrmXml extends XML {
         for (int i = 0; i < actionNodes.getLength(); i++) {
             final Node actionNode = actionNodes.item(i);
             if (actionNode.getNodeName().equals("action")) {
-                final String name = getAttribute(actionNode, "name");
+                final String name = XMLTools.getAttribute(actionNode, "name");
                 actions.add(new StringValue(name));
             }
         }
@@ -1652,19 +1652,19 @@ public final class CrmXml extends XML {
                                     final String provider,
                                     final String xml,
                                     final boolean masterSlave) {
-        final Document document = getXMLDocument(xml);
+        final Document document = XMLTools.getXMLDocument(xml);
         if (document == null) {
             return;
         }
 
         /* get root <resource-agent> */
-        final Node raNode = getChildNode(document, "resource-agent");
+        final Node raNode = XMLTools.getChildNode(document, "resource-agent");
         if (raNode == null) {
             return;
         }
 
         /* class */
-        String resourceClass = getAttribute(raNode, "class");
+        String resourceClass = XMLTools.getAttribute(raNode, "class");
         if (resourceClass == null) {
             resourceClass = ResourceAgent.OCF_CLASS_NAME;
         }
@@ -1684,30 +1684,30 @@ public final class CrmXml extends XML {
             setLsbResourceAgent(serviceName, resourceClass, resourceAgent);
         } else {
             /* <version> */
-            final Node versionNode = getChildNode(raNode, "version");
+            final Node versionNode = XMLTools.getChildNode(raNode, "version");
             if (versionNode != null) {
-                resourceAgent.setServiceVersion(getText(versionNode));
+                resourceAgent.setServiceVersion(XMLTools.getText(versionNode));
             }
 
             /* <longdesc lang="en"> */
-            final Node longdescNode = getChildNode(raNode, "longdesc");
+            final Node longdescNode = XMLTools.getChildNode(raNode, "longdesc");
             if (longdescNode != null) {
-                resourceAgent.setServiceLongDesc(Tools.trimText(getText(longdescNode)));
+                resourceAgent.setServiceLongDesc(Tools.trimText(XMLTools.getText(longdescNode)));
             }
 
             /* <shortdesc lang="en"> */
-            final Node shortdescNode = getChildNode(raNode, "shortdesc");
+            final Node shortdescNode = XMLTools.getChildNode(raNode, "shortdesc");
             if (shortdescNode != null) {
-                resourceAgent.setServiceShortDesc(getText(shortdescNode));
+                resourceAgent.setServiceShortDesc(XMLTools.getText(shortdescNode));
             }
 
             /* <parameters> */
-            final Node parametersNode = getChildNode(raNode, "parameters");
+            final Node parametersNode = XMLTools.getChildNode(raNode, "parameters");
             if (parametersNode != null) {
                 parseParameters(resourceAgent, parametersNode);
             }
             /* <actions> */
-            final Node actionsNode = getChildNode(raNode, "actions");
+            final Node actionsNode = XMLTools.getChildNode(raNode, "actions");
             if (actionsNode != null) {
                 if (resourceAgent.isStonith()
                     && resourceAgent.hasParameter(FENCING_ACTION_PARAM)) {
@@ -1764,13 +1764,13 @@ public final class CrmXml extends XML {
      */
     void parseClusterMetaData(
         final String xml) {
-        final Document document = getXMLDocument(xml);
+        final Document document = XMLTools.getXMLDocument(xml);
         if (document == null) {
             return;
         }
 
         /* get root <metadata> */
-        final Node metadataNode = getChildNode(document, "metadata");
+        final Node metadataNode = XMLTools.getChildNode(document, "metadata");
         if (metadataNode == null) {
             return;
         }
@@ -1786,7 +1786,7 @@ public final class CrmXml extends XML {
             }
 
             /* <parameters> */
-            final Node parametersNode = getChildNode(resAgentNode, "parameters");
+            final Node parametersNode = XMLTools.getChildNode(resAgentNode, "parameters");
             if (parametersNode == null) {
                 return;
             }
@@ -1795,8 +1795,8 @@ public final class CrmXml extends XML {
             for (int j = 0; j < parameters.getLength(); j++) {
                 final Node parameterNode = parameters.item(j);
                 if (parameterNode.getNodeName().equals("parameter")) {
-                    final String param = getAttribute(parameterNode, "name");
-                    final String required = getAttribute(parameterNode, "required");
+                    final String param = XMLTools.getAttribute(parameterNode, "name");
+                    final String required = XMLTools.getAttribute(parameterNode, "required");
                     if (!globalParams.contains(param)) {
                         globalParams.add(param);
                     }
@@ -1805,17 +1805,17 @@ public final class CrmXml extends XML {
                     }
 
                     /* <longdesc lang="en"> */
-                    final Node longdescParamNode = getChildNode(parameterNode, "longdesc");
+                    final Node longdescParamNode = XMLTools.getChildNode(parameterNode, "longdesc");
                     if (longdescParamNode != null) {
-                        final String longDesc = getText(longdescParamNode);
+                        final String longDesc = XMLTools.getText(longdescParamNode);
                         globalLongDescMap.put(param, Tools.trimText(longDesc));
                     }
 
                     /* <content> */
-                    final Node contentParamNode = getChildNode(parameterNode, "content");
+                    final Node contentParamNode = XMLTools.getChildNode(parameterNode, "content");
                     if (contentParamNode != null) {
-                        final String type = getAttribute(contentParamNode, "type");
-                        String dv = getAttribute(contentParamNode, "default");
+                        final String type = XMLTools.getAttribute(contentParamNode, "type");
+                        String dv = XMLTools.getAttribute(contentParamNode, "default");
                         if ("(null)".equals(dv)) {
                             dv = null;
                         }
@@ -1890,14 +1890,14 @@ public final class CrmXml extends XML {
                                  final Map<String, String> rscDefaultsParamsNvpairIds) {
         
         /* <meta_attributtes> */
-        final Node metaAttrsNode = getChildNode(rscDefaultsNode, "meta_attributes");
+        final Node metaAttrsNode = XMLTools.getChildNode(rscDefaultsNode, "meta_attributes");
         String rscDefaultsId = null;
         if (metaAttrsNode != null) {
-            rscDefaultsId = getAttribute(metaAttrsNode, "id");
+            rscDefaultsId = XMLTools.getAttribute(metaAttrsNode, "id");
             final NodeList nvpairsMA;
             if (Tools.versionBeforePacemaker(host)) {
                 /* <attributtes> only til 2.1.4 */
-                final Node attrsNode = getChildNode(metaAttrsNode, "attributes");
+                final Node attrsNode = XMLTools.getChildNode(metaAttrsNode, "attributes");
                 nvpairsMA = attrsNode.getChildNodes();
             } else {
                 nvpairsMA = metaAttrsNode.getChildNodes();
@@ -1907,9 +1907,9 @@ public final class CrmXml extends XML {
             for (int l = 0; l < nvpairsMA.getLength(); l++) {
                 final Node maNode = nvpairsMA.item(l);
                 if (maNode.getNodeName().equals("nvpair")) {
-                    final String nvpairId = getAttribute(maNode, "id");
-                    final String name = getAttribute(maNode, "name");
-                    String value = getAttribute(maNode, "value");
+                    final String nvpairId = XMLTools.getAttribute(maNode, "id");
+                    final String name = XMLTools.getAttribute(maNode, "name");
+                    String value = XMLTools.getAttribute(maNode, "value");
                     if (TARGET_ROLE_META_ATTR.equals(name)) {
                         value = value.toLowerCase(Locale.US);
                     }
@@ -1924,12 +1924,12 @@ public final class CrmXml extends XML {
     void parseOpDefaults(final Node opDefaultsNode, final Map<String, Value> opDefaultsParams) {
         
         /* <meta_attributtes> */
-        final Node metaAttrsNode = getChildNode(opDefaultsNode, "meta_attributes");
+        final Node metaAttrsNode = XMLTools.getChildNode(opDefaultsNode, "meta_attributes");
         if (metaAttrsNode != null) {
             /* <attributtes> only til 2.1.4 */
             final NodeList nvpairsMA;
             if (Tools.versionBeforePacemaker(host)) {
-                final Node attrsNode = getChildNode(metaAttrsNode, "attributes");
+                final Node attrsNode = XMLTools.getChildNode(metaAttrsNode, "attributes");
                 nvpairsMA = attrsNode.getChildNodes();
             } else {
                 nvpairsMA = metaAttrsNode.getChildNodes();
@@ -1938,8 +1938,8 @@ public final class CrmXml extends XML {
             for (int l = 0; l < nvpairsMA.getLength(); l++) {
                 final Node maNode = nvpairsMA.item(l);
                 if (maNode.getNodeName().equals("nvpair")) {
-                    final String name = getAttribute(maNode, "name");
-                    final String value = getAttribute(maNode, "value");
+                    final String name = XMLTools.getAttribute(maNode, "name");
+                    final String value = XMLTools.getAttribute(maNode, "value");
                     opDefaultsParams.put(name, parseValue(name, value));
                 }
             }
@@ -1966,15 +1966,15 @@ public final class CrmXml extends XML {
         final Map<String, String> nvpairIds = new HashMap<String, String>();
         parametersNvpairsIdsMap.put(crmId, nvpairIds);
         /* <instance_attributes> */
-        final Node instanceAttrNode = getChildNode(resourceNode, "instance_attributes");
+        final Node instanceAttrNode = XMLTools.getChildNode(resourceNode, "instance_attributes");
         /* <nvpair...> */
         if (instanceAttrNode != null) {
-            final String iAId = getAttribute(instanceAttrNode, "id");
+            final String iAId = XMLTools.getAttribute(instanceAttrNode, "id");
             resourceInstanceAttrIdMap.put(crmId, iAId);
             final NodeList nvpairsRes;
             if (Tools.versionBeforePacemaker(host)) {
                 /* <attributtes> only til 2.1.4 */
-                final Node attrNode = getChildNode(instanceAttrNode, "attributes");
+                final Node attrNode = XMLTools.getChildNode(instanceAttrNode, "attributes");
                 nvpairsRes = attrNode.getChildNodes();
             } else {
                 nvpairsRes = instanceAttrNode.getChildNodes();
@@ -1982,9 +1982,9 @@ public final class CrmXml extends XML {
             for (int j = 0; j < nvpairsRes.getLength(); j++) {
                 final Node optionNode = nvpairsRes.item(j);
                 if (optionNode.getNodeName().equals("nvpair")) {
-                    final String nvpairId = getAttribute(optionNode, "id");
-                    String name = getAttribute(optionNode, "name");
-                    final String value = getAttribute(optionNode, "value");
+                    final String nvpairId = XMLTools.getAttribute(optionNode, "id");
+                    String name = XMLTools.getAttribute(optionNode, "name");
+                    final String value = XMLTools.getAttribute(optionNode, "value");
                     if (stonith && "priority".equals(name)) {
                         /* so it does not clash with meta attr priority */
                         name = STONITH_PRIORITY_INSTANCE_ATTR;
@@ -1996,11 +1996,11 @@ public final class CrmXml extends XML {
         }
 
         /* <operations> */
-        final Node operationsNode = getChildNode(resourceNode, "operations");
+        final Node operationsNode = XMLTools.getChildNode(resourceNode, "operations");
         if (operationsNode != null) {
-            final String operationsIdRef = getAttribute(operationsNode, "id-ref");
+            final String operationsIdRef = XMLTools.getAttribute(operationsNode, "id-ref");
             if (operationsIdRef == null) {
-                final String operationsId = getAttribute(operationsNode, "id");
+                final String operationsId = XMLTools.getAttribute(operationsNode, "id");
                 operationsIdMap.put(crmId, operationsId);
                 operationsIdtoCRMId.put(operationsId, crmId);
                 final Map<String, String> opIds = new HashMap<String, String>();
@@ -2010,11 +2010,11 @@ public final class CrmXml extends XML {
                 for (int k = 0; k < ops.getLength(); k++) {
                     final Node opNode = ops.item(k);
                     if (opNode.getNodeName().equals("op")) {
-                        final String opId = getAttribute(opNode, "id");
-                        final String name = getAttribute(opNode, "name");
-                        final String timeout = getAttribute(opNode, "timeout");
-                        final String interval = getAttribute(opNode, "interval");
-                        final String startDelay = getAttribute(opNode, "start-delay");
+                        final String opId = XMLTools.getAttribute(opNode, "id");
+                        final String name = XMLTools.getAttribute(opNode, "name");
+                        final String timeout = XMLTools.getAttribute(opNode, "timeout");
+                        final String interval = XMLTools.getAttribute(opNode, "interval");
+                        final String startDelay = XMLTools.getAttribute(opNode, "start-delay");
 
                         operationsMap.put(crmId, name, "interval", parseValue("interval", interval));
                         operationsMap.put(crmId, name, "timeout", parseValue("timeout", timeout));
@@ -2033,17 +2033,17 @@ public final class CrmXml extends XML {
         }
 
         /* <meta_attributtes> */
-        final Node metaAttrsNode = getChildNode(resourceNode, "meta_attributes");
+        final Node metaAttrsNode = XMLTools.getChildNode(resourceNode, "meta_attributes");
         if (metaAttrsNode != null) {
-            final String metaAttrsIdRef = getAttribute(metaAttrsNode, "id-ref");
+            final String metaAttrsIdRef = XMLTools.getAttribute(metaAttrsNode, "id-ref");
             if (metaAttrsIdRef == null) {
-                final String metaAttrsId = getAttribute(metaAttrsNode, "id");
+                final String metaAttrsId = XMLTools.getAttribute(metaAttrsNode, "id");
                 metaAttrsIdMap.put(crmId, metaAttrsId);
                 metaAttrsIdToCRMId.put(metaAttrsId, crmId);
                 /* <attributtes> only til 2.1.4 */
                 final NodeList nvpairsMA;
                 if (Tools.versionBeforePacemaker(host)) {
-                    final Node attrsNode = getChildNode(metaAttrsNode, "attributes");
+                    final Node attrsNode = XMLTools.getChildNode(metaAttrsNode, "attributes");
                     nvpairsMA = attrsNode.getChildNodes();
                 } else {
                     nvpairsMA = metaAttrsNode.getChildNodes();
@@ -2053,9 +2053,9 @@ public final class CrmXml extends XML {
                 for (int l = 0; l < nvpairsMA.getLength(); l++) {
                     final Node maNode = nvpairsMA.item(l);
                     if (maNode.getNodeName().equals("nvpair")) {
-                        final String nvpairId = getAttribute(maNode, "id");
-                        final String name = getAttribute(maNode, "name");
-                        String value = getAttribute(maNode, "value");
+                        final String nvpairId = XMLTools.getAttribute(maNode, "id");
+                        final String name = XMLTools.getAttribute(maNode, "name");
+                        String value = XMLTools.getAttribute(maNode, "value");
                         if (TARGET_ROLE_META_ATTR.equals(name)) {
                             value = value.toLowerCase(Locale.US);
                         }
@@ -2071,16 +2071,16 @@ public final class CrmXml extends XML {
 
     /** OCF_CHECK_LEVEL */
     private String parseCheckLevelMonitorAttribute(final Node opNode) {
-        final Node iaNode = getChildNode(opNode, "instance_attributes");
+        final Node iaNode = XMLTools.getChildNode(opNode, "instance_attributes");
         if (iaNode == null) {
             return "";
         }
-        final Node nvpairNode = getChildNode(iaNode, "nvpair");
+        final Node nvpairNode = XMLTools.getChildNode(iaNode, "nvpair");
         if (nvpairNode == null) {
             return "";
         }
-        final String name = getAttribute(nvpairNode, "name");
-        final String value = getAttribute(nvpairNode, "value");
+        final String name = XMLTools.getAttribute(nvpairNode, "name");
+        final String value = XMLTools.getAttribute(nvpairNode, "value");
         if (PARAM_OCF_CHECK_LEVEL.equals(name)) {
             return value;
         } else {
@@ -2105,7 +2105,7 @@ public final class CrmXml extends XML {
                                 final Map<String, String> metaAttrsIdRefs,
                                 final Map<String, String> metaAttrsIdToCRMId) {
         final NodeList primitives = groupNode.getChildNodes();
-        final String groupId = getAttribute(groupNode, "id");
+        final String groupId = XMLTools.getAttribute(groupNode, "id");
         final Map<String, String> params = new HashMap<String, String>();
         parametersMap.put(groupId, params);
         final Map<String, String> nvpairIds = new HashMap<String, String>();
@@ -2140,17 +2140,17 @@ public final class CrmXml extends XML {
         }
 
         /* <meta_attributtes> */
-        final Node metaAttrsNode = getChildNode(groupNode, "meta_attributes");
+        final Node metaAttrsNode = XMLTools.getChildNode(groupNode, "meta_attributes");
         if (metaAttrsNode != null) {
-            final String metaAttrsIdRef = getAttribute(metaAttrsNode, "id-ref");
+            final String metaAttrsIdRef = XMLTools.getAttribute(metaAttrsNode, "id-ref");
             if (metaAttrsIdRef == null) {
-                final String metaAttrsId = getAttribute(metaAttrsNode, "id");
+                final String metaAttrsId = XMLTools.getAttribute(metaAttrsNode, "id");
                 metaAttrsIdMap.put(groupId, metaAttrsId);
                 metaAttrsIdToCRMId.put(metaAttrsId, groupId);
                 /* <attributtes> only til 2.1.4 */
                 final NodeList nvpairsMA;
                 if (Tools.versionBeforePacemaker(host)) {
-                    final Node attrsNode = getChildNode(metaAttrsNode, "attributes");
+                    final Node attrsNode = XMLTools.getChildNode(metaAttrsNode, "attributes");
                     nvpairsMA = attrsNode.getChildNodes();
                 } else {
                     nvpairsMA = metaAttrsNode.getChildNodes();
@@ -2160,9 +2160,9 @@ public final class CrmXml extends XML {
                 for (int l = 0; l < nvpairsMA.getLength(); l++) {
                     final Node maNode = nvpairsMA.item(l);
                     if (maNode.getNodeName().equals("nvpair")) {
-                        final String nvpairId = getAttribute(maNode, "id");
-                        String name = getAttribute(maNode, "name");
-                        String value = getAttribute(maNode, "value");
+                        final String nvpairId = XMLTools.getAttribute(maNode, "id");
+                        String name = XMLTools.getAttribute(maNode, "name");
+                        String value = XMLTools.getAttribute(maNode, "value");
                         if (TARGET_ROLE_META_ATTR.equals(name)) {
                             value = value.toLowerCase(Locale.US);
                         }
@@ -2193,18 +2193,18 @@ public final class CrmXml extends XML {
                                     final Map<String, String> operationsIdtoCRMId,
                                     final Map<String, String> metaAttrsIdRefs,
                                     final Map<String, String> metaAttrsIdToCRMId) {
-        final String templateId = getAttribute(primitiveNode, "template");
-        final String crmId = getAttribute(primitiveNode, "id");
+        final String templateId = XMLTools.getAttribute(primitiveNode, "template");
+        final String crmId = XMLTools.getAttribute(primitiveNode, "id");
         if (templateId != null) {
             LOG.info("parsePrimitive: templates not implemented, ignoring: " + crmId + '/' + templateId);
             return;
         }
-        final String raClass = getAttribute(primitiveNode, "class");
-        String provider = getAttribute(primitiveNode, "provider");
+        final String raClass = XMLTools.getAttribute(primitiveNode, "class");
+        String provider = XMLTools.getAttribute(primitiveNode, "provider");
         if (provider == null) {
             provider = ResourceAgent.HEARTBEAT_PROVIDER;
         }
-        final String type = getAttribute(primitiveNode, "type");
+        final String type = XMLTools.getAttribute(primitiveNode, "type");
         resourceTypeMap.put(crmId, getResourceAgent(type, provider, raClass));
         groupResList.add(crmId);
         parseAttributes(primitiveNode,
@@ -2228,8 +2228,8 @@ public final class CrmXml extends XML {
         for (int i = 0; i < scores.getLength(); i++) {
             final Node scoreNode = scores.item(i);
             if (scoreNode.getNodeName().equals("score")) {
-                final String h = getAttribute(scoreNode, "host");
-                final String score = getAttribute(scoreNode, "score");
+                final String h = XMLTools.getAttribute(scoreNode, "host");
+                final String score = XMLTools.getAttribute(scoreNode, "score");
                 allocationScores.put(h, score);
             }
         }
@@ -2239,13 +2239,13 @@ public final class CrmXml extends XML {
     /** Returns a hash with resource information. (running_on) */
     Map<String, ResourceStatus> parseResStatus(final String resStatus) {
         final Map<String, ResourceStatus> resStatusMap = new HashMap<String, ResourceStatus>();
-        final Document document = getXMLDocument(resStatus);
+        final Document document = XMLTools.getXMLDocument(resStatus);
         if (document == null) {
             return null;
         }
 
         /* get root <resource_status> */
-        final Node statusNode = getChildNode(document, "resource_status");
+        final Node statusNode = XMLTools.getChildNode(document, "resource_status");
         if (statusNode == null) {
             return null;
         }
@@ -2254,8 +2254,8 @@ public final class CrmXml extends XML {
         for (int i = 0; i < resources.getLength(); i++) {
             final Node resourceNode = resources.item(i);
             if (resourceNode.getNodeName().equals("resource")) {
-                final String id = getAttribute(resourceNode, "id");
-                final String isManaged = getAttribute(resourceNode, "managed");
+                final String id = XMLTools.getAttribute(resourceNode, "id");
+                final String isManaged = XMLTools.getAttribute(resourceNode, "managed");
                 final NodeList statusList = resourceNode.getChildNodes();
                 boolean managed = false;
                 if ("managed".equals(isManaged)) {
@@ -2269,21 +2269,21 @@ public final class CrmXml extends XML {
                     final Node setNode = statusList.item(j);
                     if (TARGET_ROLE_STARTED.equalsIgnoreCase(
                         setNode.getNodeName())) {
-                        final String node = getText(setNode);
+                        final String node = XMLTools.getText(setNode);
                         if (runningOnList == null) {
                             runningOnList = new ArrayList<String>();
                         }
                         runningOnList.add(node);
                     } else if (TARGET_ROLE_MASTER.equalsIgnoreCase(
                         setNode.getNodeName())) {
-                        final String node = getText(setNode);
+                        final String node = XMLTools.getText(setNode);
                         if (masterOnList == null) {
                             masterOnList = new ArrayList<String>();
                         }
                         masterOnList.add(node);
                     } else if (TARGET_ROLE_SLAVE.equalsIgnoreCase(
                         setNode.getNodeName())) {
-                        final String node = getText(setNode);
+                        final String node = XMLTools.getText(setNode);
                         if (slaveOnList == null) {
                             slaveOnList = new ArrayList<String>();
                         }
@@ -2308,13 +2308,13 @@ public final class CrmXml extends XML {
                                           final Table<String, String, Set<String>> failedClonesMap,
                                           final Map<String, String> pingCountMap) {
         /* <instance_attributes> */
-        final Node instanceAttrNode = getChildNode(transientAttrNode, "instance_attributes");
+        final Node instanceAttrNode = XMLTools.getChildNode(transientAttrNode, "instance_attributes");
         /* <nvpair...> */
         if (instanceAttrNode != null) {
             final NodeList nvpairsRes;
             if (Tools.versionBeforePacemaker(host)) {
                 /* <attributtes> only til 2.1.4 */
-                final Node attrNode = getChildNode(instanceAttrNode, "attributes");
+                final Node attrNode = XMLTools.getChildNode(instanceAttrNode, "attributes");
                 nvpairsRes = attrNode.getChildNodes();
             } else {
                 nvpairsRes = instanceAttrNode.getChildNodes();
@@ -2322,8 +2322,8 @@ public final class CrmXml extends XML {
             for (int j = 0; j < nvpairsRes.getLength(); j++) {
                 final Node optionNode = nvpairsRes.item(j);
                 if (optionNode.getNodeName().equals("nvpair")) {
-                    final String name = getAttribute(optionNode, "name");
-                    final String value = getAttribute(optionNode, "value");
+                    final String name = XMLTools.getAttribute(optionNode, "name");
+                    final String value = XMLTools.getAttribute(optionNode, "value");
                     /* TODO: last-failure-" */
                     if ("pingd".equals(name)) {
                         pingCountMap.put(uname, value);
@@ -2352,13 +2352,13 @@ public final class CrmXml extends XML {
     /** Parses node, to get info like if it is in stand by. */
     void parseNode(final String node, final Node nodeNode, final Table<String ,String, String> nodeParametersMap) {
         /* <instance_attributes> */
-        final Node instanceAttrNode = getChildNode(nodeNode, "instance_attributes");
+        final Node instanceAttrNode = XMLTools.getChildNode(nodeNode, "instance_attributes");
         /* <nvpair...> */
         if (instanceAttrNode != null) {
             final NodeList nvpairsRes;
             if (Tools.versionBeforePacemaker(host)) {
                 /* <attributtes> only til 2.1.4 */
-                final Node attrNode = getChildNode(instanceAttrNode, "attributes");
+                final Node attrNode = XMLTools.getChildNode(instanceAttrNode, "attributes");
                 nvpairsRes = attrNode.getChildNodes();
             } else {
                 nvpairsRes = instanceAttrNode.getChildNodes();
@@ -2366,8 +2366,8 @@ public final class CrmXml extends XML {
             for (int j = 0; j < nvpairsRes.getLength(); j++) {
                 final Node optionNode = nvpairsRes.item(j);
                 if (optionNode.getNodeName().equals("nvpair")) {
-                    final String name = getAttribute(optionNode, "name");
-                    final String value = getAttribute(optionNode, "value");
+                    final String name = XMLTools.getAttribute(optionNode, "name");
+                    final String value = XMLTools.getAttribute(optionNode, "value");
                     nodeParametersMap.put(node.toLowerCase(Locale.US), name, value);
                 }
             }
@@ -2387,17 +2387,17 @@ public final class CrmXml extends XML {
         for (int i = 0; i < nodes.getLength(); i++) {
             final Node rscSetNode = nodes.item(i);
             if (rscSetNode.getNodeName().equals("resource_set")) {
-                final String id = getAttribute(rscSetNode, "id");
-                final String sequential = getAttribute(rscSetNode, "sequential");
-                final String requireAll = getAttribute(rscSetNode, REQUIRE_ALL_ATTR);
-                final String orderAction = getAttribute(rscSetNode, "action");
-                final String colocationRole = getAttribute(rscSetNode, "role");
+                final String id = XMLTools.getAttribute(rscSetNode, "id");
+                final String sequential = XMLTools.getAttribute(rscSetNode, "sequential");
+                final String requireAll = XMLTools.getAttribute(rscSetNode, REQUIRE_ALL_ATTR);
+                final String orderAction = XMLTools.getAttribute(rscSetNode, "action");
+                final String colocationRole = XMLTools.getAttribute(rscSetNode, "role");
                 final NodeList rscNodes = rscSetNode.getChildNodes();
                 final List<String> rscIds = new ArrayList<String>();
                 for (int j = 0; j < rscNodes.getLength(); j++) {
                     final Node rscRefNode = rscNodes.item(j);
                     if (rscRefNode.getNodeName().equals("resource_ref")) {
-                        final String rscId = getAttribute(rscRefNode, "id");
+                        final String rscId = XMLTools.getAttribute(rscRefNode, "id");
                         rscIds.add(rscId);
                     }
                 }
@@ -2437,14 +2437,14 @@ public final class CrmXml extends XML {
 
     /** Returns CibQuery object with information from the cib node. */
     CibQuery parseCibQuery(final String query) {
-        final Document document = getXMLDocument(query);
+        final Document document = XMLTools.getXMLDocument(query);
         final CibQuery cibQueryData = new CibQuery();
         if (document == null) {
             LOG.appWarning("parseCibQuery: cib error: " + query);
             return cibQueryData;
         }
         /* get root <pacemaker> */
-        final Node pcmkNode = getChildNode(document, "pcmk");
+        final Node pcmkNode = XMLTools.getChildNode(document, "pcmk");
         if (pcmkNode == null) {
             LOG.appWarning("parseCibQuery: there is no pcmk node");
             return cibQueryData;
@@ -2452,13 +2452,13 @@ public final class CrmXml extends XML {
 
         /* get fenced nodes */
         final Set<String> fencedNodes = new HashSet<String>();
-        final Node fencedNode = getChildNode(pcmkNode, "fenced");
+        final Node fencedNode = XMLTools.getChildNode(pcmkNode, "fenced");
         if (fencedNode != null) {
             final NodeList nodes = fencedNode.getChildNodes();
             for (int i = 0; i < nodes.getLength(); i++) {
                 final Node hostNode = nodes.item(i);
                 if (hostNode.getNodeName().equals("node")) {
-                    final String h = getText(hostNode);
+                    final String h = XMLTools.getText(hostNode);
                     if (h != null) {
                         fencedNodes.add(h.toLowerCase(Locale.US));
                     }
@@ -2467,24 +2467,24 @@ public final class CrmXml extends XML {
         }
 
         /* get <cib> */
-        final Node cibNode = getChildNode(pcmkNode, "cib");
+        final Node cibNode = XMLTools.getChildNode(pcmkNode, "cib");
         if (cibNode == null) {
             LOG.appWarning("parseCibQuery: there is no cib node");
             return cibQueryData;
         }
         /* Designated Co-ordinator */
-        final String dcUuid = getAttribute(cibNode, "dc-uuid");
+        final String dcUuid = XMLTools.getAttribute(cibNode, "dc-uuid");
         //TODO: more attributes are here
 
         /* <configuration> */
-        final Node confNode = getChildNode(cibNode, "configuration");
+        final Node confNode = XMLTools.getChildNode(cibNode, "configuration");
         if (confNode == null) {
             LOG.appWarning("parseCibQuery: there is no configuration node");
             return cibQueryData;
         }
 
         /* <rsc_defaults> */
-        final Node rscDefaultsNode = getChildNode(confNode, "rsc_defaults");
+        final Node rscDefaultsNode = XMLTools.getChildNode(confNode, "rsc_defaults");
         String rscDefaultsId = null;
         final Map<String, String> rscDefaultsParams = new HashMap<String, String>();
         final Map<String, String> rscDefaultsParamsNvpairIds = new HashMap<String, String>();
@@ -2493,7 +2493,7 @@ public final class CrmXml extends XML {
         }
 
         /* <op_defaults> */
-        final Node opDefaultsNode = getChildNode(confNode, "op_defaults");
+        final Node opDefaultsNode = XMLTools.getChildNode(confNode, "op_defaults");
         final Map<String, Value> opDefaultsParams = new HashMap<String, Value>();
         if (opDefaultsNode != null) {
             parseOpDefaults(opDefaultsNode, opDefaultsParams);
@@ -2501,21 +2501,21 @@ public final class CrmXml extends XML {
         
         
         /* <crm_config> */
-        final Node crmConfNode = getChildNode(confNode, "crm_config");
+        final Node crmConfNode = XMLTools.getChildNode(confNode, "crm_config");
         if (crmConfNode == null) {
             LOG.appWarning("parseCibQuery: there is no crm_config node");
             return cibQueryData;
         }
 
         /*      <cluster_property_set> */
-        final Node cpsNode = getChildNode(crmConfNode, "cluster_property_set");
+        final Node cpsNode = XMLTools.getChildNode(crmConfNode, "cluster_property_set");
         if (cpsNode == null) {
             LOG.appWarning("parseCibQuery: there is no cluster_property_set node");
         } else {
             final NodeList nvpairs;
             if (Tools.versionBeforePacemaker(host)) {
                 /* <attributtes> only til 2.1.4 */
-                final Node attrNode = getChildNode(cpsNode, "attributes");
+                final Node attrNode = XMLTools.getChildNode(cpsNode, "attributes");
                 nvpairs = attrNode.getChildNodes();
             } else {
                 nvpairs = cpsNode.getChildNodes();
@@ -2526,8 +2526,8 @@ public final class CrmXml extends XML {
             for (int i = 0; i < nvpairs.getLength(); i++) {
                 final Node optionNode = nvpairs.item(i);
                 if (optionNode.getNodeName().equals("nvpair")) {
-                    final String name = getAttribute(optionNode, "name");
-                    final String value = getAttribute(optionNode, "value");
+                    final String name = XMLTools.getAttribute(optionNode, "name");
+                    final String value = XMLTools.getAttribute(optionNode, "value");
                     crmConfMap.put(name, value);
                 }
             }
@@ -2539,7 +2539,7 @@ public final class CrmXml extends XML {
         * keep the convention. */
         String dc = null;
         final Table<String, String, String> nodeParametersMap = HashBasedTable.create();
-        final Node nodesNode = getChildNode(confNode, "nodes");
+        final Node nodesNode = XMLTools.getChildNode(confNode, "nodes");
         final Map<String, String> nodeOnline = new HashMap<String, String>();
         final Map<String, String> nodeID = new HashMap<String, String>();
         if (nodesNode != null) {
@@ -2550,8 +2550,8 @@ public final class CrmXml extends XML {
                     /* TODO: doing nothing with the info, just getting the dc,
                     * for now.
                     */
-                    final String id = getAttribute(nodeNode, "id");
-                    final String uname = getAttribute(nodeNode, "uname");
+                    final String id = XMLTools.getAttribute(nodeNode, "id");
+                    final String uname = XMLTools.getAttribute(nodeNode, "uname");
                     if (!nodeID.containsKey(uname)) {
                         nodeID.put(uname, id);
                     }
@@ -2567,7 +2567,7 @@ public final class CrmXml extends XML {
         }
 
         /* <resources> */
-        final Node resourcesNode = getChildNode(confNode, "resources");
+        final Node resourcesNode = XMLTools.getChildNode(confNode, "resources");
         if (resourcesNode == null) {
             LOG.appWarning("parseCibQuery: there is no resources node");
             return cibQueryData;
@@ -2636,7 +2636,7 @@ public final class CrmXml extends XML {
                                metaAttrsIdToCRMId);
             } else if ("master".equals(nodeName) || "master_slave".equals(nodeName) || "clone".equals(nodeName)) {
                 final NodeList primitives = primitiveGroupNode.getChildNodes();
-                final String cloneId = getAttribute(primitiveGroupNode, "id");
+                final String cloneId = XMLTools.getAttribute(primitiveGroupNode, "id");
                 List<String> resList = groupsToResourcesMap.get(cloneId);
                 if (resList == null) {
                     resList = new ArrayList<String>();
@@ -2728,7 +2728,7 @@ public final class CrmXml extends XML {
         final Table<String, String, String> resHostToLocIdMap = HashBasedTable.create();
         
         final Map<String, String> resPingToLocIdMap = new HashMap<String, String>();
-        final Node constraintsNode = getChildNode(confNode, "constraints");
+        final Node constraintsNode = XMLTools.getChildNode(confNode, "constraints");
         if (constraintsNode != null) {
             final NodeList constraints = constraintsNode.getChildNodes();
             String rscString         = "rsc";
@@ -2752,17 +2752,17 @@ public final class CrmXml extends XML {
             for (int i = 0; i < constraints.getLength(); i++) {
                 final Node constraintNode = constraints.item(i);
                 if (constraintNode.getNodeName().equals("rsc_colocation")) {
-                    final String colId = getAttribute(constraintNode, "id");
-                    final String rsc = getAttribute(constraintNode, rscString);
-                    final String withRsc = getAttribute(constraintNode, withRscString);
+                    final String colId = XMLTools.getAttribute(constraintNode, "id");
+                    final String rsc = XMLTools.getAttribute(constraintNode, rscString);
+                    final String withRsc = XMLTools.getAttribute(constraintNode, withRscString);
                     if (rsc == null || withRsc == null) {
                         final List<RscSet> rscSets = new ArrayList<RscSet>();
                         parseResourceSets(constraintNode, colId, null, rscSets, rscSetConnections);
                         colocationIdRscSetsMap.put(colId, rscSets);
                     }
-                    final String rscRole = getAttribute(constraintNode, rscRoleString);
-                    final String withRscRole = getAttribute(constraintNode, withRscRoleString);
-                    final String score = getAttribute(constraintNode, SCORE_CONSTRAINT_PARAM);
+                    final String rscRole = XMLTools.getAttribute(constraintNode, rscRoleString);
+                    final String withRscRole = XMLTools.getAttribute(constraintNode, withRscRoleString);
+                    final String score = XMLTools.getAttribute(constraintNode, SCORE_CONSTRAINT_PARAM);
                     final ColocationData colocationData =
                                                  new ColocationData(colId, rsc, withRsc, rscRole, withRscRole, score);
                     colocationIdMap.put(colId, colocationData);
@@ -2773,19 +2773,19 @@ public final class CrmXml extends XML {
                     withs.add(colocationData);
                     colocationRscMap.put(rsc, withs);
                 } else if (constraintNode.getNodeName().equals("rsc_order")) {
-                    String rscFirst = getAttribute(constraintNode, firstString);
-                    String rscThen = getAttribute(constraintNode, thenString);
-                    final String ordId = getAttribute(constraintNode, "id");
+                    String rscFirst = XMLTools.getAttribute(constraintNode, firstString);
+                    String rscThen = XMLTools.getAttribute(constraintNode, thenString);
+                    final String ordId = XMLTools.getAttribute(constraintNode, "id");
                     if (rscFirst == null || rscThen == null) {
                         final List<RscSet> rscSets = new ArrayList<RscSet>();
                         parseResourceSets(constraintNode, null, ordId, rscSets, rscSetConnections);
                         orderIdRscSetsMap.put(ordId, rscSets);
                     }
-                    final String score = getAttribute(constraintNode, SCORE_CONSTRAINT_PARAM);
-                    final String symmetrical = getAttribute(constraintNode, "symmetrical");
-                    String firstAction = getAttribute(constraintNode, firstActionString);
-                    String thenAction = getAttribute(constraintNode, thenActionString);
-                    final String type = getAttribute(constraintNode, "type");
+                    final String score = XMLTools.getAttribute(constraintNode, SCORE_CONSTRAINT_PARAM);
+                    final String symmetrical = XMLTools.getAttribute(constraintNode, "symmetrical");
+                    String firstAction = XMLTools.getAttribute(constraintNode, firstActionString);
+                    String thenAction = XMLTools.getAttribute(constraintNode, thenActionString);
+                    final String type = XMLTools.getAttribute(constraintNode, "type");
                     if (type != null && "before".equals(type)) {
                         /* exchange resoruces */
                         final String rsc = rscFirst;
@@ -2810,10 +2810,10 @@ public final class CrmXml extends XML {
                     thens.add(orderData);
                     orderRscMap.put(rscFirst, thens);
                 } else if ("rsc_location".equals(constraintNode.getNodeName())) {
-                    final String locId = getAttribute(constraintNode, "id");
-                    final String node  = getAttribute(constraintNode, "node");
-                    final String rsc   = getAttribute(constraintNode, "rsc");
-                    final String score = getAttribute(constraintNode, SCORE_CONSTRAINT_PARAM);
+                    final String locId = XMLTools.getAttribute(constraintNode, "id");
+                    final String node  = XMLTools.getAttribute(constraintNode, "node");
+                    final String rsc   = XMLTools.getAttribute(constraintNode, "rsc");
+                    final String score = XMLTools.getAttribute(constraintNode, SCORE_CONSTRAINT_PARAM);
 
                     List<String> locs = locationsIdMap.get(rsc);
                     if (locs == null) {
@@ -2833,18 +2833,18 @@ public final class CrmXml extends XML {
                         }
                     }
                     locs.add(locId);
-                    final Node ruleNode = getChildNode(constraintNode, "rule");
+                    final Node ruleNode = XMLTools.getChildNode(constraintNode, "rule");
                     if (ruleNode != null) {
-                        final String score2 = getAttribute(ruleNode, SCORE_CONSTRAINT_PARAM);
-                        final String booleanOp = getAttribute(ruleNode, "boolean-op");
+                        final String score2 = XMLTools.getAttribute(ruleNode, SCORE_CONSTRAINT_PARAM);
+                        final String booleanOp = XMLTools.getAttribute(ruleNode, "boolean-op");
                         // TODO: I know only "and", ignoring everything we
                         // don't know.
-                        final Node expNode = getChildNode(ruleNode, "expression");
+                        final Node expNode = XMLTools.getChildNode(ruleNode, "expression");
                         if (expNode != null
                             && "expression".equals(expNode.getNodeName())) {
-                            final String attr = getAttribute(expNode, "attribute");
-                            final String op = getAttribute(expNode, "operation");
-                            final String value = getAttribute(expNode, "value");
+                            final String attr = XMLTools.getAttribute(expNode, "attribute");
+                            final String op = XMLTools.getAttribute(expNode, "operation");
+                            final String value = XMLTools.getAttribute(expNode, "value");
                             if ((booleanOp == null || "and".equals(booleanOp))
                                 && "#uname".equals(attr)
                                 && value != null) {
@@ -2864,7 +2864,7 @@ public final class CrmXml extends XML {
         }
 
         /* <status> */
-        final Node statusNode = getChildNode(cibNode, "status");
+        final Node statusNode = XMLTools.getChildNode(cibNode, "status");
         final Set<String> nodePending = new HashSet<String>();
         if (statusNode != null) {
             /* <node_state ...> */
@@ -2872,15 +2872,15 @@ public final class CrmXml extends XML {
             for (int i = 0; i < nodes.getLength(); i++) {
                 final Node nodeStateNode = nodes.item(i);
                 if ("node_state".equals(nodeStateNode.getNodeName())) {
-                    final String uname = getAttribute(nodeStateNode, "uname");
-                    final String id = getAttribute(nodeStateNode, "id");
+                    final String uname = XMLTools.getAttribute(nodeStateNode, "uname");
+                    final String id = XMLTools.getAttribute(nodeStateNode, "id");
                     if (uname == null || !id.equals(nodeID.get(uname))) {
                         LOG.appWarning("parseCibQuery: skipping " + uname + ' ' + id);
                         continue;
                     }
-                    final String join = getAttribute(nodeStateNode, "join");
-                    final String inCCM = getAttribute(nodeStateNode, "in_ccm");
-                    final String crmd = getAttribute(nodeStateNode, "crmd");
+                    final String join = XMLTools.getAttribute(nodeStateNode, "join");
+                    final String inCCM = XMLTools.getAttribute(nodeStateNode, "in_ccm");
+                    final String crmd = XMLTools.getAttribute(nodeStateNode, "crmd");
                     if ("member".equals(join) && "true".equals(inCCM) && !"offline".equals(crmd)) {
                         nodeOnline.put(uname.toLowerCase(Locale.US), "yes");
                     } else {
@@ -3238,12 +3238,12 @@ public final class CrmXml extends XML {
                            final Map<String, Set<String>> inLRMList,
                            final Collection<String> orphanedList,
                            final Table<String, String, Set<String>> failedClonesMap) {
-        final Node lrmResourcesNode = getChildNode(lrmNode, "lrm_resources");
+        final Node lrmResourcesNode = XMLTools.getChildNode(lrmNode, "lrm_resources");
         final NodeList lrmResources = lrmResourcesNode.getChildNodes();
         for (int j = 0; j < lrmResources.getLength(); j++) {
             final Node rscNode = lrmResources.item(j);
             if ("lrm_resource".equals(rscNode.getNodeName())) {
-                final String resId = getAttribute(rscNode, "id");
+                final String resId = XMLTools.getAttribute(rscNode, "id");
                 final Pattern p = Pattern.compile("(.*):(\\d+)$");
                 final Matcher m = p.matcher(resId);
                 final String crmId;
@@ -3259,12 +3259,12 @@ public final class CrmXml extends XML {
                     crmId = resId;
                 }
                 if (!resourceTypeMap.containsKey(crmId)) {
-                    final String raClass = getAttribute(rscNode, "class");
-                    String provider = getAttribute(rscNode, "provider");
+                    final String raClass = XMLTools.getAttribute(rscNode, "class");
+                    String provider = XMLTools.getAttribute(rscNode, "provider");
                     if (provider == null) {
                         provider = ResourceAgent.HEARTBEAT_PROVIDER;
                     }
-                    final String type = getAttribute(rscNode, "type");
+                    final String type = XMLTools.getAttribute(rscNode, "type");
                     resourceTypeMap.put(crmId, getResourceAgent(type, provider, raClass));
                     resList.add(crmId);
                     parametersMap.put(crmId, new HashMap<String, String>());

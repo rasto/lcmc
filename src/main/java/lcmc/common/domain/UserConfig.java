@@ -69,8 +69,8 @@ import org.w3c.dom.NodeList;
  */
 @Named
 @Singleton
-public final class UserConfig extends XML {
-    private static final Logger LOG = LoggerFactory.getLogger(XML.class);
+public final class UserConfig extends XMLTools {
+    private static final Logger LOG = LoggerFactory.getLogger(XMLTools.class);
     private static final String HOST_NAME_ATTR = "name";
     private static final String HOST_SSHPORT_ATTR = "ssh";
     private static final String HOST_COLOR_ATTR = "color";
