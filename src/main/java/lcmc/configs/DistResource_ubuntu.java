@@ -33,6 +33,7 @@ public final class DistResource_ubuntu extends ListResourceBundle {
     private static final Object[][] contents = {
         {"Support",                       "ubuntu"},
         {"version:7.04",                  ""},
+        {"version:jessie/sid/15.*",       "VIVID"},
         {"version:squeeze/sid/10.04",     "LUCID"},
         {"version:squeeze/sid/9.10",      "KARMIC"},
         {"version:5.0/9.04",              "JAUNTY"},
