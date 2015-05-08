@@ -273,6 +273,8 @@ public class Host implements Comparable<Host>, Value {
     @Inject
     private Provider<DrbdXml> drbdXmlProvider;
     @Inject
+    private Provider<VmsXml> vmsXmlProvider;
+    @Inject
     private Hosts allHosts;
     @Inject
     private Application application;
@@ -1360,8 +1362,9 @@ public class Host implements Comparable<Host>, Value {
                                      }
                                  }
                                  if (vmUpdate != null) {
-                                     final VmsXml newVmsXml = new VmsXml(host);
-                                     if (newVmsXml.update(vmUpdate)) {
+                                     final VmsXml newVmsXml = vmsXmlProvider.get();
+                                     newVmsXml.init(host);
+                                     if (newVmsXml.parseXml(vmUpdate)) {
                                          cb.vmsXmlPut(host, newVmsXml);
                                          cb.updateVms();
                                      }

@@ -622,6 +622,8 @@ public class DomainInfo extends EditableInfo {
     @Inject
     private Provider<VideoInfo> videoInfoProvider;
     @Inject
+    private Provider<VmsXml> vmsXmlProvider;
+    @Inject
     private WidgetFactory widgetFactory;
     @Inject
     private TreeMenuController treeMenuController;
@@ -2623,7 +2625,8 @@ public class DomainInfo extends EditableInfo {
                 final Node domainNode;
                 VmsXml vmsXml;
                 if (getResource().isNew()) {
-                    vmsXml = new VmsXml(host);
+                    vmsXml = vmsXmlProvider.get();
+                    vmsXml.init(host);
                     getBrowser().vmsXmlPut(host, vmsXml);
                     domainNode = vmsXml.createDomainXML(getUUID(), getDomainName(), parameters, needConsole);
                     for (final HardwareInfo hi : allHWP.keySet()) {
@@ -2634,7 +2637,8 @@ public class DomainInfo extends EditableInfo {
                 } else {
                     vmsXml = getBrowser().getVmsXml(host);
                     if (vmsXml == null) {
-                        vmsXml = new VmsXml(host);
+                        vmsXml = vmsXmlProvider.get();
+                        vmsXml.init(host);
                         getBrowser().vmsXmlPut(host, vmsXml);
                     }
                     if (vmsXml.getDomainNames().contains(getDomainName())) {
