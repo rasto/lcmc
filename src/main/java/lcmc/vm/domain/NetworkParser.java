@@ -30,7 +30,10 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import javax.inject.Named;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 @Named
@@ -43,8 +46,9 @@ public class NetworkParser {
 
     private final Map<String, String> netToConfigs = new HashMap<String, String>();
     private final Map<String, String> netNamesConfigsMap = new HashMap<String, String>();
+    private Map<Value, NetworkData> networkMap = new LinkedHashMap<Value, NetworkData>();
 
-    public Map<Value, NetworkData> parseNetwork(final Node netNode) {
+    public void parseNetwork(final Node netNode) {
         /* one vm */
         if (netNode == null) {
             Maps.newHashMap();
@@ -54,15 +58,14 @@ public class NetworkParser {
         netToConfigs.put(config, name);
         netNamesConfigsMap.put(name, config);
         final String autostartString = XMLTools.getAttribute(netNode, NET_PARAM_AUTOSTART);
-        final Map<Value, NetworkData> networkMap = parseNetConfig(XMLTools.getChildNode(netNode, "network"), name, autostartString);
-        return networkMap;
+        parseNetConfig(XMLTools.getChildNode(netNode, "network"), name, autostartString);
     }
 
     /** Parses the libvirt network config file. */
-    private Map<Value, NetworkData> parseNetConfig(final Node networkNode, final String nameInFilename, final String autostartString) {
-        final Map<Value, NetworkData> networkMap = Maps.newHashMap();
+    private void parseNetConfig(final Node networkNode, final String nameInFilename, final String autostartString) {
+        final Map<Value, NetworkData> newNetworkMap = Maps.newHashMap();
         if (networkNode == null) {
-            return networkMap;
+            return;
         }
         boolean autostart = false;
         if (autostartString != null && "true".equals(autostartString)) {
@@ -83,7 +86,7 @@ public class NetworkParser {
                 name = XMLTools.getText(optionNode);
                 if (!name.equals(nameInFilename)) {
                     LOG.appWarning("parseNetConfig: unexpected name: " + name + " != " + nameInFilename);
-                    return networkMap;
+                    return;
                 }
             } else if (NET_PARAM_UUID.equals(nodeName)) {
                 uuid = XMLTools.getText(optionNode);
@@ -112,8 +115,12 @@ public class NetworkParser {
                                                             bridgeDelay,
                                                             bridgeForwardDelay);
 
-            networkMap.put(new StringValue(name), networkData);
+            newNetworkMap.put(new StringValue(name), networkData);
         }
-        return networkMap;
+        this.networkMap = newNetworkMap;
+    }
+
+    public List<Value> getNetworks() {
+        return new ArrayList<Value>(networkMap.keySet());
     }
 }
