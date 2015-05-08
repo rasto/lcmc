@@ -38,6 +38,7 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import javax.inject.Named;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -67,18 +68,14 @@ import lcmc.vm.service.VIRSH;
 import lcmc.cluster.service.ssh.ExecCommandConfig;
 import lcmc.cluster.service.ssh.SshOutput;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-/**
- * This class parses xml from drbdsetup and drbdadm, stores the
- * information in the hashes and provides methods to get this
- * information.
- * The xml is obtained with drbdsetp xml command and drbdadm dump-xml.
- */
-public final class VmsXml {
+@Named
+public class VmsXml {
     private static final Logger LOG = LoggerFactory.getLogger(VmsXml.class);
     /** Pattern that maches display e.g. :4. */
     private static final Pattern DISPLAY_PATTERN = Pattern.compile(".*:(\\d+)$");
@@ -119,9 +116,6 @@ public final class VmsXml {
     public static final String VM_PARAM_ON_REBOOT = "on_reboot";
     public static final String VM_PARAM_ON_CRASH = "on_crash";
     public static final String VM_PARAM_EMULATOR = "emulator";
-    public static final String NET_PARAM_NAME = "name";
-    public static final String NET_PARAM_UUID = "uuid";
-    public static final String NET_PARAM_AUTOSTART = "autostart";
     public static final String HW_ADDRESS = "address";
     public static final Map<String, String> PARAM_INTERFACE_TAG = new HashMap<String, String>();
     public static final Map<String, String> PARAM_INTERFACE_ATTRIBUTE = new HashMap<String, String>();
@@ -272,6 +266,9 @@ public final class VmsXml {
         PARAM_VIDEO_ATTRIBUTE.put(VideoData.MODEL_HEADS, "heads");
     }
 
+    @Autowired
+    private NetworkParser networkParser;
+
     /** Returns string representation of the port; it can be autoport. */
     static String portString(final String port) {
         if ("-1".equals(port)) {
@@ -376,8 +373,6 @@ public final class VmsXml {
     private final Collection<String> domainNames = new ArrayList<String>();
     private final Map<Value, String> configsToNames = new HashMap<Value, String>();
     private final Map<String, String> namesToConfigs = new HashMap<String, String>();
-    private final Map<String, String> netToConfigs = new HashMap<String, String>();
-    private final Map<String, String> netNamesConfigsMap = new HashMap<String, String>();
     private final Table<String, String, String> parameterValues = HashBasedTable.create();
     private final Map<String, Integer> domainRemotePorts = new HashMap<String, Integer>();
     private final Map<String, Boolean> domainAutoports = new HashMap<String, Boolean>();
@@ -408,10 +403,10 @@ public final class VmsXml {
     /** Map from domain name and model type to the video device data. */
     private final Map<String, Map<String, VideoData>> videosMap = new LinkedHashMap<String, Map<String, VideoData>>();
     /** Map from domain name and network name to the network data. */
-    private final Map<Value, NetworkData> networkMap = new LinkedHashMap<Value, NetworkData>();
+    private Map<Value, NetworkData> networkMap = new LinkedHashMap<Value, NetworkData>();
     private final Collection<String> sourceFileDirs = new TreeSet<String>();
     private final Collection<String> usedMacAddresses = new HashSet<String>();
-    private final Host definedOnHost;
+    private Host definedOnHost;
 
     private final ReadWriteLock mXMLDocumentLock = new ReentrantReadWriteLock();
     private final Lock mXMLDocumentReadLock = mXMLDocumentLock.readLock();
@@ -419,8 +414,7 @@ public final class VmsXml {
     private Document xmlDocument = null;
     private String oldConfig = null;
 
-    public VmsXml(final Host definedOnHost) {
-        super();
+    public void init(final Host definedOnHost) {
         this.definedOnHost = definedOnHost;
     }
 
@@ -1140,7 +1134,7 @@ public final class VmsXml {
         removeXML(domainName, parametersMap, "devices/video", getVideoDataComparator(), virshOptions);
     }
 
-    public boolean update() {
+    public boolean parseXml() {
         final String command = definedOnHost.getDistCommand("VMSXML.GetData", (ConvertCmdCallback) null);
         final SshOutput ret = definedOnHost.captureCommand(new ExecCommandConfig().command(command)
                                                                                   .silentCommand()
@@ -1152,12 +1146,12 @@ public final class VmsXml {
         if (output == null) {
             return false;
         }
-        return update(output);
+        return parseXml(output);
     }
 
-    public boolean update(final String output) {
-        oldConfig = output;
-        final Document document = XMLTools.getXMLDocument(output);
+    public boolean parseXml(final String xml) {
+        oldConfig = xml;
+        final Document document = XMLTools.getXMLDocument(xml);
         mXMLDocumentWriteLock.lock();
         try {
             xmlDocument = document;
@@ -1177,84 +1171,14 @@ public final class VmsXml {
         for (int i = 0; i < vms.getLength(); i++) {
             final Node node = vms.item(i);
             if ("net".equals(node.getNodeName())) {
-                updateNetworks(node);
+                networkMap = networkParser.parseNetwork(node);
             } else if ("vm".equals(node.getNodeName())) {
-                updateVM(node);
+                parseVM(node);
             } else if ("version".equals(node.getNodeName())) {
                 definedOnHost.setLibvirtVersion(XMLTools.getText(node));
             }
         }
         return true;
-    }
-
-    private void updateNetworks(final Node netNode) {
-        /* one vm */
-        if (netNode == null) {
-            return;
-        }
-        final String name = XMLTools.getAttribute(netNode, VM_PARAM_NAME);
-        final String config = XMLTools.getAttribute(netNode, "config");
-        netToConfigs.put(config, name);
-        netNamesConfigsMap.put(name, config);
-        final String autostartString = XMLTools.getAttribute(netNode, NET_PARAM_AUTOSTART);
-        parseNetConfig(XMLTools.getChildNode(netNode, "network"), name, autostartString);
-    }
-
-    /** Parses the libvirt network config file. */
-    private void parseNetConfig(final Node networkNode, final String nameInFilename, final String autostartString) {
-        if (networkNode == null) {
-            return;
-        }
-        boolean autostart = false;
-        if (autostartString != null && "true".equals(autostartString)) {
-            autostart = true;
-        }
-        final NodeList options = networkNode.getChildNodes();
-        String name = null;
-        String uuid = null;
-        String forwardMode = null;
-        String bridgeName = null;
-        String bridgeSTP = null;
-        String bridgeDelay = null;
-        String bridgeForwardDelay = null;
-        for (int i = 0; i < options.getLength(); i++) {
-            final Node optionNode = options.item(i);
-            final String nodeName = optionNode.getNodeName();
-            if (NET_PARAM_NAME.equals(nodeName)) {
-                name = XMLTools.getText(optionNode);
-                if (!name.equals(nameInFilename)) {
-                    LOG.appWarning("parseNetConfig: unexpected name: " + name + " != " + nameInFilename);
-                    return;
-                }
-            } else if (NET_PARAM_UUID.equals(nodeName)) {
-                uuid = XMLTools.getText(optionNode);
-            } else if ("forward".equals(nodeName)) {
-                forwardMode = XMLTools.getAttribute(optionNode, "mode");
-            } else if ("bridge".equals(nodeName)) {
-                bridgeName = XMLTools.getAttribute(optionNode, "name");
-                bridgeSTP = XMLTools.getAttribute(optionNode, "stp");
-                bridgeDelay = XMLTools.getAttribute(optionNode, "delay");
-                bridgeForwardDelay = XMLTools.getAttribute(optionNode, "forwardDelay");
-            } else if ("mac".equals(nodeName)) {
-                /* skip */
-            } else if ("ip".equals(nodeName)) {
-                /* skip */
-            } else if (!"#text".equals(nodeName)) {
-                LOG.appWarning("parseNetConfig: unknown network option: " + nodeName);
-            }
-        }
-        if (name != null) {
-            final NetworkData networkData = new NetworkData(name,
-                                                            uuid,
-                                                            autostart,
-                                                            forwardMode,
-                                                            bridgeName,
-                                                            bridgeSTP,
-                                                            bridgeDelay,
-                                                            bridgeForwardDelay);
-
-            networkMap.put(new StringValue(name), networkData);
-        }
     }
 
     /**
@@ -1750,7 +1674,7 @@ public final class VmsXml {
         return domainType;
     }
 
-    private void updateVM(final Node vmNode) {
+    private void parseVM(final Node vmNode) {
         /* one vm */
         if (vmNode == null) {
             return;

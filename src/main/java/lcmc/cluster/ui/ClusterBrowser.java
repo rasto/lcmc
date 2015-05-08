@@ -69,8 +69,6 @@ import lcmc.crm.ui.CrmGraph;
 import lcmc.drbd.domain.DRBDtestData;
 import lcmc.drbd.domain.DrbdXml;
 import lcmc.drbd.ui.DrbdGraph;
-import lcmc.event.CommonBlockDevicesChangedEvent;
-import lcmc.event.CommonFileSystemsChangedEvent;
 import lcmc.event.NetworkChangedEvent;
 import lcmc.cluster.service.storage.BlockDeviceService;
 import lcmc.cluster.service.NetworkService;
@@ -78,14 +76,11 @@ import lcmc.host.ui.HostBrowser;
 import lcmc.host.domain.Host;
 import lcmc.crm.domain.PtestData;
 import lcmc.crm.domain.ResourceAgent;
-import lcmc.common.domain.StringValue;
 import lcmc.vm.domain.VmsXml;
-import lcmc.common.domain.Value;
 import lcmc.cluster.domain.Network;
 import lcmc.crm.domain.Service;
 import lcmc.common.ui.CategoryInfo;
 import lcmc.host.ui.ClusterHostsInfo;
-import lcmc.cluster.ui.resource.CommonBlockDevInfo;
 import lcmc.common.ui.Info;
 import lcmc.crm.ui.resource.AvailableServiceInfo;
 import lcmc.crm.ui.resource.AvailableServicesInfo;
@@ -233,6 +228,8 @@ public class ClusterBrowser extends Browser {
     private AvailableServicesInfo availableServicesInfo;
     @Inject
     private Provider<CRMInfo> crmInfoProvider;
+    @Inject
+    private Provider<VmsXml> vmsXmlProvider;
     @Inject
     private TreeMenuController treeMenuController;
     @Inject
@@ -736,8 +733,9 @@ public class ClusterBrowser extends Browser {
 
     /** Updates VMs info. */
     public void periodicalVmsUpdate(final Host host) {
-        final VmsXml newVmsXml = new VmsXml(host);
-        if (newVmsXml.update()) {
+        final VmsXml newVmsXml = vmsXmlProvider.get();
+        newVmsXml.init(host);
+        if (newVmsXml.parseXml()) {
             vmsXmlPut(host, newVmsXml);
             updateVms();
         }
@@ -752,8 +750,9 @@ public class ClusterBrowser extends Browser {
     public void periodicalVmsUpdate(final Iterable<Host> hosts) {
         boolean updated = false;
         for (final Host host : hosts) {
-            final VmsXml newVmsXml = new VmsXml(host);
-            if (newVmsXml.update()) {
+            final VmsXml newVmsXml = vmsXmlProvider.get();
+            newVmsXml.init(host);
+            if (newVmsXml.parseXml()) {
                 vmsXmlPut(host, newVmsXml);
                 updated = true;
             }
