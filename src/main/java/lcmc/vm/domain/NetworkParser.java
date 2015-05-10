@@ -27,6 +27,7 @@ import lcmc.common.domain.XMLTools;
 import lcmc.logger.Logger;
 import lcmc.logger.LoggerFactory;
 import lcmc.vm.domain.data.NetworkData;
+import lombok.val;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
@@ -54,11 +55,11 @@ public class NetworkParser {
         if (netNode == null) {
             Maps.newHashMap();
         }
-        final String name = XMLTools.getAttribute(netNode, VmsXml.VM_PARAM_NAME);
-        final String config = XMLTools.getAttribute(netNode, "config");
+        val name = XMLTools.getAttribute(netNode, VmsXml.VM_PARAM_NAME);
+        val config = XMLTools.getAttribute(netNode, "config");
         netToConfigs.put(config, name);
         netNamesConfigsMap.put(name, config);
-        final String autostartString = XMLTools.getAttribute(netNode, NET_PARAM_AUTOSTART);
+        val autostartString = XMLTools.getAttribute(netNode, NET_PARAM_AUTOSTART);
         parseNetConfig(XMLTools.getChildNode(netNode, "network"), name, autostartString);
     }
 
