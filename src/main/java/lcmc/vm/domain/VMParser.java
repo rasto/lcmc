@@ -20,8 +20,7 @@
 
 package lcmc.vm.domain;
 
-import com.google.common.collect.HashBasedTable;
-import com.google.common.collect.Table;
+import com.google.common.collect.Maps;
 import lcmc.common.domain.StringValue;
 import lcmc.common.domain.Value;
 import lcmc.common.domain.XMLTools;
@@ -30,6 +29,7 @@ import lcmc.host.domain.Host;
 import lcmc.logger.Logger;
 import lcmc.logger.LoggerFactory;
 import lcmc.vm.domain.data.DiskData;
+import lcmc.vm.domain.data.DomainData;
 import lcmc.vm.domain.data.FilesystemData;
 import lcmc.vm.domain.data.GraphicsData;
 import lcmc.vm.domain.data.InputDevData;
@@ -38,6 +38,7 @@ import lcmc.vm.domain.data.ParallelData;
 import lcmc.vm.domain.data.SerialData;
 import lcmc.vm.domain.data.SoundData;
 import lcmc.vm.domain.data.VideoData;
+import lombok.val;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
@@ -51,46 +52,28 @@ import java.util.Map;
 import java.util.TreeSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import com.google.common.base.Optional;
 
 @Named
 public class VMParser {
     private static final Logger LOG = LoggerFactory.getLogger(VMParser.class);
     private static final Pattern DISPLAY_PATTERN = Pattern.compile(".*:(\\d+)$");
 
-    private final Table<String, String, String> parameterValues = HashBasedTable.create();
-    /** Map from domain name and target device to the disk data. */
-    private final Map<String, Map<String, DiskData>> disksMap = new LinkedHashMap<String, Map<String, DiskData>>();
-    /** Map from domain name and target device to the fs data. */
-    private final Map<String, Map<String, FilesystemData>> filesystemsMap =
-            new LinkedHashMap<String, Map<String, FilesystemData>>();
-    /** Map from domain name and mac address to the interface data. */
-    private final Map<String, Map<String, InterfaceData>> interfacesMap =
-            new LinkedHashMap<String, Map<String, InterfaceData>>();
-    /** Map from domain name and index to the input device data. */
-    private final Map<String, Map<String, InputDevData>> inputDevsMap =
-            new LinkedHashMap<String, Map<String, InputDevData>>();
-    /** Map from domain name and type to the graphics device data. */
-    private final Map<String, Map<String, GraphicsData>> graphicsDevsMap =
-            new LinkedHashMap<String, Map<String, GraphicsData>>();
-    /** Map from domain name and model to the sound device data. */
-    private final Map<String, Map<String, SoundData>> soundsMap = new LinkedHashMap<String, Map<String, SoundData>>();
-    /** Map from domain name and type to the serial device data. */
-    private final Map<String, Map<String, SerialData>> serialsMap =
-            new LinkedHashMap<String, Map<String, SerialData>>();
-    /** Map from domain name and type to the parallel device data. */
-    private final Map<String, Map<String, ParallelData>> parallelsMap =
-            new LinkedHashMap<String, Map<String, ParallelData>>();
-    /** Map from domain name and model type to the video device data. */
-    private final Map<String, Map<String, VideoData>> videosMap = new LinkedHashMap<String, Map<String, VideoData>>();
+    private final Map<String, DomainData> domainDataMap = Maps.newHashMap();
+
     private final Collection<String> domainNames = new ArrayList<String>();
-    private final Map<String, Integer> domainRemotePorts = new HashMap<String, Integer>();
     private final Map<Value, String> configsToNames = new HashMap<Value, String>();
-    private final Map<String, Boolean> domainAutoports = new HashMap<String, Boolean>();
-    private final Map<String, Boolean> domainRunningMap = new HashMap<String, Boolean>();
-    private final Map<String, Boolean> domainSuspendedMap = new HashMap<String, Boolean>();
     private final Collection<String> usedMacAddresses = new HashSet<String>();
     private final Collection<String> sourceFileDirs = new TreeSet<String>();
 
+    private DomainData getDomainData(final String domainName) {
+        DomainData domainData = domainDataMap.get(domainName);
+        if (domainData == null) {
+            return new DomainData(domainName);
+        } else {
+            return domainData;
+        }
+    }
     public void parseVM(final Node vmNode, final Host definedOnHost, final Map<String, String> namesToConfigs) {
         /* one vm */
         if (vmNode == null) {
@@ -100,24 +83,25 @@ public class VMParser {
         final String domainName = XMLTools.getAttribute(vmNode, VmsXml.VM_PARAM_NAME);
         final String autostart = XMLTools.getAttribute(vmNode, VmsXml.VM_PARAM_AUTOSTART);
         final String virshOptions = XMLTools.getAttribute(vmNode, VmsXml.VM_PARAM_VIRSH_OPTIONS);
+        val domainData = getDomainData(domainName);
         if (virshOptions != null) {
-            parameterValues.put(domainName, VmsXml.VM_PARAM_VIRSH_OPTIONS, virshOptions);
+            domainData.setParameter(VmsXml.VM_PARAM_VIRSH_OPTIONS, virshOptions);
         }
         if (autostart != null && "True".equals(autostart)) {
-            parameterValues.put(domainName, VmsXml.VM_PARAM_AUTOSTART, definedOnHost.getName());
+            domainData.setParameter(VmsXml.VM_PARAM_AUTOSTART, definedOnHost.getName());
         } else {
-            parameterValues.remove(domainName, VmsXml.VM_PARAM_AUTOSTART);
+            domainData.removeParameter(VmsXml.VM_PARAM_AUTOSTART);
         }
         if (infoNode != null) {
             parseInfo(domainName, XMLTools.getText(infoNode));
         }
         final Node vncdisplayNode = XMLTools.getChildNode(vmNode, "vncdisplay");
-        domainRemotePorts.put(domainName, -1);
+        domainData.setRemotePort(-1);
         if (vncdisplayNode != null) {
             final String vncdisplay = XMLTools.getText(vncdisplayNode).trim();
             final Matcher m = DISPLAY_PATTERN.matcher(vncdisplay);
             if (m.matches()) {
-                domainRemotePorts.put(domainName, Integer.parseInt(m.group(1)) + 5900);
+                domainData.setRemotePort(Integer.parseInt(m.group(1)) + 5900);
             }
         }
         final Node configNode = XMLTools.getChildNode(vmNode, "config");
@@ -128,43 +112,43 @@ public class VMParser {
     }
 
     public String getValue(final String name, final String param) {
-        return parameterValues.get(name, param);
+        return getDomainData(name).getValue(param);
     }
 
     public Map<String, DiskData> getDisks(final String name) {
-        return disksMap.get(name);
+        return getDomainData(name).getDisksMap();
     }
 
     public Map<String, FilesystemData> getFilesystems(final String name) {
-        return filesystemsMap.get(name);
+        return getDomainData(name).getFilesystemsMap();
     }
 
     public Map<String, InterfaceData> getInterfaces(final String name) {
-        return interfacesMap.get(name);
+        return getDomainData(name).getInterfacesMap();
     }
 
     public Map<String, InputDevData> getInputDevs(final String name) {
-        return inputDevsMap.get(name);
+        return getDomainData(name).getInputDevsMap();
     }
 
     public Map<String, GraphicsData> getGraphicDisplays(final String name) {
-        return graphicsDevsMap.get(name);
+        return getDomainData(name).getGraphicsDevsMap();
     }
 
     public Map<String, SoundData> getSounds(final String name) {
-        return soundsMap.get(name);
+        return getDomainData(name).getSoundsMap();
     }
 
     public Map<String, SerialData> getSerials(final String name) {
-        return serialsMap.get(name);
+        return getDomainData(name).getSerialsMap();
     }
 
     public Map<String, ParallelData> getParallels(final String name) {
-        return parallelsMap.get(name);
+        return getDomainData(name).getParallelsMap();
     }
 
     public Map<String, VideoData> getVideos(final String name) {
-        return videosMap.get(name);
+        return getDomainData(name).getVideosMap();
     }
 
     public Collection<String> getDomainNames() {
@@ -172,7 +156,7 @@ public class VMParser {
     }
 
     public int getRemotePort(final String domainName) {
-        final Integer port = domainRemotePorts.get(domainName);
+        final Integer port = getDomainData(domainName).getRemotePort();
         if (port == null) {
             return -1;
         } else {
@@ -189,7 +173,7 @@ public class VMParser {
     }
 
     public boolean isRunning(final String domainName) {
-        final Boolean running = domainRunningMap.get(domainName);
+        final Boolean running = getDomainData(domainName).isRunning();
         if (running != null) {
             return running;
         }
@@ -197,7 +181,7 @@ public class VMParser {
     }
 
     public boolean isSuspended(final String domainName) {
-        final Boolean suspended = domainSuspendedMap.get(domainName);
+        final Boolean suspended = getDomainData(domainName).isSuspended();
         if (suspended != null) {
             return suspended;
         }
@@ -214,7 +198,7 @@ public class VMParser {
     }
 
     /** Updates all data for this domain. */
-    private void parseInfo(final String name, final String info) {
+    private void parseInfo(final String domainName, final String info) {
         if (info != null) {
             boolean running = false;
             boolean suspended = false;
@@ -234,8 +218,9 @@ public class VMParser {
                     }
                 }
             }
-            domainRunningMap.put(name, running);
-            domainSuspendedMap.put(name, suspended);
+            val domainData = getDomainData(domainName);
+            domainData.setRunning(running);
+            domainData.setSuspended(suspended);
         }
     }
 
@@ -251,30 +236,31 @@ public class VMParser {
         final String domainType = XMLTools.getAttribute(domainNode, "type");
         final NodeList options = domainNode.getChildNodes();
         boolean tabletOk = false;
-        String domainName = null;
+        Optional<DomainData> domainData = Optional.absent();
         for (int i = 0; i < options.getLength(); i++) {
             final Node option = options.item(i);
             if (VmsXml.VM_PARAM_NAME.equals(option.getNodeName())) {
-                domainName = XMLTools.getText(option);
+                final String domainName = XMLTools.getText(option);
+                domainData = Optional.of(getDomainData(domainName));
                 if (!domainNames.contains(domainName)) {
                     domainNames.add(domainName);
                 }
-                parameterValues.put(domainName, VmsXml.VM_PARAM_NAME, domainName);
-                parameterValues.put(domainName, VmsXml.VM_PARAM_DOMAIN_TYPE, domainType);
+                domainData.get().setParameter(VmsXml.VM_PARAM_NAME, domainName);
+                domainData.get().setParameter(VmsXml.VM_PARAM_DOMAIN_TYPE, domainType);
                 if (!domainName.equals(nameInFilename)) {
                     LOG.appWarning("parseConfig: unexpected name: " + domainName + " != " + nameInFilename);
                     return domainType;
                 }
             } else if (VmsXml.VM_PARAM_UUID.equals(option.getNodeName())) {
-                parameterValues.put(domainName, VmsXml.VM_PARAM_UUID, XMLTools.getText(option));
+                domainData.get().setParameter(VmsXml.VM_PARAM_UUID, XMLTools.getText(option));
             } else if (VmsXml.VM_PARAM_VCPU.equals(option.getNodeName())) {
-                parameterValues.put(domainName, VmsXml.VM_PARAM_VCPU, XMLTools.getText(option));
+                domainData.get().setParameter(VmsXml.VM_PARAM_VCPU, XMLTools.getText(option));
             } else if (VmsXml.VM_PARAM_BOOTLOADER.equals(option.getNodeName())) {
-                parameterValues.put(domainName, VmsXml.VM_PARAM_BOOTLOADER, XMLTools.getText(option));
+                domainData.get().setParameter(VmsXml.VM_PARAM_BOOTLOADER, XMLTools.getText(option));
             } else if (VmsXml.VM_PARAM_CURRENTMEMORY.equals(option.getNodeName())) {
-                parameterValues.put(domainName, VmsXml.VM_PARAM_CURRENTMEMORY, XMLTools.getText(option));
+                domainData.get().setParameter(VmsXml.VM_PARAM_CURRENTMEMORY, XMLTools.getText(option));
             } else if (VmsXml.VM_PARAM_MEMORY.equals(option.getNodeName())) {
-                parameterValues.put(domainName, VmsXml.VM_PARAM_MEMORY, XMLTools.getText(option));
+                domainData.get().setParameter(VmsXml.VM_PARAM_MEMORY, XMLTools.getText(option));
             } else if ("os".equals(option.getNodeName())) {
                 final NodeList osOptions = option.getChildNodes();
                 int bootOption = 0;
@@ -282,21 +268,21 @@ public class VMParser {
                     final Node osOption = osOptions.item(j);
                     if (VmsXml.OS_BOOT_NODE.equals(osOption.getNodeName())) {
                         if (bootOption == 0) {
-                            parameterValues.put(domainName, VmsXml.VM_PARAM_BOOT, XMLTools.getAttribute(osOption, VmsXml.OS_BOOT_NODE_DEV));
+                            domainData.get().setParameter(VmsXml.VM_PARAM_BOOT, XMLTools.getAttribute(osOption, VmsXml.OS_BOOT_NODE_DEV));
                         } else {
-                            parameterValues.put(domainName, VmsXml.VM_PARAM_BOOT_2, XMLTools.getAttribute(osOption, VmsXml.OS_BOOT_NODE_DEV));
+                            domainData.get().setParameter(VmsXml.VM_PARAM_BOOT_2, XMLTools.getAttribute(osOption, VmsXml.OS_BOOT_NODE_DEV));
                         }
                         bootOption++;
                     } else if (VmsXml.VM_PARAM_LOADER.equals(osOption.getNodeName())) {
-                        parameterValues.put(domainName, VmsXml.VM_PARAM_LOADER, XMLTools.getText(osOption));
+                        domainData.get().setParameter(VmsXml.VM_PARAM_LOADER, XMLTools.getText(osOption));
                     } else if (VmsXml.VM_PARAM_TYPE.equals(osOption.getNodeName())) {
-                        parameterValues.put(domainName, VmsXml.VM_PARAM_TYPE, XMLTools.getText(osOption));
-                        parameterValues.put(domainName, VmsXml.VM_PARAM_TYPE_ARCH, XMLTools.getAttribute(osOption, "arch"));
-                        parameterValues.put(domainName, VmsXml.VM_PARAM_TYPE_MACHINE, XMLTools.getAttribute(osOption, "machine"));
+                        domainData.get().setParameter(VmsXml.VM_PARAM_TYPE, XMLTools.getText(osOption));
+                        domainData.get().setParameter(VmsXml.VM_PARAM_TYPE_ARCH, XMLTools.getAttribute(osOption, "arch"));
+                        domainData.get().setParameter(VmsXml.VM_PARAM_TYPE_MACHINE, XMLTools.getAttribute(osOption, "machine"));
                     } else if (VmsXml.VM_PARAM_INIT.equals(osOption.getNodeName())) {
-                        parameterValues.put(domainName, VmsXml.VM_PARAM_INIT, XMLTools.getText(osOption));
+                        domainData.get().setParameter(VmsXml.VM_PARAM_INIT, XMLTools.getText(osOption));
                     } else {
-                        parameterValues.put(domainName, osOption.getNodeName(), XMLTools.getText(osOption));
+                        domainData.get().setParameter(osOption.getNodeName(), XMLTools.getText(osOption));
                     }
                 }
             } else if ("features".equals(option.getNodeName())) {
@@ -304,22 +290,22 @@ public class VMParser {
                 for (int j = 0; j < ftrOptions.getLength(); j++) {
                     final Node ftrOption = ftrOptions.item(j);
                     if (VmsXml.VM_PARAM_ACPI.equals(ftrOption.getNodeName())) {
-                        parameterValues.put(domainName, VmsXml.VM_PARAM_ACPI, "True");
+                        domainData.get().setParameter(VmsXml.VM_PARAM_ACPI, "True");
                     } else if (VmsXml.VM_PARAM_APIC.equals(ftrOption.getNodeName())) {
-                        parameterValues.put(domainName, VmsXml.VM_PARAM_APIC, "True");
+                        domainData.get().setParameter(VmsXml.VM_PARAM_APIC, "True");
                     } else if (VmsXml.VM_PARAM_PAE.equals(ftrOption.getNodeName())) {
-                        parameterValues.put(domainName, VmsXml.VM_PARAM_PAE, "True");
+                        domainData.get().setParameter(VmsXml.VM_PARAM_PAE, "True");
                     } else if (VmsXml.VM_PARAM_HAP.equals(ftrOption.getNodeName())) {
-                        parameterValues.put(domainName, VmsXml.VM_PARAM_HAP, "True");
+                        domainData.get().setParameter(VmsXml.VM_PARAM_HAP, "True");
                     }
                 }
             } else if ("clock".equals(option.getNodeName())) {
                 final String offset = XMLTools.getAttribute(option, "offset");
-                parameterValues.put(domainName, VmsXml.VM_PARAM_CLOCK_OFFSET, offset);
+                domainData.get().setParameter(VmsXml.VM_PARAM_CLOCK_OFFSET, offset);
             } else if ("cpu".equals(option.getNodeName())) {
                 final String match = XMLTools.getAttribute(option, "match");
                 if (!"".equals(match)) {
-                    parameterValues.put(domainName, VmsXml.VM_PARAM_CPU_MATCH, match);
+                    domainData.get().setParameter(VmsXml.VM_PARAM_CPU_MATCH, match);
                     final NodeList cpuMatchOptions = option.getChildNodes();
                     String policy = "";
                     final Collection<String> features = new ArrayList<String>();
@@ -327,13 +313,13 @@ public class VMParser {
                         final Node cpuMatchOption = cpuMatchOptions.item(j);
                         final String op = cpuMatchOption.getNodeName();
                         if ("topology".equals(op)) {
-                            parameterValues.put(domainName,
+                            domainData.get().setParameter(
                                     VmsXml.VM_PARAM_CPUMATCH_TOPOLOGY_SOCKETS,
                                     XMLTools.getAttribute(cpuMatchOption, VmsXml.VM_PARAM_CPUMATCH_TOPOLOGY_SOCKETS));
-                            parameterValues.put(domainName,
+                            domainData.get().setParameter(
                                     VmsXml.VM_PARAM_CPUMATCH_TOPOLOGY_CORES,
                                     XMLTools.getAttribute(cpuMatchOption, VmsXml.VM_PARAM_CPUMATCH_TOPOLOGY_CORES));
-                            parameterValues.put(domainName,
+                            domainData.get().setParameter(
                                     VmsXml.VM_PARAM_CPUMATCH_TOPOLOGY_THREADS,
                                     XMLTools.getAttribute(cpuMatchOption, VmsXml.VM_PARAM_CPUMATCH_TOPOLOGY_THREADS));
                         } else if ("feature".equals(op)) {
@@ -341,20 +327,20 @@ public class VMParser {
                             policy = XMLTools.getAttribute(cpuMatchOption, VmsXml.VM_PARAM_CPUMATCH_FEATURE_POLICY);
                             features.add(XMLTools.getAttribute(cpuMatchOption, "name"));
                         } else {
-                            parameterValues.put(domainName, op, XMLTools.getText(cpuMatchOption));
+                            domainData.get().setParameter(op, XMLTools.getText(cpuMatchOption));
                         }
                     }
                     if (!"".equals(policy) && !features.isEmpty()) {
-                        parameterValues.put(domainName, VmsXml.VM_PARAM_CPUMATCH_FEATURE_POLICY, policy);
-                        parameterValues.put(domainName, VmsXml.VM_PARAM_CPUMATCH_FEATURES, Tools.join(" ", features));
+                        domainData.get().setParameter(VmsXml.VM_PARAM_CPUMATCH_FEATURE_POLICY, policy);
+                        domainData.get().setParameter(VmsXml.VM_PARAM_CPUMATCH_FEATURES, Tools.join(" ", features));
                     }
                 }
             } else if (VmsXml.VM_PARAM_ON_POWEROFF.equals(option.getNodeName())) {
-                parameterValues.put(domainName, VmsXml.VM_PARAM_ON_POWEROFF, XMLTools.getText(option));
+                domainData.get().setParameter(VmsXml.VM_PARAM_ON_POWEROFF, XMLTools.getText(option));
             } else if (VmsXml.VM_PARAM_ON_REBOOT.equals(option.getNodeName())) {
-                parameterValues.put(domainName, VmsXml.VM_PARAM_ON_REBOOT, XMLTools.getText(option));
+                domainData.get().setParameter(VmsXml.VM_PARAM_ON_REBOOT, XMLTools.getText(option));
             } else if (VmsXml.VM_PARAM_ON_CRASH.equals(option.getNodeName())) {
-                parameterValues.put(domainName, VmsXml.VM_PARAM_ON_CRASH, XMLTools.getText(option));
+                domainData.get().setParameter(VmsXml.VM_PARAM_ON_CRASH, XMLTools.getText(option));
             } else if ("devices".equals(option.getNodeName())) {
                 final Map<String, DiskData> devMap = new LinkedHashMap<String, DiskData>();
                 final Map<String, FilesystemData> fsMap = new LinkedHashMap<String, FilesystemData>();
@@ -369,7 +355,7 @@ public class VMParser {
                 for (int j = 0; j < devices.getLength(); j++) {
                     final Node deviceNode = devices.item(j);
                     if ("emulator".equals(deviceNode.getNodeName())) {
-                        parameterValues.put(domainName, VmsXml.VM_PARAM_EMULATOR, XMLTools.getText(deviceNode));
+                        domainData.get().setParameter(VmsXml.VM_PARAM_EMULATOR, XMLTools.getText(deviceNode));
                     } else if ("input".equals(deviceNode.getNodeName())) {
                         final String type = XMLTools.getAttribute(deviceNode, "type");
                         final String bus = XMLTools.getAttribute(deviceNode, "bus");
@@ -393,12 +379,12 @@ public class VMParser {
                         LOG.debug2("parseConfig: autoport: " + autoport);
                         if ("vnc".equals(type)) {
                             if (port != null && Tools.isNumber(port)) {
-                                domainRemotePorts.put(domainName, Integer.parseInt(port));
+                                domainData.get().setRemotePort(Integer.parseInt(port));
                             }
                             if ("yes".equals(autoport)) {
-                                domainAutoports.put(domainName, true);
+                                domainData.get().setAutoport(true);
                             } else {
-                                domainAutoports.put(domainName, false);
+                                domainData.get().setAutoport(false);
                             }
                         }
                         final GraphicsData graphicsData =
@@ -620,19 +606,19 @@ public class VMParser {
 
                     }
                 }
-                disksMap.put(domainName, devMap);
-                filesystemsMap.put(domainName, fsMap);
-                interfacesMap.put(domainName, macMap);
-                inputDevsMap.put(domainName, inputMap);
-                graphicsDevsMap.put(domainName, graphicsMap);
-                soundsMap.put(domainName, soundMap);
-                serialsMap.put(domainName, serialMap);
-                parallelsMap.put(domainName, parallelMap);
-                videosMap.put(domainName, videoMap);
+                domainData.get().setDisksMap(devMap);
+                domainData.get().setFilesystemsMap(fsMap);
+                domainData.get().setInterfacesMap(macMap);
+                domainData.get().setInputDevsMap(inputMap);
+                domainData.get().setGraphicsDevsMap(graphicsMap);
+                domainData.get().setSoundsMap(soundMap);
+                domainData.get().setSerialsMap(serialMap);
+                domainData.get().setParallelsMap(parallelMap);
+                domainData.get().setVideosMap(videoMap);
             }
         }
         if (!tabletOk) {
-            LOG.appWarning("parseConfig: you should enable input type tablet for " + domainName);
+            LOG.appWarning("parseConfig: you should enable input type tablet for " + domainData.get().getDomainName());
         }
         return domainType;
     }
