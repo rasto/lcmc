@@ -42,7 +42,7 @@ import lcmc.host.domain.Host;
 import lcmc.common.domain.StringValue;
 import lcmc.cluster.service.NetworkService;
 import lcmc.vm.domain.VmsXml;
-import lcmc.vm.domain.InterfaceData;
+import lcmc.vm.domain.data.InterfaceData;
 import lcmc.common.domain.Value;
 import lcmc.common.ui.Browser;
 import lcmc.cluster.ui.resource.NetInfo;

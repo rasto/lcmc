@@ -29,7 +29,7 @@ import lcmc.common.domain.Application;
 import lcmc.common.ui.treemenu.TreeMenuController;
 import lcmc.host.domain.Host;
 import lcmc.vm.domain.VmsXml;
-import lcmc.vm.domain.ParallelData;
+import lcmc.vm.domain.data.ParallelData;
 import lcmc.common.domain.Value;
 import lcmc.common.ui.Browser;
 import lcmc.cluster.ui.widget.Widget;

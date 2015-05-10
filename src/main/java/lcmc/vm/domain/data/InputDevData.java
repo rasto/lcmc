@@ -18,24 +18,34 @@
  * the Free Software Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-package lcmc.vm.domain;
+package lcmc.vm.domain.data;
 
 import lcmc.common.domain.StringValue;
 
-/** Class that holds data about virtual sound devices. */
-public final class SoundData extends HardwareData {
-    private final String model;
-    /** Model: ac97, es1370, pcspk, sb16. */
-    public static final String MODEL = "model";
-    public static final String SAVED_MODEL = "saved_model";
+/** Class that holds data about virtual input devices. */
+public final class InputDevData extends HardwareData {
+    /** Type: tablet, mouse... */
+    private final String type;
+    /** Bus: usb... */
+    private final String bus;
+    public static final String TYPE = "type";
+    public static final String BUS = "bus";
+    public static final String SAVED_TYPE = "saved_type";
+    public static final String SAVED_BUS = "saved_bus";
 
-    public SoundData(final String model) {
+    public InputDevData(final String type, final String bus) {
         super();
-        this.model = model;
-        setValue(MODEL, new StringValue(model));
+        this.type = type;
+        setValue(TYPE, new StringValue(type));
+        this.bus = bus;
+        setValue(BUS, new StringValue(bus));
     }
 
-    public String getModel() {
-        return model;
+    public String getType() {
+        return type;
+    }
+
+    public String getBus() {
+        return bus;
     }
 }

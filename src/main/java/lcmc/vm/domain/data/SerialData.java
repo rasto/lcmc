@@ -18,7 +18,7 @@
  * the Free Software Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-package lcmc.vm.domain;
+package lcmc.vm.domain.data;
 
 /** Class that holds data about virtual serial devices. */
 public final class SerialData extends ParallelSerialData {

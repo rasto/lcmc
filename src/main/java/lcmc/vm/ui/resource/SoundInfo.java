@@ -38,7 +38,7 @@ import lcmc.common.ui.treemenu.TreeMenuController;
 import lcmc.host.domain.Host;
 import lcmc.common.domain.StringValue;
 import lcmc.vm.domain.VmsXml;
-import lcmc.vm.domain.SoundData;
+import lcmc.vm.domain.data.SoundData;
 import lcmc.common.domain.Value;
 import lcmc.common.ui.Browser;
 import lcmc.cluster.ui.widget.Widget;

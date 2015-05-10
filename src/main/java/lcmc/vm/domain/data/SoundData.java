@@ -18,23 +18,24 @@
  * the Free Software Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-package lcmc.vm.domain;
+package lcmc.vm.domain.data;
 
-import lcmc.common.domain.Value;
+import lcmc.common.domain.StringValue;
 
-import java.util.HashMap;
-import java.util.Map;
+/** Class that holds data about virtual sound devices. */
+public final class SoundData extends HardwareData {
+    private final String model;
+    /** Model: ac97, es1370, pcspk, sb16. */
+    public static final String MODEL = "model";
+    public static final String SAVED_MODEL = "saved_model";
 
-/** Class that holds data about virtual hardware. */
-abstract class HardwareData {
-    private final Map<String, Value> valueMap = new HashMap<String, Value>();
-
-    final void setValue(final String param, final Value value) {
-        valueMap.put(param, value);
+    public SoundData(final String model) {
+        super();
+        this.model = model;
+        setValue(MODEL, new StringValue(model));
     }
 
-    public final Value getValue(final String param) {
-        return valueMap.get(param);
+    public String getModel() {
+        return model;
     }
-
 }

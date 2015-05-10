@@ -29,6 +29,15 @@ import lcmc.common.domain.util.Tools;
 import lcmc.host.domain.Host;
 import lcmc.logger.Logger;
 import lcmc.logger.LoggerFactory;
+import lcmc.vm.domain.data.DiskData;
+import lcmc.vm.domain.data.FilesystemData;
+import lcmc.vm.domain.data.GraphicsData;
+import lcmc.vm.domain.data.InputDevData;
+import lcmc.vm.domain.data.InterfaceData;
+import lcmc.vm.domain.data.ParallelData;
+import lcmc.vm.domain.data.SerialData;
+import lcmc.vm.domain.data.SoundData;
+import lcmc.vm.domain.data.VideoData;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 

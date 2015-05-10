@@ -33,7 +33,7 @@ import javax.swing.JScrollPane;
 
 import lcmc.common.domain.Application;
 import lcmc.common.domain.StringValue;
-import lcmc.vm.domain.InterfaceData;
+import lcmc.vm.domain.data.InterfaceData;
 import lcmc.common.ui.WizardDialog;
 import lcmc.vm.ui.resource.InterfaceInfo;
 import lcmc.cluster.ui.widget.Widget;
