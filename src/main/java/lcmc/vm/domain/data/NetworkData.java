@@ -18,12 +18,12 @@
  * the Free Software Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-package lcmc.vm.domain;
+package lcmc.vm.domain.data;
 
 import lcmc.common.domain.StringValue;
 
 /** Class that holds data about networks. */
-final class NetworkData extends HardwareData {
+public final class NetworkData extends HardwareData {
     private final String name;
     private final String uuid;
     private final boolean autostart;
@@ -39,14 +39,14 @@ final class NetworkData extends HardwareData {
     static final String BRIDGE_DELAY = "bridge_delay";
     static final String BRIDGE_FORWARD_DELAY = "bridge_forward_delay";
 
-    NetworkData(final String name,
-                final String uuid,
-                final boolean autostart,
-                final String forwardMode,
-                final String bridgeName,
-                final String bridgeSTP,
-                final String bridgeDelay,
-                final String bridgeForwardDelay) {
+    public NetworkData(final String name,
+                       final String uuid,
+                       final boolean autostart,
+                       final String forwardMode,
+                       final String bridgeName,
+                       final String bridgeSTP,
+                       final String bridgeDelay,
+                       final String bridgeForwardDelay) {
         super();
         this.name = name;
         this.uuid = uuid;

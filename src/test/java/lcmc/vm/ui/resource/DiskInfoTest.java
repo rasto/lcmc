@@ -2,7 +2,7 @@ package lcmc.vm.ui.resource;
 
 import java.util.HashMap;
 import java.util.Map;
-import lcmc.vm.domain.DiskData;
+import lcmc.vm.domain.data.DiskData;
 import lcmc.common.domain.util.Tools;
 import static org.junit.Assert.assertEquals;
 

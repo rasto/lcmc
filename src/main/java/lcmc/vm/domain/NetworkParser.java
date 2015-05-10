@@ -26,6 +26,7 @@ import lcmc.common.domain.Value;
 import lcmc.common.domain.XMLTools;
 import lcmc.logger.Logger;
 import lcmc.logger.LoggerFactory;
+import lcmc.vm.domain.data.NetworkData;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 

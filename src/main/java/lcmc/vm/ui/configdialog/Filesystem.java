@@ -31,7 +31,7 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
 import lcmc.common.domain.Application;
-import lcmc.vm.domain.FilesystemData;
+import lcmc.vm.domain.data.FilesystemData;
 import lcmc.common.ui.WizardDialog;
 import lcmc.vm.ui.resource.FilesystemInfo;
 import lcmc.common.domain.util.Tools;

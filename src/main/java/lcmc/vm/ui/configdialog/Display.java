@@ -32,7 +32,7 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
 import lcmc.common.domain.Application;
-import lcmc.vm.domain.GraphicsData;
+import lcmc.vm.domain.data.GraphicsData;
 import lcmc.common.ui.WizardDialog;
 import lcmc.vm.ui.resource.GraphicsInfo;
 import lcmc.common.domain.util.Tools;
