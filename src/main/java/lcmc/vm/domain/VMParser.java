@@ -251,30 +251,30 @@ public class VMParser {
         final String domainType = XMLTools.getAttribute(domainNode, "type");
         final NodeList options = domainNode.getChildNodes();
         boolean tabletOk = false;
-        String name = null;
+        String domainName = null;
         for (int i = 0; i < options.getLength(); i++) {
             final Node option = options.item(i);
             if (VmsXml.VM_PARAM_NAME.equals(option.getNodeName())) {
-                name = XMLTools.getText(option);
-                if (!domainNames.contains(name)) {
-                    domainNames.add(name);
+                domainName = XMLTools.getText(option);
+                if (!domainNames.contains(domainName)) {
+                    domainNames.add(domainName);
                 }
-                parameterValues.put(name, VmsXml.VM_PARAM_NAME, name);
-                parameterValues.put(name, VmsXml.VM_PARAM_DOMAIN_TYPE, domainType);
-                if (!name.equals(nameInFilename)) {
-                    LOG.appWarning("parseConfig: unexpected name: " + name + " != " + nameInFilename);
+                parameterValues.put(domainName, VmsXml.VM_PARAM_NAME, domainName);
+                parameterValues.put(domainName, VmsXml.VM_PARAM_DOMAIN_TYPE, domainType);
+                if (!domainName.equals(nameInFilename)) {
+                    LOG.appWarning("parseConfig: unexpected name: " + domainName + " != " + nameInFilename);
                     return domainType;
                 }
             } else if (VmsXml.VM_PARAM_UUID.equals(option.getNodeName())) {
-                parameterValues.put(name, VmsXml.VM_PARAM_UUID, XMLTools.getText(option));
+                parameterValues.put(domainName, VmsXml.VM_PARAM_UUID, XMLTools.getText(option));
             } else if (VmsXml.VM_PARAM_VCPU.equals(option.getNodeName())) {
-                parameterValues.put(name, VmsXml.VM_PARAM_VCPU, XMLTools.getText(option));
+                parameterValues.put(domainName, VmsXml.VM_PARAM_VCPU, XMLTools.getText(option));
             } else if (VmsXml.VM_PARAM_BOOTLOADER.equals(option.getNodeName())) {
-                parameterValues.put(name, VmsXml.VM_PARAM_BOOTLOADER, XMLTools.getText(option));
+                parameterValues.put(domainName, VmsXml.VM_PARAM_BOOTLOADER, XMLTools.getText(option));
             } else if (VmsXml.VM_PARAM_CURRENTMEMORY.equals(option.getNodeName())) {
-                parameterValues.put(name, VmsXml.VM_PARAM_CURRENTMEMORY, XMLTools.getText(option));
+                parameterValues.put(domainName, VmsXml.VM_PARAM_CURRENTMEMORY, XMLTools.getText(option));
             } else if (VmsXml.VM_PARAM_MEMORY.equals(option.getNodeName())) {
-                parameterValues.put(name, VmsXml.VM_PARAM_MEMORY, XMLTools.getText(option));
+                parameterValues.put(domainName, VmsXml.VM_PARAM_MEMORY, XMLTools.getText(option));
             } else if ("os".equals(option.getNodeName())) {
                 final NodeList osOptions = option.getChildNodes();
                 int bootOption = 0;
@@ -282,21 +282,21 @@ public class VMParser {
                     final Node osOption = osOptions.item(j);
                     if (VmsXml.OS_BOOT_NODE.equals(osOption.getNodeName())) {
                         if (bootOption == 0) {
-                            parameterValues.put(name, VmsXml.VM_PARAM_BOOT, XMLTools.getAttribute(osOption, VmsXml.OS_BOOT_NODE_DEV));
+                            parameterValues.put(domainName, VmsXml.VM_PARAM_BOOT, XMLTools.getAttribute(osOption, VmsXml.OS_BOOT_NODE_DEV));
                         } else {
-                            parameterValues.put(name, VmsXml.VM_PARAM_BOOT_2, XMLTools.getAttribute(osOption, VmsXml.OS_BOOT_NODE_DEV));
+                            parameterValues.put(domainName, VmsXml.VM_PARAM_BOOT_2, XMLTools.getAttribute(osOption, VmsXml.OS_BOOT_NODE_DEV));
                         }
                         bootOption++;
                     } else if (VmsXml.VM_PARAM_LOADER.equals(osOption.getNodeName())) {
-                        parameterValues.put(name, VmsXml.VM_PARAM_LOADER, XMLTools.getText(osOption));
+                        parameterValues.put(domainName, VmsXml.VM_PARAM_LOADER, XMLTools.getText(osOption));
                     } else if (VmsXml.VM_PARAM_TYPE.equals(osOption.getNodeName())) {
-                        parameterValues.put(name, VmsXml.VM_PARAM_TYPE, XMLTools.getText(osOption));
-                        parameterValues.put(name, VmsXml.VM_PARAM_TYPE_ARCH, XMLTools.getAttribute(osOption, "arch"));
-                        parameterValues.put(name, VmsXml.VM_PARAM_TYPE_MACHINE, XMLTools.getAttribute(osOption, "machine"));
+                        parameterValues.put(domainName, VmsXml.VM_PARAM_TYPE, XMLTools.getText(osOption));
+                        parameterValues.put(domainName, VmsXml.VM_PARAM_TYPE_ARCH, XMLTools.getAttribute(osOption, "arch"));
+                        parameterValues.put(domainName, VmsXml.VM_PARAM_TYPE_MACHINE, XMLTools.getAttribute(osOption, "machine"));
                     } else if (VmsXml.VM_PARAM_INIT.equals(osOption.getNodeName())) {
-                        parameterValues.put(name, VmsXml.VM_PARAM_INIT, XMLTools.getText(osOption));
+                        parameterValues.put(domainName, VmsXml.VM_PARAM_INIT, XMLTools.getText(osOption));
                     } else {
-                        parameterValues.put(name, osOption.getNodeName(), XMLTools.getText(osOption));
+                        parameterValues.put(domainName, osOption.getNodeName(), XMLTools.getText(osOption));
                     }
                 }
             } else if ("features".equals(option.getNodeName())) {
@@ -304,22 +304,22 @@ public class VMParser {
                 for (int j = 0; j < ftrOptions.getLength(); j++) {
                     final Node ftrOption = ftrOptions.item(j);
                     if (VmsXml.VM_PARAM_ACPI.equals(ftrOption.getNodeName())) {
-                        parameterValues.put(name, VmsXml.VM_PARAM_ACPI, "True");
+                        parameterValues.put(domainName, VmsXml.VM_PARAM_ACPI, "True");
                     } else if (VmsXml.VM_PARAM_APIC.equals(ftrOption.getNodeName())) {
-                        parameterValues.put(name, VmsXml.VM_PARAM_APIC, "True");
+                        parameterValues.put(domainName, VmsXml.VM_PARAM_APIC, "True");
                     } else if (VmsXml.VM_PARAM_PAE.equals(ftrOption.getNodeName())) {
-                        parameterValues.put(name, VmsXml.VM_PARAM_PAE, "True");
+                        parameterValues.put(domainName, VmsXml.VM_PARAM_PAE, "True");
                     } else if (VmsXml.VM_PARAM_HAP.equals(ftrOption.getNodeName())) {
-                        parameterValues.put(name, VmsXml.VM_PARAM_HAP, "True");
+                        parameterValues.put(domainName, VmsXml.VM_PARAM_HAP, "True");
                     }
                 }
             } else if ("clock".equals(option.getNodeName())) {
                 final String offset = XMLTools.getAttribute(option, "offset");
-                parameterValues.put(name, VmsXml.VM_PARAM_CLOCK_OFFSET, offset);
+                parameterValues.put(domainName, VmsXml.VM_PARAM_CLOCK_OFFSET, offset);
             } else if ("cpu".equals(option.getNodeName())) {
                 final String match = XMLTools.getAttribute(option, "match");
                 if (!"".equals(match)) {
-                    parameterValues.put(name, VmsXml.VM_PARAM_CPU_MATCH, match);
+                    parameterValues.put(domainName, VmsXml.VM_PARAM_CPU_MATCH, match);
                     final NodeList cpuMatchOptions = option.getChildNodes();
                     String policy = "";
                     final Collection<String> features = new ArrayList<String>();
@@ -327,13 +327,13 @@ public class VMParser {
                         final Node cpuMatchOption = cpuMatchOptions.item(j);
                         final String op = cpuMatchOption.getNodeName();
                         if ("topology".equals(op)) {
-                            parameterValues.put(name,
+                            parameterValues.put(domainName,
                                     VmsXml.VM_PARAM_CPUMATCH_TOPOLOGY_SOCKETS,
                                     XMLTools.getAttribute(cpuMatchOption, VmsXml.VM_PARAM_CPUMATCH_TOPOLOGY_SOCKETS));
-                            parameterValues.put(name,
+                            parameterValues.put(domainName,
                                     VmsXml.VM_PARAM_CPUMATCH_TOPOLOGY_CORES,
                                     XMLTools.getAttribute(cpuMatchOption, VmsXml.VM_PARAM_CPUMATCH_TOPOLOGY_CORES));
-                            parameterValues.put(name,
+                            parameterValues.put(domainName,
                                     VmsXml.VM_PARAM_CPUMATCH_TOPOLOGY_THREADS,
                                     XMLTools.getAttribute(cpuMatchOption, VmsXml.VM_PARAM_CPUMATCH_TOPOLOGY_THREADS));
                         } else if ("feature".equals(op)) {
@@ -341,20 +341,20 @@ public class VMParser {
                             policy = XMLTools.getAttribute(cpuMatchOption, VmsXml.VM_PARAM_CPUMATCH_FEATURE_POLICY);
                             features.add(XMLTools.getAttribute(cpuMatchOption, "name"));
                         } else {
-                            parameterValues.put(name, op, XMLTools.getText(cpuMatchOption));
+                            parameterValues.put(domainName, op, XMLTools.getText(cpuMatchOption));
                         }
                     }
                     if (!"".equals(policy) && !features.isEmpty()) {
-                        parameterValues.put(name, VmsXml.VM_PARAM_CPUMATCH_FEATURE_POLICY, policy);
-                        parameterValues.put(name, VmsXml.VM_PARAM_CPUMATCH_FEATURES, Tools.join(" ", features));
+                        parameterValues.put(domainName, VmsXml.VM_PARAM_CPUMATCH_FEATURE_POLICY, policy);
+                        parameterValues.put(domainName, VmsXml.VM_PARAM_CPUMATCH_FEATURES, Tools.join(" ", features));
                     }
                 }
             } else if (VmsXml.VM_PARAM_ON_POWEROFF.equals(option.getNodeName())) {
-                parameterValues.put(name, VmsXml.VM_PARAM_ON_POWEROFF, XMLTools.getText(option));
+                parameterValues.put(domainName, VmsXml.VM_PARAM_ON_POWEROFF, XMLTools.getText(option));
             } else if (VmsXml.VM_PARAM_ON_REBOOT.equals(option.getNodeName())) {
-                parameterValues.put(name, VmsXml.VM_PARAM_ON_REBOOT, XMLTools.getText(option));
+                parameterValues.put(domainName, VmsXml.VM_PARAM_ON_REBOOT, XMLTools.getText(option));
             } else if (VmsXml.VM_PARAM_ON_CRASH.equals(option.getNodeName())) {
-                parameterValues.put(name, VmsXml.VM_PARAM_ON_CRASH, XMLTools.getText(option));
+                parameterValues.put(domainName, VmsXml.VM_PARAM_ON_CRASH, XMLTools.getText(option));
             } else if ("devices".equals(option.getNodeName())) {
                 final Map<String, DiskData> devMap = new LinkedHashMap<String, DiskData>();
                 final Map<String, FilesystemData> fsMap = new LinkedHashMap<String, FilesystemData>();
@@ -369,7 +369,7 @@ public class VMParser {
                 for (int j = 0; j < devices.getLength(); j++) {
                     final Node deviceNode = devices.item(j);
                     if ("emulator".equals(deviceNode.getNodeName())) {
-                        parameterValues.put(name, VmsXml.VM_PARAM_EMULATOR, XMLTools.getText(deviceNode));
+                        parameterValues.put(domainName, VmsXml.VM_PARAM_EMULATOR, XMLTools.getText(deviceNode));
                     } else if ("input".equals(deviceNode.getNodeName())) {
                         final String type = XMLTools.getAttribute(deviceNode, "type");
                         final String bus = XMLTools.getAttribute(deviceNode, "bus");
@@ -393,12 +393,12 @@ public class VMParser {
                         LOG.debug2("parseConfig: autoport: " + autoport);
                         if ("vnc".equals(type)) {
                             if (port != null && Tools.isNumber(port)) {
-                                domainRemotePorts.put(name, Integer.parseInt(port));
+                                domainRemotePorts.put(domainName, Integer.parseInt(port));
                             }
                             if ("yes".equals(autoport)) {
-                                domainAutoports.put(name, true);
+                                domainAutoports.put(domainName, true);
                             } else {
-                                domainAutoports.put(name, false);
+                                domainAutoports.put(domainName, false);
                             }
                         }
                         final GraphicsData graphicsData =
@@ -620,19 +620,19 @@ public class VMParser {
 
                     }
                 }
-                disksMap.put(name, devMap);
-                filesystemsMap.put(name, fsMap);
-                interfacesMap.put(name, macMap);
-                inputDevsMap.put(name, inputMap);
-                graphicsDevsMap.put(name, graphicsMap);
-                soundsMap.put(name, soundMap);
-                serialsMap.put(name, serialMap);
-                parallelsMap.put(name, parallelMap);
-                videosMap.put(name, videoMap);
+                disksMap.put(domainName, devMap);
+                filesystemsMap.put(domainName, fsMap);
+                interfacesMap.put(domainName, macMap);
+                inputDevsMap.put(domainName, inputMap);
+                graphicsDevsMap.put(domainName, graphicsMap);
+                soundsMap.put(domainName, soundMap);
+                serialsMap.put(domainName, serialMap);
+                parallelsMap.put(domainName, parallelMap);
+                videosMap.put(domainName, videoMap);
             }
         }
         if (!tabletOk) {
-            LOG.appWarning("parseConfig: you should enable input type tablet for " + name);
+            LOG.appWarning("parseConfig: you should enable input type tablet for " + domainName);
         }
         return domainType;
     }
