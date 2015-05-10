@@ -69,10 +69,10 @@ public class VMParser {
     private DomainData getDomainData(final String domainName) {
         DomainData domainData = domainDataMap.get(domainName);
         if (domainData == null) {
-            return new DomainData(domainName);
-        } else {
-            return domainData;
+            domainData = new DomainData(domainName);
+            domainDataMap.put(domainName, domainData);
         }
+        return domainData;
     }
     public void parseVM(final Node vmNode, final Host definedOnHost, final Map<String, String> namesToConfigs) {
         /* one vm */
