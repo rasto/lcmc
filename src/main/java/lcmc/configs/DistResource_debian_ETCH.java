@@ -37,17 +37,6 @@ public final class DistResource_debian_ETCH extends ListResourceBundle {
         /* support */
         {"Support", "debian-4"},
 
-        {"DrbdAvailFiles",
-         "/usr/bin/wget --no-check-certificate -q http://www.linbit.com/"
-         + "@SUPPORTDIR@/@DRBDDIR@-@DRBDVERSION@/@DISTRIBUTION@/@KERNELVERSIONDIR@/"
-         + " -O - |perl -ple '"
-         + "(undef, $ver) = split /\\s+/, `dpkg-query -W linux-image-\\`uname -r\\``;"
-         + "($_) = m!href=\"(drbd8?-(?:plus8?-)?(?:utils)?"
-         + "(?:(?:km|module|utils)[_-]@BUILD@)?[-_]?@DRBDVERSION@"
-         + "-0(?:\\+$ver.*?)?[._]@ARCH@"
-         + "\\.(?:rpm|deb))\"! or goto LINE'"
-        },
-
         {"HbPmInst.install.text.1", "apt-get install: HB 2.0.x (obsolete)"},
         {"HbPmInst.install.1",
          "apt-get update && /usr/bin/apt-get -y -q install -o 'DPkg::Options::force=--force-confnew' heartbeat-2"},

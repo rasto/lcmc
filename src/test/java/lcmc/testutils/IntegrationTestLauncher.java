@@ -29,14 +29,16 @@ import java.util.Collections;
 import java.util.List;
 
 import lcmc.LCMC;
-import lcmc.gui.GUIData;
-import lcmc.gui.ProgressIndicatorPanel;
-import lcmc.model.Application;
-import lcmc.model.Cluster;
-import lcmc.model.Host;
-import lcmc.utilities.LoggerFactory;
-import lcmc.utilities.Tools;
-import lcmc.view.ClusterTabFactory;
+import lcmc.cluster.service.storage.FileSystemService;
+import lcmc.common.ui.GUIData;
+import lcmc.common.ui.ProgressIndicatorPanel;
+import lcmc.common.domain.Application;
+import lcmc.cluster.domain.Cluster;
+import lcmc.host.domain.Host;
+import lcmc.cluster.service.NetworkService;
+import lcmc.logger.LoggerFactory;
+import lcmc.common.domain.util.Tools;
+import lcmc.cluster.ui.ClusterTabFactory;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -73,6 +75,10 @@ public class IntegrationTestLauncher {
     private LCMC lcmc;
     @Inject
     private ClusterTabFactory clusterTabFactory;
+    @Inject
+    private NetworkService networkService;
+    @Inject
+    private FileSystemService fileSystemService;
 
     public void initTestCluster() {
         initCluster();
@@ -203,9 +209,17 @@ public class IntegrationTestLauncher {
         return timeoutLeft >= 0;
     }
 
+    public FileSystemService getFileSystemService() {
+        return fileSystemService;
+    }
+
     /** Specify a condition to be passed to the waitForCondition function. */
     private interface Condition {
         /** returns true if condition is true. */
         boolean passed();
+    }
+
+    public NetworkService getNetworkService() {
+        return networkService;
     }
 }

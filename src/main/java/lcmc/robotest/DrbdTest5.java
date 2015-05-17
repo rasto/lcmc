@@ -20,9 +20,9 @@
 
 package lcmc.robotest;
 
-import lcmc.model.Cluster;
-import lcmc.utilities.Logger;
-import lcmc.utilities.LoggerFactory;
+import lcmc.cluster.domain.Cluster;
+import lcmc.logger.Logger;
+import lcmc.logger.LoggerFactory;
 
 import javax.inject.Inject;
 import javax.inject.Named;

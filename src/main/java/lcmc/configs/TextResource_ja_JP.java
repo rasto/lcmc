@@ -256,51 +256,6 @@ public final class TextResource_ja_JP extends ListResourceBundle {
         {"Dialog.Host.Devices.CheckError",
          "失敗しました。"},
 
-        {"Dialog.Host.DrbdLinbitAvailPackages.Title",
-         "利用できるパッケージ"},
-
-        {"Dialog.Host.DrbdLinbitAvailPackages.Description",
-         "利用できるDRBDのバイナリ パッケージを選ぶために、サーバーのディストリビューションとカーネル パッケージとCPUアーキテクチャを一致させます。何も選択されなければ、そのシステムで利用できるDRBDパッケージがありません。ディストリビューションのカーネルを使っていれば、パッケージはLINBITサポート（有償）で提供されます。再び試みた後に、このステップをやり直してください。"},
-
-        {"Dialog.Host.DrbdLinbitAvailPackages.NotAvailable.Dist",
-         "利用しているディストリビューションではDRBDパッケージを利用できません。"},
-
-        {"Dialog.Host.DrbdLinbitAvailPackages.NotAvailable.Kernel",
-         "利用しているカーネルのバージョンではDRBDパッケージを利用できません。"},
-
-        {"Dialog.Host.DrbdLinbitAvailPackages.NotAvailable.Arch",
-         "www.linbit.comでは利用しているカーネルのCPUアーキテクチャのDRBDパッケージを利用できません。"},
-
-        {"Dialog.Host.DrbdLinbitAvailPackages.AvailablePackages",
-         "www.linbit.comで利用できるパッケージ: "},
-
-        {"Dialog.Host.DrbdLinbitAvailPackages.NoDist",
-         "DRBDパッケージが見つかりません。"},
-
-        {"Dialog.Host.DrbdLinbitAvailPackages.NotALinux",
-         "オペレーティング システムを判定できません。"},
-
-        {"Dialog.Host.DrbdLinbitAvailPackages.NoArch",
-         "CPUアーキテクチャを判定できません"},
-
-        {"Dialog.Host.DrbdLinbitAvailPackages.Executing",
-         "利用できるパッケージを探しています..."},
-
-        {"Dialog.Host.DrbdLinbitAvailPackages.AvailVersions",
-         "利用できるバージョン: "},
-
-        {"Dialog.Host.DrbdLinbitAvailPackages.NoKernels",
-         "このカーネルでは利用できません"},
-
-        {"Dialog.Host.DrbdLinbitAvailPackages.NoVersions",
-         "DRBDのバージョンが見つかりません"},
-
-        {"Dialog.Host.DrbdLinbitAvailPackages.NoDistributions",
-         "ディストリビューションが見つかりません"},
-
-        {"Dialog.Host.DrbdLinbitAvailPackages.NoArchs",
-         "CPUアーキテクチャがわかりません"},
-
         {"Dialog.Host.DistDetection.Title",
          "ディストリビューションの検出"},
 
@@ -383,37 +338,6 @@ public final class TextResource_ja_JP extends ListResourceBundle {
         {"Dialog.Host.CheckInstallation.InstallMethod",
          "インストール方法: "},
 
-        {"Dialog.Host.LinbitLogin.Title",
-         "ログイン"},
-
-        {"Dialog.Host.LinbitLogin.Description",
-         "利用しているディストリビューションのパッケージを取得するためにはhttp://www.linbit.com/supportのダウンロード エリアにログインする必要があります。あなたのユーザー名とパスワードを入力してください。アカウントを得るためにはLINBITサポートに問い合わせてください。別な方法としては、自身でDRBDをインストール/アップグレードすることができます。続けるために前のダイアログに戻ります。<br><br>"
-         + "間違ったユーザー名やパスワードを入力してみたら、次のステップで何もダウンロードできないことがわかります。"},
-
-        {"Dialog.Host.LinbitLogin.EnterUser",
-         "ユーザー名"},
-
-        {"Dialog.Host.LinbitLogin.EnterPassword",
-         "パスワード"},
-
-        {"Dialog.Host.LinbitLogin.Save",
-         "保存"},
-
-        {"Dialog.Host.DrbdAvailFiles.Title",
-         "利用できるDRBDパッケージ"},
-
-        {"Dialog.Host.DrbdAvailFiles.Description",
-         "利用できるパッケージを検出します。ディストリビューションのカーネルを使っていれば、一つのモジュールと一つのユーティリティ パッケージになります。パッケージが自動検出できなければ、プルダウン メニューで適切なカーネル バージョンを選びます。あなたのシステムでパッケージがビルドされていなくてもよいです。その場合はLINBITサポートに問い合わせてください。できるだけ早くパッケージが提供されるでしょう。"},
-
-        {"Dialog.Host.DrbdAvailFiles.Executing",
-         "実行しています..."},
-
-        {"Dialog.Host.DrbdAvailFiles.NoFiles",
-         "パッケージが見つかりません。"},
-
-        {"Dialog.Host.DrbdAvailFiles.NoBuilds",
-         "ビルドが見つかりません。"},
-
         {"Dialog.Host.DrbdAvailSourceFiles.Title",
          "利用できるDRBDソースコードのtarファイル"},
 
@@ -425,42 +349,6 @@ public final class TextResource_ja_JP extends ListResourceBundle {
 
         {"Dialog.Host.DrbdAvailSourceFiles.NoBuilds",
          "ビルドが見つかりません"},
-
-        {"Dialog.Host.DrbdLinbitInst.Title",
-         "DRBDのインストール"},
-
-        {"Dialog.Host.DrbdLinbitInst.Description",
-         "DRBDをインストールしています。認証エラーで失敗したら、間違ったユーザー名とパスワードを入力しています。前に戻って、正しく入力して修正します。他の可能性としては、誤ったディストリビューションが選択されていて、インストールがうまく動かないことです。別の可能性としては、LINBITサーバーがダウンしていることです。しかし、LINBITサーバはDRBDにより耐障害性があるため、ほとんど起こりません。"},
-
-        {"Dialog.Host.DrbdLinbitInst.CheckingFile",
-         "インストールされるファイルを確認しています..."},
-
-        {"Dialog.Host.DrbdLinbitInst.FileExists",
-         "ファイルはすでに存在します。"},
-
-        {"Dialog.Host.DrbdLinbitInst.Downloading",
-         "ダウンロードしています..."},
-
-        {"Dialog.Host.DrbdLinbitInst.Installing",
-         "DRBDをインストールしています..."},
-
-        {"Dialog.Host.DrbdLinbitInst.InstallationDone",
-         "インストールが完了しました。"},
-
-        {"Dialog.Host.DrbdLinbitInst.InstallationFailed",
-         "インストールが失敗しました。"},
-
-        {"Dialog.Host.DrbdLinbitInst.Executing",
-         "実行しています..."},
-
-        {"Dialog.Host.DrbdLinbitInst.Starting",
-         "DRBDを開始しています..."},
-
-        {"Dialog.Host.DrbdLinbitInst.MkdirError",
-         "ディレクトリが生成できませんでした"},
-
-        {"Dialog.Host.DrbdLinbitInst.WgetError",
-         "DRBDパッケージを取得できませんでした。"},
 
         {"Dialog.Host.HeartbeatInst.Title",
          "Heartbeatのインストール"},

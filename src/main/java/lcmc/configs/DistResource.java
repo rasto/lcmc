@@ -70,21 +70,6 @@ public final class DistResource extends ListResourceBundle {
         {"ProxyCheck.version",
          SUDO + "drbd-proxy-ctl -c version 2>/dev/null"
          + "|sed 's/.* \\([0-9.]\\+\\),.*/\\1/'"},
-        /* DrbdAvailableVersions returns available versions of drbd in the download area. One
-         * version per line.
-         *
-         * example output:
-         * -----
-         * drbd-0.7.17
-         * drbd-0.7.18
-         * drbd-0.7.19
-         * drbd-0.7.20
-         * ------
-         */
-        {"DrbdAvailVersions",
-         "/usr/bin/wget --no-check-certificate -q "
-         + "http://www.linbit.com/@SUPPORTDIR@/ -O - "
-         + "|perl -ple '($_) = /href=\"@DRBDDIR@-(\\d[.rc0-9]*?)\\/\"/ or goto LINE'"},
 
         {"DrbdAvailVersionsSource",
          "/usr/bin/wget --no-check-certificate -q http://oss.linbit.com/drbd/"
@@ -100,72 +85,7 @@ public final class DistResource extends ListResourceBundle {
          + " or goto LINE'"
          },
 
-        {"DrbdAvailDistributions",
-         "/usr/bin/wget --no-check-certificate -q"
-         + " http://www.linbit.com/@SUPPORTDIR@/@DRBDDIR@-@DRBDVERSION@/ -O - "
-         + "|perl -ple '($_) = m!href=\"([^\"/]+)/\"! or goto LINE'"},
-
-        {"DrbdAvailKernels",
-         "/usr/bin/wget --no-check-certificate -q"
-         + " http://www.linbit.com/@SUPPORTDIR@"
-         + "/@DRBDDIR@-@DRBDVERSION@/@DISTRIBUTION@/ -O -"
-         + " |perl -ple '($_) = m!href=\"([^\"/]+)/\"! or goto LINE'"
-        },
-
-        {"DrbdAvailArchs",
-         "/usr/bin/wget --no-check-certificate -q"
-         + " http://www.linbit.com/@SUPPORTDIR@/"
-         + "@DRBDDIR@-@DRBDVERSION@/@DISTRIBUTION@/@KERNELVERSIONDIR@/ -O -"
-         + " |perl -ple '($_) = m!href=\"drbd8?-(?:plus8?-)?(?:km|module)-.+?(i386|x86_64|amd64|i486|i686|k7)\\.(?:rpm|deb)\"! or goto LINE'"
-        },
-
-        {"DrbdAvailBuilds",
-         "/usr/bin/wget --no-check-certificate -q"
-         + " http://www.linbit.com/@SUPPORTDIR@/"
-         + "@DRBDDIR@-@DRBDVERSION@/@DISTRIBUTION@/@KERNELVERSIONDIR@/ -O -"
-         + " |perl -ple '($_) = m!href=\"drbd8?-(?:plus8?-)?(?:km|module)-(.*?)[-_]@DRBDVERSION@.+?[._]@ARCH@\\..+?\"! or goto LINE'"
-        },
-
-        {"DrbdAvailVersionsForDist",
-         "/usr/bin/wget --no-check-certificate -q"
-         + " http://www.linbit.com/@SUPPORTDIR@/"
-         + "@DRBDDIR@-@DRBDVERSION@/@DISTRIBUTION@/@KERNELVERSIONDIR@/ -O -"
-         + " |perl -ple '($_) = m!href=\"drbd8?-(?:plus8?-)?(?:utils_)?(\\d.*?)-\\d+(?:\\.el5)[._]@ARCH@\\..+?\"! or goto LINE'"
-        },
-
-        {"DrbdAvailFiles",
-         "/usr/bin/wget --no-check-certificate -q http://www.linbit.com/"
-         + "@SUPPORTDIR@/@DRBDDIR@-@DRBDVERSION@/@DISTRIBUTION@"
-         + "/@KERNELVERSIONDIR@/"
-         + " -O - |perl -ple '($_) = m!href=\"(drbd8?-(?:plus8?-)?(?:utils)?"
-         + "(?:bash-completion)?"
-         + "(?:heartbeat)?"
-         + "(?:pacemaker)?"
-         + "(?:udev)?"
-         + "(?:xen)?"
-         + "(?:(?:km|module|utils|bash-completion|heartbeat|pacemaker|udev|xen)"
-         + "[_-]@BUILD@)?[-_]?@DRBDVERSION@.*?[._]@ARCH@"
-         + "\\.(?:rpm|deb))\"! or goto LINE'"
-        },
-
         {"TestCommand", "uptime"},
-
-        /* donwload and installation */
-        {"DrbdInst.test",
-         "/bin/ls /tmp/drbdinst/@DRBDPACKAGES@"},
-
-        {"DrbdInst.mkdir",   "/bin/mkdir -p /tmp/drbdinst/"},
-
-        {"DrbdInst.wget",
-         "/usr/bin/wget --no-check-certificate --http-user='@USER@'"
-         + " --http-passwd='@PASSWORD@' --directory-prefix=/tmp/drbdinst/ "
-         + "http://www.linbit.com/@SUPPORTDIR@/@DRBDDIR@-@DRBDVERSION@"
-         + "/@DISTRIBUTION@/@KERNELVERSIONDIR@/@DRBDPACKAGES@"},
-         //+ "http://www.linbit.com/@SUPPORTDIR@/@DRBDDIR@-@DRBDVERSION@"
-         //+ "/@DISTRIBUTION@/@KERNELVERSIONDIR@/@DRBDPACKAGE@ "
-         //+ "http://www.linbit.com/@SUPPORTDIR@/@DRBDDIR@-@DRBDVERSION@"
-         //+ "/@DISTRIBUTION@/@KERNELVERSIONDIR@/@DRBDMODULEPACKAGE@"},
-        {"DrbdInst.start",   SUDO + "/etc/init.d/drbd start"},
 
         {"GetHostAllInfo", SUDO + "@GUI-HELPER@ all"},
         {"HostHWInfoDaemon", SUDO + "@GUI-HELPER@ hw-info-daemon"},
@@ -460,12 +380,6 @@ public final class DistResource extends ListResourceBundle {
         {"DrbdLog.log",
          "(grep @GREPPATTERN@ /var/log/kern.log 2>/dev/null"
          +  " || grep @GREPPATTERN@ /var/log/messages)| tail -500"},
-
-        /* DrbdINst.install.x is automatically in 'sudo bash -c ...' */
-        {"DrbdInst.install.text.6", "packages from LINBIT"},
-        {"DrbdInst.install.6",
-                        " packages from www.linbit.com for LINBIT customers"},
-        {"DrbdInst.install.method.6",       "linbit"},
 
         {"Pacemaker.Service.Ver", "0"},
 

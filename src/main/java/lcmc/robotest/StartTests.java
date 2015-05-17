@@ -20,13 +20,13 @@
 
 package lcmc.robotest;
 
-import lcmc.gui.GUIData;
-import lcmc.model.Application;
-import lcmc.model.Cluster;
-import lcmc.model.Host;
-import lcmc.utilities.Logger;
-import lcmc.utilities.LoggerFactory;
-import lcmc.utilities.Tools;
+import lcmc.common.ui.GUIData;
+import lcmc.common.domain.Application;
+import lcmc.cluster.domain.Cluster;
+import lcmc.host.domain.Host;
+import lcmc.logger.Logger;
+import lcmc.logger.LoggerFactory;
+import lcmc.common.domain.util.Tools;
 
 import javax.inject.Inject;
 import javax.inject.Named;

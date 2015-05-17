@@ -291,57 +291,6 @@ public final class TextResource extends ListResourceBundle {
         {"Dialog.Host.Devices.CheckError",
          "Failed."},
 
-        {"Dialog.Host.DrbdLinbitAvailPackages.Title",
-         "Available Packages"},
-
-        {"Dialog.Host.DrbdLinbitAvailPackages.Description",
-         "Trying to match distribution, kernel package and architecture of "
-         + "the server to the available binary DRBD packages. If none is "
-         + "selected, most likely there is no DRBD package available for "
-         + "your system. If you use stock kernel of your distribution, the "
-         + "package will be provided to you by LINBIT support (not free). "
-         + "After that you may retry this step again."},
-
-        {"Dialog.Host.DrbdLinbitAvailPackages.NotAvailable.Dist",
-         "There are no DRBD packages available for your distribution."},
-
-        {"Dialog.Host.DrbdLinbitAvailPackages.NotAvailable.Kernel",
-         "There are no DRBD packages available for your kernel version."},
-
-        {"Dialog.Host.DrbdLinbitAvailPackages.NotAvailable.Arch",
-         "There are no DRBD packages available at www.linbit.com for your "
-         + "kernel architecture."},
-
-        {"Dialog.Host.DrbdLinbitAvailPackages.AvailablePackages",
-         "Available packages at www.linbit.com: "},
-
-        {"Dialog.Host.DrbdLinbitAvailPackages.NoDist",
-         "DRBD package not found."},
-
-        {"Dialog.Host.DrbdLinbitAvailPackages.NotALinux",
-         "Cannot determine an operating system."},
-
-        {"Dialog.Host.DrbdLinbitAvailPackages.NoArch",
-         "Cannot determine the architecture"},
-
-        {"Dialog.Host.DrbdLinbitAvailPackages.Executing",
-         "Looking for available packages..."},
-
-        {"Dialog.Host.DrbdLinbitAvailPackages.AvailVersions",
-         "Available versions: "},
-
-        {"Dialog.Host.DrbdLinbitAvailPackages.NoKernels",
-         "Not available for this kernel"},
-
-        {"Dialog.Host.DrbdLinbitAvailPackages.NoVersions",
-         "Could not find any DRBD versions"},
-
-        {"Dialog.Host.DrbdLinbitAvailPackages.NoDistributions",
-         "No distributions found"},
-
-        {"Dialog.Host.DrbdLinbitAvailPackages.NoArchs",
-         "No archs found"},
-
         {"Dialog.Host.DistDetection.Title",
          "Distribution Detection"},
 
@@ -444,49 +393,6 @@ public final class TextResource extends ListResourceBundle {
         {"ProxyCheckInstallation.ProxyCheckForUpgradeButton",
          "Check for Upgrade"},
 
-        {"Dialog.Host.LinbitLogin.Title",
-         "Log in"},
-
-        {"Dialog.Host.LinbitLogin.Description",
-         "You need to log in to the http://www.linbit.com/support download "
-         + "area to get a package for your distribution. Please provide "
-         + "your username and password. Contact LINBIT support to obtain "
-         + "one. Alternatively you can install/upgrade the DRBD yourself "
-         + "and go back to the previous dialog in order to continue.<br><br>"
-         + "If you enter a wrong username or password you will find out "
-         + "about it, only in the next step, when you will be unable to "
-         + "download anything."},
-
-        {"Dialog.Host.LinbitLogin.EnterUser",
-         "Username"},
-
-        {"Dialog.Host.LinbitLogin.EnterPassword",
-         "Password"},
-
-        {"Dialog.Host.LinbitLogin.Save",
-         "Save"},
-
-        {"Dialog.Host.DrbdAvailFiles.Title",
-         "Available DRBD Packages"},
-
-        {"Dialog.Host.DrbdAvailFiles.Description",
-         "Trying to detect available packages. There should be one module "
-         + "and one util package if you use stock distribution kernel. "
-         + "If no package was auto-detected, you may choose appropriate "
-         + "kernel version in the pull down menu. It is also possible "
-         + "that packages were not build for your system at all. In that "
-         + "case contact LINBIT support and packages will be provided "
-         + "to you as soon as possible."},
-
-        {"Dialog.Host.DrbdAvailFiles.Executing",
-         "Executing..."},
-
-        {"Dialog.Host.DrbdAvailFiles.NoFiles",
-         "No packages found."},
-
-        {"Dialog.Host.DrbdAvailFiles.NoBuilds",
-         "No builds found."},
-
         {"Dialog.Host.DrbdAvailSourceFiles.Title",
          "Available DRBD Source Tarballs"},
 
@@ -500,48 +406,6 @@ public final class TextResource extends ListResourceBundle {
 
         {"Dialog.Host.DrbdAvailSourceFiles.NoBuilds",
          "Could not find any builds"},
-
-        {"Dialog.Host.DrbdLinbitInst.Title",
-         "DRBD Installation"},
-
-        {"Dialog.Host.DrbdLinbitInst.Description",
-         "DRBD is being installed. If it fails with authorization errors, "
-         + "you entered a wrong username or password, going back, entering "
-         + "it correctly, would fix it. Other possibility is that wrong "
-         + "distribution was selected and therefore the installation did "
-         + "not work. Yet another remote possibility is that LINBIT "
-         + "servers are down, but this is not very likely, since LINBIT "
-         + "servers are fault-tolerant using DRBD."},
-
-        {"Dialog.Host.DrbdLinbitInst.CheckingFile",
-         "Checking installed file..."},
-
-        {"Dialog.Host.DrbdLinbitInst.FileExists",
-         "File already exists."},
-
-        {"Dialog.Host.DrbdLinbitInst.Downloading",
-         "Downloading..."},
-
-        {"Dialog.Host.DrbdLinbitInst.Installing",
-         "DRBD is being installed..."},
-
-        {"Dialog.Host.DrbdLinbitInst.InstallationDone",
-         "Installation done."},
-
-        {"Dialog.Host.DrbdLinbitInst.InstallationFailed",
-         "Installation failed."},
-
-        {"Dialog.Host.DrbdLinbitInst.Executing",
-         "Executing..."},
-
-        {"Dialog.Host.DrbdLinbitInst.Starting",
-         "Starting DRBD..."},
-
-        {"Dialog.Host.DrbdLinbitInst.MkdirError",
-         "Could not create a directory"},
-
-        {"Dialog.Host.DrbdLinbitInst.WgetError",
-         "Could not get DRBD packages."},
 
         {"Dialog.Host.HeartbeatInst.Title",
          "Heartbeat Install"},
@@ -1498,6 +1362,10 @@ public final class TextResource extends ListResourceBundle {
 
         {"ClusterBrowser.Hb.ViewServiceLog",
          "View Service Log"},
+         
+         {"ClusterBrowser.Hb.ExportGraph",
+        	 "Export Graph as PNG"
+         },
 
         {"ClusterBrowser.Hb.RemoveEdge",
          "Remove Colocation and Order"},

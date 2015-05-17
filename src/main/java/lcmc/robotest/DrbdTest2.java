@@ -20,8 +20,8 @@
 
 package lcmc.robotest;
 
-import lcmc.model.Cluster;
-import lcmc.utilities.Tools;
+import lcmc.cluster.domain.Cluster;
+import lcmc.common.domain.util.Tools;
 
 import javax.inject.Inject;
 import javax.inject.Named;

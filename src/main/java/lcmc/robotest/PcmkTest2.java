@@ -21,7 +21,7 @@
 package lcmc.robotest;
 
 import static lcmc.robotest.RoboTest.CONFIRM_REMOVE;
-import lcmc.utilities.Tools;
+import lcmc.common.domain.util.Tools;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -180,7 +180,6 @@ final class PcmkTest2 {
             roboTest.rightClick();
             roboTest.moveTo(Tools.getString("ConstraintPHInfo.Remove"));
             roboTest.leftClick();
-            roboTest.confirmRemove();
         }
         roboTest.checkTest("test2", 16);
     }

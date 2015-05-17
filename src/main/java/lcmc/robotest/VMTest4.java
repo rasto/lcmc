@@ -23,7 +23,7 @@ package lcmc.robotest;
 import java.awt.Color;
 import java.awt.event.KeyEvent;
 import java.awt.geom.Point2D;
-import lcmc.gui.widget.GenericWidget.MTextField;
+import lcmc.cluster.ui.widget.GenericWidget.MTextField;
 
 import javax.inject.Inject;
 import javax.inject.Named;

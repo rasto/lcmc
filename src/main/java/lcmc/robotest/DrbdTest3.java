@@ -22,13 +22,13 @@ package lcmc.robotest;
 
 import java.awt.event.KeyEvent;
 import lcmc.Exceptions;
-import lcmc.gui.GUIData;
-import lcmc.model.Cluster;
-import lcmc.gui.widget.GenericWidget.MTextField;
-import lcmc.gui.widget.MComboBox;
-import lcmc.utilities.Logger;
-import lcmc.utilities.LoggerFactory;
-import lcmc.utilities.Tools;
+import lcmc.common.ui.GUIData;
+import lcmc.cluster.domain.Cluster;
+import lcmc.cluster.ui.widget.GenericWidget.MTextField;
+import lcmc.cluster.ui.widget.MComboBox;
+import lcmc.logger.Logger;
+import lcmc.logger.LoggerFactory;
+import lcmc.common.domain.util.Tools;
 
 import javax.inject.Inject;
 import javax.inject.Named;
