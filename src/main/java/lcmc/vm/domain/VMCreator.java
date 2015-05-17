@@ -39,6 +39,13 @@ import java.util.Map;
 @Named
 class VMCreator {
     private static final Logger LOG = LoggerFactory.getLogger(VMCreator.class);
+    private Document doc;
+    private Map<String, String> parametersMap;
+
+    public void init(final Document doc, final Map<String, String> parametersMap) {
+        this.doc = doc;
+        this.parametersMap = parametersMap;
+    }
 
     //<domain type='kvm'>
     //  <memory>524288</memory>
@@ -49,10 +56,8 @@ class VMCreator {
     //</domain>
     public Element createDomain(final String uuid,
                                 final String domainName,
-                                final Map<String, String> parametersMap,
                                 final boolean needConsole,
-                                final String type,
-                                final Document doc) {
+                                final String type) {
         final Element root = (Element) doc.appendChild(doc.createElement("domain"));
         root.setAttribute("type", type); /* kvm/xen */
         final Node uuidNode = root.appendChild(doc.createElement("uuid"));
@@ -98,9 +103,9 @@ class VMCreator {
         final Node loaderNode = osNode.appendChild(doc.createElement("loader"));
         loaderNode.appendChild(doc.createTextNode(parametersMap.get(VMParams.VM_PARAM_LOADER)));
 
-        addFeatures(doc, root, parametersMap);
-        addClockOffset(doc, root, parametersMap);
-        addCPUMatchNode(doc, root, parametersMap);
+        addFeatures(root);
+        addClockOffset(root);
+        addCPUMatchNode(root);
 
         final String onPoweroff = parametersMap.get(VMParams.VM_PARAM_ON_POWEROFF);
         if (onPoweroff != null) {
@@ -130,7 +135,7 @@ class VMCreator {
         return root;
     }
 
-    public void addCPUMatchNode(final Document doc, final Node root, final Map<String, String> parametersMap) {
+    public void addCPUMatchNode(final Node root) {
         final String cpuMatch = parametersMap.get(VMParams.VM_PARAM_CPU_MATCH);
         final Element cpuMatchNode = (Element) root.appendChild(doc.createElement("cpu"));
         if (!"".equals(cpuMatch)) {
@@ -178,7 +183,7 @@ class VMCreator {
         }
     }
 
-    public void addFeatures(final Document doc, final Node root, final Map<String, String> parametersMap) {
+    public void addFeatures(final Node root) {
         final boolean acpi = "True".equals(parametersMap.get(VMParams.VM_PARAM_ACPI));
         final boolean apic = "True".equals(parametersMap.get(VMParams.VM_PARAM_APIC));
         final boolean pae = "True".equals(parametersMap.get(VMParams.VM_PARAM_PAE));
@@ -200,7 +205,7 @@ class VMCreator {
         }
     }
 
-    public void addClockOffset(final Document doc, final Node root, final Map<String, String> parametersMap) {
+    public void addClockOffset(final Node root) {
         final Element clockNode = (Element) root.appendChild(doc.createElement("clock"));
         final String offset = parametersMap.get(VMParams.VM_PARAM_CLOCK_OFFSET);
         clockNode.setAttribute("offset", offset);
@@ -216,7 +221,7 @@ class VMCreator {
         timer3.setAttribute("present", "no");
     }
 
-    public void modifyDomain(final Document doc, final Node domainNode, final Map<String, String> parametersMap) {
+    public void modifyDomain(final Node domainNode) {
         final XPath xpath = XPathFactory.newInstance().newXPath();
         final Map<String, String> paths = new HashMap<String, String>();
         paths.put(VMParams.VM_PARAM_MEMORY, "memory");
@@ -295,9 +300,9 @@ class VMCreator {
                     }
                 }
             }
-            addCPUMatchNode(doc, domainNode, parametersMap);
-            addFeatures(doc, domainNode, parametersMap);
-            addClockOffset(doc, domainNode, parametersMap);
+            addCPUMatchNode(domainNode);
+            addFeatures(domainNode);
+            addClockOffset(domainNode);
         } catch (final XPathExpressionException e) {
             LOG.appError("modifyDomainXML: could not evaluate: ", e);
         }
