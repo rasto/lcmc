@@ -33,6 +33,7 @@ import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import javax.inject.Named;
+import javax.inject.Provider;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -69,6 +70,7 @@ import lcmc.vm.service.VIRSH;
 import lcmc.cluster.service.ssh.ExecCommandConfig;
 import lcmc.cluster.service.ssh.SshOutput;
 
+import lombok.val;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -84,7 +86,7 @@ public class VmsXml {
     @Autowired
     private VMParser vmParser;
     @Autowired
-    private VMCreator vmCreator;
+    private Provider<VMCreator> vmCreatorProvider;
 
     private final Map<String, String> namesToConfigs = new HashMap<String, String>();
 
@@ -291,7 +293,9 @@ public class VmsXml {
             throw new RuntimeException("cannot configure parser", pce);
         }
         final Document doc = db.newDocument();
-        return vmCreator.createDomain(uuid, domainName, parametersMap, needConsole, type, doc);
+        val vmCreator = vmCreatorProvider.get();
+        vmCreator.init(doc, parametersMap);
+        return vmCreator.createDomain(uuid, domainName, needConsole, type);
     }
 
     public Node modifyDomainXML(final String domainName, final Map<String, String> parametersMap) {
@@ -304,7 +308,9 @@ public class VmsXml {
             return null;
         }
         final Document doc = domainNode.getOwnerDocument();
-        vmCreator.modifyDomain(doc, domainNode, parametersMap);
+        val vmCreator = vmCreatorProvider.get();
+        vmCreator.init(doc, parametersMap);
+        vmCreator.modifyDomain(domainNode);
         return domainNode;
     }
 
