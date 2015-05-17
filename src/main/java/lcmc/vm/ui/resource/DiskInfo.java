@@ -44,6 +44,7 @@ import lcmc.common.domain.Application;
 import lcmc.common.ui.treemenu.TreeMenuController;
 import lcmc.host.domain.Host;
 import lcmc.common.domain.StringValue;
+import lcmc.vm.domain.VMParams;
 import lcmc.vm.domain.VmsXml;
 import lcmc.vm.domain.data.DiskData;
 import lcmc.common.domain.Value;
@@ -460,7 +461,7 @@ public final class DiskInfo extends HardwareInfo {
     protected Value getParamPreferred(final String param) {
         final String domainType =
                         getVMSVirtualDomainInfo().getWidget(
-                            VmsXml.VM_PARAM_DOMAIN_TYPE, null).getStringValue();
+                            VMParams.VM_PARAM_DOMAIN_TYPE, null).getStringValue();
         if (DiskData.DRIVER_NAME.equals(param)
             && DomainInfo.DOMAIN_TYPE_KVM.equals(domainType)) {
             return DRIVER_NAME_QEMU;

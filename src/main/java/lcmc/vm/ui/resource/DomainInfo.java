@@ -69,6 +69,7 @@ import lcmc.common.domain.AccessMode;
 import lcmc.common.domain.Application;
 import lcmc.host.domain.Host;
 import lcmc.common.domain.StringValue;
+import lcmc.vm.domain.VMParams;
 import lcmc.vm.domain.VmsXml;
 import lcmc.vm.domain.data.DiskData;
 import lcmc.vm.domain.data.FilesystemData;
@@ -147,55 +148,55 @@ public class DomainInfo extends EditableInfo {
          Collections.unmodifiableSet(new HashSet<String>(Arrays.asList(DOMAIN_TYPE_LXC,
                                                                        DOMAIN_TYPE_OPENVZ,
                                                                        DOMAIN_TYPE_VBOX)));
-    private static final String[] VM_PARAMETERS = new String[]{VmsXml.VM_PARAM_DOMAIN_TYPE,
-                                                               VmsXml.VM_PARAM_NAME,
-                                                               VmsXml.VM_PARAM_VIRSH_OPTIONS,
-                                                               VmsXml.VM_PARAM_EMULATOR,
-                                                               VmsXml.VM_PARAM_VCPU,
-                                                               VmsXml.VM_PARAM_CURRENTMEMORY,
-                                                               VmsXml.VM_PARAM_MEMORY,
-                                                               VmsXml.VM_PARAM_BOOTLOADER,
-                                                               VmsXml.VM_PARAM_BOOT,
-                                                               VmsXml.VM_PARAM_BOOT_2,
-                                                               VmsXml.VM_PARAM_LOADER,
-                                                               VmsXml.VM_PARAM_AUTOSTART,
-                                                               VmsXml.VM_PARAM_TYPE,
-                                                               VmsXml.VM_PARAM_INIT,
-                                                               VmsXml.VM_PARAM_TYPE_ARCH,
-                                                               VmsXml.VM_PARAM_TYPE_MACHINE,
-                                                               VmsXml.VM_PARAM_ACPI,
-                                                               VmsXml.VM_PARAM_APIC,
-                                                               VmsXml.VM_PARAM_PAE,
-                                                               VmsXml.VM_PARAM_HAP,
-                                                               VmsXml.VM_PARAM_CLOCK_OFFSET,
-                                                               VmsXml.VM_PARAM_CPU_MATCH,
-                                                               VmsXml.VM_PARAM_CPUMATCH_MODEL,
-                                                               VmsXml.VM_PARAM_CPUMATCH_VENDOR,
-                                                               VmsXml.VM_PARAM_CPUMATCH_TOPOLOGY_SOCKETS,
-                                                               VmsXml.VM_PARAM_CPUMATCH_TOPOLOGY_CORES,
-                                                               VmsXml.VM_PARAM_CPUMATCH_TOPOLOGY_THREADS,
-                                                               VmsXml.VM_PARAM_CPUMATCH_FEATURE_POLICY,
-                                                               VmsXml.VM_PARAM_CPUMATCH_FEATURES,
-                                                               VmsXml.VM_PARAM_ON_POWEROFF,
-                                                               VmsXml.VM_PARAM_ON_REBOOT,
-                                                               VmsXml.VM_PARAM_ON_CRASH};
+    private static final String[] VM_PARAMETERS = new String[]{VMParams.VM_PARAM_DOMAIN_TYPE,
+                                                               VMParams.VM_PARAM_NAME,
+                                                               VMParams.VM_PARAM_VIRSH_OPTIONS,
+                                                               VMParams.VM_PARAM_EMULATOR,
+                                                               VMParams.VM_PARAM_VCPU,
+                                                               VMParams.VM_PARAM_CURRENTMEMORY,
+                                                               VMParams.VM_PARAM_MEMORY,
+                                                               VMParams.VM_PARAM_BOOTLOADER,
+                                                               VMParams.VM_PARAM_BOOT,
+                                                               VMParams.VM_PARAM_BOOT_2,
+                                                               VMParams.VM_PARAM_LOADER,
+                                                               VMParams.VM_PARAM_AUTOSTART,
+                                                               VMParams.VM_PARAM_TYPE,
+                                                               VMParams.VM_PARAM_INIT,
+                                                               VMParams.VM_PARAM_TYPE_ARCH,
+                                                               VMParams.VM_PARAM_TYPE_MACHINE,
+                                                               VMParams.VM_PARAM_ACPI,
+                                                               VMParams.VM_PARAM_APIC,
+                                                               VMParams.VM_PARAM_PAE,
+                                                               VMParams.VM_PARAM_HAP,
+                                                               VMParams.VM_PARAM_CLOCK_OFFSET,
+                                                               VMParams.VM_PARAM_CPU_MATCH,
+                                                               VMParams.VM_PARAM_CPUMATCH_MODEL,
+                                                               VMParams.VM_PARAM_CPUMATCH_VENDOR,
+                                                               VMParams.VM_PARAM_CPUMATCH_TOPOLOGY_SOCKETS,
+                                                               VMParams.VM_PARAM_CPUMATCH_TOPOLOGY_CORES,
+                                                               VMParams.VM_PARAM_CPUMATCH_TOPOLOGY_THREADS,
+                                                               VMParams.VM_PARAM_CPUMATCH_FEATURE_POLICY,
+                                                               VMParams.VM_PARAM_CPUMATCH_FEATURES,
+                                                               VMParams.VM_PARAM_ON_POWEROFF,
+                                                               VMParams.VM_PARAM_ON_REBOOT,
+                                                               VMParams.VM_PARAM_ON_CRASH};
 
     private static final Collection<String> IS_ADVANCED =
-        new HashSet<String>(Arrays.asList(new String[]{VmsXml.VM_PARAM_ACPI,
-                                                       VmsXml.VM_PARAM_APIC,
-                                                       VmsXml.VM_PARAM_PAE,
-                                                       VmsXml.VM_PARAM_HAP,
-                                                       VmsXml.VM_PARAM_CPU_MATCH,
-                                                       VmsXml.VM_PARAM_CPUMATCH_MODEL,
-                                                       VmsXml.VM_PARAM_CPUMATCH_VENDOR,
-                                                       VmsXml.VM_PARAM_CPUMATCH_TOPOLOGY_SOCKETS,
-                                                       VmsXml.VM_PARAM_CPUMATCH_TOPOLOGY_CORES,
-                                                       VmsXml.VM_PARAM_CPUMATCH_TOPOLOGY_THREADS,
-                                                       VmsXml.VM_PARAM_CPUMATCH_FEATURE_POLICY,
-                                                       VmsXml.VM_PARAM_CPUMATCH_FEATURES,
-                                                       VmsXml.VM_PARAM_ON_POWEROFF,
-                                                       VmsXml.VM_PARAM_ON_REBOOT,
-                                                       VmsXml.VM_PARAM_ON_CRASH}));
+        new HashSet<String>(Arrays.asList(new String[]{VMParams.VM_PARAM_ACPI,
+                                                       VMParams.VM_PARAM_APIC,
+                                                       VMParams.VM_PARAM_PAE,
+                                                       VMParams.VM_PARAM_HAP,
+                                                       VMParams.VM_PARAM_CPU_MATCH,
+                                                       VMParams.VM_PARAM_CPUMATCH_MODEL,
+                                                       VMParams.VM_PARAM_CPUMATCH_VENDOR,
+                                                       VMParams.VM_PARAM_CPUMATCH_TOPOLOGY_SOCKETS,
+                                                       VMParams.VM_PARAM_CPUMATCH_TOPOLOGY_CORES,
+                                                       VMParams.VM_PARAM_CPUMATCH_TOPOLOGY_THREADS,
+                                                       VMParams.VM_PARAM_CPUMATCH_FEATURE_POLICY,
+                                                       VMParams.VM_PARAM_CPUMATCH_FEATURES,
+                                                       VMParams.VM_PARAM_ON_POWEROFF,
+                                                       VMParams.VM_PARAM_ON_REBOOT,
+                                                       VMParams.VM_PARAM_ON_CRASH}));
     /** Map of sections to which every param belongs. */
     private static final Map<String, String> SECTION_MAP = new HashMap<String, String>();
     /** Map of short param names with uppercased first character. */
@@ -318,133 +319,133 @@ public class DomainInfo extends EditableInfo {
     public static final Value BOOT_FD      = new StringValue("fd", "Floppy");
 
     static {
-        SECTION_MAP.put(VmsXml.VM_PARAM_NAME,          VIRTUAL_SYSTEM_STRING);
-        SECTION_MAP.put(VmsXml.VM_PARAM_DOMAIN_TYPE,   VIRTUAL_SYSTEM_STRING);
-        SECTION_MAP.put(VmsXml.VM_PARAM_EMULATOR,      VIRTUAL_SYSTEM_STRING);
-        SECTION_MAP.put(VmsXml.VM_PARAM_VCPU,          VIRTUAL_SYSTEM_STRING);
-        SECTION_MAP.put(VmsXml.VM_PARAM_CURRENTMEMORY, VIRTUAL_SYSTEM_STRING);
-        SECTION_MAP.put(VmsXml.VM_PARAM_MEMORY,        VIRTUAL_SYSTEM_STRING);
-        SECTION_MAP.put(VmsXml.VM_PARAM_BOOTLOADER,    VIRTUAL_SYSTEM_STRING);
-        SECTION_MAP.put(VmsXml.VM_PARAM_BOOT,          VIRTUAL_SYSTEM_STRING);
-        SECTION_MAP.put(VmsXml.VM_PARAM_BOOT_2,        VIRTUAL_SYSTEM_STRING);
-        SECTION_MAP.put(VmsXml.VM_PARAM_LOADER,        VIRTUAL_SYSTEM_STRING);
-        SECTION_MAP.put(VmsXml.VM_PARAM_AUTOSTART,     VIRTUAL_SYSTEM_STRING);
-        SECTION_MAP.put(VmsXml.VM_PARAM_VIRSH_OPTIONS, VIRTUAL_SYSTEM_STRING);
-        SECTION_MAP.put(VmsXml.VM_PARAM_TYPE,          VIRTUAL_SYSTEM_STRING);
-        SECTION_MAP.put(VmsXml.VM_PARAM_TYPE_ARCH,     VIRTUAL_SYSTEM_STRING);
-        SECTION_MAP.put(VmsXml.VM_PARAM_TYPE_MACHINE,  VIRTUAL_SYSTEM_STRING);
-        SECTION_MAP.put(VmsXml.VM_PARAM_INIT,          VIRTUAL_SYSTEM_STRING);
+        SECTION_MAP.put(VMParams.VM_PARAM_NAME,          VIRTUAL_SYSTEM_STRING);
+        SECTION_MAP.put(VMParams.VM_PARAM_DOMAIN_TYPE,   VIRTUAL_SYSTEM_STRING);
+        SECTION_MAP.put(VMParams.VM_PARAM_EMULATOR,      VIRTUAL_SYSTEM_STRING);
+        SECTION_MAP.put(VMParams.VM_PARAM_VCPU,          VIRTUAL_SYSTEM_STRING);
+        SECTION_MAP.put(VMParams.VM_PARAM_CURRENTMEMORY, VIRTUAL_SYSTEM_STRING);
+        SECTION_MAP.put(VMParams.VM_PARAM_MEMORY,        VIRTUAL_SYSTEM_STRING);
+        SECTION_MAP.put(VMParams.VM_PARAM_BOOTLOADER,    VIRTUAL_SYSTEM_STRING);
+        SECTION_MAP.put(VMParams.VM_PARAM_BOOT,          VIRTUAL_SYSTEM_STRING);
+        SECTION_MAP.put(VMParams.VM_PARAM_BOOT_2,        VIRTUAL_SYSTEM_STRING);
+        SECTION_MAP.put(VMParams.VM_PARAM_LOADER,        VIRTUAL_SYSTEM_STRING);
+        SECTION_MAP.put(VMParams.VM_PARAM_AUTOSTART,     VIRTUAL_SYSTEM_STRING);
+        SECTION_MAP.put(VMParams.VM_PARAM_VIRSH_OPTIONS, VIRTUAL_SYSTEM_STRING);
+        SECTION_MAP.put(VMParams.VM_PARAM_TYPE,          VIRTUAL_SYSTEM_STRING);
+        SECTION_MAP.put(VMParams.VM_PARAM_TYPE_ARCH,     VIRTUAL_SYSTEM_STRING);
+        SECTION_MAP.put(VMParams.VM_PARAM_TYPE_MACHINE,  VIRTUAL_SYSTEM_STRING);
+        SECTION_MAP.put(VMParams.VM_PARAM_INIT,          VIRTUAL_SYSTEM_STRING);
 
-        SECTION_MAP.put(VmsXml.VM_PARAM_ON_POWEROFF,   VIRTUAL_SYSTEM_OPTIONS);
-        SECTION_MAP.put(VmsXml.VM_PARAM_ON_REBOOT,     VIRTUAL_SYSTEM_OPTIONS);
-        SECTION_MAP.put(VmsXml.VM_PARAM_ON_CRASH,      VIRTUAL_SYSTEM_OPTIONS);
+        SECTION_MAP.put(VMParams.VM_PARAM_ON_POWEROFF,   VIRTUAL_SYSTEM_OPTIONS);
+        SECTION_MAP.put(VMParams.VM_PARAM_ON_REBOOT,     VIRTUAL_SYSTEM_OPTIONS);
+        SECTION_MAP.put(VMParams.VM_PARAM_ON_CRASH,      VIRTUAL_SYSTEM_OPTIONS);
 
-        SECTION_MAP.put(VmsXml.VM_PARAM_ACPI, VIRTUAL_SYSTEM_FEATURES);
-        SECTION_MAP.put(VmsXml.VM_PARAM_APIC, VIRTUAL_SYSTEM_FEATURES);
-        SECTION_MAP.put(VmsXml.VM_PARAM_PAE, VIRTUAL_SYSTEM_FEATURES);
-        SECTION_MAP.put(VmsXml.VM_PARAM_HAP, VIRTUAL_SYSTEM_FEATURES);
+        SECTION_MAP.put(VMParams.VM_PARAM_ACPI, VIRTUAL_SYSTEM_FEATURES);
+        SECTION_MAP.put(VMParams.VM_PARAM_APIC, VIRTUAL_SYSTEM_FEATURES);
+        SECTION_MAP.put(VMParams.VM_PARAM_PAE, VIRTUAL_SYSTEM_FEATURES);
+        SECTION_MAP.put(VMParams.VM_PARAM_HAP, VIRTUAL_SYSTEM_FEATURES);
 
-        SECTION_MAP.put(VmsXml.VM_PARAM_CLOCK_OFFSET,   VIRTUAL_SYSTEM_STRING);
+        SECTION_MAP.put(VMParams.VM_PARAM_CLOCK_OFFSET,   VIRTUAL_SYSTEM_STRING);
 
-        SECTION_MAP.put(VmsXml.VM_PARAM_CPU_MATCH, CPU_MATCH_OPTIONS);
-        SECTION_MAP.put(VmsXml.VM_PARAM_CPUMATCH_MODEL, CPU_MATCH_OPTIONS);
-        SECTION_MAP.put(VmsXml.VM_PARAM_CPUMATCH_VENDOR, CPU_MATCH_OPTIONS);
-        SECTION_MAP.put(VmsXml.VM_PARAM_CPUMATCH_TOPOLOGY_SOCKETS, CPU_MATCH_OPTIONS);
-        SECTION_MAP.put(VmsXml.VM_PARAM_CPUMATCH_TOPOLOGY_CORES, CPU_MATCH_OPTIONS);
-        SECTION_MAP.put(VmsXml.VM_PARAM_CPUMATCH_TOPOLOGY_THREADS, CPU_MATCH_OPTIONS);
-        SECTION_MAP.put(VmsXml.VM_PARAM_CPUMATCH_FEATURE_POLICY, CPU_MATCH_OPTIONS);
-        SECTION_MAP.put(VmsXml.VM_PARAM_CPUMATCH_FEATURES, CPU_MATCH_OPTIONS);
+        SECTION_MAP.put(VMParams.VM_PARAM_CPU_MATCH, CPU_MATCH_OPTIONS);
+        SECTION_MAP.put(VMParams.VM_PARAM_CPUMATCH_MODEL, CPU_MATCH_OPTIONS);
+        SECTION_MAP.put(VMParams.VM_PARAM_CPUMATCH_VENDOR, CPU_MATCH_OPTIONS);
+        SECTION_MAP.put(VMParams.VM_PARAM_CPUMATCH_TOPOLOGY_SOCKETS, CPU_MATCH_OPTIONS);
+        SECTION_MAP.put(VMParams.VM_PARAM_CPUMATCH_TOPOLOGY_CORES, CPU_MATCH_OPTIONS);
+        SECTION_MAP.put(VMParams.VM_PARAM_CPUMATCH_TOPOLOGY_THREADS, CPU_MATCH_OPTIONS);
+        SECTION_MAP.put(VMParams.VM_PARAM_CPUMATCH_FEATURE_POLICY, CPU_MATCH_OPTIONS);
+        SECTION_MAP.put(VMParams.VM_PARAM_CPUMATCH_FEATURES, CPU_MATCH_OPTIONS);
 
-        SHORTNAME_MAP.put(VmsXml.VM_PARAM_NAME, Tools.getString("DomainInfo.Short.Name"));
-        SHORTNAME_MAP.put(VmsXml.VM_PARAM_DOMAIN_TYPE, Tools.getString("DomainInfo.Short.DomainType"));
-        SHORTNAME_MAP.put(VmsXml.VM_PARAM_VCPU, Tools.getString("DomainInfo.Short.Vcpu"));
-        SHORTNAME_MAP.put(VmsXml.VM_PARAM_BOOTLOADER, Tools.getString("DomainInfo.Short.Bootloader"));
-        SHORTNAME_MAP.put(VmsXml.VM_PARAM_CURRENTMEMORY, Tools.getString("DomainInfo.Short.CurrentMemory"));
-        SHORTNAME_MAP.put(VmsXml.VM_PARAM_MEMORY, Tools.getString("DomainInfo.Short.Memory"));
-        SHORTNAME_MAP.put(VmsXml.VM_PARAM_BOOT, Tools.getString("DomainInfo.Short.Os.Boot"));
-        SHORTNAME_MAP.put(VmsXml.VM_PARAM_BOOT_2, Tools.getString("DomainInfo.Short.Os.Boot.2"));
-        SHORTNAME_MAP.put(VmsXml.VM_PARAM_LOADER, Tools.getString("DomainInfo.Short.Os.Loader"));
-        SHORTNAME_MAP.put(VmsXml.VM_PARAM_AUTOSTART, Tools.getString("DomainInfo.Short.Autostart"));
-        SHORTNAME_MAP.put(VmsXml.VM_PARAM_VIRSH_OPTIONS, Tools.getString("DomainInfo.Short.VirshOptions"));
-        SHORTNAME_MAP.put(VmsXml.VM_PARAM_TYPE, Tools.getString("DomainInfo.Short.Type"));
-        SHORTNAME_MAP.put(VmsXml.VM_PARAM_INIT, Tools.getString("DomainInfo.Short.Init"));
-        SHORTNAME_MAP.put(VmsXml.VM_PARAM_TYPE_ARCH, Tools.getString("DomainInfo.Short.Arch"));
-        SHORTNAME_MAP.put(VmsXml.VM_PARAM_TYPE_MACHINE, Tools.getString("DomainInfo.Short.Machine"));
-        SHORTNAME_MAP.put(VmsXml.VM_PARAM_ACPI, Tools.getString("DomainInfo.Short.Acpi"));
-        SHORTNAME_MAP.put(VmsXml.VM_PARAM_APIC, Tools.getString("DomainInfo.Short.Apic"));
-        SHORTNAME_MAP.put(VmsXml.VM_PARAM_PAE, Tools.getString("DomainInfo.Short.Pae"));
-        SHORTNAME_MAP.put(VmsXml.VM_PARAM_HAP, Tools.getString("DomainInfo.Short.Hap"));
-        SHORTNAME_MAP.put(VmsXml.VM_PARAM_CLOCK_OFFSET, Tools.getString("DomainInfo.Short.Clock.Offset"));
-        SHORTNAME_MAP.put(VmsXml.VM_PARAM_CPU_MATCH, Tools.getString("DomainInfo.Short.CPU.Match"));
-        SHORTNAME_MAP.put(VmsXml.VM_PARAM_CPUMATCH_MODEL, Tools.getString("DomainInfo.Short.CPUMatch.Model"));
-        SHORTNAME_MAP.put(VmsXml.VM_PARAM_CPUMATCH_VENDOR, Tools.getString("DomainInfo.Short.CPUMatch.Vendor"));
-        SHORTNAME_MAP.put(VmsXml.VM_PARAM_CPUMATCH_TOPOLOGY_SOCKETS,
+        SHORTNAME_MAP.put(VMParams.VM_PARAM_NAME, Tools.getString("DomainInfo.Short.Name"));
+        SHORTNAME_MAP.put(VMParams.VM_PARAM_DOMAIN_TYPE, Tools.getString("DomainInfo.Short.DomainType"));
+        SHORTNAME_MAP.put(VMParams.VM_PARAM_VCPU, Tools.getString("DomainInfo.Short.Vcpu"));
+        SHORTNAME_MAP.put(VMParams.VM_PARAM_BOOTLOADER, Tools.getString("DomainInfo.Short.Bootloader"));
+        SHORTNAME_MAP.put(VMParams.VM_PARAM_CURRENTMEMORY, Tools.getString("DomainInfo.Short.CurrentMemory"));
+        SHORTNAME_MAP.put(VMParams.VM_PARAM_MEMORY, Tools.getString("DomainInfo.Short.Memory"));
+        SHORTNAME_MAP.put(VMParams.VM_PARAM_BOOT, Tools.getString("DomainInfo.Short.Os.Boot"));
+        SHORTNAME_MAP.put(VMParams.VM_PARAM_BOOT_2, Tools.getString("DomainInfo.Short.Os.Boot.2"));
+        SHORTNAME_MAP.put(VMParams.VM_PARAM_LOADER, Tools.getString("DomainInfo.Short.Os.Loader"));
+        SHORTNAME_MAP.put(VMParams.VM_PARAM_AUTOSTART, Tools.getString("DomainInfo.Short.Autostart"));
+        SHORTNAME_MAP.put(VMParams.VM_PARAM_VIRSH_OPTIONS, Tools.getString("DomainInfo.Short.VirshOptions"));
+        SHORTNAME_MAP.put(VMParams.VM_PARAM_TYPE, Tools.getString("DomainInfo.Short.Type"));
+        SHORTNAME_MAP.put(VMParams.VM_PARAM_INIT, Tools.getString("DomainInfo.Short.Init"));
+        SHORTNAME_MAP.put(VMParams.VM_PARAM_TYPE_ARCH, Tools.getString("DomainInfo.Short.Arch"));
+        SHORTNAME_MAP.put(VMParams.VM_PARAM_TYPE_MACHINE, Tools.getString("DomainInfo.Short.Machine"));
+        SHORTNAME_MAP.put(VMParams.VM_PARAM_ACPI, Tools.getString("DomainInfo.Short.Acpi"));
+        SHORTNAME_MAP.put(VMParams.VM_PARAM_APIC, Tools.getString("DomainInfo.Short.Apic"));
+        SHORTNAME_MAP.put(VMParams.VM_PARAM_PAE, Tools.getString("DomainInfo.Short.Pae"));
+        SHORTNAME_MAP.put(VMParams.VM_PARAM_HAP, Tools.getString("DomainInfo.Short.Hap"));
+        SHORTNAME_MAP.put(VMParams.VM_PARAM_CLOCK_OFFSET, Tools.getString("DomainInfo.Short.Clock.Offset"));
+        SHORTNAME_MAP.put(VMParams.VM_PARAM_CPU_MATCH, Tools.getString("DomainInfo.Short.CPU.Match"));
+        SHORTNAME_MAP.put(VMParams.VM_PARAM_CPUMATCH_MODEL, Tools.getString("DomainInfo.Short.CPUMatch.Model"));
+        SHORTNAME_MAP.put(VMParams.VM_PARAM_CPUMATCH_VENDOR, Tools.getString("DomainInfo.Short.CPUMatch.Vendor"));
+        SHORTNAME_MAP.put(VMParams.VM_PARAM_CPUMATCH_TOPOLOGY_SOCKETS,
                           Tools.getString("DomainInfo.Short.CPUMatch.TopologySockets"));
-        SHORTNAME_MAP.put(VmsXml.VM_PARAM_CPUMATCH_TOPOLOGY_CORES,
+        SHORTNAME_MAP.put(VMParams.VM_PARAM_CPUMATCH_TOPOLOGY_CORES,
                           Tools.getString("DomainInfo.Short.CPUMatch.TopologyCores"));
-        SHORTNAME_MAP.put(VmsXml.VM_PARAM_CPUMATCH_TOPOLOGY_THREADS,
+        SHORTNAME_MAP.put(VMParams.VM_PARAM_CPUMATCH_TOPOLOGY_THREADS,
                           Tools.getString("DomainInfo.Short.CPUMatch.TopologyThreads"));
-        SHORTNAME_MAP.put(VmsXml.VM_PARAM_CPUMATCH_FEATURE_POLICY,
+        SHORTNAME_MAP.put(VMParams.VM_PARAM_CPUMATCH_FEATURE_POLICY,
                           Tools.getString("DomainInfo.Short.CPUMatch.Policy"));
-        SHORTNAME_MAP.put(VmsXml.VM_PARAM_CPUMATCH_FEATURES, Tools.getString("DomainInfo.Short.CPUMatch.Features"));
+        SHORTNAME_MAP.put(VMParams.VM_PARAM_CPUMATCH_FEATURES, Tools.getString("DomainInfo.Short.CPUMatch.Features"));
 
-        SHORTNAME_MAP.put(VmsXml.VM_PARAM_ON_POWEROFF, Tools.getString("DomainInfo.Short.OnPoweroff"));
-        SHORTNAME_MAP.put(VmsXml.VM_PARAM_ON_REBOOT, Tools.getString("DomainInfo.Short.OnReboot"));
-        SHORTNAME_MAP.put(VmsXml.VM_PARAM_ON_CRASH, Tools.getString("DomainInfo.Short.OnCrash"));
-        SHORTNAME_MAP.put(VmsXml.VM_PARAM_EMULATOR, Tools.getString("DomainInfo.Short.Emulator"));
+        SHORTNAME_MAP.put(VMParams.VM_PARAM_ON_POWEROFF, Tools.getString("DomainInfo.Short.OnPoweroff"));
+        SHORTNAME_MAP.put(VMParams.VM_PARAM_ON_REBOOT, Tools.getString("DomainInfo.Short.OnReboot"));
+        SHORTNAME_MAP.put(VMParams.VM_PARAM_ON_CRASH, Tools.getString("DomainInfo.Short.OnCrash"));
+        SHORTNAME_MAP.put(VMParams.VM_PARAM_EMULATOR, Tools.getString("DomainInfo.Short.Emulator"));
 
-        FIELD_TYPES.put(VmsXml.VM_PARAM_CURRENTMEMORY, Widget.Type.TEXTFIELDWITHUNIT);
-        FIELD_TYPES.put(VmsXml.VM_PARAM_MEMORY, Widget.Type.TEXTFIELDWITHUNIT);
-        FIELD_TYPES.put(VmsXml.VM_PARAM_APIC, Widget.Type.CHECKBOX);
-        FIELD_TYPES.put(VmsXml.VM_PARAM_ACPI, Widget.Type.CHECKBOX);
-        FIELD_TYPES.put(VmsXml.VM_PARAM_PAE, Widget.Type.CHECKBOX);
-        FIELD_TYPES.put(VmsXml.VM_PARAM_HAP, Widget.Type.CHECKBOX);
+        FIELD_TYPES.put(VMParams.VM_PARAM_CURRENTMEMORY, Widget.Type.TEXTFIELDWITHUNIT);
+        FIELD_TYPES.put(VMParams.VM_PARAM_MEMORY, Widget.Type.TEXTFIELDWITHUNIT);
+        FIELD_TYPES.put(VMParams.VM_PARAM_APIC, Widget.Type.CHECKBOX);
+        FIELD_TYPES.put(VMParams.VM_PARAM_ACPI, Widget.Type.CHECKBOX);
+        FIELD_TYPES.put(VMParams.VM_PARAM_PAE, Widget.Type.CHECKBOX);
+        FIELD_TYPES.put(VMParams.VM_PARAM_HAP, Widget.Type.CHECKBOX);
 
-        PREFERRED_MAP.put(VmsXml.VM_PARAM_CURRENTMEMORY, new StringValue("512", VmsXml.getUnitMiBytes()));
-        PREFERRED_MAP.put(VmsXml.VM_PARAM_MEMORY, new StringValue("512", VmsXml.getUnitMiBytes()));
-        PREFERRED_MAP.put(VmsXml.VM_PARAM_TYPE, TYPE_HVM);
-        PREFERRED_MAP.put(VmsXml.VM_PARAM_TYPE_ARCH, new StringValue("x86_64"));
-        PREFERRED_MAP.put(VmsXml.VM_PARAM_TYPE_MACHINE, new StringValue("pc"));
-        PREFERRED_MAP.put(VmsXml.VM_PARAM_ACPI, VM_TRUE);
-        PREFERRED_MAP.put(VmsXml.VM_PARAM_APIC, VM_TRUE);
-        PREFERRED_MAP.put(VmsXml.VM_PARAM_PAE, VM_TRUE);
-        PREFERRED_MAP.put(VmsXml.VM_PARAM_CLOCK_OFFSET, new StringValue("utc"));
-        PREFERRED_MAP.put(VmsXml.VM_PARAM_ON_POWEROFF, new StringValue("destroy"));
-        PREFERRED_MAP.put(VmsXml.VM_PARAM_ON_REBOOT, new StringValue("restart"));
-        PREFERRED_MAP.put(VmsXml.VM_PARAM_ON_CRASH, new StringValue("restart"));
-        PREFERRED_MAP.put(VmsXml.VM_PARAM_EMULATOR, new StringValue("/usr/bin/kvm"));
-        DEFAULTS_MAP.put(VmsXml.VM_PARAM_AUTOSTART, null);
-        DEFAULTS_MAP.put(VmsXml.VM_PARAM_VIRSH_OPTIONS, NO_SELECTION_VALUE);
-        DEFAULTS_MAP.put(VmsXml.VM_PARAM_BOOT, NO_SELECTION_VALUE);
-        DEFAULTS_MAP.put(VmsXml.VM_PARAM_DOMAIN_TYPE, new StringValue(DOMAIN_TYPE_KVM));
-        DEFAULTS_MAP.put(VmsXml.VM_PARAM_VCPU, new StringValue("1"));
-        DEFAULTS_MAP.put(VmsXml.VM_PARAM_ACPI, VM_FALSE);
-        DEFAULTS_MAP.put(VmsXml.VM_PARAM_APIC, VM_FALSE);
-        DEFAULTS_MAP.put(VmsXml.VM_PARAM_PAE, VM_FALSE);
-        DEFAULTS_MAP.put(VmsXml.VM_PARAM_HAP, VM_FALSE);
+        PREFERRED_MAP.put(VMParams.VM_PARAM_CURRENTMEMORY, new StringValue("512", VmsXml.getUnitMiBytes()));
+        PREFERRED_MAP.put(VMParams.VM_PARAM_MEMORY, new StringValue("512", VmsXml.getUnitMiBytes()));
+        PREFERRED_MAP.put(VMParams.VM_PARAM_TYPE, TYPE_HVM);
+        PREFERRED_MAP.put(VMParams.VM_PARAM_TYPE_ARCH, new StringValue("x86_64"));
+        PREFERRED_MAP.put(VMParams.VM_PARAM_TYPE_MACHINE, new StringValue("pc"));
+        PREFERRED_MAP.put(VMParams.VM_PARAM_ACPI, VM_TRUE);
+        PREFERRED_MAP.put(VMParams.VM_PARAM_APIC, VM_TRUE);
+        PREFERRED_MAP.put(VMParams.VM_PARAM_PAE, VM_TRUE);
+        PREFERRED_MAP.put(VMParams.VM_PARAM_CLOCK_OFFSET, new StringValue("utc"));
+        PREFERRED_MAP.put(VMParams.VM_PARAM_ON_POWEROFF, new StringValue("destroy"));
+        PREFERRED_MAP.put(VMParams.VM_PARAM_ON_REBOOT, new StringValue("restart"));
+        PREFERRED_MAP.put(VMParams.VM_PARAM_ON_CRASH, new StringValue("restart"));
+        PREFERRED_MAP.put(VMParams.VM_PARAM_EMULATOR, new StringValue("/usr/bin/kvm"));
+        DEFAULTS_MAP.put(VMParams.VM_PARAM_AUTOSTART, null);
+        DEFAULTS_MAP.put(VMParams.VM_PARAM_VIRSH_OPTIONS, NO_SELECTION_VALUE);
+        DEFAULTS_MAP.put(VMParams.VM_PARAM_BOOT, NO_SELECTION_VALUE);
+        DEFAULTS_MAP.put(VMParams.VM_PARAM_DOMAIN_TYPE, new StringValue(DOMAIN_TYPE_KVM));
+        DEFAULTS_MAP.put(VMParams.VM_PARAM_VCPU, new StringValue("1"));
+        DEFAULTS_MAP.put(VMParams.VM_PARAM_ACPI, VM_FALSE);
+        DEFAULTS_MAP.put(VMParams.VM_PARAM_APIC, VM_FALSE);
+        DEFAULTS_MAP.put(VMParams.VM_PARAM_PAE, VM_FALSE);
+        DEFAULTS_MAP.put(VMParams.VM_PARAM_HAP, VM_FALSE);
 
-        DEFAULTS_MAP.put(VmsXml.VM_PARAM_CPU_MATCH, NO_SELECTION_VALUE);
-        DEFAULTS_MAP.put(VmsXml.VM_PARAM_CPUMATCH_MODEL, NO_SELECTION_VALUE);
-        DEFAULTS_MAP.put(VmsXml.VM_PARAM_CPUMATCH_VENDOR, NO_SELECTION_VALUE);
-        DEFAULTS_MAP.put(VmsXml.VM_PARAM_CPUMATCH_TOPOLOGY_SOCKETS, NO_SELECTION_VALUE);
-        DEFAULTS_MAP.put(VmsXml.VM_PARAM_CPUMATCH_TOPOLOGY_CORES, NO_SELECTION_VALUE);
-        DEFAULTS_MAP.put(VmsXml.VM_PARAM_CPUMATCH_TOPOLOGY_THREADS, NO_SELECTION_VALUE);
-        DEFAULTS_MAP.put(VmsXml.VM_PARAM_CPUMATCH_FEATURE_POLICY, NO_SELECTION_VALUE);
-        DEFAULTS_MAP.put(VmsXml.VM_PARAM_CPUMATCH_FEATURES, NO_SELECTION_VALUE);
+        DEFAULTS_MAP.put(VMParams.VM_PARAM_CPU_MATCH, NO_SELECTION_VALUE);
+        DEFAULTS_MAP.put(VMParams.VM_PARAM_CPUMATCH_MODEL, NO_SELECTION_VALUE);
+        DEFAULTS_MAP.put(VMParams.VM_PARAM_CPUMATCH_VENDOR, NO_SELECTION_VALUE);
+        DEFAULTS_MAP.put(VMParams.VM_PARAM_CPUMATCH_TOPOLOGY_SOCKETS, NO_SELECTION_VALUE);
+        DEFAULTS_MAP.put(VMParams.VM_PARAM_CPUMATCH_TOPOLOGY_CORES, NO_SELECTION_VALUE);
+        DEFAULTS_MAP.put(VMParams.VM_PARAM_CPUMATCH_TOPOLOGY_THREADS, NO_SELECTION_VALUE);
+        DEFAULTS_MAP.put(VMParams.VM_PARAM_CPUMATCH_FEATURE_POLICY, NO_SELECTION_VALUE);
+        DEFAULTS_MAP.put(VMParams.VM_PARAM_CPUMATCH_FEATURES, NO_SELECTION_VALUE);
 
-        HAS_UNIT_PREFIX.put(VmsXml.VM_PARAM_MEMORY, true);
-        HAS_UNIT_PREFIX.put(VmsXml.VM_PARAM_CURRENTMEMORY, true);
+        HAS_UNIT_PREFIX.put(VMParams.VM_PARAM_MEMORY, true);
+        HAS_UNIT_PREFIX.put(VMParams.VM_PARAM_CURRENTMEMORY, true);
 
         // TODO: no virsh command for os-boot
-        POSSIBLE_VALUES.put(VmsXml.VM_PARAM_BOOT, new Value[]{BOOT_HD, BOOT_NETWORK, BOOT_CDROM, BOOT_FD});
-        POSSIBLE_VALUES.put(VmsXml.VM_PARAM_BOOT_2, new Value[]{new StringValue(),
+        POSSIBLE_VALUES.put(VMParams.VM_PARAM_BOOT, new Value[]{BOOT_HD, BOOT_NETWORK, BOOT_CDROM, BOOT_FD});
+        POSSIBLE_VALUES.put(VMParams.VM_PARAM_BOOT_2, new Value[]{new StringValue(),
                                                                 BOOT_HD,
                                                                 BOOT_NETWORK,
                                                                 BOOT_CDROM,
                                                                 BOOT_FD});
 
-        POSSIBLE_VALUES.put(VmsXml.VM_PARAM_LOADER, new Value[]{});
-        POSSIBLE_VALUES.put(VmsXml.VM_PARAM_DOMAIN_TYPE,
+        POSSIBLE_VALUES.put(VMParams.VM_PARAM_LOADER, new Value[]{});
+        POSSIBLE_VALUES.put(VMParams.VM_PARAM_DOMAIN_TYPE,
                             new Value[]{new StringValue(DOMAIN_TYPE_KVM),
                                         new StringValue(DOMAIN_TYPE_XEN),
                                         new StringValue(DOMAIN_TYPE_LXC),
@@ -452,88 +453,88 @@ public class DomainInfo extends EditableInfo {
                                         new StringValue(DOMAIN_TYPE_VBOX),
                                         new StringValue(DOMAIN_TYPE_UML),
                                         });
-        POSSIBLE_VALUES.put(VmsXml.VM_PARAM_BOOTLOADER,
+        POSSIBLE_VALUES.put(VMParams.VM_PARAM_BOOTLOADER,
                             new Value[]{NO_SELECTION_VALUE,
                                         new StringValue("/usr/bin/pygrub")});
-        POSSIBLE_VALUES.put(VmsXml.VM_PARAM_TYPE,
+        POSSIBLE_VALUES.put(VMParams.VM_PARAM_TYPE,
                             new Value[]{TYPE_HVM, TYPE_LINUX, TYPE_EXE});
-        POSSIBLE_VALUES.put(VmsXml.VM_PARAM_TYPE_ARCH,
+        POSSIBLE_VALUES.put(VMParams.VM_PARAM_TYPE_ARCH,
                             new Value[]{NO_SELECTION_VALUE,
                                         new StringValue("x86_64"),
                                         new StringValue("i686")});
-        POSSIBLE_VALUES.put(VmsXml.VM_PARAM_TYPE_MACHINE,
+        POSSIBLE_VALUES.put(VMParams.VM_PARAM_TYPE_MACHINE,
                             new Value[]{NO_SELECTION_VALUE,
                                         new StringValue("pc"),
                                         new StringValue("pc-0.12")});
-        POSSIBLE_VALUES.put(VmsXml.VM_PARAM_INIT,
+        POSSIBLE_VALUES.put(VMParams.VM_PARAM_INIT,
                             new Value[]{NO_SELECTION_VALUE,
                                         new StringValue("/bin/sh"),
                                         new StringValue("/init")});
-        POSSIBLE_VALUES.put(VmsXml.VM_PARAM_CLOCK_OFFSET,
+        POSSIBLE_VALUES.put(VMParams.VM_PARAM_CLOCK_OFFSET,
                             new Value[]{new StringValue("utc"),
                                         new StringValue("localtime")});
-        POSSIBLE_VALUES.put(VmsXml.VM_PARAM_ON_POWEROFF,
+        POSSIBLE_VALUES.put(VMParams.VM_PARAM_ON_POWEROFF,
                             new Value[]{new StringValue("destroy"),
                                         new StringValue("restart"),
                                         new StringValue("preserve"),
                                         new StringValue("rename-restart")});
-        POSSIBLE_VALUES.put(VmsXml.VM_PARAM_ON_REBOOT,
+        POSSIBLE_VALUES.put(VMParams.VM_PARAM_ON_REBOOT,
                             new Value[]{new StringValue("restart"),
                                         new StringValue("destroy"),
                                         new StringValue("preserve"),
                                         new StringValue("rename-restart")});
-        POSSIBLE_VALUES.put(VmsXml.VM_PARAM_ON_CRASH,
+        POSSIBLE_VALUES.put(VMParams.VM_PARAM_ON_CRASH,
                             new Value[]{new StringValue("restart"),
                                          new StringValue("destroy"),
                                          new StringValue("preserve"),
                                          new StringValue("rename-restart"),
                                          new StringValue("coredump-destroy"), /* since 0.8.4 */
                                          new StringValue("coredump-restart")}); /* since 0.8.4*/
-        POSSIBLE_VALUES.put(VmsXml.VM_PARAM_EMULATOR,
+        POSSIBLE_VALUES.put(VMParams.VM_PARAM_EMULATOR,
                             new Value[]{new StringValue("/usr/bin/kvm"),
                                         new StringValue("/usr/bin/qemu")});
-        POSSIBLE_VALUES.put(VmsXml.VM_PARAM_CPU_MATCH,
+        POSSIBLE_VALUES.put(VMParams.VM_PARAM_CPU_MATCH,
                             new Value[]{NO_SELECTION_VALUE,
                                         new StringValue("exact"),
                                         new StringValue("minimum"),
                                         new StringValue("strict")});
-        POSSIBLE_VALUES.put(VmsXml.VM_PARAM_CPUMATCH_TOPOLOGY_SOCKETS,
+        POSSIBLE_VALUES.put(VMParams.VM_PARAM_CPUMATCH_TOPOLOGY_SOCKETS,
                             new Value[]{NO_SELECTION_VALUE,
                                         new StringValue("1"),
                                         new StringValue("2")});
-        POSSIBLE_VALUES.put(VmsXml.VM_PARAM_CPUMATCH_TOPOLOGY_CORES,
+        POSSIBLE_VALUES.put(VMParams.VM_PARAM_CPUMATCH_TOPOLOGY_CORES,
                             new Value[]{NO_SELECTION_VALUE,
                                         new StringValue("1"),
                                         new StringValue("2"),
                                         new StringValue("4"),
                                         new StringValue("8")});
-        POSSIBLE_VALUES.put(VmsXml.VM_PARAM_CPUMATCH_TOPOLOGY_THREADS,
+        POSSIBLE_VALUES.put(VMParams.VM_PARAM_CPUMATCH_TOPOLOGY_THREADS,
                             new Value[]{NO_SELECTION_VALUE,
                                         new StringValue("1"),
                                         new StringValue("2")});
-        POSSIBLE_VALUES.put(VmsXml.VM_PARAM_CPUMATCH_FEATURE_POLICY,
+        POSSIBLE_VALUES.put(VMParams.VM_PARAM_CPUMATCH_FEATURE_POLICY,
                             new Value[]{NO_SELECTION_VALUE,
                                         new StringValue("force"),
                                         new StringValue("require"),
                                         new StringValue("optional"),
                                         new StringValue("disable"),
                                         new StringValue("forbid")});
-        POSSIBLE_VALUES.put(VmsXml.VM_PARAM_CPUMATCH_FEATURES,
+        POSSIBLE_VALUES.put(VMParams.VM_PARAM_CPUMATCH_FEATURES,
                             new Value[]{NO_SELECTION_VALUE,
                                         new StringValue("aes"),
                                         new StringValue("aes apic")});
-        IS_INTEGER.add(VmsXml.VM_PARAM_VCPU);
-        IS_INTEGER.add(VmsXml.VM_PARAM_CPUMATCH_TOPOLOGY_SOCKETS);
-        IS_INTEGER.add(VmsXml.VM_PARAM_CPUMATCH_TOPOLOGY_CORES);
-        IS_INTEGER.add(VmsXml.VM_PARAM_CPUMATCH_TOPOLOGY_THREADS);
-        REQUIRED_VERSION.put(VmsXml.VM_PARAM_CPU_MATCH, "0.7.5");
-        REQUIRED_VERSION.put(VmsXml.VM_PARAM_CPUMATCH_MODEL, "0.7.5");
-        REQUIRED_VERSION.put(VmsXml.VM_PARAM_CPUMATCH_VENDOR, "0.8.3");
-        REQUIRED_VERSION.put(VmsXml.VM_PARAM_CPUMATCH_TOPOLOGY_SOCKETS, "0.7.5");
-        REQUIRED_VERSION.put(VmsXml.VM_PARAM_CPUMATCH_TOPOLOGY_CORES, "0.7.5");
-        REQUIRED_VERSION.put(VmsXml.VM_PARAM_CPUMATCH_TOPOLOGY_THREADS, "0.7.5");
-        REQUIRED_VERSION.put(VmsXml.VM_PARAM_CPUMATCH_FEATURE_POLICY, "0.7.5");
-        REQUIRED_VERSION.put(VmsXml.VM_PARAM_CPUMATCH_FEATURES, "0.7.5");
+        IS_INTEGER.add(VMParams.VM_PARAM_VCPU);
+        IS_INTEGER.add(VMParams.VM_PARAM_CPUMATCH_TOPOLOGY_SOCKETS);
+        IS_INTEGER.add(VMParams.VM_PARAM_CPUMATCH_TOPOLOGY_CORES);
+        IS_INTEGER.add(VMParams.VM_PARAM_CPUMATCH_TOPOLOGY_THREADS);
+        REQUIRED_VERSION.put(VMParams.VM_PARAM_CPU_MATCH, "0.7.5");
+        REQUIRED_VERSION.put(VMParams.VM_PARAM_CPUMATCH_MODEL, "0.7.5");
+        REQUIRED_VERSION.put(VMParams.VM_PARAM_CPUMATCH_VENDOR, "0.8.3");
+        REQUIRED_VERSION.put(VMParams.VM_PARAM_CPUMATCH_TOPOLOGY_SOCKETS, "0.7.5");
+        REQUIRED_VERSION.put(VMParams.VM_PARAM_CPUMATCH_TOPOLOGY_CORES, "0.7.5");
+        REQUIRED_VERSION.put(VMParams.VM_PARAM_CPUMATCH_TOPOLOGY_THREADS, "0.7.5");
+        REQUIRED_VERSION.put(VMParams.VM_PARAM_CPUMATCH_FEATURE_POLICY, "0.7.5");
+        REQUIRED_VERSION.put(VMParams.VM_PARAM_CPUMATCH_FEATURES, "0.7.5");
     }
     private JComponent infoPanel = null;
     private String uuid;
@@ -1591,8 +1592,7 @@ public class DomainInfo extends EditableInfo {
                 final VmsXml vmsXml = getBrowser().getVmsXml(h);
                 if (vmsXml != null && value == null) {
                     final Value savedValue;
-                    if (VmsXml.VM_PARAM_CURRENTMEMORY.equals(param)
-                        || VmsXml.VM_PARAM_MEMORY.equals(param)) {
+                    if (VMParams.VM_PARAM_CURRENTMEMORY.equals(param) || VMParams.VM_PARAM_MEMORY.equals(param)) {
                         savedValue = VmsXml.convertKilobytes(vmsXml.getValue(getDomainName(), param));
                     } else {
                         savedValue = new StringValue(vmsXml.getValue(getDomainName(), param));
@@ -1615,7 +1615,7 @@ public class DomainInfo extends EditableInfo {
         for (final Host h : getDefinedOnHosts()) {
             final VmsXml vmsXml = getBrowser().getVmsXml(h);
             if (vmsXml != null) {
-                uuid = vmsXml.getValue(getDomainName(), VmsXml.VM_PARAM_UUID);
+                uuid = vmsXml.getValue(getDomainName(), VMParams.VM_PARAM_UUID);
             }
         }
         application.invokeInEdt(new Runnable() {
@@ -2335,7 +2335,7 @@ public class DomainInfo extends EditableInfo {
 
     @Override
     protected Value getParamPreferred(final String param) {
-        if (preferredEmulator != null && VmsXml.VM_PARAM_EMULATOR.equals(param)) {
+        if (preferredEmulator != null && VMParams.VM_PARAM_EMULATOR.equals(param)) {
             return new StringValue(preferredEmulator);
         }
         return PREFERRED_MAP.get(param);
@@ -2352,25 +2352,25 @@ public class DomainInfo extends EditableInfo {
         if (isRequired(param) && (newValue == null || newValue.isNothingSelected())) {
             return false;
         }
-        if (VmsXml.VM_PARAM_MEMORY.equals(param)) {
+        if (VMParams.VM_PARAM_MEMORY.equals(param)) {
             final long mem = VmsXml.convertToKilobytes(newValue);
             if (mem < 4096) {
                 return false;
             }
-            final long curMem = VmsXml.convertToKilobytes(getComboBoxValue(VmsXml.VM_PARAM_CURRENTMEMORY));
+            final long curMem = VmsXml.convertToKilobytes(getComboBoxValue(VMParams.VM_PARAM_CURRENTMEMORY));
             if (mem < curMem) {
                 return false;
             }
-        } else if (VmsXml.VM_PARAM_CURRENTMEMORY.equals(param)) {
+        } else if (VMParams.VM_PARAM_CURRENTMEMORY.equals(param)) {
             final long curMem = VmsXml.convertToKilobytes(newValue);
             if (curMem < 4096) {
                 return false;
             }
-            final long mem = VmsXml.convertToKilobytes(getComboBoxValue(VmsXml.VM_PARAM_MEMORY));
+            final long mem = VmsXml.convertToKilobytes(getComboBoxValue(VMParams.VM_PARAM_MEMORY));
             if (mem < curMem) {
-                getWidget(VmsXml.VM_PARAM_MEMORY, null).setValue(newValue);
+                getWidget(VMParams.VM_PARAM_MEMORY, null).setValue(newValue);
             }
-        } else if (VmsXml.VM_PARAM_DOMAIN_TYPE.equals(param)) {
+        } else if (VMParams.VM_PARAM_DOMAIN_TYPE.equals(param)) {
             final Widget wi = getWidget(param, null);
             if (getResource().isNew()
                 && !Tools.areEqual(prevType, newValue)) {
@@ -2390,11 +2390,11 @@ public class DomainInfo extends EditableInfo {
                         break;
                     }
                 }
-                final Widget emWi = getWidget(VmsXml.VM_PARAM_EMULATOR, Widget.WIZARD_PREFIX);
-                final Widget loWi = getWidget(VmsXml.VM_PARAM_LOADER, Widget.WIZARD_PREFIX);
-                final Widget voWi = getWidget(VmsXml.VM_PARAM_VIRSH_OPTIONS, Widget.WIZARD_PREFIX);
-                final Widget typeWi = getWidget(VmsXml.VM_PARAM_TYPE, Widget.WIZARD_PREFIX);
-                final Widget inWi = getWidget(VmsXml.VM_PARAM_INIT, Widget.WIZARD_PREFIX);
+                final Widget emWi = getWidget(VMParams.VM_PARAM_EMULATOR, Widget.WIZARD_PREFIX);
+                final Widget loWi = getWidget(VMParams.VM_PARAM_LOADER, Widget.WIZARD_PREFIX);
+                final Widget voWi = getWidget(VMParams.VM_PARAM_VIRSH_OPTIONS, Widget.WIZARD_PREFIX);
+                final Widget typeWi = getWidget(VMParams.VM_PARAM_TYPE, Widget.WIZARD_PREFIX);
+                final Widget inWi = getWidget(VMParams.VM_PARAM_INIT, Widget.WIZARD_PREFIX);
                 if (Tools.areEqual(DOMAIN_TYPE_XEN, newValue.getValueForConfig())) {
                     if (emWi != null) {
                         emWi.setValue(new StringValue(xenLibPath + "/bin/qemu-dm"));
@@ -2507,18 +2507,18 @@ public class DomainInfo extends EditableInfo {
     /** Returns possible choices for drop down lists. */
     @Override
     protected Value[] getParamPossibleChoices(final String param) {
-        if (VmsXml.VM_PARAM_AUTOSTART.equals(param)) {
+        if (VMParams.VM_PARAM_AUTOSTART.equals(param)) {
             return autostartPossibleValues;
-        } else if (VmsXml.VM_PARAM_VIRSH_OPTIONS.equals(param)) {
+        } else if (VMParams.VM_PARAM_VIRSH_OPTIONS.equals(param)) {
             return VIRSH_OPTIONS;
-        } else if (VmsXml.VM_PARAM_CPUMATCH_MODEL.equals(param)) {
+        } else if (VMParams.VM_PARAM_CPUMATCH_MODEL.equals(param)) {
             final Set<Value> models = new LinkedHashSet<Value>();
             models.add(new StringValue());
             for (final Host host : getBrowser().getClusterHosts()) {
                 models.addAll(host.getCPUMapModels());
             }
             return models.toArray(new Value[models.size()]);
-        } else if (VmsXml.VM_PARAM_CPUMATCH_VENDOR.equals(param)) {
+        } else if (VMParams.VM_PARAM_CPUMATCH_VENDOR.equals(param)) {
             final Set<Value> vendors = new LinkedHashSet<Value>();
             vendors.add(new StringValue());
             for (final Host host : getBrowser().getClusterHosts()) {
@@ -2536,7 +2536,7 @@ public class DomainInfo extends EditableInfo {
 
     @Override
     protected boolean isRequired(final String param) {
-        return VmsXml.VM_PARAM_NAME.equals(param);
+        return VMParams.VM_PARAM_NAME.equals(param);
     }
 
     @Override
@@ -2584,7 +2584,7 @@ public class DomainInfo extends EditableInfo {
         waitForInfoPanel();
         final String[] params = getParametersFromXML();
         final Map<String, String> parameters = new HashMap<String, String>();
-        setName(getComboBoxValue(VmsXml.VM_PARAM_NAME).getValueForConfig());
+        setName(getComboBoxValue(VMParams.VM_PARAM_NAME).getValueForConfig());
         for (final String param : getParametersFromXML()) {
             final Value value = getComboBoxValue(param);
             if (value == null) {
@@ -3688,7 +3688,7 @@ public class DomainInfo extends EditableInfo {
 
     @Override
     protected boolean isAdvanced(final String param) {
-        if (!getResource().isNew() && VmsXml.VM_PARAM_NAME.equals(param)) {
+        if (!getResource().isNew() && VMParams.VM_PARAM_NAME.equals(param)) {
             return true;
         }
         return IS_ADVANCED.contains(param);
@@ -3697,7 +3697,7 @@ public class DomainInfo extends EditableInfo {
     @Override
     protected String isEnabled(final String param) {
         final String libvirtVersion = getBrowser().getCluster().getMinLibvirtVersion();
-        if (!getResource().isNew() && VmsXml.VM_PARAM_NAME.equals(param)) {
+        if (!getResource().isNew() && VMParams.VM_PARAM_NAME.equals(param)) {
             return "";
         }
         if (REQUIRED_VERSION.containsKey(param)) {
@@ -3716,7 +3716,7 @@ public class DomainInfo extends EditableInfo {
 
     @Override
     protected AccessMode.Mode isEnabledOnlyInAdvancedMode(final String param) {
-         return VmsXml.VM_PARAM_MEMORY.equals(param) ? AccessMode.ADVANCED : AccessMode.NORMAL;
+         return VMParams.VM_PARAM_MEMORY.equals(param) ? AccessMode.ADVANCED : AccessMode.NORMAL;
     }
 
 
@@ -3727,7 +3727,7 @@ public class DomainInfo extends EditableInfo {
 
     @Override
     protected String getParamRegexp(final String param) {
-        if (VmsXml.VM_PARAM_NAME.equals(param)) {
+        if (VMParams.VM_PARAM_NAME.equals(param)) {
             return "^[\\w-]+$";
         } else {
             return super.getParamRegexp(param);
@@ -3800,8 +3800,7 @@ public class DomainInfo extends EditableInfo {
     @Override
     protected Widget createWidget(final String param, final String prefix, final int width) {
         final Widget paramWi = super.createWidget(param, prefix, width);
-        if (VmsXml.VM_PARAM_BOOT.equals(param)
-            || VmsXml.VM_PARAM_BOOT_2.equals(param)) {
+        if (VMParams.VM_PARAM_BOOT.equals(param) || VMParams.VM_PARAM_BOOT_2.equals(param)) {
             paramWi.setAlwaysEditable(false);
         }
         return paramWi;
@@ -4053,8 +4052,7 @@ public class DomainInfo extends EditableInfo {
     /** Saves all preferred values. */
     public void savePreferredValues() {
         for (final String pv : PREFERRED_MAP.keySet()) {
-            if (preferredEmulator != null
-                && VmsXml.VM_PARAM_EMULATOR.equals(pv)) {
+            if (preferredEmulator != null && VMParams.VM_PARAM_EMULATOR.equals(pv)) {
                 getResource().setValue(pv, new StringValue(preferredEmulator));
             } else {
                 getResource().setValue(pv, PREFERRED_MAP.get(pv));
@@ -4079,7 +4077,7 @@ public class DomainInfo extends EditableInfo {
 
     /** Return virsh options like -c xen:///. */
     public String getVirshOptions() {
-        final Value v = getResource().getValue(VmsXml.VM_PARAM_VIRSH_OPTIONS);
+        final Value v = getResource().getValue(VMParams.VM_PARAM_VIRSH_OPTIONS);
         if (v == null) {
             return "";
         }
@@ -4088,17 +4086,17 @@ public class DomainInfo extends EditableInfo {
 
     /** Return whether domain type needs "display" section. */
     public boolean needDisplay() {
-        return NEED_DISPLAY.contains(getWidget(VmsXml.VM_PARAM_DOMAIN_TYPE, null).getStringValue());
+        return NEED_DISPLAY.contains(getWidget(VMParams.VM_PARAM_DOMAIN_TYPE, null).getStringValue());
     }
 
     /** Return whether domain type needs "console" section. */
     public boolean needConsole() {
-        return NEED_CONSOLE.contains(getWidget(VmsXml.VM_PARAM_DOMAIN_TYPE, null).getStringValue());
+        return NEED_CONSOLE.contains(getWidget(VMParams.VM_PARAM_DOMAIN_TYPE, null).getStringValue());
     }
 
     /** Return whether domain type needs filesystem instead of disk device. */
     public boolean needFilesystem() {
-        return NEED_FILESYSTEM.contains(getWidget(VmsXml.VM_PARAM_DOMAIN_TYPE, null).getStringValue());
+        return NEED_FILESYSTEM.contains(getWidget(VMParams.VM_PARAM_DOMAIN_TYPE, null).getStringValue());
     }
 
     MyButton getNewDiskBtn() {

@@ -55,7 +55,7 @@ public class NetworkParser {
         if (netNode == null) {
             Maps.newHashMap();
         }
-        val name = XMLTools.getAttribute(netNode, VmsXml.VM_PARAM_NAME);
+        val name = XMLTools.getAttribute(netNode, NET_PARAM_NAME);
         val config = XMLTools.getAttribute(netNode, "config");
         netToConfigs.put(config, name);
         netNamesConfigsMap.put(name, config);
