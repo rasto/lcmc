@@ -32,7 +32,7 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
 import lcmc.common.domain.Application;
-import lcmc.vm.domain.VmsXml;
+import lcmc.vm.domain.VMParams;
 import lcmc.common.ui.WizardDialog;
 import lcmc.vm.ui.resource.DomainInfo;
 import lcmc.cluster.ui.widget.Widget;
@@ -43,19 +43,19 @@ import lcmc.common.domain.util.Tools;
  */
 @Named
 public final class Domain extends VMConfig {
-    private static final String[] PARAMS = {VmsXml.VM_PARAM_DOMAIN_TYPE,
-                                            VmsXml.VM_PARAM_NAME,
-                                            VmsXml.VM_PARAM_VIRSH_OPTIONS,
-                                            VmsXml.VM_PARAM_EMULATOR,
-                                            VmsXml.VM_PARAM_VCPU,
-                                            VmsXml.VM_PARAM_CURRENTMEMORY,
-                                            VmsXml.VM_PARAM_BOOT,
-                                            VmsXml.VM_PARAM_BOOT_2,
-                                            VmsXml.VM_PARAM_LOADER,
-                                            VmsXml.VM_PARAM_TYPE,
-                                            VmsXml.VM_PARAM_INIT,
-                                            VmsXml.VM_PARAM_TYPE_ARCH,
-                                            VmsXml.VM_PARAM_TYPE_MACHINE};
+    private static final String[] PARAMS = {VMParams.VM_PARAM_DOMAIN_TYPE,
+                                            VMParams.VM_PARAM_NAME,
+                                            VMParams.VM_PARAM_VIRSH_OPTIONS,
+                                            VMParams.VM_PARAM_EMULATOR,
+                                            VMParams.VM_PARAM_VCPU,
+                                            VMParams.VM_PARAM_CURRENTMEMORY,
+                                            VMParams.VM_PARAM_BOOT,
+                                            VMParams.VM_PARAM_BOOT_2,
+                                            VMParams.VM_PARAM_LOADER,
+                                            VMParams.VM_PARAM_TYPE,
+                                            VMParams.VM_PARAM_INIT,
+                                            VMParams.VM_PARAM_TYPE_ARCH,
+                                            VMParams.VM_PARAM_TYPE_MACHINE};
     private JComponent inputPane = null;
     private Widget domainNameWidget;
     private VMConfig nextDialogObject = null;
@@ -134,7 +134,7 @@ public final class Domain extends VMConfig {
         optionsPanel.setLayout(new BoxLayout(optionsPanel, BoxLayout.PAGE_AXIS));
         optionsPanel.setAlignmentY(java.awt.Component.TOP_ALIGNMENT);
 
-        vdi.getResource().setValue(VmsXml.VM_PARAM_BOOT, DomainInfo.BOOT_CDROM);
+        vdi.getResource().setValue(VMParams.VM_PARAM_BOOT, DomainInfo.BOOT_CDROM);
         vdi.savePreferredValues();
         vdi.addWizardParams(optionsPanel,
                             PARAMS,
@@ -142,7 +142,7 @@ public final class Domain extends VMConfig {
                             application.getDefaultSize("Dialog.vm.Resource.LabelWidth"),
                             application.getDefaultSize("Dialog.vm.Resource.FieldWidth"),
                             null);
-        domainNameWidget = vdi.getWidget(VmsXml.VM_PARAM_NAME, Widget.WIZARD_PREFIX);
+        domainNameWidget = vdi.getWidget(VMParams.VM_PARAM_NAME, Widget.WIZARD_PREFIX);
         panel.add(optionsPanel);
 
         final JScrollPane scrollPane = new JScrollPane(panel);
