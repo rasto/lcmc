@@ -56,12 +56,12 @@ public final class LCMCApplet extends JApplet {
         } else {
             params = paramsLine.split("\\s+");
         }
-        final LCMC lcmc = AppContext.getBean(LCMC.class);
-        final GUIData guiData = AppContext.getBean(GUIData.class);
+        final LCMC lcmc = LCMC.getInstance(LCMC.class);
+        final GUIData guiData = LCMC.getInstance(GUIData.class);
 
         lcmc.initApp(params);
 
-        final Application application = AppContext.getBean(Application.class);
+        final Application application = LCMC.getInstance(Application.class);
         final LCMCApplet thisObject = this;
         application.invokeLater(new Runnable() {
             @Override

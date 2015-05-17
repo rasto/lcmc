@@ -45,7 +45,7 @@ import lcmc.common.domain.util.Tools;
  * An implementation of a cluster tab, that contains host views of the hosts,
  * that are in the cluster.
  */
-@Named
+//@Named
 public final class ClusterTab extends JPanel {
     private Cluster cluster;
     private JLabel labelTitle;

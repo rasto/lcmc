@@ -3,7 +3,7 @@ package lcmc.drbd.ui.resource;
 import java.util.Arrays;
 import java.util.LinkedHashSet;
 
-import lcmc.AppContext;
+import lcmc.LCMC;
 import lcmc.host.domain.Host;
 import lcmc.cluster.ui.ClusterBrowser;
 import lcmc.host.domain.HostFactory;
@@ -22,7 +22,7 @@ public final class ResourceInfoITest {
 
     @Before
     public void setUp() {
-        integrationTestLauncher = AppContext.getBean(IntegrationTestLauncher.class);
+        integrationTestLauncher = LCMC.getInstance(IntegrationTestLauncher.class);
         integrationTestLauncher.initTestCluster();
     }
 
@@ -60,7 +60,7 @@ public final class ResourceInfoITest {
     @Test
     public void testEqualNamesNotEqualsHosts() {
         final ClusterBrowser clusterBrowser = integrationTestLauncher.getHosts().get(0).getBrowser().getClusterBrowser();
-        final HostFactory hostFactory = AppContext.getBean(HostFactory.class);
+        final HostFactory hostFactory = LCMC.getInstance(HostFactory.class);
 
         final ResourceInfo r1 = new ResourceInfo();
         r1.init("name", new LinkedHashSet<Host>(Arrays.asList(hostFactory.createInstance())), clusterBrowser);

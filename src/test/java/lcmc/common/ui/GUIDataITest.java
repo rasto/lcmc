@@ -1,6 +1,6 @@
 package lcmc.common.ui;
 
-import lcmc.AppContext;
+import lcmc.LCMC;
 import lcmc.common.domain.Application;
 import lcmc.host.domain.Host;
 import lcmc.testutils.IntegrationTestLauncher;
@@ -19,10 +19,10 @@ public final class GUIDataITest {
 
     @Before
     public void setUp() {
-        integrationTestLauncher = AppContext.getBean(IntegrationTestLauncher.class);
+        integrationTestLauncher = LCMC.getInstance(IntegrationTestLauncher.class);
         integrationTestLauncher.initTestCluster();
-        guiData = AppContext.getBean(GUIData.class);
-        application = AppContext.getBean(Application.class);
+        guiData = LCMC.getInstance(GUIData.class);
+        application = LCMC.getInstance(Application.class);
     }
 
     /** Tests, that the terminal area doesn't expand too much. */

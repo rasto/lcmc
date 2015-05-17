@@ -6,7 +6,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 
-import lcmc.AppContext;
+import lcmc.LCMC;
 import lcmc.common.domain.Application;
 import lcmc.common.ui.GUIData;
 import lcmc.host.domain.Host;
@@ -28,10 +28,10 @@ public final class ClusterBrowserITest {
 
     @Before
     public void setUp() {
-        integrationTestLauncher = AppContext.getBean(IntegrationTestLauncher.class);
+        integrationTestLauncher = LCMC.getInstance(IntegrationTestLauncher.class);
         integrationTestLauncher.initTestCluster();
-        guiData = AppContext.getBean(GUIData.class);
-        application = AppContext.getBean(Application.class);
+        guiData = LCMC.getInstance(GUIData.class);
+        application = LCMC.getInstance(Application.class);
     }
 
     @Test

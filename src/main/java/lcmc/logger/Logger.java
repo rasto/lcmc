@@ -33,11 +33,10 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.SwingUtilities;
 
-import lcmc.AppContext;
+import lcmc.LCMC;
 import lcmc.common.domain.AccessMode;
 import lcmc.common.ui.GUIData;
 import lcmc.common.ui.MainMenu;
-import lcmc.common.domain.Application;
 import lcmc.cluster.domain.Cluster;
 import lcmc.host.domain.Host;
 import lcmc.common.ui.BugReport;
@@ -133,7 +132,7 @@ public final class Logger {
         final String msg0 = ERROR_STRING + msg;
         System.out.println(msg0);
         LoggerFactory.LOG_BUFFER.add(msg0);
-        final GUIData guiData = AppContext.getBean(GUIData.class);
+        final GUIData guiData = LCMC.getInstance(GUIData.class);
         SwingUtilities.invokeLater(new Runnable() {
             @Override
             public void run() {
@@ -271,12 +270,12 @@ public final class Logger {
             return;
         }
 
-        AppContext.getBean(MainMenu.class).setOperatingMode(AccessMode.OP_MODE_READONLY);
+        LCMC.getInstance(MainMenu.class).setOperatingMode(AccessMode.OP_MODE_READONLY);
 
         final Thread t = new Thread(new Runnable() {
             @Override
             public void run() {
-                final BugReport bugReport = AppContext.getBean(BugReport.class);
+                final BugReport bugReport = LCMC.getInstance(BugReport.class);
                 bugReport.init(BugReport.UNKNOWN_CLUSTER, errorString.toString());
                 bugReport.showDialog();
             }

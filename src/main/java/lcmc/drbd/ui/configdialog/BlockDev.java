@@ -31,8 +31,8 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SpringLayout;
 
-import lcmc.AppContext;
 import lcmc.Exceptions;
+import lcmc.LCMC;
 import lcmc.common.ui.GUIData;
 import lcmc.drbd.ui.resource.GlobalInfo;
 import lcmc.common.domain.Application;
@@ -93,7 +93,7 @@ final class BlockDev extends DrbdConfig {
     public WizardDialog nextDialog() {
         if (getDrbdVolumeInfo().isFirstBlockDevInfo(blockDevInfo)) {
             final BlockDevInfo oBdi = getDrbdVolumeInfo().getOtherBlockDevInfo(blockDevInfo);
-            final BlockDev nextBlockDev = AppContext.getBean(BlockDev.class);
+            final BlockDev nextBlockDev = LCMC.getInstance(BlockDev.class);
             nextBlockDev.init(this, getDrbdVolumeInfo(), oBdi);
             return nextBlockDev;
         } else {

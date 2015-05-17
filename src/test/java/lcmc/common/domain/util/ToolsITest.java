@@ -3,7 +3,7 @@ package lcmc.common.domain.util;
 import java.util.Map;
 import javax.swing.JCheckBox;
 
-import lcmc.AppContext;
+import lcmc.LCMC;
 import lcmc.common.ui.GUIData;
 import lcmc.common.domain.Application;
 import lcmc.host.domain.Host;
@@ -27,10 +27,10 @@ public final class ToolsITest {
 
     @Before
     public void setUp() {
-        testSuite = AppContext.getBean(IntegrationTestLauncher.class);
+        testSuite = LCMC.getInstance(IntegrationTestLauncher.class);
         testSuite.initTestCluster();
-        application = AppContext.getBean(Application.class);
-        guiData = AppContext.getBean(GUIData.class);
+        application = LCMC.getInstance(Application.class);
+        guiData = LCMC.getInstance(GUIData.class);
     }
 
     @Test

@@ -1,6 +1,6 @@
 package lcmc.cluster.ui.widget;
 
-import lcmc.AppContext;
+import lcmc.LCMC;
 import lcmc.common.domain.AccessMode;
 import lcmc.common.domain.StringValue;
 import lcmc.common.domain.Value;
@@ -9,7 +9,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 public final class WidgetTest {
-    private final WidgetFactory widgetFactory = AppContext.getBean(WidgetFactory.class);
+    private final WidgetFactory widgetFactory = LCMC.getInstance(WidgetFactory.class);
 
     private Widget widget;
     @Before

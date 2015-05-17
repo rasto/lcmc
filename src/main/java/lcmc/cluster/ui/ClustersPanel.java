@@ -53,7 +53,6 @@ import lcmc.common.domain.util.Tools;
  * changes also host that is shown in the terminal panel, to the host, that
  * is active in the cluster.
  */
-@Named
 @Singleton
 public final class ClustersPanel extends JPanel {
     private static final Logger LOG = LoggerFactory.getLogger(ClustersPanel.class);

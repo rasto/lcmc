@@ -36,7 +36,7 @@ import javax.swing.JDialog;
 import javax.swing.JPanel;
 import javax.swing.tree.DefaultMutableTreeNode;
 
-import lcmc.AppContext;
+import lcmc.LCMC;
 import lcmc.common.ui.CallbackAction;
 import lcmc.common.ui.GUIData;
 import lcmc.common.domain.AccessMode;
@@ -1080,7 +1080,7 @@ public class ServiceMenu {
                                                popups,
                                                runMode);
                     if (otherService.getResourceAgent() != null && otherService.getResourceAgent().isGroup()) {
-                        final GroupMenu groupMenu = AppContext.getBean(GroupMenu.class);
+                        final GroupMenu groupMenu = LCMC.getInstance(GroupMenu.class);
                         groupMenu.addExistingGroupServiceMenuItems(serviceInfo,
                                                                    otherService,
                                                                    dlm,

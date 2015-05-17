@@ -47,6 +47,8 @@ import javax.swing.plaf.ColorUIResource;
 import javax.swing.plaf.metal.MetalLookAndFeel;
 import javax.swing.plaf.metal.OceanTheme;
 
+import com.google.inject.Guice;
+import com.google.inject.Injector;
 import lcmc.cluster.service.storage.FileSystemService;
 import lcmc.cluster.service.storage.MountPointService;
 import lcmc.configs.AppDefaults;
@@ -73,6 +75,7 @@ public final class LCMC extends JPanel {
 
     private static final int TOOLTIP_INITIAL_DELAY_MILLIS = 200;
     private static final int TOOLTIP_DISMISS_DELAY_MILLIS = 100000;
+    private static Injector injector;
 
     @Inject
     private Application application;
@@ -123,8 +126,15 @@ public final class LCMC extends JPanel {
         argumentParser.parseOptionsAndReturnAutoArguments(args);
         setupServices();
     }
+
+    //TODO: temp
+    public static <T> T getInstance(Class<T> clazz) {
+        return injector.getInstance(clazz);
+    }
+
     public static void main(final String[] args) {
-        final LCMC lcmc = AppContext.getBean(LCMC.class);
+        injector = Guice.createInjector(new LCMCModule());
+        final LCMC lcmc = injector.getInstance(LCMC.class);
         lcmc.launch(args);
     }
 
