@@ -27,6 +27,8 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
+
+import lcmc.common.ui.ProgressIndicator;
 import lcmc.configs.DistResource;
 import lcmc.common.ui.GUIData;
 import lcmc.host.domain.Host;
@@ -50,6 +52,7 @@ public final class ExecCommandThread extends Thread {
     private final boolean outputVisible;
     private final boolean commandVisible;
     private final GUIData guiData;
+    private final ProgressIndicator progressIndicator;
 
     private volatile boolean cancelIt = false;
     private final Lock mSessionLock = new ReentrantLock();
@@ -61,9 +64,12 @@ public final class ExecCommandThread extends Thread {
     private static final int DEFAULT_EXIT_CODE = 100;
     private static final String ENCODING = "UTF-8";
 
-    ExecCommandThread(final GUIData guiData, final ExecCommandConfig execCommandConfig) {
+    ExecCommandThread(final GUIData guiData,
+                      final ProgressIndicator progressIndicator,
+                      final ExecCommandConfig execCommandConfig) {
         this.guiData = guiData;
-                
+        this.progressIndicator = progressIndicator;
+
         this.host = execCommandConfig.getHost();
         this.connectionThread = execCommandConfig.getConnectionThread();
         this.sshGui = execCommandConfig.getSshGui();
@@ -328,7 +334,7 @@ public final class ExecCommandThread extends Thread {
                 if ((conditions & ChannelCondition.TIMEOUT) != 0) {
                     /* A timeout occured. */
                     LOG.appWarning("execOneCommand: SSH timeout: " + oneCommand);
-                    guiData.progressIndicatorFailed(host.getName(),
+                    progressIndicator.progressIndicatorFailed(host.getName(),
                             "SSH timeout: " + oneCommand.replaceAll(DistResource.SUDO, ""));
                     throw new IOException("Timeout while waiting for data from peer.");
                 }

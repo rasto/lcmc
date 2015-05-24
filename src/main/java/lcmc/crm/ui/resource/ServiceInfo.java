@@ -59,10 +59,10 @@ import javax.swing.tree.DefaultMutableTreeNode;
 
 import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.Table;
-import lcmc.common.ui.GUIData;
 import lcmc.common.domain.AccessMode;
 import lcmc.common.domain.Application;
 import lcmc.common.domain.ColorText;
+import lcmc.common.ui.ProgressIndicator;
 import lcmc.common.ui.treemenu.TreeMenuController;
 import lcmc.common.ui.utils.SwingUtils;
 import lcmc.host.domain.Host;
@@ -199,7 +199,7 @@ public class ServiceInfo extends EditableInfo {
     /** Radio buttons for clone/master/slave primitive resources. */
     private Widget typeRadioGroup;
     @Inject
-    private GUIData guiData;
+    private ProgressIndicator progressIndicator;
     @Inject
     private ServiceMenu serviceMenu;
     @Inject
@@ -3878,7 +3878,7 @@ public class ServiceInfo extends EditableInfo {
                     cleanupResource(dcHost, runMode);
                     setUpdated(false); /* must be here, is not a clone anymore*/
                     if (!ret && Application.isLive(runMode)) {
-                        guiData.progressIndicatorFailed(dcHost.getName(), "removing failed");
+                        progressIndicator.progressIndicatorFailed(dcHost.getName(), "removing failed");
                     }
                 }
             }

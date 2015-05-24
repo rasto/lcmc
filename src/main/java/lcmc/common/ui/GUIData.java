@@ -100,8 +100,6 @@ public class GUIData  {
     private JSplitPane terminalSplitPane;
     private ClustersPanel clustersPanel;
     /** Invisible panel with progress indicator. */
-    @Inject
-    private ProgressIndicatorPanel mainGlassPane;
     private final ReadWriteLock mAddClusterButtonListLock = new ReentrantReadWriteLock();
     private final Lock mAddClusterButtonListReadLock = mAddClusterButtonListLock.readLock();
     private final Lock mAddClusterButtonListWriteLock = mAddClusterButtonListLock.writeLock();
@@ -129,6 +127,8 @@ public class GUIData  {
     private SwingUtils swingUtils;
     @Inject
     private Application application;
+    @Inject
+    private ProgressIndicator progressIndicator;
 
     private Container mainFrame;
     private int lastDividerLocation = -1;
@@ -364,8 +364,8 @@ public class GUIData  {
      * - enable/disable look and feel menu etc
      */
     void godModeChanged(final boolean godMode) {
-        startProgressIndicator("OH MY GOD!!! Hi Rasto!");
-        stopProgressIndicator("OH MY GOD!!! Hi Rasto!");
+        progressIndicator.startProgressIndicator("OH MY GOD!!! Hi Rasto!");
+        progressIndicator.stopProgressIndicator("OH MY GOD!!! Hi Rasto!");
         mainMenu.resetOperatingModes(godMode);
         updateGlobalItems();
     }
@@ -483,45 +483,6 @@ public class GUIData  {
     public boolean isApplet() {
         return mainFrame instanceof JApplet;
     }
-
-    public void startProgressIndicator(final String text) {
-        mainGlassPane.start(text, null);
-    }
-
-    public void startProgressIndicator(final String name, final String text) {
-        startProgressIndicator(name + ": " + text);
-    }
-
-    public void stopProgressIndicator(final String text) {
-        mainGlassPane.stop(text);
-    }
-
-    public void stopProgressIndicator(final String name, final String text) {
-        stopProgressIndicator(name + ": " + text);
-    }
-
-    public void progressIndicatorFailed(final String text) {
-        mainGlassPane.failure(text);
-    }
-
-    public void progressIndicatorFailed(final String name, final String text) {
-        progressIndicatorFailed(name + ": " + text);
-    }
-
-    /** Progress indicator with failure message that shows for n seconds. */
-    public void progressIndicatorFailed(final String text, final int n) {
-        mainGlassPane.failure(text, n);
-    }
-
-    /**
-     * Progress indicator with failure message for host or cluster command,
-     * that shows for n seconds.
-     */
-    public void progressIndicatorFailed(final String name, final String text, final int n) {
-        progressIndicatorFailed(name + ": " + text, n);
-    }
-
-
     /** Returns a popup in a scrolling pane. */
     public boolean getScrollingMenu(final String name,
                                     final JPanel optionsPanel,

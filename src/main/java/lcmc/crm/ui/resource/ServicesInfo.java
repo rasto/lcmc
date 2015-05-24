@@ -46,6 +46,7 @@ import com.google.common.base.Optional;
 import lcmc.common.domain.AccessMode;
 import lcmc.common.ui.GUIData;
 import lcmc.common.domain.Application;
+import lcmc.common.ui.ProgressIndicator;
 import lcmc.common.ui.treemenu.TreeMenuController;
 import lcmc.common.ui.utils.Dialogs;
 import lcmc.common.ui.utils.SwingUtils;
@@ -86,7 +87,7 @@ public class ServicesInfo extends EditableInfo {
     @Inject
     private ServicesMenu servicesMenu;
     @Inject
-    private GUIData guiData;
+    private ProgressIndicator progressIndicator;
     @Inject
     private Provider<ConstraintPHInfo> constraintPHInfoProvider;
     @Inject
@@ -1107,7 +1108,7 @@ public class ServicesInfo extends EditableInfo {
             return;
         }
         final String cn = getBrowser().getCluster().getName();
-        guiData.startProgressIndicator(cn, "paste");
+        progressIndicator.startProgressIndicator(cn, "paste");
         final ClusterBrowser otherBrowser = (ClusterBrowser) oldInfos.get(0).getBrowser();
         getBrowser().getClusterViewPanel().setDisabledDuringLoad(true);
         otherBrowser.getClusterViewPanel().setDisabledDuringLoad(true);
@@ -1189,7 +1190,7 @@ public class ServicesInfo extends EditableInfo {
                 }
             }
         }
-        guiData.stopProgressIndicator(cn, "paste");
+        progressIndicator.stopProgressIndicator(cn, "paste");
         otherBrowser.getClusterViewPanel().setDisabledDuringLoad(false);
         getBrowser().getClusterViewPanel().setDisabledDuringLoad(false);
     }

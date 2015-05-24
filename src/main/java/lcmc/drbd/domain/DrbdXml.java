@@ -40,7 +40,7 @@ import com.google.common.collect.Table;
 import com.google.common.collect.TreeBasedTable;
 import lcmc.Exceptions;
 import lcmc.common.domain.AccessMode;
-import lcmc.common.ui.GUIData;
+import lcmc.common.ui.ProgressIndicator;
 import lcmc.drbd.ui.DrbdGraph;
 import lcmc.drbd.ui.resource.BlockDevInfo;
 import lcmc.drbd.ui.resource.ProxyNetInfo;
@@ -330,7 +330,7 @@ public class DrbdXml {
     private boolean unknownSections = false;
     private String oldConfig = null;
     @Inject
-    private GUIData guiData;
+    private ProgressIndicator progressIndicator;
 
     public void init(final Host[] hosts, final Map<Host, String> drbdParameters) {
         addSpecialParameter("resource", "name", true);
@@ -1100,7 +1100,7 @@ public class DrbdXml {
                     LOG.appWarning("parseConfigResourceNode: unknown section: " + secName);
                     if (!unknownSections) {
                         /* unknown section, so it's not removed. */
-                        guiData.progressIndicatorFailed("DRBD: unknown section: " + secName);
+                        progressIndicator.progressIndicatorFailed("DRBD: unknown section: " + secName);
                         unknownSections = true;
                     }
                 }

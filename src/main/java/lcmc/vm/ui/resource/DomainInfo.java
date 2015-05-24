@@ -61,7 +61,7 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import lcmc.Exceptions;
 import lcmc.common.ui.Browser;
 import lcmc.cluster.ui.ClusterBrowser;
-import lcmc.common.ui.GUIData;
+import lcmc.common.ui.ProgressIndicator;
 import lcmc.common.ui.treemenu.TreeMenuController;
 import lcmc.common.ui.utils.SwingUtils;
 import lcmc.host.ui.HostBrowser;
@@ -600,7 +600,7 @@ public class DomainInfo extends EditableInfo {
     /** This is a map from host to the check box. */
     private final Map<String, Widget> definedOnHostComboBoxHash = new HashMap<String, Widget>();
     @Inject
-    private GUIData guiData;
+    private ProgressIndicator progressIndicator;
     @Inject
     private Application application;
     @Inject
@@ -2610,7 +2610,7 @@ public class DomainInfo extends EditableInfo {
         final Map<Node, VmsXml> domainNodesToSave = new HashMap<Node, VmsXml>();
         final String clusterName = getBrowser().getCluster().getName();
         getBrowser().vmStatusLock();
-        guiData.startProgressIndicator(clusterName, "VM view update");
+        progressIndicator.startProgressIndicator(clusterName, "VM view update");
         for (final Host host : getBrowser().getClusterHosts()) {
             final Widget hostWi = definedOnHostComboBoxHash.get(host.getName());
             swingUtils.invokeLater(new Runnable() {
@@ -2706,7 +2706,7 @@ public class DomainInfo extends EditableInfo {
         }
         getBrowser().periodicalVmsUpdate(getBrowser().getClusterHosts());
         updateParameters();
-        guiData.stopProgressIndicator(clusterName, "VM view update");
+        progressIndicator.stopProgressIndicator(clusterName, "VM view update");
         getBrowser().vmStatusUnlock();
         swingUtils.invokeLater(new Runnable() {
             @Override
