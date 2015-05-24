@@ -46,7 +46,7 @@ import lcmc.cluster.ui.resource.ClusterViewFactory;
 import lcmc.common.domain.AccessMode;
 import lcmc.cluster.domain.Cluster;
 import lcmc.common.ui.Browser;
-import lcmc.common.ui.GUIData;
+import lcmc.common.ui.ProgressIndicator;
 import lcmc.common.ui.treemenu.TreeMenuController;
 import lcmc.common.ui.utils.SwingUtils;
 import lcmc.drbd.ui.DrbdGraph;
@@ -120,7 +120,7 @@ public class HostBrowser extends Browser {
     private final Lock mBlockDevInfosWriteLock = mBlockDevInfosLock.writeLock();
     private DefaultMutableTreeNode treeTop;
     @Inject
-    private GUIData guiData;
+    private ProgressIndicator progressIndicator;
     @Inject
     private Provider<BlockDevInfo> blockDevInfoFactory;
     @Inject
@@ -331,9 +331,9 @@ public class HostBrowser extends Browser {
                     public void run(final String text) {
                         final String hostName = host.getName();
                         final String command = "MakeKernelPanic";
-                        guiData.startProgressIndicator(hostName, host.getDistString(command));
+                        progressIndicator.startProgressIndicator(hostName, host.getDistString(command));
                         host.execCommand(new ExecCommandConfig().commandString(command));
-                        guiData.stopProgressIndicator(hostName, host.getDistString(command));
+                        progressIndicator.stopProgressIndicator(hostName, host.getDistString(command));
                     }
                 });
         submenu.add(panicMenuItem);
@@ -359,9 +359,9 @@ public class HostBrowser extends Browser {
                     public void run(final String text) {
                         final String hostName = host.getName();
                         final String command = "MakeKernelReboot";
-                        guiData.startProgressIndicator(hostName, host.getDistString(command));
+                        progressIndicator.startProgressIndicator(hostName, host.getDistString(command));
                         host.execCommand(new ExecCommandConfig().commandString(command));
-                        guiData.stopProgressIndicator(hostName, host.getDistString(command));
+                        progressIndicator.stopProgressIndicator(hostName, host.getDistString(command));
                     }
                 });
         submenu.add(rebootMenuItem);

@@ -175,6 +175,8 @@ public abstract class ResourceGraph {
     private ClusterBrowser clusterBrowser;
     @Inject
     private GUIData guiData;
+    @Inject
+    private ProgressIndicator progressIndicator;
 
     /** Starts the animation if vertex is being updated. */
     public final void startAnimation(final Info info) {
@@ -1114,13 +1116,13 @@ public abstract class ResourceGraph {
     /** Get selected components for copy/paste. */
     public List<Info> getSelectedComponents() {
         final String cn = clusterBrowser.getCluster().getName();
-        guiData.startProgressIndicator(cn, "copy");
+        progressIndicator.startProgressIndicator(cn, "copy");
         final List<Info> selected = new ArrayList<Info>();
         for (final Vertex v : getPickedVertices()) {
             final Info i = getInfo(v);
             selected.add(i);
         }
-        guiData.stopProgressIndicator(cn, "copy");
+        progressIndicator.stopProgressIndicator(cn, "copy");
         return selected;
     }
 

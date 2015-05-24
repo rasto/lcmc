@@ -70,7 +70,7 @@ public final class EditConfig extends ConfigDialog {
         doesn't get enabled. */
     private volatile boolean configInProgress = true;
     @Inject
-    private GUIData guiData;
+    private ProgressIndicator progressIndicator;
     @Inject
     private SwingUtils swingUtils;
 
@@ -281,7 +281,7 @@ public final class EditConfig extends ConfigDialog {
 
     private void saveButtonWasPressed() {
         final String iText = "saving " + fileToEdit + "...";
-        guiData.startProgressIndicator(iText);
+        progressIndicator.startProgressIndicator(iText);
         for (final Host host : hosts) {
             if (hostCheckBoxes.get(host).isSelected()) {
                 host.getSSH().createConfig(configArea.getText(),
@@ -293,7 +293,7 @@ public final class EditConfig extends ConfigDialog {
                                            null);  /* post cmd */
             }
         }
-        guiData.stopProgressIndicator(iText);
+        progressIndicator.stopProgressIndicator(iText);
     }
 
     /** This method is called after user has pushed the button. */

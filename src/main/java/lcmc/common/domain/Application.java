@@ -41,6 +41,7 @@ import lcmc.cluster.domain.Clusters;
 import lcmc.cluster.ui.ClusterBrowser;
 import lcmc.common.ui.GUIData;
 import lcmc.common.ui.ConfirmDialog;
+import lcmc.common.ui.ProgressIndicator;
 import lcmc.host.domain.Host;
 import lcmc.host.domain.Hosts;
 import lcmc.robotest.Test;
@@ -128,6 +129,8 @@ public class Application {
     @Inject
     private GUIData guiData;
     @Inject
+    private ProgressIndicator progressIndicator;
+    @Inject
     private UserConfig userConfig;
     @Inject
     private Provider<ConfirmDialog> confirmDialogProvider;
@@ -195,10 +198,10 @@ public class Application {
 
     /** Removes all the hosts and clusters from all the panels and data. */
     public void removeEverything() {
-        guiData.startProgressIndicator(Tools.getString("MainMenu.RemoveEverything"));
+        progressIndicator.startProgressIndicator(Tools.getString("MainMenu.RemoveEverything"));
         disconnectAllHosts();
         guiData.getClustersPanel().removeAllTabs();
-        guiData.stopProgressIndicator(Tools.getString("MainMenu.RemoveEverything"));
+        progressIndicator.stopProgressIndicator(Tools.getString("MainMenu.RemoveEverything"));
     }
 
     /**
@@ -209,7 +212,7 @@ public class Application {
         LOG.debug1("save: start");
         final String text = Tools.getString("Tools.Saving").replaceAll("@FILENAME@",
                                             Matcher.quoteReplacement(filename));
-        guiData.startProgressIndicator(text);
+        progressIndicator.startProgressIndicator(text);
         try {
             final FileOutputStream fileOut = new FileOutputStream(filename);
             userConfig.saveXML(fileOut, saveAll);
@@ -229,7 +232,7 @@ public class Application {
                     cb.saveGraphPositions();
                 }
             }
-            guiData.stopProgressIndicator(text);
+            progressIndicator.stopProgressIndicator(text);
         }
     }
 

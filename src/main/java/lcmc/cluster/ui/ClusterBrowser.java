@@ -59,6 +59,7 @@ import lcmc.common.domain.Application;
 import lcmc.common.ui.Browser;
 import lcmc.common.ui.CallbackAction;
 import lcmc.common.ui.GUIData;
+import lcmc.common.ui.ProgressIndicator;
 import lcmc.common.ui.ResourceGraph;
 import lcmc.common.ui.treemenu.TreeMenuController;
 import lcmc.common.ui.utils.SwingUtils;
@@ -313,6 +314,8 @@ public class ClusterBrowser extends Browser {
     @Inject
     private GUIData guiData;
     @Inject
+    private ProgressIndicator progressIndicator;
+    @Inject
     private GlobalInfo globalInfo;
 
     @Inject
@@ -560,9 +563,9 @@ public class ClusterBrowser extends Browser {
                 final Host[] hosts = cluster.getHostsArray();
                 for (final Host host : hosts) {
                     host.waitForServerStatusLatch();
-                    guiData.stopProgressIndicator(
-                        host.getName(),
-                        Tools.getString("ClusterBrowser.UpdatingServerInfo"));
+                    progressIndicator.stopProgressIndicator(
+                            host.getName(),
+                            Tools.getString("ClusterBrowser.UpdatingServerInfo"));
                 }
                 swingUtils.invokeInEdt(new Runnable() {
                     @Override
@@ -634,12 +637,12 @@ public class ClusterBrowser extends Browser {
                 drbdXml.init(cluster.getHostsArray(), hostDrbdParameters);
                 /* available services */
                 final String clusterName = getCluster().getName();
-                guiData.startProgressIndicator(clusterName, Tools.getString("ClusterBrowser.HbUpdateResources"));
+                progressIndicator.startProgressIndicator(clusterName, Tools.getString("ClusterBrowser.HbUpdateResources"));
 
                 updateAvailableServices();
-                guiData.stopProgressIndicator(clusterName, Tools.getString("ClusterBrowser.HbUpdateResources"));
-                guiData.startProgressIndicator(clusterName, Tools.getString("ClusterBrowser.DrbdUpdate"));
-                guiData.stopProgressIndicator(clusterName, Tools.getString("ClusterBrowser.DrbdUpdate"));
+                progressIndicator.stopProgressIndicator(clusterName, Tools.getString("ClusterBrowser.HbUpdateResources"));
+                progressIndicator.startProgressIndicator(clusterName, Tools.getString("ClusterBrowser.DrbdUpdate"));
+                progressIndicator.stopProgressIndicator(clusterName, Tools.getString("ClusterBrowser.DrbdUpdate"));
                 cluster.getBrowser().startConnectionStatusOnAllHosts();
                 cluster.getBrowser().startServerStatus();
                 cluster.getBrowser().startDrbdStatusOnAllHosts();
@@ -685,7 +688,7 @@ public class ClusterBrowser extends Browser {
         final CategoryInfo[] infosToUpdate = new CategoryInfo[]{clusterHostsInfo};
         while (true) {
             if (host.getWaitForServerStatusLatch()) {
-                guiData.startProgressIndicator(hostName, Tools.getString("ClusterBrowser.UpdatingServerInfo"));
+                progressIndicator.startProgressIndicator(hostName, Tools.getString("ClusterBrowser.UpdatingServerInfo"));
             }
 
             host.setIsLoading();
@@ -814,7 +817,7 @@ public class ClusterBrowser extends Browser {
         host.setDrbdStatusOk(false);
         final String hostName = host.getName();
         /* now what we do if the status finished for the first time. */
-        guiData.startProgressIndicator( hostName, Tools.getString("ClusterBrowser.UpdatingDrbdStatus"));
+        progressIndicator.startProgressIndicator( hostName, Tools.getString("ClusterBrowser.UpdatingDrbdStatus"));
         final Thread thread = new Thread(new Runnable() {
             @Override
             public void run() {
@@ -829,7 +832,7 @@ public class ClusterBrowser extends Browser {
                         drbdGraph.scale();
                     }
                 });
-                guiData.stopProgressIndicator(hostName, Tools.getString("ClusterBrowser.UpdatingDrbdStatus"));
+                progressIndicator.stopProgressIndicator(hostName, Tools.getString("ClusterBrowser.UpdatingDrbdStatus"));
             }
         });
         thread.start();
@@ -1004,11 +1007,11 @@ public class ClusterBrowser extends Browser {
     }
 
     void startClStatusProgressIndicator(final String clusterName) {
-        guiData.startProgressIndicator(clusterName, Tools.getString("ClusterBrowser.HbUpdateStatus"));
+        progressIndicator.startProgressIndicator(clusterName, Tools.getString("ClusterBrowser.HbUpdateStatus"));
     }
 
     void stopClStatusProgressIndicator(final String clusterName) {
-        guiData.stopProgressIndicator(clusterName, Tools.getString("ClusterBrowser.HbUpdateStatus"));
+        progressIndicator.stopProgressIndicator(clusterName, Tools.getString("ClusterBrowser.HbUpdateStatus"));
     }
 
     /** Sets status and checks if it changes and if it does some action will be
@@ -1108,7 +1111,7 @@ public class ClusterBrowser extends Browser {
                     Thread.currentThread().interrupt();
                 }
                 if (crmStatusFailed()) {
-                     guiData.progressIndicatorFailed(clusterName, Tools.getString("ClusterBrowser.ClusterStatusFailed"));
+                     progressIndicator.progressIndicatorFailed(clusterName, Tools.getString("ClusterBrowser.ClusterStatusFailed"));
                 } else {
                     swingUtils.invokeLater(new Runnable() {
                         @Override

@@ -173,6 +173,8 @@ public class TerminalPanel extends JScrollPane {
     @Inject
     private GUIData guiData;
     @Inject
+    private ProgressIndicator progressIndicator;
+    @Inject
     private Application application;
     @Inject
     private SwingUtils swingUtils;
@@ -403,21 +405,21 @@ public class TerminalPanel extends JScrollPane {
             return;
         }
         if (command != null && !command.isEmpty()) {
-            guiData.startProgressIndicator(hostName, "Executing command");
+            progressIndicator.startProgressIndicator(hostName, "Executing command");
         }
         host.execCommand(new ExecCommandConfig().command(command)
                                                 .execCallback(new ExecCallback() {
                                                     @Override
                                                     public void done(final String answer) {
                                                         if (command != null && !command.isEmpty()) {
-                                                            guiData.stopProgressIndicator(hostName, "Executing command");
+                                                            progressIndicator.stopProgressIndicator(hostName, "Executing command");
                                                         }
                                                     }
 
                                                     @Override
                                                     public void doneError(final String answer, final int errorCode) {
                                                         if (command != null && !command.isEmpty()) {
-                                                            guiData.stopProgressIndicator(hostName, "Executing command");
+                                                            progressIndicator.stopProgressIndicator(hostName, "Executing command");
                                                         }
                                                     }
                                                 }));

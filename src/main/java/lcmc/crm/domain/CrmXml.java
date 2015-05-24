@@ -44,8 +44,8 @@ import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.Table;
 import lcmc.Exceptions;
 import lcmc.common.domain.AccessMode;
-import lcmc.common.ui.GUIData;
 import lcmc.common.ui.Info;
+import lcmc.common.ui.ProgressIndicator;
 import lcmc.crm.ui.resource.ServiceInfo;
 import lcmc.crm.ui.resource.ServicesInfo;
 import lcmc.common.domain.Application;
@@ -340,7 +340,7 @@ public final class CrmXml {
 
     private static final AccessMode.Type DEFAULT_ACCESS_TYPE = AccessMode.ADMIN;
     @Inject
-    private GUIData guiData;
+    private ProgressIndicator progressIndicator;
     @Inject
     private Application application;
     @Inject
@@ -733,13 +733,13 @@ public final class CrmXml {
                 initOCFMetaDataAll();
                 final String hn = host.getName();
                 final String text = Tools.getString("CRMXML.GetRAMetaData.Done");
-                guiData.startProgressIndicator(hn, text);
+                progressIndicator.startProgressIndicator(hn, text);
                 allServicesInfo.setAllResources(allServicesInfo.getBrowser().getClusterStatus(), Application.RunMode.LIVE);
                 final Info lastSelectedInfo = allServicesInfo.getBrowser().getClusterViewPanel().getLastSelectedInfo();
                 if (lastSelectedInfo instanceof ServiceInfo || lastSelectedInfo instanceof ServicesInfo) {
                     allServicesInfo.getBrowser().getClusterViewPanel().reloadRightComponent();
                 }
-                guiData.stopProgressIndicator(hn, text);
+                progressIndicator.stopProgressIndicator(hn, text);
                 LOG.debug("CRMXML: RAs loaded");
                 final Test autoTest = application.getAutoTest();
                 if (autoTest != null) {
