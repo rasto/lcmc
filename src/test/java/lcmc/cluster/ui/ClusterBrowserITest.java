@@ -9,6 +9,7 @@ import java.util.concurrent.CountDownLatch;
 import lcmc.AppContext;
 import lcmc.common.domain.Application;
 import lcmc.common.ui.GUIData;
+import lcmc.common.ui.ProgressIndicator;
 import lcmc.common.ui.utils.SwingUtils;
 import lcmc.host.domain.Host;
 import lcmc.testutils.IntegrationTestLauncher;
@@ -27,8 +28,8 @@ import javax.inject.Inject;
 public final class ClusterBrowserITest {
     private IntegrationTestLauncher integrationTestLauncher;
     private GUIData guiData;
-    @Inject
     private SwingUtils swingUtils;
+    private ProgressIndicator progressIndicator;
 
     @Before
     public void setUp() {
@@ -36,6 +37,7 @@ public final class ClusterBrowserITest {
         integrationTestLauncher.initTestCluster();
         guiData = AppContext.getBean(GUIData.class);
         swingUtils = AppContext.getBean(SwingUtils.class);
+        progressIndicator = AppContext.getBean(ProgressIndicator.class);
     }
 
     @Test
@@ -109,7 +111,7 @@ public final class ClusterBrowserITest {
         Collections.sort(files);
         for (String file : files) {
             i++;
-            guiData.startProgressIndicator(i + ": " + file);
+            progressIndicator.startProgressIndicator(i + ": " + file);
             String xml = Tools.loadFile(guiData, file, true);
             xml = xml.replaceAll("<nodes/>", nodes.toString())
                      .replaceAll("<nodes>.*?</nodes>", nodes.toString())
@@ -143,7 +145,7 @@ public final class ClusterBrowserITest {
                 cb.getClusterViewPanel().setDisabledDuringLoad(false);
                 cb.getCrmGraph().repaint();
             }
-            guiData.stopProgressIndicator(i + ": " + file);
+            progressIndicator.stopProgressIndicator(i + ": " + file);
             for (final Host host : integrationTestLauncher.getHosts()) {
                 final ClusterBrowser cb = host.getBrowser().getClusterBrowser();
                 swingUtils.waitForSwing();

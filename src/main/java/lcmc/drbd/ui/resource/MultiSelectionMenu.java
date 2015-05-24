@@ -38,6 +38,7 @@ import lcmc.common.ui.CallbackAction;
 import lcmc.common.ui.GUIData;
 import lcmc.common.domain.AccessMode;
 import lcmc.common.domain.Application;
+import lcmc.common.ui.ProgressIndicator;
 import lcmc.host.domain.Host;
 import lcmc.drbd.domain.BlockDevice;
 import lcmc.cluster.ui.ClusterBrowser;
@@ -65,6 +66,8 @@ public class MultiSelectionMenu {
 
     @Inject
     private GUIData guiData;
+    @Inject
+    private ProgressIndicator progressIndicator;
     @Inject
     private MenuFactory menuFactory;
     @Inject
@@ -324,7 +327,7 @@ public class MultiSelectionMenu {
                         if (bdi.canCreatePV() && (!bdi.getBlockDevice().isDrbd() || bdi.getBlockDevice().isPrimary())) {
                             final boolean ret = bdi.pvCreate(Application.RunMode.LIVE);
                             if (!ret) {
-                                guiData.progressIndicatorFailed(
+                                progressIndicator.progressIndicatorFailed(
                                         Tools.getString("BlockDevInfo.PVCreate.Failed", bdi.getName()));
                             }
                             hosts.add(bdi.getHost());
@@ -367,7 +370,7 @@ public class MultiSelectionMenu {
                                 && (!bdi.getBlockDevice().isDrbd() || !bdi.getBlockDevice().isDrbdPhysicalVolume())) {
                             final boolean ret = bdi.pvRemove(Application.RunMode.LIVE);
                             if (!ret) {
-                                guiData.progressIndicatorFailed(
+                                progressIndicator.progressIndicatorFailed(
                                         Tools.getString("BlockDevInfo.PVRemove.Failed", bdi.getName()));
                             }
                             hosts.add(bdi.getHost());

@@ -33,9 +33,9 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SpringLayout;
 
-import lcmc.common.ui.GUIData;
 import lcmc.common.domain.AccessMode;
 import lcmc.common.domain.Application;
+import lcmc.common.ui.ProgressIndicator;
 import lcmc.common.ui.utils.SwingUtils;
 import lcmc.host.domain.Host;
 import lcmc.common.domain.StringValue;
@@ -62,7 +62,7 @@ final class CreateMD extends DrbdConfig {
     private static final int CREATE_MD_FS_ALREADY_THERE_RC = 40;
     private Widget metadataWidget;
     @Inject
-    private GUIData guiData;
+    private ProgressIndicator progressIndicator;
     @Inject
     private CreateFS createFSDialog;
     @Inject
@@ -181,7 +181,7 @@ final class CreateMD extends DrbdConfig {
         final BlockDevInfo bdi1 = getDrbdVolumeInfo().getFirstBlockDevInfo();
         final BlockDevInfo bdi2 = getDrbdVolumeInfo().getSecondBlockDevInfo();
         final String clusterName = bdi1.getHost().getCluster().getName();
-        guiData.startProgressIndicator(clusterName, "scanning block devices...");
+        progressIndicator.startProgressIndicator(clusterName, "scanning block devices...");
         final Application.RunMode runMode = Application.RunMode.LIVE;
         if (getDrbdVolumeInfo().getDrbdResourceInfo().isProxy(bdi1.getHost())) {
             DRBD.proxyUp(bdi1.getHost(), getDrbdVolumeInfo().getDrbdResourceInfo().getName(), null, runMode);
@@ -203,7 +203,7 @@ final class CreateMD extends DrbdConfig {
         browser.updateHWInfo(bdi2.getHost(), !Host.UPDATE_LVM);
         bdi1.getBlockDevice().setDrbdBlockDevice(bdi1.getHost().getDrbdBlockDevice(device));
         bdi2.getBlockDevice().setDrbdBlockDevice(bdi2.getHost().getDrbdBlockDevice(device));
-        guiData.stopProgressIndicator(clusterName, "scanning block devices...");
+        progressIndicator.stopProgressIndicator(clusterName, "scanning block devices...");
         createFSDialog.init(this, getDrbdVolumeInfo());
         return createFSDialog;
     }

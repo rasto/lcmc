@@ -28,6 +28,7 @@ import java.io.IOException;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
+import lcmc.common.ui.ProgressIndicator;
 import lcmc.common.ui.utils.SwingUtils;
 import lcmc.configs.DistResource;
 import lcmc.common.ui.GUIData;
@@ -75,6 +76,8 @@ public final class Ssh {
     private LocalPortForwarder localPortForwarder = null;
     @Inject
     private GUIData guiData;
+    @Inject
+    private ProgressIndicator progressIndicator;
     @Inject
     private Application application;
     @Inject
@@ -323,7 +326,7 @@ public final class Ssh {
                          .connectionThread(connectionThread)
                          .sshGui(sshGui)
                          .execCallback(execCallback)
-                         .execute(guiData).block();
+                         .execute(guiData, progressIndicator).block();
         return new SshOutput(answer[0], exitCode[0]);
     }
 
@@ -337,7 +340,7 @@ public final class Ssh {
         return execCommandConfig.host(host)
                                 .connectionThread(connectionThread)
                                 .sshGui(sshGui)
-                                .execute(guiData);
+                                .execute(guiData, progressIndicator);
     }
 
     public SshOutput captureCommand(final ExecCommandConfig execCommandConfig) {
@@ -345,7 +348,7 @@ public final class Ssh {
         return execCommandConfig.host(host)
                                 .connectionThread(connectionThread)
                                 .sshGui(sshGui)
-                                .capture(guiData);
+                                .capture(guiData, progressIndicator);
     }
 
     /** Installs gui-helper on the remote host. */
@@ -507,7 +510,7 @@ public final class Ssh {
              new Runnable() {
                  @Override
                  public void run() {
-                     guiData.progressIndicatorFailed(host.getName(), line, 3000);
+                     progressIndicator.progressIndicatorFailed(host.getName(), line, 3000);
                  }
              });
              t.start();

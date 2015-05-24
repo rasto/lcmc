@@ -52,6 +52,7 @@ import com.google.common.base.Optional;
 import lcmc.Exceptions;
 import lcmc.HwEventBus;
 import lcmc.cluster.domain.Cluster;
+import lcmc.common.ui.ProgressIndicator;
 import lcmc.common.ui.utils.SwingUtils;
 import lcmc.configs.DistResource;
 import lcmc.cluster.ui.ClusterBrowser;
@@ -266,6 +267,8 @@ public class Host implements Comparable<Host>, Value {
     private TerminalPanel terminalPanel;
     @Inject
     private GUIData guiData;
+    @Inject
+    private ProgressIndicator progressIndicator;
     @Inject
     private Ssh ssh;
     @Inject
@@ -744,21 +747,21 @@ public class Host implements Comparable<Host>, Value {
 
     public SshOutput captureCommandProgressIndicator(final String text, final ExecCommandConfig execCommandConfig) {
         final String hostName = getName();
-        guiData.startProgressIndicator(hostName, text);
+        progressIndicator.startProgressIndicator(hostName, text);
         try {
             return ssh.captureCommand(execCommandConfig);
         } finally {
-            guiData.stopProgressIndicator(hostName, text);
+            progressIndicator.stopProgressIndicator(hostName, text);
         }
     }
 
     public void execCommandProgressIndicator(final String text, final ExecCommandConfig execCommandConfig) {
         final String hostName = getName();
-        guiData.startProgressIndicator(hostName, text);
+        progressIndicator.startProgressIndicator(hostName, text);
         try {
             ssh.execCommand(execCommandConfig);
         } finally {
-            guiData.stopProgressIndicator(hostName, text);
+            progressIndicator.stopProgressIndicator(hostName, text);
         }
     }
 
@@ -1119,12 +1122,12 @@ public class Host implements Comparable<Host>, Value {
     }
 
     /** Make an ssh connection to the host. */
-    public void connect(SSHGui sshGui, final boolean progressIndicator, final int index) {
+    public void connect(SSHGui sshGui, final boolean useProgressIndicator, final int index) {
         if (!isConnected()) {
             final String hostName = getName();
-            if (progressIndicator) {
-                guiData.startProgressIndicator(hostName,
-                                               Tools.getString("Dialog.Host.SSH.Connecting") + " (" + index + ')');
+            if (useProgressIndicator) {
+                progressIndicator.startProgressIndicator(hostName,
+                        Tools.getString("Dialog.Host.SSH.Connecting") + " (" + index + ')');
             }
             if (sshGui == null) {
                 sshGui = new SSHGui(guiData.getMainFrame(), this, null);
@@ -1142,10 +1145,10 @@ public class Host implements Comparable<Host>, Value {
                                                             .sshCommandTimeout(10000));
                                     getSSH().installGuiHelper();
                             getAllInfo();
-                            if (progressIndicator) {
-                                guiData.stopProgressIndicator(
-                                  hostName,
-                                  Tools.getString("Dialog.Host.SSH.Connecting") + " (" + index + ')');
+                            if (useProgressIndicator) {
+                                progressIndicator.stopProgressIndicator(
+                                        hostName,
+                                        Tools.getString("Dialog.Host.SSH.Connecting") + " (" + index + ')');
                             }
                         }
 
@@ -1153,16 +1156,16 @@ public class Host implements Comparable<Host>, Value {
                         public void doneError(final String errorText) {
                             setLoadingError();
                             setConnected();
-                            if (progressIndicator) {
-                                guiData.stopProgressIndicator(
-                                  hostName,
-                                  Tools.getString("Dialog.Host.SSH.Connecting") + " (" + index + ')');
-                                guiData.progressIndicatorFailed(
-                                  hostName,
-                                  Tools.getString("Dialog.Host.SSH.Connecting") + " (" + index + ')');
-                                guiData.stopProgressIndicator(
-                                  hostName,
-                                  Tools.getString("Dialog.Host.SSH.Connecting") + " (" + index + ')');
+                            if (useProgressIndicator) {
+                                progressIndicator.stopProgressIndicator(
+                                        hostName,
+                                        Tools.getString("Dialog.Host.SSH.Connecting") + " (" + index + ')');
+                                progressIndicator.progressIndicatorFailed(
+                                        hostName,
+                                        Tools.getString("Dialog.Host.SSH.Connecting") + " (" + index + ')');
+                                progressIndicator.stopProgressIndicator(
+                                        hostName,
+                                        Tools.getString("Dialog.Host.SSH.Connecting") + " (" + index + ')');
                             }
                         }
                     });

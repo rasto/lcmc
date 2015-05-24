@@ -26,10 +26,10 @@ import java.util.List;
 import java.util.Set;
 
 import lcmc.common.ui.CallbackAction;
-import lcmc.common.ui.GUIData;
 import lcmc.common.domain.AccessMode;
 import lcmc.common.domain.Application;
 import lcmc.cluster.domain.Cluster;
+import lcmc.common.ui.ProgressIndicator;
 import lcmc.drbd.domain.DrbdXml;
 import lcmc.host.domain.Host;
 import lcmc.drbd.domain.BlockDevice;
@@ -81,7 +81,7 @@ public class BlockDevMenu {
 
     private BlockDevInfo blockDevInfo;
     @Inject
-    private GUIData guiData;
+    private ProgressIndicator progressIndicator;
     @Inject
     private MenuFactory menuFactory;
     @Inject
@@ -812,7 +812,7 @@ public class BlockDevMenu {
                     public void run(final String text) {
                         final boolean ret = blockDevInfo.pvCreate(Application.RunMode.LIVE);
                         if (!ret) {
-                            guiData.progressIndicatorFailed(Tools.getString("BlockDevInfo.PVCreate.Failed",
+                            progressIndicator.progressIndicatorFailed(Tools.getString("BlockDevInfo.PVCreate.Failed",
                                     blockDevInfo.getName()));
                         }
                         getClusterBrowser().updateHWInfo(getHost(), Host.UPDATE_LVM);
@@ -847,7 +847,7 @@ public class BlockDevMenu {
                     public void run(final String text) {
                         final boolean ret = blockDevInfo.pvRemove(Application.RunMode.LIVE);
                         if (!ret) {
-                            guiData.progressIndicatorFailed(
+                            progressIndicator.progressIndicatorFailed(
                                     Tools.getString("BlockDevInfo.PVRemove.Failed", blockDevInfo.getName()));
                         }
                         getClusterBrowser().updateHWInfo(getHost(), Host.UPDATE_LVM);
