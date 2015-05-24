@@ -91,8 +91,6 @@ public final class RoboTest {
 
     static final boolean PROXY = true;
     @Inject
-    private Application application;
-    @Inject
     private GUIData guiData;
 
     public void initRobot(final Cluster cluster) {

@@ -57,6 +57,7 @@ import lcmc.Exceptions;
 import lcmc.common.ui.GUIData;
 import lcmc.common.domain.AccessMode;
 import lcmc.common.domain.Application;
+import lcmc.common.ui.utils.SwingUtils;
 import lcmc.crm.domain.CastAddress;
 import lcmc.cluster.domain.Cluster;
 import lcmc.host.domain.Host;
@@ -193,6 +194,8 @@ final class HbConfig extends DialogCluster {
     @Inject
     private Application application;
     @Inject
+    private SwingUtils swingUtils;
+    @Inject
     private WidgetFactory widgetFactory;
     private MyButton makeConfigButton;
     @Inject
@@ -253,7 +256,7 @@ final class HbConfig extends DialogCluster {
                             @Override
                             public void run() {
                                 fieldCheckLatch = new CountDownLatch(1);
-                                application.invokeLater(new Runnable() {
+                                swingUtils.invokeLater(new Runnable() {
                                     @Override
                                     public void run() {
                                         makeConfigButton.setEnabled(false);
@@ -346,7 +349,7 @@ final class HbConfig extends DialogCluster {
                 @Override
                 public void run() {
                     final boolean configOk = updateOldHbConfig();
-                    application.invokeLater(new Runnable() {
+                    swingUtils.invokeLater(new Runnable() {
                         @Override
                         public void run() {
                             makeConfigButton.setEnabled(false);
@@ -481,7 +484,7 @@ final class HbConfig extends DialogCluster {
         boolean configOk = false;
         boolean noConfigs = true;
         if (configs[0].equals(HA_CF_ERROR_STRING)) {
-            application.invokeLater(new Runnable() {
+            swingUtils.invokeLater(new Runnable() {
                 @Override
                 public void run() {
                     configStatus.setText(hosts[0] + ": " + Tools.getString("Dialog.Cluster.HbConfig.NoConfigFound"));
@@ -498,7 +501,7 @@ final class HbConfig extends DialogCluster {
             for (j = 1; j < configs.length; j++) {
                 final Host host = hosts[j];
                 if (configs[j].equals(HA_CF_ERROR_STRING)) {
-                    application.invokeLater(new Runnable() {
+                    swingUtils.invokeLater(new Runnable() {
                         @Override
                         public void run() {
                             configStatus.setText(host
@@ -508,7 +511,7 @@ final class HbConfig extends DialogCluster {
                     });
                     break;
                 } else if (!configs[0].equals(configs[j])) {
-                    application.invokeLater(new Runnable() {
+                    swingUtils.invokeLater(new Runnable() {
                         @Override
                         public void run() {
                             configStatus.setText(Tools.getString("Dialog.Cluster.HbConfig.ConfigsNotTheSame"));
@@ -527,7 +530,7 @@ final class HbConfig extends DialogCluster {
                     generated = true;
                 }
                 final boolean editableConfig = generated;
-                application.invokeLater(new Runnable() {
+                swingUtils.invokeLater(new Runnable() {
                     @Override
                     public void run() {
                         configStatus.setText(Tools.getString("Dialog.Cluster.HbConfig.ha.cf.ok"));
@@ -552,7 +555,7 @@ final class HbConfig extends DialogCluster {
         }
         if (!configOk) {
             final boolean noConfigsF = noConfigs;
-            application.invokeLater(new Runnable() {
+            swingUtils.invokeLater(new Runnable() {
                 @Override
                 public void run() {
                     if (noConfigsF) {
@@ -572,7 +575,7 @@ final class HbConfig extends DialogCluster {
                 updateConfigPanelExisting();
             }
         }
-        application.invokeLater(new Runnable() {
+        swingUtils.invokeLater(new Runnable() {
             @Override
             public void run() {
                 fieldCheckLatch.countDown();
@@ -584,7 +587,7 @@ final class HbConfig extends DialogCluster {
     /** Shows all ha.cf config files. */
     private void updateConfigPanelExisting() {
         final Host[] hosts = getCluster().getHostsArray();
-        application.invokeLater(new Runnable() {
+        swingUtils.invokeLater(new Runnable() {
             @Override
             public void run() {
                 makeConfigButton.setEnabled(false);
@@ -627,7 +630,7 @@ final class HbConfig extends DialogCluster {
             return;
         }
         this.configChangedByUser = configChanged;
-        application.invokeLater(new Runnable() {
+        swingUtils.invokeLater(new Runnable() {
             @Override
             public void run() {
                 if (!configChanged) {
@@ -770,7 +773,7 @@ final class HbConfig extends DialogCluster {
             final UcastLink ucastLink1 = (UcastLink) ucastLink1Widget.getValue();
             final UcastLink ucastLink2 = (UcastLink) ucastLink2Widget.getValue();
             if (ucastLink1 == null || ucastLink2 == null || ucastLink1.getHost() == ucastLink2.getHost()) {
-                application.invokeLater(new Runnable() {
+                swingUtils.invokeLater(new Runnable() {
                     @Override
                     public void run() {
                         addAddressButton.setEnabled(false);
@@ -784,7 +787,7 @@ final class HbConfig extends DialogCluster {
 
         for (final CastAddress c : castAddresses) {
             if (c.equals(type.getValueForConfig(), iface, addr, serial)) {
-                application.invokeLater(new Runnable() {
+                swingUtils.invokeLater(new Runnable() {
                     @Override
                     public void run() {
                         addAddressButton.setEnabled(false);
@@ -793,7 +796,7 @@ final class HbConfig extends DialogCluster {
                 return;
             }
         }
-        application.invokeLater(new Runnable() {
+        swingUtils.invokeLater(new Runnable() {
             @Override
             public void run() {
                 addAddressButton.setEnabled(true);
@@ -1029,7 +1032,7 @@ final class HbConfig extends DialogCluster {
                                 ucastLink1Widget.setVisible(false);
                                 ucastLink2Widget.setVisible(false);
                             }
-                            application.invokeLater(new Runnable() {
+                            swingUtils.invokeLater(new Runnable() {
                                 @Override
                                 public void run() {
                                     mcastPanel.setMaximumSize(mcastPanel.getPreferredSize());
@@ -1114,7 +1117,7 @@ final class HbConfig extends DialogCluster {
                         public void run() {
                             if (EDIT_CONFIG_STRING.equals(text)) {
                                 updateConfigPanelEditable(configChangedByUser);
-                                application.invokeLater(new Runnable() {
+                                swingUtils.invokeLater(new Runnable() {
                                     @Override
                                     public void run() {
                                         configCheckbox.setText(SEE_EXISTING_STRING);
@@ -1124,7 +1127,7 @@ final class HbConfig extends DialogCluster {
                                 });
                             } else if (SEE_EXISTING_STRING.equals(text)) {
                                 updateConfigPanelExisting();
-                                application.invokeLater(new Runnable() {
+                                swingUtils.invokeLater(new Runnable() {
                                     @Override
                                     public void run() {
                                         configCheckbox.setText(EDIT_CONFIG_STRING);

@@ -30,10 +30,8 @@ import javax.swing.JComponent;
 import javax.swing.JPanel;
 
 import lcmc.cluster.ui.EmptyBrowser;
-import lcmc.common.ui.GUIData;
 import lcmc.common.ui.WizardDialog;
 import lcmc.common.domain.Application;
-import lcmc.common.domain.UserConfig;
 import lcmc.common.domain.util.Tools;
 
 /**
@@ -45,10 +43,6 @@ final class Finish extends DialogCluster {
     private final JCheckBox saveCheckBox = new JCheckBox(Tools.getString("Dialog.Cluster.Finish.Save"), true);
     @Inject
     private EmptyBrowser emptyBrowser;
-    @Inject
-    private UserConfig userConfig;
-    @Inject
-    private GUIData guiData;
     @Inject
     private Application application;
 

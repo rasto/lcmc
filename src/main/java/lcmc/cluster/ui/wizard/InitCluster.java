@@ -45,6 +45,7 @@ import lcmc.common.ui.GUIData;
 import lcmc.common.domain.AccessMode;
 import lcmc.common.domain.Application;
 import lcmc.cluster.domain.Cluster;
+import lcmc.common.ui.utils.SwingUtils;
 import lcmc.host.domain.Host;
 import lcmc.common.domain.StringValue;
 import lcmc.common.domain.Value;
@@ -114,6 +115,8 @@ public class InitCluster extends DialogCluster {
     private GUIData guiData;
     @Inject
     private Application application;
+    @Inject
+    private SwingUtils swingUtils;
 
     public void init(final WizardDialog previousDialog, final Cluster cluster) {
         super.init(previousDialog, cluster);
@@ -282,7 +285,7 @@ public class InitCluster extends DialogCluster {
             boolean drbdFailed = false;
             if (drbdLoaded) {
                 if (drbdLoadedChanged) {
-                    application.invokeLater(new Runnable() {
+                    swingUtils.invokeLater(new Runnable() {
                         @Override
                         public void run() {
                             drbdLoadedInfo.setText(Tools.getString("Dialog.Cluster.Init.DrbdIsLoaded"));
@@ -294,7 +297,7 @@ public class InitCluster extends DialogCluster {
                 drbdFailed = true;
                 if (drbdLoadedChanged) {
                     final MyButton drbdLoadButton = drbdLoadButtons.get(i);
-                    application.invokeLater(new Runnable() {
+                    swingUtils.invokeLater(new Runnable() {
                         @Override
                         public void run() {
                             drbdLoadedInfo.setText(Tools.getString("Dialog.Cluster.Init.DrbdIsNotLoaded"));
@@ -388,7 +391,7 @@ public class InitCluster extends DialogCluster {
             boolean csAisFailed = false;
             if (csAisRunning) {
                 if (csAisChanged || hbChanged) {
-                    application.invokeLater(new Runnable() {
+                    swingUtils.invokeLater(new Runnable() {
                         @Override
                         public void run() {
                             pmStartedInfo.setText(
@@ -411,7 +414,7 @@ public class InitCluster extends DialogCluster {
             } else {
                 csAisFailed = true;
                 if (csAisChanged || hbChanged) {
-                    application.invokeLater(new Runnable() {
+                    swingUtils.invokeLater(new Runnable() {
                         @Override
                         public void run() {
                             if (heartbeatIsRunning || heartbeatIsRc) {
@@ -449,7 +452,7 @@ public class InitCluster extends DialogCluster {
             boolean hbFailed = false;
             if (heartbeatIsRunning) {
                 if (hbChanged || csAisChanged) {
-                    application.invokeLater(new Runnable() {
+                    swingUtils.invokeLater(new Runnable() {
                         @Override
                         public void run() {
                             hbStartedInfo.setText(Tools.getString("Dialog.Cluster.Init.HbIsRunning"));
@@ -470,7 +473,7 @@ public class InitCluster extends DialogCluster {
             } else {
                 hbFailed = true;
                 if (hbChanged || csAisChanged) {
-                    application.invokeLater(new Runnable() {
+                    swingUtils.invokeLater(new Runnable() {
                         @Override
                         public void run() {
                             if (csAisRunning || csAisIsRc) {
@@ -504,7 +507,7 @@ public class InitCluster extends DialogCluster {
             i++;
         }
         final boolean nob = needOpenaisButton;
-        application.invokeLater(new Runnable() {
+        swingUtils.invokeLater(new Runnable() {
             @Override
             public void run() {
                 useOpenaisButton.setEnabled(nob);
@@ -512,7 +515,7 @@ public class InitCluster extends DialogCluster {
         });
 
         if (oneChanged || !periodic) {
-            application.invokeLater(new Runnable() {
+            swingUtils.invokeLater(new Runnable() {
                 @Override
                 public void run() {
                     mainPanel.invalidate();
@@ -524,7 +527,7 @@ public class InitCluster extends DialogCluster {
         final List<String> incorrect = new ArrayList<String>();
         if (oneFailed) {
             incorrect.add("one component failed");
-                application.invokeLater(new Runnable() {
+                swingUtils.invokeLater(new Runnable() {
                     @Override
                     public void run() {
                         buttonClass(otherFinishButton).setEnabled(false);
@@ -598,7 +601,7 @@ public class InitCluster extends DialogCluster {
                             new Runnable() {
                                 @Override
                                 public void run() {
-                                    application.invokeLater(new Runnable() {
+                                    swingUtils.invokeLater(new Runnable() {
                                         @Override
                                         public void run() {
                                             drbdLoadButtons.get(index).setVisible(false);
@@ -638,7 +641,7 @@ public class InitCluster extends DialogCluster {
                                 @Override
                                 public void run() {
                                     disableComponents();
-                                    application.invokeLater(new Runnable() {
+                                    swingUtils.invokeLater(new Runnable() {
                                         @Override
                                         public void run() {
                                             startHeartbeatButtons.get(index).setVisible(false);
@@ -685,7 +688,7 @@ public class InitCluster extends DialogCluster {
                         @Override
                         public void run() {
                             disableComponents();
-                            application.invokeLater(new Runnable() {
+                            swingUtils.invokeLater(new Runnable() {
                                 @Override
                                 public void run() {
                                     startPacemakerButtons.get(index).setVisible(false);

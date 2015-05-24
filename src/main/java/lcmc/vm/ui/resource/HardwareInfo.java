@@ -52,6 +52,7 @@ import lcmc.cluster.ui.widget.WidgetFactory;
 import lcmc.common.domain.AccessMode;
 import lcmc.common.domain.Application;
 import lcmc.common.ui.treemenu.TreeMenuController;
+import lcmc.common.ui.utils.SwingUtils;
 import lcmc.host.domain.Host;
 import lcmc.vm.domain.LinuxFile;
 import lcmc.common.domain.StringValue;
@@ -105,6 +106,8 @@ public abstract class HardwareInfo extends EditableInfo {
     @Inject
     private Application application;
     @Inject
+    private SwingUtils swingUtils;
+    @Inject
     private MenuFactory menuFactory;
     @Inject
     private WidgetFactory widgetFactory;
@@ -126,7 +129,7 @@ public abstract class HardwareInfo extends EditableInfo {
 
     @Override
     public final JComponent getInfoPanel() {
-        application.isSwingThread();
+        swingUtils.isSwingThread();
         if (infoPanel != null) {
             return infoPanel;
         }
@@ -219,7 +222,7 @@ public abstract class HardwareInfo extends EditableInfo {
         newPanel.add(getMoreOptionsPanel(application.getServiceLabelWidth()
                                          + application.getServiceFieldWidth() * 2 + 4));
         newPanel.add(new JScrollPane(mainPanel));
-        application.invokeLater(new Runnable() {
+        swingUtils.invokeLater(new Runnable() {
             @Override
             public void run() {
                 getApplyButton().setVisible(!getVMSVirtualDomainInfo().getResource().isNew());
@@ -425,7 +428,7 @@ public abstract class HardwareInfo extends EditableInfo {
     }
 
     protected Map<String, String> getHWParameters(final boolean allParams) {
-        application.invokeAndWait(new Runnable() {
+        swingUtils.invokeAndWait(new Runnable() {
             @Override
             public void run() {
                 getInfoPanel();

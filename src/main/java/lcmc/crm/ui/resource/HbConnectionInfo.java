@@ -47,6 +47,7 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import lcmc.common.domain.AccessMode;
 import lcmc.common.domain.Application;
 import lcmc.common.ui.treemenu.TreeMenuController;
+import lcmc.common.ui.utils.SwingUtils;
 import lcmc.crm.domain.ClusterStatus;
 import lcmc.host.domain.Host;
 import lcmc.crm.domain.PtestData;
@@ -87,6 +88,8 @@ public class HbConnectionInfo extends EditableInfo {
     private Provider<HbOrderInfo> orderInfoProvider;
     @Inject
     private Application application;
+    @Inject
+    private SwingUtils swingUtils;
     @Inject
     private HbConnectionMenu hbConnectionMenu;
     @Inject
@@ -203,7 +206,7 @@ public class HbConnectionInfo extends EditableInfo {
 
     void apply(final Host dcHost, final Application.RunMode runMode) {
         if (Application.isLive(runMode)) {
-            application.invokeAndWait(new Runnable() {
+            swingUtils.invokeAndWait(new Runnable() {
                 @Override
                 public void run() {
                     getApplyButton().setEnabled(false);
@@ -280,7 +283,7 @@ public class HbConnectionInfo extends EditableInfo {
      */
     @Override
     public final JComponent getInfoPanel() {
-        application.isSwingThread();
+        swingUtils.isSwingThread();
         if (infoPanel != null) {
             return infoPanel;
         }
@@ -420,7 +423,7 @@ public class HbConnectionInfo extends EditableInfo {
         /* apply button */
         addApplyButton(buttonPanel);
         addRevertButton(buttonPanel);
-        application.invokeLater(new Runnable() {
+        swingUtils.invokeLater(new Runnable() {
             @Override
             public void run() {
                 setApplyButtons(null, null);

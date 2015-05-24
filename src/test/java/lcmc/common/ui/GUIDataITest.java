@@ -2,6 +2,7 @@ package lcmc.common.ui;
 
 import lcmc.LCMC;
 import lcmc.common.domain.Application;
+import lcmc.common.ui.utils.SwingUtils;
 import lcmc.host.domain.Host;
 import lcmc.testutils.IntegrationTestLauncher;
 import lcmc.testutils.annotation.type.IntegrationTest;
@@ -15,14 +16,14 @@ import org.junit.experimental.categories.Category;
 public final class GUIDataITest {
     private IntegrationTestLauncher integrationTestLauncher;
     private GUIData guiData;
-    private Application application;
+    private SwingUtils swingUtils;
 
     @Before
     public void setUp() {
         integrationTestLauncher = LCMC.getInstance(IntegrationTestLauncher.class);
         integrationTestLauncher.initTestCluster();
         guiData = LCMC.getInstance(GUIData.class);
-        application = LCMC.getInstance(Application.class);
+        swingUtils = LCMC.getInstance(SwingUtils.class);
     }
 
     /** Tests, that the terminal area doesn't expand too much. */
@@ -36,7 +37,7 @@ public final class GUIDataITest {
                 guiData.setTerminalPanel(host.getTerminalPanel());
                 guiData.expandTerminalSplitPane(GUIData.TerminalSize.EXPAND);
             }
-            application.waitForSwing();
+            swingUtils.waitForSwing();
             if (i > 0 && guiData.getTerminalPanelPos() < 100) {
                 errors++;
             }

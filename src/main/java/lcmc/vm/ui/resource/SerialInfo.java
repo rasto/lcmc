@@ -24,7 +24,6 @@ package lcmc.vm.ui.resource;
 import java.util.HashMap;
 import java.util.Map;
 
-import lcmc.cluster.ui.widget.WidgetFactory;
 import lcmc.common.domain.Application;
 import lcmc.common.ui.treemenu.TreeMenuController;
 import lcmc.host.domain.Host;
@@ -45,8 +44,6 @@ import javax.inject.Named;
  */
 @Named
 final class SerialInfo extends ParallelSerialInfo {
-    @Inject
-    private static WidgetFactory widgetFactory;
     @Inject
     private TreeMenuController treeMenuController;
 

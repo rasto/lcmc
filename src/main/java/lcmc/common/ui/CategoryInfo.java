@@ -21,7 +21,6 @@
  */
 package lcmc.common.ui;
 
-import javax.inject.Inject;
 import javax.inject.Named;
 import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
@@ -30,7 +29,6 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import lcmc.common.domain.Application;
 import lcmc.common.domain.util.Tools;
-import lcmc.common.ui.treemenu.TreeMenuController;
 
 /**
  * This class holds info data for a category.
@@ -40,8 +38,6 @@ public class CategoryInfo extends Info {
     public static final String MAIN_TABLE = "main";
     private JComponent infoPanel = null;
     public static final ImageIcon CATEGORY_ICON = Tools.createImageIcon(Tools.getDefault("Browser.CategoryIcon"));
-    @Inject
-    private TreeMenuController treeMenuController;
 
     @Override
     public String getInfo() {

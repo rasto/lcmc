@@ -29,8 +29,8 @@ import javax.swing.ImageIcon;
 import javax.swing.JComponent;
 import javax.swing.JOptionPane;
 
-import lcmc.common.domain.Application;
 import lcmc.common.domain.util.Tools;
+import lcmc.common.ui.utils.SwingUtils;
 
 /**
  * Creates confirm dialog with yes and no options.
@@ -46,7 +46,7 @@ public final class ConfirmDialog extends ConfigDialog {
     private String yesButton;
     private String noButton;
     @Inject
-    private Application application;
+    private SwingUtils swingUtils;
 
     public void init(final String title, final String description, final String yesButton, final String noButton) {
         this.title       = title;
@@ -142,7 +142,7 @@ public final class ConfirmDialog extends ConfigDialog {
         super.initDialogBeforeVisible();
         enableComponentsLater(new JComponent[]{buttonClass(noButton())});
         enableComponents();
-        application.invokeLater(new Runnable() {
+        swingUtils.invokeLater(new Runnable() {
             @Override
             public void run() {
                 buttonClass(noButton()).setEnabled(true);
@@ -154,7 +154,7 @@ public final class ConfirmDialog extends ConfigDialog {
     @Override
     protected void initDialogAfterVisible() {
         super.initDialogAfterVisible();
-        application.invokeLater(new Runnable() {
+        swingUtils.invokeLater(new Runnable() {
             @Override
             public void run() {
                 buttonClass(noButton()).requestFocus();

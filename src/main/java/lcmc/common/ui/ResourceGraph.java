@@ -72,7 +72,6 @@ import java.awt.geom.Path2D;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
-import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.ConcurrentModificationException;
@@ -84,7 +83,6 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
-import javax.imageio.ImageIO;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.swing.ImageIcon;
@@ -96,6 +94,7 @@ import javax.swing.JScrollBar;
 import lcmc.common.domain.Application;
 import lcmc.common.domain.ColorText;
 import lcmc.cluster.ui.ClusterBrowser;
+import lcmc.common.ui.utils.SwingUtils;
 import lcmc.host.domain.Host;
 import lcmc.logger.Logger;
 import lcmc.logger.LoggerFactory;
@@ -168,6 +167,8 @@ public abstract class ResourceGraph {
     private final Lock mTestEdgeLock = new ReentrantLock();
     @Inject
     private Application application;
+    @Inject
+    private SwingUtils swingUtils;
     private final Map<String, TextLayout> textLayoutCache = new HashMap<String, TextLayout>();
     private double scaledSoFar = 1.0;
 
@@ -234,7 +235,7 @@ public abstract class ResourceGraph {
         mRunModeFlag.lock();
         runModeFlag = Application.RunMode.LIVE;
         mRunModeFlag.unlock();
-        application.invokeLater(new Runnable() {
+        swingUtils.invokeLater(new Runnable() {
             @Override
             public void run() {
                 Tools.setMenuOpaque(component, false);
@@ -646,7 +647,7 @@ public abstract class ResourceGraph {
     protected final void showPopup(final JPopupMenu popup, final Point2D p) {
         final int posX = (int) p.getX();
         final int posY = (int) p.getY();
-        application.invokeAndWait(new Runnable() {
+        swingUtils.invokeAndWait(new Runnable() {
             @Override
             public void run() {
                 if (visualizationViewer.isShowing() && visualizationViewer.isDisplayable()) {
@@ -936,7 +937,7 @@ public abstract class ResourceGraph {
 
     protected final void removeTestEdge() {
         if (testEdge != null) {
-            application.invokeLater(new Runnable() {
+            swingUtils.invokeLater(new Runnable() {
                 @Override
                 public void run() {
                     mTestEdgeLock.lock();
@@ -957,7 +958,7 @@ public abstract class ResourceGraph {
         if (vP == null || v == null) {
             throw new IllegalArgumentException("addTestEdge: vP: " + vP + ", v: " + v);
         }
-        application.invokeLater(new Runnable() {
+        swingUtils.invokeLater(new Runnable() {
             @Override
             public void run() {
                 if (!mTestEdgeLock.tryLock()) {
@@ -1042,7 +1043,7 @@ public abstract class ResourceGraph {
             public void scale(final VisualizationServer vv, final float amount, final Point2D from) {
                 final JScrollBar sbV = getScrollPane().getVerticalScrollBar();
                 final JScrollBar sbH = getScrollPane().getHorizontalScrollBar();
-                application.invokeLater(new Runnable() {
+                swingUtils.invokeLater(new Runnable() {
                     @Override
                     public void run() {
                         final Point2D prevPoint = getVisualizationViewer().getRenderContext()
@@ -1620,7 +1621,7 @@ public abstract class ResourceGraph {
                         y -= (oldShapeHeight - getVertexHeight((Vertex) v)) / 2;
                     }
                     pos.setLocation(x, y);
-                    application.invokeLater(new Runnable() {
+                    swingUtils.invokeLater(new Runnable() {
                                           @Override
                                           public void run() {
                                               scale();

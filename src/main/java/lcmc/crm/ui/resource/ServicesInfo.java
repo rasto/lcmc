@@ -48,6 +48,7 @@ import lcmc.common.ui.GUIData;
 import lcmc.common.domain.Application;
 import lcmc.common.ui.treemenu.TreeMenuController;
 import lcmc.common.ui.utils.Dialogs;
+import lcmc.common.ui.utils.SwingUtils;
 import lcmc.crm.domain.CrmXml;
 import lcmc.crm.domain.ClusterStatus;
 import lcmc.host.domain.Host;
@@ -92,6 +93,8 @@ public class ServicesInfo extends EditableInfo {
     private Provider<PcmkRscSetsInfo> pcmkRscSetsInfoProvider;
     @Inject
     private Application application;
+    @Inject
+    private SwingUtils swingUtils;
     @Inject
     private TreeMenuController treeMenuController;
     @Inject
@@ -225,7 +228,7 @@ public class ServicesInfo extends EditableInfo {
         LOG.debug1("apply: start: test: " + runMode);
         final String[] params = getParametersFromXML();
         if (Application.isLive(runMode)) {
-            application.invokeAndWait(new Runnable() {
+            swingUtils.invokeAndWait(new Runnable() {
                 @Override
                 public void run() {
                     getApplyButton().setEnabled(false);
@@ -299,7 +302,7 @@ public class ServicesInfo extends EditableInfo {
             }
         }
         if (infoPanel == null) {
-            application.invokeLater(new Runnable() {
+            swingUtils.invokeLater(new Runnable() {
                 @Override
                 public void run() {
                     getInfoPanel();
@@ -717,7 +720,7 @@ public class ServicesInfo extends EditableInfo {
         }
         hg.setServiceIsPresentList(serviceIsPresent);
         /** Set placeholders to "new", if they have no connections. */
-        application.invokeInEdt(new Runnable() {
+        swingUtils.invokeInEdt(new Runnable() {
             @Override
             public void run() {
                 hg.killRemovedEdges();
@@ -911,7 +914,7 @@ public class ServicesInfo extends EditableInfo {
         /* apply button */
         addApplyButton(buttonPanel);
         addRevertButton(buttonPanel);
-        application.invokeLater(new Runnable() {
+        swingUtils.invokeLater(new Runnable() {
             @Override
             public void run() {
                 setApplyButtons(null, params);
@@ -969,7 +972,7 @@ public class ServicesInfo extends EditableInfo {
                          final boolean reloadNode,
                          final boolean interactive,
                          final Application.RunMode runMode) {
-        application.invokeAndWait(new Runnable() {
+        swingUtils.invokeAndWait(new Runnable() {
             @Override
             public void run() {
                 newServiceInfo.getService().setResourceClass(newServiceInfo.getResourceAgent().getResourceClass());
@@ -1058,7 +1061,7 @@ public class ServicesInfo extends EditableInfo {
             return;
         }
         final Value oldValue = oldWi.getValue();
-        application.invokeLater(new Runnable() {
+        swingUtils.invokeLater(new Runnable() {
             @Override
             public void run() {
                 if (oldValue == null || oldValue.isNothingSelected()) {
@@ -1124,7 +1127,7 @@ public class ServicesInfo extends EditableInfo {
                                     null, /* clone id */
                                     null,
                                     Application.RunMode.LIVE);
-                application.invokeLater(new Runnable() {
+                swingUtils.invokeLater(new Runnable() {
                     @Override
                     public void run() {
                         if (!(newSi instanceof CloneInfo)) {
@@ -1158,7 +1161,7 @@ public class ServicesInfo extends EditableInfo {
                                 continue;
                             }
                         }
-                        application.invokeLater(new Runnable() {
+                        swingUtils.invokeLater(new Runnable() {
                             @Override
                             public void run() {
                                 copyPasteField(oldCi.getWidget(param, null), newCi.getWidget(param, null));
@@ -1170,7 +1173,7 @@ public class ServicesInfo extends EditableInfo {
                     final GroupInfo oldGi = (GroupInfo) oldI;
                     final GroupInfo newGi = (GroupInfo) newSi;
 
-                    application.invokeInEdt(new Runnable() {
+                    swingUtils.invokeInEdt(new Runnable() {
                         @Override
                         public void run() {
                             for (final ServiceInfo oldChild : oldGi.getSubServices()) {

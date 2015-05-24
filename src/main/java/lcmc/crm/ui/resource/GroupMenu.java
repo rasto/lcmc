@@ -34,6 +34,7 @@ import javax.swing.JMenuItem;
 import lcmc.common.ui.GUIData;
 import lcmc.common.domain.AccessMode;
 import lcmc.common.domain.Application;
+import lcmc.common.ui.utils.SwingUtils;
 import lcmc.crm.domain.ResourceAgent;
 import lcmc.cluster.ui.ClusterBrowser;
 import lcmc.common.ui.utils.ButtonCallback;
@@ -58,6 +59,8 @@ public class GroupMenu extends ServiceMenu {
     private MenuFactory menuFactory;
     @Inject
     private Application application;
+    @Inject
+    private SwingUtils swingUtils;
 
     @Override
     public List<UpdatableItem> getPulldownMenu(final ServiceInfo serviceInfo) {
@@ -81,7 +84,7 @@ public class GroupMenu extends ServiceMenu {
         addGroupServiceMenuItem.onUpdate(new Runnable() {
             @Override
             public void run() {
-                application.isSwingThread();
+                swingUtils.isSwingThread();
                 addGroupServiceMenuItem.removeAll();
                 final Collection<JDialog> popups = new ArrayList<JDialog>();
                 for (final String cl : ClusterBrowser.CRM_CLASSES) {
@@ -105,7 +108,7 @@ public class GroupMenu extends ServiceMenu {
                                         ci.hidePopup();
                                     }
                                     groupInfo.hidePopup();
-                                    application.invokeLater(new Runnable() {
+                                    swingUtils.invokeLater(new Runnable() {
                                         @Override
                                         public void run() {
                                             for (final JDialog otherP : popups) {
@@ -156,7 +159,7 @@ public class GroupMenu extends ServiceMenu {
                 groupServicesMenu.onUpdate(new Runnable() {
                     @Override
                     public void run() {
-                        application.isSwingThread();
+                        swingUtils.isSwingThread();
                         groupServicesMenu.removeAll();
                         final Collection<UpdatableItem> serviceMenus = new ArrayList<UpdatableItem>();
                         for (final UpdatableItem u : child.createPopup()) {

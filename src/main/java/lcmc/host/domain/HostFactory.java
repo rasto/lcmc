@@ -20,8 +20,6 @@
 
 package lcmc.host.domain;
 
-import lcmc.cluster.service.storage.BlockDeviceService;
-
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Provider;
@@ -32,8 +30,6 @@ import javax.inject.Singleton;
 public class HostFactory {
     @Inject
     private Provider<Host> hostProvider;
-    @Inject
-    private Provider<BlockDeviceService> blockDeviceServiceProvider;
 
     public Host createInstance() {
         final Host host = hostProvider.get();

@@ -32,6 +32,7 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
 import lcmc.common.domain.Application;
+import lcmc.common.ui.utils.SwingUtils;
 import lcmc.vm.domain.VMParams;
 import lcmc.common.ui.WizardDialog;
 import lcmc.vm.ui.resource.DomainInfo;
@@ -65,6 +66,8 @@ public final class Domain extends VMConfig {
     private Filesystem filesystemDialog;
     @Inject
     private Application application;
+    @Inject
+    private SwingUtils swingUtils;
 
     @Override
     public WizardDialog nextDialog() {
@@ -106,13 +109,13 @@ public final class Domain extends VMConfig {
             /* don't enable */
             enableComponents(new JComponent[]{buttonClass(nextButton())});
         }
-        application.invokeLater(new Runnable() {
+        swingUtils.invokeLater(new Runnable() {
             @Override
             public void run() {
                 makeDefaultButton(buttonClass(nextButton()));
             }
         });
-        application.invokeLater(new Runnable() {
+        swingUtils.invokeLater(new Runnable() {
             @Override
             public void run() {
                 domainNameWidget.requestFocus();

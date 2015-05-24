@@ -29,7 +29,6 @@ import java.awt.Insets;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
@@ -54,7 +53,6 @@ import javax.inject.Named;
 import javax.inject.Provider;
 import javax.inject.Singleton;
 import javax.swing.AbstractButton;
-import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.plaf.FontUIResource;
 
@@ -123,7 +121,6 @@ public class Application {
     private boolean embedApplet = Tools.isLinux();
     private boolean cmdLog = false;
     private Test autoTest = null;
-    private boolean checkSwing = false;
     @Inject
     private Hosts allHosts;
     @Inject
@@ -626,14 +623,6 @@ public class Application {
         return cmdLog;
     }
 
-    public boolean isCheckSwing() {
-        return checkSwing;
-    }
-
-    public void setCheckSwing(final boolean checkSwing) {
-        this.checkSwing = checkSwing;
-    }
-
     /**
      * Returns default value for integer option from AppDefaults resource
      * bundle and scales it according the --scale option.
@@ -780,71 +769,6 @@ public class Application {
             }
         }
     }
-
-    /**
-     * Print stack trace if it's not in a swing thread.
-     */
-    public void isSwingThread() {
-        if (!isCheckSwing()) {
-            return;
-        }
-        if (!SwingUtilities.isEventDispatchThread()) {
-            System.out.println("not a swing thread: " + Tools.getStackTrace());
-        }
-    }
-
-    /**
-     * Print stack trace if it's in a swing thread.
-     */
-    public void isNotSwingThread() {
-        if (!isCheckSwing()) {
-            return;
-        }
-        if (SwingUtilities.isEventDispatchThread()) {
-            System.out.println("swing thread: " + Tools.getStackTrace());
-        }
-    }
-
-    /** Wait for next swing threads to finish. It's used for synchronization */
-    public void waitForSwing() {
-        invokeAndWait(new Runnable() {
-            @Override
-            public void run() {
-                /* just wait */
-            }
-        });
-    }
-
-    /**
-     * Convenience invoke and wait function if not already in an event
-     * dispatch thread.
-     */
-    public void invokeAndWait(final Runnable runnable) {
-        if (SwingUtilities.isEventDispatchThread()) {
-            runnable.run();
-        } else {
-            try {
-                SwingUtilities.invokeAndWait(runnable);
-            } catch (final InterruptedException ix) {
-                Thread.currentThread().interrupt();
-            } catch (final InvocationTargetException x) {
-                LOG.appError("invokeAndWait: exception", x);
-            }
-        }
-    }
-
-    public void invokeInEdt(final Runnable runnable) {
-        if (SwingUtilities.isEventDispatchThread()) {
-            runnable.run();
-        } else {
-            SwingUtilities.invokeLater(runnable);
-        }
-    }
-
-    public void invokeLater(final Runnable runnable) {
-        SwingUtilities.invokeLater(runnable);
-    }
-
     public int getServiceLabelWidth() {
         return getDefaultSize("ClusterBrowser.ServiceLabelWidth");
     }

@@ -40,9 +40,9 @@ import javax.swing.ImageIcon;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.SwingConstants;
-import javax.swing.tree.DefaultMutableTreeNode;
 
 import lcmc.common.ui.treemenu.TreeMenuController;
+import lcmc.common.ui.utils.SwingUtils;
 import lcmc.vm.ui.AddVMConfigDialog;
 import lcmc.cluster.ui.widget.WidgetFactory;
 import lcmc.common.domain.AccessMode;
@@ -95,6 +95,8 @@ public final class VMListInfo extends CategoryInfo {
     private MenuFactory menuFactory;
     @Inject
     private Application application;
+    @Inject
+    private SwingUtils swingUtils;
     @Inject
     private WidgetFactory widgetFactory;
     @Inject
@@ -297,7 +299,7 @@ public final class VMListInfo extends CategoryInfo {
         domainInfo.init(null, getBrowser());
         domainInfo.getResource().setNew(true);
         treeMenuController.createMenuItem(getNode(), domainInfo);
-        application.invokeInEdt(new Runnable() {
+        swingUtils.invokeInEdt(new Runnable() {
             @Override
             public void run() {
                 treeMenuController.reloadNode(getNode(), true);

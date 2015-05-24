@@ -28,13 +28,13 @@ import java.util.List;
 
 import lcmc.common.ui.GUIData;
 import lcmc.common.ui.WizardDialog;
+import lcmc.common.ui.utils.SwingUtils;
 import lcmc.drbd.ui.configdialog.Resource;
 import lcmc.drbd.ui.configdialog.Start;
 import lcmc.drbd.ui.resource.BlockDevInfo;
 import lcmc.drbd.ui.resource.GlobalInfo;
 import lcmc.drbd.ui.resource.ResourceInfo;
 import lcmc.drbd.ui.resource.VolumeInfo;
-import lcmc.common.domain.Application;
 import lcmc.logger.Logger;
 import lcmc.logger.LoggerFactory;
 
@@ -58,7 +58,7 @@ public final class AddDrbdConfigDialog {
     @Inject
     private Resource resourceDialog;
     @Inject
-    private Application application;
+    private SwingUtils swingUtils;
 
     public void init(final GlobalInfo globalInfo, final BlockDevInfo blockDevInfo1, final BlockDevInfo blockDevInfo2) {
         this.globalInfo = globalInfo;
@@ -79,7 +79,7 @@ public final class AddDrbdConfigDialog {
             final VolumeInfo dvi = globalInfo.getNewDrbdVolume(resourceInfo, blockDevices);
             resourceInfo.addDrbdVolume(dvi);
             globalInfo.addDrbdResource(resourceInfo);
-            application.invokeAndWait(new Runnable() {
+            swingUtils.invokeAndWait(new Runnable() {
                 @Override
                 public void run() {
                     globalInfo.addDrbdVolume(dvi);

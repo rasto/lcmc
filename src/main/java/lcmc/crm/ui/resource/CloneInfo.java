@@ -61,8 +61,6 @@ public class CloneInfo extends ServiceInfo {
     @Inject
     private CloneMenu cloneMenu;
     @Inject
-    private Application application;
-    @Inject
     private TreeMenuController treeMenuController;
 
     void init(final ResourceAgent ra, final String name, final boolean master, final Browser browser) {

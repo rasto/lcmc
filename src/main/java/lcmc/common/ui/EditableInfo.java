@@ -49,6 +49,7 @@ import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.Table;
 import lcmc.common.domain.AccessMode;
 import lcmc.common.domain.Application;
+import lcmc.common.ui.utils.SwingUtils;
 import lcmc.crm.domain.CrmXml;
 import lcmc.common.domain.Value;
 import lcmc.common.domain.Resource;
@@ -91,6 +92,8 @@ public abstract class EditableInfo extends Info {
     private final Collection<String> disabledSections = new HashSet<String>();
     @Inject
     private Application application;
+    @Inject
+    private SwingUtils swingUtils;
     @Inject
     private WidgetFactory widgetFactory;
 
@@ -254,7 +257,7 @@ public abstract class EditableInfo extends Info {
                            final int leftWidth,
                            final int rightWidth,
                            final Map<String, Widget> sameAsFields) {
-        application.isSwingThread();
+        swingUtils.isSwingThread();
         if (params == null) {
             return;
         }
@@ -428,10 +431,10 @@ public abstract class EditableInfo extends Info {
             public void run() {
                 final Check check;
                 if (realParamWi == null) {
-                    application.waitForSwing();
+                    swingUtils.waitForSwing();
                     check = checkResourceFields(param, params);
                 } else {
-                    application.invokeLater(new Runnable() {
+                    swingUtils.invokeLater(new Runnable() {
                         @Override
                         public void run() {
                             if (paramWi.getValue() == null || paramWi.getValue().isNothingSelected()) {
@@ -442,10 +445,10 @@ public abstract class EditableInfo extends Info {
                             }
                         }
                     });
-                    application.waitForSwing();
+                    swingUtils.waitForSwing();
                     check = checkResourceFields(param, params);
                 }
-                application.invokeLater(new Runnable() {
+                swingUtils.invokeLater(new Runnable() {
                     @Override
                     public void run() {
                         if (getResource().isNew()) {
@@ -686,7 +689,7 @@ public abstract class EditableInfo extends Info {
     /** Enables and disabled apply and revert button. */
     public final void setApplyButtons(final String param, final String[] params) {
         final Check check = checkResourceFields(param, params);
-        application.invokeLater(new Runnable() {
+        swingUtils.invokeLater(new Runnable() {
             @Override
             public void run() {
                 final MyButton ab = getApplyButton();
@@ -817,7 +820,7 @@ public abstract class EditableInfo extends Info {
         final boolean advancedMode = application.isAdvancedMode();
         boolean advanced = false;
         for (final JPanel apl : advancedPanelList) {
-            application.invokeLater(new Runnable() {
+            swingUtils.invokeLater(new Runnable() {
                 @Override
                 public void run() {
                     apl.setVisible(advancedMode);
@@ -828,7 +831,7 @@ public abstract class EditableInfo extends Info {
         for (final String section : advancedOnlySectionList) {
             final JPanel p = sectionPanels.get(section, Boolean.toString(!WIZARD));
             final JPanel pw = sectionPanels.get(section, Boolean.toString(WIZARD));
-            application.invokeLater(new Runnable() {
+            swingUtils.invokeLater(new Runnable() {
                 @Override
                 public void run() {
                     final boolean v = advancedMode && isSectionEnabled(section);
@@ -841,7 +844,7 @@ public abstract class EditableInfo extends Info {
             advanced = true;
         }
         final boolean a = advanced;
-        application.invokeLater(new Runnable() {
+        swingUtils.invokeLater(new Runnable() {
             @Override
             public void run() {
                 moreOptionsPanel.setVisible(a && !advancedMode);

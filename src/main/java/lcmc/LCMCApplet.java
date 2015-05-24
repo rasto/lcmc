@@ -31,6 +31,7 @@ import javax.swing.JFrame;
 
 import lcmc.common.ui.GUIData;
 import lcmc.common.domain.Application;
+import lcmc.common.ui.utils.SwingUtils;
 import lcmc.logger.Logger;
 import lcmc.logger.LoggerFactory;
 import lcmc.common.domain.util.Tools;
@@ -62,8 +63,9 @@ public final class LCMCApplet extends JApplet {
         lcmc.initApp(params);
 
         final Application application = LCMC.getInstance(Application.class);
+        final SwingUtils swingUtils = LCMC.getInstance(SwingUtils.class);
         final LCMCApplet thisObject = this;
-        application.invokeLater(new Runnable() {
+        swingUtils.invokeLater(new Runnable() {
             @Override
             public void run() {
                 if (!application.isEmbedApplet()) {

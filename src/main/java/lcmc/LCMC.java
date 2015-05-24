@@ -51,6 +51,7 @@ import com.google.inject.Guice;
 import com.google.inject.Injector;
 import lcmc.cluster.service.storage.FileSystemService;
 import lcmc.cluster.service.storage.MountPointService;
+import lcmc.common.ui.utils.SwingUtils;
 import lcmc.configs.AppDefaults;
 import lcmc.cluster.ui.ClusterBrowser;
 import lcmc.common.ui.GUIData;
@@ -97,6 +98,8 @@ public final class LCMC extends JPanel {
     private FileSystemService fileSystemService;
     @Inject
     private NetworkService networkService;
+    @Inject
+    private SwingUtils swingUtils;
 
     protected void createAndShowGUI(final Container mainFrame) {
         setupUiManager();
@@ -151,7 +154,7 @@ public final class LCMC extends JPanel {
         }
         mainFrame.setIconImages(il);
         initApp(args);
-        application.invokeLater(new Runnable() {
+        swingUtils.invokeLater(new Runnable() {
             @Override
             public void run() {
                 createMainFrame(mainFrame);

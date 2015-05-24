@@ -46,6 +46,7 @@ import lcmc.common.domain.Application;
 import lcmc.common.domain.StringValue;
 import lcmc.common.domain.Value;
 import lcmc.common.ui.utils.MyButton;
+import lcmc.common.ui.utils.SwingUtils;
 import lcmc.common.ui.utils.WidgetListener;
 
 /**
@@ -65,6 +66,8 @@ public final class RadioGroup extends GenericWidget<JComponent> {
     private final Lock mComponentsWriteLock = mComponentsLock.writeLock();
     @Inject
     private Application application;
+    @Inject
+    private SwingUtils swingUtils;
 
     public void init(final Value selectedValue,
                      final Value[] items,
@@ -128,7 +131,7 @@ public final class RadioGroup extends GenericWidget<JComponent> {
             mComponentsReadLock.unlock();
         }
         if (c != null) {
-            application.invokeLater(new Runnable() {
+            swingUtils.invokeLater(new Runnable() {
                 @Override
                 public void run() {
                     c.setEnabled(isEnablePredicate() && accessible);
@@ -185,7 +188,7 @@ public final class RadioGroup extends GenericWidget<JComponent> {
     protected void setComponentsVisible(final boolean visible) {
         final JComponent comp = getInternalComponent();
         final JLabel label = getLabel();
-        application.invokeLater(new Runnable() {
+        swingUtils.invokeLater(new Runnable() {
             @Override
             public void run() {
                 if (label != null) {
@@ -262,7 +265,7 @@ public final class RadioGroup extends GenericWidget<JComponent> {
     @Override
     public void setBackgroundColor(final Color bg) {
         final JComponent comp = getInternalComponent();
-        application.invokeLater(new Runnable() {
+        swingUtils.invokeLater(new Runnable() {
             @Override
             public void run() {
                 setBackground(bg);

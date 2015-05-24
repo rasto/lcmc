@@ -43,6 +43,7 @@ import lcmc.cluster.ui.widget.WidgetFactory;
 import lcmc.common.domain.AccessMode;
 import lcmc.common.domain.Application;
 import lcmc.cluster.domain.Cluster;
+import lcmc.common.ui.utils.SwingUtils;
 import lcmc.host.domain.Host;
 import lcmc.common.domain.StringValue;
 import lcmc.vm.domain.VmsXml;
@@ -80,7 +81,7 @@ public final class LVResize extends LV {
     private Widget maxSizeWidget;
     private Map<Host, JCheckBox> hostCheckBoxes = null;
     @Inject
-    private Application application;
+    private SwingUtils swingUtils;
     @Inject
     private WidgetFactory widgetFactory;
     private MyButton resizeButton;
@@ -232,7 +233,7 @@ public final class LVResize extends LV {
                     @Override
                     public void run() {
                         if (checkDRBD()) {
-                            application.invokeAndWait(new Runnable() {
+                            swingUtils.invokeAndWait(new Runnable() {
                                 @Override
                                 public void run() {
                                     enableResizeButton(false);

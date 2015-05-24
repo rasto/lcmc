@@ -42,6 +42,7 @@ import javax.swing.JPopupMenu;
 
 import lcmc.common.ui.GUIData;
 import lcmc.common.ui.ResourceGraph;
+import lcmc.common.ui.utils.SwingUtils;
 import lcmc.drbd.ui.resource.BlockDevInfo;
 import lcmc.drbd.ui.resource.HostDrbdInfo;
 import lcmc.drbd.ui.resource.MultiSelectionInfo;
@@ -107,7 +108,7 @@ public class DrbdGraph extends ResourceGraph {
     @Inject
     private GUIData guiData;
     @Inject
-    private Application application;
+    private SwingUtils swingUtils;
 
     @Override
     public void initGraph(final ClusterBrowser clusterBrowser) {
@@ -173,7 +174,7 @@ public class DrbdGraph extends ResourceGraph {
                         removeDrbdVolume(dvi);
                         dvi.getDrbdResourceInfo().removeDrbdVolumeFromHashes(dvi);
                     }
-                    application.invokeLater(new Runnable() {
+                    swingUtils.invokeLater(new Runnable() {
                         @Override
                         public void run() {
                             lockGraph();
@@ -332,7 +333,7 @@ public class DrbdGraph extends ResourceGraph {
                 if (sourceBDI.isWFConnection(runMode)
                     && !destBDI.isWFConnection(runMode)) {
                     edge.setDirection(dest, source);
-                    application.invokeLater(new Runnable() {
+                    swingUtils.invokeLater(new Runnable() {
                         @Override
                         public void run() {
                             repaint();
@@ -342,7 +343,7 @@ public class DrbdGraph extends ResourceGraph {
                 }
             } else if (!sourceBD.isPrimary() && destBD.isPrimary()) {
                 edge.setDirection(dest, source);
-                application.invokeLater(new Runnable() {
+                swingUtils.invokeLater(new Runnable() {
                     @Override
                     public void run() {
                         repaint();
