@@ -42,8 +42,8 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.text.Document;
 
+import lcmc.common.ui.utils.SwingUtils;
 import lcmc.configs.DistResource;
-import lcmc.common.domain.Application;
 import lcmc.host.domain.Host;
 import lcmc.common.domain.ExecCallback;
 import lcmc.logger.Logger;
@@ -72,7 +72,7 @@ public final class EditConfig extends ConfigDialog {
     @Inject
     private GUIData guiData;
     @Inject
-    private Application application;
+    private SwingUtils swingUtils;
 
     public void init(final String fileToEdit, final Set<Host> hosts) {
         this.fileToEdit = fileToEdit;
@@ -191,7 +191,7 @@ public final class EditConfig extends ConfigDialog {
             hcb.addItemListener(new ItemListener() {
                 @Override
                 public void itemStateChanged(final ItemEvent e) {
-                    application.invokeLater(new Runnable() {
+                    swingUtils.invokeLater(new Runnable() {
                         @Override
                         public void run() {
                             setConfigArea(results[index], errors[index], e.getStateChange() == ItemEvent.SELECTED);
@@ -210,7 +210,7 @@ public final class EditConfig extends ConfigDialog {
                 }
             });
         }
-        application.invokeLater(new Runnable() {
+        swingUtils.invokeLater(new Runnable() {
             @Override
             public void run() {
                 setConfigArea(results[0], errors[0], true);

@@ -66,8 +66,9 @@ import javax.swing.plaf.basic.BasicSplitPaneDivider;
 import javax.swing.plaf.basic.BasicSplitPaneUI;
 
 import lcmc.common.domain.AccessMode;
-import lcmc.common.domain.Application;
 import lcmc.cluster.domain.Cluster;
+import lcmc.common.domain.Application;
+import lcmc.common.ui.utils.SwingUtils;
 import lcmc.crm.ui.resource.ServicesInfo;
 import lcmc.common.domain.AllHostsUpdatable;
 import lcmc.common.ui.utils.ButtonCallback;
@@ -125,6 +126,8 @@ public class GUIData  {
 
     private static volatile int prevScrollingMenuIndex = -1;
     @Inject
+    private SwingUtils swingUtils;
+    @Inject
     private Application application;
 
     private Container mainFrame;
@@ -154,7 +157,7 @@ public class GUIData  {
         if (terminalPanel == null) {
             return;
         }
-        application.invokeInEdt(new Runnable() {
+        swingUtils.invokeInEdt(new Runnable() {
             @Override
             public void run() {
                 final java.awt.Component oldTerminalPanel = terminalSplitPane.getBottomComponent();
@@ -184,7 +187,7 @@ public class GUIData  {
         if (terminalSplitPane == null) {
             return;
         }
-        application.invokeLater(new Runnable() {
+        swingUtils.invokeLater(new Runnable() {
             @Override
             public void run() {
                 final int height = terminalSplitPane.getHeight() - terminalSplitPane.getDividerLocation() - 11;
@@ -207,7 +210,7 @@ public class GUIData  {
     }
 
     public void initTerminalSplitPane() {
-        application.invokeLater(new Runnable() {
+        swingUtils.invokeLater(new Runnable() {
             @Override
             public void run() {
                 final BasicSplitPaneUI ui = (BasicSplitPaneUI) terminalSplitPane.getUI();
@@ -227,7 +230,7 @@ public class GUIData  {
     }
 
     public void renameSelectedClusterTab(final String newName) {
-        application.invokeLater(new Runnable() {
+        swingUtils.invokeLater(new Runnable() {
             @Override
             public void run() {
                 clustersPanel.renameSelectedTab(newName);
@@ -239,7 +242,7 @@ public class GUIData  {
      * This is used, if cluster was added, but than it was canceled.
      */
     public void removeSelectedClusterTab() {
-        application.invokeLater(new Runnable() {
+        swingUtils.invokeLater(new Runnable() {
             @Override
             public void run() {
                 clustersPanel.removeTab();
@@ -249,7 +252,7 @@ public class GUIData  {
 
     /** Revalidates and repaints clusters panel. */
     public void refreshClustersPanel() {
-        application.invokeLater(new Runnable() {
+        swingUtils.invokeLater(new Runnable() {
             @Override
             public void run() {
                 clustersPanel.refreshView();
@@ -293,7 +296,7 @@ public class GUIData  {
      * are enough hosts to make cluster.
      */
     public void checkAddClusterButtons() {
-        application.isSwingThread();
+        swingUtils.isSwingThread();
         final boolean enabled = application.danglingHostsCount() >= 1;
         mAddClusterButtonListReadLock.lock();
         try {
@@ -306,7 +309,7 @@ public class GUIData  {
     }
 
     public void enableAddClusterButtons(final boolean enable) {
-        application.invokeLater(new Runnable() {
+        swingUtils.invokeLater(new Runnable() {
             @Override
             public void run() {
                 mAddClusterButtonListReadLock.lock();
@@ -322,7 +325,7 @@ public class GUIData  {
     }
 
     public void enableAddHostButtons(final boolean enable) {
-        application.invokeLater(new Runnable() {
+        swingUtils.invokeLater(new Runnable() {
             @Override
             public void run() {
                 mAddHostButtonListReadLock.lock();
@@ -400,7 +403,7 @@ public class GUIData  {
         for (final AllHostsUpdatable component : allHostsUpdateList) {
             component.allHostsUpdate();
         }
-        application.invokeLater(new Runnable() {
+        swingUtils.invokeLater(new Runnable() {
             @Override
             public void run() {
                 checkAddClusterButtons();
@@ -590,7 +593,7 @@ public class GUIData  {
                     }
                 }
                 final int index = list.locationToIndex(e.getPoint());
-                application.invokeLater(new Runnable() {
+                swingUtils.invokeLater(new Runnable() {
                     @Override
                     public void run() {
                         list.setSelectedIndex(index);
@@ -625,7 +628,7 @@ public class GUIData  {
                             return;
                         }
                         prevScrollingMenuIndex = index;
-                        application.invokeLater(new Runnable() {
+                        swingUtils.invokeLater(new Runnable() {
                             @Override
                             public void run() {
                                 list.setSelectedIndex(index);
@@ -660,14 +663,14 @@ public class GUIData  {
             public void keyPressed(final KeyEvent e) {
                 final int ch = e.getKeyCode();
                 if (ch == KeyEvent.VK_UP && list.getSelectedIndex() == 0) {
-                    application.invokeLater(new Runnable() {
+                    swingUtils.invokeLater(new Runnable() {
                         @Override
                         public void run() {
                             typeToSearchField.requestFocus();
                         }
                     });
                 } else if (ch == KeyEvent.VK_ESCAPE) {
-                    application.invokeLater(new Runnable() {
+                    swingUtils.invokeLater(new Runnable() {
                         @Override
                         public void run() {
                             for (final JDialog otherP : popups) {
@@ -708,7 +711,7 @@ public class GUIData  {
                     @Override
                     public void run() {
                         if (ch == KeyEvent.VK_DOWN) {
-                            application.invokeLater(new Runnable() {
+                            swingUtils.invokeLater(new Runnable() {
                                 @Override
                                 public void run() {
                                     list.requestFocus();
@@ -717,7 +720,7 @@ public class GUIData  {
                                 }
                             });
                         } else if (ch == KeyEvent.VK_ESCAPE) {
-                            application.invokeLater(new Runnable() {
+                            swingUtils.invokeLater(new Runnable() {
                                 @Override
                                 public void run() {
                                     for (final JDialog otherP : popups) {
@@ -793,7 +796,7 @@ public class GUIData  {
         infoPane.setMinimumSize(DIALOG_PANEL_SIZE);
         infoPane.setMaximumSize(DIALOG_PANEL_SIZE);
         infoPane.setPreferredSize(DIALOG_PANEL_SIZE);
-        application.invokeLater(new Runnable() {
+        swingUtils.invokeLater(new Runnable() {
             @Override
             public void run() {
                 JOptionPane.showMessageDialog(mainFrame,

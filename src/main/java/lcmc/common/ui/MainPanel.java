@@ -29,7 +29,6 @@ import javax.swing.JPanel;
 import javax.swing.JSplitPane;
 
 import lcmc.cluster.ui.ClustersPanel;
-import lcmc.common.domain.Application;
 import lcmc.host.domain.Host;
 import lcmc.host.domain.HostFactory;
 
@@ -46,8 +45,6 @@ public final class MainPanel extends JPanel {
     private HostFactory hostFactory;
     @Inject
     private GUIData guiData;
-    @Inject
-    private Application application;
 
     public void init() {
         setLayout(new BorderLayout());

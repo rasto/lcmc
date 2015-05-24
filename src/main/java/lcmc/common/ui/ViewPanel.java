@@ -40,9 +40,9 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreePath;
 
 import lcmc.cluster.ui.network.InfoPresenter;
-import lcmc.common.domain.Application;
 import lcmc.common.domain.util.Tools;
 import lcmc.common.ui.treemenu.TreeMenuController;
+import lcmc.common.ui.utils.SwingUtils;
 
 /**
  * An implementation of a host view with tree of resources. This view is used
@@ -64,7 +64,7 @@ public class ViewPanel extends JPanel {
     /** Last selected info object in the right pane. */
     private Info lastSelectedInfo = null;
     @Inject
-    private Application application;
+    private SwingUtils swingUtils;
     @Inject
     private TreeMenuController treeMenuController;
 
@@ -127,7 +127,7 @@ public class ViewPanel extends JPanel {
                         final InfoPresenter infoPresenter =
                                 (InfoPresenter) ((DefaultMutableTreeNode) tp.getLastPathComponent()).getUserObject();
                         if (infoPresenter instanceof EditableInfo) {
-                           application.invokeInEdt(new Runnable() {
+                           swingUtils.invokeInEdt(new Runnable() {
                                                         @Override
                                                         public void run() {
                                                             tree.setSelectionPath(tp);
@@ -167,7 +167,7 @@ public class ViewPanel extends JPanel {
             lastSelectedInfo = (Info) nodeInfo;
         }
         if (nodeInfo != null) {
-            application.invokeInEdt(new Runnable() {
+            swingUtils.invokeInEdt(new Runnable() {
                 @Override
                 public void run() {
                     if (!mSetPanelLock.tryLock()) {
@@ -188,7 +188,7 @@ public class ViewPanel extends JPanel {
     /** Sets the right component in the view. */
     public final void setRightComponentInView(final Browser browser, final Info nodeInfo) {
         if (viewSP != null) {
-            application.invokeInEdt(new Runnable() {
+            swingUtils.invokeInEdt(new Runnable() {
                 @Override
                 public void run() {
                     if (!mSetPanelLock.tryLock()) {

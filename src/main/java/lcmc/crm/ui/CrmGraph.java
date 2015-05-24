@@ -56,6 +56,7 @@ import javax.swing.JPopupMenu;
 import lcmc.common.ui.GUIData;
 import lcmc.common.ui.Info;
 import lcmc.common.ui.ResourceGraph;
+import lcmc.common.ui.utils.SwingUtils;
 import lcmc.crm.ui.resource.ConstraintPHInfo;
 import lcmc.crm.ui.resource.GroupInfo;
 import lcmc.crm.ui.resource.HbConnectionInfo;
@@ -153,7 +154,7 @@ public class CrmGraph extends ResourceGraph {
     @Inject
     private Provider<PcmkMultiSelectionInfo> pcmkMultiSelectionInfoProvider;
     @Inject
-    private Application application;
+    private SwingUtils swingUtils;
     @Inject
     private MenuFactory menuFactory;
 
@@ -374,7 +375,7 @@ public class CrmGraph extends ResourceGraph {
                 addOrder(null, parent, serviceInfo);
             }
         }
-        application.invokeLater(new Runnable() {
+        swingUtils.invokeLater(new Runnable() {
             @Override
             public void run() {
                 repaint();
@@ -418,7 +419,7 @@ public class CrmGraph extends ResourceGraph {
         final Vertex vP0 = vP;
         final Vertex v0 = v;
 
-        application.invokeLater(new Runnable() {
+        swingUtils.invokeLater(new Runnable() {
             @Override
             public void run() {
                 mHbConnectionWriteLock.lock();
@@ -536,7 +537,7 @@ public class CrmGraph extends ResourceGraph {
         }
         final Vertex vWithRsc0 = vWithRsc;
         final Vertex vRsc0 = vRsc;
-        application.invokeLater(new Runnable() {
+        swingUtils.invokeLater(new Runnable() {
             @Override
             public void run() {
                 mHbConnectionWriteLock.lock();
@@ -1483,7 +1484,7 @@ public class CrmGraph extends ResourceGraph {
             addExistingTestEdge(edge);
         } else {
             if (hbci.isNew()) {
-                application.invokeLater(new Runnable() {
+                swingUtils.invokeLater(new Runnable() {
                     @Override
                     public void run() {
                         removeEdge(edge, runMode);
@@ -1517,7 +1518,7 @@ public class CrmGraph extends ResourceGraph {
             addExistingTestEdge(edge);
         } else {
             if (hbci.isNew()) {
-                application.invokeLater(new Runnable() {
+                swingUtils.invokeLater(new Runnable() {
                     @Override
                     public void run() {
                         removeEdge(edge, runMode);
@@ -1574,7 +1575,7 @@ public class CrmGraph extends ResourceGraph {
             addExistingTestEdge(edge);
         } else {
             if (hbci.isNew()) {
-                application.invokeLater(new Runnable() {
+                swingUtils.invokeLater(new Runnable() {
                     @Override
                     public void run() {
                         removeEdge(edge, runMode);

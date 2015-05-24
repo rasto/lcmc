@@ -42,6 +42,7 @@ import lcmc.common.ui.SpringUtilities;
 import lcmc.common.ui.WizardDialog;
 import lcmc.cluster.ui.widget.Widget;
 import lcmc.cluster.ui.widget.WidgetFactory;
+import lcmc.common.ui.utils.SwingUtils;
 import lcmc.logger.Logger;
 import lcmc.logger.LoggerFactory;
 import lcmc.common.domain.util.Tools;
@@ -66,6 +67,8 @@ public class Configuration extends DialogHost {
     private SSH sshDialog;
     @Inject
     private Application application;
+    @Inject
+    private SwingUtils swingUtils;
     @Inject
     private WidgetFactory widgetFactory;
 
@@ -249,7 +252,7 @@ public class Configuration extends DialogHost {
                 @Override
                 public void run() {
                     getHost().setHostname(Tools.join(",", hostnames, getHops()));
-                    application.invokeLater(new Runnable() {
+                    swingUtils.invokeLater(new Runnable() {
                         @Override
                         public void run() {
                             for (int i = 0; i < getHops(); i++) {
@@ -363,7 +366,7 @@ public class Configuration extends DialogHost {
             }
             final Value[] items = StringValue.getValues(getHost().getIps(numberOfHops));
             if (items != null) {
-                application.invokeLater(new Runnable() {
+                swingUtils.invokeLater(new Runnable() {
                     @Override
                     public void run() {
                         final String savedIp = getHost().getIp(numberOfHops);

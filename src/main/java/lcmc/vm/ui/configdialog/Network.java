@@ -33,6 +33,7 @@ import javax.swing.JScrollPane;
 
 import lcmc.common.domain.Application;
 import lcmc.common.domain.StringValue;
+import lcmc.common.ui.utils.SwingUtils;
 import lcmc.vm.domain.data.InterfaceData;
 import lcmc.common.ui.WizardDialog;
 import lcmc.vm.ui.resource.InterfaceInfo;
@@ -59,6 +60,8 @@ final class Network extends VMConfig {
     private VMFinish VMFinishDialog;
     @Inject
     private Application application;
+    @Inject
+    private SwingUtils swingUtils;
 
     @Override
     public WizardDialog nextDialog() {
@@ -103,7 +106,7 @@ final class Network extends VMConfig {
     @Override
     protected void initDialogAfterVisible() {
         enableComponents();
-        application.invokeLater(new Runnable() {
+        swingUtils.invokeLater(new Runnable() {
             @Override
             public void run() {
                 final boolean enable = interfaceInfo.checkResourceFields(null, interfaceInfo.getRealParametersFromXML())

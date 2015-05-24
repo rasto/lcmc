@@ -22,7 +22,6 @@ package lcmc.event;
 
 import lcmc.cluster.domain.Cluster;
 
-import java.util.List;
 import java.util.Set;
 
 public class CommonMountPointsEvent {

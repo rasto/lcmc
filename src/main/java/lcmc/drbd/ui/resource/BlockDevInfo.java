@@ -49,6 +49,7 @@ import lcmc.common.domain.AccessMode;
 import lcmc.common.ui.Browser;
 import lcmc.cluster.ui.ClusterBrowser;
 import lcmc.common.ui.treemenu.TreeMenuController;
+import lcmc.common.ui.utils.SwingUtils;
 import lcmc.drbd.ui.DrbdGraph;
 import lcmc.common.ui.GUIData;
 import lcmc.host.ui.HostBrowser;
@@ -107,6 +108,8 @@ public class BlockDevInfo extends EditableInfo {
     private BlockDevMenu blockDevMenu;
     @Inject
     private Application application;
+    @Inject
+    private SwingUtils swingUtils;
     @Inject
     private TreeMenuController treeMenuController;
 
@@ -431,7 +434,7 @@ public class BlockDevInfo extends EditableInfo {
         } else {
             final Widget gwi = super.createWidget(param, prefix, width);
             paramWi = gwi;
-            application.invokeLater(new Runnable() {
+            swingUtils.invokeLater(new Runnable() {
                 @Override
                 public void run() {
                     gwi.setEditable(false);
@@ -459,14 +462,14 @@ public class BlockDevInfo extends EditableInfo {
                             indW.setValue(DRBD_MD_TYPE_FLEXIBLE);
                         }
                     }
-                    application.invokeLater(new Runnable() {
+                    swingUtils.invokeLater(new Runnable() {
                         @Override
                         public void run() {
                             ind.setEnabled(!internal);
                         }
                     });
                     if (indW != null) {
-                        application.invokeLater(new Runnable() {
+                        swingUtils.invokeLater(new Runnable() {
                             @Override
                             public void run() {
                                 indW.setEnabled(!internal);
@@ -770,7 +773,7 @@ public class BlockDevInfo extends EditableInfo {
 
     @Override
     public JComponent getInfoPanel() {
-        application.isSwingThread();
+        swingUtils.isSwingThread();
         return getInfoPanelBD();
     }
 
@@ -787,7 +790,7 @@ public class BlockDevInfo extends EditableInfo {
     public void apply(final Application.RunMode runMode) {
         if (Application.isLive(runMode)) {
             final String[] params = getParametersFromXML();
-            application.invokeAndWait(new Runnable() {
+            swingUtils.invokeAndWait(new Runnable() {
                 @Override
                 public void run() {
                     getApplyButton().setEnabled(false);
@@ -816,7 +819,7 @@ public class BlockDevInfo extends EditableInfo {
 
     /** Returns block device panel. */
     JComponent getInfoPanelBD() {
-        application.isSwingThread();
+        swingUtils.isSwingThread();
         if (infoPanel != null) {
             infoPanelDone();
             return infoPanel;
@@ -907,7 +910,7 @@ public class BlockDevInfo extends EditableInfo {
                     final Thread thread = new Thread(new Runnable() {
                         @Override
                         public void run() {
-                            application.invokeAndWait(new Runnable() {
+                            swingUtils.invokeAndWait(new Runnable() {
                                 @Override
                                 public void run() {
                                     getApplyButton().setEnabled(false);
@@ -1234,7 +1237,7 @@ public class BlockDevInfo extends EditableInfo {
     }
 
     public void setParameters(final String resName) {
-        application.isSwingThread();
+        swingUtils.isSwingThread();
         getBlockDevice().setNew(false);
 
         final ClusterBrowser clusterBrowser = getBrowser().getClusterBrowser();

@@ -49,7 +49,7 @@ import javax.swing.text.Document;
 import lcmc.common.ui.SpringUtilities;
 import lcmc.common.ui.Browser;
 import lcmc.cluster.ui.ClusterBrowser;
-import lcmc.common.ui.treemenu.TreeMenuController;
+import lcmc.common.ui.utils.SwingUtils;
 import lcmc.crm.ui.CrmGraph;
 import lcmc.host.ui.HostBrowser;
 import lcmc.cluster.ui.widget.WidgetFactory;
@@ -107,9 +107,9 @@ public class HostInfo extends Info {
     @Inject
     private Application application;
     @Inject
-    private WidgetFactory widgetFactory;
+    private SwingUtils swingUtils;
     @Inject
-    private TreeMenuController treeMenuController;
+    private WidgetFactory widgetFactory;
 
     public void init(final Host host, final Browser browser) {
         super.init(host.getName(), browser);
@@ -172,7 +172,7 @@ public class HostInfo extends Info {
                 @Override
                 public void done(final String answer) {
                     ta.setText(answer);
-                    application.invokeLater(new Runnable() {
+                    swingUtils.invokeLater(new Runnable() {
                     @Override
                         public void run() {
                             crmConfigureShowButton.setEnabled(true);
@@ -186,7 +186,7 @@ public class HostInfo extends Info {
                 public void doneError(final String answer, final int errorCode) {
                     ta.setText(answer);
                     LOG.sshError(host, "", answer, "", errorCode);
-                    application.invokeLater(new Runnable() {
+                    swingUtils.invokeLater(new Runnable() {
                     @Override
                         public void run() {
                             crmConfigureCommitButton.setEnabled(false);

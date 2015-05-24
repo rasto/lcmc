@@ -23,6 +23,7 @@ package lcmc.cluster.service.ssh;
 import java.io.IOException;
 
 import lcmc.common.domain.Application;
+import lcmc.common.ui.utils.SwingUtils;
 import lcmc.host.domain.Host;
 import lcmc.common.ui.ProgressBar;
 import lcmc.cluster.ui.SSHGui;
@@ -52,6 +53,8 @@ public class ConnectionThread extends Thread {
     private volatile boolean connectionEstablished = false;
     @Inject
     private Application application;
+    @Inject
+    private SwingUtils swingUtils;
     @Inject
     private Provider<PopupHostKeyVerifier> popupHostKeyVerifierProvider;
 
@@ -190,7 +193,7 @@ public class ConnectionThread extends Thread {
         sshConnection = newSshConnection;
         connectionEstablished = true;
         host.setConnected();
-        application.invokeLater(new Runnable() {
+        swingUtils.invokeLater(new Runnable() {
             @Override
             public void run() {
                 host.getTerminalPanel().nextCommand();

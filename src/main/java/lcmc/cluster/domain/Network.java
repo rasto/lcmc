@@ -23,7 +23,6 @@
 
 package lcmc.cluster.domain;
 
-import lcmc.common.domain.Resource;
 import lcmc.common.domain.StringValue;
 import lcmc.common.domain.Value;
 import lcmc.logger.Logger;

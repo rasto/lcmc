@@ -38,18 +38,17 @@ import javax.inject.Named;
 import javax.inject.Provider;
 import javax.swing.ImageIcon;
 import javax.swing.tree.DefaultMutableTreeNode;
-import javax.swing.tree.TreeNode;
 
 import com.google.common.eventbus.Subscribe;
 import lcmc.ClusterEventBus;
 import lcmc.cluster.ui.ClusterBrowser;
 import lcmc.cluster.ui.resource.ClusterViewFactory;
 import lcmc.common.domain.AccessMode;
-import lcmc.common.domain.Application;
 import lcmc.cluster.domain.Cluster;
 import lcmc.common.ui.Browser;
 import lcmc.common.ui.GUIData;
 import lcmc.common.ui.treemenu.TreeMenuController;
+import lcmc.common.ui.utils.SwingUtils;
 import lcmc.drbd.ui.DrbdGraph;
 import lcmc.event.BlockDevicesChangedEvent;
 import lcmc.event.FileSystemsChangedEvent;
@@ -125,7 +124,7 @@ public class HostBrowser extends Browser {
     @Inject
     private Provider<BlockDevInfo> blockDevInfoFactory;
     @Inject
-    private Application application;
+    private SwingUtils swingUtils;
     @Inject
     private MenuFactory menuFactory;
     @Inject
@@ -148,7 +147,7 @@ public class HostBrowser extends Browser {
         hostInfo.init(host, this);
         hostDrbdInfo.init(host, this);
         treeTop = treeMenuController.createMenuTreeTop(hostInfo);
-        application.invokeInEdt(new Runnable() {
+        swingUtils.invokeInEdt(new Runnable() {
             @Override
             public void run() {
                 initHostResources();

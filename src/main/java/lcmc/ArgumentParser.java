@@ -23,6 +23,7 @@ package lcmc;
 import lcmc.common.domain.AccessMode;
 import lcmc.common.domain.Application;
 import lcmc.cluster.domain.Cluster;
+import lcmc.common.ui.utils.SwingUtils;
 import lcmc.host.domain.Host;
 import lcmc.host.domain.HostOptions;
 import lcmc.common.domain.UserConfig;
@@ -113,6 +114,8 @@ public class ArgumentParser {
     private Provider<Cluster> clusterProvider;
     @Inject
     private Application application;
+    @Inject
+    private SwingUtils swingUtils;
 
     public void parseOptionsAndReturnAutoArguments(String[] args) {
         final Options options = new Options();
@@ -222,7 +225,7 @@ public class ArgumentParser {
                 application.setCmdLog(true);
             }
             if (cmd.hasOption(CHECK_SWING_OP)) {
-                application.setCheckSwing(true);
+                swingUtils.setCheckSwing(true);
             }
             final String pwd = System.getProperty("user.home");
             final String scaleOp = cmd.getOptionValue(SCALE_OP, "100");

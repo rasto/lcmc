@@ -53,6 +53,7 @@ import javax.swing.SpringLayout;
 import lcmc.Exceptions.IllegalVersionException;
 import lcmc.common.ui.GUIData;
 import lcmc.common.domain.AccessMode;
+import lcmc.common.ui.utils.SwingUtils;
 import lcmc.crm.domain.AisCastAddress;
 import lcmc.common.domain.Application;
 import lcmc.cluster.domain.Cluster;
@@ -125,6 +126,8 @@ final class CoroConfig extends DialogCluster {
     @Inject
     private Application application;
     @Inject
+    private SwingUtils swingUtils;
+    @Inject
     private WidgetFactory widgetFactory;
     private MyButton makeConfigButton;
     @Inject
@@ -144,7 +147,7 @@ final class CoroConfig extends DialogCluster {
                         new Runnable() {
                             @Override
                             public void run() {
-                                application.invokeLater(new Runnable() {
+                                swingUtils.invokeLater(new Runnable() {
                                     @Override
                                     public void run() {
                                         makeConfigButton.setEnabled(false);
@@ -233,7 +236,7 @@ final class CoroConfig extends DialogCluster {
                 @Override
                 public void run() {
                     final boolean configOk = updateOldAisConfig();
-                    application.invokeLater(new Runnable() {
+                    swingUtils.invokeLater(new Runnable() {
                         @Override
                         public void run() {
                             makeConfigButton.setEnabled(false);
@@ -390,7 +393,7 @@ final class CoroConfig extends DialogCluster {
         boolean noConfigs = true;
         boolean configOk = false;
         if (configs[0].equals(OPENAIS_CONF_READ_ERROR_STRING)) {
-            application.invokeLater(new Runnable() {
+            swingUtils.invokeLater(new Runnable() {
                 @Override
                 public void run() {
                     configStatus.setText(hosts[0] + Tools.getString("Dialog.Cluster.CoroConfig.NoConfigFound"));
@@ -407,7 +410,7 @@ final class CoroConfig extends DialogCluster {
             for (j = 1; j < configs.length; j++) {
                 final Host host = hosts[j];
                 if (configs[j].equals(OPENAIS_CONF_READ_ERROR_STRING)) {
-                    application.invokeLater(new Runnable() {
+                    swingUtils.invokeLater(new Runnable() {
                         @Override
                         public void run() {
                             configStatus.setText(host
@@ -418,7 +421,7 @@ final class CoroConfig extends DialogCluster {
                     });
                     break;
                 } else if (!configs[0].equals(configs[j])) {
-                    application.invokeLater(new Runnable() {
+                    swingUtils.invokeLater(new Runnable() {
                         @Override
                         public void run() {
                             configStatus.setText(Tools.getString("Dialog.Cluster.CoroConfig.ConfigsNotTheSame"));
@@ -437,7 +440,7 @@ final class CoroConfig extends DialogCluster {
                     generated = true;
                 }
                 final boolean editableConfig = generated;
-                application.invokeLater(new Runnable() {
+                swingUtils.invokeLater(new Runnable() {
                     @Override
                     public void run() {
                         configStatus.setText(configFile + Tools.getString("Dialog.Cluster.CoroConfig.ais.conf.ok"));
@@ -462,7 +465,7 @@ final class CoroConfig extends DialogCluster {
         }
         if (!configOk) {
             final boolean noConfigsF = noConfigs;
-            application.invokeLater(new Runnable() {
+            swingUtils.invokeLater(new Runnable() {
                 @Override
                 public void run() {
                     if (noConfigsF) {
@@ -486,7 +489,7 @@ final class CoroConfig extends DialogCluster {
     /** Shows all corosync or openais.conf config files. */
     private void updateConfigPanelExisting() {
         final Host[] hosts = getCluster().getHostsArray();
-        application.invokeLater(new Runnable() {
+        swingUtils.invokeLater(new Runnable() {
             @Override
             public void run() {
                 makeConfigButton.setEnabled(false);
@@ -526,7 +529,7 @@ final class CoroConfig extends DialogCluster {
     private void updateConfigPanelEditable(final boolean configChanged) {
         this.configChangedByUser = configChanged;
         final Host[] hosts = getCluster().getHostsArray();
-        application.invokeLater(new Runnable() {
+        swingUtils.invokeLater(new Runnable() {
             @Override
             public void run() {
                 if (!configChanged) {
@@ -664,7 +667,7 @@ final class CoroConfig extends DialogCluster {
 
         for (final AisCastAddress c : aisCastAddresses) {
             if (c.equals("\t", type.getValueForConfig(), bindnetaddr, address, port)) {
-                application.invokeLater(new Runnable() {
+                swingUtils.invokeLater(new Runnable() {
                     @Override
                     public void run() {
                         addAddressButton.setEnabled(false);
@@ -673,7 +676,7 @@ final class CoroConfig extends DialogCluster {
                 return;
             }
         }
-        application.invokeLater(new Runnable() {
+        swingUtils.invokeLater(new Runnable() {
             @Override
             public void run() {
                 addAddressButton.setEnabled(true);
@@ -977,7 +980,7 @@ final class CoroConfig extends DialogCluster {
                         public void run() {
                             if (CHECKBOX_EDIT_CONFIG_STRING.equals(text)) {
                                 updateConfigPanelEditable(configChangedByUser);
-                                application.invokeLater(new Runnable() {
+                                swingUtils.invokeLater(new Runnable() {
                                     @Override
                                     public void run() {
                                         configCheckbox.setText(CHECKBOX_SEE_EXISTING_STRING);
@@ -987,7 +990,7 @@ final class CoroConfig extends DialogCluster {
                                 });
                             } else if (CHECKBOX_SEE_EXISTING_STRING.equals(text)) {
                                 updateConfigPanelExisting();
-                                application.invokeLater(new Runnable() {
+                                swingUtils.invokeLater(new Runnable() {
                                     @Override
                                     public void run() {
                                         configCheckbox.setText(CHECKBOX_EDIT_CONFIG_STRING);

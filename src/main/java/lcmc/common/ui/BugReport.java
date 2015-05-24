@@ -41,9 +41,9 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextPane;
 
-import lcmc.common.domain.Application;
 import lcmc.cluster.domain.Cluster;
 import lcmc.cluster.domain.Clusters;
+import lcmc.common.ui.utils.SwingUtils;
 import lcmc.crm.domain.ClusterStatus;
 import lcmc.drbd.domain.DrbdXml;
 import lcmc.host.domain.Host;
@@ -77,7 +77,7 @@ public final class BugReport extends ConfigDialog {
     private final Map<Cluster, JCheckBox> clusterCheckBoxMap = new HashMap<Cluster, JCheckBox>();
     private String logBuffer;
     @Inject
-    private Application application;
+    private SwingUtils swingUtils;
     @Inject
     private Clusters allClusters;
 
@@ -95,7 +95,7 @@ public final class BugReport extends ConfigDialog {
     }
 
     private void enableAllComponents(final boolean enable) {
-        application.invokeLater(new Runnable() {
+        swingUtils.invokeLater(new Runnable() {
             @Override
             public void run() {
                 for (final Map.Entry<String, JCheckBox> configEntry : configCheckBoxMap.entrySet()) {
@@ -209,7 +209,7 @@ public final class BugReport extends ConfigDialog {
             }
         }
         appendLogText(text);
-        application.invokeLater(new Runnable() {
+        swingUtils.invokeLater(new Runnable() {
             @Override
             public void run() {
                 bugReportTextArea.setText(text.toString());

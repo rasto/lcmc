@@ -36,6 +36,7 @@ import lcmc.Exceptions;
 import lcmc.cluster.service.storage.FileSystemService;
 import lcmc.common.domain.AccessMode;
 import lcmc.common.domain.Application;
+import lcmc.common.ui.utils.SwingUtils;
 import lcmc.host.domain.Host;
 import lcmc.common.domain.StringValue;
 import lcmc.common.domain.Value;
@@ -74,6 +75,8 @@ final class CreateFS extends DrbdConfig {
     private JLabel skipInitialSyncLabel;
     @Inject
     private Application application;
+    @Inject
+    private SwingUtils swingUtils;
     @Inject
     private WidgetFactory widgetFactory;
     @Inject
@@ -115,7 +118,7 @@ final class CreateFS extends DrbdConfig {
             public void run() {
                 getProgressBar().start(1);
                 answerPaneSetText(Tools.getString("Dialog.DrbdConfig.CreateFS.MakeFS"));
-                application.invokeLater(new Runnable() {
+                swingUtils.invokeLater(new Runnable() {
                     @Override
                     public void run() {
                         buttonClass(finishButton()).setEnabled(false);
@@ -171,7 +174,7 @@ final class CreateFS extends DrbdConfig {
     protected void initDialogAfterVisible() {
         enableComponents();
         if (application.getAutoOptionGlobal("autodrbd") != null) {
-            application.invokeLater(new Runnable() {
+            swingUtils.invokeLater(new Runnable() {
                 @Override
                 public void run() {
                     makeFileSystemButton.pressButton();
@@ -187,7 +190,7 @@ final class CreateFS extends DrbdConfig {
     protected void checkButtons() {
         final boolean noHost = hostChoiceWidget.getValue().equals(NO_HOST_STRING);
         final boolean noFileSystem = filesystemWidget.getValue().equals(NO_FILESYSTEM_STRING);
-        application.invokeLater(new Runnable() {
+        swingUtils.invokeLater(new Runnable() {
             @Override
             public void run() {
                 if (noHost) {
@@ -203,7 +206,7 @@ final class CreateFS extends DrbdConfig {
             }
         });
         if (noFileSystem) {
-            application.invokeLater(new Runnable() {
+            swingUtils.invokeLater(new Runnable() {
                 @Override
                 public void run() {
                     buttonClass(finishButton()).setEnabled(true);
@@ -212,7 +215,7 @@ final class CreateFS extends DrbdConfig {
                 }
             });
         } else if (noHost) {
-            application.invokeLater(new Runnable() {
+            swingUtils.invokeLater(new Runnable() {
                 @Override
                 public void run() {
                     buttonClass(finishButton()).setEnabled(false);
@@ -220,7 +223,7 @@ final class CreateFS extends DrbdConfig {
             });
             makeFileSystemButton.setEnabled(false);
         } else {
-            application.invokeLater(new Runnable() {
+            swingUtils.invokeLater(new Runnable() {
                 @Override
                 public void run() {
                     buttonClass(finishButton()).setEnabled(false);

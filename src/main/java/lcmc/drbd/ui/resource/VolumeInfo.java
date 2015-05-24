@@ -48,9 +48,9 @@ import javax.swing.JScrollPane;
 
 import lcmc.common.domain.AccessMode;
 import lcmc.common.ui.treemenu.TreeMenuController;
+import lcmc.common.ui.utils.SwingUtils;
 import lcmc.drbd.ui.AddDrbdSplitBrainDialog;
 import lcmc.Exceptions;
-import lcmc.common.ui.GUIData;
 import lcmc.crm.ui.resource.CloneInfo;
 import lcmc.crm.ui.resource.DrbddiskInfo;
 import lcmc.crm.ui.resource.FilesystemRaInfo;
@@ -142,13 +142,13 @@ public class VolumeInfo extends EditableInfo implements CommonDeviceInterface {
     private JComponent infoPanel = null;
     private Set<Host> hosts;
     @Inject
-    private GUIData guiData;
-    @Inject
     private AddDrbdSplitBrainDialog addDrbdSplitBrainDialog;
     @Inject
     private Provider<DrbdXml> drbdXmlProvider;
     @Inject
     private Application application;
+    @Inject
+    private SwingUtils swingUtils;
     @Inject
     private VolumeMenu volumeMenu;
     @Inject
@@ -190,7 +190,7 @@ public class VolumeInfo extends EditableInfo implements CommonDeviceInterface {
 
     @Override
     public JComponent getInfoPanel() {
-        application.isSwingThread();
+        swingUtils.isSwingThread();
         getBrowser().getDrbdGraph().pickInfo(this);
         final JComponent driPanel = getDrbdResourceInfo().getInfoPanel();
         getInfoPanelVolume();
@@ -291,7 +291,7 @@ public class VolumeInfo extends EditableInfo implements CommonDeviceInterface {
                 final Thread thread = new Thread(new Runnable() {
                     @Override
                     public void run() {
-                        application.invokeAndWait(new Runnable() {
+                        swingUtils.invokeAndWait(new Runnable() {
                             @Override
                             public void run() {
                                 getApplyButton().setEnabled(false);
@@ -443,7 +443,7 @@ public class VolumeInfo extends EditableInfo implements CommonDeviceInterface {
      * infos without confirmation dialog.
      */
     private void removeMyselfNoConfirm(final Application.RunMode runMode) {
-        application.isNotSwingThread();
+        swingUtils.isNotSwingThread();
         final ClusterBrowser clusterBrowser = getBrowser();
         removeMyselfNoConfirm0(runMode, clusterBrowser);
     }
@@ -514,14 +514,14 @@ public class VolumeInfo extends EditableInfo implements CommonDeviceInterface {
                 }
             }
             clusterBrowser.setDrbdXml(dxml);
-            application.invokeInEdt(new Runnable() {
+            swingUtils.invokeInEdt(new Runnable() {
                 @Override
                 public void run() {
                     clusterBrowser.updateDrbdResources();
                 }
             });
             if (Application.isLive(runMode)) {
-                application.invokeInEdt(new Runnable() {
+                swingUtils.invokeInEdt(new Runnable() {
                     @Override
                     public void run() {
                         clusterBrowser.getDrbdGraph().updatePopupMenus();
@@ -738,7 +738,7 @@ public class VolumeInfo extends EditableInfo implements CommonDeviceInterface {
         di.getWidget("1", null).setValueAndWait(new StringValue(getDrbdResourceInfo().getName()));
         di.apply(dcHost, runMode);
         di.getResource().setNew(false);
-        application.invokeInEdt(new Runnable() {
+        swingUtils.invokeInEdt(new Runnable() {
             @Override
             public void run() {
                 di.setApplyButtons(null, di.getParametersFromXML());
@@ -761,7 +761,7 @@ public class VolumeInfo extends EditableInfo implements CommonDeviceInterface {
                                      drbdId,
                                      null,
                                      runMode);
-        application.waitForSwing();
+        swingUtils.waitForSwing();
         ldi.setGroupInfo(fi.getGroupInfo());
         getBrowser().addToHeartbeatIdList(ldi);
         fi.setLinbitDrbdInfo(ldi);
@@ -779,10 +779,10 @@ public class VolumeInfo extends EditableInfo implements CommonDeviceInterface {
         ldi.waitForInfoPanel();
         ldi.getWidget("drbd_resource", null).setValueAndWait(new StringValue(getDrbdResourceInfo().getName()));
         /* apply gets parents from graph and adds colocations. */
-        application.waitForSwing();
+        swingUtils.waitForSwing();
         ldi.apply(dcHost, runMode);
         ldi.getResource().setNew(false);
-        application.invokeInEdt(new Runnable() {
+        swingUtils.invokeInEdt(new Runnable() {
             @Override
             public void run() {
                 ldi.setApplyButtons(null, ldi.getParametersFromXML());
@@ -1073,7 +1073,7 @@ public class VolumeInfo extends EditableInfo implements CommonDeviceInterface {
 
     /** Sets stored parameters. */
     public void setParameters() {
-        application.isSwingThread();
+        swingUtils.isSwingThread();
         getBrowser().getDrbdDeviceHash().put(device, this);
         getBrowser().putDrbdDevHash();
         getDrbdVolume().setCommited(true);

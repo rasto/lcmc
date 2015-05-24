@@ -62,6 +62,7 @@ import com.google.common.base.Optional;
 import lcmc.cluster.ui.wizard.AddClusterDialog;
 import lcmc.cluster.ui.ClusterBrowser;
 import lcmc.common.ui.utils.Dialogs;
+import lcmc.common.ui.utils.SwingUtils;
 import lcmc.host.ui.AddHostDialog;
 import lcmc.Exceptions;
 import lcmc.common.domain.AccessMode;
@@ -111,6 +112,8 @@ public final class MainMenu extends JPanel implements ActionListener {
     private GUIData guiData;
     @Inject
     private Application application;
+    @Inject
+    private SwingUtils swingUtils;
     @Inject
     private BugReport bugReport;
     @Inject
@@ -633,7 +636,7 @@ public final class MainMenu extends JPanel implements ActionListener {
 
     /** Modify the operating modes combo box according to the godmode. */
     void resetOperatingModes(final boolean godMode) {
-        application.invokeLater(new Runnable() {
+        swingUtils.invokeLater(new Runnable() {
             @Override
             public void run() {
                 if (godMode) {
@@ -648,7 +651,7 @@ public final class MainMenu extends JPanel implements ActionListener {
 
     /** Sets operating mode. */
     public void setOperatingMode(final String opMode) {
-        application.invokeLater(new Runnable() {
+        swingUtils.invokeLater(new Runnable() {
             @Override
             public void run() {
                 operatingModesCB.setSelectedItem(opMode);
@@ -679,7 +682,7 @@ public final class MainMenu extends JPanel implements ActionListener {
                     }
                 }
                 final String text = upgradeCheck;
-                application.invokeLater(new Runnable() {
+                swingUtils.invokeLater(new Runnable() {
                     @Override
                     public void run() {
                         upgradeTextField.setText(text);

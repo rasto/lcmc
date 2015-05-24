@@ -34,6 +34,7 @@ import lcmc.common.ui.GUIData;
 import lcmc.common.ui.ProgressIndicatorPanel;
 import lcmc.common.domain.Application;
 import lcmc.cluster.domain.Cluster;
+import lcmc.common.ui.utils.SwingUtils;
 import lcmc.host.domain.Host;
 import lcmc.cluster.service.NetworkService;
 import lcmc.logger.LoggerFactory;
@@ -66,6 +67,8 @@ public class IntegrationTestLauncher {
     @Inject
     private Application application;
     @Inject
+    private SwingUtils swingUtils;
+    @Inject
     private Provider<Host> hostProvider;
     @Inject
     private Provider<Cluster> clusterProvider;
@@ -82,7 +85,7 @@ public class IntegrationTestLauncher {
 
     public void initTestCluster() {
         initCluster();
-        application.waitForSwing();
+        swingUtils.waitForSwing();
     }
 
     /** Returns test hosts. */
@@ -102,7 +105,7 @@ public class IntegrationTestLauncher {
 
     private synchronized void initMain() {
         lcmc.launch(new String[]{"--no-upgrade-check"});
-        application.waitForSwing();
+        swingUtils.waitForSwing();
     }
 
     /** Adds test cluster to the GUI. */
@@ -111,7 +114,7 @@ public class IntegrationTestLauncher {
             return;
         }
         initMain();
-        application.waitForSwing();
+        swingUtils.waitForSwing();
 
         LoggerFactory.setDebugLevel(-1);
         final String username = TEST_USERNAME;
@@ -147,7 +150,7 @@ public class IntegrationTestLauncher {
             }
         }
         application.addClusterToClusters(cluster);
-        application.invokeAndWait(new Runnable() {
+        swingUtils.invokeAndWait(new Runnable() {
             @Override
             public void run() {
                 clusterTabFactory.createClusterTab(cluster);

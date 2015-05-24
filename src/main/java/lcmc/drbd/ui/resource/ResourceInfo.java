@@ -52,6 +52,7 @@ import javax.swing.SpringLayout;
 import lcmc.Exceptions;
 import lcmc.cluster.ui.resource.ClusterViewFactory;
 import lcmc.common.ui.treemenu.TreeMenuController;
+import lcmc.common.ui.utils.SwingUtils;
 import lcmc.configs.AppDefaults;
 import lcmc.common.domain.AccessMode;
 import lcmc.common.domain.Application;
@@ -144,6 +145,8 @@ public class ResourceInfo extends AbstractDrbdInfo {
     private GlobalInfo globalInfo;
     @Inject
     private Application application;
+    @Inject
+    private SwingUtils swingUtils;
     @Inject
     private ResourceMenu resourceMenu;
     @Inject
@@ -442,7 +445,7 @@ public class ResourceInfo extends AbstractDrbdInfo {
     /** Returns panel with form to configure a drbd resource. */
     @Override
     public JComponent getInfoPanel() {
-        application.isSwingThread();
+        swingUtils.isSwingThread();
         if (infoPanel != null) {
             infoPanelDone();
             return infoPanel;
@@ -538,7 +541,7 @@ public class ResourceInfo extends AbstractDrbdInfo {
                 final Thread thread = new Thread(new Runnable() {
                     @Override
                     public void run() {
-                        application.invokeAndWait(new Runnable() {
+                        swingUtils.invokeAndWait(new Runnable() {
                             @Override
                             public void run() {
                                 getApplyButton().setEnabled(false);
@@ -804,7 +807,7 @@ public class ResourceInfo extends AbstractDrbdInfo {
     }
 
     public void setParameters() {
-        application.isSwingThread();
+        swingUtils.isSwingThread();
         getDrbdResource().setCommited(true);
         final DrbdXml dxml = getBrowser().getDrbdXml();
         final String resName = getResource().getName();
@@ -1694,7 +1697,7 @@ public class ResourceInfo extends AbstractDrbdInfo {
                         final int s = ProxyNetInfo.PROXY_PREFIX.length();
                         /* select the IP part */
                         wi.setAlwaysEditable(true);
-                        application.invokeLater(new Runnable() {
+                        swingUtils.invokeLater(new Runnable() {
                             @Override
                             public void run() {
                                 wi.select(s, s + NetInfo.IP_PLACEHOLDER.length());

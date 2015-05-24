@@ -46,6 +46,7 @@ import javax.swing.SwingConstants;
 
 import lcmc.common.ui.GUIData;
 import lcmc.common.domain.Application;
+import lcmc.common.ui.utils.SwingUtils;
 import lcmc.host.domain.Host;
 import lcmc.host.domain.Hosts;
 import lcmc.common.ui.WizardDialog;
@@ -72,6 +73,8 @@ final class ClusterHosts extends DialogCluster {
     private GUIData guiData;
     @Inject
     private Application application;
+    @Inject
+    private SwingUtils swingUtils;
     @Inject
     private Hosts allHosts;
 
@@ -136,7 +139,7 @@ final class ClusterHosts extends DialogCluster {
             }
         }
         final boolean enableButton = enable;
-        application.invokeLater(new Runnable() {
+        swingUtils.invokeLater(new Runnable() {
             @Override
             public void run() {
                 buttonClass(nextButton()).setEnabled(enableButton);

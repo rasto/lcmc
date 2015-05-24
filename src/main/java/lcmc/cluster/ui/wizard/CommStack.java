@@ -34,6 +34,7 @@ import javax.swing.SpringLayout;
 
 import lcmc.common.domain.AccessMode;
 import lcmc.common.domain.Application;
+import lcmc.common.ui.utils.SwingUtils;
 import lcmc.host.domain.Host;
 import lcmc.common.domain.StringValue;
 import lcmc.common.domain.Value;
@@ -63,6 +64,8 @@ final class CommStack extends DialogCluster {
     private CoroConfig coroConfigDialog;
     @Inject
     private Application application;
+    @Inject
+    private SwingUtils swingUtils;
     @Inject
     private WidgetFactory widgetFactory;
 
@@ -151,7 +154,7 @@ final class CommStack extends DialogCluster {
         final boolean ais = aisIsPossible;
         final boolean hb = hbIsPossible;
         if (ais || hb) {
-            application.invokeLater(new Runnable() {
+            swingUtils.invokeLater(new Runnable() {
                 @Override
                 public void run() {
                     if (ais) {
@@ -165,7 +168,7 @@ final class CommStack extends DialogCluster {
         }
         enableComponents();
         if (ais || hb) {
-            application.invokeLater(new Runnable() {
+            swingUtils.invokeLater(new Runnable() {
                 @Override
                 public void run() {
                     buttonClass(nextButton()).setEnabled(true);

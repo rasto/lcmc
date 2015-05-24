@@ -51,6 +51,7 @@ import javax.xml.transform.stream.StreamResult;
 import lcmc.cluster.domain.Cluster;
 import lcmc.cluster.domain.Clusters;
 import lcmc.cluster.ui.ClusterTab;
+import lcmc.common.ui.utils.SwingUtils;
 import lcmc.host.domain.Host;
 import lcmc.host.domain.HostFactory;
 import lcmc.host.domain.Hosts;
@@ -93,6 +94,8 @@ public final class UserConfig extends XMLTools {
     private Provider<Cluster> clusterProvider;
     @Inject
     private Application application;
+    @Inject
+    private SwingUtils swingUtils;
     @Inject
     private Hosts allHosts;
     @Inject
@@ -187,7 +190,7 @@ public final class UserConfig extends XMLTools {
                 if (selectedClusters != null && !selectedClusters.contains(cluster)) {
                     continue;
                 }
-                application.invokeLater(new Runnable() {
+                swingUtils.invokeLater(new Runnable() {
                     @Override
                     public void run() {
                         clusterTabFactory.createClusterTab(cluster);
@@ -198,7 +201,7 @@ public final class UserConfig extends XMLTools {
                 }
                 final boolean ok = cluster.connect(null, true, 1);
                 if (!ok) {
-                    application.invokeLater(new Runnable() {
+                    swingUtils.invokeLater(new Runnable() {
                         @Override
                         public void run() {
                             clustersPanel.removeTabWithCluster(cluster);
@@ -212,7 +215,7 @@ public final class UserConfig extends XMLTools {
                         for (final Host host : cluster.getHosts()) {
                             host.waitOnLoading();
                         }
-                        application.invokeLater(new Runnable() {
+                        swingUtils.invokeLater(new Runnable() {
                             @Override
                             public void run() {
                                 final ClusterTab clusterTab = cluster.getClusterTab();

@@ -36,6 +36,7 @@ import javax.swing.SpringLayout;
 import lcmc.common.ui.GUIData;
 import lcmc.common.domain.AccessMode;
 import lcmc.common.domain.Application;
+import lcmc.common.ui.utils.SwingUtils;
 import lcmc.host.domain.Host;
 import lcmc.common.domain.StringValue;
 import lcmc.common.domain.Value;
@@ -67,11 +68,13 @@ final class CreateMD extends DrbdConfig {
     @Inject
     private Application application;
     @Inject
+    private SwingUtils swingUtils;
+    @Inject
     private WidgetFactory widgetFactory;
     private MyButton makeMetaDataButton;
 
     private void createMetadataAndCheckResult(final boolean destroyData) {
-        application.invokeLater(new Runnable() {
+        swingUtils.invokeLater(new Runnable() {
             @Override
             public void run() {
                 makeMetaDataButton.setEnabled(false);
@@ -93,7 +96,7 @@ final class CreateMD extends DrbdConfig {
                         new ExecCallback() {
                             @Override
                             public void done(final String answer) {
-                                application.invokeLater(new Runnable() {
+                                swingUtils.invokeLater(new Runnable() {
                                     @Override
                                     public void run() {
                                         makeMetaDataButton.setEnabled(false);
@@ -155,7 +158,7 @@ final class CreateMD extends DrbdConfig {
         if (error) {
             answerPaneSetTextError(Tools.join("\n", answerStore));
         } else {
-            application.invokeLater(new Runnable() {
+            swingUtils.invokeLater(new Runnable() {
                 @Override
                 public void run() {
                     makeMetaDataButton.setEnabled(false);
@@ -231,7 +234,7 @@ final class CreateMD extends DrbdConfig {
     protected void initDialogAfterVisible() {
         enableComponents();
         if (application.getAutoOptionGlobal("autodrbd") != null) {
-            application.invokeLater(new Runnable() {
+            swingUtils.invokeLater(new Runnable() {
                 @Override
                 public void run() {
                     makeMetaDataButton.pressButton();

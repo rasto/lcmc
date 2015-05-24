@@ -64,6 +64,7 @@ import lcmc.common.domain.AccessMode;
 import lcmc.common.domain.Application;
 import lcmc.common.domain.ColorText;
 import lcmc.common.ui.treemenu.TreeMenuController;
+import lcmc.common.ui.utils.SwingUtils;
 import lcmc.host.domain.Host;
 import lcmc.common.domain.StringValue;
 import lcmc.common.domain.Value;
@@ -206,6 +207,8 @@ public class ServiceInfo extends EditableInfo {
     @Inject
     private Application application;
     @Inject
+    private SwingUtils swingUtils;
+    @Inject
     private WidgetFactory widgetFactory;
     @Inject
     private TreeMenuController treeMenuController;
@@ -325,14 +328,14 @@ public class ServiceInfo extends EditableInfo {
             if (savedMetaAttrInfoRef == null
                 && defaultValues != allMetaAttrsAreDefaultValues) {
                 if (allMetaAttrsAreDefaultValues) {
-                    application.invokeLater(new Runnable() {
+                    swingUtils.invokeLater(new Runnable() {
                         @Override
                         public void run() {
                             sameAsMetaAttrsWi.setValueNoListeners(META_ATTRS_DEFAULT_VALUES);
                         }
                     });
                 } else {
-                    application.invokeLater(new Runnable() {
+                    swingUtils.invokeLater(new Runnable() {
                         @Override
                         public void run() {
                             sameAsMetaAttrsWi.setValueNoListeners(null);
@@ -685,7 +688,7 @@ public class ServiceInfo extends EditableInfo {
                             } finally {
                                 mOperationsComboBoxHashReadLock.unlock();
                             }
-                            application.invokeLater(new Runnable() {
+                            swingUtils.invokeLater(new Runnable() {
                                 @Override
                                 public void run() {
                                     wi.setEnabled(operationIdRef == null);
@@ -1119,14 +1122,14 @@ public class ServiceInfo extends EditableInfo {
                 }
                 if (savedOperationIdRef == null && defaultValues != allAreDefaultValues) {
                     if (allAreDefaultValues) {
-                        application.invokeLater(new Runnable() {
+                        swingUtils.invokeLater(new Runnable() {
                             @Override
                             public void run() {
                                 sameAsOperationsWi.setValueNoListeners(OPERATIONS_DEFAULT_VALUES);
                             }
                         });
                     } else {
-                        application.invokeLater(new Runnable() {
+                        swingUtils.invokeLater(new Runnable() {
                             @Override
                             public void run() {
                                 sameAsOperationsWi.setValueNoListeners(null);
@@ -1323,7 +1326,7 @@ public class ServiceInfo extends EditableInfo {
                 @Override
                 public void mousePressed(final MouseEvent e) {
                     final String currentText = label.getText();
-                    application.invokeLater(new Runnable() {
+                    swingUtils.invokeLater(new Runnable() {
                         @Override
                         public void run() {
                             if (currentText.equals(onText)) {
@@ -1408,7 +1411,7 @@ public class ServiceInfo extends EditableInfo {
      * values.
      */
     private void setMetaAttrsSameAs(final Value info) {
-        application.isSwingThread();
+        swingUtils.isSwingThread();
         if (sameAsMetaAttrsWi == null || info == null || info.isNothingSelected()) {
             return;
         }
@@ -1572,7 +1575,7 @@ public class ServiceInfo extends EditableInfo {
      * values.
      */
     private void setOperationsSameAs(final Value info) {
-        application.isSwingThread();
+        swingUtils.isSwingThread();
         if (sameAsOperationsWi == null) {
             return;
         }
@@ -1741,7 +1744,7 @@ public class ServiceInfo extends EditableInfo {
                     normalRows++;
                 }
                 addField(panel, wiLabel, wi.getComponent(), leftWidth, rightWidth, 0);
-                application.invokeLater(new Runnable() {
+                swingUtils.invokeLater(new Runnable() {
                     @Override
                     public void run() {
                         wiLabel.setToolTipText(labelText);
@@ -1767,7 +1770,7 @@ public class ServiceInfo extends EditableInfo {
                     @Override
                     public void check(final Value value) {
                         final String[] params = getParametersFromXML();
-                        application.invokeLater(new Runnable() {
+                        swingUtils.invokeLater(new Runnable() {
                             @Override
                             public void run() {
                                 final Value info = sameAsOperationsWiValue();
@@ -2105,7 +2108,7 @@ public class ServiceInfo extends EditableInfo {
         final boolean clone = clone0;
         final boolean masterSlave = masterSlave0;
 
-        application.invokeInEdt(new Runnable() {
+        swingUtils.invokeInEdt(new Runnable() {
             @Override
             public void run() {
                 if (clone) {
@@ -2126,7 +2129,7 @@ public class ServiceInfo extends EditableInfo {
                                 @Override
                                 public void check(final Value value) {
                                     setApplyButtons(CACHED_FIELD, params);
-                                    application.invokeLater(
+                                    swingUtils.invokeLater(
                                         new Runnable() {
                                             @Override
                                             public void run() {
@@ -2200,7 +2203,7 @@ public class ServiceInfo extends EditableInfo {
                 @Override
                 public void check(final Value value) {
                     final String[] params = getParametersFromXML();
-                    application.invokeLater(new Runnable() {
+                    swingUtils.invokeLater(new Runnable() {
                         @Override
                         public void run() {
                             final Value v = sameAsMetaAttrsWiValue();
@@ -2454,7 +2457,7 @@ public class ServiceInfo extends EditableInfo {
         /* apply button */
         addApplyButton(buttonPanel);
         addRevertButton(buttonPanel);
-        application.invokeLater(new Runnable() {
+        swingUtils.invokeLater(new Runnable() {
             @Override
             public void run() {
                 /* invoke later on purpose  */
@@ -2886,7 +2889,7 @@ public class ServiceInfo extends EditableInfo {
                         mOperationsComboBoxHashReadLock.unlock();
                     }
                     if (wi != null) {
-                        application.invokeLater(new Runnable() {
+                        swingUtils.invokeLater(new Runnable() {
                             @Override
                             public void run() {
                                 wi.setEnabled(savedOpIdRef == null);
@@ -2906,7 +2909,7 @@ public class ServiceInfo extends EditableInfo {
     public void apply(final Host dcHost, final Application.RunMode runMode) {
         LOG.debug1("apply: start: test: " + runMode);
         if (Application.isLive(runMode)) {
-            application.invokeAndWait(new Runnable() {
+            swingUtils.invokeAndWait(new Runnable() {
                 @Override
                 public void run() {
                     getApplyButton().setEnabled(false);
@@ -2938,7 +2941,7 @@ public class ServiceInfo extends EditableInfo {
             master = clInfo.getService().isMaster();
         }
         if (Application.isLive(runMode)) {
-            application.invokeLater(new Runnable() {
+            swingUtils.invokeLater(new Runnable() {
                 @Override
                 public void run() {
                     getApplyButton().setToolTipText("");
@@ -3215,7 +3218,7 @@ public class ServiceInfo extends EditableInfo {
                 clInfo.storeComboBoxValues(cloneParams);
             }
 
-            application.invokeInEdt(new Runnable() {
+            swingUtils.invokeInEdt(new Runnable() {
                 @Override
                 public void run() {
                     getWidget(PCMK_ID, null).setValueAndWait(getParamSaved(PCMK_ID));
@@ -3590,7 +3593,7 @@ public class ServiceInfo extends EditableInfo {
             serviceInfo.getService().setResourceClass(ra.getResourceClass());
         }
         if (getBrowser().getCrmGraph().addResource(serviceInfo, this, pos, colocation, order, runMode)) {
-            application.waitForSwing();
+            swingUtils.waitForSwing();
             /* edge added */
             if (isConstraintPlaceholder() || serviceInfo.isConstraintPlaceholder()) {
                 final ConstraintPHInfo cphi;
@@ -3654,7 +3657,7 @@ public class ServiceInfo extends EditableInfo {
             }
         } else {
             getBrowser().addNameToServiceInfoHash(serviceInfo);
-            application.invokeInEdt(new Runnable() {
+            swingUtils.invokeInEdt(new Runnable() {
                 @Override
                 public void run() {
                     final DefaultMutableTreeNode newServiceNode = treeMenuController.createMenuItem(
@@ -3677,7 +3680,7 @@ public class ServiceInfo extends EditableInfo {
         }
         getBrowser().getCrmGraph().reloadServiceMenus();
         if (reloadNode) {
-            application.invokeLater(new Runnable() {
+            swingUtils.invokeLater(new Runnable() {
                 @Override
                 public void run() {
                     getBrowser().getCrmGraph().scale();
@@ -3912,7 +3915,7 @@ public class ServiceInfo extends EditableInfo {
     /** Removes the service from some global hashes and lists. */
     public void removeInfo() {
         final CloneInfo ci = cloneInfo;
-        application.invokeInEdt(new Runnable() {
+        swingUtils.invokeInEdt(new Runnable() {
             @Override
             public void run() {
                 treeMenuController.removeNode(getNode());
@@ -4206,7 +4209,7 @@ public class ServiceInfo extends EditableInfo {
     public void reloadComboBoxes() {
         if (sameAsOperationsWi != null) {
             final Value savedOpIdRef = sameAsOperationsWiValue();
-            application.invokeLater(new Runnable() {
+            swingUtils.invokeLater(new Runnable() {
                 @Override
                 public void run() {
                     sameAsOperationsWi.reloadComboBox(savedOpIdRef, getSameServicesOperations());
@@ -4215,7 +4218,7 @@ public class ServiceInfo extends EditableInfo {
         }
         if (sameAsMetaAttrsWi != null) {
             final Value savedMAIdRef = sameAsMetaAttrsWiValue();
-            application.invokeLater(new Runnable() {
+            swingUtils.invokeLater(new Runnable() {
                 @Override
                 public void run() {
                     sameAsMetaAttrsWi.reloadComboBox(savedMAIdRef, getSameServicesMetaAttrs());

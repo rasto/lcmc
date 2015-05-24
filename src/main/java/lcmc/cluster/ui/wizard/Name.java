@@ -42,6 +42,7 @@ import lcmc.cluster.domain.Clusters;
 import lcmc.common.domain.StringValue;
 import lcmc.common.domain.util.Tools;
 import lcmc.cluster.ui.ClusterTabFactory;
+import lcmc.common.ui.utils.SwingUtils;
 
 /**
  * An implementation of a dialog where user can enter the name of the cluster.
@@ -59,6 +60,8 @@ public final class Name extends DialogCluster {
     private GUIData guiData;
     @Inject
     private Application application;
+    @Inject
+    private SwingUtils swingUtils;
     @Inject
     private Clusters allClusters;
     @Inject
@@ -91,7 +94,7 @@ public final class Name extends DialogCluster {
             }
         }
         final boolean isValid = v;
-        application.invokeLater(new Runnable() {
+        swingUtils.invokeLater(new Runnable() {
             @Override
             public void run() {
                 buttonClass(nextButton()).setEnabled(isValid);
@@ -123,7 +126,7 @@ public final class Name extends DialogCluster {
         enableComponents();
         if (!application.existsCluster(getCluster())) {
             application.addClusterToClusters(getCluster());
-            application.invokeLater(new Runnable() {
+            swingUtils.invokeLater(new Runnable() {
                 @Override
                 public void run() {
                     clusterTabFactory.createClusterTab(getCluster());
@@ -134,7 +137,7 @@ public final class Name extends DialogCluster {
 
     @Override
     protected void initDialogAfterVisible() {
-        application.invokeLater(new Runnable() {
+        swingUtils.invokeLater(new Runnable() {
             @Override
             public void run() {
                 nameField.requestFocus();
@@ -143,7 +146,7 @@ public final class Name extends DialogCluster {
         if (!application.getAutoClusters().isEmpty()) {
             final String name = application.getAutoClusters().get(0);
             if (!".".equals(name)) {
-                application.invokeLater(new Runnable() {
+                swingUtils.invokeLater(new Runnable() {
                     @Override
                     public void run() {
                         nameField.setValue(new StringValue(name));
