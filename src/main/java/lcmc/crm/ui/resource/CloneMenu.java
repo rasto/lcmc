@@ -29,6 +29,7 @@ import javax.swing.JMenuItem;
 import lcmc.common.ui.CallbackAction;
 import lcmc.common.domain.AccessMode;
 import lcmc.common.domain.Application;
+import lcmc.common.ui.utils.SwingUtils;
 import lcmc.host.domain.Host;
 import lcmc.cluster.ui.ClusterBrowser;
 import lcmc.common.ui.utils.ButtonCallback;
@@ -47,7 +48,7 @@ public class CloneMenu extends ServiceMenu {
     @Inject
     private MenuFactory menuFactory;
     @Inject
-    private Application application;
+    private SwingUtils swingUtils;
 
     @Override
     public List<UpdatableItem> getPulldownMenu(final ServiceInfo serviceInfo) {
@@ -63,7 +64,7 @@ public class CloneMenu extends ServiceMenu {
         csMenu.onUpdate(new Runnable() {
             @Override
             public void run() {
-                application.isSwingThread();
+                swingUtils.isSwingThread();
                 csMenu.removeAll();
                 final ServiceInfo cs0 = cloneInfo.getContainedService();
                 if (cs0 != null) {

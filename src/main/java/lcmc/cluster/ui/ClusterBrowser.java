@@ -53,7 +53,6 @@ import javax.swing.tree.TreeNode;
 import com.google.common.collect.Table;
 import com.google.common.eventbus.Subscribe;
 import lcmc.ClusterEventBus;
-import lcmc.cluster.service.storage.FileSystemService;
 import lcmc.cluster.ui.network.NetworkFactory;
 import lcmc.cluster.ui.network.NetworkPresenter;
 import lcmc.common.domain.Application;
@@ -62,6 +61,7 @@ import lcmc.common.ui.CallbackAction;
 import lcmc.common.ui.GUIData;
 import lcmc.common.ui.ResourceGraph;
 import lcmc.common.ui.treemenu.TreeMenuController;
+import lcmc.common.ui.utils.SwingUtils;
 import lcmc.crm.domain.CrmXml;
 import lcmc.cluster.domain.Cluster;
 import lcmc.crm.domain.ClusterStatus;
@@ -70,7 +70,6 @@ import lcmc.drbd.domain.DRBDtestData;
 import lcmc.drbd.domain.DrbdXml;
 import lcmc.drbd.ui.DrbdGraph;
 import lcmc.event.NetworkChangedEvent;
-import lcmc.cluster.service.storage.BlockDeviceService;
 import lcmc.cluster.service.NetworkService;
 import lcmc.host.ui.HostBrowser;
 import lcmc.host.domain.Host;
@@ -127,6 +126,8 @@ public class ClusterBrowser extends Browser {
 
     @Inject
     private Application application;
+    @Inject
+    private SwingUtils swingUtils;
     public static final Color SERVICE_STOPPED_FILL_PAINT = Tools.getDefaultColor("CRMGraph.FillPaintStopped");
     public static final String IDENT_4 = "    ";
     public static final String DRBD_RESOURCE_BOOL_TYPE_NAME = "boolean";
@@ -220,8 +221,6 @@ public class ClusterBrowser extends Browser {
     private Provider<ClusterStatus> clusterStatusProvider;
     @Resource(name="categoryInfo")
     private CategoryInfo networksCategory;
-    @Resource(name="categoryInfo")
-    private CategoryInfo commonBlockDevicesCategory;
     @Inject
     private Provider<ResourceAgentClassInfo> resourceAgentClassInfoProvider;
     @Inject
@@ -238,10 +237,6 @@ public class ClusterBrowser extends Browser {
     private NetworkService networkService;
     @Inject
     private NetworkFactory networkFactory;
-    @Inject
-    private BlockDeviceService blockDeviceService;
-    @Inject
-    private FileSystemService fileSystemService;
 
     public static String getClassMenuName(final String cl) {
         final String name = CRM_CLASS_MENU.get(cl);
@@ -546,7 +541,7 @@ public class ClusterBrowser extends Browser {
 
         treeMenuController.reloadNode(clusterHostsNode, false);
 
-        application.invokeLater(new Runnable() {
+        swingUtils.invokeLater(new Runnable() {
             @Override
             public void run() {
                 crmGraph.scale();
@@ -569,7 +564,7 @@ public class ClusterBrowser extends Browser {
                         host.getName(),
                         Tools.getString("ClusterBrowser.UpdatingServerInfo"));
                 }
-                application.invokeInEdt(new Runnable() {
+                swingUtils.invokeInEdt(new Runnable() {
                     @Override
                     public void run() {
                         getClusterViewPanel().setDisabledDuringLoad(false);
@@ -583,7 +578,7 @@ public class ClusterBrowser extends Browser {
             @Override
             public void run() {
                 final Host[] hosts = cluster.getHostsArray();
-                application.invokeAndWait(new Runnable() {
+                swingUtils.invokeAndWait(new Runnable() {
                     @Override
                     public void run() {
                         for (final Host host : hosts) {
@@ -706,13 +701,13 @@ public class ClusterBrowser extends Browser {
     }
 
     public void updateServerStatus(final Host host) {
-        application.invokeAndWait(new Runnable() {
+        swingUtils.invokeAndWait(new Runnable() {
             @Override
             public void run() {
                 drbdGraph.addHost(host.getBrowser().getHostDrbdInfo());
             }
         });
-        application.invokeLater(new Runnable() {
+        swingUtils.invokeLater(new Runnable() {
             @Override
             public void run() {
                 drbdGraph.scale();
@@ -828,7 +823,7 @@ public class ClusterBrowser extends Browser {
                 } catch (final InterruptedException ignored) {
                     Thread.currentThread().interrupt();
                 }
-                application.invokeLater(new Runnable() {
+                swingUtils.invokeLater(new Runnable() {
                     @Override
                     public void run() {
                         drbdGraph.scale();
@@ -928,7 +923,7 @@ public class ClusterBrowser extends Browser {
                            } while (event != null || drbdConfig != null);
                            Tools.chomp(outputBuffer);
                            if (drbdUpdate) {
-                               application.invokeLater(new Runnable() {
+                               swingUtils.invokeLater(new Runnable() {
                                    @Override
                                    public void run() {
                                        globalInfo.setParameters();
@@ -947,7 +942,7 @@ public class ClusterBrowser extends Browser {
                                        public void run() {
                                            repaintSplitPane();
                                            drbdGraph.updatePopupMenus();
-                                           application.invokeInEdt(
+                                           swingUtils.invokeInEdt(
                                                new Runnable() {
                                                    @Override
                                                    public void run() {
@@ -1115,7 +1110,7 @@ public class ClusterBrowser extends Browser {
                 if (crmStatusFailed()) {
                      guiData.progressIndicatorFailed(clusterName, Tools.getString("ClusterBrowser.ClusterStatusFailed"));
                 } else {
-                    application.invokeLater(new Runnable() {
+                    swingUtils.invokeLater(new Runnable() {
                         @Override
                         public void run() {
                            crmGraph.scale();
@@ -1294,7 +1289,7 @@ public class ClusterBrowser extends Browser {
     }
 
     public void updateDrbdResources() {
-        application.isSwingThread();
+        swingUtils.isSwingThread();
         drbdStatusLock();
         final DrbdXml dxml = drbdXml;
         if (dxml == null) {
@@ -1942,7 +1937,7 @@ public class ClusterBrowser extends Browser {
     }
 
     public void reloadAllComboBoxes(final ServiceInfo exceptThisOne) {
-        application.invokeInEdt(new Runnable() {
+        swingUtils.invokeInEdt(new Runnable() {
             @Override
             public void run() {
                 lockNameToServiceInfo();
@@ -2078,7 +2073,7 @@ public class ClusterBrowser extends Browser {
         host.getHWInfo(new CategoryInfo[]{clusterHostsInfo},
                 new ResourceGraph[]{drbdGraph, crmGraph},
                 updateLVM);
-        application.invokeAndWait(new Runnable() {
+        swingUtils.invokeAndWait(new Runnable() {
             @Override
             public void run() {
                 drbdGraph.addHost(host.getBrowser().getHostDrbdInfo());

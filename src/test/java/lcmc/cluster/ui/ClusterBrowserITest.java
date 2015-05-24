@@ -9,6 +9,7 @@ import java.util.concurrent.CountDownLatch;
 import lcmc.AppContext;
 import lcmc.common.domain.Application;
 import lcmc.common.ui.GUIData;
+import lcmc.common.ui.utils.SwingUtils;
 import lcmc.host.domain.Host;
 import lcmc.testutils.IntegrationTestLauncher;
 import lcmc.testutils.annotation.type.IntegrationTest;
@@ -20,18 +21,21 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 
+import javax.inject.Inject;
+
 @Category(IntegrationTest.class)
 public final class ClusterBrowserITest {
     private IntegrationTestLauncher integrationTestLauncher;
     private GUIData guiData;
-    private Application application;
+    @Inject
+    private SwingUtils swingUtils;
 
     @Before
     public void setUp() {
         integrationTestLauncher = AppContext.getBean(IntegrationTestLauncher.class);
         integrationTestLauncher.initTestCluster();
         guiData = AppContext.getBean(GUIData.class);
-        application = AppContext.getBean(Application.class);
+        swingUtils = AppContext.getBean(SwingUtils.class);
     }
 
     @Test
@@ -135,16 +139,16 @@ public final class ClusterBrowserITest {
                 final ClusterBrowser cb = host.getBrowser().getClusterBrowser();
                 cb.getClusterViewPanel().setDisabledDuringLoad(true);
                 cb.parseClusterOutput(cib, new StringBuffer(""), host, firstTime, runMode);
-                application.waitForSwing();
+                swingUtils.waitForSwing();
                 cb.getClusterViewPanel().setDisabledDuringLoad(false);
                 cb.getCrmGraph().repaint();
             }
             guiData.stopProgressIndicator(i + ": " + file);
             for (final Host host : integrationTestLauncher.getHosts()) {
                 final ClusterBrowser cb = host.getBrowser().getClusterBrowser();
-                application.waitForSwing();
+                swingUtils.waitForSwing();
                 cb.parseClusterOutput(emptyCib, new StringBuffer(""), host, firstTime, runMode);
-                application.waitForSwing();
+                swingUtils.waitForSwing();
             }
         }
     }

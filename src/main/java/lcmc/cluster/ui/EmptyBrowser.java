@@ -28,7 +28,6 @@ import javax.inject.Singleton;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.MutableTreeNode;
 
-import lcmc.common.domain.Application;
 import lcmc.cluster.domain.Cluster;
 import lcmc.common.ui.Browser;
 import lcmc.common.ui.treemenu.TreeMenuController;
@@ -50,8 +49,6 @@ public final class EmptyBrowser extends Browser {
     private DefaultMutableTreeNode treeTop;
     @Inject
     private AllHostsInfo allHostsInfo;
-    @Inject
-    private Application application;
     @Inject
     private Hosts allHosts;
     @Inject

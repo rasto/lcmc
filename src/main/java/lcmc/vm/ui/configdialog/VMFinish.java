@@ -36,6 +36,7 @@ import javax.swing.JScrollPane;
 import lcmc.cluster.ui.widget.WidgetFactory;
 import lcmc.common.domain.Application;
 import lcmc.common.ui.WizardDialog;
+import lcmc.common.ui.utils.SwingUtils;
 import lcmc.vm.ui.resource.DomainInfo;
 import lcmc.cluster.ui.widget.Widget;
 import lcmc.common.ui.utils.MyButton;
@@ -48,7 +49,7 @@ import lcmc.common.domain.util.Tools;
 final class VMFinish extends VMConfig {
     private JComponent inputPane = null;
     @Inject
-    private Application application;
+    private SwingUtils swingUtils;
     @Inject
     private WidgetFactory widgetFactory;
 
@@ -76,7 +77,7 @@ final class VMFinish extends VMConfig {
     @Override
     protected void initDialogAfterVisible() {
         enableComponents();
-        application.invokeLater(new Runnable() {
+        swingUtils.invokeLater(new Runnable() {
             @Override
             public void run() {
                 buttonClass(finishButton()).setEnabled(false);
@@ -101,14 +102,14 @@ final class VMFinish extends VMConfig {
                 final Thread thread = new Thread(new Runnable() {
                     @Override
                     public void run() {
-                        application.invokeAndWait(new Runnable() {
+                        swingUtils.invokeAndWait(new Runnable() {
                             @Override
                             public void run() {
                                 createConfigBtn.setEnabled(false);
                             }
                         });
                         domainInfo.apply(Application.RunMode.LIVE);
-                        application.invokeLater(new Runnable() {
+                        swingUtils.invokeLater(new Runnable() {
                             @Override
                             public void run() {
                                 buttonClass(finishButton()).setEnabled(true);

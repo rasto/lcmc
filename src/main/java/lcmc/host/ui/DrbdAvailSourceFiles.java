@@ -35,6 +35,7 @@ import lcmc.Exceptions;
 import lcmc.common.domain.AccessMode;
 import lcmc.common.domain.Application;
 import lcmc.common.domain.Value;
+import lcmc.common.ui.utils.SwingUtils;
 import lcmc.drbd.domain.DrbdInstallation;
 import lcmc.common.ui.SpringUtilities;
 import lcmc.common.ui.WizardDialog;
@@ -60,6 +61,8 @@ final class DrbdAvailSourceFiles extends DialogHost {
     private boolean listenersAdded = false;
     @Inject
     private Application application;
+    @Inject
+    private SwingUtils swingUtils;
     @Inject
     private WidgetFactory widgetFactory;
     private static final Logger drbdVersions = LoggerFactory.getLogger(DrbdAvailSourceFiles.class);
@@ -119,7 +122,7 @@ final class DrbdAvailSourceFiles extends DialogHost {
                 }
             }
             drbdTarballCombo.clear();
-            application.invokeLater(new Runnable() {
+            swingUtils.invokeLater(new Runnable() {
                 @Override
                 public void run() {
                     if (!items.isEmpty()) {
@@ -132,7 +135,7 @@ final class DrbdAvailSourceFiles extends DialogHost {
             });
 
         } else {
-            application.invokeLater(new Runnable() {
+            swingUtils.invokeLater(new Runnable() {
                 @Override
                 public void run() {
                     progressBarDoneError();
@@ -162,7 +165,7 @@ final class DrbdAvailSourceFiles extends DialogHost {
             }
             return versions[0];
         } else {
-            application.invokeLater(new Runnable() {
+            swingUtils.invokeLater(new Runnable() {
                 @Override
                 public void run() {
                     progressBarDoneError();

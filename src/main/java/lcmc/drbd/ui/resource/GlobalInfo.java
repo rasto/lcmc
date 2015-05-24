@@ -53,10 +53,10 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import com.google.common.base.Optional;
 import lcmc.common.ui.treemenu.TreeMenuController;
 import lcmc.common.ui.utils.Dialogs;
+import lcmc.common.ui.utils.SwingUtils;
 import lcmc.drbd.ui.AddDrbdConfigDialog;
 import lcmc.Exceptions;
 import lcmc.configs.AppDefaults;
-import lcmc.common.ui.GUIData;
 import lcmc.common.domain.Application;
 import lcmc.common.domain.Application.RunMode;
 import lcmc.cluster.domain.Cluster;
@@ -101,8 +101,6 @@ public class GlobalInfo extends AbstractDrbdInfo {
     @Inject
     private Provider<VolumeInfo> volumeInfoProvider;
     @Inject
-    private GUIData guiData;
-    @Inject
     private Provider<AddDrbdConfigDialog> addDrbdConfigDialogProvider;
     private ProxyHostInfo proxyHostInfo = null;
     @Inject
@@ -113,6 +111,8 @@ public class GlobalInfo extends AbstractDrbdInfo {
     private Provider<DrbdXml> drbdXmlProvider;
     @Inject
     private Application application;
+    @Inject
+    private SwingUtils swingUtils;
     @Inject
     private TreeMenuController treeMenuController;
     @Inject
@@ -236,7 +236,7 @@ public class GlobalInfo extends AbstractDrbdInfo {
         if (Application.isLive(runMode)) {
             final String[] params = getParametersFromXML();
             storeComboBoxValues(params);
-            application.invokeLater(new Runnable() {
+            swingUtils.invokeLater(new Runnable() {
                 @Override
                 public void run() {
                     for (final ResourceInfo dri : getDrbdResources()) {
@@ -375,7 +375,7 @@ public class GlobalInfo extends AbstractDrbdInfo {
                     final Thread thread = new Thread(new Runnable() {
                         @Override
                         public void run() {
-                            application.invokeAndWait(new Runnable() {
+                            swingUtils.invokeAndWait(new Runnable() {
                                 @Override
                                 public void run() {
                                     getApplyButton().setEnabled(false);
@@ -623,7 +623,7 @@ public class GlobalInfo extends AbstractDrbdInfo {
                 dvi.getDrbdResourceInfo().getNode(),
                 dvi);
 
-        application.isSwingThread();
+        swingUtils.isSwingThread();
 
         final DefaultMutableTreeNode drbdBDNode1 = treeMenuController.createMenuItem(drbdVolumeNode, bdi1);
         final DefaultMutableTreeNode drbdBDNode2 = treeMenuController.createMenuItem(drbdVolumeNode, bdi2);

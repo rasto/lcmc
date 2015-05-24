@@ -32,9 +32,9 @@ import javax.swing.JPanel;
 
 import lcmc.cluster.ui.SSHGui;
 import lcmc.common.ui.WizardDialog;
-import lcmc.common.domain.Application;
 import lcmc.common.domain.CancelCallback;
 import lcmc.common.domain.ConnectionCallback;
+import lcmc.common.ui.utils.SwingUtils;
 import lcmc.logger.Logger;
 import lcmc.logger.LoggerFactory;
 import lcmc.common.domain.util.Tools;
@@ -48,7 +48,7 @@ public class SSH extends DialogHost {
     @Inject
     private Devices devices;
     @Inject
-    private Application application;
+    private SwingUtils swingUtils;
 
     private String connectHost() {
         final SSHGui sshGui = new SSHGui(getDialogPanel(), getHost(), getProgressBar());
@@ -63,7 +63,7 @@ public class SSH extends DialogHost {
                              getHost().setConnected();
                              progressBarDone();
                              answerPaneSetText(Tools.getString("Dialog.Host.SSH.Connected"));
-                             application.invokeLater(new Runnable() {
+                             swingUtils.invokeLater(new Runnable() {
                                  @Override
                                  public void run() {
                                     buttonClass(nextButton()).pressButton();

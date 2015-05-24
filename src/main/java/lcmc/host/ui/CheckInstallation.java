@@ -41,6 +41,7 @@ import lcmc.common.domain.Application;
 import lcmc.common.ui.SpringUtilities;
 import lcmc.common.ui.WizardDialog;
 import lcmc.cluster.ui.widget.Widget;
+import lcmc.common.ui.utils.SwingUtils;
 import lcmc.host.domain.Host;
 import lcmc.drbd.domain.DrbdInstallation;
 import lcmc.common.domain.ExecCallback;
@@ -114,6 +115,8 @@ final class CheckInstallation extends DialogHost {
     private PacemakerInst pacemakerInstDialog;
     @Inject
     private Application application;
+    @Inject
+    private SwingUtils swingUtils;
 
     @Override
     public void init(final WizardDialog previousDialog, final Host host, final DrbdInstallation drbdInstallation) {
@@ -141,7 +144,7 @@ final class CheckInstallation extends DialogHost {
         nextDialogObject = hostFinishDialog;
 
         final CheckInstallation thisClass = this;
-        application.invokeLater(new Runnable() {
+        swingUtils.invokeLater(new Runnable() {
             @Override
             public void run() {
                 installDrbdButton.setBackgroundColor(Tools.getDefaultColor("ConfigDialog.Button"));
@@ -173,7 +176,7 @@ final class CheckInstallation extends DialogHost {
                             getDrbdInstallation().setDrbdInstallMethodIndex(im.getIndex());
                         }
                         nextDialogObject.init(thisClass, getHost(), getDrbdInstallation());
-                        application.invokeLater(new Runnable() {
+                        swingUtils.invokeLater(new Runnable() {
                             @Override
                             public void run() {
                                 buttonClass(nextButton()).pressButton();
@@ -193,7 +196,7 @@ final class CheckInstallation extends DialogHost {
                     nextDialogObject.init(thisClass, getHost(), getDrbdInstallation());
                     final InstallMethods im = (InstallMethods) heartbeatPacemakerInstMethodWidget.getValue();
                     getHost().setHeartbeatPacemakerInstallMethodIndex(im.getIndex());
-                    application.invokeLater(new Runnable() {
+                    swingUtils.invokeLater(new Runnable() {
                         @Override
                         public void run() {
                             buttonClass(nextButton()).pressButton();
@@ -212,7 +215,7 @@ final class CheckInstallation extends DialogHost {
                     nextDialogObject.init(thisClass, getHost(), getDrbdInstallation());
                     final InstallMethods im = (InstallMethods) pacemakerInstMethodWidget.getValue();
                     getHost().setPacemakerInstallMethodIndex(im.getIndex());
-                    application.invokeLater(new Runnable() {
+                    swingUtils.invokeLater(new Runnable() {
                         @Override
                         public void run() {
                             buttonClass(nextButton()).pressButton();
@@ -244,7 +247,7 @@ final class CheckInstallation extends DialogHost {
      */
     void checkDrbd(final String ans) {
         if (ans != null && ans.isEmpty() || "\n".equals(ans)) {
-            application.invokeLater(new Runnable() {
+            swingUtils.invokeLater(new Runnable() {
                 @Override
                 public void run() {
                     checkingDrbdLabel.setText(": " + Tools.getString("Dialog.Host.CheckInstallation.DrbdNotInstalled"));
@@ -258,7 +261,7 @@ final class CheckInstallation extends DialogHost {
             });
         } else {
             drbdInstallationOk = true;
-            application.invokeLater(new Runnable() {
+            swingUtils.invokeLater(new Runnable() {
                 @Override
                 @SuppressWarnings("DeadBranch")
                 public void run() {
@@ -332,7 +335,7 @@ final class CheckInstallation extends DialogHost {
         }
         if (hbVersion == null) {
             /* hb */
-            application.invokeLater(new Runnable() {
+            swingUtils.invokeLater(new Runnable() {
                 @Override
                 public void run() {
                     heartbeatPacemakerIcon.setIcon(NOT_INSTALLED_ICON);
@@ -352,7 +355,7 @@ final class CheckInstallation extends DialogHost {
                 text = hbVersion;
             }
             getHost().setHeartbeatVersion(hbVersion);
-            application.invokeLater(new Runnable() {
+            swingUtils.invokeLater(new Runnable() {
                 @Override
                 public void run() {
                     if (getHost().getPacemakerVersion() == null
@@ -368,7 +371,7 @@ final class CheckInstallation extends DialogHost {
         }
         if (getHost().getPacemakerVersion() == null || (aisVersion == null && corosyncVersion == null)) {
             /* corosync */
-            application.invokeLater(new Runnable() {
+            swingUtils.invokeLater(new Runnable() {
                 @Override
                 public void run() {
                     checkingPacemakerIcon.setIcon(NOT_INSTALLED_ICON);
@@ -379,7 +382,7 @@ final class CheckInstallation extends DialogHost {
             });
         } else {
             pacemakerInstallationOk = true;
-            application.invokeLater(new Runnable() {
+            swingUtils.invokeLater(new Runnable() {
                 @Override
                 public void run() {
                     checkingPacemakerIcon.setIcon(ALREADY_INSTALLED_ICON);
@@ -400,7 +403,7 @@ final class CheckInstallation extends DialogHost {
         final List<String> incorrect = new ArrayList<String>();
         if (drbdInstallationOk && (heartbeatPacemakerInstallationOk || pacemakerInstallationOk)) {
             progressBarDone();
-            application.invokeLater(new Runnable() {
+            swingUtils.invokeLater(new Runnable() {
                 @Override
                 public void run() {
                     answerPaneSetText(Tools.getString("Dialog.Host.CheckInstallation.AllOk"));
@@ -410,7 +413,7 @@ final class CheckInstallation extends DialogHost {
                 || application.getAutoOptionHost("hbinst") != null
                 || application.getAutoOptionHost("pminst") != null) {
                 Tools.sleep(1000);
-                application.invokeLater(new Runnable() {
+                swingUtils.invokeLater(new Runnable() {
                     @Override
                     public void run() {
                         pressNextButton();

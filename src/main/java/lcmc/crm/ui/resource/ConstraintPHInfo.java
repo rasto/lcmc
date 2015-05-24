@@ -34,6 +34,7 @@ import javax.swing.JComponent;
 import lcmc.common.domain.AccessMode;
 import lcmc.common.domain.Application;
 import lcmc.common.domain.ColorText;
+import lcmc.common.ui.utils.SwingUtils;
 import lcmc.host.domain.Host;
 import lcmc.common.domain.StringValue;
 import lcmc.common.domain.Value;
@@ -76,6 +77,8 @@ public class ConstraintPHInfo extends ServiceInfo {
     private ConstraintPHMenu constraintPHMenu;
     @Inject
     private Application application;
+    @Inject
+    private SwingUtils swingUtils;
 
 
     void init(final Browser browser,
@@ -337,7 +340,7 @@ public class ConstraintPHInfo extends ServiceInfo {
                 }
                 getService().setNew(false);
                 getBrowser().removeFromServiceInfoHash(this);
-                application.invokeLater(new Runnable() {
+                swingUtils.invokeLater(new Runnable() {
                     @Override
                     public void run() {
                         getBrowser().getCrmGraph().killRemovedVertices();

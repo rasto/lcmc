@@ -25,6 +25,7 @@ package lcmc.cluster.ui.wizard;
 import lcmc.common.ui.GUIData;
 import lcmc.common.domain.Application;
 import lcmc.cluster.domain.Cluster;
+import lcmc.common.ui.utils.SwingUtils;
 import lcmc.host.domain.Hosts;
 import lcmc.logger.Logger;
 import lcmc.logger.LoggerFactory;
@@ -48,6 +49,8 @@ public final class AddClusterDialog {
     @Inject
     private Application application;
     @Inject
+    private SwingUtils swingUtils;
+    @Inject
     private Hosts allHosts;
 
     /**
@@ -67,7 +70,7 @@ public final class AddClusterDialog {
                 allHosts.removeHostsFromCluster(cluster);
                 application.removeClusterFromClusters(cluster);
                 dialog.cancelDialog();
-                application.invokeLater(new Runnable() {
+                swingUtils.invokeLater(new Runnable() {
                     @Override
                     public void run() {
                         guiData.checkAddClusterButtons();
@@ -88,14 +91,14 @@ public final class AddClusterDialog {
             }
         }
         guiData.expandTerminalSplitPane(GUIData.TerminalSize.COLLAPSE);
-        application.invokeLater(new Runnable() {
+        swingUtils.invokeLater(new Runnable() {
             @Override
             public void run() {
                 cluster.getClusterTab().addClusterView();
                 cluster.getClusterTab().requestFocus();
             }
         });
-        application.invokeLater(new Runnable() {
+        swingUtils.invokeLater(new Runnable() {
             @Override
             public void run() {
                 guiData.checkAddClusterButtons();

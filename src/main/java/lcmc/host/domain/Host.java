@@ -52,6 +52,7 @@ import com.google.common.base.Optional;
 import lcmc.Exceptions;
 import lcmc.HwEventBus;
 import lcmc.cluster.domain.Cluster;
+import lcmc.common.ui.utils.SwingUtils;
 import lcmc.configs.DistResource;
 import lcmc.cluster.ui.ClusterBrowser;
 import lcmc.common.ui.GUIData;
@@ -63,7 +64,6 @@ import lcmc.event.HwFileSystemsChangedEvent;
 import lcmc.event.HwMountPointsChangedEvent;
 import lcmc.event.HwNetInterfacesChangedEvent;
 import lcmc.cluster.service.storage.BlockDeviceService;
-import lcmc.cluster.service.NetworkService;
 import lcmc.host.ui.HostBrowser;
 import lcmc.common.ui.ProgressBar;
 import lcmc.common.ui.ResourceGraph;
@@ -279,13 +279,13 @@ public class Host implements Comparable<Host>, Value {
     @Inject
     private Application application;
     @Inject
+    private SwingUtils swingUtils;
+    @Inject
     private RoboTest roboTest;
     @Inject
     private HwEventBus hwEventBus;
     @Inject
     private BlockDeviceService blockDeviceService;
-    @Inject
-    private NetworkService netInterfacesService;
 
     public void init() {
         if (allHosts.size() == 1) {
@@ -1080,7 +1080,7 @@ public class Host implements Comparable<Host>, Value {
         if (!enableOnConnectElements.contains(c)) {
             enableOnConnectElements.add(c);
         }
-        application.invokeLater(new Runnable() {
+        swingUtils.invokeLater(new Runnable() {
             @Override
             public void run() {
                 c.setEnabled(isConnected());
@@ -1095,7 +1095,7 @@ public class Host implements Comparable<Host>, Value {
      */
     public void setConnected() {
         final boolean con = isConnected();
-        application.invokeLater(new Runnable() {
+        swingUtils.invokeLater(new Runnable() {
             @Override
             public void run() {
                 for (final JComponent c : enableOnConnectElements) {
@@ -1374,7 +1374,7 @@ public class Host implements Comparable<Host>, Value {
                                      dxml.init(cluster.getHostsArray(), cb.getHostDrbdParameters());
                                      dxml.update(drbdUpdate);
                                      cb.setDrbdXml(dxml);
-                                     application.invokeLater(new Runnable() {
+                                     swingUtils.invokeLater(new Runnable() {
                                          @Override
                                          public void run() {
                                              hostBrowser.getClusterBrowser().getGlobalInfo().setParameters();

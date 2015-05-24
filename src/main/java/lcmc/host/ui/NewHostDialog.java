@@ -36,6 +36,7 @@ import javax.swing.SpringLayout;
 import lcmc.common.ui.GUIData;
 import lcmc.common.domain.AccessMode;
 import lcmc.common.domain.Application;
+import lcmc.common.ui.utils.SwingUtils;
 import lcmc.host.domain.Host;
 import lcmc.common.domain.StringValue;
 import lcmc.common.domain.Value;
@@ -70,6 +71,8 @@ public class NewHostDialog extends DialogHost {
     private GUIData guiData;
     @Inject
     private Application application;
+    @Inject
+    private SwingUtils swingUtils;
     @Inject
     private WidgetFactory widgetFactory;
 
@@ -136,7 +139,7 @@ public class NewHostDialog extends DialogHost {
         }
 
         if (hf) {
-            application.invokeLater(new Runnable() {
+            swingUtils.invokeLater(new Runnable() {
                 @Override
                 public void run() {
                     hostField.setBackground(new StringValue(getHost().getEnteredHostOrIp()),
@@ -150,7 +153,7 @@ public class NewHostDialog extends DialogHost {
         }
 
         if (uf) {
-            application.invokeLater(new Runnable() {
+            swingUtils.invokeLater(new Runnable() {
                 @Override
                 public void run() {
                     usernameField.setBackground(new StringValue(getHost().getUsername()),
@@ -173,7 +176,7 @@ public class NewHostDialog extends DialogHost {
         }
 
         if (pf) {
-            application.invokeLater(new Runnable() {
+            swingUtils.invokeLater(new Runnable() {
                 @Override
                 public void run() {
                     sshPortField.setBackground(new StringValue(getHost().getSSHPort()),
@@ -210,14 +213,14 @@ public class NewHostDialog extends DialogHost {
         enableComponents();
         makeDefaultButton(buttonClass(nextButton()));
         checkFields(null);
-        application.invokeLater(new Runnable() {
+        swingUtils.invokeLater(new Runnable() {
             @Override
             public void run() {
                 hostField.requestFocus();
             }
         });
         if (!application.getAutoHosts().isEmpty()) {
-            application.invokeLater(new Runnable() {
+            swingUtils.invokeLater(new Runnable() {
                 @Override
                 public void run() {
                     hostField.setValue(new StringValue(application.getAutoHosts().get(0)));

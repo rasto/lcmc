@@ -44,6 +44,7 @@ import javax.swing.SpringLayout;
 import lcmc.common.domain.AccessMode;
 import lcmc.common.domain.Application;
 import lcmc.cluster.domain.Cluster;
+import lcmc.common.ui.utils.SwingUtils;
 import lcmc.host.domain.Host;
 import lcmc.common.domain.StringValue;
 import lcmc.vm.domain.VmsXml;
@@ -72,7 +73,7 @@ public final class LVCreate extends LV {
     private Map<Host, JCheckBox> hostCheckBoxes = null;
     private final Collection<BlockDevice> selectedBlockDevices = new LinkedHashSet<BlockDevice>();
     @Inject
-    private Application application;
+    private SwingUtils swingUtils;
     @Inject
     private WidgetFactory widgetFactory;
     private MyButton createButton;
@@ -126,7 +127,7 @@ public final class LVCreate extends LV {
     }
 
     private void enableCreateButton(boolean enable) {
-        application.isSwingThread();
+        swingUtils.isSwingThread();
         if (enable) {
             final String maxBlockSize = getMaxBlockSize(getSelectedHostCbs());
             final long maxSize = Long.parseLong(maxBlockSize);
@@ -234,7 +235,7 @@ public final class LVCreate extends LV {
                 final Thread thread = new Thread(new Runnable() {
                     @Override
                     public void run() {
-                        application.invokeAndWait(new Runnable() {
+                        swingUtils.invokeAndWait(new Runnable() {
                             @Override
                             public void run() {
                                 enableCreateButton(false);

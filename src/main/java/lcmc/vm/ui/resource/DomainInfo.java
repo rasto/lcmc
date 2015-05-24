@@ -63,6 +63,7 @@ import lcmc.common.ui.Browser;
 import lcmc.cluster.ui.ClusterBrowser;
 import lcmc.common.ui.GUIData;
 import lcmc.common.ui.treemenu.TreeMenuController;
+import lcmc.common.ui.utils.SwingUtils;
 import lcmc.host.ui.HostBrowser;
 import lcmc.common.ui.SpringUtilities;
 import lcmc.common.domain.AccessMode;
@@ -603,6 +604,8 @@ public class DomainInfo extends EditableInfo {
     @Inject
     private Application application;
     @Inject
+    private SwingUtils swingUtils;
+    @Inject
     private DomainMenu domainMenu;
     @Inject
     private Provider<DiskInfo> diskInfoProvider;
@@ -708,7 +711,7 @@ public class DomainInfo extends EditableInfo {
         }
 
         /* remove nodes */
-        application.isSwingThread();
+        swingUtils.isSwingThread();
         treeMenuController.removeFromParent(nodesToRemove);
 
         for (final String disk : diskNames) {
@@ -786,7 +789,7 @@ public class DomainInfo extends EditableInfo {
         }
 
         /* remove nodes */
-        application.isSwingThread();
+        swingUtils.isSwingThread();
         treeMenuController.removeFromParent(nodesToRemove);
 
         for (final String filesystem : filesystemNames) {
@@ -861,7 +864,7 @@ public class DomainInfo extends EditableInfo {
         }
 
         /* remove nodes */
-        application.isSwingThread();
+        swingUtils.isSwingThread();
         treeMenuController.removeFromParent(nodesToRemove);
 
         for (final String interf : interfaceNames) {
@@ -944,7 +947,7 @@ public class DomainInfo extends EditableInfo {
         }
 
         /* remove nodes */
-        application.isSwingThread();
+        swingUtils.isSwingThread();
         treeMenuController.removeFromParent(nodesToRemove);
 
         for (final String inputDev : inputDevNames) {
@@ -1027,7 +1030,7 @@ public class DomainInfo extends EditableInfo {
         }
 
         /* remove nodes */
-        application.isSwingThread();
+        swingUtils.isSwingThread();
         treeMenuController.removeFromParent(nodesToRemove);
 
         for (final String graphicDisplay : graphicsNames) {
@@ -1111,7 +1114,7 @@ public class DomainInfo extends EditableInfo {
         }
 
         /* remove nodes */
-        application.isSwingThread();
+        swingUtils.isSwingThread();
         treeMenuController.removeFromParent(nodesToRemove);
 
         for (final String sound : soundNames) {
@@ -1193,7 +1196,7 @@ public class DomainInfo extends EditableInfo {
         }
 
         /* remove nodes */
-        application.isSwingThread();
+        swingUtils.isSwingThread();
         treeMenuController.removeFromParent(nodesToRemove);
 
         for (final String serial : serialNames) {
@@ -1283,7 +1286,7 @@ public class DomainInfo extends EditableInfo {
         }
 
         /* remove nodes */
-        application.isSwingThread();
+        swingUtils.isSwingThread();
         treeMenuController.removeFromParent(nodesToRemove);
 
         for (final String parallel : parallelNames) {
@@ -1377,7 +1380,7 @@ public class DomainInfo extends EditableInfo {
         }
 
         /* remove nodes */
-        application.isSwingThread();
+        swingUtils.isSwingThread();
         treeMenuController.removeFromParent(nodesToRemove);
 
         for (final String video : videoNames) {
@@ -1424,7 +1427,7 @@ public class DomainInfo extends EditableInfo {
         final MyButton hostBtn = widgetFactory.createButton("Start", null, "not defined on " + host.getName());
         application.makeMiniButton(hostBtn);
         final MyButton hBtn = hostBtn;
-        application.invokeLater(new Runnable() {
+        swingUtils.invokeLater(new Runnable() {
             @Override
             public void run() {
                 hBtn.setBackgroundColor(Browser.PANEL_BACKGROUND);
@@ -1443,7 +1446,7 @@ public class DomainInfo extends EditableInfo {
                                 final int remotePort = vxml.getRemotePort(getDomainName());
                                 application.startTightVncViewer(host, remotePort);
                             } else if (hBtn.getIcon() == HostBrowser.HOST_ON_ICON) {
-                                application.invokeLater(new Runnable() {
+                                swingUtils.invokeLater(new Runnable() {
                                     @Override
                                     public void run() {
                                         hBtn.setEnabled(false);
@@ -1618,7 +1621,7 @@ public class DomainInfo extends EditableInfo {
                 uuid = vmsXml.getValue(getDomainName(), VMParams.VM_PARAM_UUID);
             }
         }
-        application.invokeInEdt(new Runnable() {
+        swingUtils.invokeInEdt(new Runnable() {
             @Override
             public void run() {
                 final boolean interfaceNodeChanged = updateInterfaceNodes();
@@ -1653,7 +1656,7 @@ public class DomainInfo extends EditableInfo {
         updateTable(SERIAL_TABLE);
         updateTable(PARALLEL_TABLE);
         updateTable(VIDEO_TABLE);
-        application.invokeLater(new Runnable() {
+        swingUtils.invokeLater(new Runnable() {
             @Override
             public void run() {
                 setApplyButtons(null, getParametersFromXML());
@@ -1702,7 +1705,7 @@ public class DomainInfo extends EditableInfo {
             }
             final Widget realParamWi = rpwi;
             if (!host.isConnected()) {
-                application.invokeLater(new Runnable() {
+                swingUtils.invokeLater(new Runnable() {
                     @Override
                     public void run() {
                         wi.setEnabled(false);
@@ -1741,7 +1744,7 @@ public class DomainInfo extends EditableInfo {
 
     @Override
     public JComponent getInfoPanel() {
-        application.isSwingThread();
+        swingUtils.isSwingThread();
         if (infoPanel != null) {
             return infoPanel;
         }
@@ -1868,7 +1871,7 @@ public class DomainInfo extends EditableInfo {
         newPanel.add(getMoreOptionsPanel(application.getServiceLabelWidth()
                                          + application.getServiceFieldWidth() * 2 + 4));
         newPanel.add(new JScrollPane(mainPanel));
-        application.invokeLater(new Runnable() {
+        swingUtils.invokeLater(new Runnable() {
             @Override
             public void run() {
                 setApplyButtons(null, params);
@@ -2573,7 +2576,7 @@ public class DomainInfo extends EditableInfo {
         if (Application.isTest(runMode)) {
             return;
         }
-        application.invokeAndWait(new Runnable() {
+        swingUtils.invokeAndWait(new Runnable() {
             @Override
             public void run() {
                 getApplyButton().setEnabled(false);
@@ -2610,7 +2613,7 @@ public class DomainInfo extends EditableInfo {
         guiData.startProgressIndicator(clusterName, "VM view update");
         for (final Host host : getBrowser().getClusterHosts()) {
             final Widget hostWi = definedOnHostComboBoxHash.get(host.getName());
-            application.invokeLater(new Runnable() {
+            swingUtils.invokeLater(new Runnable() {
                 @Override
                 public void run() {
                     final Widget wizardHostWi = definedOnHostComboBoxHash.get(WIZARD_HOST_PREFIX + host.getName());
@@ -2705,7 +2708,7 @@ public class DomainInfo extends EditableInfo {
         updateParameters();
         guiData.stopProgressIndicator(clusterName, "VM view update");
         getBrowser().vmStatusUnlock();
-        application.invokeLater(new Runnable() {
+        swingUtils.invokeLater(new Runnable() {
             @Override
             public void run() {
                 for (final Host host : getBrowser().getClusterHosts()) {
@@ -3955,7 +3958,7 @@ public class DomainInfo extends EditableInfo {
                                   final boolean stopped) {
         if (hostWi != null) {
             final boolean enable = host.isConnected();
-            application.invokeLater(new Runnable() {
+            swingUtils.invokeLater(new Runnable() {
                 @Override
                 public void run() {
                     hostWi.setTFButtonEnabled(enable && stopped);
@@ -3971,7 +3974,7 @@ public class DomainInfo extends EditableInfo {
     private void setButtonToView(final Host host, final Widget hostWi, final MyButton hostBtn) {
         if (hostWi != null) {
             final boolean enable = host.isConnected();
-            application.invokeLater(new Runnable() {
+            swingUtils.invokeLater(new Runnable() {
                 @Override
                 public void run() {
                     hostWi.setTFButtonEnabled(enable);
@@ -3986,7 +3989,7 @@ public class DomainInfo extends EditableInfo {
     /** Sets button next to host to the not defined button. */
     private void setButtonToNotDefined(final Host host, final Widget hostWi, final MyButton hostBtn) {
         if (hostWi != null) {
-            application.invokeLater(new Runnable() {
+            swingUtils.invokeLater(new Runnable() {
                 @Override
                 public void run() {
                     hostWi.setTFButtonEnabled(false);

@@ -74,6 +74,7 @@ import lcmc.cluster.ui.widget.Widget;
 import lcmc.common.ui.treemenu.TreeMenuController;
 import lcmc.common.ui.utils.ButtonCallback;
 import lcmc.common.ui.utils.ComponentWithTest;
+import lcmc.common.ui.utils.SwingUtils;
 import lcmc.logger.Logger;
 import lcmc.logger.LoggerFactory;
 import lcmc.common.ui.utils.MyButton;
@@ -127,6 +128,8 @@ public class Info implements Comparable<Info>, Value, InfoPresenter {
     private final Map<JComponent, AccessMode> componentToEnableAccessMode = new HashMap<JComponent, AccessMode>();
     @Inject
     private Application application;
+    @Inject
+    private SwingUtils swingUtils;
     @Inject
     private TreeMenuController treeMenuController;
 
@@ -255,7 +258,7 @@ public class Info implements Comparable<Info>, Value, InfoPresenter {
             final String newInfo = getInfo();
             if (newInfo != null && !newInfo.equals(infoCache)) {
                 infoCache = newInfo;
-                application.invokeLater(new Runnable() {
+                swingUtils.invokeLater(new Runnable() {
                     @Override
                     public void run() {
                         ria.setText(newInfo);
@@ -414,7 +417,7 @@ public class Info implements Comparable<Info>, Value, InfoPresenter {
                 final JPopupMenu pm = getPopup();
                 if (pm != null) {
                     updateMenus(null);
-                    application.invokeLater(new Runnable() {
+                    swingUtils.invokeLater(new Runnable() {
                         @Override
                         public void run() {
                             if (!c.isShowing() || !c.isDisplayable()) {
@@ -449,7 +452,7 @@ public class Info implements Comparable<Info>, Value, InfoPresenter {
             mPopupLock.unlock();
         }
         if (popup0 != null) {
-            application.invokeLater(new Runnable() {
+            swingUtils.invokeLater(new Runnable() {
                 @Override
                 public void run() {
                     popup0.setVisible(false);
@@ -466,7 +469,7 @@ public class Info implements Comparable<Info>, Value, InfoPresenter {
         LOG.debug1("ACTION: getPopup: " + getClass() + " name: " + getName());
         mPopupLock.lock();
         try {
-            application.invokeAndWait(new Runnable() {
+            swingUtils.invokeAndWait(new Runnable() {
                 @Override
                 public void run() {
                     if (popup == null) {
@@ -492,7 +495,7 @@ public class Info implements Comparable<Info>, Value, InfoPresenter {
         pm.addPopupMenuListener(new PopupMenuListener() {
             @Override
             public void popupMenuCanceled(final PopupMenuEvent e) {
-                application.invokeLater(new Runnable() {
+                swingUtils.invokeLater(new Runnable() {
                     @Override
                     public void run() {
                         b.setSelected(false);
@@ -501,7 +504,7 @@ public class Info implements Comparable<Info>, Value, InfoPresenter {
             }
             @Override
             public void popupMenuWillBecomeInvisible(final PopupMenuEvent e) {
-                application.invokeLater(new Runnable() {
+                swingUtils.invokeLater(new Runnable() {
                     @Override
                     public void run() {
                         b.setSelected(false);
@@ -539,7 +542,7 @@ public class Info implements Comparable<Info>, Value, InfoPresenter {
                 public void mousePressed(final MouseEvent e) {
                     final JToggleButton source = (JToggleButton) (e.getSource());
                     if (source.isSelected()) {
-                        application.invokeLater(new Runnable() {
+                        swingUtils.invokeLater(new Runnable() {
                         @Override
                             public void run() {
                                 b.setSelected(true);
@@ -552,7 +555,7 @@ public class Info implements Comparable<Info>, Value, InfoPresenter {
                                 final JPopupMenu pm = getPopup();
                                 if (pm != null) {
                                     updateMenus(null);
-                                    application.invokeLater(new Runnable() {
+                                    swingUtils.invokeLater(new Runnable() {
                                     @Override
                                         public void run() {
                                             showPopup(pm, b);
@@ -584,14 +587,14 @@ public class Info implements Comparable<Info>, Value, InfoPresenter {
 
     /** Update menus with positions and calles their update methods. */
     public void updateMenus(final Point2D pos) {
-        application.isNotSwingThread();
+        swingUtils.isNotSwingThread();
         mMenuListLock.lock();
         if (menuList == null) {
             mMenuListLock.unlock();
         } else {
             final Collection<UpdatableItem> menuListCopy = new ArrayList<UpdatableItem>(menuList);
             mMenuListLock.unlock();
-            application.invokeAndWait(new Runnable() {
+            swingUtils.invokeAndWait(new Runnable() {
                 @Override
                 public void run() {
                     for (final UpdatableItem i : menuListCopy) {
@@ -606,7 +609,7 @@ public class Info implements Comparable<Info>, Value, InfoPresenter {
             });
             for (final UpdatableItem i : menuListCopy) {
                 if (i instanceof MyMenu) {
-                    application.invokeAndWait(new Runnable() {
+                    swingUtils.invokeAndWait(new Runnable() {
                         @Override
                         public void run() {
                             i.updateAndWait();
@@ -974,7 +977,7 @@ public class Info implements Comparable<Info>, Value, InfoPresenter {
         if (tableModel != null) {
             final String[] colNames = getColumnNames(tableName);
             if (colNames != null && colNames.length > 0) {
-                application.invokeLater(new Runnable() {
+                swingUtils.invokeLater(new Runnable() {
                     @Override
                     public void run() {
                         final Object[][] data = getTableData(tableName);

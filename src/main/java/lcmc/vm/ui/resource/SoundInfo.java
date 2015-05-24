@@ -31,10 +31,10 @@ import javax.inject.Named;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 
-import lcmc.cluster.ui.widget.WidgetFactory;
 import lcmc.common.domain.AccessMode;
 import lcmc.common.domain.Application;
 import lcmc.common.ui.treemenu.TreeMenuController;
+import lcmc.common.ui.utils.SwingUtils;
 import lcmc.host.domain.Host;
 import lcmc.common.domain.StringValue;
 import lcmc.vm.domain.VmsXml;
@@ -80,9 +80,7 @@ final class SoundInfo extends HardwareInfo {
     }
 
     @Inject
-    private Application application;
-    @Inject
-    private WidgetFactory widgetFactory;
+    private SwingUtils swingUtils;
 
     /** Table panel. */
     private JComponent tablePanel = null;
@@ -100,7 +98,7 @@ final class SoundInfo extends HardwareInfo {
                                    DomainInfo.SOUND_TABLE,
                                    getVMSVirtualDomainInfo().getNewSoundBtn());
         if (getResource().isNew()) {
-            application.invokeLater(new Runnable() {
+            swingUtils.invokeLater(new Runnable() {
                 @Override
                 public void run() {
                     tablePanel.setVisible(false);
@@ -210,7 +208,7 @@ final class SoundInfo extends HardwareInfo {
         if (Application.isTest(runMode)) {
             return;
         }
-        application.invokeAndWait(new Runnable() {
+        swingUtils.invokeAndWait(new Runnable() {
             @Override
             public void run() {
                 getApplyButton().setEnabled(false);
@@ -245,7 +243,7 @@ final class SoundInfo extends HardwareInfo {
         treeMenuController.reloadNode(getNode(), false);
         getBrowser().periodicalVmsUpdate(
                 getVMSVirtualDomainInfo().getDefinedOnHosts());
-        application.invokeLater(new Runnable() {
+        swingUtils.invokeLater(new Runnable() {
             @Override
             public void run() {
                 tablePanel.setVisible(true);

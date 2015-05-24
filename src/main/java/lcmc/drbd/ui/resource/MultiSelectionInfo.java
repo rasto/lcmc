@@ -38,6 +38,7 @@ import javax.swing.JScrollPane;
 import lcmc.common.domain.AccessMode;
 import lcmc.common.ui.GUIData;
 import lcmc.common.domain.Application;
+import lcmc.common.ui.utils.SwingUtils;
 import lcmc.crm.domain.ClusterStatus;
 import lcmc.host.domain.Host;
 import lcmc.crm.domain.PtestData;
@@ -63,6 +64,8 @@ public class MultiSelectionInfo extends EditableInfo {
     private MultiSelectionMenu multiSelectionMenu;
     @Inject
     private Application application;
+    @Inject
+    private SwingUtils swingUtils;
 
     public void init(final List<Info> selectedInfos, final Browser browser) {
         super.init("selection", browser);
@@ -308,7 +311,7 @@ public class MultiSelectionInfo extends EditableInfo {
         addApplyButton(buttonPanel);
         addRevertButton(buttonPanel);
         final String[] params = getParametersFromXML();
-        application.invokeLater(new Runnable() {
+        swingUtils.invokeLater(new Runnable() {
             @Override
             public void run() {
                 /* invoke later on purpose  */

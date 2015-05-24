@@ -42,6 +42,7 @@ import lcmc.common.ui.GUIData;
 import lcmc.common.domain.AccessMode;
 import lcmc.common.domain.Application;
 import lcmc.common.ui.treemenu.TreeMenuController;
+import lcmc.common.ui.utils.SwingUtils;
 import lcmc.crm.domain.CrmXml;
 import lcmc.crm.domain.ClusterStatus;
 import lcmc.host.domain.Host;
@@ -75,6 +76,8 @@ public class ServiceMenu {
     private MenuFactory menuFactory;
     @Inject
     private Application application;
+    @Inject
+    private SwingUtils swingUtils;
     @Inject
     private Provider<ServiceLogs> serviceLogsProvider;
     @Inject
@@ -493,8 +496,8 @@ public class ServiceMenu {
         filesSubmenu.onUpdate(new Runnable() {
             @Override
             public void run() {
-                application.isSwingThread();
-                application.invokeLater(new Runnable() {
+                swingUtils.isSwingThread();
+                swingUtils.invokeLater(new Runnable() {
                     @Override
                     public void run() {
                         filesSubmenu.removeAll();
@@ -536,7 +539,7 @@ public class ServiceMenu {
         serviceMenu.onUpdate(new Runnable() {
             @Override
             public void run() {
-                application.isSwingThread();
+                swingUtils.isSwingThread();
                 serviceMenu.removeAll();
                 final Point2D pos = serviceMenu.getPos();
                 final CrmXml crmXML = serviceInfo.getBrowser().getCrmXml();
@@ -971,7 +974,7 @@ public class ServiceMenu {
                     @Override
                     public void run() {
                         serviceInfo.hidePopup();
-                        application.invokeLater(new Runnable() {
+                        swingUtils.invokeLater(new Runnable() {
                             @Override
                             public void run() {
                                 for (final JDialog otherP : popups) {
@@ -986,7 +989,7 @@ public class ServiceMenu {
                                                     true,
                                                     serviceInfo.getBrowser().getDCHost(),
                                                     runMode);
-                        application.invokeLater(new Runnable() {
+                        swingUtils.invokeLater(new Runnable() {
                             @Override
                             public void run() {
                                 existingServiceMenu.repaint();
@@ -1046,7 +1049,7 @@ public class ServiceMenu {
         serviceMenu.onUpdate(new Runnable() {
             @Override
             public void run() {
-                application.isSwingThread();
+                swingUtils.isSwingThread();
                 final JCheckBox colocationWi = new JCheckBox("Colo", true);
                 final JCheckBox orderWi = new JCheckBox("Order", true);
                 colocationWi.setBackground(ClusterBrowser.STATUS_BACKGROUND);
@@ -1278,7 +1281,7 @@ public class ServiceMenu {
             @Override
             public void run(final String text) {
                 serviceInfo.hidePopup();
-                application.invokeLater(new Runnable() {
+                swingUtils.invokeLater(new Runnable() {
                     @Override
                     public void run() {
                         for (final JDialog otherP : popups) {

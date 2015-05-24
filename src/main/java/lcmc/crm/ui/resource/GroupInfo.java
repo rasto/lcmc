@@ -43,6 +43,7 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import lcmc.common.domain.Application;
 import lcmc.common.domain.ColorText;
 import lcmc.common.ui.treemenu.TreeMenuController;
+import lcmc.common.ui.utils.SwingUtils;
 import lcmc.crm.domain.CrmXml;
 import lcmc.crm.domain.ClusterStatus;
 import lcmc.host.domain.Host;
@@ -87,6 +88,8 @@ public class GroupInfo extends ServiceInfo {
     @Inject
     private Application application;
     @Inject
+    private SwingUtils swingUtils;
+    @Inject
     private TreeMenuController treeMenuController;
 
     void init(final ResourceAgent ra, final Browser browser) {
@@ -100,7 +103,7 @@ public class GroupInfo extends ServiceInfo {
                     final Application.RunMode runMode) {
         final String[] params = getParametersFromXML();
         if (Application.isLive(runMode)) {
-            application.invokeAndWait(new Runnable() {
+            swingUtils.invokeAndWait(new Runnable() {
                 @Override
                 public void run() {
                     final MyButton ab = getApplyButton();
@@ -147,14 +150,14 @@ public class GroupInfo extends ServiceInfo {
             if (gsi == null) {
                 continue;
             }
-            application.invokeAndWait(new Runnable() {
+            swingUtils.invokeAndWait(new Runnable() {
                 @Override
                 public void run() {
                     gsi.getInfoPanel();
                 }
             });
         }
-        application.waitForSwing();
+        swingUtils.waitForSwing();
         for (final ServiceInfo gsi : servicesInNewOrder) {
             if (gsi == null) {
                 continue;
@@ -237,7 +240,7 @@ public class GroupInfo extends ServiceInfo {
     @Override
     public void apply(final Host dcHost, final Application.RunMode runMode) {
         if (Application.isLive(runMode)) {
-            application.invokeAndWait(new Runnable() {
+            swingUtils.invokeAndWait(new Runnable() {
                 @Override
                 public void run() {
                     getApplyButton().setEnabled(false);
@@ -249,7 +252,7 @@ public class GroupInfo extends ServiceInfo {
         waitForInfoPanel();
         final String[] params = getParametersFromXML();
         if (Application.isLive(runMode)) {
-            application.invokeLater(new Runnable() {
+            swingUtils.invokeLater(new Runnable() {
                 @Override
                 public void run() {
                     getApplyButton().setToolTipText("");

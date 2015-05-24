@@ -68,6 +68,7 @@ import lcmc.cluster.ui.widget.WidgetFactory;
 import lcmc.common.domain.Application;
 import lcmc.common.ui.utils.MyButton;
 import lcmc.common.domain.util.Tools;
+import lcmc.common.ui.utils.SwingUtils;
 
 /**
  * An implementation of a dialog with buttons. Ok button is predefined.
@@ -91,6 +92,8 @@ public abstract class ConfigDialog {
     private final List<JComponent> additionalOptions = new ArrayList<JComponent>();
     @Inject
     private Application application;
+    @Inject
+    private SwingUtils swingUtils;
     @Inject
     private WidgetFactory widgetFactory;
     private final MyButton[] options = new MyButton[buttons().length];
@@ -132,7 +135,7 @@ public abstract class ConfigDialog {
     }
 
     protected final void answerPaneSetText(final String text) {
-        application.invokeLater(new Runnable() {
+        swingUtils.invokeLater(new Runnable() {
             @Override
             public void run() {
                 final int l = answerPaneText.length();
@@ -146,7 +149,7 @@ public abstract class ConfigDialog {
     }
 
     protected final void answerPaneAddText(final String text) {
-        application.invokeLater(new Runnable() {
+        swingUtils.invokeLater(new Runnable() {
             @Override
             public void run() {
                 answerPaneText.append('\n');
@@ -158,7 +161,7 @@ public abstract class ConfigDialog {
 
 
     protected final void answerPaneSetTextError(final String text) {
-        application.invokeLater(new Runnable() {
+        swingUtils.invokeLater(new Runnable() {
             @Override
             public void run() {
                 answerPane.setForeground(Tools.getDefaultColor("ConfigDialog.AnswerPane.Error"));
@@ -173,7 +176,7 @@ public abstract class ConfigDialog {
     }
 
     protected final void answerPaneAddTextError(final String text) {
-        application.invokeLater(new Runnable() {
+        swingUtils.invokeLater(new Runnable() {
             @Override
             public void run() {
                 answerPaneText.append('\n');
@@ -432,7 +435,7 @@ public abstract class ConfigDialog {
             }
             /* create option pane */
             final MyButton dbc = defaultButtonClass;
-            application.invokeAndWait(new Runnable() {
+            swingUtils.invokeAndWait(new Runnable() {
                 @Override
                 public void run() {
                     optionPane = new JOptionPane(body(),
@@ -489,7 +492,7 @@ public abstract class ConfigDialog {
             };
         optionPane.addPropertyChangeListener(propertyChangeListener);
         initDialogBeforeVisible();
-        application.invokeAndWait(new Runnable() {
+        swingUtils.invokeAndWait(new Runnable() {
             @Override
             public void run() {
                 dialogPanel.setPreferredSize(new Dimension(dialogWidth(), dialogHeight()));
@@ -499,7 +502,7 @@ public abstract class ConfigDialog {
                 dialogPanel.setVisible(true);
             }
         });
-        application.invokeLater(new Runnable() {
+        swingUtils.invokeLater(new Runnable() {
             @Override
             public void run() {
                 dialogPanel.setLocationRelativeTo(guiData.getMainFrame());
@@ -535,7 +538,7 @@ public abstract class ConfigDialog {
      * can be later enabled with call to enableComponents.
      */
     protected final void disableComponents(final java.awt.Component[] components) {
-        application.invokeLater(new Runnable() {
+        swingUtils.invokeLater(new Runnable() {
             @Override
             public void run() {
                 for (final String b : buttons()) {
@@ -570,7 +573,7 @@ public abstract class ConfigDialog {
      */
     protected void enableComponents(final JComponent[] componentsToDisable) {
         final Collection<java.awt.Component> ctdHash = new HashSet<java.awt.Component>(Arrays.asList(componentsToDisable));
-        application.invokeLater(new Runnable() {
+        swingUtils.invokeLater(new Runnable() {
             @Override
             public void run() {
                 for (final java.awt.Component dc : disabledComponents) {
@@ -638,7 +641,7 @@ public abstract class ConfigDialog {
             final Thread t = new Thread(new Runnable() {
                 @Override
                 public void run() {
-                    application.invokeLater(new Runnable() {
+                    swingUtils.invokeLater(new Runnable() {
                         @Override
                         public void run() {
                             optionPane.setValue(((AbstractButton) e.getSource()).getText());

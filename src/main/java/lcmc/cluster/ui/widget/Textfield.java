@@ -29,11 +29,11 @@ import javax.swing.text.AbstractDocument;
 import javax.swing.text.Document;
 import javax.swing.text.JTextComponent;
 import lcmc.common.domain.AccessMode;
-import lcmc.common.domain.Application;
 import lcmc.common.domain.StringValue;
 import lcmc.common.domain.Value;
 import lcmc.common.ui.utils.MyButton;
 import lcmc.common.ui.utils.PatternDocument;
+import lcmc.common.ui.utils.SwingUtils;
 import lcmc.common.ui.utils.WidgetListener;
 
 /**
@@ -44,7 +44,7 @@ import lcmc.common.ui.utils.WidgetListener;
 @Named
 public class Textfield extends GenericWidget<JComponent> {
     @Inject
-    private Application application;
+    private SwingUtils swingUtils;
 
     public void init(final Value selectedValue,
                      final String regexp,
@@ -137,7 +137,7 @@ public class Textfield extends GenericWidget<JComponent> {
 
     @Override
     public void setBackgroundColor(final Color bg) {
-        application.invokeLater(new Runnable() {
+        swingUtils.invokeLater(new Runnable() {
             @Override
             public void run() {
                 setBackground(bg);

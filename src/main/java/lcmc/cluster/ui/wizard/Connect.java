@@ -29,7 +29,7 @@ import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.SpringLayout;
 
-import lcmc.common.domain.Application;
+import lcmc.common.ui.utils.SwingUtils;
 import lcmc.host.domain.Host;
 import lcmc.common.ui.SpringUtilities;
 import lcmc.common.ui.WizardDialog;
@@ -48,7 +48,7 @@ final class Connect extends DialogCluster {
     @Inject
     private CommStack commStackDialog;
     @Inject
-    private Application application;
+    private SwingUtils swingUtils;
 
     @Override
     public WizardDialog nextDialog() {
@@ -97,7 +97,7 @@ final class Connect extends DialogCluster {
                  Thread.currentThread().interrupt();
              }
 
-             application.invokeLater(new Runnable() {
+             swingUtils.invokeLater(new Runnable() {
                  @Override
                  public void run() {
                     buttonClass(nextButton()).pressButton();

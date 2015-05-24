@@ -24,6 +24,7 @@ package lcmc.host.ui;
 
 import lcmc.common.ui.GUIData;
 import lcmc.common.domain.Application;
+import lcmc.common.ui.utils.SwingUtils;
 import lcmc.host.domain.Host;
 import lcmc.drbd.domain.DrbdInstallation;
 import lcmc.logger.Logger;
@@ -46,6 +47,8 @@ public final class AddHostDialog {
     private GUIData guiData;
     @Inject
     private Application application;
+    @Inject
+    private SwingUtils swingUtils;
 
     public void showDialogs(final Host host) {
         guiData.enableAddHostButtons(false);
@@ -69,7 +72,7 @@ public final class AddHostDialog {
             } else if (dialog.isPressedFinishButton()) {
                 LOG.debug1("showDialogs: dialog: " + dialog.getClass().getName() + " finished");
                 guiData.allHostsUpdate();
-                application.invokeLater(new Runnable() {
+                swingUtils.invokeLater(new Runnable() {
                     @Override
                     public void run() {
                         guiData.checkAddClusterButtons();

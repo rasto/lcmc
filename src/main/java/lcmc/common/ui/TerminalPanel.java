@@ -52,6 +52,7 @@ import javax.swing.text.SimpleAttributeSet;
 import javax.swing.text.StyleConstants;
 
 import lcmc.common.domain.Application;
+import lcmc.common.ui.utils.SwingUtils;
 import lcmc.host.domain.Host;
 import lcmc.robotest.RoboTest;
 import lcmc.robotest.StartTests;
@@ -173,6 +174,8 @@ public class TerminalPanel extends JScrollPane {
     private GUIData guiData;
     @Inject
     private Application application;
+    @Inject
+    private SwingUtils swingUtils;
     @Inject
     private StartTests srartTests;
 
@@ -444,7 +447,7 @@ public class TerminalPanel extends JScrollPane {
      * and scrolls the text up.
      */
     public void nextCommand() {
-        application.invokeLater(new Runnable() {
+        swingUtils.invokeLater(new Runnable() {
             @Override
             public void run() {
                 append(prompt(), promptColor);
@@ -456,7 +459,7 @@ public class TerminalPanel extends JScrollPane {
     public void addCommand(final String command) {
         final String[] lines = command.split("\\r?\\n");
 
-        application.invokeLater(new Runnable() {
+        swingUtils.invokeLater(new Runnable() {
             @Override
             public void run() {
                 append(lines[0], commandColor);
@@ -470,7 +473,7 @@ public class TerminalPanel extends JScrollPane {
 
     /** Adds command output to the terminal textarea and scrolls up. */
     public void addCommandOutput(final String output) {
-        application.invokeLater(new Runnable() {
+        swingUtils.invokeLater(new Runnable() {
             @Override
             public void run() {
                 append(output, outputColor);
@@ -480,7 +483,7 @@ public class TerminalPanel extends JScrollPane {
 
     /** Adds array of command output to the terminal textarea and scrolls up. */
     public void addCommandOutput(final String[] output) {
-        application.invokeLater(new Runnable() {
+        swingUtils.invokeLater(new Runnable() {
             @Override
             public void run() {
                 for (int i = 0; i < output.length; i++) {
@@ -498,7 +501,7 @@ public class TerminalPanel extends JScrollPane {
 
     /** Adds content string (output of a command) to the terminal area. */
     public void addContent(final String c) {
-        application.invokeLater(new Runnable() {
+        swingUtils.invokeLater(new Runnable() {
             @Override
             public void run() {
                 append(c, outputColor);
@@ -508,7 +511,7 @@ public class TerminalPanel extends JScrollPane {
 
     /** Adds content to the terminal textarea and scrolls up. */
     public void addContentErr(final String c) {
-        application.invokeLater(new Runnable() {
+        swingUtils.invokeLater(new Runnable() {
             @Override
             public void run() {
                 append(c, errorColor);

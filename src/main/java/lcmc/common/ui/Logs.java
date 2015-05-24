@@ -58,7 +58,7 @@ import javax.swing.text.SimpleAttributeSet;
 import javax.swing.text.StyleConstants;
 
 import lcmc.cluster.ui.widget.WidgetFactory;
-import lcmc.common.domain.Application;
+import lcmc.common.ui.utils.SwingUtils;
 import lcmc.host.domain.Host;
 import lcmc.common.domain.ExecCallback;
 import lcmc.logger.Logger;
@@ -78,7 +78,7 @@ public class Logs extends ConfigDialog {
     private final Lock mRefreshLock = new ReentrantLock();
     private final Collection<JComponent> additionalComponents = new ArrayList<JComponent>();
     @Inject
-    private Application application;
+    private SwingUtils swingUtils;
     @Inject
     private WidgetFactory widgetFactory;
 
@@ -138,7 +138,7 @@ public class Logs extends ConfigDialog {
     }
 
     protected void enableAllComponents(final boolean enable) {
-        application.invokeLater(new Runnable() {
+        swingUtils.invokeLater(new Runnable() {
             @Override
             public void run() {
                 for (final Map.Entry<String, JCheckBox> checkBoxEntry : patternToCheckBoxMap.entrySet()) {

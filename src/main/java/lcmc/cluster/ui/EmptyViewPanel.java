@@ -39,6 +39,7 @@ import lcmc.cluster.ui.wizard.AddClusterDialog;
 import lcmc.common.ui.Browser;
 import lcmc.common.ui.GUIData;
 import lcmc.common.ui.ViewPanel;
+import lcmc.common.ui.utils.SwingUtils;
 import lcmc.host.ui.AddHostDialog;
 import lcmc.cluster.ui.widget.WidgetFactory;
 import lcmc.common.domain.Application;
@@ -71,6 +72,8 @@ public final class EmptyViewPanel extends ViewPanel implements AllHostsUpdatable
     private GUIData guiData;
     @Inject
     private Application application;
+    @Inject
+    private SwingUtils swingUtils;
     @Inject
     private WidgetFactory widgetFactory;
 
@@ -144,7 +147,7 @@ public final class EmptyViewPanel extends ViewPanel implements AllHostsUpdatable
         guiData.checkAddClusterButtons();
         buttonPanel.add(addClusterButton);
         if (!application.getAutoHosts().isEmpty()) {
-            application.invokeLater(new Runnable() {
+            swingUtils.invokeLater(new Runnable() {
                 @Override
                 public void run() {
                     addHostButton.pressButton();

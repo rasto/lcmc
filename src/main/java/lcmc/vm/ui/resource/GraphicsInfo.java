@@ -35,10 +35,10 @@ import javax.swing.ImageIcon;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 
-import lcmc.cluster.ui.widget.WidgetFactory;
 import lcmc.common.domain.AccessMode;
 import lcmc.common.domain.Application;
 import lcmc.common.ui.treemenu.TreeMenuController;
+import lcmc.common.ui.utils.SwingUtils;
 import lcmc.host.domain.Host;
 import lcmc.common.domain.StringValue;
 import lcmc.cluster.service.NetworkService;
@@ -130,9 +130,7 @@ public final class GraphicsInfo extends HardwareInfo {
     }
 
     @Inject
-    private Application application;
-    @Inject
-    private WidgetFactory widgetFactory;
+    private SwingUtils swingUtils;
 
     /** Combo box that can be made invisible. */
     private final Map<String, Widget> portWi = new HashMap<String, Widget>();
@@ -164,7 +162,7 @@ public final class GraphicsInfo extends HardwareInfo {
                                    DomainInfo.GRAPHICS_TABLE,
                                    getVMSVirtualDomainInfo().getNewGraphicsBtn());
         if (getResource().isNew()) {
-            application.invokeLater(new Runnable() {
+            swingUtils.invokeLater(new Runnable() {
                 @Override
                 public void run() {
                     tablePanel.setVisible(false);
@@ -327,7 +325,7 @@ public final class GraphicsInfo extends HardwareInfo {
     /** Returns device parameters. */
     @Override
     protected Map<String, String> getHWParameters(final boolean allParams) {
-        application.invokeAndWait(new Runnable() {
+        swingUtils.invokeAndWait(new Runnable() {
             @Override
             public void run() {
                 getInfoPanel();
@@ -372,7 +370,7 @@ public final class GraphicsInfo extends HardwareInfo {
         if (Application.isTest(runMode)) {
             return;
         }
-        application.invokeAndWait(new Runnable() {
+        swingUtils.invokeAndWait(new Runnable() {
             @Override
             public void run() {
                 getApplyButton().setEnabled(false);
@@ -402,7 +400,7 @@ public final class GraphicsInfo extends HardwareInfo {
         treeMenuController.reloadNode(getNode(), false);
         getBrowser().periodicalVmsUpdate(
                 getVMSVirtualDomainInfo().getDefinedOnHosts());
-        application.invokeLater(new Runnable() {
+        swingUtils.invokeLater(new Runnable() {
             @Override
             public void run() {
                 tablePanel.setVisible(true);
@@ -466,7 +464,7 @@ public final class GraphicsInfo extends HardwareInfo {
         if (GraphicsData.TYPE.equals(param)) {
             final boolean vnc = TYPE_VNC.equals(newValue);
             final boolean sdl = TYPE_SDL.equals(newValue);
-            application.invokeLater(new Runnable() {
+            swingUtils.invokeLater(new Runnable() {
                 @Override
                 public void run() {
                     for (final Map.Entry<String, Widget> entry : listenWi.entrySet()) {

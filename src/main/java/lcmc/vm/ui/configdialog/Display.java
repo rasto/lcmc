@@ -32,6 +32,7 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
 import lcmc.common.domain.Application;
+import lcmc.common.ui.utils.SwingUtils;
 import lcmc.vm.domain.data.GraphicsData;
 import lcmc.common.ui.WizardDialog;
 import lcmc.vm.ui.resource.GraphicsInfo;
@@ -56,6 +57,8 @@ final class Display extends VMConfig {
     private VMFinish vmFinishDialog;
     @Inject
     private Application application;
+    @Inject
+    private SwingUtils swingUtils;
 
     @Override
     public WizardDialog nextDialog() {
@@ -95,7 +98,7 @@ final class Display extends VMConfig {
     @Override
     protected void initDialogAfterVisible() {
         enableComponents();
-        application.invokeLater(new Runnable() {
+        swingUtils.invokeLater(new Runnable() {
             @Override
             public void run() {
                 final boolean enable = graphicsInfo.checkResourceFields(null, graphicsInfo.getRealParametersFromXML())

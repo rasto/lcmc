@@ -46,6 +46,7 @@ import javax.swing.SpringLayout;
 import lcmc.common.domain.AccessMode;
 import lcmc.common.domain.Application;
 import lcmc.cluster.domain.Cluster;
+import lcmc.common.ui.utils.SwingUtils;
 import lcmc.host.domain.Host;
 import lcmc.common.domain.StringValue;
 import lcmc.drbd.domain.BlockDevice;
@@ -69,7 +70,7 @@ public final class VGCreate extends LV {
     private Map<Host, JCheckBox> hostCheckBoxes = null;
     private Map<String, JCheckBox> pvCheckBoxes = null;
     @Inject
-    private Application application;
+    private SwingUtils swingUtils;
     @Inject
     private WidgetFactory widgetFactory;
     private MyButton createButton;
@@ -324,7 +325,7 @@ public final class VGCreate extends LV {
     private class CreateRunnable implements Runnable {
         @Override
         public void run() {
-            application.invokeAndWait(new Runnable() {
+            swingUtils.invokeAndWait(new Runnable() {
                 @Override
                 public void run() {
                     enableCreateButton(false);
@@ -353,7 +354,7 @@ public final class VGCreate extends LV {
                 for (final Host h : hostCheckBoxes.keySet()) {
                     h.getBrowser().getClusterBrowser().updateHWInfo(h, Host.UPDATE_LVM);
                 }
-                application.invokeLater(new Runnable() {
+                swingUtils.invokeLater(new Runnable() {
                     @Override
                     public void run() {
                         checkButtons();

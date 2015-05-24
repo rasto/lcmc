@@ -81,6 +81,8 @@ implements ActionListener, UpdatableItem, ComponentWithTest {
     private String origToolTipText = "";
     @Inject
     private Application application;
+    @Inject
+    private SwingUtils swingUtils;
 
     private MenuAction menuAction;
 
@@ -127,7 +129,7 @@ implements ActionListener, UpdatableItem, ComponentWithTest {
         this.robot = createRobot();
         processAccessMode();
         setIconAndTooltip();
-        application.isSwingThread();
+        swingUtils.isSwingThread();
     }
 
     protected void init(final String text,
@@ -154,7 +156,7 @@ implements ActionListener, UpdatableItem, ComponentWithTest {
         robot = createRobot();
         processAccessMode();
         setIconAndTooltip();
-        application.isSwingThread();
+        swingUtils.isSwingThread();
     }
 
     private Robot createRobot() {
@@ -223,7 +225,7 @@ implements ActionListener, UpdatableItem, ComponentWithTest {
         final String name = font.getFontName();
         final int style   = Font.PLAIN;
         final int size    = font.getSize();
-        application.invokeLater(new Runnable() {
+        swingUtils.invokeLater(new Runnable() {
             @Override
             public void run() {
                 setFont(new Font(name, style, size));
@@ -237,7 +239,7 @@ implements ActionListener, UpdatableItem, ComponentWithTest {
         final String name = font.getFontName();
         final int style   = Font.ITALIC;
         final int size    = font.getSize();
-        application.invokeLater(new Runnable() {
+        swingUtils.invokeLater(new Runnable() {
             @Override
             public void run() {
                 setFont(new Font(name, style, size));

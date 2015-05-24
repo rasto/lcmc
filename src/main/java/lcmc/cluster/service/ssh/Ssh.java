@@ -28,6 +28,7 @@ import java.io.IOException;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
+import lcmc.common.ui.utils.SwingUtils;
 import lcmc.configs.DistResource;
 import lcmc.common.ui.GUIData;
 import lcmc.common.domain.Application;
@@ -77,10 +78,12 @@ public final class Ssh {
     @Inject
     private Application application;
     @Inject
+    private SwingUtils swingUtils;
+    @Inject
     private Provider<Authentication> authenticationProvider;
 
     boolean reconnect() {
-        application.isNotSwingThread();
+        swingUtils.isNotSwingThread();
         mConnectionThreadLock.lock();
         if (connectionThread == null) {
             mConnectionThreadLock.unlock();

@@ -33,6 +33,7 @@ import javax.swing.JPanel;
 import javax.swing.SpringLayout;
 import lcmc.common.domain.AccessMode;
 import lcmc.common.domain.Application;
+import lcmc.common.ui.utils.SwingUtils;
 import lcmc.host.domain.Host;
 import lcmc.common.domain.StringValue;
 import lcmc.vm.domain.VmsXml;
@@ -57,7 +58,7 @@ public final class LVSnapshot extends LV {
     private Widget sizeWi;
     private Widget maxSizeWi;
     @Inject
-    private Application application;
+    private SwingUtils swingUtils;
     @Inject
     private WidgetFactory widgetFactory;
     private MyButton snapshotButton;
@@ -90,7 +91,7 @@ public final class LVSnapshot extends LV {
     }
 
     protected void checkButtons() {
-        application.invokeLater(new EnableSnapshotRunnable(true));
+        swingUtils.invokeLater(new EnableSnapshotRunnable(true));
     }
 
     private void setComboBoxes() {
@@ -164,7 +165,7 @@ public final class LVSnapshot extends LV {
                 final Thread thread = new Thread(new Runnable() {
                     @Override
                     public void run() {
-                        application.invokeAndWait(new EnableSnapshotRunnable(false));
+                        swingUtils.invokeAndWait(new EnableSnapshotRunnable(false));
                         disableComponents();
                         getProgressBar().start(SNAPSHOT_TIMEOUT);
                         final boolean ret = lvSnapshot(lvNameWi.getStringValue(), sizeWi.getStringValue());

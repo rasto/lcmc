@@ -30,10 +30,10 @@ import javax.swing.JCheckBox;
 import javax.swing.JComponent;
 import javax.swing.text.Document;
 import lcmc.common.domain.AccessMode;
-import lcmc.common.domain.Application;
 import lcmc.common.domain.StringValue;
 import lcmc.common.domain.Value;
 import lcmc.common.ui.utils.MyButton;
+import lcmc.common.ui.utils.SwingUtils;
 import lcmc.common.ui.utils.WidgetListener;
 
 /**
@@ -50,7 +50,7 @@ public class Checkbox extends GenericWidget<JComponent> {
     /** Name for the 'false' value. */
     private Value checkBoxFalse = new StringValue(CHECKBOX_FALSE);
     @Inject
-    private Application application;
+    private SwingUtils swingUtils;
 
     public void init(final Value selectedValue,
                     final Value[] items,
@@ -133,7 +133,7 @@ public class Checkbox extends GenericWidget<JComponent> {
 
     @Override
     public void setBackgroundColor(final Color bg) {
-        application.invokeLater(new Runnable() {
+        swingUtils.invokeLater(new Runnable() {
             @Override
             public void run() {
                 setBackground(bg);

@@ -37,7 +37,6 @@ import lcmc.AppContext;
 import lcmc.common.domain.AccessMode;
 import lcmc.common.ui.GUIData;
 import lcmc.common.ui.MainMenu;
-import lcmc.common.domain.Application;
 import lcmc.cluster.domain.Cluster;
 import lcmc.host.domain.Host;
 import lcmc.common.ui.BugReport;
