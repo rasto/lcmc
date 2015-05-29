@@ -62,6 +62,7 @@ import com.google.common.collect.Table;
 import lcmc.common.domain.AccessMode;
 import lcmc.common.domain.Application;
 import lcmc.common.domain.ColorText;
+import lcmc.common.ui.Access;
 import lcmc.common.ui.ProgressIndicator;
 import lcmc.common.ui.treemenu.TreeMenuController;
 import lcmc.common.ui.utils.SwingUtils;
@@ -214,6 +215,8 @@ public class ServiceInfo extends EditableInfo {
     private TreeMenuController treeMenuController;
     @Inject
     private CrmServiceFactory crmServiceFactory;
+    @Inject
+    private Access access;
 
     public void init(final String name, final ResourceAgent resourceAgent, final Browser browser) {
         super.init(name, browser);
@@ -1656,7 +1659,7 @@ public class ServiceInfo extends EditableInfo {
         final JPanel advancedOpPanel = new JPanel(new SpringLayout());
         advancedOpPanel.setBackground(ClusterBrowser.PANEL_BACKGROUND);
         addToAdvancedList(advancedOpPanel);
-        advancedOpPanel.setVisible(application.isAdvancedMode());
+        advancedOpPanel.setVisible(access.isAdvancedMode());
         int advancedRows = 0;
         boolean allAreDefaultValues = true;
         int normalRows = 0;

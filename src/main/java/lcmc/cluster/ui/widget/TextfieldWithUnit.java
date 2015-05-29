@@ -42,6 +42,7 @@ import lcmc.common.domain.AccessMode;
 import lcmc.common.domain.Application;
 import lcmc.common.domain.StringValue;
 import lcmc.common.domain.Value;
+import lcmc.common.ui.Access;
 import lcmc.common.ui.SpringUtilities;
 import lcmc.common.ui.utils.MyButton;
 import lcmc.common.ui.utils.PatternDocument;
@@ -60,6 +61,8 @@ public final class TextfieldWithUnit extends GenericWidget<JComponent> {
     private Application application;
     @Inject
     private SwingUtils swingUtils;
+    @Inject
+    private Access access;
     /** Text field in widget with units. */
     private JTextField textFieldPart;
     private MComboBox<Unit> unitComboBox;
@@ -202,7 +205,7 @@ public final class TextfieldWithUnit extends GenericWidget<JComponent> {
                 unit.setPlural(!"1".equals(text));
                 unitComboBox.repaint();
             }
-            final boolean accessible = application.isAccessible(getEnableAccessMode());
+            final boolean accessible = access.isAccessible(getEnableAccessMode());
             if (text == null || text.isEmpty()) {
                 if (!unit.isEmpty()) {
                     unit.setEmpty(true);

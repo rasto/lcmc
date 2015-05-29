@@ -45,6 +45,7 @@ import lcmc.common.domain.AccessMode;
 import lcmc.common.domain.Application;
 import lcmc.common.domain.StringValue;
 import lcmc.common.domain.Value;
+import lcmc.common.ui.Access;
 import lcmc.common.ui.utils.MyButton;
 import lcmc.common.ui.utils.SwingUtils;
 import lcmc.common.ui.utils.WidgetListener;
@@ -68,6 +69,8 @@ public final class RadioGroup extends GenericWidget<JComponent> {
     private Application application;
     @Inject
     private SwingUtils swingUtils;
+    @Inject
+    private Access access;
 
     public void init(final Value selectedValue,
                      final Value[] items,
@@ -122,7 +125,7 @@ public final class RadioGroup extends GenericWidget<JComponent> {
      */
     @Override
     public void setEnabled(final String s, final boolean enabled) {
-        final boolean accessible = application.isAccessible(getEnableAccessMode());
+        final boolean accessible = access.isAccessible(getEnableAccessMode());
         mComponentsReadLock.lock();
         final JComponent c;
         try {

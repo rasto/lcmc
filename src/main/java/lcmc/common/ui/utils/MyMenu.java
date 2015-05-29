@@ -33,6 +33,7 @@ import javax.swing.JScrollPane;
 import lcmc.common.domain.AccessMode;
 import lcmc.common.domain.Application;
 import lcmc.common.domain.EnablePredicate;
+import lcmc.common.ui.Access;
 
 /**
  * This is a menu object that holds MyMenuItems.
@@ -44,6 +45,8 @@ public class MyMenu extends JMenu implements UpdatableItem {
     private AccessMode enableAccessMode;
     @Inject
     private Application application;
+    @Inject
+    private Access access;
 
     private EnablePredicate enablePredicate = new EnablePredicate() {
         @Override
@@ -101,7 +104,7 @@ public class MyMenu extends JMenu implements UpdatableItem {
 
     /** Sets this item enabled and visible according to its access type. */
     public void processAccessMode() {
-        final boolean accessible = application.isAccessible(enableAccessMode);
+        final boolean accessible = access.isAccessible(enableAccessMode);
         final String disableTooltip = enablePredicate.check();
         setEnabled(disableTooltip == null && accessible);
         if (isVisible()) {

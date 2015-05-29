@@ -132,6 +132,8 @@ public class Info implements Comparable<Info>, Value, InfoPresenter {
     private SwingUtils swingUtils;
     @Inject
     private TreeMenuController treeMenuController;
+    @Inject
+    private Access access;
 
     public void init(final String name, final Browser browser) {
         this.name = name;
@@ -1049,11 +1051,11 @@ public class Info implements Comparable<Info>, Value, InfoPresenter {
     /** Process access lists. TODO: rename.*/
     public void updateAdvancedPanels() {
         for (final Map.Entry<JComponent, AccessMode> componentEntry : componentToEnableAccessMode.entrySet()) {
-            final boolean accessible = application.isAccessible(componentEntry.getValue());
+            final boolean accessible = access.isAccessible(componentEntry.getValue());
             componentEntry.getKey().setEnabled(accessible);
         }
         for (final Map.Entry<JTextComponent, AccessMode> componentEntry : componentToEditAccessMode.entrySet()) {
-            final boolean accessible = application.isAccessible(componentEntry.getValue());
+            final boolean accessible = access.isAccessible(componentEntry.getValue());
             componentEntry.getKey().setEditable(accessible);
         }
     }

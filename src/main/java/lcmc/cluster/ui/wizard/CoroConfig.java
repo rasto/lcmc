@@ -51,6 +51,7 @@ import javax.swing.JTextArea;
 import javax.swing.SpringLayout;
 
 import lcmc.Exceptions.IllegalVersionException;
+import lcmc.common.ui.Access;
 import lcmc.common.ui.GUIData;
 import lcmc.common.domain.AccessMode;
 import lcmc.common.ui.utils.SwingUtils;
@@ -132,6 +133,8 @@ final class CoroConfig extends DialogCluster {
     private MyButton makeConfigButton;
     @Inject
     private NetworkService networkService;
+    @Inject
+    private Access access;
 
     public void init(final WizardDialog previousDialog, final Cluster cluster) {
         super.init(previousDialog, cluster);
@@ -614,7 +617,7 @@ final class CoroConfig extends DialogCluster {
                     if (aisCastAddresses.isEmpty()) {
                         makeConfigButton.setEnabled(false);
                     } else {
-                        guiData.setAccessible(makeConfigButton, AccessMode.ADMIN);
+                        access.setAccessible(makeConfigButton, AccessMode.ADMIN);
                     }
                     if (!application.getAutoClusters().isEmpty() && !aisCastAddresses.isEmpty()) {
                         Tools.sleep(1000);
@@ -969,7 +972,7 @@ final class CoroConfig extends DialogCluster {
         configCheckbox = new JCheckBox("-----", true);
         configCheckbox.setBackground(Tools.getDefaultColor("ConfigDialog.Background.Light"));
 
-        guiData.setAccessible(configCheckbox, AccessMode.ADMIN);
+        access.setAccessible(configCheckbox, AccessMode.ADMIN);
         configCheckbox.addItemListener(new ItemListener() {
             @Override
             public void itemStateChanged(final ItemEvent e) {

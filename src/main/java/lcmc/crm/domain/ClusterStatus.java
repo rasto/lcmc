@@ -32,6 +32,7 @@ import java.util.Set;
 
 import com.google.common.collect.Table;
 import lcmc.common.domain.Application;
+import lcmc.common.ui.Access;
 import lcmc.host.domain.Host;
 import lcmc.common.domain.Value;
 import lcmc.common.domain.ConvertCmdCallback;
@@ -63,6 +64,8 @@ public final class ClusterStatus {
     private Host host;
     @Inject
     private Application application;
+    @Inject
+    private Access access;
 
     /**
      * Gets and parses metadata from pengine and crmd.
@@ -459,7 +462,7 @@ public final class ClusterStatus {
                 }
             } else if ("cibadmin".equals(cmd)) {
                 final String cib = Tools.join("\n", data.toArray(new String[data.size()]));
-                final boolean advancedMode = application.isAdvancedMode();
+                final boolean advancedMode = access.isAdvancedMode();
                 if (!cib.equals(oldCib) || oldAdvancedMode != advancedMode) {
                     LOG.debug1("parseCommand: cib update: " + host.getName());
                     oldCib = cib;

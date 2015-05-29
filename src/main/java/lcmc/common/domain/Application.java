@@ -86,7 +86,6 @@ public class Application {
     private String savedDownloadPassword = "";
     private boolean loginSave = true;
 
-    private boolean advancedMode = false;
     private String defaultSaveFile = Tools.getDefault("MainMenu.DrbdGuiFiles.Default");
     private final KnownHosts knownHosts = new KnownHosts();
     private String knownHostPath;
@@ -112,8 +111,6 @@ public class Application {
     private boolean stagingPacemaker = false;
     private boolean hideLRM = false;
     private float animFPS = DEFAULT_ANIM_FPS;
-    private AccessMode.Type accessType = AccessMode.ADMIN;
-    private AccessMode.Type maxAccessType = AccessMode.ADMIN;
     private boolean upgradeCheckEnabled = true;
     private boolean bigDRBDConf = false;
     private boolean oneHostCluster = false;
@@ -259,14 +256,6 @@ public class Application {
 
     public void disconnectAllHosts() {
         allHosts.disconnectAllHosts();
-    }
-
-    public void setAdvancedMode(final boolean advancedMode) {
-        this.advancedMode = advancedMode;
-    }
-
-    public boolean isAdvancedMode() {
-        return advancedMode;
     }
 
     public void setDefaultSaveFile(final String defaultSaveFile) {
@@ -523,39 +512,6 @@ public class Application {
         this.animFPS = animFPS;
     }
 
-    public void setAccessType(final AccessMode.Type accessType) {
-        this.accessType = accessType;
-    }
-
-    public AccessMode.Type getAccessType() {
-        return accessType;
-    }
-
-    AccessMode.Type getMaxAccessType() {
-        return maxAccessType;
-    }
-
-    /**
-     * Returns true if the access type is greater than the one that is
-     * required and advanced mode is required and we are not in advanced mode.
-     */
-    public boolean isAccessible(final AccessMode required) {
-        return getAccessType().compareTo(required.getType()) > 0
-               || (getAccessType().compareTo(required.getType()) == 0
-                   && (advancedMode || !required.isAdvancedMode()));
-    }
-
-    public String[] getOperatingModes() {
-        final List<String> modes = new ArrayList<String>();
-        for (final AccessMode.Type at : AccessMode.OP_MODES_MAP.keySet()) {
-            modes.add(AccessMode.OP_MODES_MAP.get(at));
-            if (at.equals(maxAccessType)) {
-                break;
-            }
-        }
-        return modes.toArray(new String[modes.size()]);
-    }
-
     public void setUpgradeCheckEnabled(final boolean upgradeCheckEnabled) {
         this.upgradeCheckEnabled = upgradeCheckEnabled;
     }
@@ -758,20 +714,6 @@ public class Application {
         }
     }
 
-    public void setMaxAccessType(final AccessMode.Type maxAccessType) {
-        this.maxAccessType = maxAccessType;
-        setAccessType(maxAccessType);
-        checkAccessOfEverything();
-    }
-
-    public void checkAccessOfEverything() {
-        for (final Cluster c : allClusters.getClusterSet()) {
-            final ClusterBrowser cb = c.getBrowser();
-            if (cb != null) {
-                cb.checkAccessOfEverything();
-            }
-        }
-    }
     public int getServiceLabelWidth() {
         return getDefaultSize("ClusterBrowser.ServiceLabelWidth");
     }

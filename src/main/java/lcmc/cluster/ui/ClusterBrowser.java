@@ -56,6 +56,7 @@ import lcmc.ClusterEventBus;
 import lcmc.cluster.ui.network.NetworkFactory;
 import lcmc.cluster.ui.network.NetworkPresenter;
 import lcmc.common.domain.Application;
+import lcmc.common.ui.Access;
 import lcmc.common.ui.Browser;
 import lcmc.common.ui.CallbackAction;
 import lcmc.common.ui.GUIData;
@@ -275,6 +276,8 @@ public class ClusterBrowser extends Browser {
     private ClusterStatus clusterStatus;
     @Inject
     private CrmXml crmXml;
+    @Inject
+    private Access access;
     private DrbdXml drbdXml;
     private final ReadWriteLock mVmsLock = new ReentrantReadWriteLock();
     private final Lock mVmsReadLock = mVmsLock.readLock();
@@ -2008,7 +2011,7 @@ public class ClusterBrowser extends Browser {
         servicesInfo.checkResourceFields(null, servicesInfo.getParametersFromXML());
         servicesInfo.updateAdvancedPanels();
         rscDefaultsInfo.updateAdvancedPanels();
-        guiData.updateGlobalItems();
+        access.updateGlobalItems();
         for (final ServiceInfo si : getExistingServiceList(null)) {
             si.checkResourceFields(null, si.getParametersFromXML());
             si.updateAdvancedPanels();

@@ -180,6 +180,8 @@ public class TerminalPanel extends JScrollPane {
     private SwingUtils swingUtils;
     @Inject
     private StartTests srartTests;
+    @Inject
+    private Access access;
 
     public void initWithHost(final Host host0) {
         host = host0;
@@ -528,10 +530,10 @@ public class TerminalPanel extends JScrollPane {
         }
         if (!editEnabled && GOD_ON.equals(cheat)) {
             editEnabled = true;
-            guiData.godModeChanged(editEnabled);
+            access.godModeChanged(editEnabled);
         } else if (editEnabled && GOD_OFF.equals(cheat)) {
             editEnabled = false;
-            guiData.godModeChanged(editEnabled);
+            access.godModeChanged(editEnabled);
         } else if (CHEAT_LIST.equals(cheat)) {
             final StringBuilder list = new StringBuilder();
             for (final String ch : CHEATS_MAP.keySet()) {

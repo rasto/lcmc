@@ -25,6 +25,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
+import lcmc.common.ui.Access;
 import lcmc.common.ui.CallbackAction;
 import lcmc.common.domain.AccessMode;
 import lcmc.common.domain.Application;
@@ -98,6 +99,8 @@ public class BlockDevMenu {
     private Provider<LVSnapshot> lvSnapshotProvider;
     @Inject
     private Provider<DrbdLog> drbdLogProvider;
+    @Inject
+    private Access access;
 
     public List<UpdatableItem> getPulldownMenu(final BlockDevInfo blockDevInfo) {
         this.blockDevInfo = blockDevInfo;
@@ -240,7 +243,7 @@ public class BlockDevMenu {
                                 if (!getBlockDevice().isDrbd()) {
                                     return BlockDevInfo.NO_DRBD_RESOURCE_STRING;
                                 }
-                                if (!application.isAdvancedMode() && getDrbdResourceInfo().isUsedByCRM()) {
+                                if (!access.isAdvancedMode() && getDrbdResourceInfo().isUsedByCRM()) {
                                     return VolumeInfo.IS_USED_BY_CRM_STRING;
                                 }
                                 if (getBlockDevice().isSyncing()) {
@@ -304,7 +307,7 @@ public class BlockDevMenu {
                                 if (!getBlockDevice().isDrbd()) {
                                     return BlockDevInfo.NO_DRBD_RESOURCE_STRING;
                                 }
-                                if (!application.isAdvancedMode() && getDrbdResourceInfo().isUsedByCRM()) {
+                                if (!access.isAdvancedMode() && getDrbdResourceInfo().isUsedByCRM()) {
                                     return VolumeInfo.IS_USED_BY_CRM_STRING;
                                 }
                                 if (!getBlockDevice().isSyncing()
@@ -378,7 +381,7 @@ public class BlockDevMenu {
                                 if (!getBlockDevice().isDrbd()) {
                                     return BlockDevInfo.NO_DRBD_RESOURCE_STRING;
                                 }
-                                if (!application.isAdvancedMode() && getDrbdResourceInfo().isUsedByCRM()) {
+                                if (!access.isAdvancedMode() && getDrbdResourceInfo().isUsedByCRM()) {
                                     return VolumeInfo.IS_USED_BY_CRM_STRING;
                                 }
                                 if (!getBlockDevice().isSecondary()) {
@@ -421,7 +424,7 @@ public class BlockDevMenu {
                                 if (!getBlockDevice().isDrbd()) {
                                     return BlockDevInfo.NO_DRBD_RESOURCE_STRING;
                                 }
-                                if (!application.isAdvancedMode() && getDrbdResourceInfo().isUsedByCRM()) {
+                                if (!access.isAdvancedMode() && getDrbdResourceInfo().isUsedByCRM()) {
                                     return VolumeInfo.IS_USED_BY_CRM_STRING;
                                 }
                                 if (!getBlockDevice().isPrimary()) {
@@ -457,7 +460,7 @@ public class BlockDevMenu {
                                 if (!getBlockDevice().isDrbd()) {
                                     return BlockDevInfo.NO_DRBD_RESOURCE_STRING;
                                 }
-                                if (!application.isAdvancedMode() && getDrbdResourceInfo().isUsedByCRM()) {
+                                if (!access.isAdvancedMode() && getDrbdResourceInfo().isUsedByCRM()) {
                                     return VolumeInfo.IS_USED_BY_CRM_STRING;
                                 }
                                 return null;
@@ -491,7 +494,7 @@ public class BlockDevMenu {
                                 if (!getBlockDevice().isDrbd()) {
                                     return BlockDevInfo.NO_DRBD_RESOURCE_STRING;
                                 }
-                                if (!application.isAdvancedMode() && getDrbdResourceInfo().isUsedByCRM()) {
+                                if (!access.isAdvancedMode() && getDrbdResourceInfo().isUsedByCRM()) {
                                     return VolumeInfo.IS_USED_BY_CRM_STRING;
                                 }
                                 if (getBlockDevice().isSyncing()) {
@@ -541,7 +544,7 @@ public class BlockDevMenu {
                                 if (!getBlockDevice().isDrbd()) {
                                     return BlockDevInfo.NO_DRBD_RESOURCE_STRING;
                                 }
-                                if (!application.isAdvancedMode() && getDrbdResourceInfo().isUsedByCRM()) {
+                                if (!access.isAdvancedMode() && getDrbdResourceInfo().isUsedByCRM()) {
                                     return VolumeInfo.IS_USED_BY_CRM_STRING;
                                 }
                                 if (!getBlockDevice().isSyncing()) {
@@ -581,7 +584,7 @@ public class BlockDevMenu {
                                 if (!getBlockDevice().isDrbd()) {
                                     return BlockDevInfo.NO_DRBD_RESOURCE_STRING;
                                 }
-                                if (!application.isAdvancedMode() && getDrbdResourceInfo().isUsedByCRM()) {
+                                if (!access.isAdvancedMode() && getDrbdResourceInfo().isUsedByCRM()) {
                                     return VolumeInfo.IS_USED_BY_CRM_STRING;
                                 }
                                 if (getBlockDevice().isSyncing()) {
@@ -617,7 +620,7 @@ public class BlockDevMenu {
                                 if (!getBlockDevice().isDrbd()) {
                                     return BlockDevInfo.NO_DRBD_RESOURCE_STRING;
                                 }
-                                if (!application.isAdvancedMode() && getDrbdResourceInfo().isUsedByCRM()) {
+                                if (!access.isAdvancedMode() && getDrbdResourceInfo().isUsedByCRM()) {
                                     return VolumeInfo.IS_USED_BY_CRM_STRING;
                                 }
                                 if (getBlockDevice().isSyncing()) {

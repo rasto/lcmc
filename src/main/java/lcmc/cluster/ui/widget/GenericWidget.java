@@ -55,6 +55,7 @@ import javax.swing.text.Document;
 import lcmc.common.domain.AccessMode;
 import lcmc.common.domain.Application;
 import lcmc.common.domain.Value;
+import lcmc.common.ui.Access;
 import lcmc.common.ui.SpringUtilities;
 import lcmc.common.ui.utils.SwingUtils;
 import lcmc.logger.Logger;
@@ -98,6 +99,8 @@ public abstract class GenericWidget<T extends JComponent> extends JPanel impleme
     private Application application;
     @Inject
     private SwingUtils swingUtils;
+    @Inject
+    private Access access;
 
     public void init(final String regexp, final AccessMode enableAccessMode) {
         this.init(regexp, enableAccessMode, NO_BUTTON);
@@ -158,7 +161,7 @@ public abstract class GenericWidget<T extends JComponent> extends JPanel impleme
             text = text + "<br>" + disabledReason0;
         }
         if (enableAccessMode.getType() != AccessMode.NEVER) {
-            final boolean accessible = application.isAccessible(enableAccessMode);
+            final boolean accessible = access.isAccessible(enableAccessMode);
             if (!accessible) {
                 text = text + "<br>" + getDisabledTooltip();
             }
@@ -177,7 +180,7 @@ public abstract class GenericWidget<T extends JComponent> extends JPanel impleme
         }
         String disabledTooltip = null;
         if (enableAccessMode.getType() != AccessMode.NEVER) {
-            final boolean accessible = application.isAccessible(enableAccessMode);
+            final boolean accessible = access.isAccessible(enableAccessMode);
             if (!accessible) {
                 disabledTooltip = getDisabledTooltip();
             }
@@ -293,7 +296,7 @@ public abstract class GenericWidget<T extends JComponent> extends JPanel impleme
     @Override
     public final void setEnabled(final boolean enabled) {
         enablePredicate = enabled;
-        setComponentsEnabled(enablePredicate && application.isAccessible(enableAccessMode));
+        setComponentsEnabled(enablePredicate && access.isAccessible(enableAccessMode));
     }
 
     /** Sets extra button enabled. */
@@ -628,7 +631,7 @@ public abstract class GenericWidget<T extends JComponent> extends JPanel impleme
     /** Sets this item enabled and visible according to its access type. */
     @Override
     public final void processAccessMode() {
-        final boolean accessible = application.isAccessible(enableAccessMode);
+        final boolean accessible = access.isAccessible(enableAccessMode);
         setComponentsEnabled(enablePredicate && accessible);
         if (toolTipText != null) {
             setToolTipText(toolTipText);
