@@ -29,6 +29,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.swing.JColorChooser;
 
+import lcmc.common.ui.Access;
 import lcmc.common.ui.CallbackAction;
 import lcmc.common.ui.GUIData;
 import lcmc.common.domain.AccessMode;
@@ -61,6 +62,8 @@ public class PcmkMultiSelectionMenu {
     private Application application;
     @Inject
     private GUIData guiData;
+    @Inject
+    private Access access;
 
     public List<UpdatableItem> getPulldownMenu(final PcmkMultiSelectionInfo pcmkMultiSelectionInfo) {
         this.pcmkMultiSelectionInfo = pcmkMultiSelectionInfo;
@@ -1063,7 +1066,7 @@ public class PcmkMultiSelectionMenu {
                                 continue;
                             } else if (si.getService().isRemoved()) {
                                 return ServiceInfo.IS_BEING_REMOVED_STRING;
-                            } else if (si.isRunning(Application.RunMode.LIVE) && !application.isAdvancedMode()) {
+                            } else if (si.isRunning(Application.RunMode.LIVE) && !access.isAdvancedMode()) {
                                 return "cannot remove running resource<br>(advanced mode only)";
                             }
                             final GroupInfo gi = si.getGroupInfo();

@@ -34,6 +34,7 @@ import javax.inject.Named;
 import javax.inject.Provider;
 import javax.swing.JColorChooser;
 
+import lcmc.common.ui.Access;
 import lcmc.common.ui.CallbackAction;
 import lcmc.common.ui.GUIData;
 import lcmc.common.domain.AccessMode;
@@ -72,6 +73,8 @@ public class MultiSelectionMenu {
     private MenuFactory menuFactory;
     @Inject
     private Application application;
+    @Inject
+    private Access access;
     @Inject
     private Provider<VGCreate> vgCreateProvider;
     @Inject
@@ -629,7 +632,7 @@ public class MultiSelectionMenu {
                                 if (!bdi.getBlockDevice().isDrbd()) {
                                     continue;
                                 }
-                                if (!application.isAdvancedMode() && bdi.getDrbdVolumeInfo().isUsedByCRM()) {
+                                if (!access.isAdvancedMode() && bdi.getDrbdVolumeInfo().isUsedByCRM()) {
                                     continue;
                                 }
                                 if (bdi.getBlockDevice().isSyncing()) {
@@ -649,7 +652,7 @@ public class MultiSelectionMenu {
                         public void run(final String text) {
                     for (final BlockDevInfo bdi : selectedBlockDevInfos) {
                         if (bdi.getBlockDevice().isDrbd()
-                            && (application.isAdvancedMode() || !bdi.getDrbdVolumeInfo().isUsedByCRM())
+                            && (access.isAdvancedMode() || !bdi.getDrbdVolumeInfo().isUsedByCRM())
                             && !bdi.getBlockDevice().isSyncing()
                             && !bdi.isDiskless(Application.RunMode.LIVE)) {
                             bdi.detach(Application.RunMode.LIVE);
@@ -663,7 +666,7 @@ public class MultiSelectionMenu {
                           public void run(final Host host) {
                 for (final BlockDevInfo bdi : selectedBlockDevInfos) {
                     if (bdi.getBlockDevice().isDrbd()
-                        && (application.isAdvancedMode() || !bdi.getDrbdVolumeInfo().isUsedByCRM())
+                        && (access.isAdvancedMode() || !bdi.getDrbdVolumeInfo().isUsedByCRM())
                         && !bdi.getBlockDevice().isSyncing()
                         && !bdi.isDiskless(Application.RunMode.LIVE)) {
                         bdi.detach(Application.RunMode.TEST);
@@ -702,7 +705,7 @@ public class MultiSelectionMenu {
                         if (!bdi.getBlockDevice().isDrbd()) {
                             continue;
                         }
-                        if (!application.isAdvancedMode() && bdi.getDrbdVolumeInfo().isUsedByCRM()) {
+                        if (!access.isAdvancedMode() && bdi.getDrbdVolumeInfo().isUsedByCRM()) {
                             continue;
                         }
                         if (bdi.getBlockDevice().isSyncing()) {
@@ -721,7 +724,7 @@ public class MultiSelectionMenu {
                         public void run(final String text) {
                     for (final BlockDevInfo bdi : selectedBlockDevInfos) {
                         if (bdi.getBlockDevice().isDrbd()
-                            && (application.isAdvancedMode() || !bdi.getDrbdVolumeInfo().isUsedByCRM())
+                            && (access.isAdvancedMode() || !bdi.getDrbdVolumeInfo().isUsedByCRM())
                             && !bdi.getBlockDevice().isSyncing()
                             && bdi.isDiskless(Application.RunMode.LIVE)) {
                             bdi.attach(Application.RunMode.LIVE);
@@ -735,7 +738,7 @@ public class MultiSelectionMenu {
                          public void run(final Host host) {
                 for (final BlockDevInfo bdi : selectedBlockDevInfos) {
                     if (bdi.getBlockDevice().isDrbd()
-                        && (application.isAdvancedMode() || !bdi.getDrbdVolumeInfo().isUsedByCRM())
+                        && (access.isAdvancedMode() || !bdi.getDrbdVolumeInfo().isUsedByCRM())
                         && !bdi.getBlockDevice().isSyncing()
                         && bdi.isDiskless(Application.RunMode.LIVE)) {
                         bdi.attach(Application.RunMode.TEST);
@@ -774,7 +777,7 @@ public class MultiSelectionMenu {
                         if (!bdi.getBlockDevice().isDrbd()) {
                             continue;
                         }
-                        if (!application.isAdvancedMode() && bdi.getDrbdVolumeInfo().isUsedByCRM()) {
+                        if (!access.isAdvancedMode() && bdi.getDrbdVolumeInfo().isUsedByCRM()) {
                             continue;
                         }
                         if (bdi.isConnectedOrWF(Application.RunMode.LIVE)) {
@@ -793,7 +796,7 @@ public class MultiSelectionMenu {
                         public void run(final String text) {
                     for (final BlockDevInfo bdi : selectedBlockDevInfos) {
                         if (bdi.getBlockDevice().isDrbd()
-                            && (application.isAdvancedMode() || !bdi.getDrbdVolumeInfo().isUsedByCRM())
+                            && (access.isAdvancedMode() || !bdi.getDrbdVolumeInfo().isUsedByCRM())
                             && !bdi.isConnectedOrWF(Application.RunMode.LIVE)) {
                             bdi.connect(Application.RunMode.LIVE);
                         }
@@ -806,7 +809,7 @@ public class MultiSelectionMenu {
                           public void run(final Host host) {
                 for (final BlockDevInfo bdi : selectedBlockDevInfos) {
                     if (bdi.getBlockDevice().isDrbd()
-                        && (application.isAdvancedMode() || !bdi.getDrbdVolumeInfo().isUsedByCRM())
+                        && (access.isAdvancedMode() || !bdi.getDrbdVolumeInfo().isUsedByCRM())
                         && !bdi.isConnectedOrWF(Application.RunMode.LIVE)) {
                         bdi.connect(Application.RunMode.TEST);
                     }
@@ -844,7 +847,7 @@ public class MultiSelectionMenu {
                         if (!bdi.getBlockDevice().isDrbd()) {
                             continue;
                         }
-                        if (!application.isAdvancedMode() && bdi.getDrbdVolumeInfo().isUsedByCRM()) {
+                        if (!access.isAdvancedMode() && bdi.getDrbdVolumeInfo().isUsedByCRM()) {
                             continue;
                         }
                         if (bdi.getBlockDevice().isSyncing()
@@ -870,7 +873,7 @@ public class MultiSelectionMenu {
                     for (final BlockDevInfo bdi : selectedBlockDevInfos) {
                         if (bdi.getBlockDevice().isDrbd()
                             && bdi.isConnectedOrWF(Application.RunMode.LIVE)
-                            && (application.isAdvancedMode() || !bdi.getDrbdVolumeInfo().isUsedByCRM())
+                            && (access.isAdvancedMode() || !bdi.getDrbdVolumeInfo().isUsedByCRM())
                             && (!bdi.getBlockDevice().isSyncing()
                                 || (bdi.getBlockDevice().isPrimary() && bdi.getBlockDevice().isSyncSource())
                                    || (bdi.getOtherBlockDevInfo().getBlockDevice().isPrimary()
@@ -887,7 +890,7 @@ public class MultiSelectionMenu {
                 for (final BlockDevInfo bdi : selectedBlockDevInfos) {
                     if (bdi.getBlockDevice().isDrbd()
                         && bdi.isConnectedOrWF(Application.RunMode.LIVE)
-                        && (application.isAdvancedMode() || !bdi.getDrbdVolumeInfo().isUsedByCRM())
+                        && (access.isAdvancedMode() || !bdi.getDrbdVolumeInfo().isUsedByCRM())
                         && (!bdi.getBlockDevice().isSyncing()
                             || (bdi.getBlockDevice().isPrimary() && bdi.getBlockDevice().isSyncSource())
                                || (bdi.getOtherBlockDevInfo().getBlockDevice().isPrimary()
@@ -924,7 +927,7 @@ public class MultiSelectionMenu {
                         if (!bdi.getBlockDevice().isDrbd()) {
                             continue;
                         }
-                        if (!application.isAdvancedMode() && bdi.getDrbdVolumeInfo().isUsedByCRM()) {
+                        if (!access.isAdvancedMode() && bdi.getDrbdVolumeInfo().isUsedByCRM()) {
                             continue;
                         }
                         final BlockDevInfo oBdi = bdi.getOtherBlockDevInfo();
@@ -945,7 +948,7 @@ public class MultiSelectionMenu {
                     for (final BlockDevInfo bdi : selectedBlockDevInfos) {
                         if (bdi.getBlockDevice().isDrbd()
                             && !bdi.getBlockDevice().isPrimary()
-                            && (application.isAdvancedMode() || !bdi.getDrbdVolumeInfo().isUsedByCRM())) {
+                            && (access.isAdvancedMode() || !bdi.getDrbdVolumeInfo().isUsedByCRM())) {
                             final BlockDevInfo oBdi = bdi.getOtherBlockDevInfo();
                             if (oBdi != null
                                 && oBdi.getBlockDevice().isPrimary()
@@ -985,7 +988,7 @@ public class MultiSelectionMenu {
                         if (!bdi.getBlockDevice().isDrbd()) {
                             continue;
                         }
-                        if (!application.isAdvancedMode() && bdi.getDrbdVolumeInfo().isUsedByCRM()) {
+                        if (!access.isAdvancedMode() && bdi.getDrbdVolumeInfo().isUsedByCRM()) {
                             continue;
                         }
                         if (bdi.getBlockDevice().isPrimary()) {
@@ -1003,7 +1006,7 @@ public class MultiSelectionMenu {
                     for (final BlockDevInfo bdi : selectedBlockDevInfos) {
                         if (bdi.getBlockDevice().isDrbd()
                             && bdi.getBlockDevice().isPrimary()
-                            && (application.isAdvancedMode() || !bdi.getDrbdVolumeInfo().isUsedByCRM())) {
+                            && (access.isAdvancedMode() || !bdi.getDrbdVolumeInfo().isUsedByCRM())) {
                             bdi.setSecondary(Application.RunMode.LIVE);
                         }
                     }
@@ -1036,7 +1039,7 @@ public class MultiSelectionMenu {
                         if (!bdi.getBlockDevice().isDrbd()) {
                             continue;
                         }
-                        if (!application.isAdvancedMode() && bdi.getDrbdVolumeInfo().isUsedByCRM()) {
+                        if (!access.isAdvancedMode() && bdi.getDrbdVolumeInfo().isUsedByCRM()) {
                             continue;
                         }
                         final BlockDevInfo oBdi = bdi.getOtherBlockDevInfo();
@@ -1057,7 +1060,7 @@ public class MultiSelectionMenu {
                     for (final BlockDevInfo bdi : selectedBlockDevInfos) {
                         if (bdi.getBlockDevice().isDrbd()
                             && !bdi.getBlockDevice().isPrimary()
-                            && (application.isAdvancedMode() || !bdi.getDrbdVolumeInfo().isUsedByCRM())) {
+                            && (access.isAdvancedMode() || !bdi.getDrbdVolumeInfo().isUsedByCRM())) {
                             final BlockDevInfo oBdi = bdi.getOtherBlockDevInfo();
                             if (oBdi != null
                                 && oBdi.getBlockDevice().isPrimary()
@@ -1096,7 +1099,7 @@ public class MultiSelectionMenu {
                         if (!bdi.getBlockDevice().isDrbd()) {
                             continue;
                         }
-                        if (!application.isAdvancedMode() && bdi.getDrbdVolumeInfo().isUsedByCRM()) {
+                        if (!access.isAdvancedMode() && bdi.getDrbdVolumeInfo().isUsedByCRM()) {
                             continue;
                         }
                         if (bdi.getBlockDevice().isSyncing()) {
@@ -1124,7 +1127,7 @@ public class MultiSelectionMenu {
                             && !bdi.getBlockDevice().isSyncing()
                             && !bdi.getDrbdVolumeInfo().isVerifying()
                             && !selectedBlockDevInfos.contains(bdi.getOtherBlockDevInfo())
-                            && (application.isAdvancedMode() || !bdi.getDrbdVolumeInfo().isUsedByCRM())) {
+                            && (access.isAdvancedMode() || !bdi.getDrbdVolumeInfo().isUsedByCRM())) {
                             bdi.invalidateBD(Application.RunMode.LIVE);
                         }
                     }
@@ -1309,7 +1312,7 @@ public class MultiSelectionMenu {
                         if (!bdi.getBlockDevice().isDrbd()) {
                             continue;
                         }
-                        if (!application.isAdvancedMode() && bdi.getDrbdVolumeInfo().isUsedByCRM()) {
+                        if (!access.isAdvancedMode() && bdi.getDrbdVolumeInfo().isUsedByCRM()) {
                             continue;
                         }
                         if (bdi.getBlockDevice().isSyncing()) {
@@ -1335,7 +1338,7 @@ public class MultiSelectionMenu {
                     for (final BlockDevInfo bdi : selectedBlockDevInfos) {
                         if (bdi.getBlockDevice().isDrbd()
                             && !selectedBlockDevInfos.contains(bdi.getOtherBlockDevInfo())
-                            && (application.isAdvancedMode() || !bdi.getDrbdVolumeInfo().isUsedByCRM())
+                            && (access.isAdvancedMode() || !bdi.getDrbdVolumeInfo().isUsedByCRM())
                             && !bdi.getBlockDevice().isSyncing()
                             && !bdi.getBlockDevice().isPrimary()) {
                             bdi.discardData(Application.RunMode.LIVE);

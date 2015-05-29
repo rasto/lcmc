@@ -23,6 +23,7 @@ package lcmc;
 import lcmc.common.domain.AccessMode;
 import lcmc.common.domain.Application;
 import lcmc.cluster.domain.Cluster;
+import lcmc.common.ui.Access;
 import lcmc.common.ui.utils.SwingUtils;
 import lcmc.host.domain.Host;
 import lcmc.host.domain.HostOptions;
@@ -116,6 +117,8 @@ public class ArgumentParser {
     private Application application;
     @Inject
     private SwingUtils swingUtils;
+    @Inject
+    private Access access;
 
     public void parseOptionsAndReturnAutoArguments(String[] args) {
         final Options options = new Options();
@@ -202,7 +205,7 @@ public class ArgumentParser {
                 }
             }
             final boolean advanced = cmd.hasOption(ADVANCED_OP);
-            application.setAdvancedMode(advanced);
+            access.setAdvancedMode(advanced);
             application.setUseTightvnc(tightvnc);
             application.setUseUltravnc(ultravnc);
             application.setUseRealvnc(realvnc);
@@ -256,14 +259,14 @@ public class ArgumentParser {
                 System.exit(0);
             }
             if (cmd.hasOption("ro") || "ro".equals(opMode)) {
-                application.setAccessType(AccessMode.RO);
-                application.setMaxAccessType(AccessMode.RO);
+                access.setAccessType(AccessMode.RO);
+                access.setMaxAccessType(AccessMode.RO);
             } else if (cmd.hasOption("op") || "op".equals(opMode)) {
-                application.setAccessType(AccessMode.OP);
-                application.setMaxAccessType(AccessMode.OP);
+                access.setAccessType(AccessMode.OP);
+                access.setMaxAccessType(AccessMode.OP);
             } else if (cmd.hasOption("admin") || "admin".equals(opMode)) {
-                application.setAccessType(AccessMode.ADMIN);
-                application.setMaxAccessType(AccessMode.ADMIN);
+                access.setAccessType(AccessMode.ADMIN);
+                access.setMaxAccessType(AccessMode.ADMIN);
             } else if (opMode != null) {
                 LOG.appWarning("initApp: unknown operating mode: " + opMode);
             }

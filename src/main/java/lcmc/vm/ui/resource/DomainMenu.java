@@ -31,6 +31,7 @@ import javax.swing.ImageIcon;
 
 import lcmc.common.domain.AccessMode;
 import lcmc.common.domain.Application;
+import lcmc.common.ui.Access;
 import lcmc.host.domain.Host;
 import lcmc.vm.domain.VmsXml;
 import lcmc.common.domain.Resource;
@@ -59,6 +60,8 @@ public class DomainMenu {
     private MenuFactory menuFactory;
     @Inject
     private Application application;
+    @Inject
+    private Access access;
 
     public List<UpdatableItem> getPulldownMenu(final DomainInfo domainInfo) {
         this.domainInfo = domainInfo;
@@ -139,7 +142,7 @@ public class DomainMenu {
                 .enablePredicate(new EnablePredicate() {
                     @Override
                     public String check() {
-                        if (!application.isAdvancedMode() && domainInfo.isUsedByCRM()) {
+                        if (!access.isAdvancedMode() && domainInfo.isUsedByCRM()) {
                             return DomainInfo.IS_USED_BY_CRM_STRING;
                         }
                         for (final Host host : getBrowser().getClusterHosts()) {
@@ -350,7 +353,7 @@ public class DomainMenu {
                 .enablePredicate(new EnablePredicate() {
                     @Override
                     public String check() {
-                        if (!application.isAdvancedMode() && domainInfo.isUsedByCRM()) {
+                        if (!access.isAdvancedMode() && domainInfo.isUsedByCRM()) {
                             return DomainInfo.IS_USED_BY_CRM_STRING;
                         }
                         return null;
@@ -391,7 +394,7 @@ public class DomainMenu {
                 .enablePredicate(new EnablePredicate() {
                     @Override
                     public String check() {
-                        if (!application.isAdvancedMode() && domainInfo.isUsedByCRM()) {
+                        if (!access.isAdvancedMode() && domainInfo.isUsedByCRM()) {
                             return DomainInfo.IS_USED_BY_CRM_STRING;
                         }
                         return null;
@@ -432,7 +435,7 @@ public class DomainMenu {
                 .enablePredicate(new EnablePredicate() {
                     @Override
                     public String check() {
-                        if (!application.isAdvancedMode() && domainInfo.isUsedByCRM()) {
+                        if (!access.isAdvancedMode() && domainInfo.isUsedByCRM()) {
                             return DomainInfo.IS_USED_BY_CRM_STRING;
                         }
                         return null;
@@ -512,7 +515,7 @@ public class DomainMenu {
                 .enablePredicate(new EnablePredicate() {
                     @Override
                     public String check() {
-                        if (!application.isAdvancedMode() && domainInfo.isUsedByCRM()) {
+                        if (!access.isAdvancedMode() && domainInfo.isUsedByCRM()) {
                             return DomainInfo.IS_USED_BY_CRM_STRING;
                         }
                         if (getResource().isNew()) {

@@ -40,6 +40,7 @@ import com.google.common.collect.Table;
 import com.google.common.collect.TreeBasedTable;
 import lcmc.Exceptions;
 import lcmc.common.domain.AccessMode;
+import lcmc.common.ui.Access;
 import lcmc.common.ui.ProgressIndicator;
 import lcmc.drbd.ui.DrbdGraph;
 import lcmc.drbd.ui.resource.BlockDevInfo;
@@ -102,6 +103,8 @@ public class DrbdXml {
 
     @Inject
     private Application application;
+    @Inject
+    private Access access;
 
     static {
         NOT_ADVANCED_PARAMS.add("rate");
@@ -1376,7 +1379,7 @@ public class DrbdXml {
      * want to overwrite.
      */
     public boolean isDrbdDisabled() {
-        return unknownSections && !application.isAdvancedMode();
+        return unknownSections && !access.isAdvancedMode();
     }
 
     public String getOldConfig() {
