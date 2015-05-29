@@ -41,6 +41,7 @@ import java.util.Map;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
+import java.util.regex.Matcher;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
@@ -66,6 +67,7 @@ import javax.swing.plaf.basic.BasicSplitPaneUI;
 
 import lcmc.cluster.domain.Cluster;
 import lcmc.common.domain.Application;
+import lcmc.common.domain.util.Tools;
 import lcmc.common.ui.utils.SwingUtils;
 import lcmc.crm.ui.resource.ServicesInfo;
 import lcmc.common.domain.AllHostsUpdatable;
@@ -121,6 +123,8 @@ public class GUIData  {
     private SwingUtils swingUtils;
     @Inject
     private Application application;
+    @Inject
+    private ProgressIndicator progressIndicator;
 
     private Container mainFrame;
     private int lastDividerLocation = -1;
@@ -722,6 +726,24 @@ public class GUIData  {
 
     public void setMainFrame(final Container mainFrame) {
         this.mainFrame = mainFrame;
+    }
+
+    /** Removes all the hosts and clusters from all the panels and data. */
+    public void removeEverything() {
+        progressIndicator.startProgressIndicator(Tools.getString("MainMenu.RemoveEverything"));
+        application.disconnectAllHosts();
+        getClustersPanel().removeAllTabs();
+        progressIndicator.stopProgressIndicator(Tools.getString("MainMenu.RemoveEverything"));
+    }
+
+    public void saveConfig(final String filename,
+                           final boolean saveAll) {
+        LOG.debug1("save: start");
+        final String text = Tools.getString("Tools.Saving").replaceAll("@FILENAME@",
+                Matcher.quoteReplacement(filename));
+        progressIndicator.startProgressIndicator(text);
+        application.saveConfig(filename, saveAll);
+        progressIndicator.stopProgressIndicator(text);
     }
 
     public enum TerminalSize {

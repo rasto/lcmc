@@ -349,7 +349,7 @@ public final class MainMenu extends JPanel implements ActionListener {
                     new Runnable() {
                         @Override
                         public void run() {
-                            application.removeEverything();
+                            guiData.removeEverything();
                         }
                     }
                  );
