@@ -120,6 +120,8 @@ public final class MainMenu extends JPanel implements ActionListener {
     private About aboutDialog;
     @Inject
     private Dialogs dialogs;
+    @Inject
+    private Access access;
 
     public void init() {
         if (application.isUpgradeCheckEnabled()) {
@@ -159,7 +161,7 @@ public final class MainMenu extends JPanel implements ActionListener {
                                                KeyEvent.VK_L,
                                                loadActionListener(),
                                                null);
-        guiData.addToEnabledInAccessType(loadItem, new AccessMode(AccessMode.GOD, AccessMode.NORMAL));
+        access.addToEnabledInAccessType(loadItem, new AccessMode(AccessMode.GOD, AccessMode.NORMAL));
 
         final JMenuItem item = addMenuItem(Tools.getString("MainMenu.RemoveEverything"),
                                            submenu,
@@ -167,7 +169,7 @@ public final class MainMenu extends JPanel implements ActionListener {
                                            0,
                                            removeEverythingActionListener(),
                                            null);
-        guiData.addToVisibleInAccessType(item, new AccessMode(AccessMode.GOD, AccessMode.NORMAL));
+        access.addToVisibleInAccessType(item, new AccessMode(AccessMode.GOD, AccessMode.NORMAL));
 
         addMenuItem(Tools.getString("MainMenu.Save"),
                     submenu,
@@ -196,7 +198,7 @@ public final class MainMenu extends JPanel implements ActionListener {
 
         /* settings */
         submenu = addMenu(Tools.getString("MainMenu.Settings"), 0);
-        guiData.addToVisibleInAccessType(submenu, new AccessMode(AccessMode.GOD, AccessMode.NORMAL));
+        access.addToVisibleInAccessType(submenu, new AccessMode(AccessMode.GOD, AccessMode.NORMAL));
         final JMenu menuLookAndFeel = addMenu(Tools.getString("MainMenu.LookAndFeel"), 0);
         final UIManager.LookAndFeelInfo[] lookAndFeels = UIManager.getInstalledLookAndFeels();
         for (final UIManager.LookAndFeelInfo lookAndFeel : lookAndFeels) {
@@ -582,17 +584,17 @@ public final class MainMenu extends JPanel implements ActionListener {
     /** Returns advanced mode check box. That hides advanced options. */
     private JCheckBox createAdvancedModeButton() {
         final JCheckBox emCb = new JCheckBox(Tools.getString("Browser.AdvancedMode"));
-        emCb.setSelected(application.isAdvancedMode());
+        emCb.setSelected(access.isAdvancedMode());
         emCb.addItemListener(new ItemListener() {
             @Override
             public void itemStateChanged(final ItemEvent e) {
                 final boolean selected = e.getStateChange() == ItemEvent.SELECTED;
-                if (selected != application.isAdvancedMode()) {
+                if (selected != access.isAdvancedMode()) {
                     final Thread thread = new Thread(new Runnable() {
                         @Override
                         public void run() {
-                            application.setAdvancedMode(selected);
-                            application.checkAccessOfEverything();
+                            access.setAdvancedMode(selected);
+                            access.checkAccessOfEverything();
                         }
                     });
                     thread.start();
@@ -604,10 +606,10 @@ public final class MainMenu extends JPanel implements ActionListener {
     }
 
     private JComboBox<String> createOperationModeCb() {
-        final String[] modes = application.getOperatingModes();
+        final String[] modes = access.getOperatingModes();
         final JComboBox<String> opModeCB = new JComboBox<String>(modes);
 
-        final AccessMode.Type accessType = application.getAccessType();
+        final AccessMode.Type accessType = access.getAccessType();
         opModeCB.setSelectedItem(AccessMode.OP_MODES_MAP.get(accessType));
         opModeCB.addItemListener(new ItemListener() {
             @Override
@@ -622,8 +624,8 @@ public final class MainMenu extends JPanel implements ActionListener {
                                 LOG.appError("run: unknown mode: " + opMode);
                                 type = AccessMode.RO;
                             }
-                            application.setAccessType(type);
-                            application.checkAccessOfEverything();
+                            access.setAccessType(type);
+                            access.checkAccessOfEverything();
                         }
                     });
                     thread.start();

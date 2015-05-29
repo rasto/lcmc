@@ -36,7 +36,6 @@ import java.awt.event.WindowEvent;
 import java.awt.event.WindowFocusListener;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.locks.Lock;
@@ -65,7 +64,6 @@ import javax.swing.event.MenuListener;
 import javax.swing.plaf.basic.BasicSplitPaneDivider;
 import javax.swing.plaf.basic.BasicSplitPaneUI;
 
-import lcmc.common.domain.AccessMode;
 import lcmc.cluster.domain.Cluster;
 import lcmc.common.domain.Application;
 import lcmc.common.ui.utils.SwingUtils;
@@ -108,10 +106,6 @@ public class GUIData  {
     private final Lock mAddHostButtonListReadLock = mAddHostButtonListLock.readLock();
     private final Lock mAddHostButtonListWriteLock = mAddHostButtonListLock.writeLock();
     private final Collection<JComponent> addHostButtonList = new ArrayList<JComponent>();
-    private final Map<JComponent, AccessMode> visibleInAccessType = new HashMap<JComponent, AccessMode>();
-    /** Global elements like menus, that are enabled, disabled according to
-     * their access type. */
-    private final Map<JComponent, AccessMode> enabledInAccessType = new HashMap<JComponent, AccessMode>();
     /**
      * List of components that have allHostsUpdate method that must be called
      * when a host is added.
@@ -127,8 +121,6 @@ public class GUIData  {
     private SwingUtils swingUtils;
     @Inject
     private Application application;
-    @Inject
-    private ProgressIndicator progressIndicator;
 
     private Container mainFrame;
     private int lastDividerLocation = -1;
@@ -340,46 +332,6 @@ public class GUIData  {
         });
     }
 
-
-    /**
-     * Add to the list of components that are visible only in specific access
-     * mode.
-     */
-    void addToVisibleInAccessType(final JComponent c, final AccessMode accessMode) {
-        c.setVisible(application.isAccessible(accessMode));
-        visibleInAccessType.put(c, accessMode);
-    }
-
-    /**
-     * Add to the list of components that are visible only in specific access
-     * mode.
-     */
-    void addToEnabledInAccessType(final JComponent c, final AccessMode accessMode) {
-        c.setEnabled(application.isAccessible(accessMode));
-        enabledInAccessType.put(c, accessMode);
-    }
-
-    /**
-     * Do gui actions when we are in the god mode.
-     * - enable/disable look and feel menu etc
-     */
-    void godModeChanged(final boolean godMode) {
-        progressIndicator.startProgressIndicator("OH MY GOD!!! Hi Rasto!");
-        progressIndicator.stopProgressIndicator("OH MY GOD!!! Hi Rasto!");
-        mainMenu.resetOperatingModes(godMode);
-        updateGlobalItems();
-    }
-
-    /** Updates access of the item according of their access type. */
-    public void updateGlobalItems() {
-        for (final Map.Entry<JComponent, AccessMode> accessEntry : visibleInAccessType.entrySet()) {
-            accessEntry.getKey().setVisible(application.isAccessible(accessEntry.getValue()));
-        }
-        for (final Map.Entry<JComponent, AccessMode> enabledEntry : enabledInAccessType.entrySet()) {
-            enabledEntry.getKey().setEnabled(application.isAccessible(enabledEntry.getValue()));
-        }
-    }
-
     /**
      * Adds a component to the list of components that have allHostsUpdate
      * method that must be called when a host is added.
@@ -409,10 +361,6 @@ public class GUIData  {
                 checkAddClusterButtons();
             }
         });
-    }
-
-    public void setAccessible(final JComponent c, final AccessMode.Type required) {
-        c.setEnabled(application.getAccessType().compareTo(required) >= 0);
     }
 
     private ServicesInfo getSelectedServicesInfo() {

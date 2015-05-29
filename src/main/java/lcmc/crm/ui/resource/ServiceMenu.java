@@ -37,6 +37,7 @@ import javax.swing.JPanel;
 import javax.swing.tree.DefaultMutableTreeNode;
 
 import lcmc.LCMC;
+import lcmc.common.ui.Access;
 import lcmc.common.ui.CallbackAction;
 import lcmc.common.ui.GUIData;
 import lcmc.common.domain.AccessMode;
@@ -82,6 +83,8 @@ public class ServiceMenu {
     private Provider<ServiceLogs> serviceLogsProvider;
     @Inject
     private TreeMenuController treeMenuController;
+    @Inject
+    private Access access;
 
     public List<UpdatableItem> getPulldownMenu(final ServiceInfo serviceInfo) {
         final List<UpdatableItem> items = new ArrayList<UpdatableItem>();
@@ -391,7 +394,7 @@ public class ServiceMenu {
                                 return ClusterBrowser.UNKNOWN_CLUSTER_STATUS_STRING;
                             } else if (serviceInfo.getService().isRemoved()) {
                                 return ServiceInfo.IS_BEING_REMOVED_STRING;
-                            } else if (serviceInfo.isRunning(runMode) && !application.isAdvancedMode()) {
+                            } else if (serviceInfo.isRunning(runMode) && !access.isAdvancedMode()) {
                                 return "cannot remove running resource<br>(advanced mode only)";
                             }
                             if (serviceInfo.getGroupInfo() == null) {

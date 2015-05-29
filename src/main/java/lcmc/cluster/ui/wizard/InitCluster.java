@@ -41,6 +41,7 @@ import javax.swing.JScrollPane;
 import javax.swing.SpringLayout;
 import javax.swing.border.TitledBorder;
 
+import lcmc.common.ui.Access;
 import lcmc.common.ui.GUIData;
 import lcmc.common.domain.AccessMode;
 import lcmc.common.domain.Application;
@@ -117,6 +118,8 @@ public class InitCluster extends DialogCluster {
     private Application application;
     @Inject
     private SwingUtils swingUtils;
+    @Inject
+    private Access access;
 
     public void init(final WizardDialog previousDialog, final Cluster cluster) {
         super.init(previousDialog, cluster);
@@ -436,7 +439,7 @@ public class InitCluster extends DialogCluster {
                                 if (heartbeatIsRunning) {
                                     csAisStartButton.setEnabled(false);
                                 } else {
-                                    guiData.setAccessible(csAisStartButton, AccessMode.OP);
+                                    access.setAccessible(csAisStartButton, AccessMode.OP);
                                 }
                             }
                             csAisStartButton.setVisible(true);
@@ -492,7 +495,7 @@ public class InitCluster extends DialogCluster {
                                 if (csAisRunning) {
                                     hbStartButton.setEnabled(false);
                                 } else {
-                                    guiData.setAccessible(hbStartButton, AccessMode.OP);
+                                    access.setAccessible(hbStartButton, AccessMode.OP);
                                 }
                             }
                             hbStartButton.setVisible(true);

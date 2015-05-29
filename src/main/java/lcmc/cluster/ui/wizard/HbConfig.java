@@ -54,6 +54,7 @@ import javax.swing.JTextArea;
 import javax.swing.SpringLayout;
 
 import lcmc.Exceptions;
+import lcmc.common.ui.Access;
 import lcmc.common.ui.GUIData;
 import lcmc.common.domain.AccessMode;
 import lcmc.common.domain.Application;
@@ -202,6 +203,8 @@ final class HbConfig extends DialogCluster {
     private InitCluster initCluster;
     @Inject
     private NetworkService networkService;
+    @Inject
+    private Access access;
 
     @Override
     public void init(final WizardDialog previousDialog, final Cluster cluster) {
@@ -718,7 +721,7 @@ final class HbConfig extends DialogCluster {
                     if (castAddresses.isEmpty()) {
                         makeConfigButton.setEnabled(false);
                     } else {
-                        guiData.setAccessible(makeConfigButton, AccessMode.ADMIN);
+                        access.setAccessible(makeConfigButton, AccessMode.ADMIN);
                     }
                     if (!application.getAutoClusters().isEmpty() && !castAddresses.isEmpty()) {
                         Tools.sleep(1000);
@@ -1106,7 +1109,7 @@ final class HbConfig extends DialogCluster {
         statusPanel.add(configStatus);
         configCheckbox = new JCheckBox("-----", true);
         configCheckbox.setBackground(Tools.getDefaultColor("ConfigDialog.Background.Light"));
-        guiData.setAccessible(configCheckbox, AccessMode.ADMIN);
+        access.setAccessible(configCheckbox, AccessMode.ADMIN);
         configCheckbox.addItemListener(new ItemListener() {
             @Override
             public void itemStateChanged(final ItemEvent e) {
@@ -1242,7 +1245,7 @@ final class HbConfig extends DialogCluster {
                         }
                     }
                 }
-                guiData.setAccessible(makeConfigButton, AccessMode.ADMIN);
+                access.setAccessible(makeConfigButton, AccessMode.ADMIN);
             }
         };
     }

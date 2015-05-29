@@ -45,6 +45,7 @@ import javax.swing.JToolTip;
 import lcmc.common.domain.AccessMode;
 import lcmc.common.domain.Application;
 import lcmc.common.domain.EnablePredicate;
+import lcmc.common.ui.Access;
 import lcmc.logger.Logger;
 import lcmc.logger.LoggerFactory;
 import lcmc.common.domain.Predicate;
@@ -83,6 +84,8 @@ implements ActionListener, UpdatableItem, ComponentWithTest {
     private Application application;
     @Inject
     private SwingUtils swingUtils;
+    @Inject
+    private Access access;
 
     private MenuAction menuAction;
 
@@ -308,11 +311,11 @@ implements ActionListener, UpdatableItem, ComponentWithTest {
 
     /** Sets this item enabled and visible according to its access type. */
     private void processAccessMode() {
-        final boolean accessible = application.isAccessible(enableAccessMode);
+        final boolean accessible = access.isAccessible(enableAccessMode);
         final String disableTooltip = enablePredicate.check();
         final boolean visible = visiblePredicate.check();
         setEnabled(disableTooltip == null && accessible);
-        setVisible(visible && application.isAccessible(visibleAccessMode));
+        setVisible(visible && access.isAccessible(visibleAccessMode));
         if (toolTip != null && isVisible()) {
             if (!accessible && enableAccessMode.getType() != AccessMode.NEVER) {
                 String advanced = "";

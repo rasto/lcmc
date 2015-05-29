@@ -96,6 +96,8 @@ public abstract class EditableInfo extends Info {
     private SwingUtils swingUtils;
     @Inject
     private WidgetFactory widgetFactory;
+    @Inject
+    private Access access;
 
     protected abstract String getSection(String param);
 
@@ -286,7 +288,7 @@ public abstract class EditableInfo extends Info {
                 panel.setBackground(getSectionColor(section));
                 if (advanced) {
                     advancedPanelList.add(panel);
-                    panel.setVisible(application.isAdvancedMode());
+                    panel.setVisible(access.isAdvancedMode());
                 }
                 panelPartsMap.put(section, accessTypeString, advancedString, panel);
                 panelPartsList.add(new PanelPart(section, accessType, advanced));
@@ -396,10 +398,10 @@ public abstract class EditableInfo extends Info {
             }
             if (!notAdvancedSections.contains(sectionPanel)) {
                 advancedOnlySectionList.add(sectionEntry.getKey());
-                sectionPanel.setVisible(application.isAdvancedMode() && isSectionEnabled(sectionEntry.getKey()));
+                sectionPanel.setVisible(access.isAdvancedMode() && isSectionEnabled(sectionEntry.getKey()));
             }
         }
-        moreOptionsPanel.setVisible(advanced && !application.isAdvancedMode());
+        moreOptionsPanel.setVisible(advanced && !access.isAdvancedMode());
     }
 
 
@@ -817,7 +819,7 @@ public abstract class EditableInfo extends Info {
     @Override
     public void updateAdvancedPanels() {
         super.updateAdvancedPanels();
-        final boolean advancedMode = application.isAdvancedMode();
+        final boolean advancedMode = access.isAdvancedMode();
         boolean advanced = false;
         for (final JPanel apl : advancedPanelList) {
             swingUtils.invokeLater(new Runnable() {
