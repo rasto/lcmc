@@ -66,8 +66,6 @@ public final class RadioGroup extends GenericWidget<JComponent> {
     private final Lock mComponentsReadLock = mComponentsLock.readLock();
     private final Lock mComponentsWriteLock = mComponentsLock.writeLock();
     @Inject
-    private Application application;
-    @Inject
     private SwingUtils swingUtils;
     @Inject
     private Access access;

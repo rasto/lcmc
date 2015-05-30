@@ -96,8 +96,6 @@ public abstract class GenericWidget<T extends JComponent> extends JPanel impleme
     /** Whether the combobox was never set. */
     private boolean newFlag = true;
     @Inject
-    private Application application;
-    @Inject
     private SwingUtils swingUtils;
     @Inject
     private Access access;
