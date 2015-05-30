@@ -23,6 +23,7 @@
 
 package lcmc.common.domain;
 
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.ArrayList;
@@ -50,6 +51,7 @@ import javax.xml.transform.stream.StreamResult;
 
 import lcmc.cluster.domain.Cluster;
 import lcmc.cluster.domain.Clusters;
+import lcmc.cluster.ui.ClusterBrowser;
 import lcmc.cluster.ui.ClusterTab;
 import lcmc.common.ui.utils.SwingUtils;
 import lcmc.host.domain.Host;
@@ -100,9 +102,36 @@ public final class UserConfig extends XMLTools {
     private Hosts allHosts;
     @Inject
     private Clusters allClusters;
+    /**
+     * @param saveAll whether to save clusters specified from the command line
+     */
+    public void saveConfig(final String filename, final boolean saveAll) {
+        try {
+            final FileOutputStream fileOut = new FileOutputStream(filename);
+            saveXML(fileOut, saveAll);
+            LOG.debug("save: filename: " + filename);
+        } catch (final IOException e) {
+            LOG.appError("save: error saving: " + filename, "", e);
+        } finally {
+            try {
+                Thread.sleep(1000);
+            } catch (final InterruptedException e) {
+                Thread.currentThread().interrupt();
+            }
+
+            for (final Cluster cluster : allClusters.getClusterSet()) {
+                final ClusterBrowser cb = cluster.getBrowser();
+                if (cb != null) {
+                    cb.saveGraphPositions();
+                }
+            }
+        }
+    }
+
+
 
     /** Saves data about clusters and hosts to the supplied output stream. */
-    public String saveXML(final OutputStream outputStream, final boolean saveAll) throws IOException {
+    private String saveXML(final OutputStream outputStream, final boolean saveAll) throws IOException {
         LOG.debug1("saveXML: start");
         final DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
 
