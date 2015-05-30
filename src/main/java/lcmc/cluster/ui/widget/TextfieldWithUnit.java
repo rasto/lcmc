@@ -58,8 +58,6 @@ import lcmc.common.ui.utils.WidgetListener;
 @Named
 public final class TextfieldWithUnit extends GenericWidget<JComponent> {
     @Inject
-    private Application application;
-    @Inject
     private SwingUtils swingUtils;
     @Inject
     private Access access;
