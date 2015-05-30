@@ -32,14 +32,12 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
-import java.util.regex.Matcher;
 
 import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.Table;
 import lcmc.cluster.domain.Cluster;
 import lcmc.cluster.domain.Clusters;
 import lcmc.cluster.ui.ClusterBrowser;
-import lcmc.common.ui.GUIData;
 import lcmc.common.ui.ConfirmDialog;
 import lcmc.host.domain.Host;
 import lcmc.host.domain.Hosts;
@@ -123,10 +121,6 @@ public class Application {
     @Inject
     private Clusters allClusters;
     @Inject
-    private GUIData guiData;
-    @Inject
-    private UserConfig userConfig;
-    @Inject
     private Provider<ConfirmDialog> confirmDialogProvider;
 
     public int danglingHostsCount() {
@@ -189,33 +183,6 @@ public class Application {
             }
         }
     }
-
-    /**
-     * @param saveAll whether to save clusters specified from the command line
-     */
-    public void saveConfig(final String filename, final boolean saveAll) {
-        try {
-            final FileOutputStream fileOut = new FileOutputStream(filename);
-            userConfig.saveXML(fileOut, saveAll);
-            LOG.debug("save: filename: " + filename);
-        } catch (final IOException e) {
-            LOG.appError("save: error saving: " + filename, "", e);
-        } finally {
-            try {
-                Thread.sleep(1000);
-            } catch (final InterruptedException e) {
-                Thread.currentThread().interrupt();
-            }
-
-            for (final Cluster cluster : allClusters.getClusterSet()) {
-                final ClusterBrowser cb = cluster.getBrowser();
-                if (cb != null) {
-                    cb.saveGraphPositions();
-                }
-            }
-        }
-    }
-
 
     public void addHostToHosts(final Host host) {
         allHosts.addHost(host);

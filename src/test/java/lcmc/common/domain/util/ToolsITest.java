@@ -4,8 +4,8 @@ import java.util.Map;
 import javax.swing.JCheckBox;
 
 import lcmc.AppContext;
+import lcmc.common.domain.UserConfig;
 import lcmc.common.ui.GUIData;
-import lcmc.common.domain.Application;
 import lcmc.common.ui.ProgressIndicator;
 import lcmc.host.domain.Host;
 import lcmc.testutils.IntegrationTestLauncher;
@@ -24,14 +24,14 @@ import static org.junit.Assert.*;
 public final class ToolsITest {
     private IntegrationTestLauncher testSuite;
     private GUIData guiData;
-    private Application application;
     private ProgressIndicator progressIndicator;
+    private UserConfig userConfig;
 
     @Before
     public void setUp() {
         testSuite = AppContext.getBean(IntegrationTestLauncher.class);
         testSuite.initTestCluster();
-        application = AppContext.getBean(Application.class);
+        userConfig = AppContext.getBean(UserConfig.class);
         guiData = AppContext.getBean(GUIData.class);
         progressIndicator = AppContext.getBean(ProgressIndicator.class);
     }
@@ -89,7 +89,7 @@ public final class ToolsITest {
     public void testLoadFile() {
         assertNull(Tools.loadFile(guiData, "JUNIT_TEST_FILE_CLICK_OK", false));
         final String testFile = "/tmp/lcmc-test-file";
-        application.saveConfig(testFile, false);
+        userConfig.saveConfig(testFile, false);
         final String file = Tools.loadFile(guiData, testFile, false);
         assertNotNull(file);
         assertFalse("".equals(file));

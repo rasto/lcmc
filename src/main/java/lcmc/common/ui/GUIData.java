@@ -67,6 +67,7 @@ import javax.swing.plaf.basic.BasicSplitPaneUI;
 
 import lcmc.cluster.domain.Cluster;
 import lcmc.common.domain.Application;
+import lcmc.common.domain.UserConfig;
 import lcmc.common.domain.util.Tools;
 import lcmc.common.ui.utils.SwingUtils;
 import lcmc.crm.ui.resource.ServicesInfo;
@@ -125,6 +126,8 @@ public class GUIData  {
     private Application application;
     @Inject
     private ProgressIndicator progressIndicator;
+    @Inject
+    private UserConfig userConfig;
 
     private Container mainFrame;
     private int lastDividerLocation = -1;
@@ -742,7 +745,7 @@ public class GUIData  {
         final String text = Tools.getString("Tools.Saving").replaceAll("@FILENAME@",
                 Matcher.quoteReplacement(filename));
         progressIndicator.startProgressIndicator(text);
-        application.saveConfig(filename, saveAll);
+        userConfig.saveConfig(filename, saveAll);
         progressIndicator.stopProgressIndicator(text);
     }
 
