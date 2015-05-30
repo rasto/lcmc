@@ -30,6 +30,7 @@ import javax.swing.JComponent;
 import javax.swing.JPanel;
 
 import lcmc.cluster.ui.EmptyBrowser;
+import lcmc.common.domain.UserConfig;
 import lcmc.common.ui.WizardDialog;
 import lcmc.common.domain.Application;
 import lcmc.common.domain.util.Tools;
@@ -45,6 +46,8 @@ final class Finish extends DialogCluster {
     private EmptyBrowser emptyBrowser;
     @Inject
     private Application application;
+    @Inject
+    private UserConfig userConfig;
 
     @Override
     public WizardDialog nextDialog() {
@@ -56,7 +59,7 @@ final class Finish extends DialogCluster {
         emptyBrowser.addClusterBox(getCluster());
         if (saveCheckBox.isSelected()) {
             final String saveFile = application.getDefaultSaveFile();
-            application.saveConfig(saveFile, false);
+            userConfig.saveConfig(saveFile, false);
         }
     }
 

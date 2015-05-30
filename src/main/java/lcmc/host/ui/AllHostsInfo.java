@@ -182,7 +182,7 @@ public final class AllHostsInfo extends Info {
                 Tools.stopClusters(selectedRunningClusters);
                 application.removeClusters(selectedClusters);
                 final String saveFile = application.getDefaultSaveFile();
-                application.saveConfig(saveFile, false);
+                userConfig.saveConfig(saveFile, false);
                 mainPanel.repaint();
                 swingUtils.invokeLater(new Runnable() {
                     @Override

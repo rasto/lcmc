@@ -370,7 +370,7 @@ public final class MainMenu extends JPanel implements ActionListener {
                  final Thread thread = new Thread(new Runnable() {
                      @Override
                      public void run() {
-                         application.saveConfig(application.getDefaultSaveFile(), true);
+                         userConfig.saveConfig(application.getDefaultSaveFile(), true);
                      }
                  });
                  thread.start();
@@ -415,7 +415,7 @@ public final class MainMenu extends JPanel implements ActionListener {
                  if (ret == JFileChooser.APPROVE_OPTION) {
                      final String name = fc.getSelectedFile().getAbsolutePath();
                      application.setDefaultSaveFile(name);
-                     application.saveConfig(application.getDefaultSaveFile(), true);
+                     userConfig.saveConfig(application.getDefaultSaveFile(), true);
                  }
              }
         };

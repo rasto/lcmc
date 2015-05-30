@@ -30,6 +30,7 @@ import java.util.List;
 
 import lcmc.LCMC;
 import lcmc.cluster.service.storage.FileSystemService;
+import lcmc.common.domain.UserConfig;
 import lcmc.common.ui.GUIData;
 import lcmc.common.ui.ProgressIndicatorPanel;
 import lcmc.common.domain.Application;
@@ -82,6 +83,8 @@ public class IntegrationTestLauncher {
     private NetworkService networkService;
     @Inject
     private FileSystemService fileSystemService;
+    @Inject
+    private UserConfig userConfig;
 
     public void initTestCluster() {
         initCluster();
@@ -131,7 +134,7 @@ public class IntegrationTestLauncher {
             host.setCluster(cluster);
             cluster.addHost(host);
             final String saveFile = application.getDefaultSaveFile();
-            application.saveConfig(saveFile, false);
+            userConfig.saveConfig(saveFile, false);
         }
         for (final Host host : hosts) {
             host.disconnect();
@@ -159,7 +162,7 @@ public class IntegrationTestLauncher {
         
         //guiData.getEmptyBrowser().addClusterBox(cluster);
         final String saveFile = application.getDefaultSaveFile();
-        application.saveConfig(saveFile, false);
+        userConfig.saveConfig(saveFile, false);
         guiData.refreshClustersPanel();
         
         guiData.expandTerminalSplitPane(GUIData.TerminalSize.COLLAPSE);

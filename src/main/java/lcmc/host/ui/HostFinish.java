@@ -33,6 +33,7 @@ import javax.swing.JCheckBox;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 import lcmc.cluster.ui.wizard.AddClusterDialog;
+import lcmc.common.domain.UserConfig;
 import lcmc.common.ui.GUIData;
 import lcmc.cluster.ui.widget.WidgetFactory;
 import lcmc.common.domain.Application;
@@ -72,6 +73,8 @@ final class HostFinish extends DialogHost {
     private SwingUtils swingUtils;
     @Inject
     private WidgetFactory widgetFactory;
+    @Inject
+    private UserConfig userConfig;
 
     @Override
     public WizardDialog nextDialog() {
@@ -82,7 +85,7 @@ final class HostFinish extends DialogHost {
     protected void finishDialog() {
         if (saveCheckBox.isSelected()) {
             final String saveFile = application.getDefaultSaveFile();
-            application.saveConfig(saveFile, false);
+            userConfig.saveConfig(saveFile, false);
         }
     }
 
