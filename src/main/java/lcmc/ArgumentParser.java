@@ -24,6 +24,8 @@ import lcmc.common.domain.AccessMode;
 import lcmc.common.domain.Application;
 import lcmc.cluster.domain.Cluster;
 import lcmc.common.ui.Access;
+import lcmc.common.ui.ProgressIndicator;
+import lcmc.common.ui.ProgressIndicatorPanel;
 import lcmc.common.ui.utils.SwingUtils;
 import lcmc.host.domain.Host;
 import lcmc.host.domain.HostOptions;
@@ -119,6 +121,8 @@ public class ArgumentParser {
     private SwingUtils swingUtils;
     @Inject
     private Access access;
+    @Inject
+    private ProgressIndicatorPanel progressIndicatorPanel;
 
     public void parseOptionsAndReturnAutoArguments(String[] args) {
         final Options options = new Options();
@@ -270,7 +274,7 @@ public class ArgumentParser {
             } else if (opMode != null) {
                 LOG.appWarning("initApp: unknown operating mode: " + opMode);
             }
-            float fps = Application.DEFAULT_ANIM_FPS;
+            float fps = ProgressIndicatorPanel.DEFAULT_ANIM_FPS;
             if (cmd.hasOption(SLOW_OP)) {
                 fps /= 2;
             }
@@ -283,7 +287,7 @@ public class ArgumentParser {
             if (vncPortOffsetString != null && lcmc.common.domain.util.Tools.isNumber(vncPortOffsetString)) {
                 application.setVncPortOffset(Integer.parseInt(vncPortOffsetString));
             }
-            application.setAnimFPS(fps);
+            progressIndicatorPanel.setAnimFPS(fps);
             if (cmd.hasOption(CLUSTER_OP) || cmd.hasOption(HOST_OP)) {
                 parseClusterOptionsAndCreateClusterButton(cmd);
             }

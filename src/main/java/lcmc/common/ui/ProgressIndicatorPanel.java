@@ -56,11 +56,11 @@ import javax.swing.*;
 
 import lcmc.configs.AppDefaults;
 import lcmc.cluster.ui.widget.WidgetFactory;
-import lcmc.common.domain.Application;
 import lcmc.logger.Logger;
 import lcmc.logger.LoggerFactory;
 import lcmc.common.ui.utils.MyButton;
 import lcmc.common.domain.util.Tools;
+import lombok.Getter;
 
 /**
  * An infinite progress panel displays a rotating figure and
@@ -103,6 +103,9 @@ public final class ProgressIndicatorPanel extends JComponent implements MouseLis
     private static final Color VEIL2_COLOR = Browser.STATUS_BACKGROUND;
     /** Text color. */
     private static final Color VEIL_COLOR = Browser.PANEL_BACKGROUND;
+    public static final float DEFAULT_ANIM_FPS = 20.0f;
+    @Getter
+    private float animFPS = DEFAULT_ANIM_FPS;
     /** Notifies whether the animation is running or not. */
     private boolean started    = false;
     /** Alpha level of the veil, used for fade in/out. */
@@ -140,8 +143,6 @@ public final class ProgressIndicatorPanel extends JComponent implements MouseLis
     private MainMenu mainMenu;
     @Inject
     private MainPanel mainPanel;
-    @Inject
-    private Application application;
 
     public void init() {
         cancelButton = widgetFactory.createButton(Tools.getString("ProgressIndicatorPanel.Cancel"), CANCEL_ICON);
@@ -297,7 +298,7 @@ public final class ProgressIndicatorPanel extends JComponent implements MouseLis
                     g2.fillRect((int) (width  - barPos), startAtHeight, (int) (barPos * 2 - width), barHeight);
                 }
             }
-            barPos += 5.0 * 20.0 / application.getAnimFPS();
+            barPos += 5.0 * 20.0 / animFPS;
             if (barPos >= width / 2 + getWidth() / 2) {
                 barPos = width / 2 - getWidth() / 2;
             }
@@ -391,6 +392,18 @@ public final class ProgressIndicatorPanel extends JComponent implements MouseLis
         /* do nothing */
     }
 
+    public boolean isSlow() {
+        return animFPS < DEFAULT_ANIM_FPS;
+    }
+
+    public boolean isFast() {
+        return animFPS > DEFAULT_ANIM_FPS;
+    }
+
+    public void setAnimFPS(final float animFPS) {
+        this.animFPS = animFPS;
+    }
+
     /** Animation thread. */
     private class Animator implements Runnable {
         /** Whether the alpha level goes up or down. */
@@ -475,7 +488,7 @@ public final class ProgressIndicatorPanel extends JComponent implements MouseLis
 
                 mTextsLock.unlock();
                 try {
-                    Thread.sleep((long) (1000 / application.getAnimFPS()));
+                    Thread.sleep((long) (1000 / animFPS));
                 } catch (final InterruptedException ie) {
                     Thread.currentThread().interrupt();
                 }
