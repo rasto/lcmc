@@ -53,7 +53,6 @@ import javax.swing.event.DocumentListener;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
 import lcmc.common.domain.AccessMode;
-import lcmc.common.domain.Application;
 import lcmc.common.domain.Value;
 import lcmc.common.ui.Access;
 import lcmc.common.ui.SpringUtilities;

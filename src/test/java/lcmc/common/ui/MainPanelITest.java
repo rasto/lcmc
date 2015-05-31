@@ -1,7 +1,6 @@
 package lcmc.common.ui;
 
 import lcmc.LCMC;
-import lcmc.common.domain.Application;
 import lcmc.common.ui.utils.SwingUtils;
 import lcmc.host.domain.Host;
 import lcmc.testutils.IntegrationTestLauncher;
@@ -13,16 +12,16 @@ import org.junit.Test;
 import org.junit.experimental.categories.Category;
 
 @Category(IntegrationTest.class)
-public final class GUIDataITest {
+public final class MainPanelITest {
     private IntegrationTestLauncher integrationTestLauncher;
-    private GUIData guiData;
+    private MainPanel mainPanel;
     private SwingUtils swingUtils;
 
     @Before
     public void setUp() {
         integrationTestLauncher = LCMC.getInstance(IntegrationTestLauncher.class);
         integrationTestLauncher.initTestCluster();
-        guiData = LCMC.getInstance(GUIData.class);
+        mainPanel = LCMC.getInstance(MainPanel.class);
         swingUtils = LCMC.getInstance(SwingUtils.class);
     }
 
@@ -32,13 +31,13 @@ public final class GUIDataITest {
         float count = 200;
         float errors = 0;
         for (int i = 0; i < count; i++) {
-            guiData.expandTerminalSplitPane(GUIData.TerminalSize.COLLAPSE);
+            mainPanel.expandTerminalSplitPane(MainPanel.TerminalSize.COLLAPSE);
             for (final Host host : integrationTestLauncher.getHosts()) {
-                guiData.setTerminalPanel(host.getTerminalPanel());
-                guiData.expandTerminalSplitPane(GUIData.TerminalSize.EXPAND);
+                mainPanel.setTerminalPanel(host.getTerminalPanel());
+                mainPanel.expandTerminalSplitPane(MainPanel.TerminalSize.EXPAND);
             }
             swingUtils.waitForSwing();
-            if (i > 0 && guiData.getTerminalPanelPos() < 100) {
+            if (i > 0 && mainPanel.getTerminalPanelPos() < 100) {
                 errors++;
             }
         }

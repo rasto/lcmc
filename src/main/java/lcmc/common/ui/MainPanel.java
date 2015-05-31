@@ -25,10 +25,12 @@ import java.awt.BorderLayout;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
-import javax.swing.JPanel;
-import javax.swing.JSplitPane;
+import javax.swing.*;
+import javax.swing.plaf.basic.BasicSplitPaneDivider;
+import javax.swing.plaf.basic.BasicSplitPaneUI;
 
 import lcmc.cluster.ui.ClustersPanel;
+import lcmc.common.ui.utils.SwingUtils;
 import lcmc.host.domain.Host;
 import lcmc.host.domain.HostFactory;
 
@@ -44,21 +46,96 @@ public final class MainPanel extends JPanel {
     @Inject
     private HostFactory hostFactory;
     @Inject
-    private GUIData guiData;
+    private SwingUtils swingUtils;
+
+    private JSplitPane terminalSplitPane;
+    private boolean terminalAreaExpanded = true;
+    private int lastDividerLocation = -1;
 
     public void init() {
         setLayout(new BorderLayout());
         clustersPanel.init();
         final Host noHost = hostFactory.createInstance();
-        final JSplitPane splitPane =
-                                new JSplitPane(JSplitPane.VERTICAL_SPLIT, clustersPanel, noHost.getTerminalPanel());
-        guiData.setTerminalSplitPane(splitPane);
+        terminalSplitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT, clustersPanel, noHost.getTerminalPanel());
 
-        splitPane.setContinuousLayout(true);
-        splitPane.setResizeWeight(1.0);
-        splitPane.setOneTouchExpandable(true);
+        terminalSplitPane.setContinuousLayout(true);
+        terminalSplitPane.setResizeWeight(1.0);
+        terminalSplitPane.setOneTouchExpandable(true);
 
-        add(splitPane, BorderLayout.CENTER);
-        guiData.initTerminalSplitPane();
+        add(terminalSplitPane, BorderLayout.CENTER);
+        initTerminalSplitPane();
+    }
+
+    public void setTerminalPanel(final java.awt.Component terminalPanel) {
+        if (terminalPanel == null) {
+            return;
+        }
+        swingUtils.invokeInEdt(new Runnable() {
+            @Override
+            public void run() {
+                final java.awt.Component oldTerminalPanel = terminalSplitPane.getBottomComponent();
+                if (!terminalPanel.equals(oldTerminalPanel)) {
+                    expandTerminalSplitPane(TerminalSize.EXPAND);
+                    terminalSplitPane.setBottomComponent(terminalPanel);
+                    expandTerminalSplitPane(TerminalSize.COLLAPSE);
+                }
+            }
+        });
+    }
+
+    /** Returns the position of the terminal panel. */
+    public int getTerminalPanelPos() {
+        if (terminalSplitPane.getBottomComponent() == null) {
+            return 0;
+        } else {
+            return getY() + terminalSplitPane.getBottomComponent().getY();
+        }
+    }
+
+    public boolean isTerminalPanelExpanded() {
+        return terminalSplitPane.getBottomComponent().getSize().getHeight() != 0;
+    }
+
+    public void expandTerminalSplitPane(final TerminalSize terminalSize) {
+        if (terminalSplitPane == null) {
+            return;
+        }
+        swingUtils.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                final int height = terminalSplitPane.getHeight() - terminalSplitPane.getDividerLocation() - 11;
+                if (!terminalAreaExpanded && terminalSize == TerminalSize.EXPAND) {
+                    terminalAreaExpanded = true;
+                    lastDividerLocation = terminalSplitPane.getDividerLocation();
+                    if (height < 10) {
+                        terminalSplitPane.setDividerLocation(terminalSplitPane.getHeight() - 150);
+                    }
+                } else if (terminalAreaExpanded && terminalSize == TerminalSize.COLLAPSE) {
+                    terminalAreaExpanded = false;
+                    if (lastDividerLocation < 0) {
+                        terminalSplitPane.setDividerLocation(1.0);
+                    } else {
+                        terminalSplitPane.setDividerLocation(lastDividerLocation);
+                    }
+                }
+            }
+        });
+    }
+
+    public void initTerminalSplitPane() {
+        swingUtils.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                final BasicSplitPaneUI ui = (BasicSplitPaneUI) terminalSplitPane.getUI();
+                final BasicSplitPaneDivider divider = ui.getDivider();
+                final JButton button = (JButton) divider.getComponent(1);
+                button.doClick();
+            }
+        });
+    }
+
+    public enum TerminalSize {
+        EXPAND,
+        COLLAPSE
     }
 }

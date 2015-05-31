@@ -40,7 +40,7 @@ import javax.inject.Provider;
 import javax.swing.ImageIcon;
 import javax.swing.JPopupMenu;
 
-import lcmc.common.ui.GUIData;
+import lcmc.common.ui.MainPanel;
 import lcmc.common.ui.ResourceGraph;
 import lcmc.common.ui.utils.SwingUtils;
 import lcmc.drbd.ui.resource.BlockDevInfo;
@@ -106,7 +106,7 @@ public class DrbdGraph extends ResourceGraph {
     /** The first X position of the host. */
     private int hostDefaultXPos = 10;
     @Inject
-    private GUIData guiData;
+    private MainPanel mainPanel;
     @Inject
     private SwingUtils swingUtils;
 
@@ -606,7 +606,7 @@ public class DrbdGraph extends ResourceGraph {
         if (hi == null) {
             return;
         }
-        guiData.setTerminalPanel(hi.getHost().getTerminalPanel());
+        mainPanel.setTerminalPanel(hi.getHost().getTerminalPanel());
     }
 
     /** Is called when one block device vertex was pressed. */
