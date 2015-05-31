@@ -530,10 +530,10 @@ public class TerminalPanel extends JScrollPane {
         }
         if (!editEnabled && GOD_ON.equals(cheat)) {
             editEnabled = true;
-            access.godModeChanged(editEnabled);
+            guiData.godModeChanged(editEnabled);
         } else if (editEnabled && GOD_OFF.equals(cheat)) {
             editEnabled = false;
-            access.godModeChanged(editEnabled);
+            guiData.godModeChanged(editEnabled);
         } else if (CHEAT_LIST.equals(cheat)) {
             final StringBuilder list = new StringBuilder();
             for (final String ch : CHEATS_MAP.keySet()) {
