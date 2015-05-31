@@ -24,6 +24,7 @@ package lcmc.vm.ui;
 
 import lcmc.common.ui.GUIData;
 import lcmc.common.domain.Application;
+import lcmc.common.ui.MainPanel;
 import lcmc.vm.ui.configdialog.Domain;
 import lcmc.vm.ui.configdialog.VMConfig;
 import lcmc.vm.ui.resource.DomainInfo;
@@ -43,6 +44,8 @@ public final class AddVMConfigDialog {
     @Inject
     private GUIData guiData;
     @Inject
+    private MainPanel mainPanel;
+    @Inject
     private Domain domainDialog;
 
     public void init(final DomainInfo vmsVirtualDomainInfo) {
@@ -53,7 +56,7 @@ public final class AddVMConfigDialog {
         vmsVirtualDomainInfo.setDialogStarted(true);
         VMConfig dialog = domainDialog;
         dialog.init(null, vmsVirtualDomainInfo);
-        guiData.expandTerminalSplitPane(GUIData.TerminalSize.EXPAND);
+        mainPanel.expandTerminalSplitPane(MainPanel.TerminalSize.EXPAND);
         while (true) {
             LOG.debug1("showDialogs: dialog: " + dialog.getClass().getName());
             final VMConfig newdialog = (VMConfig) dialog.showDialog();
@@ -74,7 +77,7 @@ public final class AddVMConfigDialog {
         }
         vmsVirtualDomainInfo.setDialogStarted(false);
         vmsVirtualDomainInfo.getBrowser().reloadAllComboBoxes(null);
-        guiData.expandTerminalSplitPane(GUIData.TerminalSize.COLLAPSE);
+        mainPanel.expandTerminalSplitPane(MainPanel.TerminalSize.COLLAPSE);
         guiData.getMainFrame().requestFocus();
     }
 }

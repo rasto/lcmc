@@ -23,6 +23,7 @@ package lcmc.robotest;
 import lcmc.common.ui.GUIData;
 import lcmc.common.domain.Application;
 import lcmc.cluster.domain.Cluster;
+import lcmc.common.ui.MainPanel;
 import lcmc.host.domain.Host;
 import lcmc.logger.Logger;
 import lcmc.logger.LoggerFactory;
@@ -97,6 +98,8 @@ public class StartTests {
     @Inject
     private GUIData guiData;
     @Inject
+    private MainPanel mainPanel;
+    @Inject
     private Application application;
 
     private Cluster cluster;
@@ -121,7 +124,7 @@ public class StartTests {
                 }
             }
             final Host firstHost = cluster.getHostsArray()[0];
-            guiData.setTerminalPanel(firstHost.getTerminalPanel());
+            mainPanel.setTerminalPanel(firstHost.getTerminalPanel());
         }
         final Thread thread = new Thread(new Runnable() {
             @Override
@@ -153,7 +156,7 @@ public class StartTests {
                 } else if (type == Type.DRBD) {
                     roboTest.moveToMenu(Tools.getString("Dialog.vm.Storage.Title"));
                     roboTest.leftClick();
-                    guiData.expandTerminalSplitPane(GUIData.TerminalSize.COLLAPSE);
+                    mainPanel.expandTerminalSplitPane(MainPanel.TerminalSize.COLLAPSE);
                     if (index == '0') {
                         /* all DRBD tests */
                         int i = 1;

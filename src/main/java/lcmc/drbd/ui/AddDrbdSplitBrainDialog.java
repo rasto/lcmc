@@ -23,6 +23,7 @@
 package lcmc.drbd.ui;
 
 import lcmc.common.ui.GUIData;
+import lcmc.common.ui.MainPanel;
 import lcmc.drbd.ui.configdialog.DrbdConfig;
 import lcmc.drbd.ui.resource.VolumeInfo;
 import lcmc.logger.Logger;
@@ -41,6 +42,8 @@ public final class AddDrbdSplitBrainDialog {
     @Inject
     private GUIData guiData;
     @Inject
+    private MainPanel mainPanel;
+    @Inject
     private SplitBrain splitBrainDialog;
 
     public void init(final VolumeInfo volumeInfo) {
@@ -50,13 +53,13 @@ public final class AddDrbdSplitBrainDialog {
     public void showDialogs() {
         splitBrainDialog.init(null, volumeInfo);
         DrbdConfig dialog = splitBrainDialog;
-        guiData.expandTerminalSplitPane(GUIData.TerminalSize.EXPAND);
+        mainPanel.expandTerminalSplitPane(MainPanel.TerminalSize.EXPAND);
         while (true) {
             LOG.debug1("showDialogs: dialog: " + dialog.getClass().getName());
             final DrbdConfig newdialog = (DrbdConfig) dialog.showDialog();
             if (dialog.isPressedCancelButton()) {
                 dialog.cancelDialog();
-                guiData.expandTerminalSplitPane(GUIData.TerminalSize.COLLAPSE);
+                mainPanel.expandTerminalSplitPane(MainPanel.TerminalSize.COLLAPSE);
                 if (newdialog == null) {
                     LOG.debug1("showDialogs: dialog: " + dialog.getClass().getName() + " canceled");
                     return;
@@ -67,7 +70,7 @@ public final class AddDrbdSplitBrainDialog {
             }
             dialog = newdialog;
         }
-        guiData.expandTerminalSplitPane(GUIData.TerminalSize.COLLAPSE);
+        mainPanel.expandTerminalSplitPane(MainPanel.TerminalSize.COLLAPSE);
         guiData.getMainFrame().requestFocus();
     }
 }

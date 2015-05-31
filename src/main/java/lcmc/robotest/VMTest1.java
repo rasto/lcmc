@@ -28,11 +28,11 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 import javax.swing.JCheckBox;
 
-import lcmc.common.ui.GUIData;
 import lcmc.cluster.domain.Cluster;
 import lcmc.cluster.ui.widget.GenericWidget.MTextField;
 import lcmc.cluster.ui.widget.MComboBox;
 import lcmc.common.domain.util.Tools;
+import lcmc.common.ui.MainPanel;
 
 /**
  * This class is used to test the GUI.
@@ -43,7 +43,7 @@ final class VMTest1 {
     @Inject
     private RoboTest roboTest;
     @Inject
-    private GUIData guiData;
+    private MainPanel mainPanel;
 
     void start(final Cluster cluster, final String vmTest, final int count) {
         startVMTest(cluster, vmTest, "kvm", count);
@@ -327,7 +327,7 @@ final class VMTest1 {
                 roboTest.moveTo("Apply"); /* apply */
                 roboTest.leftClick();
                 roboTest.checkVMTest(vmTest, 3.1, name);
-                guiData.expandTerminalSplitPane(GUIData.TerminalSize.COLLAPSE);
+                mainPanel.expandTerminalSplitPane(MainPanel.TerminalSize.COLLAPSE);
                 roboTest.moveTo("Readonly", JCheckBox.class);
                 roboTest.leftClick();
 

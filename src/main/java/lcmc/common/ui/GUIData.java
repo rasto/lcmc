@@ -47,7 +47,6 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 import javax.swing.BoxLayout;
 import javax.swing.JApplet;
-import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.JEditorPane;
@@ -56,14 +55,11 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JRootPane;
 import javax.swing.JScrollPane;
-import javax.swing.JSplitPane;
 import javax.swing.JTextField;
 import javax.swing.RootPaneContainer;
 import javax.swing.SwingUtilities;
 import javax.swing.event.MenuEvent;
 import javax.swing.event.MenuListener;
-import javax.swing.plaf.basic.BasicSplitPaneDivider;
-import javax.swing.plaf.basic.BasicSplitPaneUI;
 
 import lcmc.cluster.domain.Cluster;
 import lcmc.common.domain.Application;
@@ -100,7 +96,6 @@ public class GUIData  {
     private MainPanel mainPanel;
     @Inject
     private Access access;
-    private JSplitPane terminalSplitPane;
     private ClustersPanel clustersPanel;
     /** Invisible panel with progress indicator. */
     private final ReadWriteLock mAddClusterButtonListLock = new ReentrantReadWriteLock();
@@ -132,8 +127,6 @@ public class GUIData  {
     private UserConfig userConfig;
 
     private Container mainFrame;
-    private int lastDividerLocation = -1;
-    private boolean terminalAreaExpanded = true;
 
     public Container getMainFrameContentPane() {
         return ((RootPaneContainer) mainFrame).getContentPane();
@@ -147,79 +140,6 @@ public class GUIData  {
             return ((RootPaneContainer) mainFrame).getRootPane();
         }
         return null;
-    }
-
-    /** Sets split pane that contains terminal as bottom component. */
-    public void setTerminalSplitPane(final JSplitPane terminalSplitPane) {
-        this.terminalSplitPane = terminalSplitPane;
-    }
-
-    public void setTerminalPanel(final java.awt.Component terminalPanel) {
-        if (terminalPanel == null) {
-            return;
-        }
-        swingUtils.invokeInEdt(new Runnable() {
-            @Override
-            public void run() {
-                final java.awt.Component oldTerminalPanel = terminalSplitPane.getBottomComponent();
-                if (!terminalPanel.equals(oldTerminalPanel)) {
-                    expandTerminalSplitPane(TerminalSize.EXPAND);
-                    terminalSplitPane.setBottomComponent(terminalPanel);
-                    expandTerminalSplitPane(TerminalSize.COLLAPSE);
-                }
-            }
-        });
-    }
-
-    /** Returns the position of the terminal panel. */
-    public int getTerminalPanelPos() {
-        if (terminalSplitPane.getBottomComponent() == null) {
-            return 0;
-        } else {
-            return mainPanel.getY() + terminalSplitPane.getBottomComponent().getY();
-        }
-    }
-
-    public boolean isTerminalPanelExpanded() {
-        return terminalSplitPane.getBottomComponent().getSize().getHeight() != 0;
-    }
-
-    public void expandTerminalSplitPane(final TerminalSize terminalSize) {
-        if (terminalSplitPane == null) {
-            return;
-        }
-        swingUtils.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                final int height = terminalSplitPane.getHeight() - terminalSplitPane.getDividerLocation() - 11;
-                if (!terminalAreaExpanded && terminalSize == TerminalSize.EXPAND) {
-                    terminalAreaExpanded = true;
-                    lastDividerLocation = terminalSplitPane.getDividerLocation();
-                    if (height < 10) {
-                        terminalSplitPane.setDividerLocation(terminalSplitPane.getHeight() - 150);
-                    }
-                } else if (terminalAreaExpanded && terminalSize == TerminalSize.COLLAPSE) {
-                    terminalAreaExpanded = false;
-                    if (lastDividerLocation < 0) {
-                        terminalSplitPane.setDividerLocation(1.0);
-                    } else {
-                        terminalSplitPane.setDividerLocation(lastDividerLocation);
-                    }
-                }
-            }
-        });
-    }
-
-    public void initTerminalSplitPane() {
-        swingUtils.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                final BasicSplitPaneUI ui = (BasicSplitPaneUI) terminalSplitPane.getUI();
-                final BasicSplitPaneDivider divider = ui.getDivider();
-                final JButton button = (JButton) divider.getComponent(1);
-                button.doClick();
-            }
-        });
     }
 
     public ClustersPanel getClustersPanel() {
@@ -760,10 +680,5 @@ public class GUIData  {
         progressIndicator.stopProgressIndicator("OH MY GOD!!! Hi Rasto!");
         mainMenu.resetOperatingModes(godMode);
         access.updateGlobalItems();
-    }
-
-    public enum TerminalSize {
-        EXPAND,
-        COLLAPSE
     }
 }

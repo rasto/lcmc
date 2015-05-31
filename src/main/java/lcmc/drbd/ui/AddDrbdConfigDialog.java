@@ -26,7 +26,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import lcmc.common.ui.GUIData;
+import lcmc.common.ui.MainPanel;
 import lcmc.common.ui.WizardDialog;
 import lcmc.common.ui.utils.SwingUtils;
 import lcmc.drbd.ui.configdialog.Resource;
@@ -52,7 +52,7 @@ public final class AddDrbdConfigDialog {
     private BlockDevInfo blockDevInfo1;
     private BlockDevInfo blockDevInfo2;
     @Inject
-    private GUIData guiData;
+    private MainPanel mainPanel;
     @Inject
     private Start startDialog;
     @Inject
@@ -88,14 +88,14 @@ public final class AddDrbdConfigDialog {
             resourceDialog.init(null, dvi);
             dialog = resourceDialog;
         }
-        guiData.expandTerminalSplitPane(GUIData.TerminalSize.EXPAND);
+        mainPanel.expandTerminalSplitPane(MainPanel.TerminalSize.EXPAND);
         while (true) {
             LOG.debug1("showDialogs: dialog: " + dialog.getClass().getName());
             final WizardDialog newdialog = (WizardDialog) dialog.showDialog();
             if (dialog.isPressedCancelButton()) {
                 dialog.cancelDialog();
                 wizardCanceled = true;
-                guiData.expandTerminalSplitPane(GUIData.TerminalSize.COLLAPSE);
+                mainPanel.expandTerminalSplitPane(MainPanel.TerminalSize.COLLAPSE);
                 if (newdialog == null) {
                     LOG.debug1("showDialogs: dialog: " + dialog.getClass().getName() + " canceled");
                     return;

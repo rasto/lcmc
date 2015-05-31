@@ -42,7 +42,6 @@ import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.text.Document;
 import lcmc.common.domain.AccessMode;
-import lcmc.common.domain.Application;
 import lcmc.common.domain.StringValue;
 import lcmc.common.domain.Value;
 import lcmc.common.ui.Access;

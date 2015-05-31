@@ -28,9 +28,9 @@ import java.io.OutputStream;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
+import lcmc.common.ui.MainPanel;
 import lcmc.common.ui.ProgressIndicator;
 import lcmc.configs.DistResource;
-import lcmc.common.ui.GUIData;
 import lcmc.host.domain.Host;
 import lcmc.cluster.ui.SSHGui;
 import lcmc.common.domain.ExecCallback;
@@ -51,7 +51,7 @@ public final class ExecCommandThread extends Thread {
     private final NewOutputCallback newOutputCallback;
     private final boolean outputVisible;
     private final boolean commandVisible;
-    private final GUIData guiData;
+    private final MainPanel mainPanel;
     private final ProgressIndicator progressIndicator;
 
     private volatile boolean cancelIt = false;
@@ -64,10 +64,10 @@ public final class ExecCommandThread extends Thread {
     private static final int DEFAULT_EXIT_CODE = 100;
     private static final String ENCODING = "UTF-8";
 
-    ExecCommandThread(final GUIData guiData,
+    ExecCommandThread(final MainPanel mainPanel,
                       final ProgressIndicator progressIndicator,
                       final ExecCommandConfig execCommandConfig) {
-        this.guiData = guiData;
+        this.mainPanel = mainPanel;
         this.progressIndicator = progressIndicator;
 
         this.host = execCommandConfig.getHost();
@@ -106,11 +106,11 @@ public final class ExecCommandThread extends Thread {
             }
         } else {
             if (commandVisible || outputVisible) {
-                guiData.expandTerminalSplitPane(GUIData.TerminalSize.EXPAND);
+                mainPanel.expandTerminalSplitPane(MainPanel.TerminalSize.EXPAND);
             }
             exec();
             if (commandVisible || outputVisible) {
-                guiData.expandTerminalSplitPane(GUIData.TerminalSize.COLLAPSE);
+                mainPanel.expandTerminalSplitPane(MainPanel.TerminalSize.COLLAPSE);
             }
         }
     }
@@ -184,7 +184,7 @@ public final class ExecCommandThread extends Thread {
             final int exitCode) {
         if (execCallback != null) {
             if (commandVisible || outputVisible) {
-                guiData.expandTerminalSplitPane(GUIData.TerminalSize.EXPAND);
+                mainPanel.expandTerminalSplitPane(MainPanel.TerminalSize.EXPAND);
             }
             execCallback.doneError(ans.toString(), exitCode);
         }

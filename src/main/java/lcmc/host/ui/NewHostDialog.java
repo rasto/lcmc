@@ -33,9 +33,9 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SpringLayout;
 
-import lcmc.common.ui.GUIData;
 import lcmc.common.domain.AccessMode;
 import lcmc.common.domain.Application;
+import lcmc.common.ui.MainPanel;
 import lcmc.common.ui.utils.SwingUtils;
 import lcmc.host.domain.Host;
 import lcmc.common.domain.StringValue;
@@ -68,7 +68,7 @@ public class NewHostDialog extends DialogHost {
     @Resource(name="configuration")
     private Configuration configuration;
     @Inject
-    private GUIData guiData;
+    private MainPanel mainPanel;
     @Inject
     private Application application;
     @Inject
@@ -92,7 +92,7 @@ public class NewHostDialog extends DialogHost {
         application.setLastEnteredUseSudo("true".equals(useSudoString));
         if (!application.existsHost(getHost())) {
             application.addHostToHosts(getHost());
-            guiData.setTerminalPanel(getHost().getTerminalPanel());
+            mainPanel.setTerminalPanel(getHost().getTerminalPanel());
         }
     }
 

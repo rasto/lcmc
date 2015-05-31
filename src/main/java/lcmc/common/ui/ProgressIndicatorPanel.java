@@ -139,7 +139,7 @@ public final class ProgressIndicatorPanel extends JComponent implements MouseLis
     @Inject
     private MainMenu mainMenu;
     @Inject
-    private GUIData guiData;
+    private MainPanel mainPanel;
     @Inject
     private Application application;
 
@@ -282,7 +282,7 @@ public final class ProgressIndicatorPanel extends JComponent implements MouseLis
             g2.setColor(new Color(VEIL_COLOR.getRed(), VEIL_COLOR.getGreen(), VEIL_COLOR.getBlue(), newAlphaLevel));
             final int barHeight = 40;
             final int startAtHeight = getHeight() / 2 - barHeight / 2;
-            g2.fillRect(0, 20, width, guiData.getTerminalPanelPos() - 20);
+            g2.fillRect(0, 20, width, mainPanel.getTerminalPanelPos() - 20);
             if (barPos < 0) {
                 barPos = width / 2;
             }

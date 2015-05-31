@@ -20,7 +20,7 @@
 
 package lcmc.drbd.ui;
 
-import lcmc.common.ui.GUIData;
+import lcmc.common.ui.MainPanel;
 import lcmc.host.domain.Host;
 import lcmc.drbd.domain.DrbdInstallation;
 import lcmc.common.ui.WizardDialog;
@@ -41,7 +41,7 @@ public final class ProxyHostWizard {
     private VolumeInfo volumeInfo;
     private Host host;
     @Inject
-    private GUIData guiData;
+    private MainPanel mainPanel;
     @Inject
     private NewProxyHostDialog newProxyHostDialog;
 
@@ -53,13 +53,13 @@ public final class ProxyHostWizard {
     public void showDialogs() {
         newProxyHostDialog.init(null, host, volumeInfo, null, new DrbdInstallation());
         WizardDialog dialog = newProxyHostDialog;
-        guiData.expandTerminalSplitPane(GUIData.TerminalSize.EXPAND);
+        mainPanel.expandTerminalSplitPane(MainPanel.TerminalSize.EXPAND);
         while (true) {
             LOG.debug1("showDialogs: dialog: " + dialog.getClass().getName());
             final WizardDialog newdialog = (WizardDialog) dialog.showDialog();
             if (dialog.isPressedCancelButton()) {
                 dialog.cancelDialog();
-                guiData.expandTerminalSplitPane(GUIData.TerminalSize.COLLAPSE);
+                mainPanel.expandTerminalSplitPane(MainPanel.TerminalSize.COLLAPSE);
                 if (newdialog == null) {
                     LOG.debug1("showDialogs: dialog: " + dialog.getClass().getName() + " canceled");
                     return;

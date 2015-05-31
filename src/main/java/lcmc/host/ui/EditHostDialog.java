@@ -22,7 +22,7 @@
 
 package lcmc.host.ui;
 
-import lcmc.common.ui.GUIData;
+import lcmc.common.ui.MainPanel;
 import lcmc.host.domain.Host;
 import lcmc.drbd.domain.DrbdInstallation;
 import lcmc.logger.Logger;
@@ -42,19 +42,19 @@ public final class EditHostDialog {
     @Resource(name="SSH")
     private SSH sshDialog;
     @Inject
-    private GUIData guiData;
+    private MainPanel mainPanel;
 
     public void showDialogs(final Host host) {
         DialogHost dialog = sshDialog;
         dialog.init(null, host, new DrbdInstallation());
-        final boolean expanded = guiData.isTerminalPanelExpanded();
-        guiData.expandTerminalSplitPane(GUIData.TerminalSize.EXPAND);
+        final boolean expanded = mainPanel.isTerminalPanelExpanded();
+        mainPanel.expandTerminalSplitPane(MainPanel.TerminalSize.EXPAND);
         while (true) {
             LOG.debug1("showDialogs: dialog: " + dialog.getClass().getName());
             final DialogHost newdialog = (DialogHost) dialog.showDialog();
             if (dialog.isPressedCancelButton()) {
                 if (!expanded) {
-                    guiData.expandTerminalSplitPane(GUIData.TerminalSize.COLLAPSE);
+                    mainPanel.expandTerminalSplitPane(MainPanel.TerminalSize.COLLAPSE);
                 }
                 if (newdialog == null) {
                     LOG.debug1("showDialogs: dialog: " + dialog.getClass().getName() + " canceled");
@@ -67,7 +67,7 @@ public final class EditHostDialog {
             dialog = newdialog;
         }
         if (!expanded) {
-            guiData.expandTerminalSplitPane(GUIData.TerminalSize.COLLAPSE);
+            mainPanel.expandTerminalSplitPane(MainPanel.TerminalSize.COLLAPSE);
         }
     }
 }
