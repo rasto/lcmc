@@ -93,8 +93,6 @@ public class GUIData  {
     public static final String MIME_TYPE_TEXT_HTML = "text/html";
     public static final String MIME_TYPE_TEXT_PLAIN = "text/plain";
     @Inject
-    private MainPanel mainPanel;
-    @Inject
     private Access access;
     private ClustersPanel clustersPanel;
     /** Invisible panel with progress indicator. */
@@ -113,8 +111,6 @@ public class GUIData  {
     private final Collection<AllHostsUpdatable> allHostsUpdateList = new ArrayList<AllHostsUpdatable>();
     /** Selected components for copy/paste. */
     private List<Info> selectedComponents = null;
-    @Inject
-    private MainMenu mainMenu;
 
     private static volatile int prevScrollingMenuIndex = -1;
     @Inject
@@ -669,16 +665,5 @@ public class GUIData  {
         progressIndicator.startProgressIndicator(text);
         userConfig.saveConfig(filename, saveAll);
         progressIndicator.stopProgressIndicator(text);
-    }
-
-    /**
-     * Do gui actions when we are in the god mode.
-     * - enable/disable look and feel menu etc
-     */
-    public void godModeChanged(final boolean godMode) {
-        progressIndicator.startProgressIndicator("OH MY GOD!!! Hi Rasto!");
-        progressIndicator.stopProgressIndicator("OH MY GOD!!! Hi Rasto!");
-        mainMenu.resetOperatingModes(godMode);
-        access.updateGlobalItems();
     }
 }
