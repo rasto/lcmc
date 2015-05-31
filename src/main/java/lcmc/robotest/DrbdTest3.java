@@ -22,10 +22,10 @@ package lcmc.robotest;
 
 import java.awt.event.KeyEvent;
 import lcmc.Exceptions;
-import lcmc.common.ui.GUIData;
 import lcmc.cluster.domain.Cluster;
 import lcmc.cluster.ui.widget.GenericWidget.MTextField;
 import lcmc.cluster.ui.widget.MComboBox;
+import lcmc.common.ui.MainPanel;
 import lcmc.logger.Logger;
 import lcmc.logger.LoggerFactory;
 import lcmc.common.domain.util.Tools;
@@ -46,7 +46,7 @@ final class DrbdTest3 {
     private DrbdTest1 drbdTest1;
     private static final Logger LOG = LoggerFactory.getLogger(DrbdTest3.class);
     @Inject
-    private GUIData guiData;
+    private MainPanel mainPanel;
 
     void start(final Cluster cluster, final int blockDevY) {
         /* Two drbds. */
@@ -115,7 +115,7 @@ final class DrbdTest3 {
         roboTest.press(KeyEvent.VK_DOWN);
         roboTest.press(KeyEvent.VK_DOWN); /* select dopd */
         roboTest.press(KeyEvent.VK_ENTER);
-        guiData.expandTerminalSplitPane(GUIData.TerminalSize.COLLAPSE);
+        mainPanel.expandTerminalSplitPane(MainPanel.TerminalSize.COLLAPSE);
 
         roboTest.moveTo("Wfc timeout", MTextField.class);
         roboTest.leftClick();

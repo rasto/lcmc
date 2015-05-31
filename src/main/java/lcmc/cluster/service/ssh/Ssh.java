@@ -28,10 +28,11 @@ import java.io.IOException;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
+import lcmc.common.ui.GUIData;
+import lcmc.common.ui.MainPanel;
 import lcmc.common.ui.ProgressIndicator;
 import lcmc.common.ui.utils.SwingUtils;
 import lcmc.configs.DistResource;
-import lcmc.common.ui.GUIData;
 import lcmc.common.domain.Application;
 import lcmc.host.domain.Host;
 import lcmc.common.ui.ProgressBar;
@@ -76,6 +77,8 @@ public final class Ssh {
     private LocalPortForwarder localPortForwarder = null;
     @Inject
     private GUIData guiData;
+    @Inject
+    private MainPanel mainPanel;
     @Inject
     private ProgressIndicator progressIndicator;
     @Inject
@@ -326,7 +329,7 @@ public final class Ssh {
                          .connectionThread(connectionThread)
                          .sshGui(sshGui)
                          .execCallback(execCallback)
-                         .execute(guiData, progressIndicator).block();
+                         .execute(mainPanel, progressIndicator).block();
         return new SshOutput(answer[0], exitCode[0]);
     }
 
@@ -340,7 +343,7 @@ public final class Ssh {
         return execCommandConfig.host(host)
                                 .connectionThread(connectionThread)
                                 .sshGui(sshGui)
-                                .execute(guiData, progressIndicator);
+                                .execute(mainPanel, progressIndicator);
     }
 
     public SshOutput captureCommand(final ExecCommandConfig execCommandConfig) {
@@ -348,7 +351,7 @@ public final class Ssh {
         return execCommandConfig.host(host)
                                 .connectionThread(connectionThread)
                                 .sshGui(sshGui)
-                                .capture(guiData, progressIndicator);
+                                .capture(mainPanel, progressIndicator);
     }
 
     /** Installs gui-helper on the remote host. */

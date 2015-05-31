@@ -32,6 +32,7 @@ import lcmc.LCMC;
 import lcmc.cluster.service.storage.FileSystemService;
 import lcmc.common.domain.UserConfig;
 import lcmc.common.ui.GUIData;
+import lcmc.common.ui.MainPanel;
 import lcmc.common.ui.ProgressIndicatorPanel;
 import lcmc.common.domain.Application;
 import lcmc.cluster.domain.Cluster;
@@ -65,6 +66,8 @@ public class IntegrationTestLauncher {
 
     @Inject
     private GUIData guiData;
+    @Inject
+    private MainPanel mainPanel;
     @Inject
     private Application application;
     @Inject
@@ -165,7 +168,7 @@ public class IntegrationTestLauncher {
         userConfig.saveConfig(saveFile, false);
         guiData.refreshClustersPanel();
         
-        guiData.expandTerminalSplitPane(GUIData.TerminalSize.COLLAPSE);
+        mainPanel.expandTerminalSplitPane(MainPanel.TerminalSize.COLLAPSE);
         cluster.getClusterTab().addClusterView();
         cluster.getClusterTab().requestFocus();
         guiData.checkAddClusterButtons();

@@ -53,8 +53,8 @@ import javax.swing.ImageIcon;
 import javax.swing.JMenu;
 import javax.swing.JPopupMenu;
 
-import lcmc.common.ui.GUIData;
 import lcmc.common.ui.Info;
+import lcmc.common.ui.MainPanel;
 import lcmc.common.ui.ResourceGraph;
 import lcmc.common.ui.utils.SwingUtils;
 import lcmc.crm.ui.resource.ConstraintPHInfo;
@@ -150,7 +150,7 @@ public class CrmGraph extends ResourceGraph {
     private int hostDefaultXPos = 10;
     private PcmkMultiSelectionInfo multiSelectionInfo = null;
     @Inject
-    private GUIData guiData;
+    private MainPanel mainPanel;
     @Inject
     private Provider<PcmkMultiSelectionInfo> pcmkMultiSelectionInfoProvider;
     @Inject
@@ -799,7 +799,7 @@ public class CrmGraph extends ResourceGraph {
         if (vertexToHostMap.containsKey(v)) {
             final HostInfo hi = vertexToHostMap.get(v);
             if (hi != null) {
-                guiData.setTerminalPanel(hi.getHost().getTerminalPanel());
+                mainPanel.setTerminalPanel(hi.getHost().getTerminalPanel());
                 getClusterBrowser().setRightComponentInView(hi);
             }
         } else if (vertexToConstraintPHMap.containsKey(v)) {

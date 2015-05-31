@@ -25,6 +25,7 @@ package lcmc.cluster.ui.wizard;
 import lcmc.common.ui.GUIData;
 import lcmc.common.domain.Application;
 import lcmc.cluster.domain.Cluster;
+import lcmc.common.ui.MainPanel;
 import lcmc.common.ui.utils.SwingUtils;
 import lcmc.host.domain.Hosts;
 import lcmc.logger.Logger;
@@ -45,6 +46,8 @@ public final class AddClusterDialog {
     @Inject
     private GUIData guiData;
     @Inject
+    private MainPanel mainPanel;
+    @Inject
     private Cluster cluster;
     @Inject
     private Application application;
@@ -61,7 +64,7 @@ public final class AddClusterDialog {
         cluster.setClusterTabClosable(false);
         DialogCluster dialog = nameDialog;
         dialog.init(null, cluster);
-        guiData.expandTerminalSplitPane(GUIData.TerminalSize.EXPAND);
+        mainPanel.expandTerminalSplitPane(MainPanel.TerminalSize.EXPAND);
         while (true) {
             LOG.debug1("showDialogs: dialog: " + dialog.getClass().getName());
             final DialogCluster newDialog = (DialogCluster) dialog.showDialog();
@@ -76,7 +79,7 @@ public final class AddClusterDialog {
                         guiData.checkAddClusterButtons();
                     }
                 });
-                guiData.expandTerminalSplitPane(GUIData.TerminalSize.COLLAPSE);
+                mainPanel.expandTerminalSplitPane(MainPanel.TerminalSize.COLLAPSE);
                 if (newDialog == null) {
                     LOG.debug1("showDialogs: dialog: " + dialog.getClass().getName() + " canceled");
                     cluster.setClusterTabClosable(true);
@@ -90,7 +93,7 @@ public final class AddClusterDialog {
                 dialog = newDialog;
             }
         }
-        guiData.expandTerminalSplitPane(GUIData.TerminalSize.COLLAPSE);
+        mainPanel.expandTerminalSplitPane(MainPanel.TerminalSize.COLLAPSE);
         swingUtils.invokeLater(new Runnable() {
             @Override
             public void run() {

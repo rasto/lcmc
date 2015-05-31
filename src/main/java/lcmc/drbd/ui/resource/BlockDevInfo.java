@@ -48,10 +48,10 @@ import lcmc.Exceptions;
 import lcmc.common.domain.AccessMode;
 import lcmc.common.ui.Browser;
 import lcmc.cluster.ui.ClusterBrowser;
+import lcmc.common.ui.MainPanel;
 import lcmc.common.ui.treemenu.TreeMenuController;
 import lcmc.common.ui.utils.SwingUtils;
 import lcmc.drbd.ui.DrbdGraph;
-import lcmc.common.ui.GUIData;
 import lcmc.host.ui.HostBrowser;
 import lcmc.common.domain.Application;
 import lcmc.common.domain.ColorText;
@@ -103,7 +103,7 @@ public class BlockDevInfo extends EditableInfo {
 
     private static final String BY_UUID_PATH = "/dev/disk/by-uuid/";
     @Inject
-    private GUIData guiData;
+    private MainPanel mainPanel;
     @Inject
     private BlockDevMenu blockDevMenu;
     @Inject
@@ -767,7 +767,7 @@ public class BlockDevInfo extends EditableInfo {
     @Override
     protected void setTerminalPanel() {
         if (getHost() != null) {
-            guiData.setTerminalPanel(getHost().getTerminalPanel());
+            mainPanel.setTerminalPanel(getHost().getTerminalPanel());
         }
     }
 

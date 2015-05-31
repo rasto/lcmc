@@ -22,8 +22,8 @@
 
 package lcmc.cluster.ui.wizard;
 
-import lcmc.common.ui.GUIData;
 import lcmc.cluster.domain.Cluster;
+import lcmc.common.ui.MainPanel;
 import lcmc.logger.Logger;
 import lcmc.logger.LoggerFactory;
 import lcmc.common.domain.util.Tools;
@@ -42,18 +42,18 @@ public final class EditClusterDialog {
     @Inject
     private Name nameDialog;
     @Inject
-    private GUIData guiData;
+    private MainPanel mainPanel;
 
     public void showDialogs(final Cluster cluster) {
         cluster.setClusterTabClosable(false);
         DialogCluster dialog = nameDialog;
         dialog.init(null, cluster);
-        guiData.expandTerminalSplitPane(GUIData.TerminalSize.EXPAND);
+        mainPanel.expandTerminalSplitPane(MainPanel.TerminalSize.EXPAND);
         while (true) {
             LOG.debug1("showDialogs: dialog: " + dialog.getClass().getName());
             final DialogCluster newdialog = (DialogCluster) dialog.showDialog();
             if (dialog.isPressedButton(CANCEL_BTN)) {
-                guiData.expandTerminalSplitPane(GUIData.TerminalSize.COLLAPSE);
+                mainPanel.expandTerminalSplitPane(MainPanel.TerminalSize.COLLAPSE);
                 if (newdialog == null) {
                     LOG.debug1("showDialogs: dialog: " + dialog.getClass().getName() + " canceled");
                     cluster.setClusterTabClosable(true);
@@ -65,7 +65,7 @@ public final class EditClusterDialog {
             }
             dialog = newdialog;
         }
-        guiData.expandTerminalSplitPane(GUIData.TerminalSize.COLLAPSE);
+        mainPanel.expandTerminalSplitPane(MainPanel.TerminalSize.COLLAPSE);
         cluster.setClusterTabClosable(true);
     }
 }

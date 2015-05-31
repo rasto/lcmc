@@ -34,6 +34,7 @@ import javax.swing.SpringLayout;
 import lcmc.AppContext;
 import lcmc.Exceptions;
 import lcmc.common.ui.GUIData;
+import lcmc.common.ui.MainPanel;
 import lcmc.common.ui.utils.SwingUtils;
 import lcmc.drbd.ui.resource.GlobalInfo;
 import lcmc.common.domain.Application;
@@ -58,6 +59,8 @@ final class BlockDev extends DrbdConfig {
     private BlockDevInfo blockDevInfo;
     @Inject
     private GUIData guiData;
+    @Inject
+    private MainPanel mainPanel;
     @Inject
     private CreateMD createMDDialog;
     private GlobalInfo globalInfo;
@@ -137,7 +140,7 @@ final class BlockDev extends DrbdConfig {
                 }
                 final ClusterBrowser browser = getDrbdVolumeInfo().getDrbdResourceInfo().getBrowser();
                 browser.reloadAllComboBoxes(null);
-                guiData.expandTerminalSplitPane(GUIData.TerminalSize.COLLAPSE);
+                mainPanel.expandTerminalSplitPane(MainPanel.TerminalSize.COLLAPSE);
                 guiData.getMainFrame().requestFocus();
             } catch (final Exceptions.DrbdConfigException dce) {
                 LOG.appError("nextDialog: config failed", dce);
