@@ -34,6 +34,7 @@ import javax.swing.JMenuItem;
 import lcmc.common.ui.GUIData;
 import lcmc.common.domain.AccessMode;
 import lcmc.common.domain.Application;
+import lcmc.common.ui.ProgressIndicatorPanel;
 import lcmc.common.ui.utils.SwingUtils;
 import lcmc.crm.domain.ResourceAgent;
 import lcmc.cluster.ui.ClusterBrowser;
@@ -61,6 +62,8 @@ public class GroupMenu extends ServiceMenu {
     private Application application;
     @Inject
     private SwingUtils swingUtils;
+    @Inject
+    private ProgressIndicatorPanel progressIndicatorPanel;
 
     @Override
     public List<UpdatableItem> getPulldownMenu(final ServiceInfo serviceInfo) {
@@ -150,7 +153,7 @@ public class GroupMenu extends ServiceMenu {
         }
 
         /* group services */
-        if (!application.isSlow()) {
+        if (!progressIndicatorPanel.isSlow()) {
             for (final ServiceInfo child : groupInfo.getSubServices()) {
                 final MyMenu groupServicesMenu = menuFactory.createMenu(
                         child.toString(),

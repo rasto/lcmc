@@ -177,10 +177,12 @@ public abstract class ResourceGraph {
     private GUIData guiData;
     @Inject
     private ProgressIndicator progressIndicator;
+    @Inject
+    private ProgressIndicatorPanel progressIndicatorPanel;
 
     /** Starts the animation if vertex is being updated. */
     public final void startAnimation(final Info info) {
-        final int animInterval = (int) (1000 / application.getAnimFPS());
+        final int animInterval = (int) (1000 / progressIndicatorPanel.getAnimFPS());
         mAnimationListLock.lock();
         if (animationList.isEmpty()) {
             /* start animation thread */
@@ -232,7 +234,7 @@ public abstract class ResourceGraph {
 
     /** Starts the animation if vertex is being tested. */
     public final void startTestAnimation(final JComponent component, final CountDownLatch startTestLatch) {
-        final int animInterval = (int) (1000 / application.getAnimFPS());
+        final int animInterval = (int) (1000 / progressIndicatorPanel.getAnimFPS());
         mTestAnimationListLock.lock();
         mRunModeFlag.lock();
         runModeFlag = Application.RunMode.LIVE;

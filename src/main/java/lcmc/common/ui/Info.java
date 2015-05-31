@@ -134,6 +134,8 @@ public class Info implements Comparable<Info>, Value, InfoPresenter {
     private TreeMenuController treeMenuController;
     @Inject
     private Access access;
+    @Inject
+    private ProgressIndicatorPanel progressIndicatorPanel;
 
     public void init(final String name, final Browser browser) {
         this.name = name;
@@ -234,7 +236,7 @@ public class Info implements Comparable<Info>, Value, InfoPresenter {
      * than 100.
      */
     public final void incAnimationIndex() {
-        animationIndex += 3.0 * 20.0 / application.getAnimFPS();
+        animationIndex += 3.0 * 20.0 / progressIndicatorPanel.getAnimFPS();
         if (animationIndex > 100) {
             animationIndex = 0;
         }
