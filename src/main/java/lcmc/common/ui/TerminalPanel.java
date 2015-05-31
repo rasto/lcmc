@@ -113,6 +113,8 @@ public class TerminalPanel extends JScrollPane {
     private static final Map<String, Integer> CHEATS_MAP = new LinkedHashMap<String, Integer>();
     @Inject
     private RoboTest roboTest;
+    @Inject
+    private MainMenu mainMenu;
     private static final Map<String, Test> TEST_CHEATS = new HashMap<String, Test>();
     static {
         for (final StartTests.Type type : new StartTests.Type[]{StartTests.Type.PCMK,
@@ -530,10 +532,10 @@ public class TerminalPanel extends JScrollPane {
         }
         if (!editEnabled && GOD_ON.equals(cheat)) {
             editEnabled = true;
-            guiData.godModeChanged(editEnabled);
+            godModeChanged(editEnabled);
         } else if (editEnabled && GOD_OFF.equals(cheat)) {
             editEnabled = false;
-            guiData.godModeChanged(editEnabled);
+            godModeChanged(editEnabled);
         } else if (CHEAT_LIST.equals(cheat)) {
             final StringBuilder list = new StringBuilder();
             for (final String ch : CHEATS_MAP.keySet()) {
@@ -695,5 +697,16 @@ public class TerminalPanel extends JScrollPane {
             throws BadLocationException {
             super.remove(offs, len);
         }
+    }
+
+    /**
+     * Do gui actions when we are in the god mode.
+     * - enable/disable look and feel menu etc
+     */
+    public void godModeChanged(final boolean godMode) {
+        progressIndicator.startProgressIndicator("OH MY GOD!!! Hi Rasto!");
+        progressIndicator.stopProgressIndicator("OH MY GOD!!! Hi Rasto!");
+        mainMenu.resetOperatingModes(godMode);
+        access.updateGlobalItems();
     }
 }
