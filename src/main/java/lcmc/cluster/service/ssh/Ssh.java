@@ -28,7 +28,7 @@ import java.io.IOException;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
-import lcmc.common.ui.GUIData;
+import lcmc.common.ui.main.MainData;
 import lcmc.common.ui.MainPanel;
 import lcmc.common.ui.ProgressIndicator;
 import lcmc.common.ui.utils.SwingUtils;
@@ -76,7 +76,7 @@ public final class Ssh {
     private final Lock mConnectionThreadLock = new ReentrantLock();
     private LocalPortForwarder localPortForwarder = null;
     @Inject
-    private GUIData guiData;
+    private MainData mainData;
     @Inject
     private MainPanel mainPanel;
     @Inject
@@ -112,7 +112,7 @@ public final class Ssh {
             LOG.debug1("reconnect: connecting: " + host.getName());
             this.connectionCallback = NO_CONNECTION_CALLBACK;
             this.progressBar = NO_PROGRESS_BAR;
-            this.sshGui = new SSHGui(guiData.getMainFrame(), host, null);
+            this.sshGui = new SSHGui(mainData.getMainFrame(), host, null);
             authenticateAndConnect();
         }
         return true;

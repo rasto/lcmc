@@ -28,9 +28,10 @@ import javax.inject.Named;
 import javax.inject.Provider;
 import javax.swing.JColorChooser;
 
+import lcmc.common.ui.main.MainPresenter;
 import lcmc.host.ui.EditHostDialog;
 import lcmc.common.ui.CallbackAction;
-import lcmc.common.ui.GUIData;
+import lcmc.common.ui.main.MainData;
 import lcmc.common.domain.AccessMode;
 import lcmc.common.domain.Application;
 import lcmc.host.domain.Host;
@@ -59,7 +60,9 @@ public class HostMenu {
     @Inject
     private EditHostDialog editHostDialog;
     @Inject
-    private GUIData guiData;
+    private MainData mainData;
+    @Inject
+    private MainPresenter mainPresenter;
     @Inject
     private MenuFactory menuFactory;
     @Inject
@@ -83,7 +86,7 @@ public class HostMenu {
                             }
                         });
         items.add(hostWizardItem);
-        guiData.registerAddHostButton(hostWizardItem);
+        mainData.registerAddHostButton(hostWizardItem);
         /* cluster manager standby on/off */
         final Application.RunMode runMode = Application.RunMode.LIVE;
         final MyMenuItem standbyItem =
@@ -534,7 +537,7 @@ public class HostMenu {
                             @Override
                             public void run(final String text) {
                                 final Color newColor = JColorChooser.showDialog(
-                                        guiData.getMainFrame(),
+                                        mainData.getMainFrame(),
                                         "Choose " + hostInfo.getHost().getName() + " color",
                                         hostInfo.getHost().getPmColors()[0]);
                                 if (newColor != null) {
@@ -613,10 +616,10 @@ public class HostMenu {
                                 hostInfo.getHost().disconnect();
                                 final ClusterBrowser b = hostInfo.getBrowser().getClusterBrowser();
                                 if (b != null) {
-                                    guiData.unregisterAllHostsUpdate(b.getClusterViewPanel());
+                                    mainData.unregisterAllHostsUpdate(b.getClusterViewPanel());
                                 }
                                 application.removeHostFromHosts(hostInfo.getHost());
-                                guiData.allHostsUpdate();
+                                mainPresenter.allHostsUpdate();
                             }
                         });
         items.add(removeHostItem);

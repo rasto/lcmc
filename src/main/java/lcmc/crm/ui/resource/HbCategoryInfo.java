@@ -24,7 +24,7 @@ package lcmc.crm.ui.resource;
 import javax.inject.Named;
 import javax.swing.JPanel;
 import lcmc.cluster.ui.ClusterBrowser;
-import lcmc.common.ui.GUIData;
+import lcmc.common.ui.main.MainData;
 import lcmc.common.ui.CategoryInfo;
 /**
  * This class is used for all kind of categories in the heartbeat
@@ -43,7 +43,7 @@ public class HbCategoryInfo extends CategoryInfo {
     /** Returns type of the info text. text/plain or text/html. */
     @Override
     protected String getInfoMimeType() {
-        return GUIData.MIME_TYPE_TEXT_HTML;
+        return MainData.MIME_TYPE_TEXT_HTML;
     }
 
     @Override

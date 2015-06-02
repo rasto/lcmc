@@ -31,7 +31,7 @@ import java.util.List;
 import lcmc.LCMC;
 import lcmc.cluster.service.storage.FileSystemService;
 import lcmc.common.domain.UserConfig;
-import lcmc.common.ui.GUIData;
+import lcmc.common.ui.main.MainPresenter;
 import lcmc.common.ui.MainPanel;
 import lcmc.common.ui.ProgressIndicatorPanel;
 import lcmc.common.domain.Application;
@@ -65,7 +65,7 @@ public class IntegrationTestLauncher {
     private volatile boolean clusterLoaded = false;
 
     @Inject
-    private GUIData guiData;
+    private MainPresenter mainPresenter;
     @Inject
     private MainPanel mainPanel;
     @Inject
@@ -163,15 +163,14 @@ public class IntegrationTestLauncher {
             }
         });
         
-        //guiData.getEmptyBrowser().addClusterBox(cluster);
         final String saveFile = application.getDefaultSaveFile();
         userConfig.saveConfig(saveFile, false);
-        guiData.refreshClustersPanel();
+        mainPresenter.refreshClustersPanel();
         
         mainPanel.expandTerminalSplitPane(MainPanel.TerminalSize.COLLAPSE);
         cluster.getClusterTab().addClusterView();
         cluster.getClusterTab().requestFocus();
-        guiData.checkAddClusterButtons();
+        mainPresenter.checkAddClusterButtons();
         for (final Host host : hosts) {
             host.waitForServerStatusLatch();
         }

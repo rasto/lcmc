@@ -36,7 +36,7 @@ import javax.swing.JColorChooser;
 
 import lcmc.common.ui.Access;
 import lcmc.common.ui.CallbackAction;
-import lcmc.common.ui.GUIData;
+import lcmc.common.ui.main.MainData;
 import lcmc.common.domain.AccessMode;
 import lcmc.common.domain.Application;
 import lcmc.common.ui.ProgressIndicator;
@@ -66,7 +66,7 @@ public class MultiSelectionMenu {
     private List<Info> selectedInfos;
 
     @Inject
-    private GUIData guiData;
+    private MainData mainData;
     @Inject
     private ProgressIndicator progressIndicator;
     @Inject
@@ -288,7 +288,7 @@ public class MultiSelectionMenu {
                     public void run(final String text) {
                         final Host firstHost = selectedHostInfos.get(0).getHost();
                         final Color newColor = JColorChooser.showDialog(
-                                guiData.getMainFrame(),
+                                mainData.getMainFrame(),
                                 "Choose " + selectedHostInfos + " color",
                                 firstHost.getPmColors()[0]);
                         for (final HostDrbdInfo hi : selectedHostInfos) {

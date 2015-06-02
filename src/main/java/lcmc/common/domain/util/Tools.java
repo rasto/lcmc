@@ -86,7 +86,7 @@ import lcmc.configs.DistResource;
 import lcmc.cluster.domain.Cluster;
 import lcmc.host.domain.Host;
 import lcmc.common.domain.Value;
-import lcmc.common.ui.GUIData;
+import lcmc.common.ui.main.MainPresenter;
 import lcmc.crm.ui.resource.ServiceInfo;
 import lcmc.logger.Logger;
 import lcmc.logger.LoggerFactory;
@@ -225,7 +225,7 @@ public final class Tools {
      * Loads the save file and returns its content as string. Return null, if
      * nothing was loaded.
      */
-    public static String loadFile(GUIData guiData, final String filename, final boolean showError) {
+    public static String loadFile(MainPresenter mainPresenter, final String filename, final boolean showError) {
         final BufferedReader in;
         final StringBuilder content = new StringBuilder("");
         try {
@@ -236,7 +236,7 @@ public final class Tools {
             }
         } catch (final IOException ex) {
             if (showError) {
-                guiData.infoDialog("Load Error", "The file " + filename + " failed to load", ex.getMessage());
+                mainPresenter.infoDialog("Load Error", "The file " + filename + " failed to load", ex.getMessage());
             }
             return null;
         }

@@ -59,7 +59,7 @@ import lcmc.common.domain.Application;
 import lcmc.common.ui.Access;
 import lcmc.common.ui.Browser;
 import lcmc.common.ui.CallbackAction;
-import lcmc.common.ui.GUIData;
+import lcmc.common.ui.main.MainData;
 import lcmc.common.ui.ProgressIndicator;
 import lcmc.common.ui.ResourceGraph;
 import lcmc.common.ui.treemenu.TreeMenuController;
@@ -315,7 +315,7 @@ public class ClusterBrowser extends Browser {
     private final Map<Host, String> hostDrbdParameters = new HashMap<Host, String>();
     private DefaultMutableTreeNode treeTop;
     @Inject
-    private GUIData guiData;
+    private MainData mainData;
     @Inject
     private ProgressIndicator progressIndicator;
     @Inject

@@ -25,7 +25,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.swing.Box;
 import lcmc.cluster.domain.Cluster;
-import lcmc.common.ui.GUIData;
+import lcmc.common.ui.main.MainData;
 import lcmc.common.ui.ViewPanel;
 import lcmc.common.domain.AllHostsUpdatable;
 
@@ -39,7 +39,7 @@ public class ClusterViewPanel extends ViewPanel implements AllHostsUpdatable {
     @Inject
     private ClusterBrowser clusterBrowser;
     @Inject
-    private GUIData guiData;
+    private MainData mainData;
 
     public void init(final Cluster cluster) {
         this.cluster = cluster;
@@ -52,7 +52,7 @@ public class ClusterViewPanel extends ViewPanel implements AllHostsUpdatable {
         add(Box.createVerticalStrut(4), BorderLayout.PAGE_START);
 
         allHostsUpdate();
-        guiData.registerAllHostsUpdate(this);
+        mainData.registerAllHostsUpdate(this);
     }
 
     /** This is called when there was added a new host. */

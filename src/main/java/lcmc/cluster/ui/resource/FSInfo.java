@@ -26,7 +26,7 @@ import javax.swing.ImageIcon;
 import javax.swing.JEditorPane;
 
 import lcmc.common.ui.Info;
-import lcmc.common.ui.GUIData;
+import lcmc.common.ui.main.MainData;
 import lcmc.common.domain.Application;
 import lcmc.host.domain.Host;
 import lcmc.host.ui.HostBrowser;
@@ -54,7 +54,7 @@ public final class FSInfo extends Info {
 
     @Override
     protected String getInfoMimeType() {
-        return GUIData.MIME_TYPE_TEXT_HTML;
+        return MainData.MIME_TYPE_TEXT_HTML;
     }
 
     /** Returns info, before it is updated. */

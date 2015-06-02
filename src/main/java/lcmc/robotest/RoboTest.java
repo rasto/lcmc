@@ -47,7 +47,7 @@ import javax.swing.JLabel;
 import javax.swing.JTree;
 
 import lcmc.configs.AppDefaults;
-import lcmc.common.ui.GUIData;
+import lcmc.common.ui.main.MainData;
 import lcmc.common.domain.Application;
 import lcmc.cluster.domain.Cluster;
 import lcmc.host.domain.Host;
@@ -91,7 +91,7 @@ public final class RoboTest {
 
     static final boolean PROXY = true;
     @Inject
-    private GUIData guiData;
+    private MainData mainData;
 
     public void initRobot(final Cluster cluster) {
         this.cluster = cluster;
@@ -837,7 +837,7 @@ public final class RoboTest {
         }
         final int xOffset = getOffset();
         final Point2D appP =
-            guiData.getMainFrameContentPane()
+            mainData.getMainFrameContentPane()
                 .getLocationOnScreen();
         final int appX = (int) appP.getX() + fromX;
         final int appY = (int) appP.getY() + fromY;
@@ -888,7 +888,7 @@ public final class RoboTest {
         final int origX = (int) origP.getX();
         final int origY = (int) origP.getY();
         final Point2D endP =
-            guiData.getMainFrameContentPane().getLocationOnScreen();
+            mainData.getMainFrameContentPane().getLocationOnScreen();
         final int endX = (int) endP.getX() + toX;
         final int endY = (int) endP.getY() + toY;
         moveToAbs(endX, endY);
@@ -897,14 +897,14 @@ public final class RoboTest {
     int getY() {
         final Point2D origP = MouseInfo.getPointerInfo().getLocation();
         final Point2D endP =
-            guiData.getMainFrameContentPane().getLocationOnScreen();
+            mainData.getMainFrameContentPane().getLocationOnScreen();
         return (int) origP.getY() - (int) endP.getY();
     }
 
     int getX() {
         final Point2D origP = MouseInfo.getPointerInfo().getLocation();
         final Point2D endP =
-            guiData.getMainFrameContentPane().getLocationOnScreen();
+            mainData.getMainFrameContentPane().getLocationOnScreen();
         return (int) origP.getX() - (int) endP.getX();
     }
 
@@ -931,14 +931,14 @@ public final class RoboTest {
         do {
             final List<java.awt.Component> res = new ArrayList<java.awt.Component>();
             try {
-                findInside(guiData.getMainFrame(),
+                findInside(mainData.getMainFrame(),
                            Class.forName("javax.swing.JScrollPane$ScrollBar"),
                            res);
             } catch (final ClassNotFoundException e) {
                 Tools.printStackTrace("can't find the scrollbar");
                 return;
             }
-            final java.awt.Component app = guiData.getMainFrameContentPane();
+            final java.awt.Component app = mainData.getMainFrameContentPane();
             final int mX =
                 (int) app.getLocationOnScreen().getX() + app.getWidth() / 2;
             final int mY =
@@ -1019,7 +1019,7 @@ public final class RoboTest {
         if (aborted) {
             return;
         }
-        final JTree tree = (JTree) findInside(guiData.getMainFrame(),
+        final JTree tree = (JTree) findInside(mainData.getMainFrame(),
                                               JTree.class,
                                               0);
         if (tree == null) {
@@ -1367,7 +1367,7 @@ public final class RoboTest {
 
     Point2D getAppPosition() {
         final Point2D loc =
-            guiData.getMainFrameContentPane().getLocationOnScreen();
+            mainData.getMainFrameContentPane().getLocationOnScreen();
         final Point2D pos = MouseInfo.getPointerInfo().getLocation();
         final Point2D newPos = new Point2D.Double(pos.getX() - loc.getX(),
             pos.getY() - loc.getY());

@@ -66,6 +66,7 @@ import javax.swing.event.DocumentListener;
 import lcmc.cluster.ui.widget.Widget;
 import lcmc.cluster.ui.widget.WidgetFactory;
 import lcmc.common.domain.Application;
+import lcmc.common.ui.main.MainData;
 import lcmc.common.ui.utils.MyButton;
 import lcmc.common.domain.util.Tools;
 import lcmc.common.ui.utils.SwingUtils;
@@ -98,7 +99,7 @@ public abstract class ConfigDialog {
     private WidgetFactory widgetFactory;
     private final MyButton[] options = new MyButton[buttons().length];
     @Inject
-    private GUIData guiData;
+    private MainData mainData;
 
     protected final JDialog getDialogPanel() {
         return dialogPanel;
@@ -123,7 +124,7 @@ public abstract class ConfigDialog {
     }
 
     protected final JScrollPane getAnswerPane(final String initialText) {
-        answerPane = new JEditorPane(GUIData.MIME_TYPE_TEXT_PLAIN, initialText);
+        answerPane = new JEditorPane(MainData.MIME_TYPE_TEXT_PLAIN, initialText);
         answerPane.setBackground(Tools.getDefaultColor("ConfigDialog.AnswerPane"));
         answerPane.setForeground(Color.WHITE);
         answerPane.setEditable(false);
@@ -194,7 +195,7 @@ public abstract class ConfigDialog {
     protected final JPanel body() {
         final JPanel pane = new JPanel();
         pane.setLayout(new BoxLayout(pane, BoxLayout.PAGE_AXIS));
-        final JEditorPane descPane = new JEditorPane(GUIData.MIME_TYPE_TEXT_HTML,
+        final JEditorPane descPane = new JEditorPane(MainData.MIME_TYPE_TEXT_HTML,
                                                      "<span style='font:bold italic;font-family:Dialog; font-size:"
                                                      + application.scaled(14)
                                                      + ";'>"
@@ -449,7 +450,7 @@ public abstract class ConfigDialog {
                     optionPane.setMinimumSize(new Dimension(dialogWidth(), dialogHeight()));
 
                     optionPane.setBackground(Tools.getDefaultColor( "ConfigDialog.Background.Dark"));
-                    final Container mainFrame = guiData.getMainFrame();
+                    final Container mainFrame = mainData.getMainFrame();
                     if (mainFrame instanceof JApplet) {
                         final JFrame noframe = new JFrame();
                         dialogPanel = new JDialog(noframe);
@@ -498,14 +499,14 @@ public abstract class ConfigDialog {
                 dialogPanel.setPreferredSize(new Dimension(dialogWidth(), dialogHeight()));
                 dialogPanel.setMaximumSize(new Dimension(dialogWidth(), dialogHeight()));
                 dialogPanel.setMinimumSize(new Dimension(dialogWidth(), dialogHeight()));
-                dialogPanel.setLocationRelativeTo(guiData.getMainFrame());
+                dialogPanel.setLocationRelativeTo(mainData.getMainFrame());
                 dialogPanel.setVisible(true);
             }
         });
         swingUtils.invokeLater(new Runnable() {
             @Override
             public void run() {
-                dialogPanel.setLocationRelativeTo(guiData.getMainFrame());
+                dialogPanel.setLocationRelativeTo(mainData.getMainFrame());
                 /* although the location was set before, it is set again as a
                  * workaround for gray dialogs with nothing in it, that appear
                  * in some comination of Java and compiz. */

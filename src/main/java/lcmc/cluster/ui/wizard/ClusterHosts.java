@@ -44,7 +44,7 @@ import javax.swing.JScrollPane;
 import javax.swing.Scrollable;
 import javax.swing.SwingConstants;
 
-import lcmc.common.ui.GUIData;
+import lcmc.common.ui.main.MainPresenter;
 import lcmc.common.domain.Application;
 import lcmc.common.ui.utils.SwingUtils;
 import lcmc.host.domain.Host;
@@ -70,7 +70,7 @@ final class ClusterHosts extends DialogCluster {
     @Inject
     private Connect connectDialog;
     @Inject
-    private GUIData guiData;
+    private MainPresenter mainPresenter;
     @Inject
     private Application application;
     @Inject
@@ -89,7 +89,7 @@ final class ClusterHosts extends DialogCluster {
                 getCluster().addHost(host);
             }
         }
-        guiData.refreshClustersPanel();
+        mainPresenter.refreshClustersPanel();
     }
 
     @Override

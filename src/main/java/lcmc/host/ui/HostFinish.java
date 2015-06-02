@@ -34,7 +34,7 @@ import javax.swing.JComponent;
 import javax.swing.JPanel;
 import lcmc.cluster.ui.wizard.AddClusterDialog;
 import lcmc.common.domain.UserConfig;
-import lcmc.common.ui.GUIData;
+import lcmc.common.ui.main.MainPresenter;
 import lcmc.cluster.ui.widget.WidgetFactory;
 import lcmc.common.domain.Application;
 import lcmc.common.ui.utils.SwingUtils;
@@ -64,7 +64,7 @@ final class HostFinish extends DialogHost {
     @Inject
     private AddClusterDialog addClusterDialog;
     @Inject
-    private GUIData guiData;
+    private MainPresenter mainPresenter;
     @Inject @Named("newHostDialog")
     private Provider<NewHostDialog> newHostDialogFactory;
     @Inject
@@ -154,7 +154,7 @@ final class HostFinish extends DialogHost {
                                 getHost().getSSH().getLastSuccessfulPassword());
                         newHostDialog = newHostDialogFactory.get();
                         newHostDialog.init(thisClass, newHost, getDrbdInstallation());
-                        guiData.allHostsUpdate();
+                        mainPresenter.allHostsUpdate();
                         swingUtils.invokeLater(new Runnable() {
                             @Override
                             public void run() {

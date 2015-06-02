@@ -44,7 +44,7 @@ import javax.swing.tree.DefaultMutableTreeNode;
 
 import com.google.common.base.Optional;
 import lcmc.common.domain.AccessMode;
-import lcmc.common.ui.GUIData;
+import lcmc.common.ui.main.MainData;
 import lcmc.common.domain.Application;
 import lcmc.common.ui.ProgressIndicator;
 import lcmc.common.ui.treemenu.TreeMenuController;
@@ -750,7 +750,7 @@ public class ServicesInfo extends EditableInfo {
     /** Returns type of the info text. text/plain or text/html. */
     @Override
     protected String getInfoMimeType() {
-        return GUIData.MIME_TYPE_TEXT_HTML;
+        return MainData.MIME_TYPE_TEXT_HTML;
     }
 
     /**

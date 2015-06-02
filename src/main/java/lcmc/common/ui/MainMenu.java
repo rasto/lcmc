@@ -61,6 +61,8 @@ import javax.swing.filechooser.FileFilter;
 import com.google.common.base.Optional;
 import lcmc.cluster.ui.wizard.AddClusterDialog;
 import lcmc.cluster.ui.ClusterBrowser;
+import lcmc.common.ui.main.MainData;
+import lcmc.common.ui.main.MainPresenter;
 import lcmc.common.ui.utils.Dialogs;
 import lcmc.common.ui.utils.SwingUtils;
 import lcmc.host.ui.AddHostDialog;
@@ -94,8 +96,8 @@ public final class MainMenu extends JPanel implements ActionListener {
     /** Advanced mode button. */
     private JCheckBox advancedModeCB;
     /** Upgrade check text field. */
-    private final JEditorPane upgradeTextField = new JEditorPane(GUIData.MIME_TYPE_TEXT_HTML, "");
-    private final JEditorPane infoTextField = new JEditorPane(GUIData.MIME_TYPE_TEXT_HTML, "");
+    private final JEditorPane upgradeTextField = new JEditorPane(MainData.MIME_TYPE_TEXT_HTML, "");
+    private final JEditorPane infoTextField = new JEditorPane(MainData.MIME_TYPE_TEXT_HTML, "");
     /** Upgrade check text. */
     private String upgradeCheck = "";
     private String infoText = null;
@@ -109,7 +111,9 @@ public final class MainMenu extends JPanel implements ActionListener {
     @Inject
     private HostFactory hostFactory;
     @Inject
-    private GUIData guiData;
+    private MainData mainData;
+    @Inject
+    private MainPresenter mainPresenter;
     @Inject
     private Application application;
     @Inject
@@ -140,7 +144,7 @@ public final class MainMenu extends JPanel implements ActionListener {
                                                KeyEvent.VK_N,
                                                newHostActionListener(),
                                                HOST_ICON);
-        guiData.registerAddHostButton(hostItem);
+        mainData.registerAddHostButton(hostItem);
 
         final JMenuItem cmi = addMenuItem(Tools.getString("MainMenu.Cluster"),
                                           menuNew,
@@ -149,8 +153,8 @@ public final class MainMenu extends JPanel implements ActionListener {
                                           newClusterActionListener(),
                                           ClusterBrowser.CLUSTER_ICON_SMALL);
 
-        guiData.registerAddClusterButton(cmi);
-        guiData.checkAddClusterButtons();
+        mainData.registerAddClusterButton(cmi);
+        mainPresenter.checkAddClusterButtons();
 
 
         submenu.add(menuNew);
@@ -186,7 +190,7 @@ public final class MainMenu extends JPanel implements ActionListener {
                     null);
 
         submenu.addSeparator();
-        if (!guiData.isApplet()) {
+        if (!mainData.isApplet()) {
             addMenuItem(Tools.getString("MainMenu.Exit"),
                         submenu,
                         KeyEvent.VK_X,
@@ -332,12 +336,12 @@ public final class MainMenu extends JPanel implements ActionListener {
 
     private void loadConfigData(final String filename) {
         LOG.debug("loadConfigData: start");
-        final String xml = Tools.loadFile(guiData, filename, true);
+        final String xml = Tools.loadFile(mainPresenter, filename, true);
         if (xml == null) {
             return;
         }
         userConfig.startClusters(null);
-        guiData.allHostsUpdate();
+        mainPresenter.allHostsUpdate();
     }
 
     private ActionListener removeEverythingActionListener() {
@@ -349,7 +353,7 @@ public final class MainMenu extends JPanel implements ActionListener {
                     new Runnable() {
                         @Override
                         public void run() {
-                            guiData.removeEverything();
+                            mainPresenter.removeEverything();
                         }
                     }
                  );
@@ -411,7 +415,7 @@ public final class MainMenu extends JPanel implements ActionListener {
                      }
                  };
                  fc.setFileFilter(filter);
-                 final int ret = fc.showSaveDialog(guiData.getMainFrame());
+                 final int ret = fc.showSaveDialog(mainData.getMainFrame());
                  if (ret == JFileChooser.APPROVE_OPTION) {
                      final String name = fc.getSelectedFile().getAbsolutePath();
                      application.setDefaultSaveFile(name);
@@ -452,7 +456,7 @@ public final class MainMenu extends JPanel implements ActionListener {
 
                 try {
                     UIManager.setLookAndFeel(lookAndFeel);
-                    final JComponent componentToSwitch = guiData.getMainFrameRootPane();
+                    final JComponent componentToSwitch = mainData.getMainFrameRootPane();
                     SwingUtilities.updateComponentTreeUI(componentToSwitch);
                     componentToSwitch.invalidate();
                     componentToSwitch.validate();
@@ -478,7 +482,7 @@ public final class MainMenu extends JPanel implements ActionListener {
                 final Thread t = new Thread(new Runnable() {
                     @Override
                     public void run() {
-                        guiData.copy();
+                        mainData.copy();
                     }
                 });
                 t.start();
@@ -494,7 +498,7 @@ public final class MainMenu extends JPanel implements ActionListener {
                 final Thread t = new Thread(new Runnable() {
                     @Override
                     public void run() {
-                        guiData.paste();
+                        mainData.paste();
                     }
                 });
                 t.start();
