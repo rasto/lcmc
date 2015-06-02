@@ -52,7 +52,7 @@ import javax.swing.SpringLayout;
 
 import lcmc.Exceptions.IllegalVersionException;
 import lcmc.common.ui.Access;
-import lcmc.common.ui.GUIData;
+import lcmc.common.ui.main.MainData;
 import lcmc.common.domain.AccessMode;
 import lcmc.common.ui.utils.SwingUtils;
 import lcmc.crm.domain.AisCastAddress;
@@ -123,7 +123,7 @@ final class CoroConfig extends DialogCluster {
     @Inject
     private InitCluster initClusterDialog;
     @Inject
-    private GUIData guiData;
+    private MainData mainData;
     @Inject
     private Application application;
     @Inject

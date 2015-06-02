@@ -30,7 +30,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SpringLayout;
 
-import lcmc.common.ui.GUIData;
+import lcmc.common.ui.main.MainPresenter;
 import lcmc.common.ui.SpringUtilities;
 import lcmc.common.ui.WizardDialog;
 import lcmc.cluster.ui.widget.Widget;
@@ -57,7 +57,7 @@ public final class Name extends DialogCluster {
     @Inject
     private ClusterTabFactory clusterTabFactory;
     @Inject
-    private GUIData guiData;
+    private MainPresenter mainPresenter;
     @Inject
     private Application application;
     @Inject
@@ -105,7 +105,7 @@ public final class Name extends DialogCluster {
                 }
             }
         });
-        guiData.renameSelectedClusterTab(name);
+        mainPresenter.renameSelectedClusterTab(name);
     }
 
     @Override

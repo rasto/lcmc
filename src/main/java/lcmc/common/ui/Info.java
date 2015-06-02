@@ -71,6 +71,7 @@ import lcmc.common.domain.Application;
 import lcmc.common.domain.Value;
 import lcmc.common.domain.Resource;
 import lcmc.cluster.ui.widget.Widget;
+import lcmc.common.ui.main.MainData;
 import lcmc.common.ui.treemenu.TreeMenuController;
 import lcmc.common.ui.utils.ButtonCallback;
 import lcmc.common.ui.utils.ComponentWithTest;
@@ -282,7 +283,7 @@ public class Info implements Comparable<Info>, Value, InfoPresenter {
 
     /** Returns type of the info text. text/plain or text/html. */
     protected String getInfoMimeType() {
-        return GUIData.MIME_TYPE_TEXT_PLAIN;
+        return MainData.MIME_TYPE_TEXT_PLAIN;
     }
 
     protected JComponent getBackButton() {

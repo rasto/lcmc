@@ -19,10 +19,9 @@
  * along with drbd; see the file COPYING.  If not, write to
  * the Free Software Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
  */
-package lcmc.common.ui;
+package lcmc.common.ui.main;
 
 import java.awt.Container;
-import java.awt.Dimension;
 import java.awt.Frame;
 import java.awt.MouseInfo;
 import java.awt.Point;
@@ -41,7 +40,6 @@ import java.util.Map;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
-import java.util.regex.Matcher;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
@@ -49,9 +47,7 @@ import javax.swing.BoxLayout;
 import javax.swing.JApplet;
 import javax.swing.JComponent;
 import javax.swing.JDialog;
-import javax.swing.JEditorPane;
 import javax.swing.JFrame;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JRootPane;
 import javax.swing.JScrollPane;
@@ -62,15 +58,12 @@ import javax.swing.event.MenuEvent;
 import javax.swing.event.MenuListener;
 
 import lcmc.cluster.domain.Cluster;
-import lcmc.common.domain.Application;
-import lcmc.common.domain.UserConfig;
-import lcmc.common.domain.util.Tools;
+import lcmc.common.ui.Info;
+import lcmc.common.ui.ResourceGraph;
 import lcmc.common.ui.utils.SwingUtils;
 import lcmc.crm.ui.resource.ServicesInfo;
 import lcmc.common.domain.AllHostsUpdatable;
 import lcmc.common.ui.utils.ButtonCallback;
-import lcmc.logger.Logger;
-import lcmc.logger.LoggerFactory;
 import lcmc.common.ui.utils.MyList;
 import lcmc.common.ui.utils.MyListModel;
 import lcmc.common.ui.utils.MyMenu;
@@ -84,16 +77,7 @@ import lcmc.cluster.ui.ClustersPanel;
  */
 @Named
 @Singleton
-public class GUIData  {
-    private static final Logger LOG = LoggerFactory.getLogger(GUIData.class);
-
-    private static final int DIALOG_PANEL_WIDTH = 400;
-    private static final int DIALOG_PANEL_HEIGHT = 300;
-    private static final Dimension DIALOG_PANEL_SIZE = new Dimension(DIALOG_PANEL_WIDTH, DIALOG_PANEL_HEIGHT);
-    public static final String MIME_TYPE_TEXT_HTML = "text/html";
-    public static final String MIME_TYPE_TEXT_PLAIN = "text/plain";
-    @Inject
-    private Access access;
+public class MainData {
     private ClustersPanel clustersPanel;
     /** Invisible panel with progress indicator. */
     private final ReadWriteLock mAddClusterButtonListLock = new ReentrantReadWriteLock();
@@ -113,16 +97,14 @@ public class GUIData  {
     private List<Info> selectedComponents = null;
 
     private static volatile int prevScrollingMenuIndex = -1;
-    @Inject
-    private SwingUtils swingUtils;
-    @Inject
-    private Application application;
-    @Inject
-    private ProgressIndicator progressIndicator;
-    @Inject
-    private UserConfig userConfig;
 
     private Container mainFrame;
+
+    @Inject
+    private SwingUtils swingUtils;
+
+    public static final String MIME_TYPE_TEXT_HTML = "text/html";
+    public static final String MIME_TYPE_TEXT_PLAIN = "text/plain";
 
     public Container getMainFrameContentPane() {
         return ((RootPaneContainer) mainFrame).getContentPane();
@@ -146,116 +128,6 @@ public class GUIData  {
         this.clustersPanel = clustersPanel;
     }
 
-    public void renameSelectedClusterTab(final String newName) {
-        swingUtils.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                clustersPanel.renameSelectedTab(newName);
-            }
-        });
-    }
-
-    /**
-     * This is used, if cluster was added, but than it was canceled.
-     */
-    public void removeSelectedClusterTab() {
-        swingUtils.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                clustersPanel.removeTab();
-            }
-        });
-    }
-
-    /** Revalidates and repaints clusters panel. */
-    public void refreshClustersPanel() {
-        swingUtils.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                clustersPanel.refreshView();
-            }
-        });
-    }
-
-    /**
-     * Adds the 'Add Cluster' button to the list, so that it can be enabled or
-     * disabled.
-     */
-    public void registerAddClusterButton(final JComponent addClusterButton) {
-        mAddClusterButtonListWriteLock.lock();
-        try {
-            if (!addClusterButtonList.contains(addClusterButton)) {
-                addClusterButtonList.add(addClusterButton);
-                addClusterButton.setEnabled(application.danglingHostsCount() >= 1);
-            }
-        } finally {
-            mAddClusterButtonListWriteLock.unlock();
-        }
-    }
-
-    /**
-     * Adds the 'Add Host' button to the list, so that it can be enabled or
-     * disabled.
-     */
-    public void registerAddHostButton(final JComponent addHostButton) {
-        mAddHostButtonListWriteLock.lock();
-        try {
-            if (!addHostButtonList.contains(addHostButton)) {
-                addHostButtonList.add(addHostButton);
-            }
-        } finally {
-            mAddHostButtonListWriteLock.unlock();
-        }
-    }
-
-    /**
-     * Checks 'Add Cluster' buttons and menu items and enables them, if there
-     * are enough hosts to make cluster.
-     */
-    public void checkAddClusterButtons() {
-        swingUtils.isSwingThread();
-        final boolean enabled = application.danglingHostsCount() >= 1;
-        mAddClusterButtonListReadLock.lock();
-        try {
-            for (final JComponent addClusterButton : addClusterButtonList) {
-                addClusterButton.setEnabled(enabled);
-            }
-        } finally {
-            mAddClusterButtonListReadLock.unlock();
-        }
-    }
-
-    public void enableAddClusterButtons(final boolean enable) {
-        swingUtils.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                mAddClusterButtonListReadLock.lock();
-                try {
-                    for (final JComponent addClusterButton : addClusterButtonList) {
-                        addClusterButton.setEnabled(enable);
-                    }
-                } finally {
-                    mAddClusterButtonListReadLock.unlock();
-                }
-            }
-        });
-    }
-
-    public void enableAddHostButtons(final boolean enable) {
-        swingUtils.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                mAddHostButtonListReadLock.lock();
-                try {
-                    for (final JComponent addHostButton : addHostButtonList) {
-                        addHostButton.setEnabled(enable);
-                    }
-                } finally {
-                    mAddHostButtonListReadLock.unlock();
-                }
-            }
-        });
-    }
 
     /**
      * Adds a component to the list of components that have allHostsUpdate
@@ -273,19 +145,6 @@ public class GUIData  {
      */
     public void unregisterAllHostsUpdate(final AllHostsUpdatable component) {
         allHostsUpdateList.remove(component);
-    }
-
-    /** Calls allHostsUpdate method on all registered components. */
-    public void allHostsUpdate() {
-        for (final AllHostsUpdatable component : allHostsUpdateList) {
-            component.allHostsUpdate();
-        }
-        swingUtils.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                checkAddClusterButtons();
-            }
-        });
     }
 
     private ServicesInfo getSelectedServicesInfo() {
@@ -322,6 +181,73 @@ public class GUIData  {
         return c.getBrowser().getCrmGraph();
     }
 
+    /**
+     * Return whether it is run as an applet.
+     */
+    public boolean isApplet() {
+        return mainFrame instanceof JApplet;
+    }
+
+    public Container getMainFrame() {
+        return mainFrame;
+    }
+
+    public void setMainFrame(final Container mainFrame) {
+        this.mainFrame = mainFrame;
+    }
+
+    /**
+     * Adds the 'Add Cluster' button to the list, so that it can be enabled or
+     * disabled.
+     */
+    public void registerAddClusterButton(final JComponent addClusterButton) {
+        mAddClusterButtonListWriteLock.lock();
+        try {
+            if (!addClusterButtonList.contains(addClusterButton)) {
+                addClusterButtonList.add(addClusterButton);
+            }
+        } finally {
+            mAddClusterButtonListWriteLock.unlock();
+        }
+    }
+
+    /**
+     * Adds the 'Add Host' button to the list, so that it can be enabled or
+     * disabled.
+     */
+    public void registerAddHostButton(final JComponent addHostButton) {
+        mAddHostButtonListWriteLock.lock();
+        try {
+            if (!addHostButtonList.contains(addHostButton)) {
+                addHostButtonList.add(addHostButton);
+            }
+        } finally {
+            mAddHostButtonListWriteLock.unlock();
+        }
+    }
+
+    public Collection<JComponent> getAddClusterButtonList() {
+        mAddClusterButtonListReadLock.lock();
+        try {
+            return new ArrayList<JComponent>(addClusterButtonList);
+        } finally {
+            mAddClusterButtonListReadLock.unlock();
+        }
+    }
+
+    public Collection<JComponent> getAddHostButtonList() {
+        mAddHostButtonListReadLock.lock();
+        try {
+            return new ArrayList<JComponent>(addHostButtonList);
+        } finally {
+            mAddHostButtonListReadLock.unlock();
+        }
+    }
+
+    public Collection<AllHostsUpdatable> getAllHostsUpdateList() {
+        return allHostsUpdateList;
+    }
+
     /** Copy / paste function. */
     public void copy() {
         final ResourceGraph g = getSelectedGraph();
@@ -350,12 +276,6 @@ public class GUIData  {
         t.start();
     }
 
-    /**
-     * Return whether it is run as an applet.
-     */
-    public boolean isApplet() {
-        return mainFrame instanceof JApplet;
-    }
     /** Returns a popup in a scrolling pane. */
     public boolean getScrollingMenu(final String name,
                                     final JPanel optionsPanel,
@@ -623,47 +543,4 @@ public class GUIData  {
         return true;
     }
 
-    /** Dialog that informs a user about something with ok button. */
-    public void infoDialog(final String title, final String info1, final String info2) {
-        final JEditorPane infoPane = new JEditorPane(MIME_TYPE_TEXT_PLAIN, info1 + '\n' + info2);
-        infoPane.setEditable(false);
-        infoPane.setMinimumSize(DIALOG_PANEL_SIZE);
-        infoPane.setMaximumSize(DIALOG_PANEL_SIZE);
-        infoPane.setPreferredSize(DIALOG_PANEL_SIZE);
-        swingUtils.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                JOptionPane.showMessageDialog(mainFrame,
-                        new JScrollPane(infoPane),
-                        title,
-                        JOptionPane.ERROR_MESSAGE);
-            }
-        });
-    }
-
-    public Container getMainFrame() {
-        return mainFrame;
-    }
-
-    public void setMainFrame(final Container mainFrame) {
-        this.mainFrame = mainFrame;
-    }
-
-    /** Removes all the hosts and clusters from all the panels and data. */
-    public void removeEverything() {
-        progressIndicator.startProgressIndicator(Tools.getString("MainMenu.RemoveEverything"));
-        application.disconnectAllHosts();
-        getClustersPanel().removeAllTabs();
-        progressIndicator.stopProgressIndicator(Tools.getString("MainMenu.RemoveEverything"));
-    }
-
-    public void saveConfig(final String filename,
-                           final boolean saveAll) {
-        LOG.debug1("save: start");
-        final String text = Tools.getString("Tools.Saving").replaceAll("@FILENAME@",
-                Matcher.quoteReplacement(filename));
-        progressIndicator.startProgressIndicator(text);
-        userConfig.saveConfig(filename, saveAll);
-        progressIndicator.stopProgressIndicator(text);
-    }
 }

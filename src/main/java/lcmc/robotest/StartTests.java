@@ -20,7 +20,7 @@
 
 package lcmc.robotest;
 
-import lcmc.common.ui.GUIData;
+import lcmc.common.ui.main.MainData;
 import lcmc.common.domain.Application;
 import lcmc.cluster.domain.Cluster;
 import lcmc.common.ui.MainPanel;
@@ -96,7 +96,7 @@ public class StartTests {
     @Inject
     private VMTest5 vmTest5;
     @Inject
-    private GUIData guiData;
+    private MainData mainData;
     @Inject
     private MainPanel mainPanel;
     @Inject
@@ -107,7 +107,7 @@ public class StartTests {
     public void startTest(final Test autoTest, final Cluster c) {
         final Type type = autoTest.getType();
         final char index = autoTest.getIndex();
-        guiData.getMainFrame().setSize(
+        mainData.getMainFrame().setSize(
                 Tools.getDefaultInt("DrbdMC.width"),
                 Tools.getDefaultInt("DrbdMC.height") + 50);
         cluster = c;

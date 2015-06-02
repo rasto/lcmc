@@ -94,6 +94,7 @@ import javax.swing.JScrollBar;
 import lcmc.common.domain.Application;
 import lcmc.common.domain.ColorText;
 import lcmc.cluster.ui.ClusterBrowser;
+import lcmc.common.ui.main.MainData;
 import lcmc.common.ui.utils.SwingUtils;
 import lcmc.host.domain.Host;
 import lcmc.logger.Logger;
@@ -174,7 +175,7 @@ public abstract class ResourceGraph {
 
     private ClusterBrowser clusterBrowser;
     @Inject
-    private GUIData guiData;
+    private MainData mainData;
     @Inject
     private ProgressIndicator progressIndicator;
     @Inject
@@ -885,7 +886,7 @@ public abstract class ResourceGraph {
         if (ctl != null) {
             return ctl;
         }
-        final Font font = guiData.getMainFrame().getFont();
+        final Font font = mainData.getMainFrame().getFont();
         final FontRenderContext context = g2d.getFontRenderContext();
         final TextLayout tl = new TextLayout(text,
                                              new Font(font.getName(),

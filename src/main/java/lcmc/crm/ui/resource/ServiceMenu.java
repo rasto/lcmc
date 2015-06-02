@@ -39,7 +39,7 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import lcmc.AppContext;
 import lcmc.common.ui.Access;
 import lcmc.common.ui.CallbackAction;
-import lcmc.common.ui.GUIData;
+import lcmc.common.ui.main.MainData;
 import lcmc.common.domain.AccessMode;
 import lcmc.common.domain.Application;
 import lcmc.common.ui.treemenu.TreeMenuController;
@@ -70,7 +70,7 @@ import lcmc.common.domain.VisiblePredicate;
 @Named
 public class ServiceMenu {
     @Inject
-    private GUIData drbdGui;
+    private MainData drbdGui;
     @Inject
     private EditConfig editDialog;
     @Inject

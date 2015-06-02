@@ -4,23 +4,20 @@ import java.awt.Dimension;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import java.util.TreeSet;
-import java.util.Vector;
 import javax.swing.JPanel;
 import junitparams.JUnitParamsRunner;
 import static junitparams.JUnitParamsRunner.$;
 import junitparams.Parameters;
 import lcmc.Exceptions;
 import lcmc.common.domain.ConvertCmdCallback;
-import lcmc.common.ui.GUIData;
+import lcmc.common.ui.main.MainData;
 import lcmc.common.ui.TerminalPanel;
 import lcmc.drbd.ui.resource.GlobalInfo;
 import lcmc.host.domain.Host;
 import lcmc.drbd.domain.DrbdHost;
-import org.junit.Assert;
+
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotEquals;
@@ -40,7 +37,7 @@ public final class ToolsTest {
     @Mock
     private TerminalPanel terminalPanelStub;
 
-    private final GUIData guiData = new GUIData();
+    private final MainData mainData = new MainData();
 
 
     @Before

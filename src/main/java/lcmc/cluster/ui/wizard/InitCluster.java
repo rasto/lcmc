@@ -42,7 +42,7 @@ import javax.swing.SpringLayout;
 import javax.swing.border.TitledBorder;
 
 import lcmc.common.ui.Access;
-import lcmc.common.ui.GUIData;
+import lcmc.common.ui.main.MainData;
 import lcmc.common.domain.AccessMode;
 import lcmc.common.domain.Application;
 import lcmc.cluster.domain.Cluster;
@@ -113,7 +113,7 @@ public class InitCluster extends DialogCluster {
     @Inject
     private Finish finishDialog;
     @Inject
-    private GUIData guiData;
+    private MainData mainData;
     @Inject
     private Application application;
     @Inject

@@ -28,10 +28,11 @@ import javax.inject.Named;
 import javax.inject.Provider;
 import javax.swing.JColorChooser;
 
+import lcmc.common.ui.main.MainPresenter;
 import lcmc.host.ui.EditHostDialog;
 import lcmc.drbd.ui.ProxyHostWizard;
 import lcmc.common.ui.CallbackAction;
-import lcmc.common.ui.GUIData;
+import lcmc.common.ui.main.MainData;
 import lcmc.common.domain.AccessMode;
 import lcmc.common.domain.Application;
 import lcmc.host.domain.Host;
@@ -64,7 +65,9 @@ public class HostDrbdMenu {
     @Inject
     private EditHostDialog editHostDialog;
     @Inject
-    private GUIData guiData;
+    private MainData mainData;
+    @Inject
+    private MainPresenter mainPresenter;
     @Inject
     private ProxyHostWizard proxyHostWizard;
     @Inject
@@ -95,7 +98,7 @@ public class HostDrbdMenu {
                             }
                         });
         items.add(hostWizardItem);
-        guiData.registerAddHostButton(hostWizardItem);
+        mainData.registerAddHostButton(hostWizardItem);
 
         /* proxy host wizard */
         final MyMenuItem proxyHostWizardItem =
@@ -112,7 +115,7 @@ public class HostDrbdMenu {
                             }
                         });
         items.add(proxyHostWizardItem);
-        guiData.registerAddHostButton(proxyHostWizardItem);
+        mainData.registerAddHostButton(proxyHostWizardItem);
         final Application.RunMode runMode = Application.RunMode.LIVE;
         /* load drbd */
         final UpdatableItem loadItem =
@@ -298,7 +301,7 @@ public class HostDrbdMenu {
                         .addAction(new MenuAction() {
                             @Override
                             public void run(final String text) {
-                                final Color newColor = JColorChooser.showDialog(guiData.getMainFrame(),
+                                final Color newColor = JColorChooser.showDialog(mainData.getMainFrame(),
                                         "Choose " + host.getName() + " color",
                                         host.getPmColors()[0]);
                                 if (newColor != null) {
@@ -565,7 +568,7 @@ public class HostDrbdMenu {
                             public void run(final String text) {
                                 host.disconnect();
                                 application.removeHostFromHosts(host);
-                                guiData.allHostsUpdate();
+                                mainPresenter.allHostsUpdate();
                             }
                         });
         items.add(removeHostItem);

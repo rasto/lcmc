@@ -31,7 +31,7 @@ import javax.swing.JCheckBox;
 import javax.swing.JDialog;
 import javax.swing.JMenuItem;
 
-import lcmc.common.ui.GUIData;
+import lcmc.common.ui.main.MainData;
 import lcmc.common.domain.AccessMode;
 import lcmc.common.domain.Application;
 import lcmc.common.ui.ProgressIndicatorPanel;
@@ -53,7 +53,7 @@ import lcmc.common.ui.utils.UpdatableItem;
 public class GroupMenu extends ServiceMenu {
 
     @Inject
-    private GUIData drbdGui;
+    private MainData drbdGui;
     @Inject @Named("serviceMenu")
     private Provider<ServiceMenu> serviceMenuProvider;
     @Inject

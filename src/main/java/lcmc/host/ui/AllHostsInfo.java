@@ -57,8 +57,9 @@ import javax.swing.border.TitledBorder;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
+import lcmc.common.ui.main.MainPresenter;
 import lcmc.common.ui.Info;
-import lcmc.common.ui.GUIData;
+import lcmc.common.ui.main.MainData;
 import lcmc.cluster.ui.widget.WidgetFactory;
 import lcmc.common.ui.Browser;
 import lcmc.cluster.ui.widget.GenericWidget.MTextField;
@@ -113,7 +114,9 @@ public final class AllHostsInfo extends Info {
     @Inject
     private HostFactory hostFactory;
     @Inject
-    private GUIData guiData;
+    private MainData mainData;
+    @Inject
+    private MainPresenter mainPresenter;
     @Inject
     private Provider<Cluster> clusterProvider;
     @Inject
@@ -524,7 +527,7 @@ public final class AllHostsInfo extends Info {
                             host.setHostname(hostName);
                             cluster.addHost(host);
                             application.addHostToHosts(host);
-                            guiData.allHostsUpdate();
+                            mainPresenter.allHostsUpdate();
                         }
                         application.addClusterToClusters(cluster);
                         final Collection<Cluster> selectedClusters = new ArrayList<Cluster>();
@@ -775,7 +778,7 @@ public final class AllHostsInfo extends Info {
                     addHostDialog.showDialogs(host);
                 }});
         items.add(newHostWizardItem);
-        guiData.registerAddHostButton(newHostWizardItem);
+        mainData.registerAddHostButton(newHostWizardItem);
         return items;
     }
 }

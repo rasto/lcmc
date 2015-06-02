@@ -8,7 +8,7 @@ import java.util.concurrent.CountDownLatch;
 
 import lcmc.AppContext;
 import lcmc.common.domain.Application;
-import lcmc.common.ui.GUIData;
+import lcmc.common.ui.main.MainPresenter;
 import lcmc.common.ui.ProgressIndicator;
 import lcmc.common.ui.utils.SwingUtils;
 import lcmc.host.domain.Host;
@@ -22,12 +22,10 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 
-import javax.inject.Inject;
-
 @Category(IntegrationTest.class)
 public final class ClusterBrowserITest {
     private IntegrationTestLauncher integrationTestLauncher;
-    private GUIData guiData;
+    private MainPresenter mainPresenter;
     private SwingUtils swingUtils;
     private ProgressIndicator progressIndicator;
 
@@ -35,7 +33,7 @@ public final class ClusterBrowserITest {
     public void setUp() {
         integrationTestLauncher = AppContext.getBean(IntegrationTestLauncher.class);
         integrationTestLauncher.initTestCluster();
-        guiData = AppContext.getBean(GUIData.class);
+        mainPresenter = AppContext.getBean(MainPresenter.class);
         swingUtils = AppContext.getBean(SwingUtils.class);
         progressIndicator = AppContext.getBean(ProgressIndicator.class);
     }
@@ -112,7 +110,7 @@ public final class ClusterBrowserITest {
         for (String file : files) {
             i++;
             progressIndicator.startProgressIndicator(i + ": " + file);
-            String xml = Tools.loadFile(guiData, file, true);
+            String xml = Tools.loadFile(mainPresenter, file, true);
             xml = xml.replaceAll("<nodes/>", nodes.toString())
                      .replaceAll("<nodes>.*?</nodes>", nodes.toString())
                      .replaceAll("<status>.*?</status>", status.toString())
