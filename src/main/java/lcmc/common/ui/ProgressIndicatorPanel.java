@@ -94,7 +94,7 @@ import lombok.Getter;
 
 @Named
 @Singleton
-public final class ProgressIndicatorPanel extends JComponent implements MouseListener, KeyListener {
+public class ProgressIndicatorPanel extends JComponent implements MouseListener, KeyListener {
     private static final Logger LOG = LoggerFactory.getLogger(ProgressIndicatorPanel.class);
     private static final int RAMP_DELAY_STOP  = 1000;
     private static final ImageIcon CANCEL_ICON = Tools.createImageIcon(
