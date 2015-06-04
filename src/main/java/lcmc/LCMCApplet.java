@@ -29,7 +29,7 @@ package lcmc;
 import javax.swing.JApplet;
 import javax.swing.JFrame;
 
-import lcmc.common.ui.GUIData;
+import lcmc.common.ui.main.MainData;
 import lcmc.common.domain.Application;
 import lcmc.common.ui.utils.SwingUtils;
 import lcmc.logger.Logger;
@@ -58,7 +58,7 @@ public final class LCMCApplet extends JApplet {
             params = paramsLine.split("\\s+");
         }
         final LCMC lcmc = LCMC.getInstance(LCMC.class);
-        final GUIData guiData = LCMC.getInstance(GUIData.class);
+        final MainData mainData = LCMC.getInstance(MainData.class);
 
         lcmc.initApp(params);
 
@@ -69,14 +69,14 @@ public final class LCMCApplet extends JApplet {
             @Override
             public void run() {
                 if (!application.isEmbedApplet()) {
-                    guiData.setMainFrame(thisObject);
+                    mainData.setMainFrame(thisObject);
                     setJMenuBar(lcmc.getMenuBar());
                     setContentPane(lcmc.getMainPanel());
                     setGlassPane(lcmc.getMainGlassPane());
                     lcmc.createAndShowGUI(thisObject);
                 } else {
                     final JFrame mainFrame = new JFrame();
-                    guiData.setMainFrame(mainFrame);
+                    mainData.setMainFrame(mainFrame);
                     lcmc.createMainFrame(mainFrame);
                     lcmc.createAndShowGUI(mainFrame);
                 }

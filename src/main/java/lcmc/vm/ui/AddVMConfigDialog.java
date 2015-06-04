@@ -22,7 +22,7 @@
 
 package lcmc.vm.ui;
 
-import lcmc.common.ui.GUIData;
+import lcmc.common.ui.main.MainData;
 import lcmc.common.domain.Application;
 import lcmc.common.ui.MainPanel;
 import lcmc.vm.ui.configdialog.Domain;
@@ -42,7 +42,7 @@ public final class AddVMConfigDialog {
     private static final Logger LOG = LoggerFactory.getLogger(AddVMConfigDialog.class);
     private DomainInfo vmsVirtualDomainInfo;
     @Inject
-    private GUIData guiData;
+    private MainData mainData;
     @Inject
     private MainPanel mainPanel;
     @Inject
@@ -78,6 +78,6 @@ public final class AddVMConfigDialog {
         vmsVirtualDomainInfo.setDialogStarted(false);
         vmsVirtualDomainInfo.getBrowser().reloadAllComboBoxes(null);
         mainPanel.expandTerminalSplitPane(MainPanel.TerminalSize.COLLAPSE);
-        guiData.getMainFrame().requestFocus();
+        mainData.getMainFrame().requestFocus();
     }
 }

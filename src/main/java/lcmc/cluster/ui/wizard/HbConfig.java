@@ -55,7 +55,7 @@ import javax.swing.SpringLayout;
 
 import lcmc.Exceptions;
 import lcmc.common.ui.Access;
-import lcmc.common.ui.GUIData;
+import lcmc.common.ui.main.MainData;
 import lcmc.common.domain.AccessMode;
 import lcmc.common.domain.Application;
 import lcmc.common.ui.utils.SwingUtils;
@@ -191,7 +191,7 @@ final class HbConfig extends DialogCluster {
     private volatile boolean configAlreadyScrolled = false;
     private CountDownLatch fieldCheckLatch = new CountDownLatch(1);
     @Inject
-    private GUIData guiData;
+    private MainData mainData;
     @Inject
     private Application application;
     @Inject

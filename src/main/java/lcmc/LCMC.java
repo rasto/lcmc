@@ -51,10 +51,11 @@ import com.google.inject.Guice;
 import com.google.inject.Injector;
 import lcmc.cluster.service.storage.FileSystemService;
 import lcmc.cluster.service.storage.MountPointService;
+import lcmc.common.ui.main.MainPresenter;
 import lcmc.common.ui.utils.SwingUtils;
 import lcmc.configs.AppDefaults;
 import lcmc.cluster.ui.ClusterBrowser;
-import lcmc.common.ui.GUIData;
+import lcmc.common.ui.main.MainData;
 import lcmc.common.ui.MainMenu;
 import lcmc.common.domain.Application;
 import lcmc.common.ui.MainPanel;
@@ -89,7 +90,9 @@ public final class LCMC extends JPanel {
     @Inject
     private ProgressIndicatorPanel mainGlassPane;
     @Inject
-    private GUIData guiData;
+    private MainData mainData;
+    @Inject
+    private MainPresenter mainPresenter;
     @Inject
     private BlockDeviceService blockDeviceService;
     @Inject
@@ -161,7 +164,7 @@ public final class LCMC extends JPanel {
                 createAndShowGUI(mainFrame);
             }
         });
-        guiData.setMainFrame(mainFrame);
+        mainData.setMainFrame(mainFrame);
         //final Thread t = new Thread(new Runnable() {
         //    public void run() {
         //        drbd.utilities.RoboTest.startMover(600000, true);
@@ -209,9 +212,9 @@ public final class LCMC extends JPanel {
             }
         });
         t.start();
-        guiData.getMainFrame().setVisible(false);
+        mainData.getMainFrame().setVisible(false);
         final String saveFile = application.getDefaultSaveFile();
-        guiData.saveConfig(saveFile, false);
+        mainPresenter.saveConfig(saveFile, false);
         application.disconnectAllHosts();
     }
 
@@ -318,7 +321,7 @@ public final class LCMC extends JPanel {
                     public void uncaughtException(final Thread t, final Throwable e) {
                         System.out.println(e);
                         System.out.println(Tools.getStackTrace(e));
-                        if (!uncaughtExceptionFlag && guiData.getMainFrame() != null) {
+                        if (!uncaughtExceptionFlag && mainData.getMainFrame() != null) {
                             uncaughtExceptionFlag = true;
                             LOG.appError("", e.toString(), e);
                         }

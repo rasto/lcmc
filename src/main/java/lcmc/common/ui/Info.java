@@ -71,6 +71,7 @@ import lcmc.common.domain.Application;
 import lcmc.common.domain.Value;
 import lcmc.common.domain.Resource;
 import lcmc.cluster.ui.widget.Widget;
+import lcmc.common.ui.main.MainData;
 import lcmc.common.ui.treemenu.TreeMenuController;
 import lcmc.common.ui.utils.ButtonCallback;
 import lcmc.common.ui.utils.ComponentWithTest;
@@ -134,6 +135,8 @@ public class Info implements Comparable<Info>, Value, InfoPresenter {
     private TreeMenuController treeMenuController;
     @Inject
     private Access access;
+    @Inject
+    private ProgressIndicatorPanel progressIndicatorPanel;
 
     public void init(final String name, final Browser browser) {
         this.name = name;
@@ -234,7 +237,7 @@ public class Info implements Comparable<Info>, Value, InfoPresenter {
      * than 100.
      */
     public final void incAnimationIndex() {
-        animationIndex += 3.0 * 20.0 / application.getAnimFPS();
+        animationIndex += 3.0 * 20.0 / progressIndicatorPanel.getAnimFPS();
         if (animationIndex > 100) {
             animationIndex = 0;
         }
@@ -280,7 +283,7 @@ public class Info implements Comparable<Info>, Value, InfoPresenter {
 
     /** Returns type of the info text. text/plain or text/html. */
     protected String getInfoMimeType() {
-        return GUIData.MIME_TYPE_TEXT_PLAIN;
+        return MainData.MIME_TYPE_TEXT_PLAIN;
     }
 
     protected JComponent getBackButton() {

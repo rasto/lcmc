@@ -22,7 +22,7 @@
 
 package lcmc.drbd.ui;
 
-import lcmc.common.ui.GUIData;
+import lcmc.common.ui.main.MainData;
 import lcmc.common.ui.MainPanel;
 import lcmc.drbd.ui.configdialog.DrbdConfig;
 import lcmc.drbd.ui.resource.VolumeInfo;
@@ -40,7 +40,7 @@ public final class AddDrbdSplitBrainDialog {
     private static final Logger LOG = LoggerFactory.getLogger(AddDrbdSplitBrainDialog.class);
     private VolumeInfo volumeInfo;
     @Inject
-    private GUIData guiData;
+    private MainData mainData;
     @Inject
     private MainPanel mainPanel;
     @Inject
@@ -71,6 +71,6 @@ public final class AddDrbdSplitBrainDialog {
             dialog = newdialog;
         }
         mainPanel.expandTerminalSplitPane(MainPanel.TerminalSize.COLLAPSE);
-        guiData.getMainFrame().requestFocus();
+        mainData.getMainFrame().requestFocus();
     }
 }

@@ -2,7 +2,7 @@ package lcmc.drbd.ui.resource;
 
 import java.util.List;
 
-import lcmc.common.ui.GUIData;
+import lcmc.common.ui.main.MainData;
 import lcmc.common.domain.AccessMode;
 import lcmc.host.domain.Host;
 import lcmc.host.ui.HostBrowser;
@@ -47,7 +47,7 @@ public class HostDrbdMenuITest {
     @Mock
     private HostBrowser hostBrowserNoClusterStub;
     @Mock
-    private GUIData guiData;
+    private MainData mainData;
     @Mock
     private MyMenu menuStub;
     @Mock

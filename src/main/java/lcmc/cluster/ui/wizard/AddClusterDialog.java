@@ -22,7 +22,7 @@
 
 package lcmc.cluster.ui.wizard;
 
-import lcmc.common.ui.GUIData;
+import lcmc.common.ui.main.MainPresenter;
 import lcmc.common.domain.Application;
 import lcmc.cluster.domain.Cluster;
 import lcmc.common.ui.MainPanel;
@@ -44,7 +44,7 @@ public final class AddClusterDialog {
     @Inject
     Name nameDialog;
     @Inject
-    private GUIData guiData;
+    private MainPresenter mainPresenter;
     @Inject
     private MainPanel mainPanel;
     @Inject
@@ -60,7 +60,7 @@ public final class AddClusterDialog {
      * Must always be called from new thread.
      */
     public void showDialogs() {
-        guiData.enableAddClusterButtons(false);
+        mainPresenter.enableAddClusterButtons(false);
         cluster.setClusterTabClosable(false);
         DialogCluster dialog = nameDialog;
         dialog.init(null, cluster);
@@ -69,14 +69,14 @@ public final class AddClusterDialog {
             LOG.debug1("showDialogs: dialog: " + dialog.getClass().getName());
             final DialogCluster newDialog = (DialogCluster) dialog.showDialog();
             if (dialog.isPressedCancelButton()) {
-                guiData.removeSelectedClusterTab();
+                mainPresenter.removeSelectedClusterTab();
                 allHosts.removeHostsFromCluster(cluster);
                 application.removeClusterFromClusters(cluster);
                 dialog.cancelDialog();
                 swingUtils.invokeLater(new Runnable() {
                     @Override
                     public void run() {
-                        guiData.checkAddClusterButtons();
+                        mainPresenter.checkAddClusterButtons();
                     }
                 });
                 mainPanel.expandTerminalSplitPane(MainPanel.TerminalSize.COLLAPSE);
@@ -104,7 +104,7 @@ public final class AddClusterDialog {
         swingUtils.invokeLater(new Runnable() {
             @Override
             public void run() {
-                guiData.checkAddClusterButtons();
+                mainPresenter.checkAddClusterButtons();
             }
         });
         cluster.setClusterTabClosable(true);

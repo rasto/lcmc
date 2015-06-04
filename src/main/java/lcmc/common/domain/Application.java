@@ -67,7 +67,6 @@ public class Application {
     public static final String PM_CLONE_SET_NAME = "Clone Set";
     public static final String PM_MASTER_SLAVE_SET_NAME = "Master/Slave Set";
     public static final String PACEMAKER_GROUP_NAME = "Group";
-    public static final float DEFAULT_ANIM_FPS = 20.0f;
     public static boolean isLive(final RunMode runMode) {
         return RunMode.LIVE == runMode;
     }
@@ -105,7 +104,6 @@ public class Application {
     private boolean stagingDrbd = false;
     private boolean stagingPacemaker = false;
     private boolean hideLRM = false;
-    private float animFPS = DEFAULT_ANIM_FPS;
     private boolean upgradeCheckEnabled = true;
     private boolean bigDRBDConf = false;
     private boolean oneHostCluster = false;
@@ -114,6 +112,7 @@ public class Application {
     private boolean embedApplet = Tools.isLinux();
     private boolean cmdLog = false;
     private Test autoTest = null;
+
     @Inject
     private Hosts allHosts;
     @Inject
@@ -442,22 +441,6 @@ public class Application {
 
     public boolean isUseRealvnc() {
         return useRealvnc;
-    }
-
-    public float getAnimFPS() {
-        return animFPS;
-    }
-
-    public boolean isSlow() {
-        return animFPS < DEFAULT_ANIM_FPS;
-    }
-
-    public boolean isFast() {
-        return animFPS > DEFAULT_ANIM_FPS;
-    }
-
-    public void setAnimFPS(final float animFPS) {
-        this.animFPS = animFPS;
     }
 
     public void setUpgradeCheckEnabled(final boolean upgradeCheckEnabled) {

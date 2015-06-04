@@ -56,7 +56,7 @@ import lcmc.common.ui.ProgressIndicator;
 import lcmc.common.ui.utils.SwingUtils;
 import lcmc.configs.DistResource;
 import lcmc.cluster.ui.ClusterBrowser;
-import lcmc.common.ui.GUIData;
+import lcmc.common.ui.main.MainData;
 import lcmc.event.HwBlockDevicesChangedEvent;
 import lcmc.event.HwBlockDevicesDiskSpaceEvent;
 import lcmc.event.HwBridgesChangedEvent;
@@ -266,7 +266,7 @@ public class Host implements Comparable<Host>, Value {
     @Inject
     private TerminalPanel terminalPanel;
     @Inject
-    private GUIData guiData;
+    private MainData mainData;
     @Inject
     private ProgressIndicator progressIndicator;
     @Inject
@@ -1050,7 +1050,7 @@ public class Host implements Comparable<Host>, Value {
      */
     public void connect(SSHGui sshGui, final ConnectionCallback callback) {
         if (sshGui == null) {
-            sshGui = new SSHGui(guiData.getMainFrame(), this, null);
+            sshGui = new SSHGui(mainData.getMainFrame(), this, null);
         }
         ssh.connect(sshGui, callback, this);
     }
@@ -1130,7 +1130,7 @@ public class Host implements Comparable<Host>, Value {
                         Tools.getString("Dialog.Host.SSH.Connecting") + " (" + index + ')');
             }
             if (sshGui == null) {
-                sshGui = new SSHGui(guiData.getMainFrame(), this, null);
+                sshGui = new SSHGui(mainData.getMainFrame(), this, null);
             }
 
             connect(sshGui,

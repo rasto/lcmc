@@ -33,7 +33,7 @@ import javax.swing.JDialog;
 import lcmc.cluster.ui.wizard.EditClusterDialog;
 import lcmc.Exceptions;
 import lcmc.common.ui.CallbackAction;
-import lcmc.common.ui.GUIData;
+import lcmc.common.ui.main.MainData;
 import lcmc.common.domain.AccessMode;
 import lcmc.common.domain.Application;
 import lcmc.common.ui.utils.SwingUtils;
@@ -67,7 +67,7 @@ public class ServicesMenu {
     @Inject
     private EditClusterDialog editClusterDialog;
     @Inject
-    private GUIData guiData;
+    private MainData mainData;
     @Inject
     private Provider<ConstraintPHInfo> constraintPHInfoProvider;
     @Inject
@@ -297,7 +297,7 @@ public class ServicesMenu {
                         mmi.setPos(pos);
                         dlm.addElement(mmi);
                     }
-                    final boolean ret = guiData.getScrollingMenu(
+                    final boolean ret = mainData.getScrollingMenu(
                             ClusterBrowser.getClassMenuName(cl),
                             null, /* options */
                             classItem,

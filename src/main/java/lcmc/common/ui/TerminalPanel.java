@@ -52,6 +52,7 @@ import javax.swing.text.SimpleAttributeSet;
 import javax.swing.text.StyleConstants;
 
 import lcmc.common.domain.Application;
+import lcmc.common.ui.main.MainData;
 import lcmc.common.ui.utils.SwingUtils;
 import lcmc.host.domain.Host;
 import lcmc.robotest.RoboTest;
@@ -173,7 +174,7 @@ public class TerminalPanel extends JScrollPane {
     private final Map<String, Color> terminalColor = new HashMap<String, Color>();
     private Color defaultOutputColor;
     @Inject
-    private GUIData guiData;
+    private MainData mainData;
     @Inject
     private ProgressIndicator progressIndicator;
     @Inject

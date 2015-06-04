@@ -32,7 +32,7 @@ import java.util.Set;
 
 import com.google.common.base.Optional;
 import lcmc.Exceptions;
-import lcmc.common.ui.GUIData;
+import lcmc.common.ui.main.MainData;
 import lcmc.common.ui.utils.SwingUtils;
 import lcmc.host.domain.Host;
 import lcmc.drbd.domain.BlockDevice;
@@ -69,7 +69,7 @@ public class Cluster implements Comparable<Cluster> {
 
     private ClusterBrowser clusterBrowser;
     @Inject
-    private GUIData guiData;
+    private MainData mainData;
     @Inject
     private SwingUtils swingUtils;
     /**
@@ -310,7 +310,7 @@ public class Cluster implements Comparable<Cluster> {
         swingUtils.invokeLater(new Runnable() {
             @Override
             public void run() {
-                guiData.getClustersPanel().removeTabWithCluster(thisCluster);
+                mainData.getClustersPanel().removeTabWithCluster(thisCluster);
             }
         });
     }

@@ -5,7 +5,7 @@ import javax.swing.JCheckBox;
 
 import lcmc.LCMC;
 import lcmc.common.domain.UserConfig;
-import lcmc.common.ui.GUIData;
+import lcmc.common.ui.main.MainPresenter;
 import lcmc.common.ui.ProgressIndicator;
 import lcmc.host.domain.Host;
 import lcmc.testutils.IntegrationTestLauncher;
@@ -23,7 +23,7 @@ import static org.junit.Assert.*;
 @Category(IntegrationTest.class)
 public final class ToolsITest {
     private IntegrationTestLauncher testSuite;
-    private GUIData guiData;
+    private MainPresenter mainPresenter;
     private ProgressIndicator progressIndicator;
     private UserConfig userConfig;
 
@@ -32,7 +32,7 @@ public final class ToolsITest {
         testSuite = LCMC.getInstance(IntegrationTestLauncher.class);
         testSuite.initTestCluster();
         userConfig = LCMC.getInstance(UserConfig.class);
-        guiData = LCMC.getInstance(GUIData.class);
+        mainPresenter = LCMC.getInstance(MainPresenter.class);
         progressIndicator = LCMC.getInstance(ProgressIndicator.class);
     }
 
@@ -87,10 +87,10 @@ public final class ToolsITest {
     @Test
     @Category(GuiTest.class)
     public void testLoadFile() {
-        assertNull(Tools.loadFile(guiData, "JUNIT_TEST_FILE_CLICK_OK", false));
+        assertNull(Tools.loadFile(mainPresenter, "JUNIT_TEST_FILE_CLICK_OK", false));
         final String testFile = "/tmp/lcmc-test-file";
         userConfig.saveConfig(testFile, false);
-        final String file = Tools.loadFile(guiData, testFile, false);
+        final String file = Tools.loadFile(mainPresenter, testFile, false);
         assertNotNull(file);
         assertFalse("".equals(file));
     }

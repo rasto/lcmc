@@ -36,7 +36,7 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
 import lcmc.common.domain.AccessMode;
-import lcmc.common.ui.GUIData;
+import lcmc.common.ui.main.MainData;
 import lcmc.common.domain.Application;
 import lcmc.common.ui.utils.SwingUtils;
 import lcmc.crm.domain.ClusterStatus;
@@ -74,7 +74,7 @@ public class MultiSelectionInfo extends EditableInfo {
 
     @Override
     protected String getInfoMimeType() {
-        return GUIData.MIME_TYPE_TEXT_HTML;
+        return MainData.MIME_TYPE_TEXT_HTML;
     }
 
     /** @see EditableInfo#getInfo() */
