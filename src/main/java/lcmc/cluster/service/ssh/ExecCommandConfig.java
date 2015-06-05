@@ -21,7 +21,7 @@
 package lcmc.cluster.service.ssh;
 
 import lcmc.common.ui.MainPanel;
-import lcmc.common.ui.ProgressIndicator;
+import lcmc.common.ui.main.ProgressIndicator;
 import lcmc.host.domain.Host;
 import lcmc.common.ui.ProgressBar;
 import lcmc.cluster.ui.SSHGui;

@@ -270,12 +270,12 @@ public final class MainMenu extends JPanel implements ActionListener {
     }
 
     /** Turn on menu. */
-    void turnOn() {
+    public void turnOn() {
         turnOff = false;
     }
 
     /** Turn off menu. */
-    void turnOff() {
+    public void turnOff() {
         turnOff = true;
     }
 

@@ -42,7 +42,7 @@ import javax.swing.ImageIcon;
 import javax.swing.tree.DefaultMutableTreeNode;
 import lcmc.common.domain.Application;
 import lcmc.common.domain.ColorText;
-import lcmc.common.ui.ProgressIndicatorPanel;
+import lcmc.common.ui.main.ProgressIndicatorPanel;
 import lcmc.common.ui.treemenu.TreeMenuController;
 import lcmc.common.ui.utils.SwingUtils;
 import lcmc.crm.domain.CrmXml;

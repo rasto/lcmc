@@ -9,7 +9,7 @@ import java.util.concurrent.CountDownLatch;
 import lcmc.AppContext;
 import lcmc.common.domain.Application;
 import lcmc.common.ui.main.MainPresenter;
-import lcmc.common.ui.ProgressIndicator;
+import lcmc.common.ui.main.ProgressIndicator;
 import lcmc.common.ui.utils.SwingUtils;
 import lcmc.host.domain.Host;
 import lcmc.testutils.IntegrationTestLauncher;

@@ -46,7 +46,7 @@ import lcmc.cluster.ui.resource.ClusterViewFactory;
 import lcmc.common.domain.AccessMode;
 import lcmc.cluster.domain.Cluster;
 import lcmc.common.ui.Browser;
-import lcmc.common.ui.ProgressIndicator;
+import lcmc.common.ui.main.ProgressIndicator;
 import lcmc.common.ui.treemenu.TreeMenuController;
 import lcmc.common.ui.utils.SwingUtils;
 import lcmc.drbd.ui.DrbdGraph;

@@ -18,7 +18,7 @@
  * the Free Software Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-package lcmc.common.ui;
+package lcmc.common.ui.main;
 
 import javax.inject.Inject;
 import javax.inject.Named;

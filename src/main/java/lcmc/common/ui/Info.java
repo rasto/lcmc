@@ -72,6 +72,7 @@ import lcmc.common.domain.Value;
 import lcmc.common.domain.Resource;
 import lcmc.cluster.ui.widget.Widget;
 import lcmc.common.ui.main.MainData;
+import lcmc.common.ui.main.ProgressIndicatorPanel;
 import lcmc.common.ui.treemenu.TreeMenuController;
 import lcmc.common.ui.utils.ButtonCallback;
 import lcmc.common.ui.utils.ComponentWithTest;

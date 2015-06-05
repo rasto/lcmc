@@ -45,7 +45,7 @@ import com.google.common.collect.Table;
 import lcmc.Exceptions;
 import lcmc.common.domain.AccessMode;
 import lcmc.common.ui.Info;
-import lcmc.common.ui.ProgressIndicator;
+import lcmc.common.ui.main.ProgressIndicator;
 import lcmc.crm.ui.resource.ServiceInfo;
 import lcmc.crm.ui.resource.ServicesInfo;
 import lcmc.common.domain.Application;
