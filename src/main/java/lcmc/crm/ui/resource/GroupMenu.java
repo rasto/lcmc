@@ -34,7 +34,7 @@ import javax.swing.JMenuItem;
 import lcmc.common.ui.main.MainData;
 import lcmc.common.domain.AccessMode;
 import lcmc.common.domain.Application;
-import lcmc.common.ui.ProgressIndicatorPanel;
+import lcmc.common.ui.main.ProgressIndicatorPanel;
 import lcmc.common.ui.utils.SwingUtils;
 import lcmc.crm.domain.ResourceAgent;
 import lcmc.cluster.ui.ClusterBrowser;

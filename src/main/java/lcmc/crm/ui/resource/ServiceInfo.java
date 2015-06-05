@@ -63,7 +63,7 @@ import lcmc.common.domain.AccessMode;
 import lcmc.common.domain.Application;
 import lcmc.common.domain.ColorText;
 import lcmc.common.ui.Access;
-import lcmc.common.ui.ProgressIndicator;
+import lcmc.common.ui.main.ProgressIndicator;
 import lcmc.common.ui.treemenu.TreeMenuController;
 import lcmc.common.ui.utils.SwingUtils;
 import lcmc.host.domain.Host;

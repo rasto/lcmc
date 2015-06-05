@@ -53,6 +53,7 @@ import javax.swing.text.StyleConstants;
 
 import lcmc.common.domain.Application;
 import lcmc.common.ui.main.MainData;
+import lcmc.common.ui.main.ProgressIndicator;
 import lcmc.common.ui.utils.SwingUtils;
 import lcmc.host.domain.Host;
 import lcmc.robotest.RoboTest;

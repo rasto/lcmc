@@ -95,6 +95,8 @@ import lcmc.common.domain.Application;
 import lcmc.common.domain.ColorText;
 import lcmc.cluster.ui.ClusterBrowser;
 import lcmc.common.ui.main.MainData;
+import lcmc.common.ui.main.ProgressIndicator;
+import lcmc.common.ui.main.ProgressIndicatorPanel;
 import lcmc.common.ui.utils.SwingUtils;
 import lcmc.host.domain.Host;
 import lcmc.logger.Logger;

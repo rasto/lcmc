@@ -39,7 +39,7 @@ import lcmc.common.ui.CallbackAction;
 import lcmc.common.ui.main.MainData;
 import lcmc.common.domain.AccessMode;
 import lcmc.common.domain.Application;
-import lcmc.common.ui.ProgressIndicator;
+import lcmc.common.ui.main.ProgressIndicator;
 import lcmc.host.domain.Host;
 import lcmc.drbd.domain.BlockDevice;
 import lcmc.cluster.ui.ClusterBrowser;

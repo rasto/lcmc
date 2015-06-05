@@ -33,7 +33,7 @@ import lcmc.cluster.service.storage.FileSystemService;
 import lcmc.common.domain.UserConfig;
 import lcmc.common.ui.main.MainPresenter;
 import lcmc.common.ui.MainPanel;
-import lcmc.common.ui.ProgressIndicatorPanel;
+import lcmc.common.ui.main.ProgressIndicatorPanel;
 import lcmc.common.domain.Application;
 import lcmc.cluster.domain.Cluster;
 import lcmc.common.ui.utils.SwingUtils;

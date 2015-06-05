@@ -26,7 +26,7 @@
  * Subject to the BSD license.
  */
 
-package lcmc.common.ui;
+package lcmc.common.ui.main;
 
 import java.awt.Color;
 import java.awt.Font;
@@ -54,6 +54,9 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 import javax.swing.*;
 
+import lcmc.common.ui.Browser;
+import lcmc.common.ui.MainMenu;
+import lcmc.common.ui.MainPanel;
 import lcmc.configs.AppDefaults;
 import lcmc.cluster.ui.widget.WidgetFactory;
 import lcmc.logger.Logger;
