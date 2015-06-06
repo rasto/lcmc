@@ -20,17 +20,28 @@
 
 package lcmc.common.ui.main;
 
+import lcmc.common.ui.MainMenu;
+
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
+import javax.swing.*;
 
 @Named
 @Singleton
 public class ProgressIndicator {
+
     @Inject
     private ProgressIndicatorPanel progressIndicatorPanel;
+    @Inject
+    private MainMenu mainMenu;
+
+    public void init() {
+        progressIndicatorPanel.init();
+    }
 
     public void startProgressIndicator(final String text) {
+        turnOffMainMenu();
         progressIndicatorPanel.start(text, null);
     }
 
@@ -39,6 +50,7 @@ public class ProgressIndicator {
     }
 
     public void stopProgressIndicator(final String text) {
+        turnOnMainMenu();
         progressIndicatorPanel.stop(text);
     }
 
@@ -47,6 +59,7 @@ public class ProgressIndicator {
     }
 
     public void progressIndicatorFailed(final String text) {
+        turnOnMainMenu();
         progressIndicatorPanel.failure(text);
     }
 
@@ -56,6 +69,7 @@ public class ProgressIndicator {
 
     /** Progress indicator with failure message that shows for n seconds. */
     public void progressIndicatorFailed(final String text, final int n) {
+        turnOnMainMenu();
         progressIndicatorPanel.failure(text, n);
     }
 
@@ -65,5 +79,16 @@ public class ProgressIndicator {
      */
     public void progressIndicatorFailed(final String name, final String text, final int n) {
         progressIndicatorFailed(name + ": " + text, n);
+    }
+
+    public JComponent getPane() {
+        return progressIndicatorPanel;
+    }
+
+    private void turnOffMainMenu() {
+        mainMenu.turnOff();
+    }
+    private void turnOnMainMenu() {
+        mainMenu.turnOn();
     }
 }

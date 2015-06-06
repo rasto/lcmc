@@ -26,8 +26,7 @@
  */
 package lcmc;
 
-import java.awt.Container;
-import java.awt.Image;
+import java.awt.*;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.util.ArrayList;
@@ -37,12 +36,7 @@ import java.util.logging.Level;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
-import javax.swing.JFrame;
-import javax.swing.JMenuBar;
-import javax.swing.JPanel;
-import javax.swing.ToolTipManager;
-import javax.swing.UIManager;
-import javax.swing.UnsupportedLookAndFeelException;
+import javax.swing.*;
 import javax.swing.plaf.ColorUIResource;
 import javax.swing.plaf.metal.MetalLookAndFeel;
 import javax.swing.plaf.metal.OceanTheme;
@@ -57,12 +51,13 @@ import lcmc.common.ui.main.MainData;
 import lcmc.common.ui.MainMenu;
 import lcmc.common.domain.Application;
 import lcmc.common.ui.MainPanel;
-import lcmc.common.ui.main.ProgressIndicatorPanel;
+import lcmc.common.ui.main.ProgressIndicator;
 import lcmc.cluster.service.storage.BlockDeviceService;
 import lcmc.cluster.service.NetworkService;
 import lcmc.logger.Logger;
 import lcmc.logger.LoggerFactory;
 import lcmc.common.domain.util.Tools;
+import lombok.Getter;
 
 /**
  * This is the central class with main function. It starts the LCMC GUI.
@@ -85,7 +80,7 @@ public final class LCMC extends JPanel {
     @Inject
     private MainMenu menu;
     @Inject
-    private ProgressIndicatorPanel mainGlassPane;
+    private ProgressIndicator progressIndicator;
     @Inject
     private MainData mainData;
     @Inject
@@ -100,6 +95,10 @@ public final class LCMC extends JPanel {
     private NetworkService networkService;
     @Inject
     private SwingUtils swingUtils;
+    @Getter
+    private JComponent mainGlassPane;
+    @Inject
+    private ProgressIndicator progressInidicator;
 
     protected void createAndShowGUI(final Container mainFrame) {
         setupUiManager();
@@ -116,11 +115,6 @@ public final class LCMC extends JPanel {
         /* glass pane is used for progress bar etc. */
         menu.init();
         return menu.getMenuBar();
-    }
-
-    protected ProgressIndicatorPanel getMainGlassPane() {
-        mainGlassPane.init();
-        return mainGlassPane;
     }
 
     protected void initApp(final String[] args) {
@@ -164,7 +158,9 @@ public final class LCMC extends JPanel {
     }
 
     void createMainFrame(final JFrame mainFrame) {
-        mainFrame.setGlassPane(getMainGlassPane());
+        progressIndicator.init();
+        mainGlassPane = progressInidicator.getPane();
+        mainFrame.setGlassPane(mainGlassPane);
         mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         mainFrame.addWindowListener(new ExitListener());
         mainFrame.setJMenuBar(getMenuBar());
