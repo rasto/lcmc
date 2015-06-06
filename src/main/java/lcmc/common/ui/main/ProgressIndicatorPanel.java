@@ -55,7 +55,6 @@ import javax.inject.Singleton;
 import javax.swing.*;
 
 import lcmc.common.ui.Browser;
-import lcmc.common.ui.MainMenu;
 import lcmc.common.ui.MainPanel;
 import lcmc.configs.AppDefaults;
 import lcmc.cluster.ui.widget.WidgetFactory;
@@ -63,7 +62,6 @@ import lcmc.logger.Logger;
 import lcmc.logger.LoggerFactory;
 import lcmc.common.ui.utils.MyButton;
 import lcmc.common.domain.util.Tools;
-import lombok.Getter;
 
 /**
  * An infinite progress panel displays a rotating figure and
@@ -97,7 +95,7 @@ import lombok.Getter;
 
 @Named
 @Singleton
-public class ProgressIndicatorPanel extends JComponent implements MouseListener, KeyListener {
+class ProgressIndicatorPanel extends JComponent implements MouseListener, KeyListener {
     private static final Logger LOG = LoggerFactory.getLogger(ProgressIndicatorPanel.class);
     private static final int RAMP_DELAY_STOP  = 1000;
     private static final ImageIcon CANCEL_ICON = Tools.createImageIcon(
@@ -106,9 +104,6 @@ public class ProgressIndicatorPanel extends JComponent implements MouseListener,
     private static final Color VEIL2_COLOR = Browser.STATUS_BACKGROUND;
     /** Text color. */
     private static final Color VEIL_COLOR = Browser.PANEL_BACKGROUND;
-    public static final float DEFAULT_ANIM_FPS = 20.0f;
-    @Getter
-    private float animFPS = DEFAULT_ANIM_FPS;
     /** Notifies whether the animation is running or not. */
     private boolean started    = false;
     /** Alpha level of the veil, used for fade in/out. */
@@ -143,29 +138,18 @@ public class ProgressIndicatorPanel extends JComponent implements MouseListener,
     /** Beginning position of the bar. */
     private double barPos = -1;
     @Inject
-    private MainMenu mainMenu;
-    @Inject
     private MainPanel mainPanel;
+    @Inject
+    private MainData mainData;
 
     public void init() {
-        cancelButton = widgetFactory.createButton(Tools.getString("ProgressIndicatorPanel.Cancel"), CANCEL_ICON);
-        this.init(0.40f, 300);
-    }
-
-    /**
-     * Creates a new progress panel.
-     * @param shield The alpha level between 0.0 and 1.0 of the colored
-     *               shield (or veil).
-     * @param rampDelay The duration, in milli seconds, of the fade in and
-     *                  the fade out of the veil.
-     */
-    private void init(final float shield, final int rampDelay) {
-        this.rampDelay = rampDelay >= 0 ? rampDelay : 0;
-        this.shield    = shield >= 0.0f ? shield : 0.0f;
+        this.rampDelay = 300;
+        this.shield = 0.40f;
 
         this.hints = new RenderingHints(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
         this.hints.put(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
         this.hints.put(RenderingHints.KEY_FRACTIONALMETRICS, RenderingHints.VALUE_FRACTIONALMETRICS_ON);
+        cancelButton = widgetFactory.createButton(Tools.getString("ProgressIndicatorPanel.Cancel"), CANCEL_ICON);
         cancelButton.setBounds(0, 0, cancelButton.getPreferredSize().width, cancelButton.getPreferredSize().height);
     }
 
@@ -221,7 +205,6 @@ public class ProgressIndicatorPanel extends JComponent implements MouseListener,
             return;
         }
         mTextsLock.unlock();
-        mainMenu.turnOff();
         cancelButton.setEnabled(true);
         addMouseListener(this);
         addKeyListener(this);
@@ -266,7 +249,6 @@ public class ProgressIndicatorPanel extends JComponent implements MouseListener,
         animator.setRampUp(false);
         removeMouseListener(this);
         removeKeyListener(this);
-        mainMenu.turnOn();
         mAnimatorLock.unlock();
     }
 
@@ -301,7 +283,7 @@ public class ProgressIndicatorPanel extends JComponent implements MouseListener,
                     g2.fillRect((int) (width  - barPos), startAtHeight, (int) (barPos * 2 - width), barHeight);
                 }
             }
-            barPos += 5.0 * 20.0 / animFPS;
+            barPos += 5.0 * 20.0 / mainData.getAnimFPS();
             if (barPos >= width / 2 + getWidth() / 2) {
                 barPos = width / 2 - getWidth() / 2;
             }
@@ -395,18 +377,6 @@ public class ProgressIndicatorPanel extends JComponent implements MouseListener,
         /* do nothing */
     }
 
-    public boolean isSlow() {
-        return animFPS < DEFAULT_ANIM_FPS;
-    }
-
-    public boolean isFast() {
-        return animFPS > DEFAULT_ANIM_FPS;
-    }
-
-    public void setAnimFPS(final float animFPS) {
-        this.animFPS = animFPS;
-    }
-
     /** Animation thread. */
     private class Animator implements Runnable {
         /** Whether the alpha level goes up or down. */
@@ -491,7 +461,7 @@ public class ProgressIndicatorPanel extends JComponent implements MouseListener,
 
                 mTextsLock.unlock();
                 try {
-                    Thread.sleep((long) (1000 / animFPS));
+                    Thread.sleep((long) (1000 / mainData.getAnimFPS()));
                 } catch (final InterruptedException ie) {
                     Thread.currentThread().interrupt();
                 }

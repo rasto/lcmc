@@ -96,7 +96,6 @@ import lcmc.common.domain.ColorText;
 import lcmc.cluster.ui.ClusterBrowser;
 import lcmc.common.ui.main.MainData;
 import lcmc.common.ui.main.ProgressIndicator;
-import lcmc.common.ui.main.ProgressIndicatorPanel;
 import lcmc.common.ui.utils.SwingUtils;
 import lcmc.host.domain.Host;
 import lcmc.logger.Logger;
@@ -180,12 +179,10 @@ public abstract class ResourceGraph {
     private MainData mainData;
     @Inject
     private ProgressIndicator progressIndicator;
-    @Inject
-    private ProgressIndicatorPanel progressIndicatorPanel;
 
     /** Starts the animation if vertex is being updated. */
     public final void startAnimation(final Info info) {
-        final int animInterval = (int) (1000 / progressIndicatorPanel.getAnimFPS());
+        final int animInterval = (int) (1000 / mainData.getAnimFPS());
         mAnimationListLock.lock();
         if (animationList.isEmpty()) {
             /* start animation thread */
@@ -237,7 +234,7 @@ public abstract class ResourceGraph {
 
     /** Starts the animation if vertex is being tested. */
     public final void startTestAnimation(final JComponent component, final CountDownLatch startTestLatch) {
-        final int animInterval = (int) (1000 / progressIndicatorPanel.getAnimFPS());
+        final int animInterval = (int) (1000 / mainData.getAnimFPS());
         mTestAnimationListLock.lock();
         mRunModeFlag.lock();
         runModeFlag = Application.RunMode.LIVE;
