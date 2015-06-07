@@ -70,6 +70,8 @@ import lcmc.common.ui.utils.MyMenu;
 import lcmc.common.ui.utils.MyMenuItem;
 import lcmc.cluster.ui.ClusterTab;
 import lcmc.cluster.ui.ClustersPanel;
+import lombok.Getter;
+import lombok.Setter;
 
 /**
  * Holds global GUI data, so that they can be retrieved easily throughout
@@ -105,6 +107,11 @@ public class MainData {
 
     public static final String MIME_TYPE_TEXT_HTML = "text/html";
     public static final String MIME_TYPE_TEXT_PLAIN = "text/plain";
+    public static final float DEFAULT_ANIM_FPS = 20.0f;
+
+    @Getter
+    @Setter
+    private float animFPS;
 
     public Container getMainFrameContentPane() {
         return ((RootPaneContainer) mainFrame).getContentPane();
@@ -543,4 +550,11 @@ public class MainData {
         return true;
     }
 
+    public boolean isSlow() {
+        return animFPS < DEFAULT_ANIM_FPS;
+    }
+
+    public boolean isFast() {
+        return animFPS > DEFAULT_ANIM_FPS;
+    }
 }

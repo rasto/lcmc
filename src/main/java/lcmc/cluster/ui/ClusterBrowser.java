@@ -60,7 +60,7 @@ import lcmc.common.ui.Access;
 import lcmc.common.ui.Browser;
 import lcmc.common.ui.CallbackAction;
 import lcmc.common.ui.main.MainData;
-import lcmc.common.ui.ProgressIndicator;
+import lcmc.common.ui.main.ProgressIndicator;
 import lcmc.common.ui.ResourceGraph;
 import lcmc.common.ui.treemenu.TreeMenuController;
 import lcmc.common.ui.utils.SwingUtils;

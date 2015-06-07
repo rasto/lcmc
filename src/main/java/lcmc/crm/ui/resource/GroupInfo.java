@@ -42,7 +42,7 @@ import javax.swing.ImageIcon;
 import javax.swing.tree.DefaultMutableTreeNode;
 import lcmc.common.domain.Application;
 import lcmc.common.domain.ColorText;
-import lcmc.common.ui.ProgressIndicatorPanel;
+import lcmc.common.ui.main.MainData;
 import lcmc.common.ui.treemenu.TreeMenuController;
 import lcmc.common.ui.utils.SwingUtils;
 import lcmc.crm.domain.CrmXml;
@@ -93,7 +93,7 @@ public class GroupInfo extends ServiceInfo {
     @Inject
     private TreeMenuController treeMenuController;
     @Inject
-    private ProgressIndicatorPanel progressIndicatorPanel;
+    private MainData mainData;
 
     void init(final ResourceAgent ra, final Browser browser) {
         super.init(Application.PACEMAKER_GROUP_NAME, ra, browser);
@@ -904,7 +904,7 @@ public class GroupInfo extends ServiceInfo {
     @Override
     public void updateMenus(final Point2D pos) {
         super.updateMenus(pos);
-        if (!progressIndicatorPanel.isSlow()) {
+        if (!mainData.isSlow()) {
             for (final ServiceInfo child : getSubServices()) {
                 child.updateMenus(pos);
             }

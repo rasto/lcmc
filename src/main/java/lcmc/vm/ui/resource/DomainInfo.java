@@ -61,7 +61,7 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import lcmc.Exceptions;
 import lcmc.common.ui.Browser;
 import lcmc.cluster.ui.ClusterBrowser;
-import lcmc.common.ui.ProgressIndicator;
+import lcmc.common.ui.main.ProgressIndicator;
 import lcmc.common.ui.treemenu.TreeMenuController;
 import lcmc.common.ui.utils.SwingUtils;
 import lcmc.host.ui.HostBrowser;

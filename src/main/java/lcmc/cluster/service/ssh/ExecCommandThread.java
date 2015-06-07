@@ -29,7 +29,7 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
 import lcmc.common.ui.MainPanel;
-import lcmc.common.ui.ProgressIndicator;
+import lcmc.common.ui.main.ProgressIndicator;
 import lcmc.configs.DistResource;
 import lcmc.host.domain.Host;
 import lcmc.cluster.ui.SSHGui;

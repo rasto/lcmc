@@ -35,7 +35,7 @@ import javax.swing.SpringLayout;
 
 import lcmc.common.domain.AccessMode;
 import lcmc.common.domain.Application;
-import lcmc.common.ui.ProgressIndicator;
+import lcmc.common.ui.main.ProgressIndicator;
 import lcmc.common.ui.utils.SwingUtils;
 import lcmc.host.domain.Host;
 import lcmc.common.domain.StringValue;

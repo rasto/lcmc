@@ -6,7 +6,7 @@ import javax.swing.JCheckBox;
 import lcmc.LCMC;
 import lcmc.common.domain.UserConfig;
 import lcmc.common.ui.main.MainPresenter;
-import lcmc.common.ui.ProgressIndicator;
+import lcmc.common.ui.main.ProgressIndicator;
 import lcmc.host.domain.Host;
 import lcmc.testutils.IntegrationTestLauncher;
 import lcmc.testutils.annotation.type.GuiTest;

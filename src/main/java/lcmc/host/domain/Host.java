@@ -52,7 +52,7 @@ import com.google.common.base.Optional;
 import lcmc.Exceptions;
 import lcmc.HwEventBus;
 import lcmc.cluster.domain.Cluster;
-import lcmc.common.ui.ProgressIndicator;
+import lcmc.common.ui.main.ProgressIndicator;
 import lcmc.common.ui.utils.SwingUtils;
 import lcmc.configs.DistResource;
 import lcmc.cluster.ui.ClusterBrowser;

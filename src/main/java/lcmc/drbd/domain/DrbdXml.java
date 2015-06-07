@@ -41,7 +41,7 @@ import com.google.common.collect.TreeBasedTable;
 import lcmc.Exceptions;
 import lcmc.common.domain.AccessMode;
 import lcmc.common.ui.Access;
-import lcmc.common.ui.ProgressIndicator;
+import lcmc.common.ui.main.ProgressIndicator;
 import lcmc.drbd.ui.DrbdGraph;
 import lcmc.drbd.ui.resource.BlockDevInfo;
 import lcmc.drbd.ui.resource.ProxyNetInfo;

@@ -72,6 +72,7 @@ import lcmc.common.domain.Value;
 import lcmc.common.domain.Resource;
 import lcmc.cluster.ui.widget.Widget;
 import lcmc.common.ui.main.MainData;
+import lcmc.common.ui.main.ProgressIndicator;
 import lcmc.common.ui.treemenu.TreeMenuController;
 import lcmc.common.ui.utils.ButtonCallback;
 import lcmc.common.ui.utils.ComponentWithTest;
@@ -136,7 +137,7 @@ public class Info implements Comparable<Info>, Value, InfoPresenter {
     @Inject
     private Access access;
     @Inject
-    private ProgressIndicatorPanel progressIndicatorPanel;
+    private MainData mainData;
 
     public void init(final String name, final Browser browser) {
         this.name = name;
@@ -237,7 +238,7 @@ public class Info implements Comparable<Info>, Value, InfoPresenter {
      * than 100.
      */
     public final void incAnimationIndex() {
-        animationIndex += 3.0 * 20.0 / progressIndicatorPanel.getAnimFPS();
+        animationIndex += 3.0 * 20.0 / mainData.getAnimFPS();
         if (animationIndex > 100) {
             animationIndex = 0;
         }

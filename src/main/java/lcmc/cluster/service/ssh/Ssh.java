@@ -30,7 +30,7 @@ import java.util.concurrent.locks.ReentrantLock;
 
 import lcmc.common.ui.main.MainData;
 import lcmc.common.ui.MainPanel;
-import lcmc.common.ui.ProgressIndicator;
+import lcmc.common.ui.main.ProgressIndicator;
 import lcmc.common.ui.utils.SwingUtils;
 import lcmc.configs.DistResource;
 import lcmc.common.domain.Application;

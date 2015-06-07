@@ -46,7 +46,7 @@ import com.google.common.base.Optional;
 import lcmc.common.domain.AccessMode;
 import lcmc.common.ui.main.MainData;
 import lcmc.common.domain.Application;
-import lcmc.common.ui.ProgressIndicator;
+import lcmc.common.ui.main.ProgressIndicator;
 import lcmc.common.ui.treemenu.TreeMenuController;
 import lcmc.common.ui.utils.Dialogs;
 import lcmc.common.ui.utils.SwingUtils;
