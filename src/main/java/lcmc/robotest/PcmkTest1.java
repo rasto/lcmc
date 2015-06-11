@@ -50,7 +50,7 @@ final class PcmkTest1 {
         roboTest.setAborted(false);
         /* create IPaddr2 with 192.168.100.100 ip */
         String testName = "test1";
-        final String pmV = cluster.getHostsArray()[0].getPacemakerVersion();
+        final String pmV = cluster.getHostsArray()[0].getHostParser().getPacemakerVersion();
         try {
             if (pmV != null && Tools.compareVersions(pmV, "1.1.6") < 0) {
                 testName = "test1-1.0";

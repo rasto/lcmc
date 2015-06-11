@@ -103,7 +103,7 @@ public class HostBrowser extends Browser {
      */
     private final Collection<String> usedPorts = new HashSet<String>();
     private final Collection<String> usedProxyPorts = new HashSet<String>();
-    public Host host;
+    private Host host;
     @Inject
     private HostInfo hostInfo;
     /**
@@ -367,89 +367,6 @@ public class HostBrowser extends Browser {
         submenu.add(rebootMenuItem);
     }
 
-    /**
-     * Returns info string about Pacemaker installation.
-     */
-    public String getPacemakerInfo() {
-        final StringBuilder pacemakerInfo = new StringBuilder(40);
-        final String pmV = host.getPacemakerVersion();
-        final String hbV = host.getHeartbeatVersion();
-        final StringBuilder hbRunning = new StringBuilder(20);
-        if (host.isHeartbeatRunning()) {
-            hbRunning.append("running");
-            if (!host.isHeartbeatInRc()) {
-                hbRunning.append("/no rc.d");
-            }
-        } else {
-            hbRunning.append("not running");
-        }
-        if (host.isHeartbeatInRc()) {
-            hbRunning.append("/rc.d");
-        }
-        if (pmV == null) {
-            if (hbV != null) {
-                pacemakerInfo.append(" \nHeartbeat ");
-                pacemakerInfo.append(hbV);
-                pacemakerInfo.append(" (");
-                pacemakerInfo.append(hbRunning);
-                pacemakerInfo.append(')');
-            }
-        } else {
-            final String pmRunning;
-            if (host.isCrmStatusOk()) {
-                pmRunning = "running";
-            } else {
-                pmRunning = "not running";
-            }
-            pacemakerInfo.append(" \nPacemaker ");
-            pacemakerInfo.append(pmV);
-            pacemakerInfo.append(" (");
-            pacemakerInfo.append(pmRunning);
-            pacemakerInfo.append(')');
-            String corOrAis = null;
-            final String corV = host.getCorosyncVersion();
-            final String aisV = host.getOpenaisVersion();
-            if (corV != null) {
-                corOrAis = "Corosync " + corV;
-            } else if (aisV != null) {
-                corOrAis = "Openais " + aisV;
-            }
-
-            if (hbV != null && host.isHeartbeatRunning()) {
-                pacemakerInfo.append(" \nHeartbeat ");
-                pacemakerInfo.append(hbV);
-                pacemakerInfo.append(" (");
-                pacemakerInfo.append(hbRunning);
-                pacemakerInfo.append(')');
-            }
-            if (corOrAis != null) {
-                pacemakerInfo.append(" \n");
-                pacemakerInfo.append(corOrAis);
-                pacemakerInfo.append(" (");
-                if (host.isCorosyncRunning()
-                        || host.isOpenaisRunning()) {
-                    pacemakerInfo.append("running");
-                    if (!host.isCorosyncInRc() && !host.isOpenaisInRc()) {
-                        pacemakerInfo.append("/no rc.d");
-                    }
-                } else {
-                    pacemakerInfo.append("not running");
-                }
-                if (host.isCorosyncInRc() || host.isOpenaisInRc()) {
-                    pacemakerInfo.append("/rc.d");
-                }
-                pacemakerInfo.append(')');
-            }
-            if (hbV != null && !host.isHeartbeatRunning()) {
-                pacemakerInfo.append(" \nHeartbeat ");
-                pacemakerInfo.append(hbV);
-                pacemakerInfo.append(" (");
-                pacemakerInfo.append(hbRunning);
-                pacemakerInfo.append(')');
-            }
-        }
-        return pacemakerInfo.toString();
-    }
 
     public String getHostToolTip(final Host host) {
         final StringBuilder hostToolTip = new StringBuilder(80);
@@ -461,12 +378,12 @@ public class HostBrowser extends Browser {
         if (!host.isConnected()) {
             hostToolTip.append('\n');
             hostToolTip.append(Tools.getString("ClusterBrowser.Host.Disconnected"));
-        } else if (!host.isDrbdStatusOk() && !host.isCrmStatusOk()) {
+        } else if (!host.getHostParser().isDrbdStatusOk() && !host.isCrmStatusOk()) {
             hostToolTip.append('\n');
             hostToolTip.append(Tools.getString("ClusterBrowser.Host.Offline"));
         }
         hostToolTip.append(host.getDrbdInfoAboutInstallation());
-        hostToolTip.append(getPacemakerInfo());
+        hostToolTip.append(host.getPacemakerInfo());
         return hostToolTip.toString();
     }
 

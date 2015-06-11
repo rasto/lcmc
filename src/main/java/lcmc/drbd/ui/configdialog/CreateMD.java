@@ -201,8 +201,8 @@ final class CreateMD extends DrbdConfig {
         final ClusterBrowser browser = getDrbdVolumeInfo().getDrbdResourceInfo().getBrowser();
         browser.updateHWInfo(bdi1.getHost(), !Host.UPDATE_LVM);
         browser.updateHWInfo(bdi2.getHost(), !Host.UPDATE_LVM);
-        bdi1.getBlockDevice().setDrbdBlockDevice(bdi1.getHost().getDrbdBlockDevice(device));
-        bdi2.getBlockDevice().setDrbdBlockDevice(bdi2.getHost().getDrbdBlockDevice(device));
+        bdi1.getBlockDevice().setDrbdBlockDevice(bdi1.getHost().getHostParser().getDrbdBlockDevice(device));
+        bdi2.getBlockDevice().setDrbdBlockDevice(bdi2.getHost().getHostParser().getDrbdBlockDevice(device));
         progressIndicator.stopProgressIndicator(clusterName, "scanning block devices...");
         createFSDialog.init(this, getDrbdVolumeInfo());
         return createFSDialog;

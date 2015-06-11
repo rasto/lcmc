@@ -1253,10 +1253,9 @@ public final class Tools {
      * Returns true if the hb version on the host is smaller or equal
      * Heartbeat 2.1.4.
      */
-    public static boolean versionBeforePacemaker(
-        final Host host) {
-        final String hbV = host.getHeartbeatVersion();
-        final String pcmkV = host.getPacemakerVersion();
+    public static boolean versionBeforePacemaker(final Host host) {
+        final String hbV = host.getHostParser().getHeartbeatVersion();
+        final String pcmkV = host.getHostParser().getPacemakerVersion();
         try {
             return pcmkV == null && hbV != null && Tools.compareVersions(hbV, "2.99.0") < 0;
         } catch (final Exceptions.IllegalVersionException e) {

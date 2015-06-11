@@ -145,7 +145,7 @@ public final class LVCreate extends LV {
             } else if (hostCheckBoxes != null) {
                 for (final Map.Entry<Host, JCheckBox> hostEntry : hostCheckBoxes.entrySet()) {
                     if (hostEntry.getValue().isSelected()) {
-                        final Set<String> lvs = hostEntry.getKey().getLogicalVolumesFromVolumeGroup(volumeGroup);
+                        final Set<String> lvs = hostEntry.getKey().getHostParser().getLogicalVolumesFromVolumeGroup(volumeGroup);
                         if (lvs != null
                             && lvs.contains(lvNameWidget.getStringValue())) {
                             lvNameCorrect = false;
@@ -179,7 +179,7 @@ public final class LVCreate extends LV {
         /* find next free logical volume name */
         final Collection<String> logicalVolumes = new LinkedHashSet<String>();
         for (final Host h : selectedHosts) {
-            final Set<String> hvgs = h.getLogicalVolumesFromVolumeGroup(volumeGroup);
+            final Set<String> hvgs = h.getHostParser().getLogicalVolumesFromVolumeGroup(volumeGroup);
             if (hvgs != null) {
                 logicalVolumes.addAll(hvgs);
             }
@@ -316,7 +316,7 @@ public final class LVCreate extends LV {
                 hostEntry.getValue().setEnabled(false);
                 hostEntry.getValue().setSelected(true);
             } else if (isOneBdDrbd(selectedBlockDevices)
-                       || !hostEntry.getKey().getVolumeGroupNames().contains(volumeGroup)) {
+                       || !hostEntry.getKey().getHostParser().getVolumeGroupNames().contains(volumeGroup)) {
                 hostEntry.getValue().setEnabled(false);
                 hostEntry.getValue().setSelected(false);
             } else {
@@ -355,7 +355,7 @@ public final class LVCreate extends LV {
         long free = -1;
         if (hosts != null) {
             for (final Host h : hosts) {
-                final long hostFree = h.getFreeInVolumeGroup(volumeGroup) / 1024;
+                final long hostFree = h.getHostParser().getFreeInVolumeGroup(volumeGroup) / 1024;
                 if (free == -1 || hostFree < free) {
                     free = hostFree;
                 }

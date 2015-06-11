@@ -863,7 +863,7 @@ public abstract class ResourceGraph {
         final Host[] hosts = clusterBrowser.getClusterHosts();
         Point2D p = null;
         for (final Host host : hosts) {
-            p = host.getGraphPosition(getId(info));
+            p = host.getHostParser().getGraphPosition(getId(info));
             if (p != null) {
                 break;
             }
@@ -875,7 +875,7 @@ public abstract class ResourceGraph {
     public final void resetSavedPosition(final Info info) {
         final Host[] hosts = clusterBrowser.getClusterHosts();
         for (final Host host : hosts) {
-            host.resetGraphPosition(getId(info));
+            host.getHostParser().resetGraphPosition(getId(info));
         }
     }
 

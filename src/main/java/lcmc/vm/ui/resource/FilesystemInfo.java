@@ -137,7 +137,7 @@ public final class FilesystemInfo extends HardwareInfo {
         final Set<Value> sds = new LinkedHashSet<Value>();
         sds.add(new StringValue());
         for (final Host h : hosts) {
-            for (final String guiOps : h.getGuiOptions(Host.VM_FILESYSTEM_SOURCE_DIR_LXC)) {
+            for (final String guiOps : h.getHostParser().getGuiOptions(Host.VM_FILESYSTEM_SOURCE_DIR_LXC)) {
                 sds.add(new StringValue(guiOps));
             }
         }

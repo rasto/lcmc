@@ -172,15 +172,15 @@ public class ExecCommandConfig {
 
     public String getCommand() {
         if (commandString != null) {
-            return host.replaceVars(Tools.getDistCommand(commandString,
-                                                         host.getDistributionName(),
-                                                         host.getDistributionVersionString(),
-                                                         host.getArch(),
+            return host.getHostParser().replaceVars(Tools.getDistCommand(commandString,
+                                                         host.getHostParser().getDistributionName(),
+                                                         host.getHostParser().getDistributionVersionString(),
+                                                         host.getHostParser().getArch(),
                                                          convertCmdCallback,
                                                          inBash,
                                                          inSudo));
         }
-        return host.replaceVars(command);
+        return host.getHostParser().replaceVars(command);
     }
 
     public ExecCallback getExecCallback() {

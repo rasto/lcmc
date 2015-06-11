@@ -50,6 +50,7 @@ import lcmc.logger.LoggerFactory;
 import lcmc.common.ui.utils.MyButton;
 import lcmc.common.domain.util.Tools;
 import lcmc.cluster.service.ssh.ExecCommandConfig;
+import lombok.val;
 
 /**
  * An implementation of a dialog where
@@ -302,20 +303,21 @@ final class CheckInstallation extends DialogHost {
     }
 
     void checkAisHbPm(final String ans) {
-        getHost().setPacemakerVersion(null);
-        getHost().setOpenaisVersion(null);
-        getHost().setHeartbeatVersion(null);
-        getHost().setCorosyncVersion(null);
+        final val hostParser = getHost().getHostParser();
+        hostParser.setPacemakerVersion(null);
+        hostParser.setOpenaisVersion(null);
+        hostParser.setHeartbeatVersion(null);
+        hostParser.setCorosyncVersion(null);
         if (ans != null && !ans.isEmpty() && !"\n".equals(ans)) {
             for (final String line : ans.split("\n")) {
-                getHost().parseInstallationInfo(line);
+                hostParser.parseInstallationInfo(line);
             }
         }
-        final String aisVersion = getHost().getOpenaisVersion();
-        final String corosyncVersion = getHost().getCorosyncVersion();
-        String hbVersion = getHost().getHeartbeatVersion();
+        final String aisVersion = hostParser.getOpenaisVersion();
+        final String corosyncVersion = hostParser.getCorosyncVersion();
+        String hbVersion = hostParser.getHeartbeatVersion();
         if (hbVersion == null
-            && (getHost().getPacemakerVersion() == null || (corosyncVersion == null && aisVersion == null))) {
+            && (hostParser.getPacemakerVersion() == null || (corosyncVersion == null && aisVersion == null))) {
             final InstallMethods hbim = (InstallMethods) heartbeatPacemakerInstMethodWidget.getValue();
             if (hbim != null) {
                 installHeartbeatPacemakerButton.setEnabled(true);
@@ -347,29 +349,29 @@ final class CheckInstallation extends DialogHost {
             heartbeatPacemakerInstallationOk = true;
             final String text;
             if ("2.1.3".equals(hbVersion)
-                && "sles10".equals(getHost().getDistributionVersion())) {
+                && "sles10".equals(hostParser.getDistributionVersion())) {
                 /* sles10 heartbeat 2.1.3 looks like hb 2.1.4 */
                 hbVersion = "2.1.4";
                 text = "2.1.3 (2.1.4)";
             } else {
                 text = hbVersion;
             }
-            getHost().setHeartbeatVersion(hbVersion);
+            hostParser.setHeartbeatVersion(hbVersion);
             swingUtils.invokeLater(new Runnable() {
                 @Override
                 public void run() {
-                    if (getHost().getPacemakerVersion() == null
-                        || getHost().getHeartbeatVersion().equals(getHost().getPacemakerVersion())) {
+                    if (hostParser.getPacemakerVersion() == null
+                        || hostParser.getHeartbeatVersion().equals(hostParser.getPacemakerVersion())) {
                         heartbeatPacemakerLabel.setText("Heartbeat");
                         checkingHeartbeatPacemakerLabel.setText(": " + text);
                     } else {
-                        checkingHeartbeatPacemakerLabel.setText(": " + getHost().getPacemakerVersion() + '/' + text);
+                        checkingHeartbeatPacemakerLabel.setText(": " + hostParser.getPacemakerVersion() + '/' + text);
                     }
                     heartbeatPacemakerIcon.setIcon(ALREADY_INSTALLED_ICON);
                 }
             });
         }
-        if (getHost().getPacemakerVersion() == null || (aisVersion == null && corosyncVersion == null)) {
+        if (hostParser.getPacemakerVersion() == null || (aisVersion == null && corosyncVersion == null)) {
             /* corosync */
             swingUtils.invokeLater(new Runnable() {
                 @Override
@@ -395,7 +397,7 @@ final class CheckInstallation extends DialogHost {
                         coroAisVersion = aisVersion;
                     }
                     pacemakerLabel.repaint();
-                    checkingPacemakerLabel.setText(": " + getHost().getPacemakerVersion() + '/' + coroAisVersion);
+                    checkingPacemakerLabel.setText(": " + hostParser.getPacemakerVersion() + '/' + coroAisVersion);
                 }
             });
         }

@@ -673,7 +673,7 @@ public class VmsXml {
     }
 
     public boolean parseXml() {
-        final String command = definedOnHost.getDistCommand("VMSXML.GetData", (ConvertCmdCallback) null);
+        final String command = definedOnHost.getHostParser().getDistCommand("VMSXML.GetData", (ConvertCmdCallback) null);
         final SshOutput ret = definedOnHost.captureCommand(new ExecCommandConfig().command(command)
                                                                                   .silentCommand()
                                                                                   .silentOutput());
@@ -713,7 +713,7 @@ public class VmsXml {
             } else if ("vm".equals(node.getNodeName())) {
                 vmParser.parseVM(node, definedOnHost, namesToConfigs);
             } else if ("version".equals(node.getNodeName())) {
-                definedOnHost.setLibvirtVersion(XMLTools.getText(node));
+                definedOnHost.getHostParser().setLibvirtVersion(XMLTools.getText(node));
             }
         }
         return true;

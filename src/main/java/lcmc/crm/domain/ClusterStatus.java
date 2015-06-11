@@ -73,7 +73,7 @@ public final class ClusterStatus {
     public void init(final Host host, final CrmXml crmXML) {
         this.host = host;
         this.crmXML = crmXML;
-        final String command = host.getDistCommand("Heartbeat.getClusterMetadata",
+        final String command = host.getHostParser().getDistCommand("Heartbeat.getClusterMetadata",
                                                    (ConvertCmdCallback) null);
         final SshOutput ret = host.captureCommandProgressIndicator(Tools.getString("Heartbeat.getClusterMetadata"),
                                                                    new ExecCommandConfig().command(command)

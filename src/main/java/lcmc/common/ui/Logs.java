@@ -174,7 +174,7 @@ public class Logs extends ConfigDialog {
         final String stacktrace = Tools.getStackTrace();
         for (final Host host : hosts) {
             final int index = i;
-            final String command = host.getDistCommand(logFileCommand(), replaceHash);
+            final String command = host.getHostParser().getDistCommand(logFileCommand(), replaceHash);
             threads[index] = host.execCommand(new ExecCommandConfig()
                                                    .command(command)
                                                    .execCallback(new ExecCallback() {

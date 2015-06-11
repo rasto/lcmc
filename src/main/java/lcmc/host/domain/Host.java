@@ -24,64 +24,35 @@ package lcmc.host.domain;
 
 import java.awt.Color;
 import java.awt.geom.Point2D;
-import java.net.UnknownHostException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
-import java.util.List;
 import java.util.Map;
-import java.util.Set;
-import java.util.TreeSet;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Provider;
 import javax.swing.JComponent;
 
-import com.google.common.base.Optional;
 import lcmc.Exceptions;
-import lcmc.HwEventBus;
 import lcmc.cluster.domain.Cluster;
+import lcmc.common.domain.ConvertCmdCallback;
 import lcmc.common.ui.main.ProgressIndicator;
 import lcmc.common.ui.utils.SwingUtils;
 import lcmc.configs.DistResource;
 import lcmc.cluster.ui.ClusterBrowser;
 import lcmc.common.ui.main.MainData;
-import lcmc.event.HwBlockDevicesChangedEvent;
-import lcmc.event.HwBlockDevicesDiskSpaceEvent;
-import lcmc.event.HwBridgesChangedEvent;
-import lcmc.event.HwDrbdStatusChangedEvent;
-import lcmc.event.HwFileSystemsChangedEvent;
-import lcmc.event.HwMountPointsChangedEvent;
-import lcmc.event.HwNetInterfacesChangedEvent;
 import lcmc.cluster.service.storage.BlockDeviceService;
 import lcmc.host.ui.HostBrowser;
 import lcmc.common.ui.ProgressBar;
-import lcmc.common.ui.ResourceGraph;
 import lcmc.cluster.ui.SSHGui;
-import lcmc.common.ui.TerminalPanel;
+import lcmc.host.ui.TerminalPanel;
 import lcmc.drbd.domain.DrbdHost;
 import lcmc.drbd.domain.DrbdXml;
 import lcmc.common.domain.Application;
-import lcmc.common.domain.StringValue;
 import lcmc.common.domain.Value;
 import lcmc.drbd.domain.BlockDevice;
-import lcmc.drbd.domain.NetInterface;
-import lcmc.vm.domain.VmsXml;
-import lcmc.common.ui.CategoryInfo;
 import lcmc.robotest.RoboTest;
 import lcmc.common.domain.ConnectionCallback;
-import lcmc.common.domain.ConvertCmdCallback;
 import lcmc.drbd.service.DRBD;
 import lcmc.common.domain.ExecCallback;
 import lcmc.logger.Logger;
@@ -93,23 +64,37 @@ import lcmc.cluster.service.ssh.ExecCommandConfig;
 import lcmc.cluster.service.ssh.Ssh;
 import lcmc.cluster.service.ssh.ExecCommandThread;
 import lcmc.cluster.service.ssh.SshOutput;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+import lombok.Setter;
 
 /**
  * This class holds host data and implementation of host related methods.
  */
-@Named
+@RequiredArgsConstructor
 public class Host implements Comparable<Host>, Value {
+    private final DrbdHost drbdHost;
+    private final TerminalPanel terminalPanel;
+    private final MainData mainData;
+    private final ProgressIndicator progressIndicator;
+    private final Ssh ssh;
+    private final HostBrowser hostBrowser;
+    private final Hosts allHosts;
+    private final Application application;
+    private final RoboTest roboTest;
+    private final BlockDeviceService blockDeviceService;
+    private final SwingUtils swingUtils;
+    @Getter
+    @Setter
+    private HostParser hostParser; //TODO cycle
+
     private static final Logger LOG = LoggerFactory.getLogger(Host.class);
     public static final String NOT_CONNECTED_MENU_TOOLTIP_TEXT = "not connected to the host";
     public static final String PROXY_NOT_CONNECTED_MENU_TOOLTIP_TEXT = "not connected to the proxy host";
-    public static final Pattern BLOCK_DEV_FILE_PATTERN = Pattern.compile("(\\D+)\\d+");
-    public static final Pattern DRBD_DEV_FILE_PATTERN = Pattern.compile(".*\\/drbd\\d+$");
-    public static final Pattern USED_DISK_SPACE_PATTERN = Pattern.compile("^(.*) (\\d+)$");
     /** Timeout after which the connection is considered to be dead. */
     private static final int PING_TIMEOUT = 40000;
     private static final int DRBD_EVENTS_TIMEOUT = 40000;
     private static final int CLUSTER_EVENTS_TIMEOUT = 40000;
-    private static final int HW_INFO_TIMEOUT = 40000;
 
     public static final String DEFAULT_HOSTNAME = "unknown";
 
@@ -117,52 +102,8 @@ public class Host implements Comparable<Host>, Value {
 
     public static final String ROOT_USER = "root";
     public static final String DEFAULT_SSH_PORT = "22";
-    private static final String LOG_COMMANDS_ON_SERVER_OPTION = "--cmd-log";
 
-    private static final String NET_INFO_DELIM = "net-info";
-    private static final String BRIDGE_INFO_DELIM = "bridge-info";
-    private static final String DISK_INFO_DELIM = "disk-info";
-    private static final String DISK_SPACE_DELIM = "disk-space";
-    private static final String VG_INFO_DELIM = "vg-info";
-    private static final String FILESYSTEMS_INFO_DELIM = "filesystems-info";
-    private static final String CRYPTO_INFO_DELIM = "crypto-info";
-    private static final String QEMU_KEYMAPS_INFO_DELIM = "qemu-keymaps-info";
-    private static final String CPU_MAP_MODEL_INFO_DELIM = "cpu-map-model-info";
-    private static final String CPU_MAP_VENDOR_INFO_DELIM = "cpu-map-vendor-info";
-    private static final String MOUNT_POINTS_INFO_DELIM = "mount-points-info";
-    private static final String GUI_INFO_DELIM = "gui-info";
-    private static final String INSTALLATION_INFO_DELIM = "installation-info";
-    private static final String GUI_OPTIONS_INFO_DELIM = "gui-options-info";
-    private static final String VERSION_INFO_DELIM = "version-info";
-    private static final String DRBD_PROXY_INFO_DELIM = "drbd-proxy-info";
-
-    private static final Collection<String> INFO_TYPES =
-             new HashSet<String>(Arrays.asList(new String[]{NET_INFO_DELIM,
-                     BRIDGE_INFO_DELIM,
-                     DISK_INFO_DELIM,
-                     DISK_SPACE_DELIM,
-                     VG_INFO_DELIM,
-                     FILESYSTEMS_INFO_DELIM,
-                     CRYPTO_INFO_DELIM,
-                     QEMU_KEYMAPS_INFO_DELIM,
-                     CPU_MAP_MODEL_INFO_DELIM,
-                     CPU_MAP_VENDOR_INFO_DELIM,
-                     MOUNT_POINTS_INFO_DELIM,
-                     GUI_INFO_DELIM,
-                     INSTALLATION_INFO_DELIM,
-                     GUI_OPTIONS_INFO_DELIM,
-                     VERSION_INFO_DELIM,
-                     DRBD_PROXY_INFO_DELIM}));
     public static final boolean UPDATE_LVM = true;
-
-    private static final String TOKEN_DISK_ID = "disk-id";
-    private static final String TOKEN_UUID    = "uuid";
-    private static final String TOKEN_SIZE    = "size";
-    private static final String TOKEN_MP      = "mp";
-    private static final String TOKEN_FS      = "fs";
-    private static final String TOKEN_VG      = "vg";
-    private static final String TOKEN_LV      = "lv";
-    private static final String TOKEN_PV      = "pv";
 
     private String name;
     private String enteredHostOrIp = Tools.getDefault("SSH.Host");
@@ -172,131 +113,32 @@ public class Host implements Comparable<Host>, Value {
     private Cluster cluster = null;
     private String hostname = DEFAULT_HOSTNAME;
     private String username = null;
-    private String detectedKernelName = "";
-    private String detectedDist = "";
-    private String detectedDistVersion = "";
-    private String detectedKernelVersion = "";
-    private String detectedArch = "";
-    private String kernelName = "";
-    private String distributionName = "";
-    private String distributionVersion = "";
-    private String distributionVersionString = "";
-    private String kernelVersion = "";
-    private String arch = "";
-    private Set<String> availableCryptoModules = new TreeSet<String>();
-    private Set<Value> availableQemuKeymaps = new TreeSet<Value>();
-    private Set<Value> availableCpuMapModels = new TreeSet<Value>();
-    private Set<Value> availableCpuMapVendors = new TreeSet<Value>();
-    private Map<String, BlockDevice> drbdBlockDevices = new LinkedHashMap<String, BlockDevice>();
-    /** Options for GUI drop down lists. */
-    private Map<String, List<String>> guiOptions = new HashMap<String, List<String>>();
-    private Set<String> drbdResourcesWithProxy = new HashSet<String>();
     private Color defaultHostColorInGraph;
     private Color savedHostColorInGraphs;
     private ExecCommandThread drbdStatusThread = null;
     private ExecCommandThread crmStatusThread = null;
-    private ExecCommandThread serverStatusThread = null;
-    /** List of positions of the services.
-     *  Question is this: the saved positions can be different on different
-     *  hosts, but only one can be used in the crm graph.
-     *  Only one will be used and by next save the problem solves itself.
-     */
-    private final Map<String, Point2D> servicePositions = new HashMap<String, Point2D>();
-    private String pacemakerVersion = null;
-    private String openaisVersion = null;
-    private boolean commLayerStopping = false;
-    private boolean commLayerStarting = false;
-    private boolean pacemakerStarting = false;
-    private boolean drbdProxyStarting = false;
-    private boolean corosyncInRc = false;
-    private boolean openaisInRc = false;
-    private boolean corosyncHasInitScript = false;
-    private boolean openaisHasInitScript = false;
-    private boolean corosyncRunning = false;
-    private boolean openaisRunning = false;
-    private boolean corosyncOrOpenaisConfigExists = false;
-
-    private boolean heartbeatInRc = false;
-    private boolean heartbeatRunning = false;
-    private boolean heartbeatConfigExists = false;
-    private boolean heartbeatHasInitScript = false;
-
-    private boolean pacemakerInRc = false;
-    private boolean pacemakerRunning = false;
-    private boolean pacemakerHasInitScript = false;
-    /** Pacemaker service version. From version 1, use pacamker init script. */
-    private int pcmkServiceVersion = -1;
-    private String corosyncVersion = null;
-    private String heartbeatVersion = null;
-    private boolean crmStatusOk = false;
     private String sshPort = null;
     private Boolean useSudo = null;
     private String sudoPassword = "";
     /** A gate that is used to synchronize the loading sequence. */
     private CountDownLatch isLoadingGate;
-    private final CountDownLatch waitForServerStatusLatch = new CountDownLatch(1);
     private final Collection<JComponent> enableOnConnectElements = new ArrayList<JComponent>();
     private String pacemakerInstallMethodIndex;
     private String heartbeatPacemakerInstallMethodIndex;
-    private String heartbeatLibPath = null;
     private String vmInfoFromServerMD5 = null;
     private int positionInTheCluster = 0;
     private volatile boolean lastConnectionCheckPositive = false;
-    private Boolean corosyncOrHeartbeatRunning = null;
-    private String libvirtVersion = null;
-    private List<BlockDevice> physicalVolumes = new ArrayList<BlockDevice>();
-    private Map<String, Long> volumeGroups = new LinkedHashMap<String, Long>();
-    private Map<String, Set<String>> volumeGroupsWithLvs = new HashMap<String, Set<String>>();
     private boolean savable = true;
     /** Ping is set every 10s. */
     private volatile AtomicBoolean ping = new AtomicBoolean(true);
-    private final Lock mDRBDStatusLock = new ReentrantLock();
-    private final Lock mUpdateVMSlock = new ReentrantLock();
-    private final Lock mInfoTimestampLock = new ReentrantLock();
-    /** Time stamp hash. */
-    private final Map<String, Double> infoTimestamp = new HashMap<String, Double>();
     private boolean inCluster = false;
-    /** Whether dist info was already logged. */
-    private boolean distInfoAlreadyLogged = false;
 
-    private boolean drbdStatusOk = false;
-
-    @Inject
-    private DrbdHost drbdHost;
-    @Inject
-    private TerminalPanel terminalPanel;
-    @Inject
-    private MainData mainData;
-    @Inject
-    private ProgressIndicator progressIndicator;
-    @Inject
-    private Ssh ssh;
-    @Inject
-    private HostBrowser hostBrowser;
-    @Inject
-    private Provider<DrbdXml> drbdXmlProvider;
-    @Inject
-    private Provider<VmsXml> vmsXmlProvider;
-    @Inject
-    private Hosts allHosts;
-    @Inject
-    private Application application;
-    @Inject
-    private SwingUtils swingUtils;
-    @Inject
-    private RoboTest roboTest;
-    @Inject
-    private HwEventBus hwEventBus;
-    @Inject
-    private BlockDeviceService blockDeviceService;
+    private boolean crmStatusOk = false;
 
     public void init() {
         if (allHosts.size() == 1) {
             enteredHostOrIp = Tools.getDefault("SSH.SecHost");
         }
-        hostBrowser.init(this);
-        terminalPanel.initWithHost(this);
-        hwEventBus.register(this);
     }
 
     public HostBrowser getBrowser() {
@@ -339,7 +181,7 @@ public class Host implements Comparable<Host>, Value {
         }
         final Color secColor;
         if (isConnected()) {
-            if (isDrbdStatusOk() && drbdHost.isDrbdLoaded()) {
+            if (hostParser.isDrbdStatusOk() && drbdHost.isDrbdLoaded()) {
                 return new Color[]{col};
             } else {
                 secColor = Tools.getDefaultColor("Host.NoStatusColor");
@@ -386,14 +228,6 @@ public class Host implements Comparable<Host>, Value {
     public void setSavedHostColorInGraphs(final Color savedHostColorInGraphs) {
         this.savedHostColorInGraphs = savedHostColorInGraphs;
         terminalPanel.resetPromptColor();
-    }
-
-    public void setCrmStatusOk(final boolean crmStatusOk) {
-        this.crmStatusOk = crmStatusOk;
-    }
-
-    public boolean isCrmStatusOk() {
-        return crmStatusOk && isConnected();
     }
 
     public boolean isInCluster() {
@@ -459,212 +293,8 @@ public class Host implements Comparable<Host>, Value {
         allIps.put(hop, ipsForHop);
     }
 
-    public Set<String> getAvailableCryptoModules() {
-        return availableCryptoModules;
-    }
-
-    public Set<Value> getAvailableQemuKeymaps() {
-        return availableQemuKeymaps;
-    }
-
-    public Set<Value> getCPUMapModels() {
-        return availableCpuMapModels;
-    }
-
-    public Set<Value> getCPUMapVendors() {
-        return availableCpuMapVendors;
-    }
-
     public String[] getIps(final int hop) {
         return allIps.get(hop);
-    }
-
-    /**
-     * Sets distribution info for this host from array of strings.
-     * Array consists of: kernel name, kernel version, arch, os, version
-     * and distribution.
-     */
-    @SuppressWarnings("fallthrough")
-    void setDistInfo(final String[] info) {
-        if (info == null) {
-            LOG.debug("setDistInfo: " + getName() + " dist info is null");
-            return;
-        }
-        if (!distInfoAlreadyLogged) {
-            for (final String di : info) {
-                LOG.debug1("setDistInfo: dist info: " + di);
-            }
-        }
-
-        /* no breaks in the switch statement are intentional */
-        String lsbVersion = null;
-        String lsbDist = null;
-        switch (info.length) {
-            case 9:
-                lsbVersion = info[8]; // TODO: not used
-            case 8:
-                lsbDist = info[7];
-            case 7:
-                lsbVersion = info[6]; // TODO: not used
-            case 6:
-                lsbDist = info[5];
-            case 5:
-                if (lsbDist == null || "linux".equals(lsbDist)) {
-                    detectedDist = info[4];
-                } else {
-                    detectedDist = lsbDist;
-                }
-            case 4:
-                if (lsbVersion == null) {
-                    detectedDistVersion = info[3];
-                } else {
-                    detectedDistVersion = info[3] + '/' + lsbVersion;
-                }
-            case 3:
-                detectedKernelVersion = info[2];
-            case 2:
-                detectedArch = info[1];
-            case 1:
-                detectedKernelName = info[0];
-            case 0:
-                break;
-            default:
-                LOG.appError("setDistInfo: list: ", Arrays.asList(info).toString());
-                break;
-        }
-        distributionName = detectedDist;
-        distributionVersion = detectedDistVersion;
-        initDistInfo();
-        if (!distInfoAlreadyLogged) {
-            LOG.debug1("setDistInfo: kernel name: " + detectedKernelName);
-            LOG.debug1("setDistInfo: kernel version: " + detectedKernelVersion);
-            LOG.debug1("setDistInfo: arch: " + detectedArch);
-            LOG.debug1("setDistInfo: dist version: " + detectedDistVersion);
-            LOG.debug1("setDistInfo: dist: " + detectedDist);
-        }
-        distInfoAlreadyLogged = true;
-    }
-
-    /** Initializes dist info. Must be called after setDistInfo. */
-    void initDistInfo() {
-        if (!"Linux".equals(detectedKernelName)) {
-            LOG.appWarning("initDistInfo: detected kernel not linux: " + detectedKernelName);
-        }
-        setKernelName("Linux");
-
-        if (!distributionName.equals(detectedDist)) {
-            LOG.appError("initDistInfo: dist: " + distributionName + " does not match " + detectedDist);
-        }
-        distributionVersionString = Tools.getDistVersionString(distributionName, distributionVersion);
-        distributionVersion = Tools.getDistString("distributiondir", detectedDist, distributionVersionString, null);
-        setKernelVersion(Tools.getKernelDownloadDir(detectedKernelVersion, getDistributionName(), distributionVersionString, null));
-        String arch0 = Tools.getDistString("arch:" + detectedArch, getDistributionName(), distributionVersionString, null);
-        if (arch0 == null) {
-            arch0 = detectedArch;
-        }
-        setArch(arch0);
-    }
-
-    /** Returns the detected info to show. */
-    public String getDetectedInfo() {
-        return detectedDist + ' ' + detectedDistVersion;
-    }
-
-    /**
-     * Gets distribution name from distribution version. E.g. suse from sles9.
-     * This is used only when the distribution is selected in the pulldown menu,
-     * not when it is detected.
-     * The conversion rules for distributions are defined in DistResource.java,
-     * with 'dist:' prefix.
-     * TODO: remove it?
-     */
-    public String getDistFromDistVersion(final String dV) {
-        /* remove numbers */
-        if ("No Match".equals(dV)) {
-            return null;
-        }
-        LOG.debug1("getDistFromDistVersion:" + dV.replaceFirst("\\d.*", ""));
-        return Tools.getDistString("dist:" + dV.replaceFirst("\\d.*", ""), "", "", null);
-    }
-
-    void setDistributionName(final String dist) {
-        this.distributionName = dist;
-    }
-
-    void setDistributionVersion(final String distVersion) {
-        this.distributionVersion = distVersion;
-        distributionVersionString = Tools.getDistVersionString(distributionName, distVersion);
-        distributionName = getDistFromDistVersion(distVersion);
-    }
-
-    /** Sets arch, e.g. "i386". */
-    public void setArch(final String arch) {
-        this.arch = arch;
-    }
-
-    /** Sets kernel name, e.g. "linux". */
-    void setKernelName(final String kernelName) {
-        this.kernelName = kernelName;
-    }
-
-    void setKernelVersion(final String kernelVersion) {
-        this.kernelVersion = kernelVersion;
-    }
-
-    /** Gets kernel name. Normaly "Linux" for this application. */
-    public String getKernelName() {
-        return kernelName;
-    }
-
-    /**
-     * Gets kernel version. Usually some version,
-     * like: "2.6.13.2ws-k7-up-lowmem".
-     */
-    public String getKernelVersion() {
-        return kernelVersion;
-    }
-
-    public String getDetectedKernelVersion() {
-        return detectedKernelVersion;
-    }
-
-    /** Gets architecture like i686. */
-    public String getArch() {
-        return arch;
-    }
-
-    public String getHeartbeatLibPath() {
-        if (heartbeatLibPath != null) {
-            return heartbeatLibPath;
-        }
-        if ("".equals(arch)) {
-            LOG.appWarning("getHeartbeatLibPath: called to soon: unknown arch");
-        } else if ("x86_64".equals(arch) || "amd64".equals(arch)) {
-            return "/usr/lib64/heartbeat";
-        }
-        return "/usr/lib/heartbeat";
-    }
-
-    public String getLxcLibPath() {
-        return getDistString("libvirt.lxc.libpath");
-    }
-
-    /** Returns xen lib path. */
-    public String getXenLibPath() {
-        return getDistString("libvirt.xen.libpath");
-    }
-
-    /** Gets distribution, e.g., debian. */
-    public String getDistributionName() {
-        return distributionName;
-    }
-
-    public String getDistributionVersion() {
-        return distributionVersion;
-    }
-
-    public String getDistributionVersionString() {
-        return distributionVersionString;
     }
 
     public void disconnect() {
@@ -672,63 +302,6 @@ public class Host implements Comparable<Host>, Value {
             ssh.forceDisconnect();
         }
         setVMInfoMD5(null);
-    }
-
-    /**
-     * Converts command string to real command for a distribution, specifying
-     * the convert command callback.
-     */
-    public String getDistCommand(final String commandString, final ConvertCmdCallback convertCmdCallback) {
-        return Tools.getDistCommand(commandString,
-                                    distributionName,
-                                    distributionVersionString,
-                                    arch,
-                                    convertCmdCallback,
-                                    false,  /* in bash */
-                                    false); /* sudo */
-    }
-
-    /** Converts a string that is specific to the distribution distribution. */
-    public String getDistString(final String commandString) {
-        return Tools.getDistString(commandString, distributionName, distributionVersionString, arch);
-    }
-
-    /**
-     *  Gets list of strings that are specific to the distribution
-     *  distribution.
-     */
-    public List<String> getDistStrings(final String commandString) {
-        return Tools.getDistStrings(commandString, distributionName, distributionVersionString, arch);
-    }
-
-
-    /**
-     * Converts command string to real command for a distribution, specifying
-     * what-with-what hash.
-     */
-    public String getDistCommand(final String commandString, final Map<String, String> replaceHash) {
-        return Tools.getDistCommand(
-                    commandString,
-                    distributionName,
-                    distributionVersionString,
-                    arch,
-                    new ConvertCmdCallback() {
-                        @Override
-                        public String convert(String command) {
-                            for (final String tag : replaceHash.keySet()) {
-                                if (tag != null && command.contains(tag)) {
-                                    String s = replaceHash.get(tag);
-                                    if (s == null) {
-                                        s = "";
-                                    }
-                                    command = command.replaceAll(tag, s);
-                                }
-                            }
-                            return command;
-                        }
-                    },
-                    false,  /* in bash */
-                    false); /* sudo */
     }
 
     /**
@@ -793,17 +366,6 @@ public class Host implements Comparable<Host>, Value {
         } else {
             LOG.appWarning("execDrbdStatusCommand: trying to start started drbd status");
         }
-    }
-
-    /** Stops server (hw) status background process. */
-    public void stopServerStatus() {
-        final ExecCommandThread sst = serverStatusThread;
-        if (sst == null) {
-            LOG.appWarning("trying to stop stopped server status");
-            return;
-        }
-        sst.cancelTheSession();
-        serverStatusThread = null;
     }
 
     /** Stops drbd status background process. */
@@ -1144,7 +706,7 @@ public class Host implements Comparable<Host>, Value {
                                                             .silentOutput()
                                                             .sshCommandTimeout(10000));
                                     getSSH().installGuiHelper();
-                            getAllInfo();
+                            hostParser.getAllInfo();
                             if (useProgressIndicator) {
                                 progressIndicator.stopProgressIndicator(
                                         hostName,
@@ -1172,98 +734,6 @@ public class Host implements Comparable<Host>, Value {
         }
     }
 
-    /** Gets and stores info about the host. */
-    void getAllInfo() {
-        execCommand(new ExecCommandConfig().commandString("GetHostAllInfo")
-                .execCallback(new ExecCallback() {
-                    @Override
-                    public void done(final String ans) {
-                        parseHostInfo(ans);
-                        setLoadingDone();
-                    }
-
-                    @Override
-                    public void doneError(final String ans, final int exitCode) {
-                        setLoadingError();
-                    }
-                })
-                .sshCommandTimeout(HW_INFO_TIMEOUT)
-                .silentCommand()
-                .silentOutput()
-                .silentCommand()).block();
-    }
-
-    /** Gets and stores hardware info about the host. */
-    public void getHWInfo(final boolean updateLVM) {
-        getHWInfo(new CategoryInfo[]{}, new ResourceGraph[]{}, updateLVM);
-    }
-
-    /** Gets and stores hardware info about the host. */
-    public void getHWInfo(final CategoryInfo[] infosToUpdate, final ResourceGraph[] graphs, final boolean updateLVM) {
-        final String cmd;
-        if (updateLVM) {
-            cmd = "GetHostHWInfoLVM";
-        } else {
-            cmd = "GetHostHWInfo";
-        }
-        execCommand(new ExecCommandConfig().commandString(cmd)
-                         .execCallback(new ExecCallback() {
-                             @Override
-                             public void done(final String ans) {
-                                 parseHostInfo(ans);
-                                 for (final CategoryInfo ci : infosToUpdate) {
-                                     ci.updateTable(CategoryInfo.MAIN_TABLE);
-                                 }
-                                 for (final ResourceGraph g : graphs) {
-                                     if (g != null) {
-                                         g.repaint();
-                                     }
-                                 }
-                                 setLoadingDone();
-                             }
-
-                             @Override
-                             public void doneError(final String ans, final int exitCode) {
-                                 setLoadingError();
-                                 getSSH().forceReconnect();
-                             }
-                         })
-                         .sshCommandTimeout(HW_INFO_TIMEOUT)
-                         .silentCommand()
-                         .silentOutput()).block();
-    }
-
-    public String getOutput(final String type, final StringBuffer buffer) {
-        final String infoStart = "--" + type + "-info-start--";
-        final String infoEnd = "--" + type + "-info-end--";
-        final int infoStartLength = infoStart.length();
-        final int infoEndLength = infoEnd.length();
-        final int s = buffer.indexOf(infoStart);
-        final int s2 = buffer.indexOf("\r\n", s);
-        final int e = buffer.indexOf(infoEnd, s);
-        String out = null;
-        if (s > -1 && s < s2 && s2 <= e) {
-            Double timestamp = null;
-            final String ts = buffer.substring(s + infoStartLength, s2);
-            try {
-                timestamp = Double.parseDouble(ts);
-            }  catch (final NumberFormatException nfe) {
-                LOG.debug("getOutput: could not parse: " + ts + ' ' + nfe);
-            }
-            mInfoTimestampLock.lock();
-            if (timestamp != null
-                && (!infoTimestamp.containsKey(type) || timestamp >= infoTimestamp.get(type))) {
-                infoTimestamp.put(type, timestamp);
-                mInfoTimestampLock.unlock();
-                out = buffer.substring(s2 + 2, e);
-            } else {
-                mInfoTimestampLock.unlock();
-            }
-            buffer.delete(0, e + infoEndLength + 2);
-        }
-        return out;
-    }
-
     public void startPing() {
         ssh.execCommand(new ExecCommandConfig()
                          .commandString("PingCommand")
@@ -1287,120 +757,6 @@ public class Host implements Comparable<Host>, Value {
                          .silentCommand()
                          .silentOutput()
                          .sshCommandTimeout(PING_TIMEOUT)).block();
-    }
-
-    /** Gets and stores hardware info about the host. */
-    public void startHWInfoDaemon(final CategoryInfo[] infosToUpdate, final ResourceGraph[] graphs) {
-        final Host host = this;
-        LOG.debug1("startHWInfoDaemon: " + getName());
-        serverStatusThread = ssh.execCommand(new ExecCommandConfig()
-                         .commandString("HostHWInfoDaemon")
-                         .inBash(false)
-                         .inSudo(false)
-                         .execCallback(new ExecCallback() {
-                             @Override
-                             public void done(final String ans) {
-                                 parseHostInfo(ans);
-                                 for (final CategoryInfo ci : infosToUpdate) {
-                                     ci.updateTable(CategoryInfo.MAIN_TABLE);
-                                 }
-                                 for (final ResourceGraph g : graphs) {
-                                     if (g != null) {
-                                         g.repaint();
-                                     }
-                                 }
-                                 if (host.getWaitForServerStatusLatch()) {
-                                     final ClusterBrowser cb = getBrowser().getClusterBrowser();
-                                     cb.updateServerStatus(host);
-                                 }
-                                 setLoadingDone();
-                             }
-
-                             @Override
-                             public void doneError(final String ans, final int exitCode) {
-                                 if (host.getWaitForServerStatusLatch()) {
-                                     final ClusterBrowser cb = getBrowser().getClusterBrowser();
-                                     cb.updateServerStatus(host);
-                                 }
-                                 setLoadingError();
-                             }
-                         })
-                         .newOutputCallback(new NewOutputCallback() {
-                             private final StringBuffer outputBuffer = new StringBuffer(300);
-                             @Override
-                             public void output(final String output) {
-                                 outputBuffer.append(output);
-                                 final ClusterBrowser cb = getBrowser().getClusterBrowser();
-                                 String hw, vm, drbdConfig;
-                                 String hwUpdate = null;
-                                 String vmUpdate = null;
-                                 String drbdUpdate = null;
-                                 do {
-                                     hw = getOutput("hw", outputBuffer);
-                                     if (hw != null) {
-                                         hwUpdate = hw;
-                                     }
-                                     vm = getOutput("vm", outputBuffer);
-                                     if (vmStatusTryLock()) {
-                                         if (vm != null) {
-                                             vmUpdate = vm;
-                                         }
-                                         vmStatusUnlock();
-                                     }
-                                     drbdStatusLock();
-                                     drbdConfig = getOutput("drbd", outputBuffer);
-                                     if (drbdConfig != null) {
-                                         drbdUpdate = drbdConfig;
-                                     }
-                                     drbdStatusUnlock();
-                                 } while (hw != null || vm != null || drbdConfig != null);
-
-                                 Tools.chomp(outputBuffer);
-                                 if (hwUpdate != null) {
-                                     parseHostInfo(hwUpdate);
-                                     for (final ResourceGraph g : graphs) {
-                                         if (g != null) {
-                                             g.repaint();
-                                         }
-                                     }
-                                 }
-                                 if (vmUpdate != null) {
-                                     final VmsXml newVmsXml = vmsXmlProvider.get();
-                                     newVmsXml.init(host);
-                                     if (newVmsXml.parseXml(vmUpdate)) {
-                                         cb.vmsXmlPut(host, newVmsXml);
-                                         cb.updateVms();
-                                     }
-                                 }
-                                 if (drbdUpdate != null) {
-                                     final DrbdXml dxml = drbdXmlProvider.get();
-                                     dxml.init(cluster.getHostsArray(), cb.getHostDrbdParameters());
-                                     dxml.update(drbdUpdate);
-                                     cb.setDrbdXml(dxml);
-                                     swingUtils.invokeLater(new Runnable() {
-                                         @Override
-                                         public void run() {
-                                             hostBrowser.getClusterBrowser().getGlobalInfo().setParameters();
-                                             cb.updateDrbdResources();
-                                         }
-                                     });
-                                 }
-                                 if (drbdUpdate != null
-                                     || vmUpdate != null) {
-                                     cb.updateHWInfo(host, !Host.UPDATE_LVM);
-                                 }
-                                 if (drbdUpdate != null) {
-                                     cb.updateServerStatus(host);
-                                 }
-                                 if (getWaitForServerStatusLatch()) {
-                                     cb.updateServerStatus(host);
-                                 }
-                                 setLoadingDone();
-                             }
-                         })
-                         .silentCommand()
-                         .silentOutput()
-                         .sshCommandTimeout(HW_INFO_TIMEOUT)).block();
     }
 
     public void startConnectionStatus() {
@@ -1437,544 +793,6 @@ public class Host implements Comparable<Host>, Value {
         return ssh.isConnected();
     }
 
-    /**
-     * replaces variables in command. For output to the user set hidePassword
-     * to true, so that variables like passwords are not shown to the user.
-     * This functions should not be used to really sensitive passwords, since
-     * it is not secure.
-     *
-     * following variables are defined:
-     *
-     * \@USER\@           user for download area
-     * \@PASSWORD\@       password for download area
-     * \@KERNELVERSION\@  version of the kernel
-     * \@DRBDVERSION\@    version of drbd, that will be installed
-     * \@DISTRIBUTION\@   distribution for which the drbd will be installed.
-     *
-     * @param command
-     *          command in which the variables will be replaced
-     *
-     * @param hidePassword
-     *          if set to true all vars will be replaced except of sensitive
-     *          ones.
-     *
-     * @return command with replaced variables
-     */
-    public String replaceVars(String command, final boolean hidePassword) {
-        if (command.contains("@USER@")) {
-            command = command.replaceAll("@USER@", application.getDownloadUser());
-        }
-        if (command.indexOf("@PASSWORD@") > -1) {
-            if (hidePassword) {
-                command = command.replaceAll("@PASSWORD@", "*****");
-            } else {
-                command = command.replaceAll("@PASSWORD@", application.getDownloadPassword());
-            }
-        }
-        String supportDir = "support";
-        if (application.isStagingDrbd()) {
-            supportDir = "support/staging";
-        }
-        if (kernelVersion != null
-            && command.contains("@KERNELVERSIONDIR@")) {
-            command = command.replaceAll("@KERNELVERSIONDIR@", kernelVersion);
-        }
-        if (distributionVersion != null
-            && command.contains("@DISTRIBUTION@")) {
-            command = command.replaceAll("@DISTRIBUTION@", distributionVersion);
-        }
-        if (arch != null
-            && command.contains("@ARCH@")) {
-            command = command.replaceAll("@ARCH@", arch);
-        }
-        if (command.contains("@SUPPORTDIR@")) {
-            command = command.replaceAll("@SUPPORTDIR@", supportDir);
-        }
-        if (command.contains("@DRBDDIR@")) {
-            final String drbdDir = "drbd";
-            command = command.replaceAll("@DRBDDIR@", drbdDir);
-        }
-        if (command.contains("@GUI-HELPER@")) {
-            final StringBuilder helperProg = new StringBuilder("/usr/local/bin/lcmc-gui-helper-");
-            helperProg.append(Tools.getRelease());
-            if (application.isCmdLog()) {
-                helperProg.append(' ');
-                helperProg.append(LOG_COMMANDS_ON_SERVER_OPTION);
-            }
-            command = command.replaceAll("@GUI-HELPER@", helperProg.toString());
-        }
-        if (command.contains("@GUI-HELPER-PROG@")) {
-            command = command.replaceAll("@GUI-HELPER-PROG@", "/usr/local/bin/lcmc-gui-helper-" + Tools.getRelease());
-        }
-        return command;
-    }
-
-    /**
-     * Replaces variables in command.
-     *
-     * Following variables are defined:
-     *
-     * \@USER\@           user for download area
-     * \@PASSWORD\@       password for download area
-     * \@KERNELVERSION\@  version of the kernel
-     * \@DRBDVERSION\@    version of drbd, that will be installed
-     * \@DISTRIBUTION\@   distribution for which the drbd will be installed.
-     *
-     * @param command
-     *          command in which the variables will be replaced
-     *
-     * @return command with replaced variables
-     */
-    public String replaceVars(final String command) {
-        return replaceVars(command, false);
-    }
-
-    public void parseHostInfo(final String ans) {
-        LOG.debug1("parseHostInfo: updating host info: " + getName());
-        final String[] lines = ans.split("\\r?\\n");
-        final List<String> versionLines = new ArrayList<String>();
-        final Map<String, BlockDevice> newBlockDevices = new LinkedHashMap<String, BlockDevice>();
-        final Map<String, BlockDevice> newDrbdBlockDevices = new LinkedHashMap<String, BlockDevice>();
-        final List<NetInterface> newNetInterfaces = new ArrayList<NetInterface>();
-        final List<Value> newBridges = new ArrayList<Value>();
-        final Map<String, Long> newVolumeGroups = new LinkedHashMap<String, Long>();
-        final Map<String, Set<String>> newVolumeGroupsLVS = new HashMap<String, Set<String>>();
-        final List<BlockDevice> newPhysicalVolumes = new ArrayList<BlockDevice>();
-        final Set<String> fileSystems = new TreeSet<String>();
-        final Set<String> newCryptoModules = new TreeSet<String>();
-        final Set<Value> newQemuKeymaps = new TreeSet<Value>();
-        final Set<Value> newCpuMapModels = new TreeSet<Value>();
-        final Set<Value> newCpuMapVendors = new TreeSet<Value>();
-        final Set<String> mountPoints = new TreeSet<String>();
-
-        final Map<String, List<String>> newGuiOptions = new HashMap<String, List<String>>();
-        final Set<String> newDrbdResProxy = new HashSet<String>();
-
-        final Collection<String> changedTypes = new HashSet<String>();
-
-        final Map<String, String> diskSpaces = new HashMap<String, String>();
-
-        mountPoints.add("/mnt/");
-        String guiOptionName = null;
-
-        String type = "";
-        for (final String line : lines) {
-            if (line.indexOf("ERROR:") == 0) {
-                break;
-            } else if (line.indexOf("WARNING:") == 0) {
-                continue;
-            }
-            if (INFO_TYPES.contains(line)) {
-                type = line;
-                changedTypes.add(type);
-                continue;
-            }
-            if ("net-info".equals(type)) {
-                try {
-                    final NetInterface netInterface = new NetInterface(line);
-                    if (netInterface.getIp() != null && !"".equals(netInterface.getIp())) {
-                        newNetInterfaces.add(netInterface);
-                    }
-                } catch (final UnknownHostException e) {
-                    LOG.appWarning("parseHostInfo: cannot parse: net-info: " + line);
-                }
-            } else if (BRIDGE_INFO_DELIM.equals(type)) {
-                newBridges.add(new StringValue(line));
-            } else if (DISK_INFO_DELIM.equals(type)) {
-                final Optional<BlockDevice> blockDevice = createBlockDevice(line);
-                if (!blockDevice.isPresent()) {
-                    continue;
-                }
-                final String bdName = blockDevice.get().getName();
-                if (bdName != null) {
-                    final Matcher drbdM = DRBD_DEV_FILE_PATTERN.matcher(bdName);
-                    if (drbdM.matches()) {
-                        if (drbdBlockDevices.containsKey(bdName)) {
-                            drbdBlockDevices.get(bdName).updateFrom(blockDevice.get());
-                        } else {
-                            newDrbdBlockDevices.put(bdName, blockDevice.get());
-                        }
-                    } else {
-                        newBlockDevices.put(bdName, blockDevice.get());
-                        if (blockDevice.get().getVolumeGroup() == null
-                            && bdName.length() > 5 && bdName.indexOf('/', 5) < 0) {
-                            final Matcher m = BLOCK_DEV_FILE_PATTERN.matcher(bdName);
-                            if (m.matches()) {
-                                newBlockDevices.remove(m.group(1));
-                            }
-                        }
-                    }
-                }
-                final String vg = blockDevice.get().getVolumeGroup();
-                if (vg != null) {
-                    Set<String> logicalVolumes = newVolumeGroupsLVS.get(vg);
-                    if (logicalVolumes == null) {
-                        logicalVolumes = new HashSet<String>();
-                        newVolumeGroupsLVS.put(vg, logicalVolumes);
-                    }
-                    final String lv = blockDevice.get().getLogicalVolume();
-                    if (lv != null) {
-                        logicalVolumes.add(lv);
-                    }
-                }
-                if (blockDevice.get().isPhysicalVolume()) {
-                    newPhysicalVolumes.add(blockDevice.get());
-                }
-            } else if (DISK_SPACE_DELIM.equals(type)) {
-                final Matcher dsM = USED_DISK_SPACE_PATTERN.matcher(line);
-                if (dsM.matches()) {
-                    final String bdName = dsM.group(1);
-                    final String used = dsM.group(2);
-                    diskSpaces.put(bdName, used);
-                }
-            } else if ("vg-info".equals(type)) {
-                final String[] vgi = line.split("\\s+");
-                if (vgi.length == 2) {
-                    newVolumeGroups.put(vgi[0], Long.parseLong(vgi[1]));
-                } else {
-                    LOG.appWarning("parseHostInfo: could not parse volume info: " + line);
-                }
-            } else if ("filesystems-info".equals(type)) {
-                fileSystems.add(line);
-            } else if ("crypto-info".equals(type)) {
-                newCryptoModules.add(line);
-            } else if ("qemu-keymaps-info".equals(type)) {
-                newQemuKeymaps.add(new StringValue(line));
-            } else if ("cpu-map-model-info".equals(type)) {
-                newCpuMapModels.add(new StringValue(line));
-            } else if ("cpu-map-vendor-info".equals(type)) {
-                newCpuMapVendors.add(new StringValue(line));
-            } else if ("mount-points-info".equals(type)) {
-                mountPoints.add(line);
-            } else if ("gui-info".equals(type)) {
-                parseGuiInfo(line);
-            } else if ("installation-info".equals(type)) {
-                parseInstallationInfo(line);
-            } else if ("gui-options-info".equals(type)) {
-                guiOptionName = parseGuiOptionsInfo(line, guiOptionName, newGuiOptions);
-            } else if ("version-info".equals(type)) {
-                versionLines.add(line);
-            } else if ("drbd-proxy-info".equals(type)) {
-                /* res-other.host-this.host */
-                final Cluster cl = getCluster();
-                if (cl != null) {
-                    String res = null;
-                    if (line.startsWith("up:")) {
-                        for (final Host otherHost : getCluster().getProxyHosts()) {
-                            if (otherHost == this) {
-                                continue;
-                            }
-                            final String hostsPart = '-' + otherHost.getName() + '-' + getName();
-                            final int i = line.indexOf(hostsPart);
-                            if (i > 0) {
-                                res = line.substring(3, i);
-                                break;
-                            }
-                        }
-                    }
-                    if (res == null) {
-                        LOG.appWarning("parseHostInfo: could not parse proxy line: " + line);
-                    } else {
-                        newDrbdResProxy.add(res);
-                    }
-                }
-            }
-        }
-
-        LOG.debug1("parseHostInfo: "
-                + getName()
-                + ", pacemaker: " + pacemakerVersion
-                + ", corosync: " + corosyncVersion
-                + ", heartbeat: " + heartbeatVersion
-                + ", drbd: " + drbdHost.getDrbdUtilVersion()
-                + ", drbd module: " + drbdHost.getDrbdModuleVersion());
-
-        if (changedTypes.contains(NET_INFO_DELIM)) {
-            hwEventBus.post(new HwNetInterfacesChangedEvent(this, newNetInterfaces));
-        }
-
-        if (changedTypes.contains(BRIDGE_INFO_DELIM)) {
-            hwEventBus.post(new HwBridgesChangedEvent(this, newBridges));
-        }
-
-        if (changedTypes.contains(DISK_INFO_DELIM)) {
-            drbdBlockDevices = newDrbdBlockDevices;
-            physicalVolumes = newPhysicalVolumes;
-            volumeGroupsWithLvs = newVolumeGroupsLVS;
-        }
-
-        if (changedTypes.contains(DISK_SPACE_DELIM)) {
-            hwEventBus.post(new HwBlockDevicesDiskSpaceEvent(this, diskSpaces));
-        }
-
-        if (changedTypes.contains(VG_INFO_DELIM)) {
-            volumeGroups = newVolumeGroups;
-        }
-
-        if (changedTypes.contains(FILESYSTEMS_INFO_DELIM)) {
-            hwEventBus.post(new HwFileSystemsChangedEvent(this, fileSystems));
-        }
-
-        if (changedTypes.contains(CRYPTO_INFO_DELIM)) {
-            availableCryptoModules = newCryptoModules;
-        }
-
-        if (changedTypes.contains(QEMU_KEYMAPS_INFO_DELIM)) {
-            availableQemuKeymaps = newQemuKeymaps;
-        }
-
-        if (changedTypes.contains(CPU_MAP_MODEL_INFO_DELIM)) {
-            availableCpuMapModels = newCpuMapModels;
-        }
-
-        if (changedTypes.contains(CPU_MAP_VENDOR_INFO_DELIM)) {
-            availableCpuMapVendors = newCpuMapVendors;
-        }
-
-        if (changedTypes.contains(MOUNT_POINTS_INFO_DELIM)) {
-            hwEventBus.post(new HwMountPointsChangedEvent(this, mountPoints));
-        }
-
-        if (changedTypes.contains(VERSION_INFO_DELIM)) {
-            setDistInfo(versionLines.toArray(new String[versionLines.size()]));
-        }
-
-        if (changedTypes.contains(GUI_OPTIONS_INFO_DELIM)) {
-            guiOptions = newGuiOptions;
-        }
-
-        if (changedTypes.contains(DRBD_PROXY_INFO_DELIM)) {
-            drbdResourcesWithProxy = newDrbdResProxy;
-        }
-
-        if (changedTypes.contains(DISK_INFO_DELIM) || changedTypes.contains(VG_INFO_DELIM)) {
-            hwEventBus.post(new HwBlockDevicesChangedEvent(this, newBlockDevices.values()));
-        }
-    }
-
-    /** Parses the gui info, with drbd and heartbeat graph positions. */
-    private void parseGuiInfo(final String line) {
-        final String[] tokens = line.split(";");
-        String id = null;
-        String x = null;
-        String y = null;
-        for (final String token : tokens) {
-            final String[] r = token.split("=");
-            if (r.length == 2) {
-                if (r[0].equals("hb") || r[0].equals("dr")) {
-                    id = token;
-                } else if (r[0].equals("x")) {
-                    x = r[1];
-                } else if (r[0].equals("y")) {
-                    y = r[1];
-                }
-            }
-        }
-        if (id != null && x != null && y != null) {
-            servicePositions.put(id, new Point2D.Double(new Double(x).doubleValue(), new Double(y).doubleValue()));
-        }
-    }
-    /** Parses the gui options info. */
-    public String parseGuiOptionsInfo(final String line,
-                                      final String guiOptionName,
-                                      final Map<String, List<String>> goptions) {
-        if (line.length() > 2 && line.substring(0, 2).equals("o:")) {
-            final String op = line.substring(2);
-            goptions.put(op, new ArrayList<String>());
-            return op;
-        }
-        if (guiOptionName != null) {
-            final List<String> options = goptions.get(guiOptionName);
-            if (options != null) {
-                options.add(line);
-            }
-        }
-        return guiOptionName;
-    }
-
-    public void parseInstallationInfo(final String line) {
-        final String[] tokens = line.split(":|\\s+");
-        if (tokens.length < 2) {
-            return;
-        }
-        if ("pm".equals(tokens[0])) {
-            if (tokens.length == 2) {
-                pacemakerVersion = tokens[1].trim();
-            } else {
-                pacemakerVersion = null;
-            }
-        } else if ("cs".equals(tokens[0])) {
-            if (tokens.length == 2) {
-                corosyncVersion = tokens[1].trim();
-            } else {
-                corosyncVersion = null;
-            }
-        } else if ("ais".equals(tokens[0])) {
-            if (tokens.length == 2) {
-                openaisVersion = tokens[1].trim();
-            } else {
-                openaisVersion = null;
-            }
-        } else if ("ais-rc".equals(tokens[0])) {
-            if (tokens.length == 2) {
-                openaisInRc = "on".equals(tokens[1].trim());
-            } else {
-                openaisInRc = false;
-            }
-        } else if ("cs-rc".equals(tokens[0])) {
-            if (tokens.length == 2) {
-                corosyncInRc = "on".equals(tokens[1].trim());
-            } else {
-                corosyncInRc = false;
-            }
-        } else if ("cs-ais-conf".equals(tokens[0])) {
-            if (tokens.length == 2) {
-                corosyncOrOpenaisConfigExists = "on".equals(tokens[1].trim());
-            } else {
-                corosyncOrOpenaisConfigExists = false;
-            }
-        } else if ("cs-running".equals(tokens[0])) {
-            if (tokens.length == 2) {
-                corosyncRunning = "on".equals(tokens[1].trim());
-            } else {
-                corosyncRunning = false;
-            }
-        } else if ("ais-running".equals(tokens[0])) {
-            if (tokens.length == 2) {
-                openaisRunning = "on".equals(tokens[1].trim());
-                commLayerStarting = false;
-                pacemakerStarting = false;
-            } else {
-                openaisRunning = false;
-            }
-        } else if ("cs-init".equals(tokens[0])) {
-            if (tokens.length == 2) {
-                corosyncHasInitScript = "on".equals(tokens[1].trim());
-            } else {
-                corosyncHasInitScript = false;
-            }
-        } else if ("ais-init".equals(tokens[0])) {
-            if (tokens.length == 2) {
-                openaisHasInitScript = "on".equals(tokens[1].trim());
-            } else {
-                openaisHasInitScript = false;
-            }
-        } else if ("hb".equals(tokens[0])) {
-            if (tokens.length == 2) {
-                heartbeatVersion = tokens[1].trim();
-            } else {
-                heartbeatVersion = null;
-            }
-        } else if ("hb-init".equals(tokens[0])) {
-            if (tokens.length == 2) {
-                heartbeatHasInitScript = "on".equals(tokens[1].trim());
-            } else {
-                heartbeatHasInitScript = false;
-            }
-        } else if ("hb-rc".equals(tokens[0])) {
-            if (tokens.length == 2) {
-                heartbeatInRc = "on".equals(tokens[1].trim());
-            } else {
-                heartbeatInRc = false;
-            }
-        } else if ("hb-conf".equals(tokens[0])) {
-            if (tokens.length == 2) {
-                heartbeatConfigExists = "on".equals(tokens[1].trim());
-            } else {
-                heartbeatConfigExists = false;
-            }
-        } else if ("hb-running".equals(tokens[0])) {
-            if (tokens.length == 2) {
-                heartbeatRunning = "on".equals(tokens[1].trim());
-            } else {
-                heartbeatRunning = false;
-            }
-        } else if ("pcmk-rc".equals(tokens[0])) {
-            if (tokens.length == 2) {
-                pacemakerInRc = "on".equals(tokens[1].trim());
-            } else {
-                pacemakerInRc = false;
-            }
-        } else if ("pcmk-running".equals(tokens[0])) {
-            if (tokens.length == 2) {
-                pacemakerRunning = "on".equals(tokens[1].trim());
-            } else {
-                pacemakerRunning = false;
-            }
-        } else if ("drbdp-running".equals(tokens[0])) {
-            if (tokens.length == 2) {
-                drbdHost.setDrbdProxyRunning("on".equals(tokens[1].trim()));
-            } else {
-                drbdHost.setDrbdProxyRunning(false);
-            }
-        } else if ("pcmk-init".equals(tokens[0])) {
-            if (tokens.length == 2) {
-                pacemakerHasInitScript = "on".equals(tokens[1].trim());
-            } else {
-                pacemakerHasInitScript = false;
-            }
-        } else if ("pcmk-svc-ver".equals(tokens[0])) {
-            if (tokens.length == 2) {
-                try {
-                    pcmkServiceVersion = Integer.parseInt(tokens[1].trim());
-                } catch (final NumberFormatException e) {
-                    pcmkServiceVersion = -1;
-                }
-            }
-        } else if ("drbd-loaded".equals(tokens[0])) {
-            if (tokens.length == 2) {
-                drbdHost.setDrbdLoaded("on".equals(tokens[1].trim()));
-            } else {
-                drbdHost.setDrbdLoaded(false);
-            }
-        } else if ("hb-lib-path".equals(tokens[0])) {
-            if (tokens.length == 2) {
-                heartbeatLibPath = tokens[1].trim();
-            } else {
-                heartbeatLibPath = null;
-            }
-        } else if ("hn".equals(tokens[0])) {
-            if (tokens.length == 2) {
-                hostname = tokens[1].trim();
-            } else {
-                hostname = null;
-            }
-            setName(hostname);
-        } else if ("drbd".equals(tokens[0])) {
-            if (tokens.length == 2) {
-                drbdHost.setDrbdUtilVersion(tokens[1].trim());
-            } else {
-                drbdHost.setDrbdUtilVersion(null);
-            }
-        } else if ("drbd-mod".equals(tokens[0])) {
-            if (tokens.length == 2) {
-                drbdHost.setDrbdModuleVersion(tokens[1].trim());
-            } else {
-                drbdHost.setDrbdModuleVersion(null);
-            }
-        }
-        corosyncOrHeartbeatRunning = heartbeatRunning || corosyncRunning || openaisRunning;
-        if (commLayerStarting && (corosyncRunning || openaisRunning || heartbeatRunning)) {
-            commLayerStarting = false;
-        }
-        if (pacemakerStarting && pacemakerRunning) {
-            pacemakerStarting = false;
-        }
-        if (drbdProxyStarting && drbdHost.isDrbdProxyRunning()) {
-            drbdProxyStarting = false;
-        }
-        if (commLayerStopping && !corosyncRunning && !openaisRunning && !heartbeatRunning) {
-            commLayerStopping = false;
-        }
-    }
-
-    public Point2D getGraphPosition(final String id) {
-        return servicePositions.get(id);
-    }
-
-    public void resetGraphPosition(final String id) {
-        servicePositions.remove(id);
-    }
 
     public void saveGraphPositions(final Map<String, Point2D> positions) {
         final StringBuilder lines = new StringBuilder();
@@ -1997,47 +815,6 @@ public class Host implements Comparable<Host>, Value {
                               false,
                               null,
                               null);
-    }
-
-    public void setHeartbeatVersion(final String heartbeatVersion) {
-        this.heartbeatVersion = heartbeatVersion;
-    }
-
-    public void setCorosyncVersion(final String corosyncVersion) {
-        this.corosyncVersion = corosyncVersion;
-    }
-
-    public void setPacemakerVersion(final String pacemakerVersion) {
-        this.pacemakerVersion = pacemakerVersion;
-    }
-
-    public void setOpenaisVersion(final String openaisVersion) {
-        this.openaisVersion = openaisVersion;
-    }
-
-    public String getPacemakerVersion() {
-        return pacemakerVersion;
-    }
-
-    public String getCorosyncVersion() {
-        return corosyncVersion;
-    }
-
-    public boolean isCorosyncInstalled() {
-        return corosyncVersion != null;
-    }
-
-    public boolean isOpenaisWrapper() {
-        return "wrapper".equals(openaisVersion);
-    }
-
-
-    public String getOpenaisVersion() {
-        return openaisVersion;
-    }
-
-    public String getHeartbeatVersion() {
-        return heartbeatVersion;
     }
 
     /**
@@ -2074,25 +851,6 @@ public class Host implements Comparable<Host>, Value {
      */
     void setLoadingError() {
         isLoadingGate.countDown();
-    }
-
-    /** Waits for the server status latch. */
-    public void waitForServerStatusLatch() {
-        try {
-            waitForServerStatusLatch.await();
-        } catch (final InterruptedException ignored) {
-            Thread.currentThread().interrupt();
-        }
-    }
-
-    /** The latch is set when the server status is run for the first time. */
-    public void serverStatusLatchDone() {
-        waitForServerStatusLatch.countDown();
-    }
-
-    /** Returns true if latch is set. */
-    public boolean getWaitForServerStatusLatch() {
-        return waitForServerStatusLatch.getCount() == 1;
     }
 
     public String getSSHPort() {
@@ -2143,62 +901,6 @@ public class Host implements Comparable<Host>, Value {
         return heartbeatPacemakerInstallMethodIndex;
     }
 
-    public boolean isCorosyncInRc() {
-       return corosyncInRc;
-    }
-
-    public boolean isOpenaisInRc() {
-       return openaisInRc;
-    }
-
-    public boolean isPacemakerInRc() {
-       return pacemakerInRc;
-    }
-
-    public boolean hasHeartbeatInitScript() {
-       return heartbeatHasInitScript;
-    }
-
-    public boolean hasCorosyncInitScript() {
-       return corosyncHasInitScript;
-    }
-
-    public boolean hasOpenaisInitScript() {
-       return openaisHasInitScript;
-    }
-
-    public boolean hasPacemakerInitScript() {
-       return pacemakerHasInitScript;
-    }
-
-    public boolean isCorosyncRunning() {
-       return corosyncRunning;
-    }
-
-    public boolean isPacemakerRunning() {
-       return pacemakerRunning;
-    }
-
-    public boolean isOpenaisRunning() {
-       return openaisRunning;
-    }
-
-    public boolean corosyncOrOpenaisConfigExists() {
-       return corosyncOrOpenaisConfigExists;
-    }
-
-    public boolean isHeartbeatInRc() {
-       return heartbeatInRc;
-    }
-
-    public boolean isHeartbeatRunning() {
-       return heartbeatRunning;
-    }
-
-    public boolean heartbeatConfigExists() {
-       return heartbeatConfigExists;
-    }
-
     /** Returns MD5 checksum of VM Info from server. */
     public String getVMInfoMD5() {
         return vmInfoFromServerMD5;
@@ -2225,7 +927,7 @@ public class Host implements Comparable<Host>, Value {
                       final int maxHosts) {
         Tools.sleep(1500);
         final StringBuilder command = new StringBuilder(50);
-        command.append(DistResource.SUDO).append(replaceVars("@GUI-HELPER@"));
+        command.append(DistResource.SUDO).append(hostParser.replaceVars("@GUI-HELPER@"));
         command.append(' ');
         command.append(checkCommand);
         command.append(' ');
@@ -2281,7 +983,7 @@ public class Host implements Comparable<Host>, Value {
         if (application.getBigDRBDConf()) {
             testName.append("big-");
         }
-        if (!hasVolumes()) {
+        if (!hostParser.hasVolumes()) {
             testName.append("novolumes-");
         }
         testName.append(test);
@@ -2311,99 +1013,6 @@ public class Host implements Comparable<Host>, Value {
         }
     }
 
-    public long getFreeInVolumeGroup(final String volumeGroup) {
-        final Long f = volumeGroups.get(volumeGroup);
-        if (f == null) {
-            return 0;
-        }
-        return f;
-    }
-
-    public Set<String> getVolumeGroupNames() {
-        return volumeGroups.keySet();
-    }
-
-    public Boolean getCorosyncOrHeartbeatRunning() {
-        return corosyncOrHeartbeatRunning;
-    }
-
-    public void setCorosyncOrHeartbeatRunning(final Boolean corosyncOrHeartbeatRunning) {
-        this.corosyncOrHeartbeatRunning = corosyncOrHeartbeatRunning;
-    }
-
-    public boolean isCommLayerStopping() {
-        return commLayerStopping;
-    }
-
-    public void setCommLayerStopping(final boolean commLayerStopping) {
-        this.commLayerStopping = commLayerStopping;
-    }
-
-    public boolean isCommLayerStarting() {
-        return commLayerStarting;
-    }
-
-    public void setCommLayerStarting(final boolean commLayerStarting) {
-        this.commLayerStarting = commLayerStarting;
-    }
-
-    public boolean isPacemakerStarting() {
-        return pacemakerStarting;
-    }
-
-    public void setPacemakerStarting(final boolean pacemakerStarting) {
-        this.pacemakerStarting = pacemakerStarting;
-    }
-
-    public boolean isDrbdProxyStarting() {
-        return drbdProxyStarting;
-    }
-
-    public void setDrbdProxyStarting(final boolean drbdProxyStarting) {
-        this.drbdProxyStarting = drbdProxyStarting;
-    }
-
-    public boolean isPcmkStartedByCorosync() {
-        return pcmkServiceVersion == 0;
-    }
-
-    public void setLibvirtVersion(final String libvirtVersion) {
-        this.libvirtVersion = libvirtVersion;
-    }
-
-    public String getLibvirtVersion() {
-        return libvirtVersion;
-    }
-
-    public Set<String> getLogicalVolumesFromVolumeGroup(final String vg) {
-        return volumeGroupsWithLvs.get(vg);
-    }
-
-    public Set<String> getAllLogicalVolumes() {
-        final Set<String> allLVS = new LinkedHashSet<String>();
-        for (final String vg : volumeGroups.keySet()) {
-            final Set<String> lvs = volumeGroupsWithLvs.get(vg);
-            if (lvs != null) {
-                allLVS.addAll(lvs);
-            }
-        }
-        return allLVS;
-    }
-
-    /** Returns whether DRBD has volume feature. */
-    public boolean hasVolumes() {
-        try {
-            return Tools.compareVersions(drbdHost.getDrbdUtilVersion(), "8.4") >= 0;
-        } catch (final Exceptions.IllegalVersionException e) {
-            LOG.appWarning("hasVolumes: " + e.getMessage(), e);
-        }
-        return true;
-    }
-
-    public Iterable<BlockDevice> getPhysicalVolumes() {
-        return physicalVolumes;
-    }
-
     public void setSavable(final boolean savable) {
         this.savable = savable;
     }
@@ -2412,65 +1021,8 @@ public class Host implements Comparable<Host>, Value {
         return savable;
     }
 
-    public BlockDevice getDrbdBlockDevice(final String device) {
-        return drbdBlockDevices.get(device);
-    }
-
-    public Iterable<BlockDevice> getDrbdBlockDevices() {
-        return drbdBlockDevices.values();
-    }
-
-    public Iterable<BlockDevice> getPhysicalVolumes(final String vg) {
-        final Collection<BlockDevice> bds = new ArrayList<BlockDevice>();
-        if (vg == null) {
-            return bds;
-        }
-        for (final BlockDevice b : physicalVolumes) {
-            if (vg.equals(b.getVgOnPhysicalVolume())) {
-                bds.add(b);
-            }
-        }
-        return bds;
-    }
-
-    public boolean drbdStatusTryLock() {
-        return mDRBDStatusLock.tryLock();
-    }
-
-    public void drbdStatusLock() {
-        mDRBDStatusLock.lock();
-    }
-
-    public void drbdStatusUnlock() {
-        mDRBDStatusLock.unlock();
-    }
-
-    public void vmStatusLock() {
-        mUpdateVMSlock.lock();
-    }
-
-    public boolean vmStatusTryLock() {
-        return mUpdateVMSlock.tryLock();
-    }
-
-    public void vmStatusUnlock() {
-        mUpdateVMSlock.unlock();
-    }
-
     public boolean isRoot() {
         return ROOT_USER.equals(username);
-    }
-
-    public Iterable<String> getGuiOptions(final String name) {
-        final List<String> opts = guiOptions.get(name);
-        if (opts == null) {
-            return new ArrayList<String>();
-        }
-        return new ArrayList<String>(guiOptions.get(name));
-    }
-
-    public boolean isDrbdProxyUp(final String drbdResource) {
-        return drbdResourcesWithProxy.contains(drbdResource);
     }
 
     public void updateDrbdParameters() {
@@ -2517,15 +1069,6 @@ public class Host implements Comparable<Host>, Value {
     @Override
     public String getNothingSelected() {
         return NOTHING_SELECTED;
-    }
-
-    public void setDrbdStatusOk(final boolean drbdStatusOk) {
-        this.drbdStatusOk = drbdStatusOk;
-        hwEventBus.post(new HwDrbdStatusChangedEvent(this, drbdStatusOk));
-    }
-
-    public boolean isDrbdStatusOk() {
-        return drbdStatusOk;
     }
 
     public String isDrbdUtilCompatibleWithDrbdModule() {
@@ -2606,38 +1149,136 @@ public class Host implements Comparable<Host>, Value {
         return blockDeviceService.getBlockDevices(this);
     }
 
-    private Optional<BlockDevice> createBlockDevice(final String line) {
-        final Pattern p = Pattern.compile("([^:]+):(.*)");
-        final String[] cols = line.split(" ");
-        if (cols.length < 2) {
-            LOG.appWarning("update: cannot parse block device line: " + line);
-            return Optional.absent();
+    public void setCrmStatusOk(final boolean crmStatusOk) {
+        this.crmStatusOk = crmStatusOk;
+    }
+
+    public boolean isCrmStatusOk() {
+        return crmStatusOk && isConnected();
+    }
+
+    public String getDistString(String command) {
+        return hostParser.getDistString(command);
+    }
+
+    /**
+     * Returns info string about Pacemaker installation.
+     */
+    public String getPacemakerInfo() {
+        final StringBuilder pacemakerInfo = new StringBuilder(40);
+        final String pmV = hostParser.getPacemakerVersion();
+        final String hbV = hostParser.getHeartbeatVersion();
+        final StringBuilder hbRunning = new StringBuilder(20);
+        if (hostParser.isHeartbeatRunning()) {
+            hbRunning.append("running");
+            if (!hostParser.isHeartbeatInRc()) {
+                hbRunning.append("/no rc.d");
+            }
         } else {
-            final Collection<String> diskIds = new HashSet<String>();
-            final String device = cols[0];
-            final Map<String, String> tokens = new HashMap<String, String>();
-            for (int i = 1; i < cols.length; i++) {
-                final Matcher m = p.matcher(cols[i]);
-                if (m.matches()) {
-                    if (TOKEN_DISK_ID.equals(m.group(1))) {
-                        diskIds.add(m.group(2));
-                    } else {
-                        tokens.put(m.group(1), m.group(2));
+            hbRunning.append("not running");
+        }
+        if (hostParser.isHeartbeatInRc()) {
+            hbRunning.append("/rc.d");
+        }
+        if (pmV == null) {
+            if (hbV != null) {
+                pacemakerInfo.append(" \nHeartbeat ");
+                pacemakerInfo.append(hbV);
+                pacemakerInfo.append(" (");
+                pacemakerInfo.append(hbRunning);
+                pacemakerInfo.append(')');
+            }
+        } else {
+            final String pmRunning;
+            if (isCrmStatusOk()) {
+                pmRunning = "running";
+            } else {
+                pmRunning = "not running";
+            }
+            pacemakerInfo.append(" \nPacemaker ");
+            pacemakerInfo.append(pmV);
+            pacemakerInfo.append(" (");
+            pacemakerInfo.append(pmRunning);
+            pacemakerInfo.append(')');
+            String corOrAis = null;
+            final String corV = hostParser.getCorosyncVersion();
+            final String aisV = hostParser.getOpenaisVersion();
+            if (corV != null) {
+                corOrAis = "Corosync " + corV;
+            } else if (aisV != null) {
+                corOrAis = "Openais " + aisV;
+            }
+
+            if (hbV != null && hostParser.isHeartbeatRunning()) {
+                pacemakerInfo.append(" \nHeartbeat ");
+                pacemakerInfo.append(hbV);
+                pacemakerInfo.append(" (");
+                pacemakerInfo.append(hbRunning);
+                pacemakerInfo.append(')');
+            }
+            if (corOrAis != null) {
+                pacemakerInfo.append(" \n");
+                pacemakerInfo.append(corOrAis);
+                pacemakerInfo.append(" (");
+                if (hostParser.isCorosyncRunning()
+                        || hostParser.isOpenaisRunning()) {
+                    pacemakerInfo.append("running");
+                    if (!hostParser.isCorosyncInRc() && !hostParser.isOpenaisInRc()) {
+                        pacemakerInfo.append("/no rc.d");
                     }
                 } else {
-                    LOG.appWarning("update: could not parse: " + line);
+                    pacemakerInfo.append("not running");
                 }
+                if (hostParser.isCorosyncInRc() || hostParser.isOpenaisInRc()) {
+                    pacemakerInfo.append("/rc.d");
+                }
+                pacemakerInfo.append(')');
             }
-            final BlockDevice blockDevice = new BlockDevice(this, device);
-            blockDevice.setDiskUuid(tokens.get(TOKEN_UUID));
-            blockDevice.setBlockSize(tokens.get(TOKEN_SIZE));
-            blockDevice.setMountedOn(tokens.get(TOKEN_MP));
-            blockDevice.setFsType(tokens.get(TOKEN_FS));
-            blockDevice.setVolumeGroup(tokens.get(TOKEN_VG));
-            blockDevice.setLogicalVolume(tokens.get(TOKEN_LV));
-            blockDevice.setVgOnPhysicalVolume(tokens.get(TOKEN_PV));
-            blockDevice.setDiskIds(diskIds);
-            return Optional.of(blockDevice);
+            if (hbV != null && !hostParser.isHeartbeatRunning()) {
+                pacemakerInfo.append(" \nHeartbeat ");
+                pacemakerInfo.append(hbV);
+                pacemakerInfo.append(" (");
+                pacemakerInfo.append(hbRunning);
+                pacemakerInfo.append(')');
+            }
         }
+        return pacemakerInfo.toString();
+    }
+
+    public boolean hasVolumes() {
+        return hostParser.hasVolumes();
+    }
+
+    public boolean isDrbdStatusOk() {
+        return hostParser.isDrbdStatusOk();
+    }
+
+    public void setDrbdStatusOk(boolean status) {
+        hostParser.setDrbdStatusOk(status);
+    }
+
+    public void drbdStatusLock() {
+        hostParser.drbdStatusLock();
+    }
+
+    public void drbdStatusUnlock() {
+        hostParser.drbdStatusUnlock();
+    }
+
+    public void vmStatusLock() {
+        hostParser.vmStatusLock();
+    }
+
+    public void vmStatusUnlock() {
+        hostParser.vmStatusUnlock();
+
+    }
+
+    public String getDistCommand(final String command, final ConvertCmdCallback convertCmdCallback) {
+        return hostParser.getDistCommand(command, convertCmdCallback);
+    }
+
+    public String getDistCommand(final String command, final Map<String, String> resVolReplaceHash) {
+        return hostParser.getDistCommand(command, resVolReplaceHash);
     }
 }

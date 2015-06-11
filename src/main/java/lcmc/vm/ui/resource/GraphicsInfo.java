@@ -240,9 +240,9 @@ public final class GraphicsInfo extends HardwareInfo {
                 if (keymaps == null) {
                     keymaps = new ArrayList<Value>();
                     keymaps.add(new StringValue());
-                    keymaps.addAll(host.getAvailableQemuKeymaps());
+                    keymaps.addAll(host.getHostParser().getAvailableQemuKeymaps());
                 } else {
-                    final Set<Value> hostKeymaps = host.getAvailableQemuKeymaps();
+                    final Set<Value> hostKeymaps = host.getHostParser().getAvailableQemuKeymaps();
                     final List<Value> newKeymaps = new ArrayList<Value>();
                     newKeymaps.add(new StringValue());
                     for (final Value km : keymaps) {

@@ -885,8 +885,8 @@ public class ServiceMenu {
             raName = cs.getResourceAgent().getRAString();
         }
         final Host[] hosts = serviceInfo.getBrowser().getCluster().getHostsArray();
-        final List<String> cfs = new ArrayList<String>(hosts[0].getDistStrings(raName + ".files"));
-        final Collection<String> params = new ArrayList<String>(hosts[0].getDistStrings(raName + ".params"));
+        final List<String> cfs = new ArrayList<String>(hosts[0].getHostParser().getDistStrings(raName + ".files"));
+        final Collection<String> params = new ArrayList<String>(hosts[0].getHostParser().getDistStrings(raName + ".params"));
         params.add("configfile");
         params.add("config");
         params.add("conffile");

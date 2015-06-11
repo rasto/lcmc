@@ -522,7 +522,7 @@ public class MultiSelectionMenu {
                     public boolean check() {
                         for (final BlockDevInfo bdi : bdis) {
                             final String vg = bdi.getVGName();
-                            if (vg != null && !vg.isEmpty() && bdi.getHost().getVolumeGroupNames().contains(vg)) {
+                            if (vg != null && !vg.isEmpty() && bdi.getHost().getHostParser().getVolumeGroupNames().contains(vg)) {
                                 return true;
                             }
                         }
@@ -1366,7 +1366,7 @@ public class MultiSelectionMenu {
                         if (pHost == null) {
                             return false;
                         }
-                        if (pHost.isDrbdProxyUp(dri.getName())) {
+                        if (pHost.getHostParser().isDrbdProxyUp(dri.getName())) {
                             return true;
                         }
                     }
@@ -1400,7 +1400,7 @@ public class MultiSelectionMenu {
                         }
                         final ResourceInfo dri = bdi.getDrbdVolumeInfo().getDrbdResourceInfo();
                         final Host pHost = dri.getProxyHost(bdi.getHost(), !ResourceInfo.WIZARD);
-                        if (pHost.isDrbdProxyUp(dri.getName())) {
+                        if (pHost.getHostParser().isDrbdProxyUp(dri.getName())) {
                             DRBD.proxyDown(pHost,
                                            dri.getName(),
                                            bdi.getDrbdVolumeInfo().getName(),
@@ -1433,7 +1433,7 @@ public class MultiSelectionMenu {
                         if (pHost == null) {
                             return false;
                         }
-                        if (!pHost.isDrbdProxyUp(dri.getName())) {
+                        if (!pHost.getHostParser().isDrbdProxyUp(dri.getName())) {
                             return true;
                         }
                     }
@@ -1467,7 +1467,7 @@ public class MultiSelectionMenu {
                         }
                         final ResourceInfo dri = bdi.getDrbdVolumeInfo().getDrbdResourceInfo();
                         final Host pHost = dri.getProxyHost(bdi.getHost(), !ResourceInfo.WIZARD);
-                        if (!pHost.isDrbdProxyUp(dri.getName())) {
+                        if (!pHost.getHostParser().isDrbdProxyUp(dri.getName())) {
                             DRBD.proxyUp(pHost,
                                          dri.getName(),
                                          bdi.getDrbdVolumeInfo().getName(),

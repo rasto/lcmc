@@ -641,7 +641,7 @@ public final class MainMenu extends JPanel implements ActionListener {
     }
 
     /** Modify the operating modes combo box according to the godmode. */
-    void resetOperatingModes(final boolean godMode) {
+    public void resetOperatingModes(final boolean godMode) {
         swingUtils.invokeLater(new Runnable() {
             @Override
             public void run() {

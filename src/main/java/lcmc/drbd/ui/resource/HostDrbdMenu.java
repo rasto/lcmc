@@ -676,7 +676,7 @@ public class HostDrbdMenu {
                     public boolean check() {
                         return volumeGroup != null
                                 && !volumeGroup.isEmpty()
-                                && host.getVolumeGroupNames().contains(volumeGroup);
+                                && host.getHostParser().getVolumeGroupNames().contains(volumeGroup);
                     }
                 })
                 .addAction(new MenuAction() {

@@ -60,7 +60,7 @@ public class Devices extends DialogHost {
             answerPaneSetTextError(error);
             incorrect.add(error);
         } else {
-            getHost().parseHostInfo(ans);
+            getHost().getHostParser().parseHostInfo(ans);
             progressBarDone();
             answerPaneSetText(ans);
             buttonClass(nextButton()).requestFocus();

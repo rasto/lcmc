@@ -169,13 +169,13 @@ final class CoroConfig extends DialogCluster {
                                 final String serviceVersion =
                                             hosts[0].getDistString("Pacemaker.Service.Ver");
                                 config.append(aisConfigPacemaker("\t", serviceVersion));
-                                if (hosts[0].isCorosyncInstalled()) {
+                                if (hosts[0].getHostParser().isCorosyncInstalled()) {
                                     Corosync.createCorosyncConfig(hosts, config);
                                 } else {
                                     Openais.createAISConfig(hosts, config);
                                 }
                                 final boolean configOk = updateOldAisConfig();
-                                if (hosts[0].isCorosyncInstalled() && !hosts[0].isOpenaisWrapper()) {
+                                if (hosts[0].getHostParser().isCorosyncInstalled() && !hosts[0].getHostParser().isOpenaisWrapper()) {
                                     Corosync.reloadCorosyncs(hosts);
                                 } else {
                                     Openais.reloadOpenaises(hosts);
@@ -359,7 +359,7 @@ final class CoroConfig extends DialogCluster {
 
         String cf = "/etc/corosync/corosync.conf";
         String command = "Corosync.getAisConfig";
-        if (!hosts[0].isCorosyncInstalled()) {
+        if (!hosts[0].getHostParser().isCorosyncInstalled()) {
             cf = "/etc/ais/openais.conf";
             command = "OpenAIS.getAisConfig";
         }
@@ -726,9 +726,9 @@ final class CoroConfig extends DialogCluster {
         final Host[] hosts = getCluster().getHostsArray();
         boolean corosync2 = false;
         try {
-           corosync2 = Tools.compareVersions(hosts[0].getCorosyncVersion(), "2") >= 0;
+           corosync2 = Tools.compareVersions(hosts[0].getHostParser().getCorosyncVersion(), "2") >= 0;
         } catch (final IllegalVersionException e) {
-            LOG.appWarning("aisConfigHead: cannot compare corosync version: " + hosts[0].getCorosyncVersion());
+            LOG.appWarning("aisConfigHead: cannot compare corosync version: " + hosts[0].getHostParser().getCorosyncVersion());
         }
         if (!corosync2) {
             config.append(plugins(fake));
@@ -807,9 +807,9 @@ final class CoroConfig extends DialogCluster {
         final Host[] hosts = getCluster().getHostsArray();
         boolean corosync2 = false;
         try {
-           corosync2 = Tools.compareVersions(hosts[0].getCorosyncVersion(), "2") >= 0;
+           corosync2 = Tools.compareVersions(hosts[0].getHostParser().getCorosyncVersion(), "2") >= 0;
         } catch (final IllegalVersionException e) {
-            LOG.appWarning("aisConfigPacemaker: cannot compare corosync version: " + hosts[0].getCorosyncVersion());
+            LOG.appWarning("aisConfigPacemaker: cannot compare corosync version: " + hosts[0].getHostParser().getCorosyncVersion());
         }
         if (corosync2) {
             config.append("\nquorum {\n");

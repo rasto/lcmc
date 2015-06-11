@@ -366,7 +366,7 @@ public class ServicesMenu {
                         .enablePredicate(new EnablePredicate() {
                             @Override
                             public String check() {
-                                final String pmV = servicesInfo.getBrowser().getDCHost().getPacemakerVersion();
+                                final String pmV = servicesInfo.getBrowser().getDCHost().getHostParser().getPacemakerVersion();
                                 try {
                                     //TODO: get this from constraints-.rng files
                                     if (pmV == null || Tools.compareVersions(pmV, "1.1.7") <= 0) {

@@ -38,6 +38,7 @@ import lcmc.cluster.domain.Cluster;
 import lcmc.common.ui.utils.SwingUtils;
 import lcmc.host.domain.Host;
 import lcmc.cluster.service.NetworkService;
+import lcmc.host.domain.HostFactory;
 import lcmc.logger.LoggerFactory;
 import lcmc.common.domain.util.Tools;
 import lcmc.cluster.ui.ClusterTabFactory;
@@ -72,7 +73,7 @@ public class IntegrationTestLauncher {
     @Inject
     private SwingUtils swingUtils;
     @Inject
-    private Provider<Host> hostProvider;
+    private HostFactory hostFactory;
     @Inject
     private Provider<Cluster> clusterProvider;
     @Inject
@@ -126,7 +127,7 @@ public class IntegrationTestLauncher {
         cluster.setName("test");
         for (int i = 1; i <= NUMBER_OF_HOSTS; i++) {
             final String hostName = "test" + i;
-            final Host host = hostProvider.get();
+            final Host host = hostFactory.createInstance();
             host.init();
 
             initHost(host, hostName, username, useSudo);
@@ -169,7 +170,7 @@ public class IntegrationTestLauncher {
         cluster.getClusterTab().requestFocus();
         mainPresenter.checkAddClusterButtons();
         for (final Host host : hosts) {
-            host.waitForServerStatusLatch();
+            host.getHostParser().waitForServerStatusLatch();
         }
         clusterLoaded = true;
     }

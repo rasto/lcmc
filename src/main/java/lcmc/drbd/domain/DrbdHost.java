@@ -20,9 +20,6 @@
 
 package lcmc.drbd.domain;
 
-import javax.inject.Named;
-
-@Named
 public class DrbdHost {
     private String drbdUtilVersion = null;
     private String drbdModuleVersion = null;

@@ -6,17 +6,26 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.TreeSet;
+import javax.inject.Provider;
 import javax.swing.JPanel;
 import junitparams.JUnitParamsRunner;
 import static junitparams.JUnitParamsRunner.$;
 import junitparams.Parameters;
 import lcmc.Exceptions;
+import lcmc.HwEventBus;
+import lcmc.cluster.service.ssh.Ssh;
+import lcmc.cluster.service.storage.BlockDeviceService;
+import lcmc.common.domain.Application;
 import lcmc.common.domain.ConvertCmdCallback;
 import lcmc.common.ui.main.MainData;
-import lcmc.common.ui.TerminalPanel;
+import lcmc.common.ui.main.ProgressIndicator;
+import lcmc.common.ui.utils.SwingUtils;
+import lcmc.drbd.domain.DrbdXml;
+import lcmc.host.domain.Hosts;
+import lcmc.host.ui.HostBrowser;
+import lcmc.host.ui.TerminalPanel;
 import lcmc.drbd.ui.resource.GlobalInfo;
 import lcmc.host.domain.Host;
-import lcmc.drbd.domain.DrbdHost;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -24,25 +33,68 @@ import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.when;
+
+import lcmc.host.domain.HostFactory;
+import lcmc.robotest.RoboTest;
+import lcmc.vm.domain.VmsXml;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
 @RunWith(JUnitParamsRunner.class)
 public final class ToolsTest {
+    @InjectMocks
+    private HostFactory hostFactory;
     @Mock
-    private DrbdHost drbdHostStub;
+    private HwEventBus hwEventBus;
     @Mock
-    private TerminalPanel terminalPanelStub;
+    private SwingUtils swingUtils;
+    @Mock
+    private Application application;
+    @Mock
+    private MainData mainData;
+    @Mock
+    private ProgressIndicator progressIndicator;
+    @Mock
+    private Hosts allHosts;
+    @Mock
+    private RoboTest roboTest;
+    @Mock
+    private BlockDeviceService blockDeviceService;
 
-    private final MainData mainData = new MainData();
-
+    @Mock
+    private Provider<VmsXml> vmsXmlProvider;
+    @Mock
+    private VmsXml vmsXml;
+    @Mock
+    private Provider<DrbdXml> drbdXmlProvider;
+    @Mock
+    private DrbdXml drbdXml;
+    @Mock
+    private Provider<TerminalPanel> terminalPanelProvider;
+    @Mock
+    private TerminalPanel terminalPanel;
+    @Mock
+    private Provider<Ssh> sshProvider;
+    @Mock
+    private Ssh ssh;
+    @Mock
+    private Provider<HostBrowser> hostBrowserProvider;
+    @Mock
+    private HostBrowser hostBrowser;
 
     @Before
     public void setUp() {
         MockitoAnnotations.initMocks(this);
+        when(vmsXmlProvider.get()).thenReturn(vmsXml);
+        when(drbdXmlProvider.get()).thenReturn(drbdXml);
+        when(terminalPanelProvider.get()).thenReturn(terminalPanel);
+        when(sshProvider.get()).thenReturn(ssh);
+        when(hostBrowserProvider.get()).thenReturn(hostBrowser);
         Tools.init();
     }
 
@@ -817,10 +869,10 @@ public final class ToolsTest {
     @Parameters(method="parametersForTestVersionBeforePacemaker")
     public void testVersionBeforePacemaker(final String pcmkVersion, final String hbVersion) {
         final GlobalInfo globalInfo = new GlobalInfo();
-        final Host host = new Host();
+        final Host host = hostFactory.createInstance();
 
-        host.setPacemakerVersion(pcmkVersion);
-        host.setHeartbeatVersion(hbVersion);
+        host.getHostParser().setPacemakerVersion(pcmkVersion);
+        host.getHostParser().setHeartbeatVersion(hbVersion);
         assertTrue(Tools.versionBeforePacemaker(host));
     }
 
@@ -838,10 +890,10 @@ public final class ToolsTest {
     @Test
     @Parameters(method="parametersForTestVersionAfterPacemaker")
     public void testVersionAfterPacemaker(final String pcmkVersion, final String hbVersion) {
-        final Host host = new Host();
+        final Host host = hostFactory.createInstance();
 
-        host.setPacemakerVersion(pcmkVersion);
-        host.setHeartbeatVersion(hbVersion);
+        host.getHostParser().setPacemakerVersion(pcmkVersion);
+        host.getHostParser().setHeartbeatVersion(hbVersion);
         assertFalse(Tools.versionBeforePacemaker(host));
     }
 

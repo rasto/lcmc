@@ -79,9 +79,9 @@ final class PacemakerInst extends DialogHost {
     }
 
     private void installPm() {
-        String arch = getHost().getDistString("PmInst.install." + getHost().getArch());
+        String arch = getHost().getDistString("PmInst.install." + getHost().getHostParser().getArch());
         if (arch == null) {
-            arch = getHost().getArch();
+            arch = getHost().getHostParser().getArch();
         }
         final String archString = arch.replaceAll("i686", "i386");
         String installCommand = "PmInst.install";

@@ -242,7 +242,7 @@ public class BlockDevInfo extends EditableInfo {
             vg = bd.getVolumeGroup();
         }
         if (vg != null) {
-            for (final BlockDevice pv : getHost().getPhysicalVolumes(vg)) {
+            for (final BlockDevice pv : getHost().getHostParser().getPhysicalVolumes(vg)) {
                 if (pv.getName().equals(selectedPV)) {
                     tt.append("<b>").append(tab).append(pv).append("</b>");
                 } else {
@@ -264,7 +264,7 @@ public class BlockDevInfo extends EditableInfo {
                 tt.append("    ").append(tab).append(vg).append('\n');
                 selectedLV = bd.getName();
             }
-            final Set<String> lvs = getHost().getLogicalVolumesFromVolumeGroup(vg);
+            final Set<String> lvs = getHost().getHostParser().getLogicalVolumesFromVolumeGroup(vg);
             if (lvs != null) {
                 for (final String lv : lvs) {
                     tt.append("        ").append(tab);
@@ -451,7 +451,7 @@ public class BlockDevInfo extends EditableInfo {
             ret = false;
         } else if (DRBD_MD_PARAM.equals(param)) {
             if (infoPanel != null) {
-                if (!getHost().getWaitForServerStatusLatch()) {
+                if (!getHost().getHostParser().getWaitForServerStatusLatch()) {
                     final boolean internal = "internal".equals(newValue.getValueForConfig());
                     final Widget ind = getWidget(DRBD_MD_INDEX_PARAM, null);
                     final Widget indW = getWidget(DRBD_MD_INDEX_PARAM,
@@ -1322,7 +1322,7 @@ public class BlockDevInfo extends EditableInfo {
 
     /** Returns how much is free space in a volume group. */
     public Long getFreeInVolumeGroup() {
-        return getHost().getFreeInVolumeGroup(getBlockDevice().getVolumeGroup());
+        return getHost().getHostParser().getFreeInVolumeGroup(getBlockDevice().getVolumeGroup());
     }
 
     /** Returns true if this is the first volume in the resource. Returns true
@@ -1360,7 +1360,7 @@ public class BlockDevInfo extends EditableInfo {
                 return "ERROR";
             }
             if (pHost.isConnected()) {
-                if (pHost.isDrbdProxyUp(dri.getName())) {
+                if (pHost.getHostParser().isDrbdProxyUp(dri.getName())) {
                     return PROXY_UP;
                 } else {
                     return PROXY_DOWN;
@@ -1416,6 +1416,6 @@ public class BlockDevInfo extends EditableInfo {
             return false;
         }
         final String vg = bd.getVgOnPhysicalVolume();
-        return getHost().getLogicalVolumesFromVolumeGroup(vg) == null;
+        return getHost().getHostParser().getLogicalVolumesFromVolumeGroup(vg) == null;
     }
 }

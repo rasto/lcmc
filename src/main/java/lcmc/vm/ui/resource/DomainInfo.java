@@ -635,7 +635,7 @@ public class DomainInfo extends EditableInfo {
     public void init(final String name, final Browser browser) {
         super.init(name, browser);
         final Host firstHost = getBrowser().getClusterHosts()[0];
-        preferredEmulator = firstHost.getDistString("KVM.emulator");
+        preferredEmulator = firstHost.getHostParser().getDistString("KVM.emulator");
         final List<Value> hostsList = new ArrayList<Value>();
         hostsList.add(null);
         for (final Host h : getBrowser().getClusterHosts()) {
@@ -2379,7 +2379,7 @@ public class DomainInfo extends EditableInfo {
                 && !Tools.areEqual(prevType, newValue)) {
                 String xenLibPath = "/usr/lib/xen";
                 for (final Host host : getBrowser().getClusterHosts()) {
-                    final String xlp = host.getXenLibPath();
+                    final String xlp = host.getHostParser().getXenLibPath();
                     if (xlp != null) {
                         xenLibPath = xlp;
                         break;
@@ -2387,7 +2387,7 @@ public class DomainInfo extends EditableInfo {
                 }
                 String lxcLibPath = "/usr/lib/libvirt";
                 for (final Host host : getBrowser().getClusterHosts()) {
-                    final String llp = host.getLxcLibPath();
+                    final String llp = host.getHostParser().getLxcLibPath();
                     if (llp != null) {
                         lxcLibPath = llp;
                         break;
@@ -2518,14 +2518,14 @@ public class DomainInfo extends EditableInfo {
             final Set<Value> models = new LinkedHashSet<Value>();
             models.add(new StringValue());
             for (final Host host : getBrowser().getClusterHosts()) {
-                models.addAll(host.getCPUMapModels());
+                models.addAll(host.getHostParser().getCPUMapModels());
             }
             return models.toArray(new Value[models.size()]);
         } else if (VMParams.VM_PARAM_CPUMATCH_VENDOR.equals(param)) {
             final Set<Value> vendors = new LinkedHashSet<Value>();
             vendors.add(new StringValue());
             for (final Host host : getBrowser().getClusterHosts()) {
-                vendors.addAll(host.getCPUMapVendors());
+                vendors.addAll(host.getHostParser().getCPUMapVendors());
             }
             return vendors.toArray(new Value[vendors.size()]);
         }

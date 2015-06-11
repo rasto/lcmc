@@ -67,7 +67,7 @@ import javax.inject.Named;
  */
 @Named
 @Singleton
-public final class RoboTest {
+public class RoboTest {
     private static final Logger LOG = LoggerFactory.getLogger(RoboTest.class);
     private static final GraphicsDevice SCREEN_DEVICE =
                                         GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice();

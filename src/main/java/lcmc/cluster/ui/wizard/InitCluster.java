@@ -66,6 +66,7 @@ import lcmc.crm.service.Openais;
 import lcmc.cluster.service.ssh.ExecCommandConfig;
 import lcmc.cluster.service.ssh.ExecCommandThread;
 import lcmc.common.domain.util.Tools;
+import lombok.val;
 
 /**
  * An implementation of a dialog where cluster is initialized on all hosts.
@@ -223,7 +224,7 @@ public class InitCluster extends DialogCluster {
                                                    @Override
                                                    public void done(final String answer) {
                                                        for (final String line : answer.split("\\r?\\n")) {
-                                                           h.parseInstallationInfo(line);
+                                                           h.getHostParser().parseInstallationInfo(line);
                                                        }
                                                    }
                                                    @Override
@@ -311,16 +312,17 @@ public class InitCluster extends DialogCluster {
                 }
             }
 
-            final boolean csAisIsInstalled = h.getOpenaisVersion() != null || h.getCorosyncVersion() != null;
-            final boolean csAisRunning = h.isCorosyncRunning() || h.isOpenaisRunning();
-            final boolean csAisIsRc = h.isCorosyncInRc() || h.isOpenaisInRc();
-            final boolean csAisIsConf = h.corosyncOrOpenaisConfigExists();
+            val hostParser = h.getHostParser();
+            final boolean csAisIsInstalled = hostParser.getOpenaisVersion() != null || hostParser.getCorosyncVersion() != null;
+            final boolean csAisRunning = hostParser.isCorosyncRunning() || hostParser.isOpenaisRunning();
+            final boolean csAisIsRc = hostParser.isCorosyncInRc() || hostParser.isOpenaisInRc();
+            final boolean csAisIsConf = hostParser.corosyncOrOpenaisConfigExists();
 
-            final boolean heartbeatIsInstalled = h.getHeartbeatVersion() != null;
-            final boolean heartbeatIsRunning = h.isHeartbeatRunning();
-            final boolean heartbeatIsRc = h.isHeartbeatInRc();
-            final boolean heartbeatIsConf = h.heartbeatConfigExists();
-            if (!csAisRunning && h.hasCorosyncInitScript() && h.hasOpenaisInitScript()) {
+            final boolean heartbeatIsInstalled = hostParser.getHeartbeatVersion() != null;
+            final boolean heartbeatIsRunning = hostParser.isHeartbeatRunning();
+            final boolean heartbeatIsRc = hostParser.isHeartbeatInRc();
+            final boolean heartbeatIsConf = hostParser.heartbeatConfigExists();
+            if (!csAisRunning && hostParser.hasCorosyncInitScript() && hostParser.hasOpenaisInitScript()) {
                 needOpenaisButton = true;
             }
 
@@ -387,7 +389,7 @@ public class InitCluster extends DialogCluster {
             final JLabel pmStartedInfo = pacemakerStartedLabels.get(i);
             final MyButton csAisStartButton = startPacemakerButtons.get(i);
             String is = "Corosync";
-            if (!useCorosync(h) && h.getOpenaisVersion() != null) {
+            if (!useCorosync(h) && hostParser.getOpenaisVersion() != null) {
                 is = "OpenAIS";
             }
             final String initScript = is;
@@ -626,7 +628,8 @@ public class InitCluster extends DialogCluster {
             /* Heartbeat */
             heartbeatStartedLabels.add(new JLabel(Tools.getString("Dialog.Cluster.Init.CheckingHb")));
             final MyButton btn;
-            if (host.isCorosyncRunning() || host.isOpenaisRunning() || host.isCorosyncInRc() || host.isOpenaisInRc()) {
+            final val hostParser = host.getHostParser();
+            if (hostParser.isCorosyncRunning() || hostParser.isOpenaisRunning() || hostParser.isCorosyncInRc() || hostParser.isOpenaisInRc()) {
                 btn = widgetFactory.createButton(HEARTBEAT_BUTTON_SWITCH_TEXT);
             } else {
                 btn = widgetFactory.createButton(Tools.getString("Dialog.Cluster.Init.StartHbButton"));
@@ -660,7 +663,7 @@ public class InitCluster extends DialogCluster {
                                                && HEARTBEAT_BUTTON_SWITCH_TEXT.equals(e.getActionCommand())) {
                                         Heartbeat.switchFromOpenaisToHeartbeat(host);
                                     } else {
-                                        if (host.isHeartbeatInRc()) {
+                                        if (host.getHostParser().isHeartbeatInRc()) {
                                             Heartbeat.startHeartbeat(host);
                                         } else {
                                             Heartbeat.startHeartbeatRc(host);
@@ -710,7 +713,7 @@ public class InitCluster extends DialogCluster {
                                     Openais.switchToOpenais(host);
                                 }
                             } else {
-                                if (host.isCorosyncInRc() || host.isOpenaisInRc()) {
+                                if (hostParser.isCorosyncInRc() || hostParser.isOpenaisInRc()) {
                                     if (useCorosync(host)) {
                                         Corosync.startCorosync(host);
                                     } else {
@@ -730,11 +733,11 @@ public class InitCluster extends DialogCluster {
                     thread.start();
                 }
             });
-            if (host.isCorosyncRunning() && host.isOpenaisRunning()) {
+            if (hostParser.isCorosyncRunning() && hostParser.isOpenaisRunning()) {
                 /* started with openais init script. */
                 oneStartedAsOpenais = true;
             }
-            if (!host.hasCorosyncInitScript()) {
+            if (!hostParser.hasCorosyncInitScript()) {
                 noCorosync = true;
             }
 
@@ -769,8 +772,9 @@ public class InitCluster extends DialogCluster {
 
     /** Whether to use corosync or openais init script. */
     private boolean useCorosync(final Host host) {
-        return !(!host.isCorosyncInstalled() || !host.hasCorosyncInitScript())
-               && (host.hasCorosyncInitScript() && COROSYNC_INIT_SCRIPT.equals(useOpenaisButton.getStringValue())
-               || !host.hasOpenaisInitScript());
+        val hostParser = host.getHostParser();
+        return !(!hostParser.isCorosyncInstalled() || !hostParser.hasCorosyncInitScript())
+               && (hostParser.hasCorosyncInitScript() && COROSYNC_INIT_SCRIPT.equals(useOpenaisButton.getStringValue())
+               || !hostParser.hasOpenaisInitScript());
     }
 }

@@ -528,8 +528,8 @@ public final class CrmXml {
                 new StringValue("minimal"),
                 new StringValue("balanced")});
 
-        final String hbV = host.getHeartbeatVersion();
-        final String pcmkV = host.getPacemakerVersion();
+        final String hbV = host.getHostParser().getHeartbeatVersion();
+        final String pcmkV = host.getHostParser().getPacemakerVersion();
         try {
             if (pcmkV != null || Tools.compareVersions(hbV, "2.1.3") >= 0) {
                 String clusterRecheckInterval = "cluster-recheck-interval";
@@ -751,7 +751,7 @@ public final class CrmXml {
     }
 
     private void initResourceAgentsWithoutMetaData() {
-        final String command = host.getDistCommand("Heartbeat.getOCFParametersQuick", (ConvertCmdCallback) null);
+        final String command = host.getHostParser().getDistCommand("Heartbeat.getOCFParametersQuick", (ConvertCmdCallback) null);
         final SshOutput ret = host.captureCommandProgressIndicator(Tools.getString("CRMXML.GetRAMetaData"),
                                                                    new ExecCommandConfig().command(command)
                                                                                           .silentCommand()
@@ -841,13 +841,13 @@ public final class CrmXml {
      * For faster start up.
      */
     private void initOCFMetaDataConfigured() {
-        initOCFResourceAgentsWithMetaData(host.getDistCommand("Heartbeat.getOCFParametersConfigured",
+        initOCFResourceAgentsWithMetaData(host.getHostParser().getDistCommand("Heartbeat.getOCFParametersConfigured",
                                           (ConvertCmdCallback) null));
     }
 
     /** Initialize resource agents with their meta data. */
     private void initOCFMetaDataAll() {
-        initOCFResourceAgentsWithMetaData(host.getDistCommand("Heartbeat.getOCFParameters",
+        initOCFResourceAgentsWithMetaData(host.getHostParser().getDistCommand("Heartbeat.getOCFParameters",
                                           (ConvertCmdCallback) null));
     }
 
@@ -1417,8 +1417,8 @@ public final class CrmXml {
         metaAttrParams.put(PRIORITY_META_ATTR, null);
         metaAttrParams.put(MULTIPLE_ACTIVE_META_ATTR, null);
         metaAttrParams.put(ALLOW_MIGRATE_META_ATTR, null);
-        final String hbV = host.getHeartbeatVersion();
-        final String pcmkV = host.getPacemakerVersion();
+        final String hbV = host.getHostParser().getHeartbeatVersion();
+        final String pcmkV = host.getHostParser().getPacemakerVersion();
         try {
             if (pcmkV != null || Tools.compareVersions(hbV, "2.1.4") >= 0) {
                 metaAttrParams.put(RESOURCE_STICKINESS_META_ATTR, null);

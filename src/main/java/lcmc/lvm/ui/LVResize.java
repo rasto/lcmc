@@ -295,7 +295,7 @@ public final class LVResize extends LV {
         final Host host = blockDevInfo.getHost();
         final String lv = blockDevInfo.getBlockDevice().getLogicalVolume();
         for (final Map.Entry<Host, JCheckBox> hostEntry : hostCheckBoxes.entrySet()) {
-            final Set<String> allLVS = hostEntry.getKey().getAllLogicalVolumes();
+            final Set<String> allLVS = hostEntry.getKey().getHostParser().getAllLogicalVolumes();
             hostEntry.getValue().addItemListener(
                     new ItemListener() {
                         @Override
@@ -410,7 +410,7 @@ public final class LVResize extends LV {
                     if (hostEntry.getValue().isSelected()) {
                         for (final BlockDevice b : hostEntry.getKey().getBlockDevices()) {
                             if (lvm.equals(b.getName()) || (oBDI != null && oBDI.getBlockDevice() == b)) {
-                                final long oFree = hostEntry.getKey().getFreeInVolumeGroup(b.getVolumeGroup())
+                                final long oFree = hostEntry.getKey().getHostParser().getFreeInVolumeGroup(b.getVolumeGroup())
                                  / 1024;
                                 final long oTaken = Long.parseLong(b.getBlockSize());
                                 if (oFree + oTaken < max) {

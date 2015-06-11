@@ -277,7 +277,7 @@ final class HbConfig extends DialogCluster {
                                 final boolean configOk = updateOldHbConfig();
                                 if (dopdWidget.isSelected()) {
                                     for (final Host h : hosts) {
-                                        final String hbV = h.getHeartbeatVersion();
+                                        final String hbV = h.getHostParser().getHeartbeatVersion();
                                         boolean wa = false;
                                         try {
                                             if (hbV != null && Tools.compareVersions(hbV, "3.0.2") <= 0) {
@@ -854,7 +854,7 @@ final class HbConfig extends DialogCluster {
         }
         config.append("respawn hacluster ");
         final Host[] hosts = getCluster().getHostsArray();
-        config.append(hosts[0].getHeartbeatLibPath());
+        config.append(hosts[0].getHostParser().getHeartbeatLibPath());
         config.append("/dopd\n");
         if (!useDopd) {
             config.append("# ");
@@ -874,7 +874,7 @@ final class HbConfig extends DialogCluster {
         }
         config.append("respawn root ");
         final Host[] hosts = getCluster().getHostsArray();
-        config.append(hosts[0].getHeartbeatLibPath());
+        config.append(hosts[0].getHostParser().getHeartbeatLibPath());
         config.append("/mgmtd -v\n");
         if (!useMgmt) {
             config.append("# ");

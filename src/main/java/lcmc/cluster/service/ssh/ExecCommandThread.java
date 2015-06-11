@@ -192,7 +192,7 @@ public final class ExecCommandThread extends Thread {
 
     private void writeCommandToTerminal(final String cmd) {
         if (commandVisible) {
-            final String consoleCommand = host.replaceVars(cmd, true);
+            final String consoleCommand = host.getHostParser().replaceVars(cmd, true);
             host.getTerminalPanel().addCommand(consoleCommand.replaceAll(DistResource.SUDO, " "));
         }
     }

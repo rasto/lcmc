@@ -48,7 +48,7 @@ import javax.inject.Named;
 import javax.inject.Provider;
 
 @Named
-public final class Ssh {
+public class Ssh {
     private static final Logger LOG = LoggerFactory.getLogger(Ssh.class);
     public static final int DEFAULT_COMMAND_TIMEOUT = Tools.getDefaultInt("SSH.Command.Timeout");
     public static final int DEFAULT_COMMAND_TIMEOUT_LONG =

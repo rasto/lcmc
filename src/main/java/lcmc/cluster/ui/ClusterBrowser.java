@@ -565,7 +565,7 @@ public class ClusterBrowser extends Browser {
             public void run() {
                 final Host[] hosts = cluster.getHostsArray();
                 for (final Host host : hosts) {
-                    host.waitForServerStatusLatch();
+                    host.getHostParser().waitForServerStatusLatch();
                     progressIndicator.stopProgressIndicator(
                             host.getName(),
                             Tools.getString("ClusterBrowser.UpdatingServerInfo"));
@@ -690,12 +690,12 @@ public class ClusterBrowser extends Browser {
         final String hostName = host.getName();
         final CategoryInfo[] infosToUpdate = new CategoryInfo[]{clusterHostsInfo};
         while (true) {
-            if (host.getWaitForServerStatusLatch()) {
+            if (host.getHostParser().getWaitForServerStatusLatch()) {
                 progressIndicator.startProgressIndicator(hostName, Tools.getString("ClusterBrowser.UpdatingServerInfo"));
             }
 
             host.setIsLoading();
-            host.startHWInfoDaemon(infosToUpdate, new ResourceGraph[]{drbdGraph, crmGraph});
+            host.getHostParser().startHWInfoDaemon(infosToUpdate, new ResourceGraph[]{drbdGraph, crmGraph});
             if (serverStatusCanceled) {
                 break;
             }
@@ -719,10 +719,10 @@ public class ClusterBrowser extends Browser {
                 drbdGraph.scale();
             }
         });
-        if (host.getWaitForServerStatusLatch()) {
+        if (host.getHostParser().getWaitForServerStatusLatch()) {
             LOG.debug("updateServerStatus: " + host.getName() + " loading done");
         }
-        host.serverStatusLatchDone();
+        host.getHostParser().serverStatusLatchDone();
         clusterHostsInfo.updateTable(CategoryInfo.MAIN_TABLE);
         for (final ResourceGraph graph : new ResourceGraph[]{drbdGraph, crmGraph}) {
             if (graph != null) {
@@ -909,7 +909,7 @@ public class ClusterBrowser extends Browser {
                            boolean eventUpdate = false;
                            do {
                                host.drbdStatusLock();
-                               drbdConfig = host.getOutput("drbd", outputBuffer);
+                               drbdConfig = host.getHostParser().getOutput("drbd", outputBuffer);
                                if (drbdConfig != null) {
                                    final DrbdXml newDrbdXml = drbdXmlProvider.get();
                                    newDrbdXml.init(cluster.getHostsArray(), hostDrbdParameters);
@@ -919,7 +919,7 @@ public class ClusterBrowser extends Browser {
                                    firstTime.countDown();
                                }
                                host.drbdStatusUnlock();
-                               event = host.getOutput("event", outputBuffer);
+                               event = host.getHostParser().getOutput("event", outputBuffer);
                                if (event != null) {
                                    if (drbdXml.parseDrbdEvent(host.getName(), drbdGraph, event)) {
                                        host.setDrbdStatusOk(true);
@@ -982,7 +982,7 @@ public class ClusterBrowser extends Browser {
         serverStatusCanceled = true;
         final Host[] hosts = cluster.getHostsArray();
         for (final Host host : hosts) {
-            host.stopServerStatus();
+            host.getHostParser().stopServerStatus();
         }
     }
 
@@ -1442,9 +1442,9 @@ public class ClusterBrowser extends Browser {
             }
             if (host.getName().equals(dc)
                 && host.isCrmStatusOk()
-                && !host.isCommLayerStarting()
-                && !host.isCommLayerStopping()
-                && (host.isHeartbeatRunning() || host.isCorosyncRunning() || host.isOpenaisRunning())) {
+                && !host.getHostParser().isCommLayerStarting()
+                && !host.getHostParser().isCommLayerStopping()
+                && (host.getHostParser().isHeartbeatRunning() || host.getHostParser().isCorosyncRunning() || host.getHostParser().isOpenaisRunning())) {
                 dcHost = host;
                 break;
             }
@@ -1460,9 +1460,9 @@ public class ClusterBrowser extends Browser {
                     ix = 0;
                 }
                 if (hosts.get(ix).isConnected()
-                    && (hosts.get(ix).isHeartbeatRunning()
-                        || hosts.get(ix).isCorosyncRunning()
-                        || hosts.get(ix).isOpenaisRunning())) {
+                    && (hosts.get(ix).getHostParser().isHeartbeatRunning()
+                        || hosts.get(ix).getHostParser().isCorosyncRunning()
+                        || hosts.get(ix).getHostParser().isOpenaisRunning())) {
                     lastDcHostDetected = hosts.get(ix);
                     break;
                 }
@@ -1793,7 +1793,7 @@ public class ClusterBrowser extends Browser {
             final String desc = Tools.getString("ClusterBrowser.confirmLinbitDrbd.Description");
 
             final Host dcHost = getDCHost();
-            final String hbV = dcHost.getHeartbeatVersion();
+            final String hbV = dcHost.getHostParser().getHeartbeatVersion();
             return application.confirmDialog(Tools.getString("ClusterBrowser.confirmLinbitDrbd.Title"),
                                        desc.replaceAll("@VERSION@", hbV),
                                        Tools.getString("ClusterBrowser.confirmLinbitDrbd.Yes"),
@@ -2076,7 +2076,7 @@ public class ClusterBrowser extends Browser {
     /** Updates host hardware info immediately. */
     public void updateHWInfo(final Host host, final boolean updateLVM) {
         host.setIsLoading();
-        host.getHWInfo(new CategoryInfo[]{clusterHostsInfo},
+        host.getHostParser().getHWInfo(new CategoryInfo[]{clusterHostsInfo},
                 new ResourceGraph[]{drbdGraph, crmGraph},
                 updateLVM);
         swingUtils.invokeAndWait(new Runnable() {
@@ -2091,7 +2091,7 @@ public class ClusterBrowser extends Browser {
     /** Updates proxy host hardware info immediately. */
     public void updateProxyHWInfo(final Host host) {
         host.setIsLoading();
-        host.getHWInfo(new CategoryInfo[]{clusterHostsInfo},
+        host.getHostParser().getHWInfo(new CategoryInfo[]{clusterHostsInfo},
                 new ResourceGraph[]{drbdGraph, crmGraph},
                 !Host.UPDATE_LVM);
         drbdGraph.repaint();

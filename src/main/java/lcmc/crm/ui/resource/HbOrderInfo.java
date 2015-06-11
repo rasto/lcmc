@@ -380,7 +380,7 @@ final class HbOrderInfo extends EditableInfo implements HbConstraintInterface {
     @Override
     protected String isEnabled(final String param) {
         if (CrmXml.REQUIRE_ALL_ATTR.equals(param)) {
-            final String pmV = getBrowser().getDCHost().getPacemakerVersion();
+            final String pmV = getBrowser().getDCHost().getHostParser().getPacemakerVersion();
             try {
                 //TODO: get this from constraints-.rng files
                 if (pmV == null || Tools.compareVersions(pmV, "1.1.7") <= 0) {

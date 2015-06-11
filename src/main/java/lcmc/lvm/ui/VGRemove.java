@@ -170,7 +170,7 @@ public final class VGRemove extends LV {
                 }
             }
             if (bdi.getBlockDevice().isDrbd()) {
-                for (final BlockDevice bd : bdi.getHost().getDrbdBlockDevices()) {
+                for (final BlockDevice bd : bdi.getHost().getHostParser().getDrbdBlockDevices()) {
                     final String thisVG = bd.getVgOnPhysicalVolume();
                     if (vgNames.get(bdi.getHost()).contains(thisVG)) {
                         bds.add(bd.getName());

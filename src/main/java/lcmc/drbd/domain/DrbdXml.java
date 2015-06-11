@@ -355,7 +355,7 @@ public class DrbdXml {
     }
 
     public final String updateDrbdParameters(final Host host) {
-        final String command = host.getDistCommand("Drbd.getParameters", (ConvertCmdCallback) null);
+        final String command = host.getHostParser().getDistCommand("Drbd.getParameters", (ConvertCmdCallback) null);
         final SshOutput ret = host.captureCommand(new ExecCommandConfig().command(command)
                                                                          .silentCommand()
                                                                          .silentOutput());
@@ -404,13 +404,13 @@ public class DrbdXml {
         if (!host.isConnected()) {
             return null;
         }
-        final String command2 = host.getDistCommand("Drbd.getConfig", (ConvertCmdCallback) null);
+        final String command2 = host.getHostParser().getDistCommand("Drbd.getConfig", (ConvertCmdCallback) null);
         final SshOutput ret = host.captureCommand(new ExecCommandConfig().command(command2)
                                                                          .silentCommand()
                                                                          .silentOutput());
         if (ret.getExitCode() == 0) {
             final StringBuffer confSB = new StringBuffer(ret.getOutput());
-            return host.getOutput("drbd", confSB);
+            return host.getHostParser().getOutput("drbd", confSB);
         }
         return null;
     }
@@ -686,8 +686,8 @@ public class DrbdXml {
                 if ("fence-peer".equals(name)) {
                     final List<Value> l = new ArrayList<Value>();
                     l.add(new StringValue());
-                    if (host.getArch() != null && !host.getArch().isEmpty()) {
-                        l.add(new StringValue(host.getHeartbeatLibPath() + "/drbd-peer-outdater -t 5"));
+                    if (host.getHostParser().getArch() != null && !host.getHostParser().getArch().isEmpty()) {
+                        l.add(new StringValue(host.getHostParser().getHeartbeatLibPath() + "/drbd-peer-outdater -t 5"));
                     }
                     l.add(new StringValue("/usr/lib/drbd/crm-fence-peer.sh"));
                     paramItemsMap.put(name, l);
@@ -715,7 +715,7 @@ public class DrbdXml {
                            || "cram-hmac-alg".equals(name)) {
                     final List<Value> l = new ArrayList<Value>();
                     l.add(new StringValue());
-                    for (final String cr : host.getAvailableCryptoModules()) {
+                    for (final String cr : host.getHostParser().getAvailableCryptoModules()) {
                         l.add(new StringValue(cr));
                     }
                     paramItemsMap.put(name, l);

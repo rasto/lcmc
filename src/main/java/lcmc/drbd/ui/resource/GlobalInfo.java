@@ -603,7 +603,7 @@ public class GlobalInfo extends AbstractDrbdInfo {
 
         bdi1.setDrbd(true);
         bdi1.setDrbdVolumeInfo(dvi);
-        bdi1.getBlockDevice().setDrbdBlockDevice(bdi1.getHost().getDrbdBlockDevice(device));
+        bdi1.getBlockDevice().setDrbdBlockDevice(bdi1.getHost().getHostParser().getDrbdBlockDevice(device));
         bdi1.cleanup();
         bdi1.resetInfoPanel();
         bdi1.setInfoPanel(null); /* reload panel */
@@ -612,7 +612,7 @@ public class GlobalInfo extends AbstractDrbdInfo {
 
         bdi2.setDrbd(true);
         bdi2.setDrbdVolumeInfo(dvi);
-        bdi2.getBlockDevice().setDrbdBlockDevice(bdi2.getHost().getDrbdBlockDevice(device));
+        bdi2.getBlockDevice().setDrbdBlockDevice(bdi2.getHost().getHostParser().getDrbdBlockDevice(device));
         bdi2.cleanup();
         bdi2.resetInfoPanel();
         bdi2.setInfoPanel(null); /* reload panel */

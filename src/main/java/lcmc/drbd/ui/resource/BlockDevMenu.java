@@ -691,7 +691,7 @@ public class BlockDevMenu {
                                     return false;
                                 }
                                 if (getBlockDevice().isDrbd()) {
-                                    return pHost.isDrbdProxyUp(getDrbdResourceInfo().getName());
+                                    return pHost.getHostParser().isDrbdProxyUp(getDrbdResourceInfo().getName());
                                 } else {
                                     return true;
                                 }
@@ -702,7 +702,7 @@ public class BlockDevMenu {
                             public void run(final String text) {
                                 final ResourceInfo dri = getDrbdResourceInfo();
                                 final Host pHost = dri.getProxyHost(getHost(), !ResourceInfo.WIZARD);
-                                if (pHost.isDrbdProxyUp(getDrbdResourceInfo().getName())) {
+                                if (pHost.getHostParser().isDrbdProxyUp(getDrbdResourceInfo().getName())) {
                                     DRBD.proxyDown(pHost, getDrbdResourceInfo().getName(), getDrbdVolumeInfo().getName(), runMode);
                                 } else {
                                     DRBD.proxyUp(pHost, getDrbdResourceInfo().getName(), getDrbdVolumeInfo().getName(), runMode);
@@ -942,7 +942,7 @@ public class BlockDevMenu {
                         } else {
                             vg = drbdBD.getVgOnPhysicalVolume();
                         }
-                        if (getHost().getLogicalVolumesFromVolumeGroup(vg) != null) {
+                        if (getHost().getHostParser().getLogicalVolumesFromVolumeGroup(vg) != null) {
                             return "has LV on it";
                         }
                         return null;
@@ -983,7 +983,7 @@ public class BlockDevMenu {
                     @Override
                     public boolean check() {
                         final String vg = blockDevInfo.getVGName();
-                        return vg != null && !"".equals(vg) && getHost().getVolumeGroupNames().contains(vg);
+                        return vg != null && !"".equals(vg) && getHost().getHostParser().getVolumeGroupNames().contains(vg);
                     }
                 })
                 .enablePredicate(new EnablePredicate() {

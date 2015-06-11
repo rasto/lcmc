@@ -243,7 +243,7 @@ public class Cluster implements Comparable<Cluster> {
     public String getMinLibvirtVersion() {
         String minVersion = null;
         for (final Host host : hosts) {
-            final String version = host.getLibvirtVersion();
+            final String version = host.getHostParser().getLibvirtVersion();
             if (version == null) {
                 /* not installed */
                 continue;
