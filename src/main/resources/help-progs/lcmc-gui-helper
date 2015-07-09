@@ -1002,7 +1002,10 @@ sub get_hb_lib_path {
 
 sub get_crmd_lib_path {
 	my $hb_lib_path = get_hb_lib_path();
-	for ("/usr/lib64/pacemaker", "/usr/libexec/pacemaker", $hb_lib_path) {
+	for ("/usr/lib64/pacemaker",
+		 "/usr/libexec/pacemaker",
+		 "/usr/lib/x86_64-linux-gnu/pacemaker",
+		 $hb_lib_path) {
 		if (-e "$_/crmd") {
 			return $_;
 		}
@@ -1047,13 +1050,12 @@ sub do_cluster_events {
 	my $libpath = get_hb_lib_path();
 	my $hb_version = _exec("$libpath/heartbeat -V 2>/dev/null") || "";
 	my $info = get_cluster_info($hb_version);
+	my $pcmk_path = "/usr/libexec/pacemaker:/usr/lib/heartbeat:/usr/lib64/heartbeat:/usr/lib/pacemaker:/usr/lib64/pacemaker:/usr/lib/x86_64-linux-gnu/pacemaker";
 	my $command =
-		"PATH=/usr/libexec/pacemaker:/usr/lib/heartbeat:/usr/lib64/heartbeat:/usr/lib/pacemaker:/usr/lib64/pacemaker"
-		." exec cibmon -udVVVV -m1 2>&1";
+		"PATH=$pcmk_path exec cibmon -udVVVV -m1 2>&1";
 	if ($hb_version && (compare_versions($hb_version, "2.1.4") <= 0)) {
 		$command =
-			" PATH=/usr/libexec/pacemaker:/usr/lib/heartbeat:/usr/lib64/heartbeat"
-			." exec cibmon -dV -m1 2>&1";
+			" PATH=$pcmk_path exec cibmon -dV -m1 2>&1";
 	}
 	if ($info) {
 		print "---start---\n";
