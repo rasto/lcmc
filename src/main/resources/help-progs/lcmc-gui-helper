@@ -2265,10 +2265,10 @@ sub gui_test {
 	} else {
 		my $crm_show = 
 			"TERM=dumb PATH=\$PATH:/usr/sbin /usr/sbin/crm configure show"
-			."|grep -v 'expected-quorum-votes=\"2\"'"
+			."|grep -v 'expected-quorum-votes=2'"
 			."|grep -v 'unknown-expected-votes'"
-			."|grep -v 'dc-version=\"'"
-			."|grep -v 'cluster-infrastructure=\"'"
+			."|grep -v 'dc-version='"
+			."|grep -v 'cluster-infrastructure='"
 			."|grep -v 'last-lrm-refresh='";
 		$cib = _exec("$crm_show");
 		my $ret = $?;
@@ -2287,7 +2287,7 @@ sub gui_test {
 		}
 		# older crm shell had _rsc_set_
 		$cib =~ s/_rsc_set_ //g;
-		$cib =~ s/(start-delay="\d+") (timeout="\d+")/$2 $1/g;
+		$cib =~ s/(start-delay=\d+) (timeout=\d+)/$2 $1/g;
 		$cib =~ s/(node)\s+\$id=".*?"/$1/g;
 		# sort node lines
 		$cib =~
@@ -2319,7 +2319,8 @@ sub gui_test {
 	if ($status !~ /============/) {
 		$status =~ s/\n\n/\n============\n/;
 	}
-	$cib =~ s/\s*\n\s*attributes standby="off"\s*/\n/g;
+	$cib =~ s/\s*\n\s*attributes standby=off\s*/\n/g;
+	$cib =~ s/^node \d+: host/node host/gm;
 	$cib =~ s/^(node host)\s+$/$1/gm;
       	if (pcmk_version_smaller_than("1.1.6")) {
 	      $status =~ s/(Clone Set:.*?)\s+\[.*\]/$1/g;

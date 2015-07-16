@@ -1,4 +1,5 @@
 node host
 node host
-property $id="cib-bootstrap-options" 
-	no-quorum-policy="ignore"
+property cib-bootstrap-options:
+	no-quorum-policy=ignore
+rsc_defaults rsc-options:

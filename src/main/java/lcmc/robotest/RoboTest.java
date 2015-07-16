@@ -982,7 +982,7 @@ public class RoboTest {
                 return c;
             }
         }
-        return null;
+        return mainData.getMainFrame();
     }
 
     void moveTo(final Class<?> clazz, final int number) {
@@ -1073,11 +1073,11 @@ public class RoboTest {
         int i = 0;
         while (c == null && i < 30 && !aborted) {
             c = findComponent(text, number);
-            if (i > 0) {
-                sleepNoFactor(100);
-            } else if (i > 10) {
+            if (i > 10) {
                 sleepNoFactor(1000);
                 LOG.info("moveTo: cannot find: " + text);
+            } else if (i > 0) {
+                sleepNoFactor(100);
             }
             i++;
         }

@@ -256,7 +256,7 @@ final class PcmkTest1 {
         roboTest.checkTest(testName, 3.1); /* 3.1 */
 
         try {
-            if (pmV != null && Tools.compareVersions(pmV, "1.0.8") > 0) {
+            if (false && pmV != null && Tools.compareVersions(pmV, "1.0.8") > 0) {
                 /* move up, move down */
                 for (int i = 0; i < 2; i++) {
                     roboTest.moveToMenu("Dummy (3)");
