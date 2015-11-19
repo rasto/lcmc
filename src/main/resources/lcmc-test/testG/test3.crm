@@ -41,6 +41,7 @@ primitive res_Dummy_5 Dummy
 	op migrate_from interval=0 timeout=122 
 	meta target-role=stopped
 group grp_1 res_Dummy_1 res_Dummy_2 res_Dummy_3 res_Dummy_4 res_Dummy_5
+	meta
 property cib-bootstrap-options:
         stonith-enabled=false
         no-quorum-policy=ignore

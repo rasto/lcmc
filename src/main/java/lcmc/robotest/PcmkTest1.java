@@ -77,8 +77,6 @@ final class PcmkTest1 {
         roboTest.press(KeyEvent.VK_B);
         roboTest.press(KeyEvent.VK_D);
         roboTest.press(KeyEvent.VK_ENTER);
-        roboTest.moveTo(Tools.getString("ConfirmDialog.Yes"));
-        roboTest.leftClick();
         roboTest.removeResource(ipX, ipY + 200, !CONFIRM_REMOVE);
 
         roboTest.moveTo(ipX, ipY + 200);

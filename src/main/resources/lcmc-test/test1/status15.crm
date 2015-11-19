@@ -10,6 +10,6 @@ Online: [ host host ]
      res_Dummy_2	(ocf::heartbeat:Dummy):	Started host
      res_Dummy_3	(ocf::heartbeat:Dummy):	Started host
  Master/Slave Set: ms_Stateful_1
-     res_Stateful_1	(ocf::heartbeat:Stateful):      Master host (unmanaged)
+     res_Stateful_1	(ocf::heartbeat:Stateful):	Master host (unmanaged)
      Stopped: [ host ]
 
