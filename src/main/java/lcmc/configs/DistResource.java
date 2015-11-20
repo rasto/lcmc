@@ -97,7 +97,7 @@ public final class DistResource extends ListResourceBundle {
         {"PingCommand", "while true; do echo; sleep 5; done"},
 
         /* heartbeat crm commands */
-        {"CRM.cleanupResource", SUDO + "/usr/sbin/crm_resource -C -r @ID@ -H @HOST@"},
+        {"CRM.cleanupResource", SUDO + "/usr/sbin/crm_resource -C -r @ID@ -H @HOST@; true"},
 
         /* 2.1.4 and before */
         {"CRM.2.1.4.startResource",
