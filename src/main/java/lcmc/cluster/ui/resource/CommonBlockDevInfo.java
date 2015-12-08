@@ -21,16 +21,17 @@
  */
 package lcmc.cluster.ui.resource;
 
-import javax.inject.Named;
-import javax.swing.ImageIcon;
 import lcmc.common.domain.Application;
-import lcmc.drbd.domain.BlockDevice;
-import lcmc.drbd.domain.CommonBlockDevice;
+import lcmc.common.domain.util.Tools;
 import lcmc.common.ui.Browser;
 import lcmc.crm.ui.resource.HbCategoryInfo;
 import lcmc.crm.ui.resource.ServiceInfo;
+import lcmc.drbd.domain.BlockDevice;
+import lcmc.drbd.domain.CommonBlockDevice;
 import lcmc.drbd.ui.resource.BlockDevInfo;
-import lcmc.common.domain.util.Tools;
+
+import javax.inject.Named;
+import javax.swing.*;
 
 /**
  * This class holds info data for a block device that is common
@@ -41,10 +42,11 @@ import lcmc.common.domain.util.Tools;
 public class CommonBlockDevInfo extends HbCategoryInfo implements CommonDeviceInterface {
     /** block devices of this common block device on all nodes. */
     private BlockDevice[] blockDevices;
+    private CommonBlockDevice commonBlockDevice;
 
     public void init(final String name, final BlockDevice[] blockDevices, final Browser browser) {
         super.init(name, browser);
-        setResource(new CommonBlockDevice(name));
+        commonBlockDevice = new CommonBlockDevice(name);
         this.blockDevices = blockDevices;
     }
 
@@ -96,7 +98,7 @@ public class CommonBlockDevInfo extends HbCategoryInfo implements CommonDeviceIn
     }
 
     CommonBlockDevice getCommonBlockDevice() {
-        return (CommonBlockDevice) getResource();
+        return commonBlockDevice;
     }
 
     @Override

@@ -23,6 +23,7 @@ package lcmc.common.ui.treemenu;
 import lcmc.cluster.ui.network.InfoPresenter;
 import lcmc.common.domain.util.Tools;
 import lcmc.common.ui.CategoryInfo;
+import lcmc.common.ui.EditableInfo;
 import lcmc.common.ui.Info;
 import lcmc.common.ui.utils.SwingUtils;
 import lcmc.logger.Logger;
@@ -310,11 +311,11 @@ public class TreeMenuController {
                 int i = 0;
                 for (int j = 0; j < parent.getChildCount(); j++) {
                     final DefaultMutableTreeNode node = (DefaultMutableTreeNode) parent.getChildAt(j);
-                    final Info info = (Info) node.getUserObject();
+                    final EditableInfo info = (EditableInfo) node.getUserObject();
                     final String name = info.getName();
                     if (i > 0) {
                         final DefaultMutableTreeNode prev = (DefaultMutableTreeNode) parent.getChildAt(j - 1);
-                        final Info prevI = (Info) prev.getUserObject();
+                        final EditableInfo prevI = (EditableInfo) prev.getUserObject();
                         if (prevI.getClass().getName().equals(info.getClass().getName())) {
                             final String prevN = prevI.getName();
                             if (!prevI.getResource().isNew()

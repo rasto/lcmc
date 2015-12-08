@@ -21,11 +21,38 @@
  */
 package lcmc.common.ui;
 
-import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.FlowLayout;
-import java.awt.Font;
-import java.awt.Point;
+import lcmc.cluster.ui.network.InfoPresenter;
+import lcmc.cluster.ui.widget.Widget;
+import lcmc.common.domain.AccessMode;
+import lcmc.common.domain.Application;
+import lcmc.common.domain.Unit;
+import lcmc.common.domain.Value;
+import lcmc.common.domain.util.Tools;
+import lcmc.common.ui.main.MainData;
+import lcmc.common.ui.treemenu.TreeMenuController;
+import lcmc.common.ui.utils.ButtonCallback;
+import lcmc.common.ui.utils.ComponentWithTest;
+import lcmc.common.ui.utils.MyButton;
+import lcmc.common.ui.utils.MyButtonCellRenderer;
+import lcmc.common.ui.utils.MyCellRenderer;
+import lcmc.common.ui.utils.MyMenu;
+import lcmc.common.ui.utils.SwingUtils;
+import lcmc.common.ui.utils.UpdatableItem;
+import lcmc.logger.Logger;
+import lcmc.logger.LoggerFactory;
+
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.swing.*;
+import javax.swing.border.TitledBorder;
+import javax.swing.event.PopupMenuEvent;
+import javax.swing.event.PopupMenuListener;
+import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableCellRenderer;
+import javax.swing.table.TableRowSorter;
+import javax.swing.text.JTextComponent;
+import javax.swing.tree.DefaultMutableTreeNode;
+import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
@@ -40,51 +67,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.swing.AbstractButton;
-import javax.swing.BoxLayout;
-import javax.swing.ImageIcon;
-import javax.swing.JComponent;
-import javax.swing.JEditorPane;
-import javax.swing.JMenu;
-import javax.swing.JMenuItem;
-import javax.swing.JPanel;
-import javax.swing.JPopupMenu;
-import javax.swing.JScrollPane;
-import javax.swing.JTable;
-import javax.swing.JToggleButton;
-import javax.swing.SwingConstants;
-import javax.swing.SwingUtilities;
-import javax.swing.border.TitledBorder;
-import javax.swing.event.PopupMenuEvent;
-import javax.swing.event.PopupMenuListener;
-import javax.swing.table.DefaultTableModel;
-import javax.swing.table.TableCellRenderer;
-import javax.swing.table.TableRowSorter;
-import javax.swing.text.JTextComponent;
-import javax.swing.tree.DefaultMutableTreeNode;
-
-import lcmc.cluster.ui.network.InfoPresenter;
-import lcmc.common.domain.AccessMode;
-import lcmc.common.domain.Application;
-import lcmc.common.domain.Value;
-import lcmc.common.domain.ResourceValue;
-import lcmc.cluster.ui.widget.Widget;
-import lcmc.common.ui.main.MainData;
-import lcmc.common.ui.treemenu.TreeMenuController;
-import lcmc.common.ui.utils.ButtonCallback;
-import lcmc.common.ui.utils.ComponentWithTest;
-import lcmc.common.ui.utils.SwingUtils;
-import lcmc.logger.Logger;
-import lcmc.logger.LoggerFactory;
-import lcmc.common.ui.utils.MyButton;
-import lcmc.common.ui.utils.MyButtonCellRenderer;
-import lcmc.common.ui.utils.MyCellRenderer;
-import lcmc.common.ui.utils.MyMenu;
-import lcmc.common.domain.util.Tools;
-import lcmc.common.domain.Unit;
-import lcmc.common.ui.utils.UpdatableItem;
 
 /**
  * This class holds info data for resources, services, hosts, clusters
@@ -100,8 +82,6 @@ public class Info implements Comparable<Info>, Value, InfoPresenter {
     private DefaultMutableTreeNode node = null;
     /** Name of the object. */
     private String name;
-    /** Resource object as found in data/resources associated with this object. */
-    private ResourceValue resource;
     /** TODL: Checking for leak. */
     private int maxMenuList = 0;
 
@@ -162,10 +142,6 @@ public class Info implements Comparable<Info>, Value, InfoPresenter {
 
     public String getToolTipText(final Application.RunMode runMode) {
         return "no tooltip";
-    }
-
-    protected final void setResource(final ResourceValue resource) {
-        this.resource = resource;
     }
 
     /** Adds the widget for parameter. */
@@ -393,11 +369,6 @@ public class Info implements Comparable<Info>, Value, InfoPresenter {
             treeMenuController.reloadNode(n, true);
             treeMenuController.nodeChanged(n);
         }
-    }
-
-    /** Returns resource object. */
-    public ResourceValue getResource() {
-        return resource;
     }
 
     /**

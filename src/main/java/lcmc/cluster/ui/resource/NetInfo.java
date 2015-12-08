@@ -22,20 +22,19 @@
 
 package lcmc.cluster.ui.resource;
 
-import javax.inject.Named;
-import javax.swing.ImageIcon;
-import javax.swing.JEditorPane;
-
-import lcmc.common.domain.Application;
-import lcmc.common.ui.Info;
-import lcmc.host.domain.Host;
-import lcmc.common.domain.Value;
-import lcmc.drbd.domain.NetInterface;
-import lcmc.common.ui.Browser;
-import lcmc.host.ui.HostBrowser;
-import lcmc.common.domain.util.Tools;
 import lcmc.cluster.service.ssh.ExecCommandConfig;
 import lcmc.cluster.service.ssh.SshOutput;
+import lcmc.common.domain.Application;
+import lcmc.common.domain.Value;
+import lcmc.common.domain.util.Tools;
+import lcmc.common.ui.Browser;
+import lcmc.common.ui.Info;
+import lcmc.drbd.domain.NetInterface;
+import lcmc.host.domain.Host;
+import lcmc.host.ui.HostBrowser;
+
+import javax.inject.Named;
+import javax.swing.*;
 
 /**
  * This class holds info data for a net interface.
@@ -47,10 +46,11 @@ public class NetInfo extends Info {
     public static final ImageIcon NET_INTERFACE_ICON_LARGE =
                                                Tools.createImageIcon(Tools.getDefault("HostBrowser.NetIntIconLarge"));
     public static final String IP_PLACEHOLDER = "--.--.--.--";
+    private NetInterface netInterface;
 
     public void init(final String name, final NetInterface netInterface, final Browser browser) {
+        this.netInterface = netInterface;
         super.init(name, browser);
-        setResource(netInterface);
     }
 
     @Override
@@ -101,7 +101,7 @@ public class NetInfo extends Info {
     }
 
     public final NetInterface getNetInterface() {
-        return (NetInterface) getResource();
+        return netInterface;
     }
 
     public final boolean isLocalHost() {
