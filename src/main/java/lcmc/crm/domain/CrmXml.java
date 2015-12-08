@@ -22,6 +22,37 @@
 
 package lcmc.crm.domain;
 
+import com.google.common.collect.HashBasedTable;
+import com.google.common.collect.Table;
+import lcmc.Exceptions;
+import lcmc.cluster.service.ssh.ExecCommandConfig;
+import lcmc.cluster.service.ssh.SshOutput;
+import lcmc.common.domain.AccessMode;
+import lcmc.common.domain.Application;
+import lcmc.common.domain.ConvertCmdCallback;
+import lcmc.common.domain.StringValue;
+import lcmc.common.domain.Unit;
+import lcmc.common.domain.Value;
+import lcmc.common.domain.XMLTools;
+import lcmc.common.domain.util.Tools;
+import lcmc.common.ui.Info;
+import lcmc.common.ui.main.ProgressIndicator;
+import lcmc.crm.ui.resource.ResourceUpdater;
+import lcmc.crm.ui.resource.ServiceInfo;
+import lcmc.crm.ui.resource.ServicesInfo;
+import lcmc.host.domain.Host;
+import lcmc.logger.Logger;
+import lcmc.logger.LoggerFactory;
+import lcmc.robotest.StartTests;
+import lcmc.robotest.Test;
+import org.apache.commons.collections15.map.MultiKeyMap;
+import org.w3c.dom.Document;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Provider;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -39,37 +70,6 @@ import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import com.google.common.collect.HashBasedTable;
-import com.google.common.collect.Table;
-import lcmc.Exceptions;
-import lcmc.common.domain.AccessMode;
-import lcmc.common.ui.Info;
-import lcmc.common.ui.main.ProgressIndicator;
-import lcmc.crm.ui.resource.ServiceInfo;
-import lcmc.crm.ui.resource.ServicesInfo;
-import lcmc.common.domain.Application;
-import lcmc.host.domain.Host;
-import lcmc.common.domain.StringValue;
-import lcmc.common.domain.Value;
-import lcmc.common.domain.XMLTools;
-import lcmc.robotest.StartTests;
-import lcmc.robotest.Test;
-import lcmc.common.domain.ConvertCmdCallback;
-import lcmc.logger.Logger;
-import lcmc.logger.LoggerFactory;
-import lcmc.common.domain.util.Tools;
-import lcmc.common.domain.Unit;
-import lcmc.cluster.service.ssh.ExecCommandConfig;
-import lcmc.cluster.service.ssh.SshOutput;
-
-import org.apache.commons.collections15.map.MultiKeyMap;
-import org.w3c.dom.Document;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
-import javax.inject.Inject;
-import javax.inject.Named;
 
 /**
  * This class parses ocf crm xml, stores information like
@@ -345,6 +345,8 @@ public final class CrmXml {
     private Application application;
     @Inject
     private StartTests startTests;
+    @Inject
+    private Provider<ResourceUpdater> resourceUpdaterProvider;
 
     public static Unit getUnitMilliSec() {
         return new Unit("ms", "ms", "Millisecond", "Milliseconds");
@@ -734,7 +736,9 @@ public final class CrmXml {
                 final String hn = host.getName();
                 final String text = Tools.getString("CRMXML.GetRAMetaData.Done");
                 progressIndicator.startProgressIndicator(hn, text);
-                allServicesInfo.setAllResources(allServicesInfo.getBrowser().getClusterStatus(), Application.RunMode.LIVE);
+                resourceUpdaterProvider.get().setAllResources(
+                        allServicesInfo, allServicesInfo.getBrowser(), allServicesInfo.getBrowser().getClusterStatus(),
+                        Application.RunMode.LIVE);
                 final Info lastSelectedInfo = allServicesInfo.getBrowser().getClusterViewPanel().getLastSelectedInfo();
                 if (lastSelectedInfo instanceof ServiceInfo || lastSelectedInfo instanceof ServicesInfo) {
                     allServicesInfo.getBrowser().getClusterViewPanel().reloadRightComponent();

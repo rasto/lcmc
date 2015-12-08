@@ -22,56 +22,52 @@
 
 package lcmc.crm.ui.resource;
 
-import java.awt.BorderLayout;
-import java.awt.Dimension;
+import com.google.common.base.Optional;
+import lcmc.cluster.ui.ClusterBrowser;
+import lcmc.cluster.ui.widget.Check;
+import lcmc.cluster.ui.widget.Widget;
+import lcmc.common.domain.AccessMode;
+import lcmc.common.domain.Application;
+import lcmc.common.domain.Resource;
+import lcmc.common.domain.StringValue;
+import lcmc.common.domain.Value;
+import lcmc.common.domain.util.Tools;
+import lcmc.common.ui.Browser;
+import lcmc.common.ui.EditableInfo;
+import lcmc.common.ui.Info;
+import lcmc.common.ui.main.MainData;
+import lcmc.common.ui.main.ProgressIndicator;
+import lcmc.common.ui.treemenu.TreeMenuController;
+import lcmc.common.ui.utils.ButtonCallback;
+import lcmc.common.ui.utils.ComponentWithTest;
+import lcmc.common.ui.utils.Dialogs;
+import lcmc.common.ui.utils.SwingUtils;
+import lcmc.common.ui.utils.UpdatableItem;
+import lcmc.crm.domain.ClusterStatus;
+import lcmc.crm.domain.CrmXml;
+import lcmc.crm.domain.PtestData;
+import lcmc.crm.domain.ResourceAgent;
+import lcmc.crm.service.CRM;
+import lcmc.crm.ui.CrmGraph;
+import lcmc.host.domain.Host;
+import lcmc.logger.Logger;
+import lcmc.logger.LoggerFactory;
+
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.swing.*;
+import javax.swing.tree.DefaultMutableTreeNode;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.geom.Point2D;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.CountDownLatch;
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Provider;
-import javax.swing.*;
-import javax.swing.tree.DefaultMutableTreeNode;
-
-import com.google.common.base.Optional;
-import lcmc.common.domain.AccessMode;
-import lcmc.common.ui.main.MainData;
-import lcmc.common.domain.Application;
-import lcmc.common.ui.main.ProgressIndicator;
-import lcmc.common.ui.treemenu.TreeMenuController;
-import lcmc.common.ui.utils.Dialogs;
-import lcmc.common.ui.utils.SwingUtils;
-import lcmc.crm.domain.CrmXml;
-import lcmc.crm.domain.ClusterStatus;
-import lcmc.host.domain.Host;
-import lcmc.crm.domain.PtestData;
-import lcmc.crm.domain.ResourceAgent;
-import lcmc.common.domain.StringValue;
-import lcmc.common.domain.Value;
-import lcmc.common.domain.Resource;
-import lcmc.common.ui.Browser;
-import lcmc.crm.ui.CrmGraph;
-import lcmc.cluster.ui.ClusterBrowser;
-import lcmc.common.ui.EditableInfo;
-import lcmc.common.ui.Info;
-import lcmc.cluster.ui.widget.Check;
-import lcmc.cluster.ui.widget.Widget;
-import lcmc.common.ui.utils.ButtonCallback;
-import lcmc.crm.service.CRM;
-import lcmc.common.ui.utils.ComponentWithTest;
-import lcmc.logger.Logger;
-import lcmc.logger.LoggerFactory;
-import lcmc.common.domain.util.Tools;
-import lcmc.common.ui.utils.UpdatableItem;
 
 /**
  * This class holds info data for services view and global heartbeat
@@ -88,10 +84,6 @@ public class ServicesInfo extends EditableInfo {
     private ServicesMenu servicesMenu;
     @Inject
     private ProgressIndicator progressIndicator;
-    @Inject
-    private Provider<ConstraintPHInfo> constraintPHInfoProvider;
-    @Inject
-    private Provider<PcmkRscSetsInfo> pcmkRscSetsInfoProvider;
     @Inject
     private Application application;
     @Inject
@@ -310,435 +302,6 @@ public class ServicesInfo extends EditableInfo {
                 }
             });
         }
-    }
-
-    /**
-     * Check if this connection is filesystem with drbd ra and if so, set it.
-     */
-    private void setFilesystemWithDrbd(final ServiceInfo siP, final ServiceInfo si) {
-        if (siP.getResourceAgent().isLinbitDrbd()) {
-            /* linbit::drbd -> Filesystem */
-            ((FilesystemRaInfo) si).setLinbitDrbdInfo((LinbitDrbdInfo) siP);
-        } else {
-            /* drbddisk -> Filesystem */
-            ((FilesystemRaInfo) si).setDrbddiskInfo((DrbddiskInfo) siP);
-        }
-    }
-
-    /** Sets clone info object. */
-    private CloneInfo setCreateCloneInfo(final String cloneId,
-                                         final ClusterStatus clStatus,
-                                         final Application.RunMode runMode) {
-        CloneInfo newCi = (CloneInfo) getBrowser().getServiceInfoFromCRMId(cloneId);
-        final CrmGraph hg = getBrowser().getCrmGraph();
-        if (newCi == null) {
-            final Point2D p = null;
-            newCi =
-               (CloneInfo) addServicePanel(getBrowser().getCrmXml().getCloneResourceAgent(),
-                                           p,
-                                           false,
-                                           cloneId,
-                                           null,
-                                           runMode);
-            getBrowser().addToHeartbeatIdList(newCi);
-            final Map<String, String> resourceNode = clStatus.getParamValuePairs(newCi.getHeartbeatId(runMode));
-            newCi.setParameters(resourceNode);
-        } else {
-            final Map<String, String> resourceNode = clStatus.getParamValuePairs(newCi.getHeartbeatId(runMode));
-            newCi.setParameters(resourceNode);
-            if (Application.isLive(runMode)) {
-                newCi.setUpdated(false);
-                hg.repaint();
-            }
-        }
-        newCi.getService().setNew(false);
-        return newCi;
-    }
-
-    private GroupInfo setCreateGroupInfo(final String group,
-                                         final CloneInfo newCi,
-                                         final ClusterStatus clStatus,
-                                         final Application.RunMode runMode) {
-        GroupInfo newGi = (GroupInfo) getBrowser().getServiceInfoFromCRMId(group);
-        final CrmGraph hg = getBrowser().getCrmGraph();
-        if (newGi == null) {
-            final Point2D p = null;
-            newGi =
-              (GroupInfo) addServicePanel(getBrowser().getCrmXml().getGroupResourceAgent(),
-                                          p,
-                                          false,
-                                          group,
-                                          newCi,
-                                          runMode);
-            final Map<String, String> resourceNode = clStatus.getParamValuePairs(newGi.getHeartbeatId(runMode));
-            newGi.setParameters(resourceNode);
-            if (newCi != null) {
-                newCi.addCloneServicePanel(newGi);
-            }
-        } else {
-            final Map<String, String> resourceNode = clStatus.getParamValuePairs(newGi.getHeartbeatId(runMode));
-            newGi.setParameters(resourceNode);
-            if (Application.isLive(runMode)) {
-                newGi.setUpdated(false);
-                hg.repaint();
-            }
-        }
-        newGi.getService().setNew(false);
-        return newGi;
-    }
-
-    private void setGroupResources(final Set<String> allGroupsAndClones,
-                                   final String grpOrCloneId,
-                                   final GroupInfo newGi,
-                                   final CloneInfo newCi,
-                                   final List<ServiceInfo> serviceIsPresent,
-                                   final List<ServiceInfo> groupServiceIsPresent,
-                                   final ClusterStatus clStatus,
-                                   final Application.RunMode runMode) {
-        final Map<ServiceInfo, Map<String, String>> setParametersHash = new HashMap<ServiceInfo, Map<String, String>>();
-        if (newCi != null) {
-            setParametersHash.put(newCi, clStatus.getParamValuePairs(grpOrCloneId));
-        } else if (newGi != null) {
-            setParametersHash.put(newGi, clStatus.getParamValuePairs(grpOrCloneId));
-        }
-        final CrmGraph hg = getBrowser().getCrmGraph();
-        final List<String> gs = clStatus.getGroupResources(grpOrCloneId, runMode);
-        if (gs == null) {
-            return;
-        }
-        boolean newService = false;
-        int pos = 0;
-        for (final String hbId : gs) {
-            if (clStatus.isOrphaned(hbId) && application.isHideLRM()) {
-                continue;
-            }
-            ServiceInfo newServiceInfo;
-            if (allGroupsAndClones.contains(hbId)) {
-                if (newGi != null) {
-                    LOG.appWarning("setGroupResources: group in group not implemented");
-                    continue;
-                }
-                /* clone group */
-                final GroupInfo gi = setCreateGroupInfo(hbId, newCi, clStatus, runMode);
-                setGroupResources(allGroupsAndClones,
-                                  hbId,
-                                  gi,
-                                  null,
-                                  serviceIsPresent,
-                                  groupServiceIsPresent,
-                                  clStatus,
-                                  runMode);
-                newServiceInfo = gi;
-            } else {
-                final ResourceAgent newResourceAgent = clStatus.getResourceType(hbId);
-                if (newResourceAgent == null) {
-                    /* This is bad. There is a service but we do not have
-                     * the heartbeat script of this service or the we look
-                     * in the wrong places.
-                     */
-                    LOG.appWarning("setGroupResources: " + hbId + ": could not find resource agent");
-                }
-                /* continue of creating/updating of the
-                 * service in the gui.
-                 */
-                newServiceInfo = getBrowser().getServiceInfoFromCRMId(hbId);
-                final Map<String, String> resourceNode = clStatus.getParamValuePairs(hbId);
-                if (newServiceInfo == null) {
-                    newService = true;
-                    newServiceInfo = crmServiceFactory.createServiceWithParameters(
-                            hbId,
-                            newResourceAgent,
-                            resourceNode,
-                            getBrowser());
-                    newServiceInfo.getService().setCrmId(hbId);
-                    getBrowser().addToHeartbeatIdList(newServiceInfo);
-                    if (newGi != null) {
-                        newGi.addGroupServicePanel(newServiceInfo, false);
-                    } else if (newCi != null) {
-                        newCi.addCloneServicePanel(newServiceInfo);
-                    } else {
-                        final Point2D p = null;
-                        addServicePanel(newServiceInfo, p, false, false, runMode);
-                    }
-                } else {
-                    getBrowser().addNameToServiceInfoHash(newServiceInfo);
-                    setParametersHash.put(newServiceInfo, resourceNode);
-                }
-                newServiceInfo.getService().setNew(false);
-                serviceIsPresent.add(newServiceInfo);
-                if (newGi != null || newCi != null) {
-                    groupServiceIsPresent.add(newServiceInfo);
-                }
-            }
-            final DefaultMutableTreeNode node = newServiceInfo.getNode();
-            if (node != null) {
-                treeMenuController.moveNodeToPosition(node, pos);
-                pos++;
-            }
-        }
-
-        for (final Map.Entry<ServiceInfo, Map<String, String>> setEntry : setParametersHash.entrySet()) {
-            setEntry.getKey().setParameters(setEntry.getValue());
-            if (Application.isLive(runMode)) {
-                setEntry.getKey().setUpdated(false);
-            }
-        }
-        if (newService) {
-            treeMenuController.reloadNode(getBrowser().getServicesNode(), false);
-        }
-        hg.repaint();
-    }
-
-    /**
-     * This functions goes through all services, constrains etc. in
-     * clusterStatus and updates the internal structures and graph.
-     */
-    public void setAllResources(final ClusterStatus clStatus, final Application.RunMode runMode) {
-        if (clStatus == null) {
-            return;
-        }
-        final Set<String> allGroupsAndClones = clStatus.getAllGroups();
-        final CrmGraph hg = getBrowser().getCrmGraph();
-        final List<ServiceInfo> groupServiceIsPresent = new ArrayList<ServiceInfo>();
-        final List<ServiceInfo> serviceIsPresent = new ArrayList<ServiceInfo>();
-        for (final String groupOrClone : allGroupsAndClones) {
-            CloneInfo newCi = null;
-            GroupInfo newGi = null;
-            if (clStatus.isClone(groupOrClone)) {
-                /* clone */
-                newCi = setCreateCloneInfo(groupOrClone, clStatus, runMode);
-                serviceIsPresent.add(newCi);
-            } else if (!"none".equals(groupOrClone)) {
-                /* group */
-                final GroupInfo gi = (GroupInfo) getBrowser().getServiceInfoFromCRMId(groupOrClone);
-                if (gi != null && gi.getCloneInfo() != null) {
-                    /* cloned group is already done */
-                    groupServiceIsPresent.add(gi);
-                    continue;
-                }
-                newGi = setCreateGroupInfo(groupOrClone, newCi, clStatus, runMode);
-                serviceIsPresent.add(newGi);
-            }
-            setGroupResources(allGroupsAndClones,
-                              groupOrClone,
-                              newGi,
-                              newCi,
-                              serviceIsPresent,
-                              groupServiceIsPresent,
-                              clStatus,
-                              runMode);
-        }
-
-        hg.clearKeepColocationList();
-        hg.clearKeepOrderList();
-        /* resource sets */
-        final List<CrmXml.RscSetConnectionData> rscSetConnections = clStatus.getRscSetConnections();
-        if (rscSetConnections != null) {
-            final Map<CrmXml.RscSetConnectionData, ConstraintPHInfo> rdataToCphi =
-                                                     new LinkedHashMap<CrmXml.RscSetConnectionData, ConstraintPHInfo>();
-            getBrowser().lockNameToServiceInfo();
-            final Map<String, ServiceInfo> idToInfoHash = getBrowser().getNameToServiceInfoHash(ConstraintPHInfo.NAME);
-            final List<ConstraintPHInfo> preNewCphis = new ArrayList<ConstraintPHInfo>();
-            if (idToInfoHash != null) {
-                for (final Map.Entry<String, ServiceInfo> infoEntry : idToInfoHash.entrySet()) {
-                    final ConstraintPHInfo cphi = (ConstraintPHInfo) infoEntry.getValue();
-                    final CrmXml.RscSetConnectionData rdataOrd = cphi.getRscSetConnectionDataOrder();
-                    final CrmXml.RscSetConnectionData rdataCol = cphi.getRscSetConnectionDataColocation();
-                    if (cphi.getService().isNew()) {
-                        preNewCphis.add(cphi);
-                    }
-                    if (rdataOrd != null && !rdataOrd.isEmpty()) {
-                        rdataToCphi.put(rdataOrd, cphi);
-                    }
-                    if (rdataCol != null && !rdataCol.isEmpty()) {
-                        rdataToCphi.put(rdataCol, cphi);
-                    }
-                }
-            }
-            getBrowser().unlockNameToServiceInfo();
-            final Collection<ConstraintPHInfo> newCphis = new ArrayList<ConstraintPHInfo>();
-            for (final CrmXml.RscSetConnectionData rdata : rscSetConnections) {
-                ConstraintPHInfo constraintPHInfo = null;
-
-                for (final Map.Entry<CrmXml.RscSetConnectionData, ConstraintPHInfo> phEntry : rdataToCphi.entrySet()) {
-                    if (phEntry.getKey() == rdata) {
-                        continue;
-                    }
-                    if (rdata.equals(phEntry.getKey()) || rdata.equalsAlthoughReversed(phEntry.getKey())) {
-                        constraintPHInfo = phEntry.getValue();
-                        constraintPHInfo.setRscSetConnectionData(rdata);
-                        break;
-                    }
-                }
-                PcmkRscSetsInfo rscSetsInfo = null;
-                if (constraintPHInfo == null) {
-                    for (final Map.Entry<CrmXml.RscSetConnectionData, ConstraintPHInfo> phEntry
-                            : rdataToCphi.entrySet()) {
-                        if (phEntry.getKey() == rdata) {
-                            constraintPHInfo = phEntry.getValue();
-                            break;
-                        }
-                        if (phEntry.getValue().sameConstraintId(rdata)) {
-                            /* use the same rsc set info object */
-                            rscSetsInfo = phEntry.getValue().getPcmkRscSetsInfo();
-                        }
-                        if (phEntry.getValue().getService().isNew()
-                            || (rdata.canUseSamePlaceholder(phEntry.getKey())
-                                && phEntry.getValue().sameConstraintId(rdata))) {
-                            constraintPHInfo = phEntry.getValue();
-                            constraintPHInfo.setRscSetConnectionData(rdata);
-                            rscSetsInfo = constraintPHInfo.getPcmkRscSetsInfo();
-                            if (rscSetsInfo != null) {
-                                if (rdata.isColocation()) {
-                                    rscSetsInfo.addColocation(rdata.getConstraintId(), constraintPHInfo);
-                                } else {
-                                    rscSetsInfo.addOrder(rdata.getConstraintId(), constraintPHInfo);
-                                }
-                            }
-                            break;
-                        }
-                    }
-                }
-                if (constraintPHInfo == null && !preNewCphis.isEmpty()) {
-                    /* placeholder */
-                    constraintPHInfo = preNewCphis.remove(0);
-                    rdataToCphi.put(rdata, constraintPHInfo);
-                    constraintPHInfo.setRscSetConnectionData(rdata);
-                }
-                if (constraintPHInfo == null) {
-                    constraintPHInfo = constraintPHInfoProvider.get();
-                    constraintPHInfo.init(getBrowser(), rdata, ConstraintPHInfo.Preference.AND);
-                    if (rscSetsInfo == null) {
-                        rscSetsInfo = pcmkRscSetsInfoProvider.get();
-                        rscSetsInfo.init(getBrowser());
-                    }
-                    if (rdata.isColocation()) {
-                        rscSetsInfo.addColocation(rdata.getConstraintId(), constraintPHInfo);
-                    } else {
-                        rscSetsInfo.addOrder(rdata.getConstraintId(), constraintPHInfo);
-                    }
-                    constraintPHInfo.setPcmkRscSetsInfo(rscSetsInfo);
-                    getBrowser().addNameToServiceInfoHash(constraintPHInfo);
-                    newCphis.add(constraintPHInfo); /* have to add it later,
-                                           so that ids are correct. */
-                    rdataToCphi.put(rdata, constraintPHInfo);
-                }
-                serviceIsPresent.add(constraintPHInfo);
-
-                final CrmXml.RscSet rscSet1 = rdata.getRscSet1();
-                final CrmXml.RscSet rscSet2 = rdata.getRscSet2();
-                if (rdata.isColocation()) {
-                    /* colocation */
-                    if (rscSet1 != null) {
-                        for (final String rscId : rscSet1.getRscIds()) {
-                            final ServiceInfo si =
-                               getBrowser().getServiceInfoFromCRMId(rscId);
-                            hg.addColocation(rdata.getConstraintId(), constraintPHInfo, si);
-                        }
-                    }
-                    if (rscSet2 != null) {
-                        for (final String rscId : rscSet2.getRscIds()) {
-                            final ServiceInfo si = getBrowser().getServiceInfoFromCRMId( rscId);
-                            hg.addColocation(rdata.getConstraintId(), si, constraintPHInfo);
-                        }
-                    }
-                } else {
-                    /* order */
-                    if (rscSet1 != null) {
-                        for (final String rscId : rscSet1.getRscIds()) {
-                            final ServiceInfo si = getBrowser().getServiceInfoFromCRMId( rscId);
-                            hg.addOrder(rdata.getConstraintId(), si, constraintPHInfo);
-                        }
-                    }
-                    if (rscSet2 != null) {
-                        for (final String rscId : rscSet2.getRscIds()) {
-                            final ServiceInfo si = getBrowser().getServiceInfoFromCRMId(rscId);
-                            hg.addOrder(rdata.getConstraintId(), constraintPHInfo, si);
-                        }
-                    }
-                }
-                if (Application.isLive(runMode)) {
-                    constraintPHInfo.setUpdated(false);
-                    constraintPHInfo.getService().setNew(false);
-                }
-            }
-
-            for (final ConstraintPHInfo cphi : newCphis) {
-                hg.addConstraintPlaceholder(cphi,
-                                            null, /* pos */
-                                            Application.RunMode.LIVE);
-            }
-        }
-
-        /* colocations */
-        final Map<String, List<CrmXml.ColocationData>> colocationMap = clStatus.getColocationRscMap();
-        for (final Map.Entry<String, List<CrmXml.ColocationData>> colocationEntry : colocationMap.entrySet()) {
-            final List<CrmXml.ColocationData> withs = colocationEntry.getValue();
-            for (final CrmXml.ColocationData data : withs) {
-                final String withRscId = data.getWithRsc();
-                final ServiceInfo withSi = getBrowser().getServiceInfoFromCRMId(withRscId);
-                final ServiceInfo siP = getBrowser().getServiceInfoFromCRMId(colocationEntry.getKey());
-                hg.addColocation(data.getId(), siP, withSi);
-            }
-        }
-
-        /* orders */
-        final Map<String, List<CrmXml.OrderData>> orderMap = clStatus.getOrderRscMap();
-        for (final Map.Entry<String, List<CrmXml.OrderData>> orderEntry : orderMap.entrySet()) {
-            for (final CrmXml.OrderData data : orderEntry.getValue()) {
-                final String rscThenId = data.getRscThen();
-                final ServiceInfo si = getBrowser().getServiceInfoFromCRMId(rscThenId);
-                if (si != null) { /* not yet complete */
-                    final ServiceInfo siP = getBrowser().getServiceInfoFromCRMId(orderEntry.getKey());
-                    if (siP != null && siP.getResourceAgent() != null) {
-                        /* dangling orders and colocations */
-                        if ((siP.getResourceAgent().isDrbddisk() || siP.getResourceAgent().isLinbitDrbd())
-                            && "Filesystem".equals(si.getName())) {
-                            final List<CrmXml.ColocationData> cds = clStatus.getColocationDatas(orderEntry.getKey());
-                            if (cds != null) {
-                                for (final CrmXml.ColocationData cd : cds) {
-                                    if (cd.getWithRsc().equals(rscThenId)) {
-                                        setFilesystemWithDrbd(siP, si);
-                                    }
-                                }
-                            }
-                        }
-                        hg.addOrder(data.getId(), siP, si);
-                    }
-                }
-            }
-        }
-
-        for (final Object info : treeMenuController.nodesToInfos(getNode().children())) {
-            final ServiceInfo serviceInfo = (ServiceInfo) info;
-            for (final ServiceInfo subService : serviceInfo.getSubServices()) {
-                if (!groupServiceIsPresent.contains(subService) && !subService.getService().isNew()) {
-                    /* remove the group service from the menu
-                       that does not exist anymore. */
-                    subService.removeInfo();
-                }
-            }
-        }
-        hg.setServiceIsPresentList(serviceIsPresent);
-        /** Set placeholders to "new", if they have no connections. */
-        swingUtils.invokeInEdt(new Runnable() {
-            @Override
-            public void run() {
-                hg.killRemovedEdges();
-                final Map<String, ServiceInfo> idToInfoHash =
-                                                   getBrowser().getNameToServiceInfoHash(ConstraintPHInfo.NAME);
-                if (idToInfoHash != null) {
-                    for (final Map.Entry<String, ServiceInfo> serviceEntry : idToInfoHash.entrySet()) {
-                        final ConstraintPHInfo cphi = (ConstraintPHInfo) serviceEntry.getValue();
-                        if (!cphi.getService().isNew() && cphi.isEmpty()) {
-                            cphi.getService().setNew(true);
-                        }
-                    }
-                }
-                hg.killRemovedVertices();
-                hg.scale();
-            }
-        });
     }
 
     /** Clears the info panel cache, forcing it to reload. */
