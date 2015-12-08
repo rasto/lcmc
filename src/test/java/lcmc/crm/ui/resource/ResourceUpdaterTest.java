@@ -25,8 +25,11 @@ import lcmc.common.domain.Application;
 import lcmc.crm.domain.ClusterStatus;
 import lombok.val;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.mockito.Mock;
+import org.mockito.runners.MockitoJUnitRunner;
 
+@RunWith(MockitoJUnitRunner.class)
 public class ResourceUpdaterTest {
     @Mock
     ServicesInfo servicesInfo;

@@ -23,6 +23,20 @@
 
 package lcmc.crm.domain;
 
+import com.google.common.collect.Table;
+import lcmc.cluster.service.ssh.ExecCommandConfig;
+import lcmc.cluster.service.ssh.SshOutput;
+import lcmc.common.domain.Application;
+import lcmc.common.domain.ConvertCmdCallback;
+import lcmc.common.domain.Value;
+import lcmc.common.domain.util.Tools;
+import lcmc.common.ui.Access;
+import lcmc.host.domain.Host;
+import lcmc.logger.Logger;
+import lcmc.logger.LoggerFactory;
+
+import javax.inject.Inject;
+import javax.inject.Named;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -30,27 +44,12 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
-import com.google.common.collect.Table;
-import lcmc.common.domain.Application;
-import lcmc.common.ui.Access;
-import lcmc.host.domain.Host;
-import lcmc.common.domain.Value;
-import lcmc.common.domain.ConvertCmdCallback;
-import lcmc.logger.Logger;
-import lcmc.logger.LoggerFactory;
-import lcmc.common.domain.util.Tools;
-import lcmc.cluster.service.ssh.ExecCommandConfig;
-import lcmc.cluster.service.ssh.SshOutput;
-
-import javax.inject.Inject;
-import javax.inject.Named;
-
 /**
  * This class parses pacemaker/heartbeat status, stores information
  * in the hashes and provides methods to get this information.
  */
 @Named
-public final class ClusterStatus {
+public class ClusterStatus {
     private static final Logger LOG = LoggerFactory.getLogger(ClusterStatus.class);
     private volatile CibQuery cibQuery = new CibQuery();
     private volatile CibQuery shadowCibQuery = new CibQuery();
