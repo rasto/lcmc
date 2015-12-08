@@ -95,10 +95,8 @@ public class ServicesInfo extends EditableInfo {
     @Inject
     private Dialogs dialogs;
 
-    @Override
-    public void init(final String name, final Browser browser) {
-        super.init(name, browser);
-        setResource(new ResourceValue(name));
+    public void einit(final String name, final Browser browser) {
+        super.einit(new ResourceValue(name), name, browser);
     }
 
     @Override

@@ -331,7 +331,7 @@ public class ClusterBrowser extends Browser {
         clusterEventBus.register(this);
         crmGraph.initGraph(this);
         drbdGraph.initGraph(this);
-        globalInfo.init(Tools.getString("ClusterBrowser.Drbd"), this);
+        globalInfo.einit(Tools.getString("ClusterBrowser.Drbd"), this);
         treeTop = treeMenuController.createMenuTreeTop();
     }
 
@@ -516,9 +516,9 @@ public class ClusterBrowser extends Browser {
 
         /* resource defaults */
         rscDefaultsInfo = rscDefaultsInfoProvider.get();
-        rscDefaultsInfo.init("rsc_defaults", this);
+        rscDefaultsInfo.einit("rsc_defaults", this);
         /* services */
-        servicesInfo.init(Tools.getString("ClusterBrowser.Services"), this);
+        servicesInfo.einit(Tools.getString("ClusterBrowser.Services"), this);
         servicesNode = treeMenuController.createMenuItem(crmNode, servicesInfo);
         addVmsNode();
         treeMenuController.selectPath(new Object[]{treeTop, crmNode});
@@ -1266,7 +1266,7 @@ public class ClusterBrowser extends Browser {
             }
             /* add new vms nodes */
             final DomainInfo domainInfo = domainInfoProvider.get();
-            domainInfo.init(domainName, this);
+            domainInfo.einit(domainName, this);
             currentVMSVDIs.add(domainInfo);
             treeMenuController.createMenuItem(vmsNode, domainInfo, i);
             domainInfo.updateParameters();

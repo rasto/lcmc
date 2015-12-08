@@ -22,9 +22,40 @@
 
 package lcmc.drbd.ui.resource;
 
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Dimension;
+import lcmc.Exceptions;
+import lcmc.cluster.ui.ClusterBrowser;
+import lcmc.cluster.ui.widget.Check;
+import lcmc.cluster.ui.widget.Widget;
+import lcmc.common.domain.AccessMode;
+import lcmc.common.domain.Application;
+import lcmc.common.domain.ColorText;
+import lcmc.common.domain.StringValue;
+import lcmc.common.domain.Value;
+import lcmc.common.domain.util.Tools;
+import lcmc.common.ui.Browser;
+import lcmc.common.ui.EditableInfo;
+import lcmc.common.ui.Info;
+import lcmc.common.ui.MainPanel;
+import lcmc.common.ui.treemenu.TreeMenuController;
+import lcmc.common.ui.utils.ButtonCallback;
+import lcmc.common.ui.utils.ComponentWithTest;
+import lcmc.common.ui.utils.SwingUtils;
+import lcmc.common.ui.utils.UpdatableItem;
+import lcmc.drbd.domain.BlockDevice;
+import lcmc.drbd.domain.DRBDtestData;
+import lcmc.drbd.domain.DrbdXml;
+import lcmc.drbd.service.DRBD;
+import lcmc.drbd.ui.DrbdGraph;
+import lcmc.host.domain.Host;
+import lcmc.host.ui.HostBrowser;
+import lcmc.logger.Logger;
+import lcmc.logger.LoggerFactory;
+import lcmc.lvm.service.LVM;
+
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.swing.*;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.net.UnknownHostException;
@@ -37,42 +68,6 @@ import java.util.Set;
 import java.util.concurrent.CountDownLatch;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.swing.BoxLayout;
-import javax.swing.ImageIcon;
-import javax.swing.JComponent;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import lcmc.Exceptions;
-import lcmc.common.domain.AccessMode;
-import lcmc.common.ui.Browser;
-import lcmc.cluster.ui.ClusterBrowser;
-import lcmc.common.ui.MainPanel;
-import lcmc.common.ui.treemenu.TreeMenuController;
-import lcmc.common.ui.utils.SwingUtils;
-import lcmc.drbd.ui.DrbdGraph;
-import lcmc.host.ui.HostBrowser;
-import lcmc.common.domain.Application;
-import lcmc.common.domain.ColorText;
-import lcmc.host.domain.Host;
-import lcmc.common.domain.StringValue;
-import lcmc.common.domain.Value;
-import lcmc.drbd.domain.DRBDtestData;
-import lcmc.drbd.domain.DrbdXml;
-import lcmc.drbd.domain.BlockDevice;
-import lcmc.common.ui.EditableInfo;
-import lcmc.common.ui.Info;
-import lcmc.cluster.ui.widget.Check;
-import lcmc.cluster.ui.widget.Widget;
-import lcmc.common.ui.utils.ButtonCallback;
-import lcmc.common.ui.utils.ComponentWithTest;
-import lcmc.drbd.service.DRBD;
-import lcmc.lvm.service.LVM;
-import lcmc.logger.Logger;
-import lcmc.logger.LoggerFactory;
-import lcmc.common.domain.util.Tools;
-import lcmc.common.ui.utils.UpdatableItem;
 
 /**
  * This class holds info data for a block device.
@@ -114,8 +109,7 @@ public class BlockDevInfo extends EditableInfo {
     private TreeMenuController treeMenuController;
 
     public void init(final String name, final BlockDevice blockDevice, final Browser browser) {
-        super.init(name, browser);
-        setResource(blockDevice);
+        super.einit(blockDevice, name, browser);
     }
 
     /**

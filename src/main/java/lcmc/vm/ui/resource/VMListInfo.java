@@ -296,7 +296,7 @@ public final class VMListInfo extends CategoryInfo {
      */
     public void addDomainPanel() {
         final DomainInfo domainInfo = domainInfoProvider.get();
-        domainInfo.init(null, getBrowser());
+        domainInfo.einit(null, getBrowser());
         domainInfo.getResource().setNew(true);
         treeMenuController.createMenuItem(getNode(), domainInfo);
         swingUtils.invokeInEdt(new Runnable() {

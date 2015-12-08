@@ -21,26 +21,26 @@
  */
 package lcmc.crm.ui.resource;
 
-import java.util.Collection;
-import java.util.Map;
-import javax.inject.Named;
-import javax.swing.JPanel;
-
-import lcmc.common.domain.AccessMode;
-import lcmc.common.domain.Application;
-import lcmc.crm.domain.CrmXml;
-import lcmc.crm.domain.ClusterStatus;
-import lcmc.common.domain.StringValue;
-import lcmc.common.domain.Value;
-import lcmc.common.domain.ResourceValue;
-import lcmc.common.ui.Browser;
 import lcmc.cluster.ui.ClusterBrowser;
-import lcmc.common.ui.EditableInfo;
 import lcmc.cluster.ui.widget.Check;
 import lcmc.cluster.ui.widget.Widget;
+import lcmc.common.domain.AccessMode;
+import lcmc.common.domain.Application;
+import lcmc.common.domain.ResourceValue;
+import lcmc.common.domain.StringValue;
+import lcmc.common.domain.Value;
+import lcmc.common.domain.util.Tools;
+import lcmc.common.ui.Browser;
+import lcmc.common.ui.EditableInfo;
+import lcmc.crm.domain.ClusterStatus;
+import lcmc.crm.domain.CrmXml;
 import lcmc.logger.Logger;
 import lcmc.logger.LoggerFactory;
-import lcmc.common.domain.util.Tools;
+
+import javax.inject.Named;
+import javax.swing.*;
+import java.util.Collection;
+import java.util.Map;
 
 /**
  * This class is for resource defaults or rsc_defaults.
@@ -48,9 +48,8 @@ import lcmc.common.domain.util.Tools;
 @Named
 public final class RscDefaultsInfo extends EditableInfo {
     private static final Logger LOG = LoggerFactory.getLogger(RscDefaultsInfo.class);
-    public void init(final String name, final Browser browser) {
-        super.init(name, browser);
-        setResource(new ResourceValue(name));
+    public void einit(final String name, final Browser browser) {
+        super.einit(new ResourceValue(name), name, browser);
     }
 
     @Override

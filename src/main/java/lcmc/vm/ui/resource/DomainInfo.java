@@ -21,10 +21,55 @@
  */
 package lcmc.vm.ui.resource;
 
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.FlowLayout;
+import lcmc.Exceptions;
+import lcmc.cluster.ui.ClusterBrowser;
+import lcmc.cluster.ui.resource.NetInfo;
+import lcmc.cluster.ui.widget.Check;
+import lcmc.cluster.ui.widget.Widget;
+import lcmc.cluster.ui.widget.WidgetFactory;
+import lcmc.common.domain.AccessMode;
+import lcmc.common.domain.Application;
+import lcmc.common.domain.ResourceValue;
+import lcmc.common.domain.StringValue;
+import lcmc.common.domain.Unit;
+import lcmc.common.domain.Value;
+import lcmc.common.domain.util.Tools;
+import lcmc.common.ui.Browser;
+import lcmc.common.ui.EditableInfo;
+import lcmc.common.ui.Info;
+import lcmc.common.ui.SpringUtilities;
+import lcmc.common.ui.main.ProgressIndicator;
+import lcmc.common.ui.treemenu.TreeMenuController;
+import lcmc.common.ui.utils.MyButton;
+import lcmc.common.ui.utils.SwingUtils;
+import lcmc.common.ui.utils.UpdatableItem;
+import lcmc.common.ui.utils.WidgetListener;
+import lcmc.crm.ui.resource.ServiceInfo;
+import lcmc.drbd.ui.resource.BlockDevInfo;
+import lcmc.host.domain.Host;
+import lcmc.host.ui.HostBrowser;
+import lcmc.logger.Logger;
+import lcmc.logger.LoggerFactory;
+import lcmc.vm.domain.VMParams;
+import lcmc.vm.domain.VmsXml;
+import lcmc.vm.domain.data.DiskData;
+import lcmc.vm.domain.data.FilesystemData;
+import lcmc.vm.domain.data.GraphicsData;
+import lcmc.vm.domain.data.InputDevData;
+import lcmc.vm.domain.data.InterfaceData;
+import lcmc.vm.domain.data.ParallelData;
+import lcmc.vm.domain.data.SerialData;
+import lcmc.vm.domain.data.SoundData;
+import lcmc.vm.domain.data.VideoData;
+import lcmc.vm.service.VIRSH;
+import org.w3c.dom.Node;
+
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Provider;
+import javax.swing.*;
+import javax.swing.tree.DefaultMutableTreeNode;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
@@ -44,62 +89,6 @@ import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.regex.Matcher;
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Provider;
-import javax.swing.Box;
-import javax.swing.BoxLayout;
-import javax.swing.ImageIcon;
-import javax.swing.JComponent;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTable;
-import javax.swing.SpringLayout;
-import javax.swing.SwingConstants;
-import javax.swing.tree.DefaultMutableTreeNode;
-import lcmc.Exceptions;
-import lcmc.common.ui.Browser;
-import lcmc.cluster.ui.ClusterBrowser;
-import lcmc.common.ui.main.ProgressIndicator;
-import lcmc.common.ui.treemenu.TreeMenuController;
-import lcmc.common.ui.utils.SwingUtils;
-import lcmc.host.ui.HostBrowser;
-import lcmc.common.ui.SpringUtilities;
-import lcmc.common.domain.AccessMode;
-import lcmc.common.domain.Application;
-import lcmc.host.domain.Host;
-import lcmc.common.domain.StringValue;
-import lcmc.vm.domain.VMParams;
-import lcmc.vm.domain.VmsXml;
-import lcmc.vm.domain.data.DiskData;
-import lcmc.vm.domain.data.FilesystemData;
-import lcmc.vm.domain.data.GraphicsData;
-import lcmc.vm.domain.data.InputDevData;
-import lcmc.vm.domain.data.InterfaceData;
-import lcmc.vm.domain.data.ParallelData;
-import lcmc.vm.domain.data.SerialData;
-import lcmc.vm.domain.data.SoundData;
-import lcmc.vm.domain.data.VideoData;
-import lcmc.common.domain.Value;
-import lcmc.common.domain.ResourceValue;
-import lcmc.common.ui.EditableInfo;
-import lcmc.common.ui.Info;
-import lcmc.cluster.ui.resource.NetInfo;
-import lcmc.crm.ui.resource.ServiceInfo;
-import lcmc.drbd.ui.resource.BlockDevInfo;
-import lcmc.cluster.ui.widget.Check;
-import lcmc.cluster.ui.widget.Widget;
-import lcmc.cluster.ui.widget.WidgetFactory;
-import lcmc.logger.Logger;
-import lcmc.logger.LoggerFactory;
-import lcmc.common.ui.utils.MyButton;
-import lcmc.common.domain.util.Tools;
-import lcmc.common.domain.Unit;
-import lcmc.common.ui.utils.UpdatableItem;
-import lcmc.vm.service.VIRSH;
-import lcmc.common.ui.utils.WidgetListener;
-import org.w3c.dom.Node;
 
 /**
  * This class holds info about VirtualDomain service in the VMs category,
@@ -632,8 +621,8 @@ public class DomainInfo extends EditableInfo {
     @Inject
     private TreeMenuController treeMenuController;
 
-    public void init(final String name, final Browser browser) {
-        super.init(name, browser);
+    public void einit(final String name, final Browser browser) {
+        super.einit(new ResourceValue(name), name, browser);
         final Host firstHost = getBrowser().getClusterHosts()[0];
         preferredEmulator = firstHost.getHostParser().getDistString("KVM.emulator");
         final List<Value> hostsList = new ArrayList<Value>();
@@ -642,7 +631,6 @@ public class DomainInfo extends EditableInfo {
             hostsList.add(new StringValue(h.getName()));
         }
         autostartPossibleValues = hostsList.toArray(new Value[hostsList.size()]);
-        setResource(new ResourceValue(name));
     }
 
     @Override

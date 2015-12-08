@@ -21,9 +21,41 @@
  */
 package lcmc.drbd.ui.resource;
 
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Dimension;
+import com.google.common.base.Optional;
+import lcmc.Exceptions;
+import lcmc.cluster.domain.Cluster;
+import lcmc.cluster.ui.ClusterBrowser;
+import lcmc.cluster.ui.widget.Check;
+import lcmc.cluster.ui.widget.Widget;
+import lcmc.common.domain.Application;
+import lcmc.common.domain.Application.RunMode;
+import lcmc.common.domain.ResourceValue;
+import lcmc.common.domain.StringValue;
+import lcmc.common.domain.Value;
+import lcmc.common.domain.util.Tools;
+import lcmc.common.ui.Browser;
+import lcmc.common.ui.treemenu.TreeMenuController;
+import lcmc.common.ui.utils.ButtonCallback;
+import lcmc.common.ui.utils.ComponentWithTest;
+import lcmc.common.ui.utils.Dialogs;
+import lcmc.common.ui.utils.SwingUtils;
+import lcmc.common.ui.utils.UpdatableItem;
+import lcmc.configs.AppDefaults;
+import lcmc.drbd.domain.DRBDtestData;
+import lcmc.drbd.domain.DrbdXml;
+import lcmc.drbd.service.DRBD;
+import lcmc.drbd.ui.AddDrbdConfigDialog;
+import lcmc.host.domain.Host;
+import lcmc.host.domain.HostFactory;
+import lcmc.logger.Logger;
+import lcmc.logger.LoggerFactory;
+
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Provider;
+import javax.swing.*;
+import javax.swing.tree.DefaultMutableTreeNode;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
@@ -39,45 +71,6 @@ import java.util.Set;
 import java.util.concurrent.CountDownLatch;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Provider;
-import javax.swing.BoxLayout;
-import javax.swing.ImageIcon;
-import javax.swing.JComponent;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.tree.DefaultMutableTreeNode;
-
-import com.google.common.base.Optional;
-import lcmc.common.ui.treemenu.TreeMenuController;
-import lcmc.common.ui.utils.Dialogs;
-import lcmc.common.ui.utils.SwingUtils;
-import lcmc.drbd.ui.AddDrbdConfigDialog;
-import lcmc.Exceptions;
-import lcmc.configs.AppDefaults;
-import lcmc.common.domain.Application;
-import lcmc.common.domain.Application.RunMode;
-import lcmc.cluster.domain.Cluster;
-import lcmc.host.domain.Host;
-import lcmc.host.domain.HostFactory;
-import lcmc.common.domain.StringValue;
-import lcmc.common.domain.Value;
-import lcmc.drbd.domain.DRBDtestData;
-import lcmc.drbd.domain.DrbdXml;
-import lcmc.common.domain.ResourceValue;
-import lcmc.common.ui.Browser;
-import lcmc.cluster.ui.ClusterBrowser;
-import lcmc.cluster.ui.widget.Check;
-import lcmc.cluster.ui.widget.Widget;
-import lcmc.common.ui.utils.ButtonCallback;
-import lcmc.common.ui.utils.ComponentWithTest;
-import lcmc.drbd.service.DRBD;
-import lcmc.logger.Logger;
-import lcmc.logger.LoggerFactory;
-import lcmc.common.domain.util.Tools;
-import lcmc.common.ui.utils.UpdatableItem;
 
 /**
  * This class provides drbd info. For one it shows the editable global
@@ -118,9 +111,8 @@ public class GlobalInfo extends AbstractDrbdInfo {
     @Inject
     private Dialogs dialogs;
 
-    public void init(final String name, final Browser browser) {
-        super.init(name, browser);
-        setResource(new ResourceValue(name));
+    public void einit(final String name, final Browser browser) {
+        super.einit(new ResourceValue(name), name, browser);
     }
 
     public void setParameters() {

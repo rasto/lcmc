@@ -21,8 +21,44 @@
  */
 package lcmc.drbd.ui.resource;
 
-import java.awt.BorderLayout;
-import java.awt.Dimension;
+import lcmc.Exceptions;
+import lcmc.cluster.ui.ClusterBrowser;
+import lcmc.cluster.ui.resource.CommonDeviceInterface;
+import lcmc.cluster.ui.widget.Check;
+import lcmc.cluster.ui.wizard.DrbdLogs;
+import lcmc.common.domain.AccessMode;
+import lcmc.common.domain.Application;
+import lcmc.common.domain.StringValue;
+import lcmc.common.domain.Value;
+import lcmc.common.domain.util.Tools;
+import lcmc.common.ui.Browser;
+import lcmc.common.ui.EditableInfo;
+import lcmc.common.ui.treemenu.TreeMenuController;
+import lcmc.common.ui.utils.ButtonCallback;
+import lcmc.common.ui.utils.ComponentWithTest;
+import lcmc.common.ui.utils.SwingUtils;
+import lcmc.common.ui.utils.UpdatableItem;
+import lcmc.crm.ui.CrmGraph;
+import lcmc.crm.ui.resource.CloneInfo;
+import lcmc.crm.ui.resource.DrbddiskInfo;
+import lcmc.crm.ui.resource.FilesystemRaInfo;
+import lcmc.crm.ui.resource.GroupInfo;
+import lcmc.crm.ui.resource.LinbitDrbdInfo;
+import lcmc.crm.ui.resource.ServiceInfo;
+import lcmc.drbd.domain.DRBDtestData;
+import lcmc.drbd.domain.DrbdVolume;
+import lcmc.drbd.domain.DrbdXml;
+import lcmc.drbd.service.DRBD;
+import lcmc.drbd.ui.AddDrbdSplitBrainDialog;
+import lcmc.host.domain.Host;
+import lcmc.logger.Logger;
+import lcmc.logger.LoggerFactory;
+
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Provider;
+import javax.swing.*;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.geom.Point2D;
@@ -38,46 +74,6 @@ import java.util.Set;
 import java.util.TreeSet;
 import java.util.concurrent.CountDownLatch;
 import java.util.regex.Matcher;
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Provider;
-import javax.swing.BoxLayout;
-import javax.swing.JComponent;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-
-import lcmc.common.domain.AccessMode;
-import lcmc.common.ui.treemenu.TreeMenuController;
-import lcmc.common.ui.utils.SwingUtils;
-import lcmc.drbd.ui.AddDrbdSplitBrainDialog;
-import lcmc.Exceptions;
-import lcmc.crm.ui.resource.CloneInfo;
-import lcmc.crm.ui.resource.DrbddiskInfo;
-import lcmc.crm.ui.resource.FilesystemRaInfo;
-import lcmc.crm.ui.resource.GroupInfo;
-import lcmc.crm.ui.resource.LinbitDrbdInfo;
-import lcmc.crm.ui.resource.ServiceInfo;
-import lcmc.common.domain.Application;
-import lcmc.drbd.domain.DRBDtestData;
-import lcmc.drbd.domain.DrbdXml;
-import lcmc.host.domain.Host;
-import lcmc.common.domain.StringValue;
-import lcmc.common.domain.Value;
-import lcmc.drbd.domain.DrbdVolume;
-import lcmc.common.ui.Browser;
-import lcmc.crm.ui.CrmGraph;
-import lcmc.cluster.ui.ClusterBrowser;
-import lcmc.cluster.ui.wizard.DrbdLogs;
-import lcmc.cluster.ui.resource.CommonDeviceInterface;
-import lcmc.common.ui.EditableInfo;
-import lcmc.cluster.ui.widget.Check;
-import lcmc.common.ui.utils.ButtonCallback;
-import lcmc.common.ui.utils.ComponentWithTest;
-import lcmc.drbd.service.DRBD;
-import lcmc.logger.Logger;
-import lcmc.logger.LoggerFactory;
-import lcmc.common.domain.util.Tools;
-import lcmc.common.ui.utils.UpdatableItem;
 
 /**
  * This class holds info data of a DRBD volume.
@@ -161,7 +157,7 @@ public class VolumeInfo extends EditableInfo implements CommonDeviceInterface {
               final ResourceInfo resourceInfo,
               final List<BlockDevInfo> blockDevInfos,
               final Browser browser) {
-        super.init(name, browser);
+        super.einit(new DrbdVolume(name), name, browser);
         assert (resourceInfo != null);
         assert (blockDevInfos.size() >= 2);
 
@@ -169,7 +165,6 @@ public class VolumeInfo extends EditableInfo implements CommonDeviceInterface {
         this.blockDevInfos = Collections.unmodifiableList(blockDevInfos);
         this.device = device;
         hosts = getHostsFromBlockDevices(blockDevInfos);
-        setResource(new DrbdVolume(name));
         getResource().setValue(DRBD_VOL_PARAM_DEV, new StringValue(device));
         getResource().setNew(true);
     }

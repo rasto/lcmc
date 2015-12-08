@@ -94,6 +94,11 @@ public abstract class EditableInfo extends Info {
 
     private ResourceValue resource;
 
+    public void einit(final ResourceValue resource, final String name, final Browser browser) {
+        super.init(name, browser);
+        this.resource = resource;
+    }
+
     protected abstract String getSection(String param);
 
     protected abstract boolean isRequired(String param);
@@ -969,10 +974,6 @@ public abstract class EditableInfo extends Info {
 
     protected String additionalToolTip(final String param) {
         return "";
-    }
-
-    public void setResource(final ResourceValue resource) {
-        this.resource = resource;
     }
 
     public ResourceValue getResource() {
