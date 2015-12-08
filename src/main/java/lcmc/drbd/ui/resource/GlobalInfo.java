@@ -112,7 +112,7 @@ public class GlobalInfo extends AbstractDrbdInfo {
     private Dialogs dialogs;
 
     public void einit(final String name, final Browser browser) {
-        super.einit(new ResourceValue(name), name, browser);
+        super.einit(Optional.of(new ResourceValue(name)), name, browser);
     }
 
     public void setParameters() {

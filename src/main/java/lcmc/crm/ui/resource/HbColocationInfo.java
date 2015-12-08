@@ -22,11 +22,13 @@
 
 package lcmc.crm.ui.resource;
 
+import com.google.common.base.Optional;
 import lcmc.cluster.ui.ClusterBrowser;
 import lcmc.cluster.ui.widget.Check;
 import lcmc.cluster.ui.widget.Widget;
 import lcmc.common.domain.AccessMode;
 import lcmc.common.domain.Application;
+import lcmc.common.domain.ResourceValue;
 import lcmc.common.domain.StringValue;
 import lcmc.common.domain.Value;
 import lcmc.common.domain.util.Tools;
@@ -57,7 +59,7 @@ final class HbColocationInfo extends EditableInfo implements HbConstraintInterfa
               final ServiceInfo serviceInfoRsc,
               final ServiceInfo serviceInfoWithRsc,
               final Browser browser) {
-        super.einit(new Service("Colocation"), "Colocation", browser);
+        super.einit(Optional.<ResourceValue>of(new Service("Colocation")), "Colocation", browser);
         this.connectionInfo = connectionInfo;
         this.serviceInfoRsc = serviceInfoRsc;
         this.serviceInfoWithRsc = serviceInfoWithRsc;

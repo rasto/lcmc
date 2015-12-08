@@ -21,6 +21,7 @@
  */
 package lcmc.vm.ui.resource;
 
+import com.google.common.base.Optional;
 import lcmc.Exceptions;
 import lcmc.cluster.ui.ClusterBrowser;
 import lcmc.cluster.ui.resource.NetInfo;
@@ -622,7 +623,7 @@ public class DomainInfo extends EditableInfo {
     private TreeMenuController treeMenuController;
 
     public void einit(final String name, final Browser browser) {
-        super.einit(new ResourceValue(name), name, browser);
+        super.einit(Optional.of(new ResourceValue(name)), name, browser);
         final Host firstHost = getBrowser().getClusterHosts()[0];
         preferredEmulator = firstHost.getHostParser().getDistString("KVM.emulator");
         final List<Value> hostsList = new ArrayList<Value>();

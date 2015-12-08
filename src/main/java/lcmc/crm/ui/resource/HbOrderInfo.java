@@ -22,12 +22,14 @@
 
 package lcmc.crm.ui.resource;
 
+import com.google.common.base.Optional;
 import lcmc.Exceptions;
 import lcmc.cluster.ui.ClusterBrowser;
 import lcmc.cluster.ui.widget.Check;
 import lcmc.cluster.ui.widget.Widget;
 import lcmc.common.domain.AccessMode;
 import lcmc.common.domain.Application;
+import lcmc.common.domain.ResourceValue;
 import lcmc.common.domain.StringValue;
 import lcmc.common.domain.Value;
 import lcmc.common.domain.util.Tools;
@@ -63,7 +65,7 @@ final class HbOrderInfo extends EditableInfo implements HbConstraintInterface {
               final ServiceInfo serviceInfoParent,
               final ServiceInfo serviceInfoChild,
               final Browser browser) {
-        super.einit(new Service("Order"), "Order", browser);
+        super.einit(Optional.<ResourceValue>of(new Service("Order")), "Order", browser);
         this.connectionInfo = connectionInfo;
         this.serviceInfoParent = serviceInfoParent;
         this.serviceInfoChild = serviceInfoChild;

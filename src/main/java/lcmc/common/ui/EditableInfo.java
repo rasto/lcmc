@@ -21,6 +21,7 @@
  */
 package lcmc.common.ui;
 
+import com.google.common.base.Optional;
 import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.Table;
 import lcmc.cluster.ui.widget.Check;
@@ -92,9 +93,9 @@ public abstract class EditableInfo extends Info {
     @Inject
     private Access access;
 
-    private ResourceValue resource;
+    private Optional<ResourceValue> resource;
 
-    public void einit(final ResourceValue resource, final String name, final Browser browser) {
+    public void einit(final Optional<ResourceValue> resource, final String name, final Browser browser) {
         super.init(name, browser);
         this.resource = resource;
     }
@@ -453,7 +454,7 @@ public abstract class EditableInfo extends Info {
                 swingUtils.invokeLater(new Runnable() {
                     @Override
                     public void run() {
-                        if (resource.isNew()) {
+                        if (resource.get().isNew()) {
                             check.addChanged("new resource");
                         }
                         if (thisApplyButton == applyButton) {
@@ -494,7 +495,7 @@ public abstract class EditableInfo extends Info {
     public void storeComboBoxValues(final String[] params) {
         for (final String param : params) {
             final Value value = getComboBoxValue(param);
-            resource.setValue(param, value);
+            resource.get().setValue(param, value);
             final Widget wi = getWidget(param, null);
             if (wi != null) {
                 wi.setToolTipText(getToolTipText(param, wi));
@@ -504,21 +505,21 @@ public abstract class EditableInfo extends Info {
 
     /** Returns combo box for one parameter. */
     protected Widget createWidget(final String param, final String prefix, final int width) {
-        resource.setPossibleChoices(param, getParamPossibleChoices(param));
+        resource.get().setPossibleChoices(param, getParamPossibleChoices(param));
         /* set default value */
         Value initValue = getPreviouslySelected(param, prefix);
         if (initValue == null) {
             final Value value = getParamSaved(param);
             if (value == null || value.isNothingSelected()) {
-                if (resource.isNew()) {
-                    initValue = resource.getPreferredValue(param);
+                if (resource.get().isNew()) {
+                    initValue = resource.get().getPreferredValue(param);
                     if (initValue == null) {
                         initValue = getParamPreferred(param);
                     }
                 }
                 if (initValue == null) {
                     initValue = getParamDefault(param);
-                    resource.setValue(param, initValue);
+                    resource.get().setValue(param, initValue);
                 }
             } else {
                 initValue = value;
@@ -616,11 +617,11 @@ public abstract class EditableInfo extends Info {
     protected abstract Value getParamDefault(String param);
 
     public Value getParamSaved(final String param) {
-        return resource.getValue(param);
+        return resource.get().getValue(param);
     }
 
     protected String getParamSavedForConfig(final String param) {
-        final Value v = resource.getValue(param);
+        final Value v = resource.get().getValue(param);
         if (v == null) {
             return null;
         } else {
@@ -639,7 +640,7 @@ public abstract class EditableInfo extends Info {
      * null, instead of combo box a text field will be generated.
      */
     protected Value[] getPossibleChoices(final String param) {
-        return resource.getPossibleChoices(param);
+        return resource.get().getPossibleChoices(param);
     }
 
     /**
@@ -695,9 +696,8 @@ public abstract class EditableInfo extends Info {
             @Override
             public void run() {
                 final MyButton ab = getApplyButton();
-                final ResourceValue r = resource;
                 if (ab != null) {
-                    if (r != null && r.isNew()) {
+                    if (resource.isPresent() && resource.get().isNew()) {
                         check.addChanged("new resource");
                     }
                     ab.setEnabled(check);
@@ -977,7 +977,7 @@ public abstract class EditableInfo extends Info {
     }
 
     public ResourceValue getResource() {
-        return resource;
+        return resource.get();
     }
 
     /**

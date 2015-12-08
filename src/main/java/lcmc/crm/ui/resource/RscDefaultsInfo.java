@@ -21,6 +21,7 @@
  */
 package lcmc.crm.ui.resource;
 
+import com.google.common.base.Optional;
 import lcmc.cluster.ui.ClusterBrowser;
 import lcmc.cluster.ui.widget.Check;
 import lcmc.cluster.ui.widget.Widget;
@@ -49,7 +50,7 @@ import java.util.Map;
 public final class RscDefaultsInfo extends EditableInfo {
     private static final Logger LOG = LoggerFactory.getLogger(RscDefaultsInfo.class);
     public void einit(final String name, final Browser browser) {
-        super.einit(new ResourceValue(name), name, browser);
+        super.einit(Optional.of(new ResourceValue(name)), name, browser);
     }
 
     @Override

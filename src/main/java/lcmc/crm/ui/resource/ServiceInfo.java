@@ -21,6 +21,7 @@
  */
 package lcmc.crm.ui.resource;
 
+import com.google.common.base.Optional;
 import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.Table;
 import lcmc.cluster.ui.ClusterBrowser;
@@ -30,6 +31,7 @@ import lcmc.cluster.ui.widget.WidgetFactory;
 import lcmc.common.domain.AccessMode;
 import lcmc.common.domain.Application;
 import lcmc.common.domain.ColorText;
+import lcmc.common.domain.ResourceValue;
 import lcmc.common.domain.StringValue;
 import lcmc.common.domain.Unit;
 import lcmc.common.domain.Value;
@@ -210,7 +212,7 @@ public class ServiceInfo extends EditableInfo {
 
     public void init(final String name, final ResourceAgent resourceAgent, final Browser browser) {
         final boolean isStonith = resourceAgent != null && resourceAgent.isStonith();
-        super.einit(new Service(isStonith ? name.replaceAll("/", "_") : name), name, browser);
+        super.einit(Optional.<ResourceValue>of(new Service(isStonith ? name.replaceAll("/", "_") : name)), name, browser);
         this.resourceAgent = resourceAgent;
         if (isStonith) {
             getService().setStonith(true);

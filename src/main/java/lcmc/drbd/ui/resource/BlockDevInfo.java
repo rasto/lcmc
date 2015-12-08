@@ -22,6 +22,7 @@
 
 package lcmc.drbd.ui.resource;
 
+import com.google.common.base.Optional;
 import lcmc.Exceptions;
 import lcmc.cluster.ui.ClusterBrowser;
 import lcmc.cluster.ui.widget.Check;
@@ -29,6 +30,7 @@ import lcmc.cluster.ui.widget.Widget;
 import lcmc.common.domain.AccessMode;
 import lcmc.common.domain.Application;
 import lcmc.common.domain.ColorText;
+import lcmc.common.domain.ResourceValue;
 import lcmc.common.domain.StringValue;
 import lcmc.common.domain.Value;
 import lcmc.common.domain.util.Tools;
@@ -109,7 +111,7 @@ public class BlockDevInfo extends EditableInfo {
     private TreeMenuController treeMenuController;
 
     public void init(final String name, final BlockDevice blockDevice, final Browser browser) {
-        super.einit(blockDevice, name, browser);
+        super.einit(Optional.<ResourceValue>of(blockDevice), name, browser);
     }
 
     /**

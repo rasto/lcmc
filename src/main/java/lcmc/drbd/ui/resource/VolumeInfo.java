@@ -21,6 +21,7 @@
  */
 package lcmc.drbd.ui.resource;
 
+import com.google.common.base.Optional;
 import lcmc.Exceptions;
 import lcmc.cluster.ui.ClusterBrowser;
 import lcmc.cluster.ui.resource.CommonDeviceInterface;
@@ -28,6 +29,7 @@ import lcmc.cluster.ui.widget.Check;
 import lcmc.cluster.ui.wizard.DrbdLogs;
 import lcmc.common.domain.AccessMode;
 import lcmc.common.domain.Application;
+import lcmc.common.domain.ResourceValue;
 import lcmc.common.domain.StringValue;
 import lcmc.common.domain.Value;
 import lcmc.common.domain.util.Tools;
@@ -157,7 +159,7 @@ public class VolumeInfo extends EditableInfo implements CommonDeviceInterface {
               final ResourceInfo resourceInfo,
               final List<BlockDevInfo> blockDevInfos,
               final Browser browser) {
-        super.einit(new DrbdVolume(name), name, browser);
+        super.einit(Optional.<ResourceValue>of(new DrbdVolume(name)), name, browser);
         assert (resourceInfo != null);
         assert (blockDevInfos.size() >= 2);
 

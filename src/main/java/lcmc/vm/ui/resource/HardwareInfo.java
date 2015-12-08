@@ -21,6 +21,7 @@
  */
 package lcmc.vm.ui.resource;
 
+import com.google.common.base.Optional;
 import lcmc.cluster.service.ssh.ExecCommandConfig;
 import lcmc.cluster.service.ssh.SshOutput;
 import lcmc.cluster.ui.ClusterBrowser;
@@ -105,7 +106,7 @@ public abstract class HardwareInfo extends EditableInfo {
     private TreeMenuController treeMenuController;
 
     void init(final String name, final Browser browser, final DomainInfo vmsVirtualDomainInfo) {
-        super.einit(new ResourceValue(name), name, browser);
+        super.einit(Optional.of(new ResourceValue(name)), name, browser);
         this.vmsVirtualDomainInfo = vmsVirtualDomainInfo;
     }
 

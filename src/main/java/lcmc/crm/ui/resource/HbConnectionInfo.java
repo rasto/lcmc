@@ -21,10 +21,12 @@
  */
 package lcmc.crm.ui.resource;
 
+import com.google.common.base.Optional;
 import lcmc.cluster.ui.ClusterBrowser;
 import lcmc.cluster.ui.widget.Check;
 import lcmc.common.domain.AccessMode;
 import lcmc.common.domain.Application;
+import lcmc.common.domain.ResourceValue;
 import lcmc.common.domain.Value;
 import lcmc.common.domain.util.Tools;
 import lcmc.common.ui.Browser;
@@ -91,7 +93,7 @@ public class HbConnectionInfo extends EditableInfo {
     private TreeMenuController treeMenuController;
 
     public void init(final Browser browser) {
-        super.einit(null, "HbConnectionInfo", browser);
+        super.einit(Optional.<ResourceValue>absent(), "HbConnectionInfo", browser);
     }
 
     /** Returns browser object of this info. */

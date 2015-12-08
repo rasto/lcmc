@@ -20,9 +20,11 @@
  */
 package lcmc.crm.ui.resource;
 
+import com.google.common.base.Optional;
 import lcmc.cluster.ui.ClusterBrowser;
 import lcmc.common.domain.AccessMode;
 import lcmc.common.domain.Application;
+import lcmc.common.domain.ResourceValue;
 import lcmc.common.domain.Value;
 import lcmc.common.domain.util.Tools;
 import lcmc.common.ui.Browser;
@@ -64,7 +66,7 @@ public class PcmkMultiSelectionInfo extends EditableInfo {
     private SwingUtils swingUtils;
 
     public void init(final List<Info> selectedInfos, final Browser browser) {
-        super.einit(null, "selection", browser);
+        super.einit(Optional.<ResourceValue>absent(), "selection", browser);
         this.selectedInfos = selectedInfos;
     }
 
