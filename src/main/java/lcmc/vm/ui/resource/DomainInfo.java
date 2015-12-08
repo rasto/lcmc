@@ -82,7 +82,7 @@ import lcmc.vm.domain.data.SerialData;
 import lcmc.vm.domain.data.SoundData;
 import lcmc.vm.domain.data.VideoData;
 import lcmc.common.domain.Value;
-import lcmc.common.domain.Resource;
+import lcmc.common.domain.ResourceValue;
 import lcmc.common.ui.EditableInfo;
 import lcmc.common.ui.Info;
 import lcmc.cluster.ui.resource.NetInfo;
@@ -642,7 +642,7 @@ public class DomainInfo extends EditableInfo {
             hostsList.add(new StringValue(h.getName()));
         }
         autostartPossibleValues = hostsList.toArray(new Value[hostsList.size()]);
-        setResource(new Resource(name));
+        setResource(new ResourceValue(name));
     }
 
     @Override

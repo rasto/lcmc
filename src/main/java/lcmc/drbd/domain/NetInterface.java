@@ -28,7 +28,7 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 import lcmc.common.domain.StringValue;
 import lcmc.common.domain.Value;
-import lcmc.common.domain.Resource;
+import lcmc.common.domain.ResourceValue;
 import lcmc.logger.Logger;
 import lcmc.logger.LoggerFactory;
 import lcmc.common.domain.Unit;
@@ -36,7 +36,7 @@ import lcmc.common.domain.Unit;
 /**
  * This class holds data of one network interface.
  */
-public final class NetInterface extends Resource implements Value {
+public final class NetInterface extends ResourceValue implements Value {
     private static final Logger LOG = LoggerFactory.getLogger(NetInterface.class);
 
     private static String getSymbolicIp(BigInteger numericIp, final int size) {

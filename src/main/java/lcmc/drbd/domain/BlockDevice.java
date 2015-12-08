@@ -31,7 +31,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import lcmc.common.domain.Resource;
+import lcmc.common.domain.ResourceValue;
 import lcmc.host.domain.Host;
 import lcmc.logger.Logger;
 import lcmc.logger.LoggerFactory;
@@ -40,7 +40,7 @@ import lcmc.common.domain.util.Tools;
 /**
  * This class holds data of one block device.
  */
-public class BlockDevice extends Resource {
+public class BlockDevice extends ResourceValue {
     private static final Logger LOG = LoggerFactory.getLogger(BlockDevice.class);
     private final Host host;
     private final String deviceName;

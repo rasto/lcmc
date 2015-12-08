@@ -23,12 +23,12 @@
 
 package lcmc.drbd.domain;
 
-import lcmc.common.domain.Resource;
+import lcmc.common.domain.ResourceValue;
 
 /**
  * This class holds data of one drbd resource.
  */
-public final class DrbdResource extends Resource {
+public final class DrbdResource extends ResourceValue {
     /** Whether the config for this resource was already written at least once.
      */
     private boolean commited = false;

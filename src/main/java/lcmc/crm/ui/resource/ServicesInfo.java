@@ -28,7 +28,7 @@ import lcmc.cluster.ui.widget.Check;
 import lcmc.cluster.ui.widget.Widget;
 import lcmc.common.domain.AccessMode;
 import lcmc.common.domain.Application;
-import lcmc.common.domain.Resource;
+import lcmc.common.domain.ResourceValue;
 import lcmc.common.domain.StringValue;
 import lcmc.common.domain.Value;
 import lcmc.common.domain.util.Tools;
@@ -98,7 +98,7 @@ public class ServicesInfo extends EditableInfo {
     @Override
     public void init(final String name, final Browser browser) {
         super.init(name, browser);
-        setResource(new Resource(name));
+        setResource(new ResourceValue(name));
     }
 
     @Override

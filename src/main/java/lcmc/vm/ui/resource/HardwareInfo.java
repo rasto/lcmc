@@ -58,7 +58,7 @@ import lcmc.vm.domain.LinuxFile;
 import lcmc.common.domain.StringValue;
 import lcmc.vm.domain.VmsXml;
 import lcmc.common.domain.Value;
-import lcmc.common.domain.Resource;
+import lcmc.common.domain.ResourceValue;
 import lcmc.common.ui.Browser;
 import lcmc.cluster.ui.ClusterBrowser;
 import lcmc.common.ui.EditableInfo;
@@ -118,7 +118,7 @@ public abstract class HardwareInfo extends EditableInfo {
 
     void init(final String name, final Browser browser, final DomainInfo vmsVirtualDomainInfo) {
         super.init(name, browser);
-        setResource(new Resource(name));
+        setResource(new ResourceValue(name));
         this.vmsVirtualDomainInfo = vmsVirtualDomainInfo;
     }
 

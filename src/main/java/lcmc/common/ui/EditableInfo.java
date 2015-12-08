@@ -52,7 +52,7 @@ import lcmc.common.domain.Application;
 import lcmc.common.ui.utils.SwingUtils;
 import lcmc.crm.domain.CrmXml;
 import lcmc.common.domain.Value;
-import lcmc.common.domain.Resource;
+import lcmc.common.domain.ResourceValue;
 import lcmc.cluster.ui.widget.Check;
 import lcmc.cluster.ui.widget.Label;
 import lcmc.cluster.ui.widget.Widget;
@@ -695,7 +695,7 @@ public abstract class EditableInfo extends Info {
             @Override
             public void run() {
                 final MyButton ab = getApplyButton();
-                final Resource r = getResource();
+                final ResourceValue r = getResource();
                 if (ab != null) {
                     if (r != null && r.isNew()) {
                         check.addChanged("new resource");

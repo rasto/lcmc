@@ -66,7 +66,7 @@ import lcmc.common.domain.StringValue;
 import lcmc.common.domain.Value;
 import lcmc.drbd.domain.DRBDtestData;
 import lcmc.drbd.domain.DrbdXml;
-import lcmc.common.domain.Resource;
+import lcmc.common.domain.ResourceValue;
 import lcmc.common.ui.Browser;
 import lcmc.cluster.ui.ClusterBrowser;
 import lcmc.cluster.ui.widget.Check;
@@ -120,7 +120,7 @@ public class GlobalInfo extends AbstractDrbdInfo {
 
     public void init(final String name, final Browser browser) {
         super.init(name, browser);
-        setResource(new Resource(name));
+        setResource(new ResourceValue(name));
     }
 
     public void setParameters() {

@@ -69,10 +69,9 @@ import lcmc.cluster.ui.network.InfoPresenter;
 import lcmc.common.domain.AccessMode;
 import lcmc.common.domain.Application;
 import lcmc.common.domain.Value;
-import lcmc.common.domain.Resource;
+import lcmc.common.domain.ResourceValue;
 import lcmc.cluster.ui.widget.Widget;
 import lcmc.common.ui.main.MainData;
-import lcmc.common.ui.main.ProgressIndicator;
 import lcmc.common.ui.treemenu.TreeMenuController;
 import lcmc.common.ui.utils.ButtonCallback;
 import lcmc.common.ui.utils.ComponentWithTest;
@@ -102,7 +101,7 @@ public class Info implements Comparable<Info>, Value, InfoPresenter {
     /** Name of the object. */
     private String name;
     /** Resource object as found in data/resources associated with this object. */
-    private Resource resource;
+    private ResourceValue resource;
     /** TODL: Checking for leak. */
     private int maxMenuList = 0;
 
@@ -165,7 +164,7 @@ public class Info implements Comparable<Info>, Value, InfoPresenter {
         return "no tooltip";
     }
 
-    protected final void setResource(final Resource resource) {
+    protected final void setResource(final ResourceValue resource) {
         this.resource = resource;
     }
 
@@ -397,7 +396,7 @@ public class Info implements Comparable<Info>, Value, InfoPresenter {
     }
 
     /** Returns resource object. */
-    public Resource getResource() {
+    public ResourceValue getResource() {
         return resource;
     }
 

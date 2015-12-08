@@ -31,7 +31,7 @@ import java.util.Map;
 /**
  * This class holds resource data.
  */
-public class Resource {
+public class ResourceValue {
     private String name = null;
     private final Map<String, Value> savedValue = new HashMap<String, Value>();
     private final Map<String, Value[]> possibleChoicesMap = new HashMap<String, Value[]>();
@@ -40,10 +40,10 @@ public class Resource {
 
     private boolean newResource = false;
 
-    public Resource() {
+    public ResourceValue() {
     }
 
-    public Resource(final String name) {
+    public ResourceValue(final String name) {
         this.name = name;
     }
 

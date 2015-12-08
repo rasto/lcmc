@@ -34,7 +34,7 @@ import lcmc.common.domain.Application;
 import lcmc.common.ui.Access;
 import lcmc.host.domain.Host;
 import lcmc.vm.domain.VmsXml;
-import lcmc.common.domain.Resource;
+import lcmc.common.domain.ResourceValue;
 import lcmc.cluster.ui.ClusterBrowser;
 import lcmc.host.ui.HostBrowser;
 import lcmc.cluster.ui.resource.NetInfo;
@@ -755,7 +755,7 @@ public class DomainMenu {
         return domainInfo.getBrowser();
     }
 
-    private Resource getResource() {
+    private ResourceValue getResource() {
         return domainInfo.getResource();
     }
 

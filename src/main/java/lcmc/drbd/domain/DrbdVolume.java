@@ -24,12 +24,12 @@
 package lcmc.drbd.domain;
 
 import lcmc.common.domain.StringValue;
-import lcmc.common.domain.Resource;
+import lcmc.common.domain.ResourceValue;
 
 /**
  * This class holds data of one drbd volumes.
  */
-public final class DrbdVolume extends Resource implements ClusterBlockDeviceInterface {
+public final class DrbdVolume extends ResourceValue implements ClusterBlockDeviceInterface {
     private String drbdDevice;
     private boolean commited = false;
 

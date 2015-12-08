@@ -32,7 +32,7 @@ import lcmc.crm.domain.CrmXml;
 import lcmc.crm.domain.ClusterStatus;
 import lcmc.common.domain.StringValue;
 import lcmc.common.domain.Value;
-import lcmc.common.domain.Resource;
+import lcmc.common.domain.ResourceValue;
 import lcmc.common.ui.Browser;
 import lcmc.cluster.ui.ClusterBrowser;
 import lcmc.common.ui.EditableInfo;
@@ -50,7 +50,7 @@ public final class RscDefaultsInfo extends EditableInfo {
     private static final Logger LOG = LoggerFactory.getLogger(RscDefaultsInfo.class);
     public void init(final String name, final Browser browser) {
         super.init(name, browser);
-        setResource(new Resource(name));
+        setResource(new ResourceValue(name));
     }
 
     @Override
