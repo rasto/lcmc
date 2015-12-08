@@ -345,9 +345,9 @@ public class ServicesInfo extends EditableInfo {
         if (getBrowser().crmStatusFailed()) {
             return super.getInfoPanel();
         }
-        final CrmGraph hg = getBrowser().getCrmGraph();
+        final CrmGraph crmGraph = getBrowser().getCrmGraph();
         if (infoPanel != null) {
-            hg.pickBackground();
+            crmGraph.pickBackground();
             return infoPanel;
         }
         final JPanel newPanel = new JPanel();
@@ -374,7 +374,7 @@ public class ServicesInfo extends EditableInfo {
                     return;
                 }
                 mouseStillOver = false;
-                hg.stopTestAnimation((JComponent) component);
+                crmGraph.stopTestAnimation((JComponent) component);
                 component.setToolTipText("");
             }
 
@@ -392,7 +392,7 @@ public class ServicesInfo extends EditableInfo {
                 }
                 mouseStillOver = false;
                 final CountDownLatch startTestLatch = new CountDownLatch(1);
-                hg.startTestAnimation((JComponent) component, startTestLatch);
+                crmGraph.startTestAnimation((JComponent) component, startTestLatch);
                 final Host dcHost = getBrowser().getDCHost();
                 getBrowser().ptestLockAcquire();
                 try {
@@ -490,7 +490,7 @@ public class ServicesInfo extends EditableInfo {
         newPanel.add(getMoreOptionsPanel(application.getServiceLabelWidth() + application.getServiceFieldWidth() + 4));
         newPanel.add(new JScrollPane(mainPanel));
 
-        hg.pickBackground();
+        crmGraph.pickBackground();
         infoPanel = newPanel;
         infoPanelDone();
         return infoPanel;
@@ -768,5 +768,26 @@ public class ServicesInfo extends EditableInfo {
                 }
             }.start();
         }
+    }
+
+    public void cleanupServiceMenu(final List<ServiceInfo> groupServiceIsPresent) {
+        for (final Object info : treeMenuController.nodesToInfos(getNode().children())) {
+            final ServiceInfo serviceInfo = (ServiceInfo) info;
+            for (final ServiceInfo subService : serviceInfo.getSubServices()) {
+                if (!groupServiceIsPresent.contains(subService) && !subService.getService().isNew()) { //TODO: NPE
+                    /* remove the group service from the menu
+                       that does not exist anymore. */
+                    subService.removeInfo();
+                }
+            }
+        }
+    }
+
+    public void reloadNode(ResourceUpdater resourceUpdater) {
+        treeMenuController.reloadNode(getBrowser().getServicesNode(), false);
+    }
+
+    public void moveNodeToPosition(int pos, DefaultMutableTreeNode node, ResourceUpdater resourceUpdater) {
+        treeMenuController.moveNodeToPosition(node, pos);
     }
 }

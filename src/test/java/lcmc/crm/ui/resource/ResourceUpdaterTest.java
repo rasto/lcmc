@@ -22,28 +22,46 @@ package lcmc.crm.ui.resource;
 
 import lcmc.cluster.ui.ClusterBrowser;
 import lcmc.common.domain.Application;
+import lcmc.common.ui.treemenu.TreeMenuController;
 import lcmc.crm.domain.ClusterStatus;
-import lombok.val;
+import lcmc.crm.ui.CrmGraph;
+import lcmc.testutils.annotation.type.IntegrationTest;
+import org.junit.Before;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
+import javax.inject.Named;
+
+import static org.mockito.Mockito.when;
+
 @RunWith(MockitoJUnitRunner.class)
+@Category(IntegrationTest.class)
+@Named
 public class ResourceUpdaterTest {
     @Mock
-    ServicesInfo servicesInfo;
+    private ServicesInfo servicesInfo;
     @Mock
-    ClusterStatus clusterStatus;
+    private ClusterStatus clusterStatus;
     @Mock
-    ClusterBrowser clusterBrowser;
+    private ClusterBrowser clusterBrowser;
+    @Mock
+    private CrmGraph crmGraph;
+    @Mock
+    private TreeMenuController treeMenuController;
+    @InjectMocks
+    private ResourceUpdater resourceUpdater = new ResourceUpdater();
+
+    @Before
+    public void setUp() {
+        when(clusterBrowser.getCrmGraph()).thenReturn(crmGraph);
+    }
 
     @Test
     public void shouldSetResources() {
-        val resourceUpdater = new ResourceUpdater();
-
         resourceUpdater.setAllResources(servicesInfo, clusterBrowser, clusterStatus, Application.RunMode.LIVE);
-
-
     }
 }

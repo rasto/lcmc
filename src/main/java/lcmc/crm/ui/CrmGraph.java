@@ -25,12 +25,32 @@ import edu.uci.ics.jung.graph.util.Pair;
 import edu.uci.ics.jung.visualization.Layer;
 import edu.uci.ics.jung.visualization.picking.PickedState;
 import edu.uci.ics.jung.visualization.util.VertexShapeFactory;
-import java.awt.BasicStroke;
-import java.awt.Color;
-import java.awt.GradientPaint;
-import java.awt.Graphics2D;
-import java.awt.Paint;
-import java.awt.Shape;
+import lcmc.cluster.ui.ClusterBrowser;
+import lcmc.common.domain.AccessMode;
+import lcmc.common.domain.Application;
+import lcmc.common.domain.ColorText;
+import lcmc.common.domain.util.Tools;
+import lcmc.common.ui.Info;
+import lcmc.common.ui.MainPanel;
+import lcmc.common.ui.ResourceGraph;
+import lcmc.common.ui.utils.MenuAction;
+import lcmc.common.ui.utils.MenuFactory;
+import lcmc.common.ui.utils.MyMenuItem;
+import lcmc.common.ui.utils.SwingUtils;
+import lcmc.crm.ui.resource.ConstraintPHInfo;
+import lcmc.crm.ui.resource.GroupInfo;
+import lcmc.crm.ui.resource.HbConnectionInfo;
+import lcmc.crm.ui.resource.HostInfo;
+import lcmc.crm.ui.resource.PcmkMultiSelectionInfo;
+import lcmc.crm.ui.resource.ServiceInfo;
+import lcmc.host.domain.Host;
+import lcmc.host.ui.HostBrowser;
+
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Provider;
+import javax.swing.*;
+import java.awt.*;
 import java.awt.geom.Point2D;
 import java.awt.geom.RoundRectangle2D;
 import java.util.ArrayList;
@@ -46,33 +66,6 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Provider;
-import javax.swing.ImageIcon;
-import javax.swing.JMenu;
-import javax.swing.JPopupMenu;
-
-import lcmc.common.ui.Info;
-import lcmc.common.ui.MainPanel;
-import lcmc.common.ui.ResourceGraph;
-import lcmc.common.ui.utils.SwingUtils;
-import lcmc.crm.ui.resource.ConstraintPHInfo;
-import lcmc.crm.ui.resource.GroupInfo;
-import lcmc.crm.ui.resource.HbConnectionInfo;
-import lcmc.crm.ui.resource.HostInfo;
-import lcmc.crm.ui.resource.PcmkMultiSelectionInfo;
-import lcmc.crm.ui.resource.ServiceInfo;
-import lcmc.common.domain.AccessMode;
-import lcmc.common.domain.Application;
-import lcmc.common.domain.ColorText;
-import lcmc.cluster.ui.ClusterBrowser;
-import lcmc.host.ui.HostBrowser;
-import lcmc.host.domain.Host;
-import lcmc.common.ui.utils.MenuAction;
-import lcmc.common.ui.utils.MenuFactory;
-import lcmc.common.ui.utils.MyMenuItem;
-import lcmc.common.domain.util.Tools;
 
 /**
  * This class creates graph and provides methods to add new nodes, edges,
@@ -1910,5 +1903,27 @@ public class CrmGraph extends ResourceGraph {
         multiSelectionInfo = pcmkMultiSelectionInfoProvider.get();
         multiSelectionInfo.init(selectedInfos, getClusterBrowser());
         getClusterBrowser().setRightComponentInView(multiSelectionInfo);
+    }
+
+    public void updateRemovedElements(List<ServiceInfo> serviceIsPresent) {
+        setServiceIsPresentList(serviceIsPresent);
+        swingUtils.invokeInEdt(new Runnable() {
+            @Override
+            public void run() {
+                killRemovedEdges();
+                final Map<String, ServiceInfo> idToInfoHash =
+                        getClusterBrowser().getNameToServiceInfoHash(ConstraintPHInfo.NAME);
+                if (idToInfoHash != null) {
+                    for (final Map.Entry<String, ServiceInfo> serviceEntry : idToInfoHash.entrySet()) {
+                        final ConstraintPHInfo cphi = (ConstraintPHInfo) serviceEntry.getValue();
+                        if (!cphi.getService().isNew() && cphi.isEmpty()) {
+                            cphi.getService().setNew(true);
+                        }
+                    }
+                }
+                killRemovedVertices();
+                scale();
+            }
+        });
     }
 }

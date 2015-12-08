@@ -79,7 +79,7 @@ public class ResourceUpdater {
             return;
         }
         final Set<String> allGroupsAndClones = clStatus.getAllGroups();
-        final CrmGraph hg = this.browser.getCrmGraph();
+        final CrmGraph crmGraph = browser.getCrmGraph();
         final List<ServiceInfo> groupServiceIsPresent = new ArrayList<ServiceInfo>();
         final List<ServiceInfo> serviceIsPresent = new ArrayList<ServiceInfo>();
         for (final String groupOrClone : allGroupsAndClones) {
@@ -110,8 +110,8 @@ public class ResourceUpdater {
                     runMode);
         }
 
-        hg.clearKeepColocationList();
-        hg.clearKeepOrderList();
+        crmGraph.clearKeepColocationList();
+        crmGraph.clearKeepOrderList();
         /* resource sets */
         final List<CrmXml.RscSetConnectionData> rscSetConnections = clStatus.getRscSetConnections();
         if (rscSetConnections != null) {
@@ -214,13 +214,13 @@ public class ResourceUpdater {
                         for (final String rscId : rscSet1.getRscIds()) {
                             final ServiceInfo si =
                                     this.browser.getServiceInfoFromCRMId(rscId);
-                            hg.addColocation(rdata.getConstraintId(), constraintPHInfo, si);
+                            crmGraph.addColocation(rdata.getConstraintId(), constraintPHInfo, si);
                         }
                     }
                     if (rscSet2 != null) {
                         for (final String rscId : rscSet2.getRscIds()) {
                             final ServiceInfo si = this.browser.getServiceInfoFromCRMId(rscId);
-                            hg.addColocation(rdata.getConstraintId(), si, constraintPHInfo);
+                            crmGraph.addColocation(rdata.getConstraintId(), si, constraintPHInfo);
                         }
                     }
                 } else {
@@ -228,13 +228,13 @@ public class ResourceUpdater {
                     if (rscSet1 != null) {
                         for (final String rscId : rscSet1.getRscIds()) {
                             final ServiceInfo si = this.browser.getServiceInfoFromCRMId(rscId);
-                            hg.addOrder(rdata.getConstraintId(), si, constraintPHInfo);
+                            crmGraph.addOrder(rdata.getConstraintId(), si, constraintPHInfo);
                         }
                     }
                     if (rscSet2 != null) {
                         for (final String rscId : rscSet2.getRscIds()) {
                             final ServiceInfo si = this.browser.getServiceInfoFromCRMId(rscId);
-                            hg.addOrder(rdata.getConstraintId(), constraintPHInfo, si);
+                            crmGraph.addOrder(rdata.getConstraintId(), constraintPHInfo, si);
                         }
                     }
                 }
@@ -245,7 +245,7 @@ public class ResourceUpdater {
             }
 
             for (final ConstraintPHInfo cphi : newCphis) {
-                hg.addConstraintPlaceholder(cphi,
+                crmGraph.addConstraintPlaceholder(cphi,
                         null, /* pos */
                         Application.RunMode.LIVE);
             }
@@ -259,7 +259,7 @@ public class ResourceUpdater {
                 final String withRscId = data.getWithRsc();
                 final ServiceInfo withSi = this.browser.getServiceInfoFromCRMId(withRscId);
                 final ServiceInfo siP = this.browser.getServiceInfoFromCRMId(colocationEntry.getKey());
-                hg.addColocation(data.getId(), siP, withSi);
+                crmGraph.addColocation(data.getId(), siP, withSi);
             }
         }
 
@@ -284,42 +284,14 @@ public class ResourceUpdater {
                                 }
                             }
                         }
-                        hg.addOrder(data.getId(), siP, si);
+                        crmGraph.addOrder(data.getId(), siP, si);
                     }
                 }
             }
         }
 
-        for (final Object info : treeMenuController.nodesToInfos(servicesInfo.getNode().children())) {
-            final ServiceInfo serviceInfo = (ServiceInfo) info;
-            for (final ServiceInfo subService : serviceInfo.getSubServices()) {
-                if (!groupServiceIsPresent.contains(subService) && !subService.getService().isNew()) {
-                    /* remove the group service from the menu
-                       that does not exist anymore. */
-                    subService.removeInfo();
-                }
-            }
-        }
-        hg.setServiceIsPresentList(serviceIsPresent);
-        /** Set placeholders to "new", if they have no connections. */
-        swingUtils.invokeInEdt(new Runnable() {
-            @Override
-            public void run() {
-                hg.killRemovedEdges();
-                final Map<String, ServiceInfo> idToInfoHash =
-                        ResourceUpdater.this.browser.getNameToServiceInfoHash(ConstraintPHInfo.NAME);
-                if (idToInfoHash != null) {
-                    for (final Map.Entry<String, ServiceInfo> serviceEntry : idToInfoHash.entrySet()) {
-                        final ConstraintPHInfo cphi = (ConstraintPHInfo) serviceEntry.getValue();
-                        if (!cphi.getService().isNew() && cphi.isEmpty()) {
-                            cphi.getService().setNew(true);
-                        }
-                    }
-                }
-                hg.killRemovedVertices();
-                hg.scale();
-            }
-        });
+        servicesInfo.cleanupServiceMenu(groupServiceIsPresent);
+        crmGraph.updateRemovedElements(serviceIsPresent);
     }
 
     /**
@@ -470,7 +442,7 @@ public class ResourceUpdater {
             }
             final DefaultMutableTreeNode node = newServiceInfo.getNode();
             if (node != null) {
-                treeMenuController.moveNodeToPosition(node, pos);
+                servicesInfo.moveNodeToPosition(pos, node, this);
                 pos++;
             }
         }
@@ -482,7 +454,7 @@ public class ResourceUpdater {
             }
         }
         if (newService) {
-            treeMenuController.reloadNode(browser.getServicesNode(), false);
+            servicesInfo.reloadNode(this);
         }
         hg.repaint();
     }

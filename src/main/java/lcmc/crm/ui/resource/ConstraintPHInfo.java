@@ -53,7 +53,7 @@ import lcmc.common.ui.utils.UpdatableItem;
 @Named
 public class ConstraintPHInfo extends ServiceInfo {
     private static final Logger LOG = LoggerFactory.getLogger(ConstraintPHInfo.class);
-    static final String NAME = "Placeholder";
+    public static final String NAME = "Placeholder";
     private static final String CONSTRAINT_PLACEHOLDER_AND = Tools.getString("ConstraintPHInfo.And");
     private static final String CONSTRAINT_PLACEHOLDER_OR = Tools.getString("ConstraintPHInfo.Or");
     private CrmXml.RscSetConnectionData rscSetConnectionDataColocation = null;
@@ -766,7 +766,7 @@ public class ConstraintPHInfo extends ServiceInfo {
     }
 
     /** Returns whether the placeholder has any connections at all. */
-    boolean isEmpty() {
+    public boolean isEmpty() {
         final CrmXml.RscSetConnectionData rdataOrd = getRscSetConnectionDataOrder();
         final CrmXml.RscSetConnectionData rdataCol = getRscSetConnectionDataColocation();
         return (rdataOrd == null || rdataOrd.isEmpty()) && (rdataCol == null || rdataCol.isEmpty());
