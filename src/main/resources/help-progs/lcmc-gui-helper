@@ -690,6 +690,8 @@ sub get_disk_info {
 			} else {
 				$device = "/dev/$name";
 			}
+		} elsif ($major == 1) {
+			next; # ramdisk
 		} elsif ($major == 3
 		         || $major == 8
 		         || $major == 72
