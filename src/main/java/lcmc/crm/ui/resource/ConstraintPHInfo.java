@@ -733,7 +733,7 @@ public class ConstraintPHInfo extends ServiceInfo {
 
     /** Whether the id of this constraint is the same or there is no id in this
      * object. */
-    boolean sameConstraintId(final CrmXml.RscSetConnectionData otherRdata) {
+    public boolean sameConstraintId(final CrmXml.RscSetConnectionData otherRdata) {
         if (otherRdata.isColocation()) {
             final CrmXml.RscSetConnectionData rdataCol = rscSetConnectionDataColocation;
             return rdataCol == null
@@ -747,11 +747,11 @@ public class ConstraintPHInfo extends ServiceInfo {
         }
     }
 
-    void setPcmkRscSetsInfo(final PcmkRscSetsInfo pcmkRscSetsInfo) {
+    public void setPcmkRscSetsInfo(final PcmkRscSetsInfo pcmkRscSetsInfo) {
         this.pcmkRscSetsInfo = pcmkRscSetsInfo;
     }
 
-    PcmkRscSetsInfo getPcmkRscSetsInfo() {
+    public PcmkRscSetsInfo getPcmkRscSetsInfo() {
         return pcmkRscSetsInfo;
     }
 
@@ -773,9 +773,9 @@ public class ConstraintPHInfo extends ServiceInfo {
     }
 
     /** Returns attributes for resource_set tag. */
-    void getAttributes(final boolean isCol,
-                       final boolean first,
-                       final Map<CrmXml.RscSet, Map<String, String>> rscSetsAttrs) {
+    public void getAttributes(final boolean isCol,
+                              final boolean first,
+                              final Map<CrmXml.RscSet, Map<String, String>> rscSetsAttrs) {
         final CrmXml.RscSetConnectionData rscd;
         if (isCol) {
             rscd = rscSetConnectionDataColocation;

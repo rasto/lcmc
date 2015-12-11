@@ -467,9 +467,10 @@ public class ServiceInfo extends EditableInfo {
         /* Attributes */
         final String[] params = getEnabledSectionParams(crmXML.getOcfMetaDataParameters(resourceAgent,
                 getService().isMaster()));
-        final ClusterStatus cs = getBrowser().getClusterStatus();
+
+        final ClusterStatus clusterStatus = getBrowser().getClusterStatus();
         if (params != null) {
-            final String newMetaAttrsId = cs.getMetaAttrsId(getService().getCrmId());
+            final String newMetaAttrsId = clusterStatus.getMetaAttrsId(getService().getCrmId());
             if ((savedMetaAttrsId == null && newMetaAttrsId != null)
                 || (savedMetaAttrsId != null && !savedMetaAttrsId.equals(newMetaAttrsId))) {
                 /* newly generated operations id, reload all other combo
@@ -477,7 +478,7 @@ public class ServiceInfo extends EditableInfo {
                 getBrowser().reloadAllComboBoxes(this);
             }
             savedMetaAttrsId = newMetaAttrsId;
-            String refCRMId = cs.getMetaAttrsRef(getService().getCrmId());
+            String refCRMId = clusterStatus.getMetaAttrsRef(getService().getCrmId());
             final ServiceInfo metaAttrInfoRef = getBrowser().getServiceInfoFromCRMId(refCRMId);
             if (refCRMId == null) {
                 refCRMId = getService().getCrmId();
@@ -489,10 +490,11 @@ public class ServiceInfo extends EditableInfo {
             for (final String param : params) {
                 Value value;
                 if (isMetaAttr(param) && refCRMId != null) {
-                    value = new StringValue(cs.getParameter(refCRMId, param, Application.RunMode.LIVE));
+                    value = new StringValue(clusterStatus.getParameter(refCRMId, param, Application.RunMode.LIVE));
                 } else {
                     value = new StringValue(resourceNode.get(param));
                 }
+
                 final Value defaultValue = getParamDefault(param);
                 if (value.isNothingSelected()) {
                     value = defaultValue;
@@ -545,7 +547,7 @@ public class ServiceInfo extends EditableInfo {
         /* set scores */
         for (final Host host : getBrowser().getClusterHosts()) {
             final HostInfo hi = host.getBrowser().getHostInfo();
-            final HostLocation hostLocation = cs.getScore(getService().getCrmId(),
+            final HostLocation hostLocation = clusterStatus.getScore(getService().getCrmId(),
                                                           hi.getName(),
                                                           Application.RunMode.LIVE);
             final HostLocation savedLocation = savedHostLocations.get(hi);
@@ -574,7 +576,7 @@ public class ServiceInfo extends EditableInfo {
         }
 
         /* set ping constraint */
-        final HostLocation hostLocation = cs.getPingScore(getService().getCrmId(), Application.RunMode.LIVE);
+        final HostLocation hostLocation = clusterStatus.getPingScore(getService().getCrmId(), Application.RunMode.LIVE);
         Value pingOperation = null;
         if (hostLocation != null) {
             final String op = hostLocation.getOperation();
@@ -600,7 +602,7 @@ public class ServiceInfo extends EditableInfo {
         }
 
         /* Operations */
-        final String newOperationsId = cs.getOperationsId(getService().getCrmId());
+        final String newOperationsId = clusterStatus.getOperationsId(getService().getCrmId());
         if ((savedOperationsId == null && newOperationsId != null)
             || (savedOperationsId != null && !savedOperationsId.equals(newOperationsId))) {
             /* newly generated operations id, reload all other combo
@@ -609,7 +611,7 @@ public class ServiceInfo extends EditableInfo {
         }
 
         savedOperationsId = newOperationsId;
-        String refCRMId = cs.getOperationsRef(getService().getCrmId());
+        String refCRMId = clusterStatus.getOperationsRef(getService().getCrmId());
         final ServiceInfo operationIdRef = getBrowser().getServiceInfoFromCRMId(refCRMId);
         if (refCRMId == null) {
             refCRMId = getService().getCrmId();
@@ -626,7 +628,7 @@ public class ServiceInfo extends EditableInfo {
                 if (ClusterBrowser.CRM_OPERATIONS_WITH_IGNORED_DEFAULT.contains(op)) {
                     defaultValue = NOTHING_SELECTED_VALUE;
                 }
-                Value value = cs.getOperation(refCRMId, op, param);
+                Value value = clusterStatus.getOperation(refCRMId, op, param);
                 if (value == null || value.isNothingSelected()) {
                     value = getOpDefaultsDefault(param);
                 }
@@ -665,7 +667,7 @@ public class ServiceInfo extends EditableInfo {
                     if (defaultValue == null || defaultValue.isNothingSelected()) {
                         continue;
                     }
-                    Value value = cs.getOperation(refCRMId, op, param);
+                    Value value = clusterStatus.getOperation(refCRMId, op, param);
                     if (value == null || value.isNothingSelected()) {
                         value = getOpDefaultsDefault(param);
                     }
@@ -697,7 +699,7 @@ public class ServiceInfo extends EditableInfo {
         }
         mSavedOperationsLock.unlock();
         getService().setAvailable();
-        if (cs.isOrphaned(getHeartbeatId(Application.RunMode.LIVE))) {
+        if (clusterStatus.isOrphaned(getHeartbeatId(Application.RunMode.LIVE))) {
             getService().setOrphaned(true);
             getService().setNew(false);
             final CloneInfo ci = getCloneInfo();
@@ -3329,7 +3331,7 @@ public class ServiceInfo extends EditableInfo {
     }
 
     /** Returns pacemaker id. */
-    final String getHeartbeatId(final Application.RunMode runMode) {
+    public String getHeartbeatId(final Application.RunMode runMode) {
         String heartbeatId = getService().getCrmId();
         if (heartbeatId == null && Application.isTest(runMode)) {
             final Value guiIdV = getComboBoxValue(GUI_ID);
@@ -4021,9 +4023,9 @@ public class ServiceInfo extends EditableInfo {
             return;
         }
         if (updated && !isUpdated()) {
-            getBrowser().getCrmGraph().startAnimation(this);
+            getBrowser().startAnimation(this);
         } else if (!updated) {
-            getBrowser().getCrmGraph().stopAnimation(this);
+            getBrowser().stopAnimation(this);
         }
         super.setUpdated(updated);
     }
@@ -4318,5 +4320,17 @@ public class ServiceInfo extends EditableInfo {
 
     public List<ServiceInfo> getSubServices() {
         return new ArrayList<ServiceInfo>();
+    }
+
+    public void setNew(boolean isNew) {
+        getService().setNew(isNew);
+    }
+
+    public void setCrmId(String crmId) {
+        getService().setCrmId(crmId);
+    }
+
+    public boolean isNew() {
+        return getService().isNew();
     }
 }

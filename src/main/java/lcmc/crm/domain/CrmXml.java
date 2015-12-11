@@ -78,7 +78,7 @@ import java.util.regex.Pattern;
  * information.
  */
 @Named
-public final class CrmXml {
+public class CrmXml {
     private static final Logger LOG = LoggerFactory.getLogger(CrmXml.class);
     private static final Table<String, String, String> RA_NON_ADVANCED_PARAM = HashBasedTable.create();
     static final Value PCMK_TRUE_VALUE = new StringValue("true");
@@ -3370,12 +3370,12 @@ public final class CrmXml {
         private final String withRscRole;
         private final String score;
 
-        ColocationData(final String id,
-                       final String rsc,
-                       final String withRsc,
-                       final String rscRole,
-                       final String withRscRole,
-                       final String score) {
+        public ColocationData(final String id,
+                              final String rsc,
+                              final String withRsc,
+                              final String rscRole,
+                              final String withRscRole,
+                              final String score) {
             this.id = id;
             this.rsc = rsc;
             this.withRsc = withRsc;
@@ -3418,13 +3418,13 @@ public final class CrmXml {
         private final String firstAction;
         private final String thenAction;
 
-        OrderData(final String id,
-                  final String rscFirst,
-                  final String rscThen,
-                  final String score,
-                  final String symmetrical,
-                  final String firstAction,
-                  final String thenAction) {
+        public OrderData(final String id,
+                         final String rscFirst,
+                         final String rscThen,
+                         final String score,
+                         final String symmetrical,
+                         final String firstAction,
+                         final String thenAction) {
             this.id = id;
             this.rscFirst = rscFirst;
             this.rscThen = rscThen;
@@ -3606,7 +3606,7 @@ public final class CrmXml {
     }
 
     /** Class that holds data between two resource sests. */
-    public static final class RscSetConnectionData {
+    public static class RscSetConnectionData {
         private RscSet rscSet1;
         private RscSet rscSet2;
         private String constraintId;
@@ -3614,7 +3614,7 @@ public final class CrmXml {
         private final int connectionPos;
         private final boolean colocation;
 
-        RscSetConnectionData(final RscSet rscSet1,
+        public RscSetConnectionData(final RscSet rscSet1,
                              final RscSet rscSet2,
                              final String constraintId,
                              final int connectionPos,
@@ -3656,7 +3656,7 @@ public final class CrmXml {
             return set1.equals(set2);
         }
 
-        boolean equals(final RscSetConnectionData oRdata) {
+        public boolean equals(final RscSetConnectionData oRdata) {
             final RscSet oRscSet1 = oRdata.getRscSet1();
             final RscSet oRscSet2 = oRdata.getRscSet2();
             return oRdata.isColocation() == colocation

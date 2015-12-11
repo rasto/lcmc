@@ -33,7 +33,7 @@ import javax.inject.Named;
  * treated in special way.
  */
 @Named
-public final class DrbddiskInfo extends ServiceInfo {
+public class DrbddiskInfo extends ServiceInfo {
     /** Returns string representation of the drbddisk service. */
     @Override
     public String toString() {

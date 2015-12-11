@@ -51,7 +51,7 @@ import lcmc.common.ui.utils.UpdatableItem;
  * It can be order, colocation or both.
  */
 @Named
-final class PcmkRscSetsInfo extends HbConnectionInfo {
+public class PcmkRscSetsInfo extends HbConnectionInfo {
     private final Collection<ConstraintPHInfo> constraintPHInfos = new LinkedHashSet<ConstraintPHInfo>();
     private final Lock mConstraintPHLock = new ReentrantLock();
     @Inject

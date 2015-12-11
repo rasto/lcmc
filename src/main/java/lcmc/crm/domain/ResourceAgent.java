@@ -46,7 +46,7 @@ import lcmc.logger.LoggerFactory;
  * This is important in otder to distinguish services that have the same name
  * int the heartbeat, ocf, service or lsb classes.
  */
-public final class ResourceAgent {
+public class ResourceAgent {
     private static final Logger LOG = LoggerFactory.getLogger(ResourceAgent.class);
     public static final String SERVICE_CLASS_NAME = "service";
     public static final String UPSTART_CLASS_NAME = "upstart";

@@ -330,7 +330,7 @@ public class Info implements Comparable<Info>, Value, InfoPresenter {
     }
 
     /** Gets node of this resource or service. */
-    public final DefaultMutableTreeNode getNode() {
+    public DefaultMutableTreeNode getNode() {
         return node;
     }
 

@@ -144,7 +144,7 @@ public class ClusterStatus {
         return cibQuery.getResourceParameters().get(hbId);
     }
 
-    public Set<String> getAllGroups() {
+    public Set<String> getAllGroupsAndClones() {
         final Map<String, List<String>> groupsToResources = cibQuery.getGroupsToResources();
         return groupsToResources.keySet();
     }

@@ -34,7 +34,7 @@ import javax.inject.Named;
  * treated in special way.
  */
 @Named
-public final class LinbitDrbdInfo extends ServiceInfo {
+public class LinbitDrbdInfo extends ServiceInfo {
     /** Returns string representation of the linbit::drbd service. */
     @Override
     public String toString() {

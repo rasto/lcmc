@@ -2120,6 +2120,26 @@ public class ClusterBrowser extends Browser {
         return host.isDrbdUtilCompatibleWithDrbdModule();
     }
 
+    public ResourceAgent getGroupResourceAgent() {
+        return crmXml.getGroupResourceAgent();
+    }
+
+    public void startAnimation(ServiceInfo serviceInfo) {
+        crmGraph.startAnimation(serviceInfo);
+    }
+
+    public void stopAnimation(ServiceInfo serviceInfo) {
+        crmGraph.stopAnimation(serviceInfo);
+    }
+
+    public void repaint() {
+        crmGraph.repaint();
+    }
+
+    public ResourceAgent getCloneResourceAgent() {
+        return crmXml.getCloneResourceAgent();
+    }
+
     /** Callback to service menu items, that show ptest results in tooltips. */
     public class ClMenuItemCallback implements ButtonCallback {
         /** Host if over a menu item that belongs to a host. */

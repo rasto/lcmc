@@ -70,34 +70,34 @@ public class ResourceUpdater {
      */
     public void setAllResources(final ServicesInfo servicesInfo,
                                 final ClusterBrowser browser,
-                                final ClusterStatus clStatus,
+                                final ClusterStatus clusterStatus,
                                 final Application.RunMode runMode) {
         this.servicesInfo = servicesInfo;
         this.browser = browser;
 
-        if (clStatus == null) {
+        if (clusterStatus == null) {
             return;
         }
-        final Set<String> allGroupsAndClones = clStatus.getAllGroups();
+        final Set<String> allGroupsAndClones = clusterStatus.getAllGroupsAndClones();
         final CrmGraph crmGraph = browser.getCrmGraph();
         final List<ServiceInfo> groupServiceIsPresent = new ArrayList<ServiceInfo>();
         final List<ServiceInfo> serviceIsPresent = new ArrayList<ServiceInfo>();
         for (final String groupOrClone : allGroupsAndClones) {
             CloneInfo newCi = null;
             GroupInfo newGi = null;
-            if (clStatus.isClone(groupOrClone)) {
-            /* clone */
-                newCi = setCreateCloneInfo(groupOrClone, clStatus, runMode);
+            if (clusterStatus.isClone(groupOrClone)) {
+                /* clone */
+                newCi = setCreateCloneInfo(groupOrClone, clusterStatus, runMode);
                 serviceIsPresent.add(newCi);
             } else if (!"none".equals(groupOrClone)) {
-            /* group */
+                /* group */
                 final GroupInfo gi = (GroupInfo) this.browser.getServiceInfoFromCRMId(groupOrClone);
                 if (gi != null && gi.getCloneInfo() != null) {
-                /* cloned group is already done */
+                    /* cloned group is already done */
                     groupServiceIsPresent.add(gi);
                     continue;
                 }
-                newGi = setCreateGroupInfo(groupOrClone, newCi, clStatus, runMode);
+                newGi = setCreateGroupInfo(groupOrClone, newCi, clusterStatus, runMode);
                 serviceIsPresent.add(newGi);
             }
             setGroupResources(allGroupsAndClones,
@@ -106,74 +106,77 @@ public class ResourceUpdater {
                     newCi,
                     serviceIsPresent,
                     groupServiceIsPresent,
-                    clStatus,
+                    clusterStatus,
                     runMode);
         }
 
         crmGraph.clearKeepColocationList();
         crmGraph.clearKeepOrderList();
         /* resource sets */
-        final List<CrmXml.RscSetConnectionData> rscSetConnections = clStatus.getRscSetConnections();
-        if (rscSetConnections != null) {
-            final Map<CrmXml.RscSetConnectionData, ConstraintPHInfo> rdataToCphi =
+        final List<CrmXml.RscSetConnectionData> newRscSetConnections = clusterStatus.getRscSetConnections();
+        if (newRscSetConnections != null) {
+            final Map<CrmXml.RscSetConnectionData, ConstraintPHInfo> oldResourceSetToPlaceholder =
                     new LinkedHashMap<CrmXml.RscSetConnectionData, ConstraintPHInfo>();
             this.browser.lockNameToServiceInfo();
-            final Map<String, ServiceInfo> idToInfoHash = this.browser.getNameToServiceInfoHash(ConstraintPHInfo.NAME);
+            final Map<String, ServiceInfo> oldIdToInfoHash = this.browser.getNameToServiceInfoHash(ConstraintPHInfo.NAME);
             final List<ConstraintPHInfo> preNewCphis = new ArrayList<ConstraintPHInfo>();
-            if (idToInfoHash != null) {
-                for (final Map.Entry<String, ServiceInfo> infoEntry : idToInfoHash.entrySet()) {
+            if (oldIdToInfoHash != null) {
+                for (final Map.Entry<String, ServiceInfo> infoEntry : oldIdToInfoHash.entrySet()) {
                     final ConstraintPHInfo cphi = (ConstraintPHInfo) infoEntry.getValue();
                     final CrmXml.RscSetConnectionData rdataOrd = cphi.getRscSetConnectionDataOrder();
                     final CrmXml.RscSetConnectionData rdataCol = cphi.getRscSetConnectionDataColocation();
-                    if (cphi.getService().isNew()) {
+                    if (cphi.isNew()) {
                         preNewCphis.add(cphi);
                     }
                     if (rdataOrd != null && !rdataOrd.isEmpty()) {
-                        rdataToCphi.put(rdataOrd, cphi);
+                        oldResourceSetToPlaceholder.put(rdataOrd, cphi);
                     }
                     if (rdataCol != null && !rdataCol.isEmpty()) {
-                        rdataToCphi.put(rdataCol, cphi);
+                        oldResourceSetToPlaceholder.put(rdataCol, cphi);
                     }
                 }
             }
             this.browser.unlockNameToServiceInfo();
             final Collection<ConstraintPHInfo> newCphis = new ArrayList<ConstraintPHInfo>();
-            for (final CrmXml.RscSetConnectionData rdata : rscSetConnections) {
+            for (final CrmXml.RscSetConnectionData newRscSetConnectionData : newRscSetConnections) {
                 ConstraintPHInfo constraintPHInfo = null;
 
-                for (final Map.Entry<CrmXml.RscSetConnectionData, ConstraintPHInfo> phEntry : rdataToCphi.entrySet()) {
-                    if (phEntry.getKey() == rdata) {
+                for (final Map.Entry<CrmXml.RscSetConnectionData, ConstraintPHInfo> phEntry : oldResourceSetToPlaceholder.entrySet()) {
+                    final CrmXml.RscSetConnectionData oldRscSetConnectionData = phEntry.getKey();
+                    final ConstraintPHInfo placeholder = phEntry.getValue();
+                    if (oldRscSetConnectionData == newRscSetConnectionData) {
                         continue;
                     }
-                    if (rdata.equals(phEntry.getKey()) || rdata.equalsAlthoughReversed(phEntry.getKey())) {
-                        constraintPHInfo = phEntry.getValue();
-                        constraintPHInfo.setRscSetConnectionData(rdata);
+                    if (newRscSetConnectionData.equals(oldRscSetConnectionData) || newRscSetConnectionData.equalsAlthoughReversed(oldRscSetConnectionData)) {
+                        constraintPHInfo = placeholder;
+                        constraintPHInfo.setRscSetConnectionData(newRscSetConnectionData);
                         break;
                     }
                 }
                 PcmkRscSetsInfo rscSetsInfo = null;
                 if (constraintPHInfo == null) {
-                    for (final Map.Entry<CrmXml.RscSetConnectionData, ConstraintPHInfo> phEntry
-                            : rdataToCphi.entrySet()) {
-                        if (phEntry.getKey() == rdata) {
-                            constraintPHInfo = phEntry.getValue();
+                    for (final Map.Entry<CrmXml.RscSetConnectionData, ConstraintPHInfo> phEntry : oldResourceSetToPlaceholder.entrySet()) {
+                        final CrmXml.RscSetConnectionData oldRrcSetConnectionData = phEntry.getKey();
+                        final ConstraintPHInfo placeholder = phEntry.getValue();
+                        if (oldRrcSetConnectionData == newRscSetConnectionData) {
+                            constraintPHInfo = placeholder;
                             break;
                         }
-                        if (phEntry.getValue().sameConstraintId(rdata)) {
+                        if (placeholder.sameConstraintId(newRscSetConnectionData)) {
                             /* use the same rsc set info object */
-                            rscSetsInfo = phEntry.getValue().getPcmkRscSetsInfo();
+                            rscSetsInfo = placeholder.getPcmkRscSetsInfo();
                         }
-                        if (phEntry.getValue().getService().isNew()
-                                || (rdata.canUseSamePlaceholder(phEntry.getKey())
-                                && phEntry.getValue().sameConstraintId(rdata))) {
-                            constraintPHInfo = phEntry.getValue();
-                            constraintPHInfo.setRscSetConnectionData(rdata);
+                        if (placeholder.isNew()
+                                || (newRscSetConnectionData.canUseSamePlaceholder(oldRrcSetConnectionData)
+                                && placeholder.sameConstraintId(newRscSetConnectionData))) {
+                            constraintPHInfo = placeholder;
+                            constraintPHInfo.setRscSetConnectionData(newRscSetConnectionData);
                             rscSetsInfo = constraintPHInfo.getPcmkRscSetsInfo();
                             if (rscSetsInfo != null) {
-                                if (rdata.isColocation()) {
-                                    rscSetsInfo.addColocation(rdata.getConstraintId(), constraintPHInfo);
+                                if (newRscSetConnectionData.isColocation()) {
+                                    rscSetsInfo.addColocation(newRscSetConnectionData.getConstraintId(), constraintPHInfo);
                                 } else {
-                                    rscSetsInfo.addOrder(rdata.getConstraintId(), constraintPHInfo);
+                                    rscSetsInfo.addOrder(newRscSetConnectionData.getConstraintId(), constraintPHInfo);
                                 }
                             }
                             break;
@@ -181,46 +184,46 @@ public class ResourceUpdater {
                     }
                 }
                 if (constraintPHInfo == null && !preNewCphis.isEmpty()) {
-                /* placeholder */
+                    /* placeholder */
                     constraintPHInfo = preNewCphis.remove(0);
-                    rdataToCphi.put(rdata, constraintPHInfo);
-                    constraintPHInfo.setRscSetConnectionData(rdata);
+                    oldResourceSetToPlaceholder.put(newRscSetConnectionData, constraintPHInfo);
+                    constraintPHInfo.setRscSetConnectionData(newRscSetConnectionData);
                 }
                 if (constraintPHInfo == null) {
                     constraintPHInfo = constraintPHInfoProvider.get();
-                    constraintPHInfo.init(this.browser, rdata, ConstraintPHInfo.Preference.AND);
+                    constraintPHInfo.init(this.browser, newRscSetConnectionData, ConstraintPHInfo.Preference.AND);
                     if (rscSetsInfo == null) {
                         rscSetsInfo = pcmkRscSetsInfoProvider.get();
                         rscSetsInfo.init(this.browser);
                     }
-                    if (rdata.isColocation()) {
-                        rscSetsInfo.addColocation(rdata.getConstraintId(), constraintPHInfo);
+                    if (newRscSetConnectionData.isColocation()) {
+                        rscSetsInfo.addColocation(newRscSetConnectionData.getConstraintId(), constraintPHInfo);
                     } else {
-                        rscSetsInfo.addOrder(rdata.getConstraintId(), constraintPHInfo);
+                        rscSetsInfo.addOrder(newRscSetConnectionData.getConstraintId(), constraintPHInfo);
                     }
                     constraintPHInfo.setPcmkRscSetsInfo(rscSetsInfo);
                     this.browser.addNameToServiceInfoHash(constraintPHInfo);
                     newCphis.add(constraintPHInfo); /* have to add it later,
                                        so that ids are correct. */
-                    rdataToCphi.put(rdata, constraintPHInfo);
+                    oldResourceSetToPlaceholder.put(newRscSetConnectionData, constraintPHInfo);
                 }
                 serviceIsPresent.add(constraintPHInfo);
 
-                final CrmXml.RscSet rscSet1 = rdata.getRscSet1();
-                final CrmXml.RscSet rscSet2 = rdata.getRscSet2();
-                if (rdata.isColocation()) {
+                final CrmXml.RscSet rscSet1 = newRscSetConnectionData.getRscSet1();
+                final CrmXml.RscSet rscSet2 = newRscSetConnectionData.getRscSet2();
+                if (newRscSetConnectionData.isColocation()) {
                     /* colocation */
                     if (rscSet1 != null) {
                         for (final String rscId : rscSet1.getRscIds()) {
                             final ServiceInfo si =
                                     this.browser.getServiceInfoFromCRMId(rscId);
-                            crmGraph.addColocation(rdata.getConstraintId(), constraintPHInfo, si);
+                            crmGraph.addColocation(newRscSetConnectionData.getConstraintId(), constraintPHInfo, si);
                         }
                     }
                     if (rscSet2 != null) {
                         for (final String rscId : rscSet2.getRscIds()) {
                             final ServiceInfo si = this.browser.getServiceInfoFromCRMId(rscId);
-                            crmGraph.addColocation(rdata.getConstraintId(), si, constraintPHInfo);
+                            crmGraph.addColocation(newRscSetConnectionData.getConstraintId(), si, constraintPHInfo);
                         }
                     }
                 } else {
@@ -228,19 +231,19 @@ public class ResourceUpdater {
                     if (rscSet1 != null) {
                         for (final String rscId : rscSet1.getRscIds()) {
                             final ServiceInfo si = this.browser.getServiceInfoFromCRMId(rscId);
-                            crmGraph.addOrder(rdata.getConstraintId(), si, constraintPHInfo);
+                            crmGraph.addOrder(newRscSetConnectionData.getConstraintId(), si, constraintPHInfo);
                         }
                     }
                     if (rscSet2 != null) {
                         for (final String rscId : rscSet2.getRscIds()) {
                             final ServiceInfo si = this.browser.getServiceInfoFromCRMId(rscId);
-                            crmGraph.addOrder(rdata.getConstraintId(), constraintPHInfo, si);
+                            crmGraph.addOrder(newRscSetConnectionData.getConstraintId(), constraintPHInfo, si);
                         }
                     }
                 }
                 if (Application.isLive(runMode)) {
                     constraintPHInfo.setUpdated(false);
-                    constraintPHInfo.getService().setNew(false);
+                    constraintPHInfo.setNew(false);
                 }
             }
 
@@ -252,19 +255,19 @@ public class ResourceUpdater {
         }
 
         /* colocations */
-        final Map<String, List<CrmXml.ColocationData>> colocationMap = clStatus.getColocationRscMap();
+        final Map<String, List<CrmXml.ColocationData>> colocationMap = clusterStatus.getColocationRscMap();
         for (final Map.Entry<String, List<CrmXml.ColocationData>> colocationEntry : colocationMap.entrySet()) {
             final List<CrmXml.ColocationData> withs = colocationEntry.getValue();
-            for (final CrmXml.ColocationData data : withs) {
-                final String withRscId = data.getWithRsc();
+            for (final CrmXml.ColocationData colocationData : withs) {
+                final String withRscId = colocationData.getWithRsc();
                 final ServiceInfo withSi = this.browser.getServiceInfoFromCRMId(withRscId);
                 final ServiceInfo siP = this.browser.getServiceInfoFromCRMId(colocationEntry.getKey());
-                crmGraph.addColocation(data.getId(), siP, withSi);
+                crmGraph.addColocation(colocationData.getId(), siP, withSi);
             }
         }
 
         /* orders */
-        final Map<String, List<CrmXml.OrderData>> orderMap = clStatus.getOrderRscMap();
+        final Map<String, List<CrmXml.OrderData>> orderMap = clusterStatus.getOrderRscMap();
         for (final Map.Entry<String, List<CrmXml.OrderData>> orderEntry : orderMap.entrySet()) {
             for (final CrmXml.OrderData data : orderEntry.getValue()) {
                 final String rscThenId = data.getRscThen();
@@ -272,10 +275,10 @@ public class ResourceUpdater {
                 if (si != null) { /* not yet complete */
                     final ServiceInfo siP = this.browser.getServiceInfoFromCRMId(orderEntry.getKey());
                     if (siP != null && siP.getResourceAgent() != null) {
-                    /* dangling orders and colocations */
+                        /* dangling orders and colocations */
                         if ((siP.getResourceAgent().isDrbddisk() || siP.getResourceAgent().isLinbitDrbd())
                                 && "Filesystem".equals(si.getName())) {
-                            final List<CrmXml.ColocationData> cds = clStatus.getColocationDatas(orderEntry.getKey());
+                            final List<CrmXml.ColocationData> cds = clusterStatus.getColocationDatas(orderEntry.getKey());
                             if (cds != null) {
                                 for (final CrmXml.ColocationData cd : cds) {
                                     if (cd.getWithRsc().equals(rscThenId)) {
@@ -301,10 +304,9 @@ public class ResourceUpdater {
                                          final ClusterStatus clStatus,
                                          final Application.RunMode runMode) {
         CloneInfo newCi = (CloneInfo) browser.getServiceInfoFromCRMId(cloneId);
-        final CrmGraph hg = browser.getCrmGraph();
         if (newCi == null) {
             final Point2D p = null;
-            newCi = (CloneInfo) servicesInfo.addServicePanel(browser.getCrmXml().getCloneResourceAgent(),
+            newCi = (CloneInfo) servicesInfo.addServicePanel(browser.getCloneResourceAgent(),
                             p,
                             false,
                             cloneId,
@@ -318,10 +320,10 @@ public class ResourceUpdater {
             newCi.setParameters(resourceNode);
             if (Application.isLive(runMode)) {
                 newCi.setUpdated(false);
-                hg.repaint();
+                browser.repaint();
             }
         }
-        newCi.getService().setNew(false);
+        newCi.setNew(false);
         return newCi;
     }
 
@@ -330,11 +332,10 @@ public class ResourceUpdater {
                                          final ClusterStatus clStatus,
                                          final Application.RunMode runMode) {
         GroupInfo newGi = (GroupInfo) browser.getServiceInfoFromCRMId(group);
-        final CrmGraph hg = browser.getCrmGraph();
         if (newGi == null) {
             final Point2D p = null;
             newGi =
-                    (GroupInfo) servicesInfo.addServicePanel(browser.getCrmXml().getGroupResourceAgent(),
+                    (GroupInfo) servicesInfo.addServicePanel(browser.getGroupResourceAgent(),
                             p,
                             false,
                             group,
@@ -350,10 +351,10 @@ public class ResourceUpdater {
             newGi.setParameters(resourceNode);
             if (Application.isLive(runMode)) {
                 newGi.setUpdated(false);
-                hg.repaint();
+                browser.repaint();
             }
         }
-        newGi.getService().setNew(false);
+        newGi.setNew(false);
         return newGi;
     }
 
@@ -363,23 +364,22 @@ public class ResourceUpdater {
                                    final CloneInfo newCi,
                                    final List<ServiceInfo> serviceIsPresent,
                                    final List<ServiceInfo> groupServiceIsPresent,
-                                   final ClusterStatus clStatus,
+                                   final ClusterStatus clusterStatus,
                                    final Application.RunMode runMode) {
         final Map<ServiceInfo, Map<String, String>> setParametersHash = new HashMap<ServiceInfo, Map<String, String>>();
         if (newCi != null) {
-            setParametersHash.put(newCi, clStatus.getParamValuePairs(grpOrCloneId));
+            setParametersHash.put(newCi, clusterStatus.getParamValuePairs(grpOrCloneId));
         } else if (newGi != null) {
-            setParametersHash.put(newGi, clStatus.getParamValuePairs(grpOrCloneId));
+            setParametersHash.put(newGi, clusterStatus.getParamValuePairs(grpOrCloneId));
         }
-        final CrmGraph hg = browser.getCrmGraph();
-        final List<String> gs = clStatus.getGroupResources(grpOrCloneId, runMode);
-        if (gs == null) {
+        final List<String> groupResources = clusterStatus.getGroupResources(grpOrCloneId, runMode);
+        if (groupResources == null) {
             return;
         }
         boolean newService = false;
         int pos = 0;
-        for (final String hbId : gs) {
-            if (clStatus.isOrphaned(hbId) && application.isHideLRM()) {
+        for (final String hbId : groupResources) {
+            if (clusterStatus.isOrphaned(hbId) && application.isHideLRM()) {
                 continue;
             }
             ServiceInfo newServiceInfo;
@@ -389,18 +389,18 @@ public class ResourceUpdater {
                     continue;
                 }
                 /* clone group */
-                final GroupInfo gi = setCreateGroupInfo(hbId, newCi, clStatus, runMode);
+                final GroupInfo gi = setCreateGroupInfo(hbId, newCi, clusterStatus, runMode);
                 setGroupResources(allGroupsAndClones,
                         hbId,
                         gi,
                         null,
                         serviceIsPresent,
                         groupServiceIsPresent,
-                        clStatus,
+                        clusterStatus,
                         runMode);
                 newServiceInfo = gi;
             } else {
-                final ResourceAgent newResourceAgent = clStatus.getResourceType(hbId);
+                final ResourceAgent newResourceAgent = clusterStatus.getResourceType(hbId);
                 if (newResourceAgent == null) {
                     /* This is bad. There is a service but we do not have
                      * the heartbeat script of this service or the we look
@@ -412,7 +412,7 @@ public class ResourceUpdater {
                  * service in the gui.
                  */
                 newServiceInfo = browser.getServiceInfoFromCRMId(hbId);
-                final Map<String, String> resourceNode = clStatus.getParamValuePairs(hbId);
+                final Map<String, String> resourceNode = clusterStatus.getParamValuePairs(hbId);
                 if (newServiceInfo == null) {
                     newService = true;
                     newServiceInfo = crmServiceFactory.createServiceWithParameters(
@@ -420,7 +420,7 @@ public class ResourceUpdater {
                             newResourceAgent,
                             resourceNode,
                             browser);
-                    newServiceInfo.getService().setCrmId(hbId);
+                    newServiceInfo.setCrmId(hbId);
                     browser.addToHeartbeatIdList(newServiceInfo);
                     if (newGi != null) {
                         newGi.addGroupServicePanel(newServiceInfo, false);
@@ -434,7 +434,7 @@ public class ResourceUpdater {
                     browser.addNameToServiceInfoHash(newServiceInfo);
                     setParametersHash.put(newServiceInfo, resourceNode);
                 }
-                newServiceInfo.getService().setNew(false);
+                newServiceInfo.setNew(false);
                 serviceIsPresent.add(newServiceInfo);
                 if (newGi != null || newCi != null) {
                     groupServiceIsPresent.add(newServiceInfo);
@@ -456,7 +456,7 @@ public class ResourceUpdater {
         if (newService) {
             servicesInfo.reloadNode(this);
         }
-        hg.repaint();
+        browser.repaint();
     }
 
     /**

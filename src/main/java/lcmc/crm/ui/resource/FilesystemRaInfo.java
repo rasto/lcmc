@@ -67,7 +67,7 @@ import javax.swing.tree.DefaultMutableTreeNode;
  * drbd device is selected, the drbddisk service will be added too.
  */
 @Named
-public final class FilesystemRaInfo extends ServiceInfo {
+public class FilesystemRaInfo extends ServiceInfo {
     /** Name of the device parameter in the file system. */
     private static final String FS_RES_PARAM_DEV = "device";
     private static final String FS_RES_PARAM_DIRECTORY = "directory";
