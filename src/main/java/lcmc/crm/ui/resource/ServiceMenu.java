@@ -66,6 +66,7 @@ import lcmc.common.domain.Predicate;
 import lcmc.common.domain.util.Tools;
 import lcmc.common.ui.utils.UpdatableItem;
 import lcmc.common.domain.VisiblePredicate;
+import lombok.val;
 
 @Named
 public class ServiceMenu {
@@ -401,12 +402,12 @@ public class ServiceMenu {
                                 return null;
                             }
                             final ClusterStatus cs = serviceInfo.getBrowser().getClusterStatus();
-                            final List<String> gr = cs.getGroupResources(
+                            val groupResources = cs.getGroupResources(
                                                           serviceInfo.getGroupInfo().getHeartbeatId(runMode),
                                                           runMode);
 
 
-                            if (gr != null && gr.size() > 1) {
+                            if (groupResources.isPresent() && groupResources.get().size() > 1) {
                                 return null;
                             } else {
                                 return "you can remove the group";

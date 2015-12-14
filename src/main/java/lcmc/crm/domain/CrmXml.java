@@ -27,6 +27,7 @@ import com.google.common.collect.Table;
 import lcmc.Exceptions;
 import lcmc.cluster.service.ssh.ExecCommandConfig;
 import lcmc.cluster.service.ssh.SshOutput;
+import lcmc.cluster.ui.ClusterBrowser;
 import lcmc.common.domain.AccessMode;
 import lcmc.common.domain.Application;
 import lcmc.common.domain.ConvertCmdCallback;
@@ -736,18 +737,20 @@ public class CrmXml {
                 final String hn = host.getName();
                 final String text = Tools.getString("CRMXML.GetRAMetaData.Done");
                 progressIndicator.startProgressIndicator(hn, text);
-                resourceUpdaterProvider.get().setAllResources(
-                        allServicesInfo, allServicesInfo.getBrowser(), allServicesInfo.getBrowser().getClusterStatus(),
-                        Application.RunMode.LIVE);
-                final Info lastSelectedInfo = allServicesInfo.getBrowser().getClusterViewPanel().getLastSelectedInfo();
+                final ClusterBrowser browser = allServicesInfo.getBrowser();
+                final ClusterStatus clusterStatus = browser.getClusterStatus();
+                if (clusterStatus != null) {
+                    resourceUpdaterProvider.get().setAllResources(allServicesInfo, browser, clusterStatus, Application.RunMode.LIVE);
+                }
+                final Info lastSelectedInfo = browser.getClusterViewPanel().getLastSelectedInfo();
                 if (lastSelectedInfo instanceof ServiceInfo || lastSelectedInfo instanceof ServicesInfo) {
-                    allServicesInfo.getBrowser().getClusterViewPanel().reloadRightComponent();
+                    browser.getClusterViewPanel().reloadRightComponent();
                 }
                 progressIndicator.stopProgressIndicator(hn, text);
                 LOG.debug("CRMXML: RAs loaded");
                 final Test autoTest = application.getAutoTest();
                 if (autoTest != null) {
-                    startTests.startTest(autoTest, allServicesInfo.getBrowser().getCluster());
+                    startTests.startTest(autoTest, browser.getCluster());
                 }
             }
         });

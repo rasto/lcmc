@@ -59,6 +59,7 @@ import lcmc.host.domain.Host;
 import lcmc.logger.Logger;
 import lcmc.logger.LoggerFactory;
 import lcmc.vm.ui.resource.DomainInfo;
+import lombok.val;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -3846,7 +3847,8 @@ public class ServiceInfo extends EditableInfo {
                                 child.getService().doneModifying();
                             }
                         }
-                        if (cs.getGroupResources(group, runMode).size() == 1) {
+                        val groupResources = cs.getGroupResources(group, runMode);
+                        if (groupResources.isPresent() && groupResources.get().size() == 1) {
                             if (Application.isLive(runMode)) {
                                 gi.getService().setRemoved(true);
                             }

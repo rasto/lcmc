@@ -59,6 +59,7 @@ import lcmc.logger.LoggerFactory;
 import lcmc.common.ui.utils.MyButton;
 import lcmc.common.domain.util.Tools;
 import lcmc.common.ui.utils.UpdatableItem;
+import lombok.val;
 
 /**
  * GroupInfo class holds data for heartbeat group, that is in some ways
@@ -458,10 +459,10 @@ public class GroupInfo extends ServiceInfo {
     @Override
     protected List<String> getRunningOnNodes(final Application.RunMode runMode) {
         final ClusterStatus cs = getBrowser().getClusterStatus();
-        final List<String> resources = cs.getGroupResources(getHeartbeatId(runMode), runMode);
+        val resources = cs.getGroupResources(getHeartbeatId(runMode), runMode);
         final List<String> allNodes = new ArrayList<String>();
-        if (resources != null) {
-            for (final String hbId : resources) {
+        if (resources.isPresent()) {
+            for (final String hbId : resources.get()) {
                 final List<String> ns = cs.getRunningOnNodes(hbId, runMode);
                 if (ns != null) {
                     for (final String n : ns) {
@@ -479,10 +480,10 @@ public class GroupInfo extends ServiceInfo {
     @Override
     List<String> getMasterOnNodes(final Application.RunMode runMode) {
         final ClusterStatus cs = getBrowser().getClusterStatus();
-        final List<String> resources = cs.getGroupResources(getHeartbeatId(runMode), runMode);
+        final val resources = cs.getGroupResources(getHeartbeatId(runMode), runMode);
         final List<String> allNodes = new ArrayList<String>();
-        if (resources != null) {
-            for (final String hbId : resources) {
+        if (resources.isPresent()) {
+            for (final String hbId : resources.get()) {
                 final List<String> ns = cs.getMasterOnNodes(hbId, runMode);
                 if (ns != null) {
                     for (final String n : ns) {

@@ -20,6 +20,7 @@
 
 package lcmc.crm.ui.resource;
 
+import com.google.common.base.Optional;
 import lcmc.cluster.ui.ClusterBrowser;
 import lcmc.common.domain.Application;
 import lcmc.common.ui.treemenu.TreeMenuController;
@@ -75,9 +76,6 @@ public class ResourceUpdater {
         this.servicesInfo = servicesInfo;
         this.browser = browser;
 
-        if (clusterStatus == null) {
-            return;
-        }
         final Set<String> allGroupsAndClones = clusterStatus.getAllGroupsAndClones();
         final CrmGraph crmGraph = browser.getCrmGraph();
         final List<ServiceInfo> groupServiceIsPresent = new ArrayList<ServiceInfo>();
@@ -372,13 +370,13 @@ public class ResourceUpdater {
         } else if (newGi != null) {
             setParametersHash.put(newGi, clusterStatus.getParamValuePairs(grpOrCloneId));
         }
-        final List<String> groupResources = clusterStatus.getGroupResources(grpOrCloneId, runMode);
-        if (groupResources == null) {
+        final Optional<List<String>> groupResources = clusterStatus.getGroupResources(grpOrCloneId, runMode);
+        if (!groupResources.isPresent()) {
             return;
         }
         boolean newService = false;
         int pos = 0;
-        for (final String hbId : groupResources) {
+        for (final String hbId : groupResources.get()) {
             if (clusterStatus.isOrphaned(hbId) && application.isHideLRM()) {
                 continue;
             }

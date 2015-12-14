@@ -51,6 +51,7 @@ import lcmc.cluster.ui.widget.Check;
 import lcmc.crm.service.CRM;
 import lcmc.common.domain.util.Tools;
 import lcmc.common.ui.utils.UpdatableItem;
+import lombok.val;
 
 /**
  * This class holds clone service info object.
@@ -160,12 +161,12 @@ public class CloneInfo extends ServiceInfo {
             return null;
         }
         if (cs.getResourceAgent().isGroup()) {
-            final List<String> resources = clStatus.getGroupResources(cs.getHeartbeatId(runMode), runMode);
-            if (resources == null) {
+            val resources = clStatus.getGroupResources(cs.getHeartbeatId(runMode), runMode);
+            if (!resources.isPresent()) {
                 return null;
             }
             final Set<String> slaves = new TreeSet<String>();
-            for (final String hbId : resources) {
+            for (final String hbId : resources.get()) {
                 final List<String> slNodes = clStatus.getSlaveOnNodes(hbId, runMode);
                 if (slNodes != null) {
                     slaves.addAll(slNodes);
@@ -249,9 +250,9 @@ public class CloneInfo extends ServiceInfo {
         final ServiceInfo cs = getContainedService();
         if (cs != null && cs.getResourceAgent().isGroup()) {
             final ClusterStatus clStatus = getBrowser().getClusterStatus();
-            final List<String> resources = clStatus.getGroupResources(cs.getHeartbeatId(runMode), runMode);
-            if (resources != null) {
-                for (final String hbId : resources) {
+            val resources = clStatus.getGroupResources(cs.getHeartbeatId(runMode), runMode);
+            if (resources.isPresent()) {
+                for (final String hbId : resources.get()) {
                     final ServiceInfo si = getBrowser().getServiceInfoFromCRMId(hbId);
                     if (si == null) {
                         texts.add(new ColorText("   unknown", null, Color.BLACK));

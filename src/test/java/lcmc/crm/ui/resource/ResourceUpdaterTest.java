@@ -20,6 +20,7 @@
 
 package lcmc.crm.ui.resource;
 
+import com.google.common.base.Optional;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import lcmc.cluster.ui.ClusterBrowser;
@@ -44,6 +45,7 @@ import javax.inject.Provider;
 import javax.swing.tree.DefaultMutableTreeNode;
 
 import java.awt.geom.Point2D;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -117,7 +119,7 @@ public class ResourceUpdaterTest {
         val serviceInfo = mock(ServiceInfo.class);
         when(clusterStatus.getAllGroupsAndClones()).thenReturn(Sets.newHashSet("none"));
         when(clusterStatus.getGroupResources("none", RUN_MODE))
-                .thenReturn(Lists.newArrayList(SERVICE_1));
+                .thenReturn(Optional.<List<String>>of(Lists.newArrayList(SERVICE_1)));
         when(crmServiceFactory.createServiceWithParameters(
                 eq(SERVICE_1),
                 (ResourceAgent) anyObject(),
@@ -141,6 +143,7 @@ public class ResourceUpdaterTest {
         when(clusterBrowser.getServiceInfoFromCRMId(GROUP_1)).thenReturn(groupInfo);
 
         when(clusterStatus.getParamValuePairs(GROUP_1)).thenReturn(EXAMPLE_PARAMS);
+        when(clusterStatus.getGroupResources(GROUP_1, Application.RunMode.LIVE)).thenReturn(Optional.of(Collections.<String>emptyList()));
 
         //when:
         resourceUpdater.setAllResources(servicesInfo, clusterBrowser, clusterStatus, RUN_MODE);
@@ -162,6 +165,7 @@ public class ResourceUpdaterTest {
                 (Application.RunMode) anyObject())).thenReturn(groupInfo);
 
         when(clusterStatus.getParamValuePairs(GROUP_1)).thenReturn(EXAMPLE_PARAMS);
+        when(clusterStatus.getGroupResources(GROUP_1, Application.RunMode.LIVE)).thenReturn(Optional.of(Collections.<String>emptyList()));
 
         //when:
         resourceUpdater.setAllResources(servicesInfo, clusterBrowser, clusterStatus, RUN_MODE);
@@ -179,7 +183,7 @@ public class ResourceUpdaterTest {
         when(clusterStatus.getAllGroupsAndClones()).thenReturn(Sets.newHashSet(GROUP_1, CLONE_1));
         when(clusterStatus.isClone(CLONE_1)).thenReturn(true);
         when(clusterStatus.getGroupResources(CLONE_1, RUN_MODE))
-                .thenReturn(Lists.newArrayList(GROUP_1));
+                .thenReturn(Optional.<List<String>>of(Lists.newArrayList(GROUP_1)));
 
         when(servicesInfo.addServicePanel((ResourceAgent) anyObject(),
                 (Point2D) anyObject(),
@@ -190,6 +194,7 @@ public class ResourceUpdaterTest {
 
         when(clusterStatus.getParamValuePairs(GROUP_1)).thenReturn(EXAMPLE_PARAMS);
         when(clusterStatus.getParamValuePairs(CLONE_1)).thenReturn(EXAMPLE_PARAMS_2);
+        when(clusterStatus.getGroupResources(GROUP_1, Application.RunMode.LIVE)).thenReturn(Optional.of(Collections.<String>emptyList()));
 
         //when:
         resourceUpdater.setAllResources(servicesInfo, clusterBrowser, clusterStatus, RUN_MODE);
@@ -206,7 +211,7 @@ public class ResourceUpdaterTest {
         when(clusterStatus.getAllGroupsAndClones()).thenReturn(Sets.newHashSet(GROUP_1));
         when(clusterBrowser.getServiceInfoFromCRMId(GROUP_1)).thenReturn(groupInfo);
         when(clusterStatus.getGroupResources(GROUP_1, RUN_MODE))
-                .thenReturn(Lists.newArrayList(SERVICE_1));
+                .thenReturn(Optional.<List<String>>of(Lists.newArrayList(SERVICE_1)));
         val groupService = mock(ServiceInfo.class);
         when(clusterBrowser.getServiceInfoFromCRMId(SERVICE_1)).thenReturn(groupService);
 
@@ -226,7 +231,7 @@ public class ResourceUpdaterTest {
         when(clusterStatus.getAllGroupsAndClones()).thenReturn(Sets.newHashSet(GROUP_1));
         when(clusterBrowser.getServiceInfoFromCRMId(GROUP_1)).thenReturn(groupInfo);
         when(clusterStatus.getGroupResources(GROUP_1, RUN_MODE))
-                .thenReturn(Lists.newArrayList(SERVICE_1));
+                .thenReturn(Optional.<List<String>>of(Lists.newArrayList(SERVICE_1)));
         val groupService = mock(ServiceInfo.class);
         when(groupService.getNode()).thenReturn(new DefaultMutableTreeNode());
         when(crmServiceFactory.createServiceWithParameters(
@@ -252,7 +257,7 @@ public class ResourceUpdaterTest {
         when(clusterStatus.isClone(CLONE_1)).thenReturn(true);
         when(clusterBrowser.getServiceInfoFromCRMId(CLONE_1)).thenReturn(cloneInfo);
         when(clusterStatus.getGroupResources(CLONE_1, RUN_MODE))
-                .thenReturn(Lists.newArrayList(SERVICE_1));
+                .thenReturn(Optional.<List<String>>of(Lists.newArrayList(SERVICE_1)));
         val cloneService = mock(ServiceInfo.class);
         when(cloneService.getNode()).thenReturn(new DefaultMutableTreeNode());
         when(crmServiceFactory.createServiceWithParameters(
@@ -278,7 +283,7 @@ public class ResourceUpdaterTest {
         when(clusterStatus.isClone(CLONE_1)).thenReturn(true);
         when(clusterBrowser.getServiceInfoFromCRMId(CLONE_1)).thenReturn(cloneInfo);
         when(clusterStatus.getGroupResources(CLONE_1, RUN_MODE))
-                .thenReturn(Lists.newArrayList(SERVICE_1));
+                .thenReturn(Optional.<List<String>>of(Lists.newArrayList(SERVICE_1)));
         when(clusterStatus.isOrphaned(SERVICE_1)).thenReturn(true);
         when(application.isHideLRM()).thenReturn(true);
         val cloneService = mock(ServiceInfo.class);
@@ -324,6 +329,7 @@ public class ResourceUpdaterTest {
         when(clusterBrowser.getServiceInfoFromCRMId(CLONE_1)).thenReturn(cloneInfo);
 
         when(clusterStatus.getParamValuePairs(CLONE_1)).thenReturn(EXAMPLE_PARAMS);
+        when(clusterStatus.getGroupResources(CLONE_1, Application.RunMode.LIVE)).thenReturn(Optional.of(Collections.<String>emptyList()));
 
         //when:
         resourceUpdater.setAllResources(servicesInfo, clusterBrowser, clusterStatus, RUN_MODE);
@@ -337,6 +343,7 @@ public class ResourceUpdaterTest {
         //given:
         val cloneInfo = mock(CloneInfo.class);
         when(clusterStatus.getAllGroupsAndClones()).thenReturn(Sets.newHashSet(CLONE_1));
+        when(clusterStatus.getGroupResources(CLONE_1, Application.RunMode.LIVE)).thenReturn(Optional.of(Collections.<String>emptyList()));
         when(clusterStatus.isClone(CLONE_1)).thenReturn(true);
         when(servicesInfo.addServicePanel(
                 (ResourceAgent) anyObject(),

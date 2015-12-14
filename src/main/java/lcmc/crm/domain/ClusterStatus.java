@@ -23,6 +23,7 @@
 
 package lcmc.crm.domain;
 
+import com.google.common.base.Optional;
 import com.google.common.collect.Table;
 import lcmc.cluster.service.ssh.ExecCommandConfig;
 import lcmc.cluster.service.ssh.SshOutput;
@@ -149,11 +150,11 @@ public class ClusterStatus {
         return groupsToResources.keySet();
     }
 
-    public List<String> getGroupResources(final String group, final Application.RunMode runMode) {
+    public Optional<List<String>> getGroupResources(final String group, final Application.RunMode runMode) {
         if (ptestResult != null && Application.isTest(runMode)) {
-            return shadowCibQuery.getGroupsToResources().get(group);
+            return Optional.fromNullable(shadowCibQuery.getGroupsToResources().get(group));
         } else {
-            return cibQuery.getGroupsToResources().get(group);
+            return Optional.fromNullable(cibQuery.getGroupsToResources().get(group));
         }
     }
 

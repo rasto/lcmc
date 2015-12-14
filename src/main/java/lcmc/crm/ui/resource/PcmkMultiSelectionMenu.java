@@ -1076,12 +1076,12 @@ public class PcmkMultiSelectionMenu {
                             if (gi == null) {
                                 continue;
                             }
-                            final List<String> gr = cs.getGroupResources(
+                            val groupResources = cs.getGroupResources(
                                     gi.getHeartbeatId(Application.RunMode.LIVE),
                                     Application.RunMode.LIVE);
 
 
-                            if (gr == null || gr.size() <= 1) {
+                            if (!groupResources.isPresent() || groupResources.get().size() <= 1) {
                                 return "you can remove the group";
                             }
                         }
