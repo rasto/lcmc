@@ -384,10 +384,6 @@ public class ResourceUpdater {
             }
             ServiceInfo newServiceInfo;
             if (allGroupsAndClones.contains(hbId)) {
-                if (newGi != null) {
-                    LOG.appWarning("setGroupResources: group in group not implemented");
-                    continue;
-                }
                 /* clone group */
                 final GroupInfo gi = setCreateGroupInfo(hbId, newCi, clusterStatus, runMode);
                 setGroupResources(allGroupsAndClones,
