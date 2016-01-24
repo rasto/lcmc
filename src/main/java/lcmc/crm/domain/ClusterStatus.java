@@ -207,7 +207,7 @@ public class ClusterStatus {
         return cibQuery.getOrderRsc();
     }
 
-    public List<CrmXml.RscSetConnectionData> getRscSetConnections() {
+    public List<RscSetConnectionData> getRscSetConnections() {
         return cibQuery.getRscSetConnections();
     }
 

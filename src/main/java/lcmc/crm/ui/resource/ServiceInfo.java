@@ -53,6 +53,7 @@ import lcmc.crm.domain.CrmXml;
 import lcmc.crm.domain.HostLocation;
 import lcmc.crm.domain.PtestData;
 import lcmc.crm.domain.ResourceAgent;
+import lcmc.crm.domain.RscSetConnectionData;
 import lcmc.crm.domain.Service;
 import lcmc.crm.service.CRM;
 import lcmc.host.domain.Host;
@@ -3259,7 +3260,7 @@ public class ServiceInfo extends EditableInfo {
             }
             final Map<CrmXml.RscSet, Map<String, String>> rscSetsOrdAttrs =
                                                             new LinkedHashMap<CrmXml.RscSet, Map<String, String>>();
-            final CrmXml.RscSetConnectionData rdata = cphi.getRscSetConnectionDataOrder();
+            final RscSetConnectionData rdata = cphi.getRscSetConnectionDataOrder();
             /** resource set */
             final String ordId = rdata.getConstraintId();
             String idToRemove;
@@ -3423,7 +3424,7 @@ public class ServiceInfo extends EditableInfo {
             } else {
                 cphi = (ConstraintPHInfo) parent;
             }
-            final CrmXml.RscSetConnectionData rdata = cphi.getRscSetConnectionDataColocation();
+            final RscSetConnectionData rdata = cphi.getRscSetConnectionDataColocation();
             /** resource set */
             final String colId = rdata.getConstraintId();
             final String idToRemove;

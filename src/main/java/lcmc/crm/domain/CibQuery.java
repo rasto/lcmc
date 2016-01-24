@@ -55,7 +55,7 @@ final class CibQuery {
     private Map<String, CrmXml.OrderData> orderId = new LinkedHashMap<String, CrmXml.OrderData>();
     private Map<String, List<CrmXml.RscSet>> orderIdRscSets = new LinkedHashMap<String, List<CrmXml.RscSet>>();
     private Map<String, List<CrmXml.RscSet>> colocationIdRscSets = new LinkedHashMap<String, List<CrmXml.RscSet>>();
-    private List<CrmXml.RscSetConnectionData> rscSetConnections = new ArrayList<CrmXml.RscSetConnectionData>();
+    private List<RscSetConnectionData> rscSetConnections = new ArrayList<RscSetConnectionData>();
     private Table<String, String, String> nodeParameters;
     private Map<String, Map<String, HostLocation>> locations = new HashMap<String, Map<String, HostLocation>>();
     private Map<String, HostLocation> pingLocations = new HashMap<String, HostLocation>();
@@ -197,11 +197,11 @@ final class CibQuery {
         this.colocationIdRscSets = colocationIdRscSets;
     }
 
-    List<CrmXml.RscSetConnectionData> getRscSetConnections() {
+    List<RscSetConnectionData> getRscSetConnections() {
         return rscSetConnections;
     }
 
-    void setRscSetConnections(final List<CrmXml.RscSetConnectionData> rscSetConnections) {
+    void setRscSetConnections(final List<RscSetConnectionData> rscSetConnections) {
         this.rscSetConnections = rscSetConnections;
     }
 

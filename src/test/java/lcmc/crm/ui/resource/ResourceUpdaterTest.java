@@ -29,6 +29,7 @@ import lcmc.common.ui.treemenu.TreeMenuController;
 import lcmc.crm.domain.ClusterStatus;
 import lcmc.crm.domain.CrmXml;
 import lcmc.crm.domain.ResourceAgent;
+import lcmc.crm.domain.RscSetConnectionData;
 import lcmc.crm.ui.CrmGraph;
 import lcmc.crm.ui.resource.update.ResourceUpdater;
 import lcmc.host.domain.Host;
@@ -373,7 +374,7 @@ public class ResourceUpdaterTest {
         when(clusterBrowser.getNameToServiceInfoHash(ConstraintPHInfo.NAME))
                 .thenReturn(placeholderMap);
         boolean isColocation = false;
-        final CrmXml.RscSetConnectionData rscSetConnectionData = createRscSetConnectionData(isColocation);
+        final RscSetConnectionData rscSetConnectionData = createRscSetConnectionData(isColocation);
         when(clusterStatus.getRscSetConnections())
                 .thenReturn(Lists.newArrayList(rscSetConnectionData));
         when(constraintPlaceHolder.getRscSetConnectionDataOrder())
@@ -402,7 +403,7 @@ public class ResourceUpdaterTest {
         when(clusterBrowser.getNameToServiceInfoHash(ConstraintPHInfo.NAME))
                 .thenReturn(placeholderMap);
         boolean isColocation = true;
-        final CrmXml.RscSetConnectionData rscSetConnectionData = createRscSetConnectionData(isColocation);
+        final RscSetConnectionData rscSetConnectionData = createRscSetConnectionData(isColocation);
         when(clusterStatus.getRscSetConnections())
                 .thenReturn(Lists.newArrayList(rscSetConnectionData));
         when(constraintPlaceHolder.getRscSetConnectionDataColocation())
@@ -428,14 +429,14 @@ public class ResourceUpdaterTest {
         newConstraintPHInfo = constraintPlaceHolder;
         boolean isColocation = true;
 
-        final CrmXml.RscSetConnectionData oldRscSetConnectionData = createRscSetConnectionData("oldrsc1", "oldrsc2", isColocation);
+        final RscSetConnectionData oldRscSetConnectionData = createRscSetConnectionData("oldrsc1", "oldrsc2", isColocation);
         final Map<String, ServiceInfo> placeholderMap = new HashMap<String, ServiceInfo>() {{
             put("Placeholder", constraintPlaceHolder);
         }};
         when(clusterBrowser.getNameToServiceInfoHash(ConstraintPHInfo.NAME))
                 .thenReturn(placeholderMap);
 
-        final CrmXml.RscSetConnectionData newRscSetConnectionData = createRscSetConnectionData(isColocation);
+        final RscSetConnectionData newRscSetConnectionData = createRscSetConnectionData(isColocation);
         when(clusterStatus.getRscSetConnections())
                 .thenReturn(Lists.newArrayList(oldRscSetConnectionData));
         when(constraintPlaceHolder.getRscSetConnectionDataColocation())
@@ -458,7 +459,7 @@ public class ResourceUpdaterTest {
         final ConstraintPHInfo constraintPlaceHolder = mock(ConstraintPHInfo.class);
         newConstraintPHInfo = constraintPlaceHolder;
         boolean isColocation = false;
-        final CrmXml.RscSetConnectionData rscSetConnectionData = createRscSetConnectionData(isColocation);
+        final RscSetConnectionData rscSetConnectionData = createRscSetConnectionData(isColocation);
         when(clusterStatus.getRscSetConnections())
                 .thenReturn(Lists.newArrayList(rscSetConnectionData));
         when(constraintPlaceHolder.getRscSetConnectionDataOrder())
@@ -485,8 +486,8 @@ public class ResourceUpdaterTest {
         when(clusterBrowser.getNameToServiceInfoHash(ConstraintPHInfo.NAME))
                 .thenReturn(placeholderMap);
         boolean isColocation = true;
-        final CrmXml.RscSetConnectionData oldRscSetConnectionData = createRscSetConnectionData(isColocation);
-        final CrmXml.RscSetConnectionData newRscSetConnectionData = createRscSetConnectionData(isColocation);
+        final RscSetConnectionData oldRscSetConnectionData = createRscSetConnectionData(isColocation);
+        final RscSetConnectionData newRscSetConnectionData = createRscSetConnectionData(isColocation);
         when(clusterStatus.getRscSetConnections())
                 .thenReturn(Lists.newArrayList(newRscSetConnectionData));
         when(constraintPlaceHolder.getRscSetConnectionDataColocation())
@@ -515,8 +516,8 @@ public class ResourceUpdaterTest {
         when(clusterBrowser.getNameToServiceInfoHash(ConstraintPHInfo.NAME))
                 .thenReturn(placeholderMap);
         boolean isColocation = true;
-        final CrmXml.RscSetConnectionData oldRscSetConnectionData = createRscSetConnectionData("rsc1", "rsc2", !isColocation);
-        final CrmXml.RscSetConnectionData newRscSetConnectionData = createRscSetConnectionData("rsc1", "rsc2", isColocation);
+        final RscSetConnectionData oldRscSetConnectionData = createRscSetConnectionData("rsc1", "rsc2", !isColocation);
+        final RscSetConnectionData newRscSetConnectionData = createRscSetConnectionData("rsc1", "rsc2", isColocation);
         when(clusterStatus.getRscSetConnections())
                 .thenReturn(Lists.newArrayList(newRscSetConnectionData));
         when(constraintPlaceHolder.getRscSetConnectionDataColocation())
@@ -547,8 +548,8 @@ public class ResourceUpdaterTest {
         when(clusterBrowser.getNameToServiceInfoHash(ConstraintPHInfo.NAME))
                 .thenReturn(placeholderMap);
         boolean isColocation = true;
-        final CrmXml.RscSetConnectionData oldRscSetConnectionData = createRscSetConnectionData("rsc1", "rsc2", isColocation);
-        final CrmXml.RscSetConnectionData newRscSetConnectionData = createRscSetConnectionData("rsc1", "rsc2", !isColocation);
+        final RscSetConnectionData oldRscSetConnectionData = createRscSetConnectionData("rsc1", "rsc2", isColocation);
+        final RscSetConnectionData newRscSetConnectionData = createRscSetConnectionData("rsc1", "rsc2", !isColocation);
         when(clusterStatus.getRscSetConnections())
                 .thenReturn(Lists.newArrayList(newRscSetConnectionData));
         when(constraintPlaceHolder.getRscSetConnectionDataColocation())
@@ -579,7 +580,7 @@ public class ResourceUpdaterTest {
         when(clusterBrowser.getNameToServiceInfoHash(ConstraintPHInfo.NAME))
                 .thenReturn(placeholderMap);
         boolean isColocation = false;
-        final CrmXml.RscSetConnectionData newRscSetConnectionData = createRscSetConnectionData("rsc1", "rsc2", isColocation);
+        final RscSetConnectionData newRscSetConnectionData = createRscSetConnectionData("rsc1", "rsc2", isColocation);
         when(clusterStatus.getRscSetConnections())
                 .thenReturn(Lists.newArrayList(newRscSetConnectionData));
         final ServiceInfo service1 = mock(ServiceInfo.class);
@@ -709,12 +710,12 @@ public class ResourceUpdaterTest {
         verify(rscThen).setDrbddiskInfo(rscFirst);
     }
 
-    private CrmXml.RscSetConnectionData createRscSetConnectionData(final boolean isColocation) {
+    private RscSetConnectionData createRscSetConnectionData(final boolean isColocation) {
         return createRscSetConnectionData("rsc1", "rsc2", isColocation);
     }
-    private CrmXml.RscSetConnectionData createRscSetConnectionData(final String rsc1,
-                                                                   final String rsc2,
-                                                                   final boolean isColocation) {
+    private RscSetConnectionData createRscSetConnectionData(final String rsc1,
+                                                            final String rsc2,
+                                                            final boolean isColocation) {
         final CrmXml.RscSet rscSet1 = new CrmXml.RscSet(
                 "id1",
                 Lists.newArrayList(rsc1),
@@ -723,7 +724,7 @@ public class ResourceUpdaterTest {
                 "id2",
                 Lists.newArrayList(rsc2),
                 null, null, null, null);
-        final CrmXml.RscSetConnectionData rscSetConnectionData = new CrmXml.RscSetConnectionData(
+        final RscSetConnectionData rscSetConnectionData = new RscSetConnectionData(
                 rscSet1,
                 rscSet2,
                 "constraintId1",
