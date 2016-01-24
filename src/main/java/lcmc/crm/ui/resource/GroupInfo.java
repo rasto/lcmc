@@ -404,7 +404,7 @@ public class GroupInfo extends ServiceInfo {
      * @param newServiceInfo
      *      service info object of the new service
      */
-    void addGroupServicePanel(final ServiceInfo newServiceInfo, final boolean reloadNode) {
+    public void addGroupServicePanel(final ServiceInfo newServiceInfo, final boolean reloadNode) {
         final DefaultMutableTreeNode groupNode = getNode();
         if (groupNode == null) {
             return;

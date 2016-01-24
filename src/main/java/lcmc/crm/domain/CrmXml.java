@@ -38,7 +38,7 @@ import lcmc.common.domain.XMLTools;
 import lcmc.common.domain.util.Tools;
 import lcmc.common.ui.Info;
 import lcmc.common.ui.main.ProgressIndicator;
-import lcmc.crm.ui.resource.ResourceUpdater;
+import lcmc.crm.ui.resource.update.ResourceUpdater;
 import lcmc.crm.ui.resource.ServiceInfo;
 import lcmc.crm.ui.resource.ServicesInfo;
 import lcmc.host.domain.Host;
@@ -740,7 +740,7 @@ public class CrmXml {
                 final ClusterBrowser browser = allServicesInfo.getBrowser();
                 final ClusterStatus clusterStatus = browser.getClusterStatus();
                 if (clusterStatus != null) {
-                    resourceUpdaterProvider.get().setAllResources(allServicesInfo, browser, clusterStatus, Application.RunMode.LIVE);
+                    resourceUpdaterProvider.get().updateAllResources(allServicesInfo, browser, clusterStatus, Application.RunMode.LIVE);
                 }
                 final Info lastSelectedInfo = browser.getClusterViewPanel().getLastSelectedInfo();
                 if (lastSelectedInfo instanceof ServiceInfo || lastSelectedInfo instanceof ServicesInfo) {

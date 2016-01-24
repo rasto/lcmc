@@ -56,7 +56,7 @@ public class DrbddiskInfo extends ServiceInfo {
     }
 
     @Override
-    protected void setParameters(final Map<String, String> resourceNode) {
+    public void setParameters(final Map<String, String> resourceNode) {
         super.setParameters(resourceNode);
         final ResourceInfo dri = getBrowser().getDrbdResourceNameHash().get(getResourceName());
         getBrowser().putDrbdResHash();

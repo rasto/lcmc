@@ -30,6 +30,7 @@ import lcmc.crm.domain.ClusterStatus;
 import lcmc.crm.domain.CrmXml;
 import lcmc.crm.domain.ResourceAgent;
 import lcmc.crm.ui.CrmGraph;
+import lcmc.crm.ui.resource.update.ResourceUpdater;
 import lcmc.host.domain.Host;
 import lombok.val;
 import org.junit.Before;
@@ -129,7 +130,7 @@ public class ResourceUpdaterTest {
         when(clusterStatus.getParamValuePairs(SERVICE_1)).thenReturn(EXAMPLE_PARAMS);
 
         //when:
-        resourceUpdater.setAllResources(servicesInfo, clusterBrowser, clusterStatus, RUN_MODE);
+        resourceUpdater.updateAllResources(servicesInfo, clusterBrowser, clusterStatus, RUN_MODE);
 
         //then:
         verify(servicesInfo).addServicePanel(serviceInfo, null, false, false, Application.RunMode.LIVE);
@@ -146,7 +147,7 @@ public class ResourceUpdaterTest {
         when(clusterStatus.getGroupResources(GROUP_1, Application.RunMode.LIVE)).thenReturn(Optional.of(Collections.<String>emptyList()));
 
         //when:
-        resourceUpdater.setAllResources(servicesInfo, clusterBrowser, clusterStatus, RUN_MODE);
+        resourceUpdater.updateAllResources(servicesInfo, clusterBrowser, clusterStatus, RUN_MODE);
 
         //then:
         verify(groupInfo).setParameters(EXAMPLE_PARAMS);
@@ -168,7 +169,7 @@ public class ResourceUpdaterTest {
         when(clusterStatus.getGroupResources(GROUP_1, Application.RunMode.LIVE)).thenReturn(Optional.of(Collections.<String>emptyList()));
 
         //when:
-        resourceUpdater.setAllResources(servicesInfo, clusterBrowser, clusterStatus, RUN_MODE);
+        resourceUpdater.updateAllResources(servicesInfo, clusterBrowser, clusterStatus, RUN_MODE);
 
         //then:
         verify(groupInfo).setParameters(EXAMPLE_PARAMS);
@@ -197,7 +198,7 @@ public class ResourceUpdaterTest {
         when(clusterStatus.getGroupResources(GROUP_1, Application.RunMode.LIVE)).thenReturn(Optional.of(Collections.<String>emptyList()));
 
         //when:
-        resourceUpdater.setAllResources(servicesInfo, clusterBrowser, clusterStatus, RUN_MODE);
+        resourceUpdater.updateAllResources(servicesInfo, clusterBrowser, clusterStatus, RUN_MODE);
 
         //then:
         verify(groupInfo, atLeastOnce()).setParameters(EXAMPLE_PARAMS); //TODO: times(1)
@@ -218,7 +219,7 @@ public class ResourceUpdaterTest {
         when(clusterStatus.getParamValuePairs(SERVICE_1)).thenReturn(EXAMPLE_PARAMS);
 
         //when:
-        resourceUpdater.setAllResources(servicesInfo, clusterBrowser, clusterStatus, RUN_MODE);
+        resourceUpdater.updateAllResources(servicesInfo, clusterBrowser, clusterStatus, RUN_MODE);
 
         //then:
         verify(groupService).setParameters(EXAMPLE_PARAMS);
@@ -243,7 +244,7 @@ public class ResourceUpdaterTest {
         when(clusterStatus.getParamValuePairs(SERVICE_1)).thenReturn(EXAMPLE_PARAMS);
 
         //when:
-        resourceUpdater.setAllResources(servicesInfo, clusterBrowser, clusterStatus, RUN_MODE);
+        resourceUpdater.updateAllResources(servicesInfo, clusterBrowser, clusterStatus, RUN_MODE);
 
         //then:
         verify(groupInfo).addGroupServicePanel(groupService, false);
@@ -269,7 +270,7 @@ public class ResourceUpdaterTest {
         when(clusterStatus.getParamValuePairs(SERVICE_1)).thenReturn(EXAMPLE_PARAMS);
 
         //when:
-        resourceUpdater.setAllResources(servicesInfo, clusterBrowser, clusterStatus, RUN_MODE);
+        resourceUpdater.updateAllResources(servicesInfo, clusterBrowser, clusterStatus, RUN_MODE);
 
         //then:
         verify(cloneInfo).addCloneServicePanel(cloneService);
@@ -297,7 +298,7 @@ public class ResourceUpdaterTest {
         when(clusterStatus.getParamValuePairs(SERVICE_1)).thenReturn(EXAMPLE_PARAMS);
 
         //when:
-        resourceUpdater.setAllResources(servicesInfo, clusterBrowser, clusterStatus, RUN_MODE);
+        resourceUpdater.updateAllResources(servicesInfo, clusterBrowser, clusterStatus, RUN_MODE);
 
         //then:
         verify(cloneInfo, never()).addCloneServicePanel(cloneService);
@@ -313,7 +314,7 @@ public class ResourceUpdaterTest {
         when(clusterStatus.getAllGroupsAndClones()).thenReturn(Sets.newHashSet(GROUP_1));
 
         //when:
-        resourceUpdater.setAllResources(servicesInfo, clusterBrowser, clusterStatus, RUN_MODE);
+        resourceUpdater.updateAllResources(servicesInfo, clusterBrowser, clusterStatus, RUN_MODE);
 
         //then:
         verify(groupInfo, never()).setParameters((Map<String, String>) anyObject());
@@ -332,7 +333,7 @@ public class ResourceUpdaterTest {
         when(clusterStatus.getGroupResources(CLONE_1, Application.RunMode.LIVE)).thenReturn(Optional.of(Collections.<String>emptyList()));
 
         //when:
-        resourceUpdater.setAllResources(servicesInfo, clusterBrowser, clusterStatus, RUN_MODE);
+        resourceUpdater.updateAllResources(servicesInfo, clusterBrowser, clusterStatus, RUN_MODE);
 
         //then:
         verify(cloneInfo).setParameters(EXAMPLE_PARAMS);
@@ -356,7 +357,7 @@ public class ResourceUpdaterTest {
         when(clusterStatus.getParamValuePairs(CLONE_1)).thenReturn(EXAMPLE_PARAMS);
 
         //when:
-        resourceUpdater.setAllResources(servicesInfo, clusterBrowser, clusterStatus, RUN_MODE);
+        resourceUpdater.updateAllResources(servicesInfo, clusterBrowser, clusterStatus, RUN_MODE);
 
         //then:
         verify(cloneInfo).setParameters(EXAMPLE_PARAMS);
@@ -383,7 +384,7 @@ public class ResourceUpdaterTest {
         when(clusterBrowser.getServiceInfoFromCRMId("rsc2")).thenReturn(service2);
 
         //when:
-        resourceUpdater.setAllResources(servicesInfo, clusterBrowser, clusterStatus, RUN_MODE);
+        resourceUpdater.updateAllResources(servicesInfo, clusterBrowser, clusterStatus, RUN_MODE);
 
         //then:
         verify(crmGraph).addOrder("constraintId1", service1, constraintPlaceHolder);
@@ -412,7 +413,7 @@ public class ResourceUpdaterTest {
         when(clusterBrowser.getServiceInfoFromCRMId("rsc2")).thenReturn(service2);
 
         //when:
-        resourceUpdater.setAllResources(servicesInfo, clusterBrowser, clusterStatus, RUN_MODE);
+        resourceUpdater.updateAllResources(servicesInfo, clusterBrowser, clusterStatus, RUN_MODE);
 
         //then:
         verify(crmGraph).addColocation("constraintId1", constraintPlaceHolder, service1);
@@ -445,7 +446,7 @@ public class ResourceUpdaterTest {
         when(clusterBrowser.getServiceInfoFromCRMId("rsc2")).thenReturn(service2);
 
         //when:
-        resourceUpdater.setAllResources(servicesInfo, clusterBrowser, clusterStatus, RUN_MODE);
+        resourceUpdater.updateAllResources(servicesInfo, clusterBrowser, clusterStatus, RUN_MODE);
 
         //then:
         verify(crmGraph).addConstraintPlaceholder(constraintPlaceHolder, null, Application.RunMode.LIVE);
@@ -468,7 +469,7 @@ public class ResourceUpdaterTest {
         when(clusterBrowser.getServiceInfoFromCRMId("rsc2")).thenReturn(service2);
 
         //when:
-        resourceUpdater.setAllResources(servicesInfo, clusterBrowser, clusterStatus, RUN_MODE);
+        resourceUpdater.updateAllResources(servicesInfo, clusterBrowser, clusterStatus, RUN_MODE);
 
         //then:
         verify(crmGraph).addConstraintPlaceholder(constraintPlaceHolder, null, Application.RunMode.LIVE);
@@ -496,7 +497,7 @@ public class ResourceUpdaterTest {
         when(clusterBrowser.getServiceInfoFromCRMId("rsc2")).thenReturn(service2);
 
         //when:
-        resourceUpdater.setAllResources(servicesInfo, clusterBrowser, clusterStatus, RUN_MODE);
+        resourceUpdater.updateAllResources(servicesInfo, clusterBrowser, clusterStatus, RUN_MODE);
 
         //then:
         verify(crmGraph).addColocation("constraintId1", constraintPlaceHolder, service1);
@@ -529,7 +530,7 @@ public class ResourceUpdaterTest {
         when(constraintPlaceHolder.getPcmkRscSetsInfo()).thenReturn(pcmkRscSetsInfo);
 
         //when:
-        resourceUpdater.setAllResources(servicesInfo, clusterBrowser, clusterStatus, RUN_MODE);
+        resourceUpdater.updateAllResources(servicesInfo, clusterBrowser, clusterStatus, RUN_MODE);
 
         //then:
         pcmkRscSetsInfo.addColocation("constraintId1", constraintPlaceHolder);
@@ -561,7 +562,7 @@ public class ResourceUpdaterTest {
         when(constraintPlaceHolder.getPcmkRscSetsInfo()).thenReturn(pcmkRscSetsInfo);
 
         //when:
-        resourceUpdater.setAllResources(servicesInfo, clusterBrowser, clusterStatus, RUN_MODE);
+        resourceUpdater.updateAllResources(servicesInfo, clusterBrowser, clusterStatus, RUN_MODE);
 
         //then:
         pcmkRscSetsInfo.addOrder("constraintId1", constraintPlaceHolder);
@@ -587,7 +588,7 @@ public class ResourceUpdaterTest {
         when(clusterBrowser.getServiceInfoFromCRMId("rsc2")).thenReturn(service2);
 
         //when:
-        resourceUpdater.setAllResources(servicesInfo, clusterBrowser, clusterStatus, RUN_MODE);
+        resourceUpdater.updateAllResources(servicesInfo, clusterBrowser, clusterStatus, RUN_MODE);
 
         //then:
         verify(crmGraph).addOrder("constraintId1", service1, constraintPlaceHolder);
@@ -611,7 +612,7 @@ public class ResourceUpdaterTest {
         when(clusterBrowser.getServiceInfoFromCRMId("withService")).thenReturn(withService);
 
         //when:
-        resourceUpdater.setAllResources(servicesInfo, clusterBrowser, clusterStatus, RUN_MODE);
+        resourceUpdater.updateAllResources(servicesInfo, clusterBrowser, clusterStatus, RUN_MODE);
 
         //then:
         verify(crmGraph).addColocation("colId1", service, withService);
@@ -636,7 +637,7 @@ public class ResourceUpdaterTest {
         when(clusterBrowser.getServiceInfoFromCRMId("rscThen")).thenReturn(rscThen);
 
         //when:
-        resourceUpdater.setAllResources(servicesInfo, clusterBrowser, clusterStatus, RUN_MODE);
+        resourceUpdater.updateAllResources(servicesInfo, clusterBrowser, clusterStatus, RUN_MODE);
 
         //then:
         verify(crmGraph).addOrder("ordId1", rscFirst, rscThen);
@@ -668,7 +669,7 @@ public class ResourceUpdaterTest {
         when(clusterBrowser.getServiceInfoFromCRMId("rscThen")).thenReturn(rscThen);
 
         //when:
-        resourceUpdater.setAllResources(servicesInfo, clusterBrowser, clusterStatus, RUN_MODE);
+        resourceUpdater.updateAllResources(servicesInfo, clusterBrowser, clusterStatus, RUN_MODE);
 
         //then:
         verify(crmGraph).addOrder("ordId1", rscFirst, rscThen);
@@ -701,7 +702,7 @@ public class ResourceUpdaterTest {
         when(clusterBrowser.getServiceInfoFromCRMId("rscThen")).thenReturn(rscThen);
 
         //when:
-        resourceUpdater.setAllResources(servicesInfo, clusterBrowser, clusterStatus, RUN_MODE);
+        resourceUpdater.updateAllResources(servicesInfo, clusterBrowser, clusterStatus, RUN_MODE);
 
         //then:
         verify(crmGraph).addOrder("ordId1", rscFirst, rscThen);

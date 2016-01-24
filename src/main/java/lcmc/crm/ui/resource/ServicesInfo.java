@@ -49,6 +49,7 @@ import lcmc.crm.domain.PtestData;
 import lcmc.crm.domain.ResourceAgent;
 import lcmc.crm.service.CRM;
 import lcmc.crm.ui.CrmGraph;
+import lcmc.crm.ui.resource.update.ResourceUpdater;
 import lcmc.host.domain.Host;
 import lcmc.logger.Logger;
 import lcmc.logger.LoggerFactory;
@@ -529,11 +530,11 @@ public class ServicesInfo extends EditableInfo {
      * will be computed later. reloadNode specifies if the node in
      * the menu should be reloaded and get uptodate.
      */
-    void addServicePanel(final ServiceInfo newServiceInfo,
-                         final Point2D pos,
-                         final boolean reloadNode,
-                         final boolean interactive,
-                         final Application.RunMode runMode) {
+    public void addServicePanel(final ServiceInfo newServiceInfo,
+                                final Point2D pos,
+                                final boolean reloadNode,
+                                final boolean interactive,
+                                final Application.RunMode runMode) {
         swingUtils.invokeAndWait(new Runnable() {
             @Override
             public void run() {

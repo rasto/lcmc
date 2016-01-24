@@ -73,7 +73,7 @@ public class CloneInfo extends ServiceInfo {
      * Adds service to this clone set. Adds it in the submenu in
      * the menu tree and initializes it.
      */
-    void addCloneServicePanel(final ServiceInfo newServiceInfo) {
+    public void addCloneServicePanel(final ServiceInfo newServiceInfo) {
         containedService = newServiceInfo;
         newServiceInfo.getService().setResourceClass(newServiceInfo.getResourceAgent().getResourceClass());
         newServiceInfo.setCloneInfo(this);

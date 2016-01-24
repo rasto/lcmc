@@ -69,7 +69,7 @@ public class VirtualDomainInfo extends ServiceInfo {
     }
 
     @Override
-    protected void setParameters(final Map<String, String> resourceNode) {
+    public void setParameters(final Map<String, String> resourceNode) {
         super.setParameters(resourceNode);
         connectWithVMS();
     }

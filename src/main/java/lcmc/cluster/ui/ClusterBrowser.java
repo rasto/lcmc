@@ -59,7 +59,7 @@ import lcmc.crm.ui.resource.CRMInfo;
 import lcmc.crm.ui.resource.GroupInfo;
 import lcmc.crm.ui.resource.HbConnectionInfo;
 import lcmc.crm.ui.resource.ResourceAgentClassInfo;
-import lcmc.crm.ui.resource.ResourceUpdater;
+import lcmc.crm.ui.resource.update.ResourceUpdater;
 import lcmc.crm.ui.resource.RscDefaultsInfo;
 import lcmc.crm.ui.resource.ServiceInfo;
 import lcmc.crm.ui.resource.ServicesInfo;
@@ -1077,10 +1077,10 @@ public class ClusterBrowser extends Browser {
                                     final ServicesInfo ssi = servicesInfo;
                                     rscDefaultsInfo.setParameters(clusterStatus0.getRscDefaultsValuePairs());
                                     ssi.setGlobalConfig(clusterStatus0);
-                                    resourceUpdaterProvider.get().setAllResources(ssi, ssi.getBrowser(), clusterStatus0, runMode);
+                                    resourceUpdaterProvider.get().updateAllResources(ssi, ssi.getBrowser(), clusterStatus0, runMode);
                                     if (firstTime.getCount() == 1) {
                                         /* one more time so that id-refs work.*/
-                                        resourceUpdaterProvider.get().setAllResources(ssi, ssi.getBrowser(), clusterStatus0, runMode);
+                                        resourceUpdaterProvider.get().updateAllResources(ssi, ssi.getBrowser(), clusterStatus0, runMode);
                                     }
                                     treeMenuController.repaintMenuTree();
                                     clusterHostsInfo.updateTable(ClusterHostsInfo.MAIN_TABLE);

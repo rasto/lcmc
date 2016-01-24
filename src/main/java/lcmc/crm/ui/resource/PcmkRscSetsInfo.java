@@ -68,7 +68,7 @@ public class PcmkRscSetsInfo extends HbConnectionInfo {
     }
 
     /** Adds a new rsc set colocation. */
-    void addColocation(final String colId, final ConstraintPHInfo cphi) {
+    public void addColocation(final String colId, final ConstraintPHInfo cphi) {
         mConstraintPHLock.lock();
         try {
             constraintPHInfos.add(cphi);
@@ -79,7 +79,7 @@ public class PcmkRscSetsInfo extends HbConnectionInfo {
     }
 
     /** Adds a new rsc set order. */
-    void addOrder(final String ordId, final ConstraintPHInfo cphi) {
+    public void addOrder(final String ordId, final ConstraintPHInfo cphi) {
         mConstraintPHLock.lock();
         try {
             constraintPHInfos.add(cphi);

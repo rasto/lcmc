@@ -81,9 +81,9 @@ public class ConstraintPHInfo extends ServiceInfo {
     private SwingUtils swingUtils;
 
 
-    void init(final Browser browser,
-              final CrmXml.RscSetConnectionData rscSetConnectionData,
-              final Preference preference) {
+    public void init(final Browser browser,
+                     final CrmXml.RscSetConnectionData rscSetConnectionData,
+                     final Preference preference) {
         super.init(NAME, null, browser);
         this.preference = preference;
         if (rscSetConnectionData != null) {
@@ -95,11 +95,11 @@ public class ConstraintPHInfo extends ServiceInfo {
         }
     }
 
-    CrmXml.RscSetConnectionData getRscSetConnectionDataColocation() {
+    public CrmXml.RscSetConnectionData getRscSetConnectionDataColocation() {
         return rscSetConnectionDataColocation;
     }
 
-    CrmXml.RscSetConnectionData getRscSetConnectionDataOrder() {
+    public CrmXml.RscSetConnectionData getRscSetConnectionDataOrder() {
         return rscSetConnectionDataOrder;
     }
 
@@ -115,7 +115,7 @@ public class ConstraintPHInfo extends ServiceInfo {
         }
     }
 
-    void setRscSetConnectionData(final CrmXml.RscSetConnectionData rscSetConnectionData) {
+    public void setRscSetConnectionData(final CrmXml.RscSetConnectionData rscSetConnectionData) {
         if (rscSetConnectionData.isColocation()) {
             if (reverseCol) {
                 if (rscSetConnectionData.getRscSet2() == null && rscSetConnectionData.getRscSet1() != null) {

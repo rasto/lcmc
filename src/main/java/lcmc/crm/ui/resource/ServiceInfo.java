@@ -455,7 +455,7 @@ public class ServiceInfo extends EditableInfo {
     }
 
     /** Sets service parameters with values from resourceNode hash. */
-    protected void setParameters(final Map<String, String> resourceNode) {
+    public void setParameters(final Map<String, String> resourceNode) {
         if (resourceNode == null) {
             return;
         }

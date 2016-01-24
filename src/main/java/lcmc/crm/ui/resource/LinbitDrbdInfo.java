@@ -80,7 +80,7 @@ public class LinbitDrbdInfo extends ServiceInfo {
 
     /** Sets service parameters with values from resourceNode hash. */
     @Override
-    protected void setParameters(final Map<String, String> resourceNode) {
+    public void setParameters(final Map<String, String> resourceNode) {
         super.setParameters(resourceNode);
         final ResourceInfo dri =
                         getBrowser().getDrbdResourceNameHash().get(getResourceName());
