@@ -23,8 +23,6 @@ package lcmc.crm.ui.resource;
 import com.google.common.base.Optional;
 import lcmc.cluster.ui.ClusterBrowser;
 import lcmc.common.domain.Application;
-import lcmc.common.ui.treemenu.TreeMenuController;
-import lcmc.common.ui.utils.SwingUtils;
 import lcmc.crm.domain.ClusterStatus;
 import lcmc.crm.domain.CrmXml;
 import lcmc.crm.domain.ResourceAgent;
@@ -50,7 +48,6 @@ public class ResourceUpdater {
     private static final Logger LOG = LoggerFactory.getLogger(ResourceUpdater.class);
 
     private ClusterBrowser browser;
-//    @Inject
     private ServicesInfo servicesInfo;
     @Inject
     private Provider<ConstraintPHInfo> constraintPHInfoProvider;
@@ -58,10 +55,6 @@ public class ResourceUpdater {
     private Provider<PcmkRscSetsInfo> pcmkRscSetsInfoProvider;
     @Inject
     private Application application;
-    @Inject
-    private SwingUtils swingUtils;
-    @Inject
-    private TreeMenuController treeMenuController;
     @Inject
     private CrmServiceFactory crmServiceFactory;
 
