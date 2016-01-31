@@ -49,7 +49,6 @@ import lcmc.crm.domain.PtestData;
 import lcmc.crm.domain.ResourceAgent;
 import lcmc.crm.service.CRM;
 import lcmc.crm.ui.CrmGraph;
-import lcmc.crm.ui.resource.update.ResourceUpdater;
 import lcmc.host.domain.Host;
 import lcmc.logger.Logger;
 import lcmc.logger.LoggerFactory;
@@ -782,11 +781,11 @@ public class ServicesInfo extends EditableInfo {
         }
     }
 
-    public void reloadNode(ResourceUpdater resourceUpdater) {
+    public void reloadNode() {
         treeMenuController.reloadNode(getBrowser().getServicesNode(), false);
     }
 
-    public void moveNodeToPosition(int pos, DefaultMutableTreeNode node, ResourceUpdater resourceUpdater) {
+    public void moveNodeToPosition(int pos, DefaultMutableTreeNode node) {
         treeMenuController.moveNodeToPosition(node, pos);
     }
 }

@@ -570,7 +570,7 @@ public class ResourceUpdaterTest {
     }
 
     @Test
-    public void shouldAddResourceSetOrdersToNewPlacehlder() {
+    public void shouldAddResourceSetOrdersToNewPlaceholder() {
         //given:
         final ConstraintPHInfo constraintPlaceHolder = mock(ConstraintPHInfo.class);
         when(constraintPlaceHolder.isNew()).thenReturn(true);

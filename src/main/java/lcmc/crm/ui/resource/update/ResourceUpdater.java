@@ -105,7 +105,6 @@ public class ResourceUpdater {
 
         updateColocations();
 
-        /* orders */
         updateOrders();
 
         servicesInfo.cleanupServiceMenu(groupServiceIsPresent);
@@ -246,8 +245,65 @@ public class ResourceUpdater {
         boolean newService = false;
         int pos = 0;
         for (final String hbId : groupResources.get()) {
+            final GroupUpdater groupUpdater = new GroupUpdater(newGi, newCi, setParametersHash, newService, pos, hbId);
+            groupUpdater.update();
+            newService = groupUpdater.isNewService();
+        }
+
+        for (final Map.Entry<ServiceInfo, Map<String, String>> setEntry : setParametersHash.entrySet()) {
+            setEntry.getKey().setParameters(setEntry.getValue());
+            if (Application.isLive(runMode)) {
+                setEntry.getKey().setUpdated(false);
+            }
+        }
+        if (newService) {
+            servicesInfo.reloadNode();
+        }
+        browser.repaint();
+    }
+
+    /**
+     * Check if this connection is filesystem with drbd ra and if so, set it.
+     */
+    private void setFilesystemWithDrbd(final ServiceInfo siP, final ServiceInfo si) {
+        if (siP.getResourceAgent().isLinbitDrbd()) {
+            /* linbit::drbd -> Filesystem */
+            ((FilesystemRaInfo) si).setLinbitDrbdInfo((LinbitDrbdInfo) siP);
+        } else {
+            /* drbddisk -> Filesystem */
+            ((FilesystemRaInfo) si).setDrbddiskInfo((DrbddiskInfo) siP);
+        }
+    }
+
+    private class GroupUpdater {
+        private final GroupInfo newGi;
+        private final CloneInfo newCi;
+        private final Map<ServiceInfo, Map<String, String>> setParametersHash;
+        private boolean newService;
+        private int pos;
+        private final String hbId;
+
+        public GroupUpdater(GroupInfo newGi,
+                            CloneInfo newCi,
+                            Map<ServiceInfo, Map<String, String>> setParametersHash,
+                            boolean newService,
+                            int pos,
+                            String hbId) {
+            this.newGi = newGi;
+            this.newCi = newCi;
+            this.setParametersHash = setParametersHash;
+            this.newService = newService;
+            this.pos = pos;
+            this.hbId = hbId;
+        }
+
+        public boolean isNewService() {
+            return newService;
+        }
+
+        public GroupUpdater update() {
             if (clusterStatus.isOrphaned(hbId) && application.isHideLRM()) {
-                continue;
+                return this;
             }
             ServiceInfo newServiceInfo;
             if (allGroupsAndClones.contains(hbId)) {
@@ -302,34 +358,10 @@ public class ResourceUpdater {
             }
             final DefaultMutableTreeNode node = newServiceInfo.getNode();
             if (node != null) {
-                servicesInfo.moveNodeToPosition(pos, node, this);
+                servicesInfo.moveNodeToPosition(pos, node);
                 pos++;
             }
-        }
-
-        for (final Map.Entry<ServiceInfo, Map<String, String>> setEntry : setParametersHash.entrySet()) {
-            setEntry.getKey().setParameters(setEntry.getValue());
-            if (Application.isLive(runMode)) {
-                setEntry.getKey().setUpdated(false);
-            }
-        }
-        if (newService) {
-            servicesInfo.reloadNode(this);
-        }
-        browser.repaint();
-    }
-
-    /**
-     * Check if this connection is filesystem with drbd ra and if so, set it.
-     */
-    private void setFilesystemWithDrbd(final ServiceInfo siP, final ServiceInfo si) {
-        if (siP.getResourceAgent().isLinbitDrbd()) {
-            /* linbit::drbd -> Filesystem */
-            ((FilesystemRaInfo) si).setLinbitDrbdInfo((LinbitDrbdInfo) siP);
-        } else {
-            /* drbddisk -> Filesystem */
-            ((FilesystemRaInfo) si).setDrbddiskInfo((DrbddiskInfo) siP);
+            return this;
         }
     }
-
 }
