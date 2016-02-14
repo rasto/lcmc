@@ -36,6 +36,7 @@ import javax.inject.Provider;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 public class RscSetUpdater {
     private final Application.RunMode runMode;
@@ -63,57 +64,65 @@ public class RscSetUpdater {
     public void update(final List<RscSetConnectionData> newRscSetConnections) {
         findExistingPlaceholders();
         for (final RscSetConnectionData newRscSetConnectionData : newRscSetConnections) {
-            ConstraintPHInfo constraintPHInfo = updateExistingResourceSet(newRscSetConnectionData);
-
-            if (constraintPHInfo == null) {
-                constraintPHInfo = addConstraintsToExistingPlaceholder(newRscSetConnectionData);
-            }
-
-            PcmkRscSetsInfo rscSetsInfo = null;
-
-            if (constraintPHInfo != null) {
-                rscSetsInfo = constraintPHInfo.getPcmkRscSetsInfo();
-            }
-
-            if (constraintPHInfo == null && !preNewCphis.isEmpty()) {
-                constraintPHInfo = setOldPlaceholder(newRscSetConnectionData);
-            }
-
-            if (constraintPHInfo == null) {
-                constraintPHInfo = createNewPlaceholder(newRscSetConnectionData, rscSetsInfo);
-            }
-
-            serviceIsPresent.add(constraintPHInfo);
-
-            if (newRscSetConnectionData.isColocation()) {
-                addColocation(newRscSetConnectionData, constraintPHInfo);
-            } else {
-                addOrder(newRscSetConnectionData, constraintPHInfo);
-            }
-            if (Application.isLive(runMode)) {
-                constraintPHInfo.setUpdated(false);
-                constraintPHInfo.setNew(false);
-            }
+            updateRscConnection(newRscSetConnectionData);
         }
 
         addNewPlaceholders();
     }
 
-    private ConstraintPHInfo updateExistingResourceSet(RscSetConnectionData newRscSetConnectionData) {
-        ConstraintPHInfo constraintPHInfo = null;
+    private void updateRscConnection(RscSetConnectionData newRscSetConnectionData) {
+        Optional<ConstraintPHInfo> constraintPHInfo = updateExistingResourceSet(newRscSetConnectionData);
+
+        if (!constraintPHInfo.isPresent()) {
+            constraintPHInfo = addConstraintsToExistingPlaceholder(newRscSetConnectionData);
+        }
+
+        PcmkRscSetsInfo rscSetsInfo = null;
+
+        if (constraintPHInfo.isPresent()) {
+            rscSetsInfo = constraintPHInfo.get().getPcmkRscSetsInfo();
+        }
+
+        if (!constraintPHInfo.isPresent() && !preNewCphis.isEmpty()) {
+            constraintPHInfo = Optional.of(setOldPlaceholder(newRscSetConnectionData));
+        }
+
+        if (!constraintPHInfo.isPresent()) {
+            constraintPHInfo = Optional.of(createNewPlaceholder(newRscSetConnectionData, rscSetsInfo));
+        }
+
+        addPlaceholder(newRscSetConnectionData, constraintPHInfo.get());
+    }
+
+    private void addPlaceholder(final RscSetConnectionData newRscSetConnectionData,
+                                final ConstraintPHInfo constraintPHInfo) {
+        serviceIsPresent.add(constraintPHInfo);
+
+        if (newRscSetConnectionData.isColocation()) {
+            addColocation(newRscSetConnectionData, constraintPHInfo);
+        } else {
+            addOrder(newRscSetConnectionData, constraintPHInfo);
+        }
+        if (Application.isLive(runMode)) {
+            constraintPHInfo.setUpdated(false);
+            constraintPHInfo.setNew(false);
+        }
+    }
+
+    private Optional<ConstraintPHInfo> updateExistingResourceSet(RscSetConnectionData newRscSetConnectionData) {
         for (final Map.Entry<RscSetConnectionData, ConstraintPHInfo> phEntry : oldResourceSetToPlaceholder.entrySet()) {
             final RscSetConnectionData oldRscSetConnectionData = phEntry.getKey();
             final ConstraintPHInfo placeholder = phEntry.getValue();
+
             if (oldRscSetConnectionData == newRscSetConnectionData) {
                 continue;
             }
             if (newRscSetConnectionData.equals(oldRscSetConnectionData) || newRscSetConnectionData.equalsAlthoughReversed(oldRscSetConnectionData)) {
-                constraintPHInfo = placeholder;
-                constraintPHInfo.setRscSetConnectionData(newRscSetConnectionData);
-                break;
+                placeholder.setRscSetConnectionData(newRscSetConnectionData);
+                return Optional.of(placeholder);
             }
         }
-        return constraintPHInfo;
+        return Optional.empty();
     }
 
     private ConstraintPHInfo setOldPlaceholder(RscSetConnectionData newRscSetConnectionData) {
@@ -146,70 +155,99 @@ public class RscSetUpdater {
     }
 
 
-    private ConstraintPHInfo addConstraintsToExistingPlaceholder(RscSetConnectionData newRscSetConnectionData) {
-        ConstraintPHInfo constraintPHInfo = null;
+    private Optional<ConstraintPHInfo> addConstraintsToExistingPlaceholder(RscSetConnectionData newRscSetConnectionData) {
         for (final Map.Entry<RscSetConnectionData, ConstraintPHInfo> phEntry : oldResourceSetToPlaceholder.entrySet()) {
             final RscSetConnectionData oldRrcSetConnectionData = phEntry.getKey();
             final ConstraintPHInfo placeholder = phEntry.getValue();
             if (oldRrcSetConnectionData == newRscSetConnectionData) {
-                constraintPHInfo = placeholder;
-                break;
+                return Optional.of(placeholder);
             }
-            if (placeholder.isNew()
-                    || (newRscSetConnectionData.canUseSamePlaceholder(oldRrcSetConnectionData)
-                    && placeholder.sameConstraintId(newRscSetConnectionData))) {
-                constraintPHInfo = placeholder;
-                constraintPHInfo.setRscSetConnectionData(newRscSetConnectionData);
-                final PcmkRscSetsInfo rscSetsInfo = constraintPHInfo.getPcmkRscSetsInfo();
-                if (rscSetsInfo != null) {
-                    if (newRscSetConnectionData.isColocation()) {
-                        rscSetsInfo.addColocation(newRscSetConnectionData.getConstraintId(), constraintPHInfo);
-                    } else {
-                        rscSetsInfo.addOrder(newRscSetConnectionData.getConstraintId(), constraintPHInfo);
-                    }
-                }
-                break;
+            if (canReusePlaceholder(newRscSetConnectionData, oldRrcSetConnectionData, placeholder)) {
+                return Optional.of(addContraintsToPlaceholder(newRscSetConnectionData, placeholder));
+            }
+        }
+        return Optional.empty();
+    }
+
+    private ConstraintPHInfo addContraintsToPlaceholder(RscSetConnectionData newRscSetConnectionData, ConstraintPHInfo placeholder) {
+        ConstraintPHInfo constraintPHInfo;
+        constraintPHInfo = placeholder;
+        constraintPHInfo.setRscSetConnectionData(newRscSetConnectionData);
+        final PcmkRscSetsInfo rscSetsInfo = constraintPHInfo.getPcmkRscSetsInfo();
+        if (rscSetsInfo != null) {
+            if (newRscSetConnectionData.isColocation()) {
+                rscSetsInfo.addColocation(newRscSetConnectionData.getConstraintId(), constraintPHInfo);
+            } else {
+                rscSetsInfo.addOrder(newRscSetConnectionData.getConstraintId(), constraintPHInfo);
             }
         }
         return constraintPHInfo;
     }
 
-    private void addColocation(RscSetConnectionData newRscSetConnectionData, ConstraintPHInfo constraintPHInfo) {
+    private boolean canReusePlaceholder(final RscSetConnectionData newRscSetConnectionData,
+                                        final RscSetConnectionData oldRrcSetConnectionData,
+                                        final ConstraintPHInfo placeholder) {
+        return placeholder.isNew()
+                || (newRscSetConnectionData.canUseSamePlaceholder(oldRrcSetConnectionData)
+                && placeholder.sameConstraintId(newRscSetConnectionData));
+    }
+
+    private void addColocation(final RscSetConnectionData newRscSetConnectionData,
+                               final ConstraintPHInfo constraintPHInfo) {
         final CrmXml.RscSet rscSet1 = newRscSetConnectionData.getRscSet1();
         final CrmXml.RscSet rscSet2 = newRscSetConnectionData.getRscSet2();
-                /* colocation */
         if (rscSet1 != null) {
-            for (final String rscId : rscSet1.getRscIds()) {
-                final ServiceInfo si =
-                        this.browser.getServiceInfoFromCRMId(rscId);
-                crmGraph.addColocation(newRscSetConnectionData.getConstraintId(), constraintPHInfo, si);
-            }
+            addColocationsFromPlaceholder(newRscSetConnectionData, constraintPHInfo, rscSet1);
         }
         if (rscSet2 != null) {
-            for (final String rscId : rscSet2.getRscIds()) {
-                final ServiceInfo si = this.browser.getServiceInfoFromCRMId(rscId);
-                crmGraph.addColocation(newRscSetConnectionData.getConstraintId(), si, constraintPHInfo);
-            }
+            addColocationsToPlaceholder(newRscSetConnectionData, constraintPHInfo, rscSet2);
+        }
+    }
+
+    private void addColocationsToPlaceholder(final RscSetConnectionData newRscSetConnectionData,
+                                             final ConstraintPHInfo constraintPHInfo,
+                                             final CrmXml.RscSet rscSet2) {
+        for (final String rscId : rscSet2.getRscIds()) {
+            final ServiceInfo si = this.browser.getServiceInfoFromCRMId(rscId);
+            crmGraph.addColocation(newRscSetConnectionData.getConstraintId(), si, constraintPHInfo);
+        }
+    }
+
+    private void addColocationsFromPlaceholder(final RscSetConnectionData newRscSetConnectionData,
+                                               final ConstraintPHInfo constraintPHInfo,
+                                               final CrmXml.RscSet rscSet1) {
+        for (final String rscId : rscSet1.getRscIds()) {
+            final ServiceInfo si =
+                    this.browser.getServiceInfoFromCRMId(rscId);
+            crmGraph.addColocation(newRscSetConnectionData.getConstraintId(), constraintPHInfo, si);
         }
     }
 
     private void addOrder(RscSetConnectionData newRscSetConnectionData, ConstraintPHInfo constraintPHInfo) {
         final CrmXml.RscSet rscSet1 = newRscSetConnectionData.getRscSet1();
         final CrmXml.RscSet rscSet2 = newRscSetConnectionData.getRscSet2();
-                /* order */
         if (rscSet1 != null) {
-            for (final String rscId : rscSet1.getRscIds()) {
-                final ServiceInfo si = this.browser.getServiceInfoFromCRMId(rscId);
-                crmGraph.addOrder(newRscSetConnectionData.getConstraintId(), si, constraintPHInfo);
-            }
+            addRscSetOrdersToPlaceholder(newRscSetConnectionData, rscSet1, constraintPHInfo);
         }
         if (rscSet2 != null) {
-            for (final String rscId : rscSet2.getRscIds()) {
-                final ServiceInfo si = this.browser.getServiceInfoFromCRMId(rscId);
-                crmGraph.addOrder(newRscSetConnectionData.getConstraintId(), constraintPHInfo, si);
-            }
+            addRscSetOrdersFromPlaceholder(newRscSetConnectionData, constraintPHInfo, rscSet2);
         }
     }
+
+    private void addRscSetOrdersToPlaceholder(RscSetConnectionData newRscSetConnectionData, CrmXml.RscSet rscSet1, ConstraintPHInfo constraintPHInfo) {
+        for (final String rscId : rscSet1.getRscIds()) {
+            final ServiceInfo si = this.browser.getServiceInfoFromCRMId(rscId);
+            crmGraph.addOrder(newRscSetConnectionData.getConstraintId(), si, constraintPHInfo);
+        }
+    }
+
+    private void addRscSetOrdersFromPlaceholder(RscSetConnectionData newRscSetConnectionData, ConstraintPHInfo constraintPHInfo, CrmXml.RscSet rscSet2) {
+        for (final String rscId : rscSet2.getRscIds()) {
+            final ServiceInfo si = this.browser.getServiceInfoFromCRMId(rscId);
+            crmGraph.addOrder(newRscSetConnectionData.getConstraintId(), constraintPHInfo, si);
+        }
+    }
+
 
     private void findExistingPlaceholders() {
         browser.lockNameToServiceInfo();

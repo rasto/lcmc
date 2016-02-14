@@ -41,6 +41,7 @@ import lcmc.crm.ui.resource.ServiceInfo;
 import lcmc.crm.ui.resource.ServicesInfo;
 import lcmc.logger.Logger;
 import lcmc.logger.LoggerFactory;
+import lombok.RequiredArgsConstructor;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -114,28 +115,10 @@ public class ResourceUpdater {
     private void updateOrders() {
         final Map<String, List<CrmXml.OrderData>> orderMap = clusterStatus.getOrderRscMap();
         for (final Map.Entry<String, List<CrmXml.OrderData>> orderEntry : orderMap.entrySet()) {
-            for (final CrmXml.OrderData data : orderEntry.getValue()) {
-                final String rscThenId = data.getRscThen();
-                final ServiceInfo si = this.browser.getServiceInfoFromCRMId(rscThenId);
-                if (si != null) { /* not yet complete */
-                    final ServiceInfo siP = this.browser.getServiceInfoFromCRMId(orderEntry.getKey());
-                    if (siP != null && siP.getResourceAgent() != null) {
-                        /* dangling orders and colocations */
-                        if ((siP.getResourceAgent().isDrbddisk() || siP.getResourceAgent().isLinbitDrbd())
-                                && "Filesystem".equals(si.getName())) {
-                            final List<CrmXml.ColocationData> cds = clusterStatus.getColocationDatas(orderEntry.getKey());
-                            if (cds != null) {
-                                for (final CrmXml.ColocationData cd : cds) {
-                                    if (cd.getWithRsc().equals(rscThenId)) {
-                                        setFilesystemWithDrbd(siP, si);
-                                    }
-                                }
-                            }
-                        }
-                        crmGraph.addOrder(data.getId(), siP, si);
-                    }
-                }
-            }
+            final String orderId = orderEntry.getKey();
+            final List<CrmXml.OrderData> orderData = orderEntry.getValue();
+            final OrderUpdater orderUpdater = new OrderUpdater(crmGraph, browser, clusterStatus);
+            orderUpdater.updateOrder(orderId, orderData);
         }
     }
 
@@ -152,7 +135,7 @@ public class ResourceUpdater {
         }
     }
 
-    private void updateGroupOrClone(String groupOrClone) {
+    private void updateGroupOrClone(final String groupOrClone) {
         GroupInfo newGi = null;
         CloneInfo newCi = null;
         if (clusterStatus.isClone(groupOrClone)) {
@@ -179,59 +162,76 @@ public class ResourceUpdater {
     private CloneInfo setCreateCloneInfo(final String cloneId) {
         CloneInfo newCi = (CloneInfo) browser.getServiceInfoFromCRMId(cloneId);
         if (newCi == null) {
-            final Point2D p = null;
-            newCi = (CloneInfo) servicesInfo.addServicePanel(browser.getCloneResourceAgent(),
-                            p,
-                            false,
-                            cloneId,
-                            null,
-                            runMode);
-            browser.addToHeartbeatIdList(newCi);
-            final Map<String, String> resourceNode = clusterStatus.getParamValuePairs(newCi.getHeartbeatId(runMode));
-            newCi.setParameters(resourceNode);
+            newCi = createNewClone(cloneId);
         } else {
-            final Map<String, String> resourceNode = clusterStatus.getParamValuePairs(newCi.getHeartbeatId(runMode));
-            newCi.setParameters(resourceNode);
-            if (Application.isLive(runMode)) {
-                newCi.setUpdated(false);
-                browser.repaint();
-            }
+            updateExistingClone(newCi);
         }
         newCi.setNew(false);
         return newCi;
     }
 
-    private GroupInfo setCreateGroupInfo(final String group,
-                                         final CloneInfo newCi) {
+    private void updateExistingClone(final CloneInfo newCi) {
+        final Map<String, String> resourceNode = clusterStatus.getParamValuePairs(newCi.getHeartbeatId(runMode));
+        newCi.setParameters(resourceNode);
+        if (Application.isLive(runMode)) {
+            newCi.setUpdated(false);
+            browser.repaint();
+        }
+    }
+
+    private CloneInfo createNewClone(final String cloneId) {
+        CloneInfo newCi;
+        final Point2D p = null;
+        newCi = (CloneInfo) servicesInfo.addServicePanel(browser.getCloneResourceAgent(),
+                        p,
+                        false,
+                        cloneId,
+                        null,
+                        runMode);
+        browser.addToHeartbeatIdList(newCi);
+        final Map<String, String> resourceNode = clusterStatus.getParamValuePairs(newCi.getHeartbeatId(runMode));
+        newCi.setParameters(resourceNode);
+        return newCi;
+    }
+
+    private GroupInfo setCreateGroupInfo(final String group, final CloneInfo newCi) {
         GroupInfo newGi = (GroupInfo) browser.getServiceInfoFromCRMId(group);
         if (newGi == null) {
-            final Point2D p = null;
-            newGi = (GroupInfo) servicesInfo.addServicePanel(browser.getGroupResourceAgent(),
-                            p,
-                            false,
-                            group,
-                            newCi,
-                            runMode);
-            final Map<String, String> resourceNode = clusterStatus.getParamValuePairs(newGi.getHeartbeatId(runMode));
-            newGi.setParameters(resourceNode);
-            if (newCi != null) {
-                newCi.addCloneServicePanel(newGi);
-            }
+            newGi = createNewGroup(group, newCi);
         } else {
-            final Map<String, String> resourceNode = clusterStatus.getParamValuePairs(newGi.getHeartbeatId(runMode));
-            newGi.setParameters(resourceNode);
-            if (Application.isLive(runMode)) {
-                newGi.setUpdated(false);
-                browser.repaint();
-            }
+            updateExistingGroup(newGi);
         }
         newGi.setNew(false);
         return newGi;
     }
 
-    private void setGroupResources(final String grpOrCloneId,
-                                   final GroupInfo newGi,
-                                   final CloneInfo newCi) {
+    private void updateExistingGroup(final GroupInfo newGi) {
+        final Map<String, String> resourceNode = clusterStatus.getParamValuePairs(newGi.getHeartbeatId(runMode));
+        newGi.setParameters(resourceNode);
+        if (Application.isLive(runMode)) {
+            newGi.setUpdated(false);
+            browser.repaint();
+        }
+    }
+
+    private GroupInfo createNewGroup(final String group, final CloneInfo newCi) {
+        GroupInfo newGi;
+        final Point2D p = null;
+        newGi = (GroupInfo) servicesInfo.addServicePanel(browser.getGroupResourceAgent(),
+                        p,
+                        false,
+                        group,
+                        newCi,
+                        runMode);
+        final Map<String, String> resourceNode = clusterStatus.getParamValuePairs(newGi.getHeartbeatId(runMode));
+        newGi.setParameters(resourceNode);
+        if (newCi != null) {
+            newCi.addCloneServicePanel(newGi);
+        }
+        return newGi;
+    }
+
+    private void setGroupResources(final String grpOrCloneId, final GroupInfo newGi, final CloneInfo newCi) {
         final Map<ServiceInfo, Map<String, String>> setParametersHash = new HashMap<ServiceInfo, Map<String, String>>();
         if (newCi != null) {
             setParametersHash.put(newCi, clusterStatus.getParamValuePairs(grpOrCloneId));
@@ -245,9 +245,9 @@ public class ResourceUpdater {
         boolean newService = false;
         int pos = 0;
         for (final String hbId : groupResources.get()) {
-            final GroupUpdater groupUpdater = new GroupUpdater(newGi, newCi, setParametersHash, newService, pos, hbId);
-            groupUpdater.update();
-            newService = groupUpdater.isNewService();
+            final GroupServiceUpdater groupServiceUpdater = new GroupServiceUpdater(newGi, newCi, setParametersHash, newService, pos, hbId);
+            groupServiceUpdater.update();
+            newService = groupServiceUpdater.isNewService();
         }
 
         for (final Map.Entry<ServiceInfo, Map<String, String>> setEntry : setParametersHash.entrySet()) {
@@ -262,20 +262,7 @@ public class ResourceUpdater {
         browser.repaint();
     }
 
-    /**
-     * Check if this connection is filesystem with drbd ra and if so, set it.
-     */
-    private void setFilesystemWithDrbd(final ServiceInfo siP, final ServiceInfo si) {
-        if (siP.getResourceAgent().isLinbitDrbd()) {
-            /* linbit::drbd -> Filesystem */
-            ((FilesystemRaInfo) si).setLinbitDrbdInfo((LinbitDrbdInfo) siP);
-        } else {
-            /* drbddisk -> Filesystem */
-            ((FilesystemRaInfo) si).setDrbddiskInfo((DrbddiskInfo) siP);
-        }
-    }
-
-    private class GroupUpdater {
+    private class GroupServiceUpdater {
         private final GroupInfo newGi;
         private final CloneInfo newCi;
         private final Map<ServiceInfo, Map<String, String>> setParametersHash;
@@ -283,12 +270,12 @@ public class ResourceUpdater {
         private int pos;
         private final String hbId;
 
-        public GroupUpdater(GroupInfo newGi,
-                            CloneInfo newCi,
-                            Map<ServiceInfo, Map<String, String>> setParametersHash,
-                            boolean newService,
-                            int pos,
-                            String hbId) {
+        public GroupServiceUpdater(final GroupInfo newGi,
+                                   final CloneInfo newCi,
+                                   final Map<ServiceInfo, Map<String, String>> setParametersHash,
+                                   final boolean newService,
+                                   final int pos,
+                                   final String hbId) {
             this.newGi = newGi;
             this.newCi = newCi;
             this.setParametersHash = setParametersHash;
@@ -301,20 +288,14 @@ public class ResourceUpdater {
             return newService;
         }
 
-        public GroupUpdater update() {
+        public void update() {
             if (clusterStatus.isOrphaned(hbId) && application.isHideLRM()) {
-                return this;
+                return;
             }
             ServiceInfo newServiceInfo;
             if (allGroupsAndClones.contains(hbId)) {
                 /* clone group */
-                final GroupInfo gi = setCreateGroupInfo(hbId, newCi);
-                setGroupResources(
-                        hbId,
-                        gi,
-                        null
-                );
-                newServiceInfo = gi;
+                newServiceInfo = setClonedGroup();
             } else {
                 final ResourceAgent newResourceAgent = clusterStatus.getResourceType(hbId);
                 if (newResourceAgent == null) {
@@ -324,31 +305,12 @@ public class ResourceUpdater {
                      */
                     LOG.appWarning("setGroupResources: " + hbId + ": could not find resource agent");
                 }
-                /* continue of creating/updating of the
-                 * service in the gui.
-                 */
                 newServiceInfo = browser.getServiceInfoFromCRMId(hbId);
                 final Map<String, String> resourceNode = clusterStatus.getParamValuePairs(hbId);
                 if (newServiceInfo == null) {
-                    newService = true;
-                    newServiceInfo = crmServiceFactory.createServiceWithParameters(
-                            hbId,
-                            newResourceAgent,
-                            resourceNode,
-                            browser);
-                    newServiceInfo.setCrmId(hbId);
-                    browser.addToHeartbeatIdList(newServiceInfo);
-                    if (newGi != null) {
-                        newGi.addGroupServicePanel(newServiceInfo, false);
-                    } else if (newCi != null) {
-                        newCi.addCloneServicePanel(newServiceInfo);
-                    } else {
-                        final Point2D p = null;
-                        servicesInfo.addServicePanel(newServiceInfo, p, false, false, runMode);
-                    }
+                    newServiceInfo = createNewService(newResourceAgent, resourceNode);
                 } else {
-                    browser.addNameToServiceInfoHash(newServiceInfo);
-                    setParametersHash.put(newServiceInfo, resourceNode);
+                    updateService(newServiceInfo, resourceNode);
                 }
                 newServiceInfo.setNew(false);
                 serviceIsPresent.add(newServiceInfo);
@@ -356,12 +318,111 @@ public class ResourceUpdater {
                     groupServiceIsPresent.add(newServiceInfo);
                 }
             }
+            updateServicePosition(newServiceInfo);
+        }
+
+        private void updateServicePosition(ServiceInfo newServiceInfo) {
             final DefaultMutableTreeNode node = newServiceInfo.getNode();
             if (node != null) {
                 servicesInfo.moveNodeToPosition(pos, node);
                 pos++;
             }
-            return this;
+        }
+
+        private void updateService(final ServiceInfo newServiceInfo, final Map<String, String> resourceNode) {
+            browser.addNameToServiceInfoHash(newServiceInfo);
+            setParametersHash.put(newServiceInfo, resourceNode);
+        }
+
+        private ServiceInfo createNewService(ResourceAgent newResourceAgent, Map<String, String> resourceNode) {
+            ServiceInfo newServiceInfo;
+            newService = true;
+            newServiceInfo = crmServiceFactory.createServiceWithParameters(
+                    hbId,
+                    newResourceAgent,
+                    resourceNode,
+                    browser);
+            newServiceInfo.setCrmId(hbId);
+            browser.addToHeartbeatIdList(newServiceInfo);
+            if (newGi != null) {
+                newGi.addGroupServicePanel(newServiceInfo, false);
+            } else if (newCi != null) {
+                newCi.addCloneServicePanel(newServiceInfo);
+            } else {
+                final Point2D p = null;
+                servicesInfo.addServicePanel(newServiceInfo, p, false, false, runMode);
+            }
+            return newServiceInfo;
+        }
+
+        private GroupInfo setClonedGroup() {
+            final GroupInfo gi = setCreateGroupInfo(hbId, newCi);
+            setGroupResources(hbId, gi, null);
+            return gi;
+        }
+    }
+
+    @RequiredArgsConstructor
+    private static class OrderUpdater {
+        private final CrmGraph crmGraph;
+        private final ClusterBrowser browser;
+        private final ClusterStatus clusterStatus;
+
+        public void updateOrder(final String orderId, final List<CrmXml.OrderData> orderData) {
+            for (final CrmXml.OrderData data : orderData) {
+                final String rscThenId = data.getRscThen();
+                final ServiceInfo service = browser.getServiceInfoFromCRMId(rscThenId);
+                final String dataId = data.getId();
+                if (service != null) { /* not yet complete */
+                    final ServiceInfo parent = browser.getServiceInfoFromCRMId(orderId);
+                    if (parent != null && parent.getResourceAgent() != null) {
+                        updateDanglinOrdersAndColocations(orderId, rscThenId, service, dataId, parent);
+                    }
+                }
+            }
+        }
+
+        private void updateDanglinOrdersAndColocations(final String orderId,
+                                                       final String rscThenId,
+                                                       final ServiceInfo service,
+                                                       final String dataId,
+                                                       final ServiceInfo parent) {
+            if (isDrbdFilesystem(service, parent)) {
+                handleFilesystemWithDrbd(rscThenId, service, orderId, parent);
+            }
+            crmGraph.addOrder(dataId, parent, service);
+        }
+
+        private boolean isDrbdFilesystem(final ServiceInfo service, final ServiceInfo parent) {
+            return (parent.getResourceAgent().isDrbddisk() || parent.getResourceAgent().isLinbitDrbd())
+                    && "Filesystem".equals(service.getName());
+        }
+
+        private void handleFilesystemWithDrbd(final String rscThenId,
+                                              final ServiceInfo service,
+                                              final String orderId,
+                                              final ServiceInfo parent) {
+            final List<CrmXml.ColocationData> cds = clusterStatus.getColocationDatas(orderId);
+            if (cds != null) {
+                for (final CrmXml.ColocationData cd : cds) {
+                    if (cd.getWithRsc().equals(rscThenId)) {
+                        setFilesystemWithDrbd(parent, service);
+                    }
+                }
+            }
+        }
+
+        /**
+         * Check if this connection is filesystem with drbd ra and if so, set it.
+         */
+        private void setFilesystemWithDrbd(final ServiceInfo siP, final ServiceInfo si) {
+            if (siP.getResourceAgent().isLinbitDrbd()) {
+            /* linbit::drbd -> Filesystem */
+                ((FilesystemRaInfo) si).setLinbitDrbdInfo((LinbitDrbdInfo) siP);
+            } else {
+            /* drbddisk -> Filesystem */
+                ((FilesystemRaInfo) si).setDrbddiskInfo((DrbddiskInfo) siP);
+            }
         }
     }
 }
