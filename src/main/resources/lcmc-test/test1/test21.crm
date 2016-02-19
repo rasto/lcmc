@@ -38,11 +38,11 @@ primitive res_Stateful_1 Stateful
 	op demote interval=0 timeout=20 
 	op stop interval=0 timeout=192 
 	op monitor interval=121 timeout=154 start-delay=0 
-	meta target-role=started is-managed=true
+	meta
 group grp_1 res_Dummy_1 res_Dummy_2 res_Dummy_3
 	meta
 ms ms_Stateful_1 res_Stateful_1 
-	meta clone-max=1 notify=true interleave=true
+	meta clone-max=1 notify=true interleave=true target-role=started is-managed=true
 location cli-ban-res_IPaddr2_1-on-host res_IPaddr2_1 role=Started -inf: host
 colocation col_res_IPaddr2_1_grp_1 inf: res_IPaddr2_1 grp_1
 order ord_grp_1_res_IPaddr2_1 inf: grp_1 res_IPaddr2_1

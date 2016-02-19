@@ -7,9 +7,9 @@ primitive res_Stateful_1 Stateful
 	op demote interval=0 timeout=20 
 	op stop interval=0 timeout=20 
 	op monitor interval=10 timeout=20 start-delay=0 
-	meta target-role=stopped
+	meta
 ms ms_Stateful_1 res_Stateful_1 
-	meta clone-max=2 notify=true interleave=true
+	meta clone-max=2 notify=true interleave=true target-role=stopped
 property cib-bootstrap-options:
         stonith-enabled=false
         no-quorum-policy=ignore

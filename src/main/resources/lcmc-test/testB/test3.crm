@@ -7,9 +7,9 @@ primitive res_Dummy_1 Dummy
 	op monitor interval=121 timeout=154 start-delay=0 
 	op migrate_to interval=0 timeout=123 
 	op migrate_from interval=0 timeout=122 
-	meta target-role=stopped
+	meta
 clone cl_Dummy_1 res_Dummy_1 
-	meta clone-max=2 notify=true interleave=true
+	meta clone-max=2 notify=true interleave=true target-role=stopped
 property cib-bootstrap-options:
         stonith-enabled=false
         no-quorum-policy=ignore

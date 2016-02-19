@@ -33,8 +33,8 @@ primitive res_IPaddr2_1 IPaddr2
 	meta
 group grp_1 res_Dummy_1 res_Dummy_2 res_Dummy_3
 	meta
-location loc_res_IPaddr2_1_host res_IPaddr2_1 -inf: host
 colocation col_res_IPaddr2_1_grp_1 inf: res_IPaddr2_1 grp_1
+location loc_res_IPaddr2_1_host res_IPaddr2_1 -inf: host
 order ord_grp_1_res_IPaddr2_1 inf: grp_1 res_IPaddr2_1
 property cib-bootstrap-options:
 	stonith-enabled=false

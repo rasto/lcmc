@@ -17,9 +17,9 @@ primitive res_drbd_1 ocf:linbit:drbd
 	op stop interval=0 timeout=100 
 	op monitor interval=10 timeout=20 start-delay=0 
 	op notify interval=0 timeout=90 
-	meta target-role=stopped
+	meta
 ms ms_drbd_1 res_drbd_1 
-	meta clone-max=2 notify=true interleave=true
+	meta clone-max=2 notify=true interleave=true target-role=stopped
 colocation col_res_Filesystem_1_ms_drbd_1 inf: res_Filesystem_1 ms_drbd_1:Master
 order ord_ms_drbd_1_res_Filesystem_1 inf: ms_drbd_1:promote res_Filesystem_1:start
 property cib-bootstrap-options:
