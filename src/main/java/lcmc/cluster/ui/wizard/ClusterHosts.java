@@ -267,7 +267,7 @@ final class ClusterHosts extends DialogCluster {
         public int getScrollableUnitIncrement(final Rectangle visibleRect, final int orientation, final int direction) {
             final int hundredth = (orientation ==  SwingConstants.VERTICAL
                     ? getParent().getHeight() : getParent().getWidth()) / 100;
-            return (hundredth == 0 ? 1 : hundredth);
+            return hundredth == 0 ? 1 : hundredth;
         }
 
         @Override

@@ -247,18 +247,18 @@ public class InitCluster extends DialogCluster {
 
         /* DRBD */
         i = 0;
-        final boolean lastDrbdLoadedExists = (lastDrbdLoaded != null);
+        final boolean lastDrbdLoadedExists = lastDrbdLoaded != null;
         if (!lastDrbdLoadedExists) {
             lastDrbdLoaded = new Boolean[hosts.length];
         }
-        final boolean lastPmStartedExists = (lastPacemakerStarted != null);
+        final boolean lastPmStartedExists = lastPacemakerStarted != null;
         if (!lastPmStartedExists) {
             lastPacemakerStarted = new Boolean[hosts.length];
             lastPacemakerInRc = new Boolean[hosts.length];
             lastPacemakerConfigured = new Boolean[hosts.length];
             lastPacemakerInstalled = new Boolean[hosts.length];
         }
-        final boolean lastHbStartedExists = (lastHeartbeatStarted != null);
+        final boolean lastHbStartedExists = lastHeartbeatStarted != null;
         if (!lastHbStartedExists) {
             lastHeartbeatStarted = new Boolean[hosts.length];
             lastHeartbeatInRc = new Boolean[hosts.length];
