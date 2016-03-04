@@ -652,7 +652,7 @@ final class HbConfig extends DialogCluster {
                 configPanel.add(new JLabel(" "));
                 if (castAddresses.size() < 2) {
                     final JLabel l;
-                    if (castAddresses.size() < 1) {
+                    if (castAddresses.isEmpty()) {
                         l = new JLabel(Tools.getString("Dialog.Cluster.HbConfig.WarningAtLeastTwoInt"));
                     } else {
                         l = new JLabel(Tools.getString("Dialog.Cluster.HbConfig.WarningAtLeastTwoInt.OneMore"));

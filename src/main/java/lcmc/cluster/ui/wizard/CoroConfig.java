@@ -563,7 +563,7 @@ final class CoroConfig extends DialogCluster {
 
                 if (aisCastAddresses.size() < 2) {
                     final JLabel l;
-                    if (aisCastAddresses.size() < 1) {
+                    if (aisCastAddresses.isEmpty()) {
                         l = new JLabel(Tools.getString("Dialog.Cluster.CoroConfig.WarningAtLeastTwoInt"));
                     } else {
                         // TODO: we need to check if there is bond interface

@@ -920,7 +920,7 @@ public class CrmGraph extends ResourceGraph {
             return Tools.getDefaultColor("CRMGraph.FillPaintUnknown");
         } else if (vipl.contains(v) || Application.isTest(runMode)) {
             final List<Color> colors = si.getHostColors(runMode);
-            if (colors.size() >= 1) {
+            if (!colors.isEmpty()) {
                 return colors.get(0);
             } else {
                 return Color.WHITE; /* more colors */

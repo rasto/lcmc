@@ -396,7 +396,7 @@ public class ArgumentParser {
         }
         for (final Map.Entry<String, List<HostOptions>> clusterEntry : clusters.entrySet()) {
             final List<HostOptions> hostOptions = clusterEntry.getValue();
-            if (hostOptions.size() < 1 || (hostOptions.size() == 1 && !application.isOneHostCluster())) {
+            if (hostOptions.isEmpty() || (hostOptions.size() == 1 && !application.isOneHostCluster())) {
                 throw new ParseException("not enough hosts for cluster: " + clusterEntry.getKey());
             }
         }

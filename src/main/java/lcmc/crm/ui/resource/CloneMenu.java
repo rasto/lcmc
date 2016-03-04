@@ -115,7 +115,7 @@ public class CloneMenu extends ServiceMenu {
                                         return false;
                                     }
                                     final List<String> runningOnNodes = cloneInfo.getRunningOnNodes(runMode);
-                                    if (runningOnNodes == null || runningOnNodes.size() < 1) {
+                                    if (runningOnNodes == null || runningOnNodes.isEmpty()) {
                                         return false;
                                     }
                                     boolean runningOnNode = false;

@@ -950,7 +950,7 @@ public class PcmkMultiSelectionMenu {
                                             return false;
                                         }
                                         final List<String> runningOnNodes = si.getRunningOnNodes(Application.RunMode.LIVE);
-                                        if (runningOnNodes == null || runningOnNodes.size() < 1) {
+                                        if (runningOnNodes == null || runningOnNodes.isEmpty()) {
                                             return false;
                                         }
                                         boolean runningOnNode = false;
