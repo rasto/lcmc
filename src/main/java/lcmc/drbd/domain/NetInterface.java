@@ -59,10 +59,10 @@ public final class NetInterface extends ResourceValue implements Value {
     private final String networkIp;
     private final boolean bridge;
     private final AddressFamily addressFamily;
-    private final String IPV6_STRING = "ipv6";
-    private final String IPV4_STRING = "ipv4";
-    private final String SSOCKS_STRING = "ssocks";
-    private final String SDP_STRING = "sdp";
+    private static final String IPV6_STRING = "ipv6";
+    private static final String IPV4_STRING = "ipv4";
+    private static final String SSOCKS_STRING = "ssocks";
+    private static final String SDP_STRING = "sdp";
 
     /**
      * @param line

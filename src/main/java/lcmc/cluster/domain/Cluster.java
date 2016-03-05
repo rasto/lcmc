@@ -58,12 +58,12 @@ public class Cluster implements Comparable<Cluster> {
     private final Set<Host> hosts = new LinkedHashSet<Host>();
     private ClusterTab clusterTab = null;
     /** Default colors of the hosts. */
-    private final Color[] defaultHostColors = {new Color(228, 228, 32),
-                                               new Color(102, 204, 255), /* blue */
-                                               Color.PINK,
-                                               new Color(255, 100, 0), /* orange */
-                                               Color.WHITE,
-                                              };
+    private static final Color[] DEFAULT_HOST_COLORS = {new Color(228, 228, 32),
+                                                   new Color(102, 204, 255), /* blue */
+                                                   Color.PINK,
+                                                   new Color(255, 100, 0), /* orange */
+                                                   Color.WHITE,
+                                                  };
     private boolean savable = true;
     private boolean clusterTabClosable = true;
 
@@ -104,8 +104,8 @@ public class Cluster implements Comparable<Cluster> {
     public void addHost(final Host host) {
         final int id = hosts.size();
         host.setPositionInTheCluster(id);
-        if (id < defaultHostColors.length) {
-            host.setColor(defaultHostColors[id]);
+        if (id < DEFAULT_HOST_COLORS.length) {
+            host.setColor(DEFAULT_HOST_COLORS[id]);
         }
         hosts.add(host);
         proxyHosts.add(host);
