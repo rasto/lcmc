@@ -450,7 +450,7 @@ public class HostParser {
             }
         }
         if (id != null && x != null && y != null) {
-            servicePositions.put(id, new Point2D.Double(new Double(x).doubleValue(), new Double(y).doubleValue()));
+            servicePositions.put(id, new Point2D.Double(Double.parseDouble(x), Double.parseDouble(y)));
         }
     }
     /** Parses the gui options info. */
