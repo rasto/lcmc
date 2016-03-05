@@ -104,7 +104,7 @@ public final class Http {
 
         /* Response */
         try {
-            final BufferedReader input = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+            final BufferedReader input = new BufferedReader(new InputStreamReader(conn.getInputStream(), ENCODING));
             String str;
             while (null != ((str = input.readLine()))) {
                 LOG.info("post: " + str);
