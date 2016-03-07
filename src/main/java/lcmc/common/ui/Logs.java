@@ -224,17 +224,17 @@ public class Logs extends ConfigDialog {
                                 final int month1 = monthsHash.get(m1.group(1));
                                 final int month2 = monthsHash.get(m2.group(1));
 
-                                final int day1 = Integer.valueOf(m1.group(2));
-                                final int day2 = Integer.valueOf(m2.group(2));
+                                final int day1 = Integer.parseInt(m1.group(2));
+                                final int day2 = Integer.parseInt(m2.group(2));
 
-                                final int hour1 = Integer.valueOf(m1.group(3));
-                                final int hour2 = Integer.valueOf(m2.group(3));
+                                final int hour1 = Integer.parseInt(m1.group(3));
+                                final int hour2 = Integer.parseInt(m2.group(3));
 
-                                final int min1 = Integer.valueOf(m1.group(4));
-                                final int min2 = Integer.valueOf(m2.group(4));
+                                final int min1 = Integer.parseInt(m1.group(4));
+                                final int min2 = Integer.parseInt(m2.group(4));
 
-                                final int sec1 = Integer.valueOf(m1.group(5));
-                                final int sec2 = Integer.valueOf(m2.group(5));
+                                final int sec1 = Integer.parseInt(m1.group(5));
+                                final int sec2 = Integer.parseInt(m2.group(5));
 
                                 if (month1 != month2) {
                                     return month1 < month2 ? -1 : 1;
