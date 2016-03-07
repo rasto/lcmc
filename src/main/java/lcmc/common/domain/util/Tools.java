@@ -228,7 +228,7 @@ public final class Tools {
      * nothing was loaded.
      */
     public static String loadFile(MainPresenter mainPresenter, final String filename, final boolean showError) {
-        final BufferedReader in;
+        BufferedReader in = null;
         final StringBuilder content = new StringBuilder("");
         try {
             in = new BufferedReader(new InputStreamReader(new FileInputStream(new File(filename)), "UTF-8"));
@@ -241,11 +241,14 @@ public final class Tools {
                 mainPresenter.infoDialog("Load Error", "The file " + filename + " failed to load", ex.getMessage());
             }
             return null;
-        }
-        try {
-            in.close();
-        } catch (final IOException ex) {
-            LOG.appError("loadFile: could not close: " + filename, ex);
+        } finally {
+            if(in != null) {
+                try {
+                    in.close();
+                } catch (final IOException ex) {
+                    LOG.appError("loadFile: could not close: " + filename, ex);
+                }
+            }
         }
         return content.toString();
     }
