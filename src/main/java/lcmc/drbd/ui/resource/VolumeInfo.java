@@ -160,8 +160,8 @@ public class VolumeInfo extends EditableInfo implements CommonDeviceInterface {
               final List<BlockDevInfo> blockDevInfos,
               final Browser browser) {
         super.einit(Optional.<ResourceValue>of(new DrbdVolume(name)), name, browser);
-        assert (resourceInfo != null);
-        assert (blockDevInfos.size() >= 2);
+        assert resourceInfo != null;
+        assert blockDevInfos.size() >= 2;
 
         this.resourceInfo = resourceInfo;
         this.blockDevInfos = Collections.unmodifiableList(blockDevInfos);

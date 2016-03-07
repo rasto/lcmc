@@ -94,7 +94,7 @@ public final class ClustersPanel extends JPanel {
                 previouslySelectedTab = (ClusterTab) prevSource.getSelectedComponent();
 
                 /* show dialogs only if got here from other tab. */
-                if ((source == null || source.getName() == null)) {
+                if (source == null || source.getName() == null) {
                     return;
                 }
 

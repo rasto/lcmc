@@ -106,7 +106,7 @@ public final class Http {
         try {
             final BufferedReader input = new BufferedReader(new InputStreamReader(conn.getInputStream(), ENCODING));
             String str;
-            while (null != ((str = input.readLine()))) {
+            while (null != (str = input.readLine())) {
                 LOG.info("post: " + str);
             }
             input.close();

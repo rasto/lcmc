@@ -1568,7 +1568,7 @@ public class DomainInfo extends EditableInfo {
             final Widget hwi = definedOnHostComboBoxHash.get(h.getName());
             if (hwi != null) {
                 final Value value;
-                if ((vmsXml != null && vmsXml.getDomainNames().contains(getDomainName()))) {
+                if (vmsXml != null && vmsXml.getDomainNames().contains(getDomainName())) {
                     value = DEFINED_ON_HOST_TRUE;
                 } else {
                     value = DEFINED_ON_HOST_FALSE;

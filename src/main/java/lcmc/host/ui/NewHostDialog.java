@@ -107,9 +107,9 @@ public class NewHostDialog extends DialogHost {
         final String hs = hostField.getStringValue().trim();
         final String us = usernameField.getStringValue().trim();
         final String ps = sshPortField.getStringValue().trim();
-        boolean hf = (!hs.isEmpty());
-        boolean uf = (!us.isEmpty());
-        final boolean pf = (!ps.isEmpty());
+        boolean hf = !hs.isEmpty();
+        boolean uf = !us.isEmpty();
+        final boolean pf = !ps.isEmpty();
         final int hc = Tools.charCount(hs, ',');
         final int uc = Tools.charCount(us, ',');
         final List<String> incorrect = new ArrayList<String>();
