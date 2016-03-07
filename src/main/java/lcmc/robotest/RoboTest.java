@@ -1326,16 +1326,14 @@ public class RoboTest {
                     }
                 }
             }
-        } else if (component instanceof JLabel) {
-            if (component.isShowing()) {
-                final String t = ((JLabel) component).getText();
-                if (t != null && (t.matches(quotedText + ".*")
-                                  || t.matches(".*" + quotedText))) {
-                    if (number[0] <= 1) {
-                        return component;
-                    } else {
-                        number[0]--;
-                    }
+        } else if (component instanceof JLabel && component.isShowing()) {
+            final String t = ((JLabel) component).getText();
+            if (t != null && (t.matches(quotedText + ".*")
+                              || t.matches(".*" + quotedText))) {
+                if (number[0] <= 1) {
+                    return component;
+                } else {
+                    number[0]--;
                 }
             }
         }

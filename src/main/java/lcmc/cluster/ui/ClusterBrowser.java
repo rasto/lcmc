@@ -922,11 +922,9 @@ public class ClusterBrowser extends Browser {
                                }
                                host.drbdStatusUnlock();
                                event = host.getHostParser().getOutput("event", outputBuffer);
-                               if (event != null) {
-                                   if (drbdXml.parseDrbdEvent(host.getName(), drbdGraph, event)) {
-                                       host.setDrbdStatusOk(true);
-                                       eventUpdate = true;
-                                   }
+                               if (event != null && drbdXml.parseDrbdEvent(host.getName(), drbdGraph, event)) {
+                                   host.setDrbdStatusOk(true);
+                                   eventUpdate = true;
                                }
                            } while (event != null || drbdConfig != null);
                            Tools.chomp(outputBuffer);

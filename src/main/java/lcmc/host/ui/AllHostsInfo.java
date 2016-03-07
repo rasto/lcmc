@@ -734,10 +734,8 @@ public final class AllHostsInfo extends Info {
                     if (notRunningCount == 0) {
                         for (final Cluster cluster : allClusterCheckboxes.keySet()) {
                             final MyButton loadButton = allLoadButtons.get(cluster);
-                            if (loadButton != null) {
-                                if (cluster.getClusterTab() == null) {
-                                    loadButton.setEnabled(true);
-                                }
+                            if (loadButton != null && cluster.getClusterTab() == null) {
+                                loadButton.setEnabled(true);
                             }
                         }
                         loadMarkedClustersButton.setEnabled(false);

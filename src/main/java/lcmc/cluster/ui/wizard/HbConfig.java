@@ -301,11 +301,9 @@ final class HbConfig extends DialogCluster {
                                 }
                                 nextButtonSetEnabled(new Check(incorrect, changed));
 
-                                if (configOk) {
-                                    if (!application.getAutoClusters().isEmpty()) {
-                                        Tools.sleep(1000);
-                                        pressNextButton();
-                                    }
+                                if (configOk && !application.getAutoClusters().isEmpty()) {
+                                    Tools.sleep(1000);
+                                    pressNextButton();
                                 }
                             }
                         }
@@ -365,11 +363,9 @@ final class HbConfig extends DialogCluster {
                         incorrect.add("config failed");
                     }
                     nextButtonSetEnabled(new Check(incorrect, changed));
-                    if (configOk) {
-                        if (!application.getAutoClusters().isEmpty()) {
-                            Tools.sleep(1000);
-                            pressNextButton();
-                        }
+                    if (configOk && !application.getAutoClusters().isEmpty()) {
+                        Tools.sleep(1000);
+                        pressNextButton();
                     }
                 }
             });

@@ -433,10 +433,8 @@ public class ServiceInfo extends EditableInfo {
         }
 
         /* id-refs */
-        if (sameAsMetaAttrsWi != null) {
-            if (checkSameAsMetaAttrsFieldsChanged(params)) {
-                changed.add("meta attributes");
-            }
+        if (sameAsMetaAttrsWi != null && checkSameAsMetaAttrsFieldsChanged(params)) {
+            changed.add("meta attributes");
         }
         if (!fromServicesInfo) {
             final ServicesInfo sis = getBrowser().getServicesInfo();

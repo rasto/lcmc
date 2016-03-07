@@ -189,11 +189,9 @@ final class CoroConfig extends DialogCluster {
                                     incorrect.add("config failed");
                                 }
                                 nextButtonSetEnabled(new Check(incorrect, changed));
-                                if (configOk) {
-                                    if (!application.getAutoClusters().isEmpty()) {
-                                        Tools.sleep(1000);
-                                        pressNextButton();
-                                    }
+                                if (configOk && !application.getAutoClusters().isEmpty()) {
+                                    Tools.sleep(1000);
+                                    pressNextButton();
                                 }
                             }
                         }
@@ -252,11 +250,9 @@ final class CoroConfig extends DialogCluster {
                         incorrect.add("config failed");
                     }
                     nextButtonSetEnabled(new Check(incorrect, changed));
-                    if (configOk) {
-                        if (!application.getAutoClusters().isEmpty()) {
-                            Tools.sleep(1000);
-                            pressNextButton();
-                        }
+                    if (configOk && !application.getAutoClusters().isEmpty()) {
+                        Tools.sleep(1000);
+                        pressNextButton();
                     }
                 }
             });

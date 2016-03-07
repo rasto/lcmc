@@ -204,10 +204,8 @@ public final class InterfaceInfo extends HardwareInfo {
             mac = Tools.generateVMMacAddress();
             for (final Host h : getBrowser().getClusterHosts()) {
                 final VmsXml vmsXml = getBrowser().getVmsXml(h);
-                if (vmsXml != null) {
-                    if (vmsXml.getUsedMacAddresses().contains(mac)) {
-                        continue LOOP;
-                    }
+                if (vmsXml != null && vmsXml.getUsedMacAddresses().contains(mac)) {
+                    continue LOOP;
                 }
             }
             break;
