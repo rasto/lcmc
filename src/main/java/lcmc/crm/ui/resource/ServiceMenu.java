@@ -655,7 +655,7 @@ public class ServiceMenu {
                                         return false;
                                     }
                                     final List<String> runningOnNodes = serviceInfo.getRunningOnNodes(runMode);
-                                    if (runningOnNodes == null || runningOnNodes.size() < 1) {
+                                    if (runningOnNodes == null || runningOnNodes.isEmpty()) {
                                         return false;
                                     }
                                     boolean runningOnNode = false;
