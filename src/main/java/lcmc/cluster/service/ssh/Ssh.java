@@ -374,7 +374,7 @@ public class Ssh {
         final String fileName = "lcmc-test.tar";
         final String file = Tools.getFile('/' + fileName);
         try {
-            scpClient.put(file.getBytes(), fileName, "/tmp");
+            scpClient.put(file.getBytes("UTF-8"), fileName, "/tmp");
         } catch (final IOException e) {
             LOG.appError("installTestFiles: could not copy: " + fileName, "", e);
             return;

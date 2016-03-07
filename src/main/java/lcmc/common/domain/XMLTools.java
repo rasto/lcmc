@@ -94,7 +94,7 @@ public class XMLTools {
         final Document document;
         try {
             final DocumentBuilder builder = factory.newDocumentBuilder();
-            document = builder.parse(new ByteArrayInputStream(xml.getBytes()));
+            document = builder.parse(new ByteArrayInputStream(xml.getBytes("UTF-8")));
         } catch (final SAXException sxe) {
             LOG.appError("getXMLDocument: could not parse: " + xml, sxe);
             return null;

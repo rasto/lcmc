@@ -33,6 +33,7 @@ import java.awt.Toolkit;
 import java.awt.image.BufferedImage;
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -79,6 +80,7 @@ import javax.swing.table.TableColumnModel;
 import javax.swing.text.html.HTMLDocument;
 
 import com.google.common.base.Optional;
+
 import lcmc.Exceptions;
 import lcmc.common.domain.ConvertCmdCallback;
 import lcmc.common.domain.StringValue;
@@ -229,7 +231,7 @@ public final class Tools {
         final BufferedReader in;
         final StringBuilder content = new StringBuilder("");
         try {
-            in = new BufferedReader(new FileReader(filename));
+            in = new BufferedReader(new InputStreamReader(new FileInputStream(new File(filename)), "UTF-8"));
             String line;
             while ((line = in.readLine()) != null) {
                 content.append(line);
@@ -794,7 +796,7 @@ public final class Tools {
             return null;
         }
         try {
-            final BufferedReader br = new BufferedReader(new InputStreamReader(url.openStream()));
+            final BufferedReader br = new BufferedReader(new InputStreamReader(url.openStream(), "UTF-8"));
             final StringBuilder content = new StringBuilder("");
             while (br.ready()) {
                 content.append(br.readLine());
@@ -830,7 +832,7 @@ public final class Tools {
         String info = null;
         try {
             final String url = "http://lcmc.sourceforge.net/version.html?lcmc-check-" + getRelease();
-            final BufferedReader reader = new BufferedReader(new InputStreamReader(new URL(url).openStream()));
+            final BufferedReader reader = new BufferedReader(new InputStreamReader(new URL(url).openStream(), "UTF-8"));
             int rate = 0;
             do {
                 final String line = reader.readLine();

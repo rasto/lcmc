@@ -356,7 +356,7 @@ public final class ExecCommandThread extends Thread {
                     enterSudoPassword();
                 }
                 final String pwd = host.getSudoPassword() + '\n';
-                stdin.write(pwd.getBytes());
+                stdin.write(pwd.getBytes("UTF-8"));
                 skipNextLine = true;
                 continue;
             } else if (output.indexOf(Ssh.SUDO_FAIL) >= 0) {
