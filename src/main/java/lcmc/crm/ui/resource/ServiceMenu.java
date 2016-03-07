@@ -660,7 +660,7 @@ public class ServiceMenu {
                                     }
                                     boolean runningOnNode = false;
                                     for (final String ron : runningOnNodes) {
-                                        if (hostName.toLowerCase(Locale.US).equals(ron.toLowerCase(Locale.US))) {
+                                        if (hostName.equalsIgnoreCase(ron)) {
                                             runningOnNode = true;
                                             break;
                                         }
@@ -781,7 +781,7 @@ public class ServiceMenu {
                                             return false;
                                         }
                                     }
-                                    if (hostName.toLowerCase(Locale.US).equals(runningOnNode)) {
+                                    if (hostName.equalsIgnoreCase(runningOnNode)) {
                                         return false;
                                     } else {
                                         return true;
@@ -842,7 +842,7 @@ public class ServiceMenu {
                                     final String runningOnNode = runningOnNodes.get(0).toLowerCase(Locale.US);
                                     if (!serviceInfo.getBrowser().crmStatusFailed()
                                         && serviceInfo.getService().isAvailable()
-                                        && !hostName.toLowerCase(Locale.US).equals(runningOnNode)
+                                        && !hostName.equalsIgnoreCase(runningOnNode)
                                         && host.isCrmStatusOk()) {
                                         return true;
                                     } else {

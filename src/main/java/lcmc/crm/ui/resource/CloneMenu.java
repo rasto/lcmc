@@ -120,7 +120,7 @@ public class CloneMenu extends ServiceMenu {
                                     }
                                     boolean runningOnNode = false;
                                     for (final String ron : runningOnNodes) {
-                                        if (hostName.toLowerCase(Locale.US).equals(ron.toLowerCase(Locale.US))) {
+                                        if (hostName.equalsIgnoreCase(ron)) {
                                             runningOnNode = true;
                                             break;
                                         }
