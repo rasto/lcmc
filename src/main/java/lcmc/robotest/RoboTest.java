@@ -960,6 +960,7 @@ public class RoboTest {
         } while (scrollbar == null);
         if (scrollbar == null) {
             Tools.printStackTrace("can't find the scrollbar");
+			return;
         }
         moveToAbs(scrollbarX, scrollbarY);
         leftPress();
