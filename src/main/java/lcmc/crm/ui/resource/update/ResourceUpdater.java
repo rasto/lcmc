@@ -41,6 +41,7 @@ import lcmc.crm.ui.resource.ServiceInfo;
 import lcmc.crm.ui.resource.ServicesInfo;
 import lcmc.logger.Logger;
 import lcmc.logger.LoggerFactory;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
 import javax.inject.Inject;
@@ -248,6 +249,7 @@ public class ResourceUpdater {
             final GroupServiceUpdater groupServiceUpdater = new GroupServiceUpdater(newGi, newCi, setParametersHash, newService, pos, hbId);
             groupServiceUpdater.update();
             newService = groupServiceUpdater.isNewService();
+            pos = groupServiceUpdater.getPos();
         }
 
         for (final Map.Entry<ServiceInfo, Map<String, String>> setEntry : setParametersHash.entrySet()) {
@@ -267,6 +269,7 @@ public class ResourceUpdater {
         private final CloneInfo newCi;
         private final Map<ServiceInfo, Map<String, String>> setParametersHash;
         private boolean newService;
+        @Getter
         private int pos;
         private final String hbId;
 
