@@ -20,6 +20,7 @@
 
 package lcmc.crm.ui.resource.update;
 
+import com.google.common.base.Optional;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import lcmc.cluster.ui.ClusterBrowser;
@@ -36,7 +37,6 @@ import javax.inject.Provider;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 public class RscSetUpdater {
     private final Application.RunMode runMode;
@@ -122,7 +122,7 @@ public class RscSetUpdater {
                 return Optional.of(placeholder);
             }
         }
-        return Optional.empty();
+        return Optional.absent();
     }
 
     private ConstraintPHInfo setOldPlaceholder(RscSetConnectionData newRscSetConnectionData) {
@@ -166,7 +166,7 @@ public class RscSetUpdater {
                 return Optional.of(addContraintsToPlaceholder(newRscSetConnectionData, placeholder));
             }
         }
-        return Optional.empty();
+        return Optional.absent();
     }
 
     private ConstraintPHInfo addContraintsToPlaceholder(RscSetConnectionData newRscSetConnectionData, ConstraintPHInfo placeholder) {
