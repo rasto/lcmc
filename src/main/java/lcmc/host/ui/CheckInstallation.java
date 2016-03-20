@@ -22,35 +22,30 @@
 
 package lcmc.host.ui;
 
-import java.awt.Color;
+import lcmc.cluster.service.ssh.ExecCommandConfig;
+import lcmc.cluster.ui.widget.Widget;
+import lcmc.cluster.ui.widget.WidgetFactory;
+import lcmc.common.domain.Application;
+import lcmc.common.domain.ExecCallback;
+import lcmc.common.domain.util.Tools;
+import lcmc.common.ui.SpringUtilities;
+import lcmc.common.ui.WizardDialog;
+import lcmc.common.ui.utils.MyButton;
+import lcmc.common.ui.utils.SwingUtils;
+import lcmc.drbd.domain.DrbdInstallation;
+import lcmc.host.domain.Host;
+import lcmc.logger.Logger;
+import lcmc.logger.LoggerFactory;
+import lombok.val;
+
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.swing.*;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.List;
-
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.swing.ImageIcon;
-import javax.swing.JComponent;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.SpringLayout;
-
-import lcmc.cluster.ui.widget.WidgetFactory;
-import lcmc.common.domain.Application;
-import lcmc.common.ui.SpringUtilities;
-import lcmc.common.ui.WizardDialog;
-import lcmc.cluster.ui.widget.Widget;
-import lcmc.common.ui.utils.SwingUtils;
-import lcmc.host.domain.Host;
-import lcmc.drbd.domain.DrbdInstallation;
-import lcmc.common.domain.ExecCallback;
-import lcmc.logger.Logger;
-import lcmc.logger.LoggerFactory;
-import lcmc.common.ui.utils.MyButton;
-import lcmc.common.domain.util.Tools;
-import lcmc.cluster.service.ssh.ExecCommandConfig;
-import lombok.val;
 
 /**
  * An implementation of a dialog where
@@ -437,7 +432,11 @@ final class CheckInstallation extends DialogHost {
         final List<String> changed = new ArrayList<String>();
         enableComponents();
         enableNextButtons(incorrect, changed);
-        makeDefaultAndRequestFocus(buttonClass(nextButton()));
+        swingUtils.invokeLater(new Runnable() {
+            public void run() {
+                makeDefaultAndRequestFocus(buttonClass(nextButton()));
+            }
+        });
         if (!drbdInstallationOk && application.getAutoOptionHost("drbdinst") != null) {
             Tools.sleep(1000);
             installDrbdButton.pressButton();
