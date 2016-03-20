@@ -23,6 +23,7 @@
 package lcmc.crm.domain;
 
 import com.google.common.collect.HashBasedTable;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Table;
 import lcmc.Exceptions;
 import lcmc.cluster.service.ssh.ExecCommandConfig;
@@ -38,9 +39,9 @@ import lcmc.common.domain.XMLTools;
 import lcmc.common.domain.util.Tools;
 import lcmc.common.ui.Info;
 import lcmc.common.ui.main.ProgressIndicator;
-import lcmc.crm.ui.resource.update.ResourceUpdater;
 import lcmc.crm.ui.resource.ServiceInfo;
 import lcmc.crm.ui.resource.ServicesInfo;
+import lcmc.crm.ui.resource.update.ResourceUpdater;
 import lcmc.host.domain.Host;
 import lcmc.logger.Logger;
 import lcmc.logger.LoggerFactory;
@@ -66,6 +67,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
@@ -379,7 +381,7 @@ public class CrmXml {
     private final Map<String, AccessMode.Type> paramGlobalAccessTypes =
                                                               new HashMap<String, AccessMode.Type>();
     private final Collection<String> globalRequiredParams = new ArrayList<String>();
-    private final Map<String, List<ResourceAgent>> classToServicesMap = new HashMap<String, List<ResourceAgent>>();
+    private final Map<String, List<ResourceAgent>> classToServicesMap = new ConcurrentHashMap<String, List<ResourceAgent>>();
     private final Map<String, String> globalShortDescMap = new HashMap<String, String>();
     private final Map<String, String> globalLongDescMap = new HashMap<String, String>();
     private final Map<String, Value> globalDefaultMap = new HashMap<String, Value>();
@@ -959,7 +961,7 @@ public class CrmXml {
         if (services == null) {
             return new ArrayList<ResourceAgent>();
         }
-        Collections.sort(services, new Comparator<ResourceAgent>() {
+        Collections.sort(Lists.newArrayList(services), new Comparator<ResourceAgent>() {
                                        @Override
                                        public int compare(final ResourceAgent ra1, final ResourceAgent ra2) {
                                            return ra1.getServiceName().compareToIgnoreCase(ra2.getServiceName());
