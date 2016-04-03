@@ -60,6 +60,7 @@ public final class DistResource_suse_OPENSUSE11_2
         {"DrbdInst.install.method.3",
          "source"},
 
+        {"DrbdInst.install.staging.3", "true"},
         {"DrbdInst.install.3",
          "/bin/mkdir -p /tmp/drbdinst && "
          + "/usr/bin/wget --directory-prefix=/tmp/drbdinst/"

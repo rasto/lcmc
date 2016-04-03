@@ -65,6 +65,7 @@ public final class DistResource_ubuntu_HARDY extends ListResourceBundle {
         {"DrbdInst.install.text.2",
          "from the source tarball"},
 
+        {"DrbdInst.install.staging.2", "true"},
         {"DrbdInst.install.2",
          "/bin/mkdir -p /tmp/drbdinst && "
          + "/usr/bin/wget --directory-prefix=/tmp/drbdinst/"
