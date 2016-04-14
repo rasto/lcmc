@@ -1191,6 +1191,7 @@ sub get_resource_status {
 		  	# unmanaged
 			$res = $1;
 			my $state = $2;
+			$state =~ s/\(.*\)\s+//;
 			if ($res =~/(.*):\d+$/) {
 				$res = $1;
 			}
