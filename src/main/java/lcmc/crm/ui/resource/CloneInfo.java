@@ -21,7 +21,28 @@
  */
 package lcmc.crm.ui.resource;
 
-import java.awt.Color;
+import lcmc.cluster.ui.ClusterBrowser;
+import lcmc.cluster.ui.widget.Check;
+import lcmc.common.domain.Application;
+import lcmc.common.domain.ColorText;
+import lcmc.common.domain.Value;
+import lcmc.common.domain.util.Tools;
+import lcmc.common.ui.Browser;
+import lcmc.common.ui.treemenu.TreeMenuController;
+import lcmc.common.ui.utils.UpdatableItem;
+import lcmc.crm.domain.ClusterStatus;
+import lcmc.crm.domain.CrmXml;
+import lcmc.crm.domain.HostLocation;
+import lcmc.crm.domain.ResourceAgent;
+import lcmc.crm.service.CRM;
+import lcmc.host.domain.Host;
+import lombok.val;
+
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.swing.*;
+import javax.swing.tree.DefaultMutableTreeNode;
+import java.awt.*;
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -30,28 +51,6 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.swing.ImageIcon;
-import javax.swing.JComponent;
-import javax.swing.JPanel;
-import javax.swing.tree.DefaultMutableTreeNode;
-import lcmc.common.domain.Application;
-import lcmc.common.domain.ColorText;
-import lcmc.common.ui.treemenu.TreeMenuController;
-import lcmc.crm.domain.CrmXml;
-import lcmc.crm.domain.ClusterStatus;
-import lcmc.host.domain.Host;
-import lcmc.crm.domain.HostLocation;
-import lcmc.crm.domain.ResourceAgent;
-import lcmc.common.domain.Value;
-import lcmc.common.ui.Browser;
-import lcmc.cluster.ui.ClusterBrowser;
-import lcmc.cluster.ui.widget.Check;
-import lcmc.crm.service.CRM;
-import lcmc.common.domain.util.Tools;
-import lcmc.common.ui.utils.UpdatableItem;
-import lombok.val;
 
 /**
  * This class holds clone service info object.
@@ -606,7 +605,10 @@ public class CloneInfo extends ServiceInfo {
 
     public List<ServiceInfo> getSubServices() {
         final List<ServiceInfo> services = new ArrayList<ServiceInfo>();
-        services.add(containedService);
+        final ServiceInfo cs = containedService;
+        if (cs != null) {
+            services.add(cs);
+        }
         return services;
     }
 }
