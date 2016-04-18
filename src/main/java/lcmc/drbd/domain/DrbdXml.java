@@ -22,6 +22,33 @@
 
 package lcmc.drbd.domain;
 
+import com.google.common.collect.HashBasedTable;
+import com.google.common.collect.Table;
+import com.google.common.collect.TreeBasedTable;
+import lcmc.Exceptions;
+import lcmc.cluster.service.ssh.ExecCommandConfig;
+import lcmc.cluster.service.ssh.SshOutput;
+import lcmc.common.domain.AccessMode;
+import lcmc.common.domain.ConvertCmdCallback;
+import lcmc.common.domain.StringValue;
+import lcmc.common.domain.Unit;
+import lcmc.common.domain.Value;
+import lcmc.common.domain.XMLTools;
+import lcmc.common.domain.util.Tools;
+import lcmc.common.ui.Access;
+import lcmc.common.ui.main.ProgressIndicator;
+import lcmc.drbd.ui.DrbdGraph;
+import lcmc.drbd.ui.resource.BlockDevInfo;
+import lcmc.drbd.ui.resource.ProxyNetInfo;
+import lcmc.host.domain.Host;
+import lcmc.logger.Logger;
+import lcmc.logger.LoggerFactory;
+import org.w3c.dom.Document;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
+import javax.inject.Inject;
+import javax.inject.Named;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -35,36 +62,6 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import com.google.common.collect.HashBasedTable;
-import com.google.common.collect.Table;
-import com.google.common.collect.TreeBasedTable;
-import lcmc.Exceptions;
-import lcmc.common.domain.AccessMode;
-import lcmc.common.ui.Access;
-import lcmc.common.ui.main.ProgressIndicator;
-import lcmc.drbd.ui.DrbdGraph;
-import lcmc.drbd.ui.resource.BlockDevInfo;
-import lcmc.drbd.ui.resource.ProxyNetInfo;
-import lcmc.common.domain.Application;
-import lcmc.host.domain.Host;
-import lcmc.common.domain.StringValue;
-import lcmc.common.domain.Value;
-import lcmc.common.domain.XMLTools;
-import lcmc.common.domain.ConvertCmdCallback;
-import lcmc.logger.Logger;
-import lcmc.logger.LoggerFactory;
-import lcmc.common.domain.util.Tools;
-import lcmc.common.domain.Unit;
-import lcmc.cluster.service.ssh.ExecCommandConfig;
-import lcmc.cluster.service.ssh.SshOutput;
-
-import org.w3c.dom.Document;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
-import javax.inject.Inject;
-import javax.inject.Named;
-
 /**
  * This class parses xml from drbdsetup and drbdadm, stores the
  * information in the hashes and provides methods to get this
@@ -74,35 +71,33 @@ import javax.inject.Named;
 @Named
 public class DrbdXml {
     private static final Logger LOG = LoggerFactory.getLogger(DrbdXml.class);
-    public static final String[] EMPTY_STRING = new String[0];
+    private static final String[] EMPTY_STRING = new String[0];
 
     private static final Pattern UNIT_PATTERN = Pattern.compile("(\\d*)([kmgtsKMGTS]?)");
     public static final String GLOBAL_SECTION = "global";
     public static final Value PROTOCOL_A = new StringValue("A", "A / Asynchronous");
-    public static final Value PROTOCOL_B = new StringValue("B", "B / Semi-Synchronous");
+    private static final Value PROTOCOL_B = new StringValue("B", "B / Semi-Synchronous");
     public static final Value PROTOCOL_C = new StringValue("C", "C / Synchronous");
     public static final String PROTOCOL_PARAM = "protocol";
     public static final String PING_TIMEOUT_PARAM = "ping-timeout";
 
     private static final BigInteger KILO = new BigInteger("1024");
-    static final Value[] PROTOCOLS = {PROTOCOL_A, PROTOCOL_B, PROTOCOL_C};
-    static final Collection<String> NOT_ADVANCED_PARAMS = new ArrayList<String>();
+    private static final Value[] PROTOCOLS = {PROTOCOL_A, PROTOCOL_B, PROTOCOL_C};
+    private static final Collection<String> NOT_ADVANCED_PARAMS = new ArrayList<String>();
 
-    static final Collection<String> IGNORE_CONFIG_ERRORS = new HashSet<String>();
-    static final Map<String, AccessMode.Type> PARAM_ACCESS_TYPE = new HashMap<String, AccessMode.Type>();
+    private static final Collection<String> IGNORE_CONFIG_ERRORS = new HashSet<String>();
+    private static final Map<String, AccessMode.Type> PARAM_ACCESS_TYPE = new HashMap<String, AccessMode.Type>();
 
     private static final Map<String, Value> PREFERRED_VALUES_MAP = new HashMap<String, Value>();
 
     /** Yes / true drbd config value. */
     public static final Value CONFIG_YES = new StringValue("yes");
     /** No / false drbd config value. */
-    public static final Value CONFIG_NO = new StringValue("no");
+    private static final Value CONFIG_NO = new StringValue("no");
     /** Hardcoded defaults, for options that have it but we don't get
         it from the drbdsetup. */
     static final Map<String, Value> HARDCODED_DEFAULTS = new HashMap<String, Value>();
 
-    @Inject
-    private Application application;
     @Inject
     private Access access;
 
@@ -266,7 +261,6 @@ public class DrbdXml {
         }
         return unitPart;
     }
-    // TODO: should that not be per host?
     /** Map from parameter name to the default value. */
     private final Map<String, Value> paramDefaultMap = new HashMap<String, Value>();
     /** Map from parameter name to its type. */
@@ -839,34 +833,38 @@ public class DrbdXml {
             if ("volume".equals(option.getNodeName())) {
                 parseVolumeConfig(hostName, resName, option);
             } else if ("address".equals(option.getNodeName())) {
-                final String ip = XMLTools.getText(option);
-                final String port = XMLTools.getAttribute(option, "port");
-                final String family = XMLTools.getAttribute(option, "family");
-                /* ip */
-                Map<String, String> hostIpMap = resourceHostIpMap.get(resName);
-                if (hostIpMap == null) {
-                    hostIpMap = new HashMap<String, String>();
-                    resourceHostIpMap.put(resName, hostIpMap);
-                }
-                hostIpMap.put(hostName, ip);
-                /* port */
-                Map<String, String> hostPortMap = resourceHostPortMap.get(resName);
-                if (hostPortMap == null) {
-                    hostPortMap = new HashMap<String, String>();
-                    resourceHostPortMap.put(resName, hostPortMap);
-                }
-                hostPortMap.put(hostName, port);
-                /* family */
-                Map<String, String> hostFamilyMap = resourceHostFamilyMap.get(resName);
-                if (hostFamilyMap == null) {
-                    hostFamilyMap = new HashMap<String, String>();
-                    resourceHostFamilyMap.put(resName, hostFamilyMap);
-                }
-                hostFamilyMap.put(hostName, family);
+                parseAddress(resName, hostName, option);
             } else if ("proxy".equals(option.getNodeName())) {
                 parseProxyHostConfig(hostName, resName, option);
             }
         }
+    }
+
+    private void parseAddress(String resName, String hostName, Node option) {
+        final String ip = XMLTools.getText(option);
+        final String port = XMLTools.getAttribute(option, "port");
+        final String family = XMLTools.getAttribute(option, "family");
+                /* ip */
+        Map<String, String> hostIpMap = resourceHostIpMap.get(resName);
+        if (hostIpMap == null) {
+            hostIpMap = new HashMap<String, String>();
+            resourceHostIpMap.put(resName, hostIpMap);
+        }
+        hostIpMap.put(hostName, ip);
+                /* port */
+        Map<String, String> hostPortMap = resourceHostPortMap.get(resName);
+        if (hostPortMap == null) {
+            hostPortMap = new HashMap<String, String>();
+            resourceHostPortMap.put(resName, hostPortMap);
+        }
+        hostPortMap.put(hostName, port);
+                /* family */
+        Map<String, String> hostFamilyMap = resourceHostFamilyMap.get(resName);
+        if (hostFamilyMap == null) {
+            hostFamilyMap = new HashMap<String, String>();
+            resourceHostFamilyMap.put(resName, hostFamilyMap);
+        }
+        hostFamilyMap.put(hostName, family);
     }
 
     /** Parses host node in the drbd config. */
@@ -925,30 +923,7 @@ public class DrbdXml {
                 hostMetaDiskIndexMap.put(hostName, metaDiskIndex);
             } else if ("address".equals(option.getNodeName())) {
                 /* since 8.4, it's outside of volume */
-                final String ip = XMLTools.getText(option);
-                final String port = XMLTools.getAttribute(option, "port");
-                final String family = XMLTools.getAttribute(option, "family");
-                /* ip */
-                Map<String, String> hostIpMap = resourceHostIpMap.get(resName);
-                if (hostIpMap == null) {
-                    hostIpMap = new HashMap<String, String>();
-                    resourceHostIpMap.put(resName, hostIpMap);
-                }
-                hostIpMap.put(hostName, ip);
-                /* port */
-                Map<String, String> hostPortMap = resourceHostPortMap.get(resName);
-                if (hostPortMap == null) {
-                    hostPortMap = new HashMap<String, String>();
-                    resourceHostPortMap.put(resName, hostPortMap);
-                }
-                hostPortMap.put(hostName, port);
-                /* family */
-                Map<String, String> hostFamilyMap = resourceHostFamilyMap.get(resName);
-                if (hostFamilyMap == null) {
-                    hostFamilyMap = new HashMap<String, String>();
-                    resourceHostFamilyMap.put(resName, hostFamilyMap);
-                }
-                hostFamilyMap.put(hostName, family);
+                parseAddress(resName, hostName, option);
             } else if ("proxy".equals(option.getNodeName())) {
                 parseProxyHostConfig(hostName, resName, option);
             }
