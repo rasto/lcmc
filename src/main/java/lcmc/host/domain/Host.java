@@ -22,51 +22,51 @@
 
 package lcmc.host.domain;
 
-import java.awt.Color;
+import lcmc.Exceptions;
+import lcmc.cluster.domain.Cluster;
+import lcmc.cluster.service.ssh.ExecCommandConfig;
+import lcmc.cluster.service.ssh.ExecCommandThread;
+import lcmc.cluster.service.ssh.Ssh;
+import lcmc.cluster.service.ssh.SshOutput;
+import lcmc.cluster.service.storage.BlockDeviceService;
+import lcmc.cluster.ui.ClusterBrowser;
+import lcmc.cluster.ui.SSHGui;
+import lcmc.common.domain.Application;
+import lcmc.common.domain.ConnectionCallback;
+import lcmc.common.domain.ConvertCmdCallback;
+import lcmc.common.domain.ExecCallback;
+import lcmc.common.domain.NewOutputCallback;
+import lcmc.common.domain.Unit;
+import lcmc.common.domain.Value;
+import lcmc.common.domain.util.Tools;
+import lcmc.common.ui.ProgressBar;
+import lcmc.common.ui.main.MainData;
+import lcmc.common.ui.main.ProgressIndicator;
+import lcmc.common.ui.utils.SwingUtils;
+import lcmc.configs.DistResource;
+import lcmc.drbd.domain.BlockDevice;
+import lcmc.drbd.domain.DrbdHost;
+import lcmc.drbd.domain.DrbdXml;
+import lcmc.drbd.service.DRBD;
+import lcmc.host.ui.HostBrowser;
+import lcmc.host.ui.TerminalPanel;
+import lcmc.logger.Logger;
+import lcmc.logger.LoggerFactory;
+import lcmc.robotest.RoboTest;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+import lombok.Setter;
+
+import javax.swing.*;
+import java.awt.*;
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicBoolean;
-
-import javax.swing.JComponent;
-
-import lcmc.Exceptions;
-import lcmc.cluster.domain.Cluster;
-import lcmc.common.domain.ConvertCmdCallback;
-import lcmc.common.ui.main.ProgressIndicator;
-import lcmc.common.ui.utils.SwingUtils;
-import lcmc.configs.DistResource;
-import lcmc.cluster.ui.ClusterBrowser;
-import lcmc.common.ui.main.MainData;
-import lcmc.cluster.service.storage.BlockDeviceService;
-import lcmc.host.ui.HostBrowser;
-import lcmc.common.ui.ProgressBar;
-import lcmc.cluster.ui.SSHGui;
-import lcmc.host.ui.TerminalPanel;
-import lcmc.drbd.domain.DrbdHost;
-import lcmc.drbd.domain.DrbdXml;
-import lcmc.common.domain.Application;
-import lcmc.common.domain.Value;
-import lcmc.drbd.domain.BlockDevice;
-import lcmc.robotest.RoboTest;
-import lcmc.common.domain.ConnectionCallback;
-import lcmc.drbd.service.DRBD;
-import lcmc.common.domain.ExecCallback;
-import lcmc.logger.Logger;
-import lcmc.logger.LoggerFactory;
-import lcmc.common.domain.NewOutputCallback;
-import lcmc.common.domain.util.Tools;
-import lcmc.common.domain.Unit;
-import lcmc.cluster.service.ssh.ExecCommandConfig;
-import lcmc.cluster.service.ssh.Ssh;
-import lcmc.cluster.service.ssh.ExecCommandThread;
-import lcmc.cluster.service.ssh.SshOutput;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
-import lombok.Setter;
 
 /**
  * This class holds host data and implementation of host related methods.
@@ -1280,5 +1280,17 @@ public class Host implements Comparable<Host>, Value {
 
     public String getDistCommand(final String command, final Map<String, String> resVolReplaceHash) {
         return hostParser.getDistCommand(command, resVolReplaceHash);
+    }
+
+    public String getArch() {
+        return hostParser.getArch();
+    }
+
+    public Set<String> getAvailableCryptoModules() {
+        return hostParser.getAvailableCryptoModules();
+    }
+
+    public String getHeartbeatLibPath() {
+        return hostParser.getHeartbeatLibPath();
     }
 }

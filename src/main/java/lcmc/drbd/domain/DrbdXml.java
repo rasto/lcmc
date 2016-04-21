@@ -23,6 +23,7 @@
 package lcmc.drbd.domain;
 
 import com.google.common.collect.HashBasedTable;
+import com.google.common.collect.Maps;
 import com.google.common.collect.Table;
 import com.google.common.collect.TreeBasedTable;
 import lcmc.Exceptions;
@@ -43,6 +44,9 @@ import lcmc.drbd.ui.resource.ProxyNetInfo;
 import lcmc.host.domain.Host;
 import lcmc.logger.Logger;
 import lcmc.logger.LoggerFactory;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.val;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -53,7 +57,6 @@ import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -61,6 +64,8 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import static java.util.Arrays.asList;
 
 /**
  * This class parses xml from drbdsetup and drbdadm, stores the
@@ -83,9 +88,26 @@ public class DrbdXml {
 
     private static final BigInteger KILO = new BigInteger("1024");
     private static final Value[] PROTOCOLS = {PROTOCOL_A, PROTOCOL_B, PROTOCOL_C};
-    private static final Collection<String> NOT_ADVANCED_PARAMS = new ArrayList<String>();
+    private static final Collection<String> NOT_ADVANCED_PARAMS = asList("rate",
+                                                                         PROTOCOL_PARAM,
+                                                                         PING_TIMEOUT_PARAM,
+                                                                         "fence-peer",
+                                                                         "wfc-timeout",
+                                                                         "degr-wfc-timeout",
+                                                                         "become-primary-on",
+                                                                         "timeout",
+                                                                         "allow-two-primaries",
+                                                                         "fencing",
+                                                                         "after",
+                                                                         "resync-after",
+                                                                         "usage-count",
+                                                                         "memlimit",
+                                                                         "plugin-zlib",
+                                                                         "plugin-lzma");
 
-    private static final Collection<String> IGNORE_CONFIG_ERRORS = new HashSet<String>();
+    private static final Collection<String> IGNORE_CONFIG_ERRORS = asList(
+            "no resources defined!",
+            "Can not open '/etc/drbd.conf': No such file or directory");
     private static final Map<String, AccessMode.Type> PARAM_ACCESS_TYPE = new HashMap<String, AccessMode.Type>();
 
     private static final Map<String, Value> PREFERRED_VALUES_MAP = new HashMap<String, Value>();
@@ -100,30 +122,6 @@ public class DrbdXml {
 
     @Inject
     private Access access;
-
-    static {
-        NOT_ADVANCED_PARAMS.add("rate");
-        NOT_ADVANCED_PARAMS.add(PROTOCOL_PARAM);
-        NOT_ADVANCED_PARAMS.add(PING_TIMEOUT_PARAM);
-        NOT_ADVANCED_PARAMS.add("fence-peer");
-        NOT_ADVANCED_PARAMS.add("wfc-timeout");
-        NOT_ADVANCED_PARAMS.add("degr-wfc-timeout");
-        NOT_ADVANCED_PARAMS.add("become-primary-on");
-        NOT_ADVANCED_PARAMS.add("timeout");
-        NOT_ADVANCED_PARAMS.add("allow-two-primaries");
-        NOT_ADVANCED_PARAMS.add("fencing");
-        NOT_ADVANCED_PARAMS.add("after"); /* before 8.4 */
-        NOT_ADVANCED_PARAMS.add("resync-after");
-        NOT_ADVANCED_PARAMS.add("usage-count"); /* global */
-        NOT_ADVANCED_PARAMS.add("memlimit"); /* proxy */
-        NOT_ADVANCED_PARAMS.add("plugin-zlib"); /* proxy */
-        NOT_ADVANCED_PARAMS.add("plugin-lzma"); /* proxy */
-    }
-    static {
-        IGNORE_CONFIG_ERRORS.add("no resources defined!");
-        IGNORE_CONFIG_ERRORS.add(
-            "Can not open '/etc/drbd.conf': No such file or directory");
-    }
     static {
         PARAM_ACCESS_TYPE.put("rate", AccessMode.OP);
     }
@@ -176,14 +174,14 @@ public class DrbdXml {
     /** Returns units. */
     public Unit[] getUnits(final String param, final String unitPart) {
         final List<Unit> units = new ArrayList<Unit>();
-        if ("k".equalsIgnoreCase(paramDefaultUnitMap.get(param))) {
+        if ("k".equalsIgnoreCase(getDefaultUnit(param))) {
             units.add(getUnitKi(unitPart));
             units.add(getUnitMi(unitPart));
             units.add(getUnitGi(unitPart));
-        } else if ("m".equalsIgnoreCase(paramDefaultUnitMap.get(param))) {
+        } else if ("m".equalsIgnoreCase(getDefaultUnit(param))) {
             units.add(getUnitMi(unitPart));
             units.add(getUnitGi(unitPart));
-        } else if ("g".equalsIgnoreCase(paramDefaultUnitMap.get(param))) {
+        } else if ("g".equalsIgnoreCase(getDefaultUnit(param))) {
             units.add(getUnitGi(unitPart));
         } else {
             units.add(getUnitDefault(unitPart));
@@ -196,28 +194,28 @@ public class DrbdXml {
 
     public Unit[] getByteUnits(final String param, final String unitPart) {
         final List<Unit> units = new ArrayList<Unit>();
-        if ("1".equalsIgnoreCase(paramDefaultUnitMap.get(param))) {
+        if ("1".equalsIgnoreCase(getDefaultUnit(param))) {
             units.add(getUnitBytes(unitPart));
             units.add(getUnitKiBytes(unitPart));
             units.add(getUnitMiBytes(unitPart));
             units.add(getUnitGiBytes(unitPart));
             units.add(getUnitSectors(unitPart));
-        } else if ("s".equalsIgnoreCase(paramDefaultUnitMap.get(param))) {
+        } else if ("s".equalsIgnoreCase(getDefaultUnit(param))) {
             units.add(getUnitSectors(unitPart));
             units.add(getUnitBytes(unitPart));
             units.add(getUnitKiBytes(unitPart));
             units.add(getUnitMiBytes(unitPart));
             units.add(getUnitGiBytes(unitPart));
-        } else if ("k".equalsIgnoreCase(paramDefaultUnitMap.get(param))) {
+        } else if ("k".equalsIgnoreCase(getDefaultUnit(param))) {
             units.add(getUnitKiBytes(unitPart));
             units.add(getUnitMiBytes(unitPart));
             units.add(getUnitGiBytes(unitPart));
             units.add(getUnitSectors(unitPart));
-        } else if ("m".equalsIgnoreCase(paramDefaultUnitMap.get(param))) {
+        } else if ("m".equalsIgnoreCase(getDefaultUnit(param))) {
             units.add(getUnitMiBytes(unitPart));
             units.add(getUnitGiBytes(unitPart));
             units.add(getUnitSectors(unitPart));
-        } else if ("g".equalsIgnoreCase(paramDefaultUnitMap.get(param))) {
+        } else if ("g".equalsIgnoreCase(getDefaultUnit(param))) {
             units.add(getUnitGiBytes(unitPart));
             units.add(getUnitSectors(unitPart));
         }
@@ -261,33 +259,57 @@ public class DrbdXml {
         }
         return unitPart;
     }
-    /** Map from parameter name to the default value. */
-    private final Map<String, Value> paramDefaultMap = new HashMap<String, Value>();
-    /** Map from parameter name to its type. */
-    private final Map<String, String> paramTypeMap = new HashMap<String, String>();
-    /** Map from parameter name to its section. */
-    private final Map<String, String> paramSectionMap = new LinkedHashMap<String, String>();
+
+    @lombok.experimental.Accessors(fluent = true)
+    public static class DrbdParam {
+        @Getter
+        @Setter
+        private Value defaultValue;
+        @Getter
+        @Setter
+        private List<Value> items;
+        @Getter
+        @Setter
+        private BigInteger min;
+        @Getter
+        @Setter
+        private BigInteger max;
+        @Getter
+        @Setter
+        private String unitLong;
+        @Getter
+        @Setter
+        private String defaultUnit;
+        @Getter
+        @Setter
+        private String longDesc;
+        @Getter
+        @Setter
+        private String type;
+        @Getter
+        @Setter
+        private String section;
+    }
+
+    private final Map<String, DrbdParam> drbdParamMap = Maps.newHashMap();
+
+    public DrbdParam getDrbdParam(final String param) {
+        val drbdParam = drbdParamMap.get(param);
+        if (drbdParam != null) {
+            return drbdParam;
+        }
+        val newDrbdParam = new DrbdParam();
+        drbdParamMap.put(param, newDrbdParam);
+        return newDrbdParam;
+    }
+
+
     /** Map from section to this section's parameters. */
     private final Map<String, List<String>> sectionParamsMap = new LinkedHashMap<String, List<String>>();
-    /** Map from parameter name to its unit name (long). */
-    private final Map<String, String> paramUnitLongMap = new LinkedHashMap<String, String>();
 
-    /** Map from parameter name to its unit name. */
-    private final Map<String, String> paramDefaultUnitMap = new LinkedHashMap<String, String>();
-
-    /** Map from parameter name to its long description. */
-    private final Map<String, String> paramLongDescMap = new HashMap<String, String>();
-
-    /** Map from parameter name to its minimum value. */
-    private final Map<String, BigInteger> paramMinMap = new LinkedHashMap<String, BigInteger>();
-
-    /** Map from parameter name to its maximum value. */
-    private final Map<String, BigInteger> paramMaxMap = new LinkedHashMap<String, BigInteger>();
     /** Map from parameter name to its correct value. */
     private final Map<String, Boolean> paramCorrectValueMap = new HashMap<String, Boolean>();
 
-    /** Map from parameter name to its items if there is a choice list. */
-    private final Map<String, List<Value>> paramItemsMap = new LinkedHashMap<String, List<Value>>();
     /** List of all parameters. */
     private final Collection<String> parametersList = new ArrayList<String>();
     /** List of all global parameters. */
@@ -386,9 +408,11 @@ public class DrbdXml {
             /* prior 8.4 */
             addParameter("resource", PROTOCOL_PARAM, new StringValue(), PROTOCOLS, true);
         }
-        if (paramItemsMap.containsKey("after-sb-0pri")) {
+
+        val drbdParam = getDrbdParam("after-sb-0pri");
+        if (drbdParam.items() != null) {
             for (final Host h : hosts) {
-                paramItemsMap.get("after-sb-0pri").add(new StringValue("discard-node-" + h.getName()));
+                drbdParam.items().add(new StringValue("discard-node-" + h.getName()));
             }
         }
     }
@@ -428,27 +452,27 @@ public class DrbdXml {
     public String getParamShortDesc(final String param) {
         final StringBuilder name = new StringBuilder(param.replaceAll("\\-", " "));
         name.replace(0, 1, name.substring(0, 1).toUpperCase());
-        if (paramUnitLongMap.containsKey(param)) {
-            name.append(" (").append(paramUnitLongMap.get(param)).append(')');
+        if (getDrbdParam(param).unitLong() != null) {
+            name.append(" (").append(getDrbdParam(param).unitLong()).append(')');
         }
         return name.toString();
     }
 
     public String getParamLongDesc(final String param) {
-        return paramLongDescMap.get(param);
+        return getDrbdParam(param).longDesc();
     }
 
     public String getUnitLong(final String param) {
-        return paramUnitLongMap.get(param);
+        return getDrbdParam(param).unitLong();
     }
 
-    public String getDefaultUnit(final String param) {
-        return paramDefaultUnitMap.get(param);
+    public String getDefaultUnit(String param) {
+        return getDrbdParam(param).defaultUnit();
     }
 
     public boolean hasUnitPrefix(final String param) {
-        final String unit = paramUnitLongMap.get(param);
-        return paramDefaultUnitMap.containsKey(param)
+        final String unit = getDrbdParam(param).unitLong();
+        return getDrbdParam(param).defaultUnit() != null
                && (unit == null || "bytes".equals(unit) || "bytes/second".equals(unit));
     }
 
@@ -461,11 +485,11 @@ public class DrbdXml {
      * .
      */
     public String getParamType(final String param) {
-        return paramTypeMap.get(param);
+        return getDrbdParam(param).type();
     }
 
     public Value getParamDefault(final String param) {
-        return paramDefaultMap.get(param);
+        return getDrbdParam(param).defaultValue();
     }
 
     public Value getParamPreferred(final String param) {
@@ -473,14 +497,14 @@ public class DrbdXml {
     }
 
     public String getSection(final String param) {
-        return paramSectionMap.get(param);
+        return getDrbdParam(param).section();
     }
 
     /**
      * Checks parameter according to its type. Returns false if value is wrong.
      */
     public boolean checkParam(final String param, final Value rawValue) {
-        final String type = paramTypeMap.get(param);
+        final String type = getDrbdParam(param).type();
         boolean correctValue = true;
 
         if (rawValue == null || rawValue.isNothingSelected()) {
@@ -500,8 +524,8 @@ public class DrbdXml {
                 // must be determined first.
                 final BigInteger value = convertToUnit(param, rawValue);
 
-                final BigInteger min = paramMinMap.get(param);
-                final BigInteger max = paramMaxMap.get(param);
+                final BigInteger min = getDrbdParam(param).min();
+                final BigInteger max = getDrbdParam(param).max();
 
                 if (min != null && value.compareTo(min) < 0) {
                     correctValue = false;
@@ -519,7 +543,7 @@ public class DrbdXml {
     }
 
     public boolean isInteger(final String param) {
-        final String type = paramTypeMap.get(param);
+        final String type = getDrbdParam(param).type();
         return "numeric".equals(type);
     }
 
@@ -528,7 +552,7 @@ public class DrbdXml {
     }
 
     public boolean isStringType(final String param) {
-        final String type = paramTypeMap.get(param);
+        final String type = getDrbdParam(param).type();
         return "string".equals(type);
     }
 
@@ -543,8 +567,8 @@ public class DrbdXml {
                 requiredParametersList.add(param);
             }
 
-            paramTypeMap.put(param, "string");
-            paramSectionMap.put(param, section);
+            getDrbdParam(param).type("string");
+            getDrbdParam(param).section(section);
         }
     }
 
@@ -561,8 +585,8 @@ public class DrbdXml {
                 l.add(item);
             }
         }
-        paramItemsMap.put(param, l);
-        paramTypeMap.put(param, "handler");
+        getDrbdParam(param).items(l);
+        getDrbdParam(param).type("handler");
     }
 
     private void addParameter(final String section, final String param, final boolean required) {
@@ -576,7 +600,7 @@ public class DrbdXml {
                               final Value defaultValue,
                               final boolean required) {
         addParameter(section, param, required);
-        paramDefaultMap.put(param, defaultValue);
+        getDrbdParam(param).defaultValue(defaultValue);
     }
 
     public String[] getSections() {
@@ -596,7 +620,7 @@ public class DrbdXml {
     }
 
     public Value[] getPossibleChoices(final String param) {
-        final List<Value> items = paramItemsMap.get(param);
+        final List<Value> items = getDrbdParam(param).items();
         if (items == null) {
             return null;
         } else {
@@ -659,7 +683,7 @@ public class DrbdXml {
 
             /* <option> */
             if ("option".equals(optionNode.getNodeName())) {
-                final String name = XMLTools.getAttribute(optionNode, "name");
+                final String param = XMLTools.getAttribute(optionNode, "name");
                 final String type = XMLTools.getAttribute(optionNode, "type");
                 if ("flag".equals(type)) {
                     /* ignore flags */
@@ -668,51 +692,51 @@ public class DrbdXml {
                 if ("handler".equals(type)) {
                     final List<Value> items = new ArrayList<Value>();
                     items.add(new StringValue());
-                    paramItemsMap.put(name, items);
-                    paramDefaultMap.put(name, HARDCODED_DEFAULTS.get(name));
+                    getDrbdParam(param).items(items);
+                    getDrbdParam(param).defaultValue(HARDCODED_DEFAULTS.get(param));
                 } else if ("boolean".equals(type)) {
-                    final List<Value> l = new ArrayList<Value>();
-                    l.add(CONFIG_YES);
-                    l.add(CONFIG_NO);
-                    paramItemsMap.put(name, l);
-                    paramDefaultMap.put(name, CONFIG_NO);
+                    final List<Value> items = new ArrayList<Value>();
+                    items.add(CONFIG_YES);
+                    items.add(CONFIG_NO);
+                    getDrbdParam(param).items(items);
+                    getDrbdParam(param).defaultValue(CONFIG_NO);
                 }
-                if ("fence-peer".equals(name)) {
-                    final List<Value> l = new ArrayList<Value>();
-                    l.add(new StringValue());
-                    if (host.getHostParser().getArch() != null && !host.getHostParser().getArch().isEmpty()) {
-                        l.add(new StringValue(host.getHostParser().getHeartbeatLibPath() + "/drbd-peer-outdater -t 5"));
+                if ("fence-peer".equals(param)) {
+                    final List<Value> items = new ArrayList<Value>();
+                    items.add(new StringValue());
+                    if (host.getArch() != null && !host.getArch().isEmpty()) {
+                        items.add(new StringValue(host.getHeartbeatLibPath() + "/drbd-peer-outdater -t 5"));
                     }
-                    l.add(new StringValue("/usr/lib/drbd/crm-fence-peer.sh"));
-                    paramItemsMap.put(name, l);
-                } else if ("after-resync-target".equals(name)) {
-                    final List<Value> l = new ArrayList<Value>();
-                    l.add(new StringValue());
-                    l.add(new StringValue("/usr/lib/drbd/crm-unfence-peer.sh"));
-                    paramItemsMap.put(name, l);
-                } else if ("split-brain".equals(name)) {
-                    final List<Value> l = new ArrayList<Value>();
-                    l.add(new StringValue());
-                    l.add(new StringValue("/usr/lib/drbd/notify-split-brain.sh root"));
-                    paramItemsMap.put(name, l);
-                } else if ("become-primary-on".equals(name)) {
-                    final List<Value> l = new ArrayList<Value>();
-                    l.add(new StringValue());
-                    l.add(new StringValue("both"));
+                    items.add(new StringValue("/usr/lib/drbd/crm-fence-peer.sh"));
+                    getDrbdParam(param).items(items);
+                } else if ("after-resync-target".equals(param)) {
+                    final List<Value> items = new ArrayList<Value>();
+                    items.add(new StringValue());
+                    items.add(new StringValue("/usr/lib/drbd/crm-unfence-peer.sh"));
+                    getDrbdParam(param).items(items);
+                } else if ("split-brain".equals(param)) {
+                    final List<Value> items = new ArrayList<Value>();
+                    items.add(new StringValue());
+                    items.add(new StringValue("/usr/lib/drbd/notify-split-brain.sh root"));
+                    getDrbdParam(param).items(items);
+                } else if ("become-primary-on".equals(param)) {
+                    final List<Value> items = new ArrayList<Value>();
+                    items.add(new StringValue());
+                    items.add(new StringValue("both"));
                     for (final Host h : hosts) {
-                        l.add(new StringValue(h.getName()));
+                        items.add(new StringValue(h.getName()));
                     }
-                    paramItemsMap.put(name, l);
-                } else if ("verify-alg".equals(name)
-                           || "csums-alg".equals(name)
-                           || "data-integrity-alg".equals(name)
-                           || "cram-hmac-alg".equals(name)) {
-                    final List<Value> l = new ArrayList<Value>();
-                    l.add(new StringValue());
-                    for (final String cr : host.getHostParser().getAvailableCryptoModules()) {
-                        l.add(new StringValue(cr));
+                    getDrbdParam(param).items(items);
+                } else if ("verify-alg".equals(param)
+                           || "csums-alg".equals(param)
+                           || "data-integrity-alg".equals(param)
+                           || "cram-hmac-alg".equals(param)) {
+                    final List<Value> items = new ArrayList<Value>();
+                    items.add(new StringValue());
+                    for (final String cr : host.getAvailableCryptoModules()) {
+                        items.add(new StringValue(cr));
                     }
-                    paramItemsMap.put(name, l);
+                    getDrbdParam(param).items(items);
                 }
                 final NodeList optionInfos = optionNode.getChildNodes();
                 for (int j = 0; j < optionInfos.getLength(); j++) {
@@ -721,22 +745,22 @@ public class DrbdXml {
                     /* <min>, <max>, <handler>, <default> */
                     if ("min".equals(tag)) {
                         final Value minValue = new StringValue(XMLTools.getText(optionInfo),
-                                                               parseUnit(name, paramDefaultUnitMap.get(name)));
-                        paramMinMap.put(name, convertToUnit(name, minValue));
+                                                               parseUnit(param, getDefaultUnit(param)));
+                        getDrbdParam(param).min(convertToUnit(param, minValue));
                     } else if ("max".equals(tag)) {
                         final Value maxValue = new StringValue(XMLTools.getText(optionInfo),
-                                                               parseUnit(name, paramDefaultUnitMap.get(name)));
-                        paramMaxMap.put(name, convertToUnit(name, maxValue));
+                                                               parseUnit(param, getDefaultUnit(param)));
+                        getDrbdParam(param).max(convertToUnit(param, maxValue));
                     } else if ("handler".equals(tag)) {
-                        paramItemsMap.get(name).add(new StringValue(XMLTools.getText(optionInfo)));
+                        getDrbdParam(param).items().add(new StringValue(XMLTools.getText(optionInfo)));
                     } else if ("default".equals(tag)) {
-                        paramDefaultMap.put(name, new StringValue(XMLTools.getText(optionInfo),
-                                                                  parseUnit(name, paramDefaultUnitMap.get(name))));
+                        getDrbdParam(param).defaultValue(new StringValue(XMLTools.getText(optionInfo),
+                                                                  parseUnit(param, getDefaultUnit(param))));
                     } else if ("unit".equals(tag)) {
-                        paramUnitLongMap.put(name, XMLTools.getText(optionInfo));
+                        getDrbdParam(param).unitLong(XMLTools.getText(optionInfo));
                     } else if ("unit_prefix".equals(tag)) {
-                        if (!"after".equals(name)
-                            && !"resync-after".equals(name)) {
+                        if (!"after".equals(param)
+                            && !"resync-after".equals(param)) {
                             String option = XMLTools.getText(optionInfo);
                             if (!"s".equals(option)) {
                                 /* "s" is an exception */
@@ -745,30 +769,30 @@ public class DrbdXml {
                             if ("1".equals(option)) {
                                 option = "";
                             }
-                            paramDefaultUnitMap.put(name, option);
+                            getDrbdParam(param).defaultUnit(option);
                         }
                     } else if ("desc".equals(tag)) {
-                        paramLongDescMap.put(name, XMLTools.getText(optionInfo));
+                        getDrbdParam(param).longDesc(XMLTools.getText(optionInfo));
                     }
                 }
-                paramTypeMap.put(name, type);
+                getDrbdParam(param).type(type);
                 if (!GLOBAL_SECTION.equals(section)
-                    && !parametersList.contains(name)) {
-                    parametersList.add(name);
+                    && !parametersList.contains(param)) {
+                    parametersList.add(param);
                 }
                 if (!"resource".equals(section)
-                    && !globalParametersList.contains(name)
-                    && !("syncer".equals(section) && "after".equals(name))
-                    && !"resync-after".equals(name)) {
-                    globalParametersList.add(name);
+                    && !globalParametersList.contains(param)
+                    && !("syncer".equals(section) && "after".equals(param))
+                    && !"resync-after".equals(param)) {
+                    globalParametersList.add(param);
                 }
 
-                paramSectionMap.put(name, section);
+                getDrbdParam(param).section(section);
                 if (!sectionParamsMap.containsKey(section)) {
                     sectionParamsMap.put(section, new ArrayList<String>());
                 }
-                if (!sectionParamsMap.get(section).contains(name)) {
-                    sectionParamsMap.get(section).add(name);
+                if (!sectionParamsMap.get(section).contains(param)) {
+                    sectionParamsMap.get(section).add(param);
                 }
             }
         }
