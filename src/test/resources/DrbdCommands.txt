@@ -1,0 +1,49 @@
+<command name="COMMAND">
+    <option name="OPTION1" type="numeric">
+        <default>16</default>
+        <unit_prefix>K</unit_prefix>
+        <unit>bytes</unit>
+        <desc>DESC1</desc>
+        <min>1</min>
+        <max>10</max>
+    </option>
+    <option name="OPTION2" type="boolean">
+        <desc>DESC2</desc>
+    </option>
+    <option name="OPTION3" type="string">
+        <desc>DESC3</desc>
+    </option>
+    <option name="OPTION4" type="handler">
+        <handler>HANDLER1</handler>
+        <handler>HANDLER2</handler>
+        <desc>DESC4</desc>
+    </option>
+    <option name="fence-peer" type="string">
+        <desc>DESC</desc>
+    </option>
+    <option name="after-resync-target" type="string">
+        <desc>DESC</desc>
+    </option>
+    <option name="split-brain" type="string">
+        <desc>DESC</desc>
+    </option>
+    <option name="become-primary-on" type="string">
+        <desc>DESC</desc>
+    </option>
+
+    <option name="verify-alg" type="string">
+        <desc></desc>
+    </option>
+
+</command>
+<command name="net-options">
+    <summary>Change the network options of a connection.</summary>
+    <argument>resource</argument>
+    <argument>peer_node_id</argument>
+    <option name="OPTION5" type="flag">not documented</option>
+</command>
+<command name="disk-options">
+    <summary>Change the disk options of an attached lower-level device.</summary>
+    <argument>minor</argument>
+    <option name="OPTION6" type="flag">not documented</option>
+</command>
