@@ -3,13 +3,13 @@ Section: admin
 Priority: extra
 Maintainer: Rasto Levrinc <rasto.levrinc@gmail.com>
 Build-Depends: maven, cdbs
-Build-Depends-Indep: openjdk-7-jdk, libxalan2-java, libjava3d-java,
+Build-Depends-Indep: oracle-java8-jre | openjdk-8-jdk, libxalan2-java, libjava3d-java,
 Standards-Version: 3.8.3
 Homepage: http://lcmc.sourceforge.net
 
 Package: lcmc
 Architecture: all
-Depends: openjdk-6-jre | sun-java6-jre | sun-java6-jre | openjdk-7-jre,
+Depends: oracle-java8-jre | openjdk-8-jre,
  java-wrappers, ${misc:Depends}
 Description: Linux Cluster Management Console
  The LCMC is a GUI application that configures, manages and visualizes high-
