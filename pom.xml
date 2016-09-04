@@ -193,8 +193,8 @@
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>3.3</version>
                 <configuration>
-                    <source>1.6</source>
-                    <target>1.6</target>
+                    <source>1.8</source>
+                    <target>1.8</target>
                     <optimize>true</optimize>
                     <showWarnings>true</showWarnings>
                     <showDeprecation>true</showDeprecation>
@@ -563,7 +563,7 @@
                             </classPath>
                             <icon>scripts/lcmc.ico</icon>
                             <jre>
-                                <minVersion>1.6.0</minVersion>
+                                <minVersion>1.8.0</minVersion>
                                 <maxVersion></maxVersion>
                                 <initialHeapSize>128</initialHeapSize>
                                 <maxHeapSize>1024</maxHeapSize>
