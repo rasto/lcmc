@@ -342,7 +342,7 @@ import ch.ethz.ssh2.util.StringEncoder;
 
 			/* Now compare */
 
-			if (pattern.charAt(0) == '|')
+			if (pattern.length() > 0 && pattern.charAt(0) == '|')
 			{
 				if (checkHashed(pattern, hostname))
 				{
