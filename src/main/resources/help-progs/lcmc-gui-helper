@@ -1007,6 +1007,7 @@ sub get_crmd_lib_path {
 	for ("/usr/lib64/pacemaker",
 		 "/usr/libexec/pacemaker",
 		 "/usr/lib/x86_64-linux-gnu/pacemaker",
+		 "/usr/lib/pacemaker",
 		 $hb_lib_path) {
 		if (-e "$_/crmd") {
 			return $_;
