@@ -70,7 +70,7 @@ public final class DistResource_ubuntu extends ListResourceBundle {
 
         /* Drbd install method 2 */
         {"DrbdInst.install.text.2",
-         "apt-get install: 8.3.x"},
+         "apt-get install"},
 
         {"DrbdInst.install.2",
          "apt-get update && /usr/bin/apt-get -y install -o "
