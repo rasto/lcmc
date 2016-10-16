@@ -49,7 +49,7 @@ public final class DistResource_ubuntu extends ListResourceBundle {
 
         /* pacemaker heartbeat install method 1 */
         {"HbPmInst.install.text.1",
-         "apt-get install: 1.0.x / 3.0.x"},
+         "apt-get install"},
 
         {"HbPmInst.install.1",
          "apt-get update && /usr/bin/apt-get -y install -o"
@@ -58,7 +58,7 @@ public final class DistResource_ubuntu extends ListResourceBundle {
 
         /* pacemaker corosync install method 1 */
         {"PmInst.install.text.1",
-         "apt-get install: 1.0.x / 1.2.x"},
+         "apt-get install"},
 
         {"PmInst.install.1",
          "apt-get update && /usr/bin/apt-get -y install -o"
