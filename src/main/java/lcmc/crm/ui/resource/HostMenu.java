@@ -29,7 +29,7 @@ import javax.inject.Provider;
 import javax.swing.JColorChooser;
 
 import lcmc.common.ui.main.MainPresenter;
-import lcmc.host.domain.HostParser;
+import lcmc.host.domain.parser.HostParser;
 import lcmc.host.ui.EditHostDialog;
 import lcmc.common.ui.CallbackAction;
 import lcmc.common.ui.main.MainData;

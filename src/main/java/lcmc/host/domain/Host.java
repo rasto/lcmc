@@ -22,6 +22,18 @@
 
 package lcmc.host.domain;
 
+import java.awt.Color;
+import java.awt.geom.Point2D;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.atomic.AtomicBoolean;
+
+import javax.swing.JComponent;
+
 import lcmc.Exceptions;
 import lcmc.cluster.domain.Cluster;
 import lcmc.cluster.service.ssh.ExecCommandConfig;
@@ -48,6 +60,7 @@ import lcmc.drbd.domain.BlockDevice;
 import lcmc.drbd.domain.DrbdHost;
 import lcmc.drbd.domain.DrbdXml;
 import lcmc.drbd.service.DRBD;
+import lcmc.host.domain.parser.HostParser;
 import lcmc.host.ui.HostBrowser;
 import lcmc.host.ui.TerminalPanel;
 import lcmc.logger.Logger;
@@ -57,36 +70,25 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 
-import javax.swing.*;
-import java.awt.*;
-import java.awt.geom.Point2D;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.atomic.AtomicBoolean;
-
 /**
  * This class holds host data and implementation of host related methods.
  */
 @RequiredArgsConstructor
 public class Host implements Comparable<Host>, Value {
-    private final DrbdHost drbdHost;
-    private final TerminalPanel terminalPanel;
-    private final MainData mainData;
-    private final ProgressIndicator progressIndicator;
-    private final Ssh ssh;
-    private final HostBrowser hostBrowser;
-    private final Hosts allHosts;
-    private final Application application;
-    private final RoboTest roboTest;
+    private final DrbdHost           drbdHost;
+    private final TerminalPanel      terminalPanel;
+    private final MainData           mainData;
+    private final ProgressIndicator  progressIndicator;
+    private final Ssh                ssh;
+    private final HostBrowser        hostBrowser;
+    private final Hosts              allHosts;
+    private final Application        application;
+    private final RoboTest           roboTest;
     private final BlockDeviceService blockDeviceService;
-    private final SwingUtils swingUtils;
+    private final SwingUtils         swingUtils;
     @Getter
     @Setter
-    private HostParser hostParser; //TODO cycle
+    private       HostParser         hostParser; //TODO cycle
 
     private static final Logger LOG = LoggerFactory.getLogger(Host.class);
     public static final String NOT_CONNECTED_MENU_TOOLTIP_TEXT = "not connected to the host";
@@ -849,7 +851,7 @@ public class Host implements Comparable<Host>, Value {
      * When loading is done but with an error. Currently it is the same as
      * setLoadingDone().
      */
-    void setLoadingError() {
+    public void setLoadingError() {
         isLoadingGate.countDown();
     }
 

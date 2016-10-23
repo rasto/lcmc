@@ -24,6 +24,7 @@ import lcmc.HwEventBus;
 import lcmc.cluster.service.ssh.Ssh;
 import lcmc.cluster.service.storage.BlockDeviceService;
 import lcmc.common.domain.Application;
+import lcmc.host.domain.parser.HostParser;
 import lcmc.host.ui.TerminalPanel;
 import lcmc.common.ui.main.MainData;
 import lcmc.common.ui.main.ProgressIndicator;

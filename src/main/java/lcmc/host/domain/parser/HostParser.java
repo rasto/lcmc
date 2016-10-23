@@ -1,7 +1,7 @@
 /*
  * This file is part of LCMC written by Rasto Levrinc.
  *
- * Copyright (C) 2015, Rastislav Levrinc.
+ * Copyright (C) 2016, Rastislav Levrinc.
  *
  * The LCMC is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License as published
@@ -18,12 +18,33 @@
  * the Free Software Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-package lcmc.host.domain;
+package lcmc.host.domain.parser;
+
+import java.awt.geom.Point2D;
+import java.net.UnknownHostException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.TreeSet;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import javax.inject.Provider;
 
 import com.google.common.base.Optional;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
+
 import lcmc.Exceptions;
 import lcmc.HwEventBus;
 import lcmc.cluster.domain.Cluster;
@@ -51,39 +72,21 @@ import lcmc.event.HwDrbdStatusChangedEvent;
 import lcmc.event.HwFileSystemsChangedEvent;
 import lcmc.event.HwMountPointsChangedEvent;
 import lcmc.event.HwNetInterfacesChangedEvent;
+import lcmc.host.domain.Host;
 import lcmc.logger.Logger;
 import lcmc.logger.LoggerFactory;
 import lcmc.vm.domain.VmsXml;
 import lombok.RequiredArgsConstructor;
 
-import javax.inject.Provider;
-import java.awt.geom.Point2D;
-import java.net.UnknownHostException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.TreeSet;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
 @RequiredArgsConstructor
 public class HostParser {
-    private final Host host;
-    private final DrbdHost drbdHost;
-    private final HwEventBus hwEventBus;
-    private final Provider<VmsXml> vmsXmlProvider;
+    private final Host              host;
+    private final DrbdHost          drbdHost;
+    private final HwEventBus        hwEventBus;
+    private final Provider<VmsXml>  vmsXmlProvider;
     private final Provider<DrbdXml> drbdXmlProvider;
-    private final SwingUtils swingUtils;
-    private final Application application;
+    private final SwingUtils        swingUtils;
+    private final Application       application;
 
     private static final Logger LOG = LoggerFactory.getLogger(Host.class);
 
@@ -901,7 +904,7 @@ public class HostParser {
     }
 
     /** Gets and stores info about the host. */
-    void getAllInfo() {
+    public void getAllInfo() {
         host.execCommand(new ExecCommandConfig().commandString("GetHostAllInfo")
                 .execCallback(new ExecCallback() {
                     @Override

@@ -24,7 +24,7 @@ import java.awt.Color;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.Locale;
+
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.swing.JColorChooser;
@@ -52,7 +52,7 @@ import lcmc.common.domain.Predicate;
 import lcmc.common.domain.util.Tools;
 import lcmc.common.ui.utils.UpdatableItem;
 import lcmc.common.domain.VisiblePredicate;
-import lcmc.host.domain.HostParser;
+import lcmc.host.domain.parser.HostParser;
 import lombok.val;
 
 @Named
