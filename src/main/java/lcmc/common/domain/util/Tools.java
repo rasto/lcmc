@@ -34,7 +34,6 @@ import java.awt.image.BufferedImage;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
@@ -82,14 +81,14 @@ import javax.swing.text.html.HTMLDocument;
 import com.google.common.base.Optional;
 
 import lcmc.Exceptions;
+import lcmc.cluster.domain.Cluster;
 import lcmc.common.domain.ConvertCmdCallback;
 import lcmc.common.domain.StringValue;
-import lcmc.configs.DistResource;
-import lcmc.cluster.domain.Cluster;
-import lcmc.host.domain.Host;
 import lcmc.common.domain.Value;
 import lcmc.common.ui.main.MainPresenter;
 import lcmc.crm.ui.resource.ServiceInfo;
+import lcmc.host.domain.Host;
+import lcmc.host.domain.parser.HostParser;
 import lcmc.logger.Logger;
 import lcmc.logger.LoggerFactory;
 
@@ -414,45 +413,11 @@ public final class Tools {
      * distribution and version.
      */
     public static String getDistCommand(final String text,
-                                        final String dist,
-                                        final String version,
-                                        final String arch,
+                                        final HostParser hostParser,
                                         final ConvertCmdCallback convertCmdCallback,
                                         final boolean inBash,
                                         final boolean inSudo) {
-        if (text == null) {
-            return null;
-        }
-        final String[] texts = text.split(";;;");
-        final List<String> results =  new ArrayList<String>();
-        int i = 0;
-        for (final String t : texts) {
-            String distString = getDistString(t, dist, version, arch);
-            if (distString == null) {
-                LOG.appWarning("getDistCommand: unknown command: " + t);
-                distString = t;
-            }
-            if (inBash && i == 0) {
-                String sudoS = "";
-                if (inSudo) {
-                    sudoS = DistResource.SUDO;
-                }
-                results.add(sudoS + "bash -c \"" + Tools.escapeQuotes(distString, 1) + '"');
-            } else {
-                results.add(distString);
-            }
-            i++;
-        }
-        String ret;
-        if (results.isEmpty()) {
-            ret = text;
-        } else {
-            ret = Tools.join(";;;", results.toArray(new String[results.size()]));
-        }
-        if (convertCmdCallback != null && ret != null) {
-            ret = convertCmdCallback.convert(ret);
-        }
-        return ret;
+        return hostParser.getDistCommand(text, convertCmdCallback, inBash, inSudo);
     }
 
     /**

@@ -41,6 +41,7 @@ import java.util.regex.Pattern;
 import javax.inject.Provider;
 
 import com.google.common.base.Optional;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
@@ -407,7 +408,7 @@ public class HostParser {
         }
 
         if (changedTypes.contains(VERSION_INFO_DELIM)) {
-            distributionDetector.setDistInfo(versionLines.toArray(new String[versionLines.size()]));
+            distributionDetector.detect(ImmutableList.copyOf(versionLines));
         }
 
         if (changedTypes.contains(GUI_OPTIONS_INFO_DELIM)) {
@@ -446,6 +447,10 @@ public class HostParser {
 
     public String getDetectedKernelVersion() {
         return distributionDetector.getDetectedKernelVersion();
+    }
+
+    public String getDistCommand(final String text, final ConvertCmdCallback convertCmdCallback, final boolean inBash, final boolean inSudo) {
+        return distributionDetector.getDistCommand(text, convertCmdCallback, inBash, inSudo);
     }
 
     /** Parses the gui info, with drbd and heartbeat graph positions. */
@@ -712,12 +717,10 @@ public class HostParser {
      */
     public String getDistCommand(final String commandString, final ConvertCmdCallback convertCmdCallback) {
         return Tools.getDistCommand(commandString,
-                distributionDetector.getDistributionName(),
-                distributionDetector.getDistributionVersionString(),
-                distributionDetector.getArch(),
-                convertCmdCallback,
-                false,  /* in bash */
-                false); /* sudo */
+                                    this,
+                                    convertCmdCallback,
+                                    false,  /* in bash */
+                                    false); /* sudo */
     }
 
     /** Converts a string that is specific to the distribution distribution. */
@@ -747,24 +750,19 @@ public class HostParser {
     public String getDistCommand(final String commandString, final Map<String, String> replaceHash) {
         return Tools.getDistCommand(
                 commandString,
-                distributionDetector.getDistributionName(),
-                distributionDetector.getDistributionVersionString(),
-                distributionDetector.getArch(),
-                new ConvertCmdCallback() {
-                    @Override
-                    public String convert(String command) {
-                        for (final String tag : replaceHash.keySet()) {
-                            if (tag != null && command.contains(tag)) {
-                                String s = replaceHash.get(tag);
-                                if (s == null) {
-                                    s = "";
-                                }
-                                command = command.replaceAll(tag, s);
-                            }
-                        }
-                        return command;
-                    }
-                },
+				this,
+                command -> {
+					for (final String tag : replaceHash.keySet()) {
+						if (tag != null && command.contains(tag)) {
+							String s = replaceHash.get(tag);
+							if (s == null) {
+								s = "";
+							}
+							command = command.replaceAll(tag, s);
+						}
+					}
+					return command;
+				},
                 false,  /* in bash */
                 false); /* sudo */
     }

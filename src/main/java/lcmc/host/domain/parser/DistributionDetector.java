@@ -20,9 +20,15 @@
 
 package lcmc.host.domain.parser;
 
-import java.util.Arrays;
+import static lcmc.common.domain.util.Tools.getDistString;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
+import lcmc.common.domain.ConvertCmdCallback;
 import lcmc.common.domain.util.Tools;
+import lcmc.configs.DistResource;
 import lcmc.host.domain.Host;
 import lcmc.logger.Logger;
 import lcmc.logger.LoggerFactory;
@@ -35,6 +41,7 @@ public class DistributionDetector {
 	private boolean distInfoAlreadyLogged = false;
 	private String detectedKernelName = "";
 	private String detectedDistVersion = "";
+	@Getter
 	private String detectedKernelVersion = "";
 	private String detectedDist = "";
 	private String detectedArch = "";
@@ -44,8 +51,11 @@ public class DistributionDetector {
 	private String distributionVersion = "";
 	@Getter
 	private String distributionVersionString = "";
+	@Getter
 	private String kernelName = "";
+	@Getter
 	private String kernelVersion = "";
+	@Getter
 	private String arch = "";
 
 	private static final Logger LOG = LoggerFactory.getLogger(Host.class);
@@ -58,15 +68,16 @@ public class DistributionDetector {
 	 * Sets distribution info for this host from array of strings.
 	 * Array consists of: kernel name, kernel version, arch, os, version
 	 * and distribution.
+	 * @param lines
 	 */
 	@SuppressWarnings("fallthrough")
-	public void setDistInfo(final String[] info) {
-		if (info == null) {
+	public void detect(final List<String> lines) {
+		if (lines == null) {
 			LOG.debug("setDistInfo: " + host.getName() + " dist info is null");
 			return;
 		}
 		if (!distInfoAlreadyLogged) {
-			for (final String di : info) {
+			for (final String di : lines) {
 				LOG.debug1("setDistInfo: dist info: " + di);
 			}
 		}
@@ -74,37 +85,37 @@ public class DistributionDetector {
         /* no breaks in the switch statement are intentional */
 		String lsbVersion = null;
 		String lsbDist = null;
-		switch (info.length) {
+		switch (lines.size()) {
 			case 9:
-				lsbVersion = info[8]; // TODO: not used
+				lsbVersion = lines.get(8); // TODO: not used
 			case 8:
-				lsbDist = info[7];
+				lsbDist = lines.get(7);
 			case 7:
-				lsbVersion = info[6]; // TODO: not used
+				lsbVersion = lines.get(6); // TODO: not used
 			case 6:
-				lsbDist = info[5];
+				lsbDist = lines.get(5);
 			case 5:
 				if (lsbDist == null || "linux".equals(lsbDist)) {
-					detectedDist = info[4];
+					detectedDist = lines.get(4);
 				} else {
 					detectedDist = lsbDist;
 				}
 			case 4:
 				if (lsbVersion == null) {
-					detectedDistVersion = info[3];
+					detectedDistVersion = lines.get(3);
 				} else {
-					detectedDistVersion = info[3] + '/' + lsbVersion;
+					detectedDistVersion = lines.get(3) + '/' + lsbVersion;
 				}
 			case 3:
-				detectedKernelVersion = info[2];
+				detectedKernelVersion = lines.get(2);
 			case 2:
-				detectedArch = info[1];
+				detectedArch = lines.get(1);
 			case 1:
-				detectedKernelName = info[0];
+				detectedKernelName = lines.get(0);
 			case 0:
 				break;
 			default:
-				LOG.appError("setDistInfo: list: ", Arrays.asList(info).toString());
+				LOG.appError("setDistInfo: list: ", Arrays.asList(lines).toString());
 				break;
 		}
 		distributionName = detectedDist;
@@ -125,19 +136,19 @@ public class DistributionDetector {
 		if (!"Linux".equals(detectedKernelName)) {
 			LOG.appWarning("initDistInfo: detected kernel not linux: " + detectedKernelName);
 		}
-		setKernelName("Linux");
+		this.kernelName = "Linux";
 
 		if (!distributionName.equals(detectedDist)) {
 			LOG.appError("initDistInfo: dist: " + distributionName + " does not match " + detectedDist);
 		}
 		distributionVersionString = Tools.getDistVersionString(distributionName, distributionVersion);
-		distributionVersion = Tools.getDistString("distributiondir", detectedDist, distributionVersionString, null);
-		setKernelVersion(Tools.getKernelDownloadDir(detectedKernelVersion, getDistributionName(), distributionVersionString, null));
-		String arch0 = Tools.getDistString("arch:" + detectedArch, getDistributionName(), distributionVersionString, null);
+		distributionVersion = getDistString("distributiondir", detectedDist, distributionVersionString, null);
+		this.kernelVersion = Tools.getKernelDownloadDir(detectedKernelVersion, getDistributionName(), distributionVersionString, null);
+		String arch0 = getDistString("arch:" + detectedArch, getDistributionName(), distributionVersionString, null);
 		if (arch0 == null) {
 			arch0 = detectedArch;
 		}
-		setArch(arch0);
+		this.arch = arch0;
 	}
 
 	/** Returns the detected info to show. */
@@ -159,53 +170,49 @@ public class DistributionDetector {
 			return null;
 		}
 		LOG.debug1("getDistFromDistVersion:" + dV.replaceFirst("\\d.*", ""));
-		return Tools.getDistString("dist:" + dV.replaceFirst("\\d.*", ""), "", "", null);
-	}
-
-	void setDistributionName(final String dist) {
-		this.distributionName = dist;
-	}
-
-	void setDistributionVersion(final String distVersion) {
-		this.distributionVersion = distVersion;
-		distributionVersionString = Tools.getDistVersionString(distributionName, distVersion);
-		distributionName = getDistFromDistVersion(distVersion);
-	}
-
-	/** Sets arch, e.g. "i386". */
-	public void setArch(final String arch) {
-		this.arch = arch;
-	}
-
-	/** Sets kernel name, e.g. "linux". */
-	void setKernelName(final String kernelName) {
-		this.kernelName = kernelName;
-	}
-
-	void setKernelVersion(final String kernelVersion) {
-		this.kernelVersion = kernelVersion;
-	}
-
-	/** Gets kernel name. Normaly "Linux" for this application. */
-	public String getKernelName() {
-		return kernelName;
+		return getDistString("dist:" + dV.replaceFirst("\\d.*", ""), "", "", null);
 	}
 
 	/**
-	 * Gets kernel version. Usually some version,
-	 * like: "2.6.13.2ws-k7-up-lowmem".
+	 * Returns command from DistResource resource bundle for specific
+	 * distribution and version.
 	 */
-	public String getKernelVersion() {
-		return kernelVersion;
+	public String getDistCommand(final String text,
+										final ConvertCmdCallback convertCmdCallback,
+										final boolean inBash,
+										final boolean inSudo) {
+		if (text == null) {
+			return null;
+		}
+		final String[] texts = text.split(";;;");
+		final List<String> results =  new ArrayList<String>();
+		int i = 0;
+		for (final String t : texts) {
+			String distString = getDistString(t, distributionName, distributionVersionString, arch);
+			if (distString == null) {
+				LOG.appWarning("getDistCommand: unknown command: " + t);
+				distString = t;
+			}
+			if (inBash && i == 0) {
+				String sudoS = "";
+				if (inSudo) {
+					sudoS = DistResource.SUDO;
+				}
+				results.add(sudoS + "bash -c \"" + Tools.escapeQuotes(distString, 1) + '"');
+			} else {
+				results.add(distString);
+			}
+			i++;
+		}
+		String ret;
+		if (results.isEmpty()) {
+			ret = text;
+		} else {
+			ret = Tools.join(";;;", results.toArray(new String[results.size()]));
+		}
+		if (convertCmdCallback != null && ret != null) {
+			ret = convertCmdCallback.convert(ret);
+		}
+		return ret;
 	}
-
-	public String getDetectedKernelVersion() {
-		return detectedKernelVersion;
-	}
-
-	/** Gets architecture like i686. */
-	public String getArch() {
-		return arch;
-	}
-
 }

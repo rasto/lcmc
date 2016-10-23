@@ -1,15 +1,33 @@
 package lcmc.common.domain.util;
 
+import static junitparams.JUnitParamsRunner.$;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.when;
+
 import java.awt.Dimension;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.TreeSet;
+
 import javax.inject.Provider;
 import javax.swing.JPanel;
+
+import com.google.common.collect.ImmutableList;
+
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 import junitparams.JUnitParamsRunner;
-import static junitparams.JUnitParamsRunner.$;
 import junitparams.Parameters;
 import lcmc.Exceptions;
 import lcmc.HwEventBus;
@@ -21,29 +39,15 @@ import lcmc.common.ui.main.MainData;
 import lcmc.common.ui.main.ProgressIndicator;
 import lcmc.common.ui.utils.SwingUtils;
 import lcmc.drbd.domain.DrbdXml;
-import lcmc.host.domain.Hosts;
-import lcmc.host.ui.HostBrowser;
-import lcmc.host.ui.TerminalPanel;
 import lcmc.drbd.ui.resource.GlobalInfo;
 import lcmc.host.domain.Host;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
-import static org.mockito.Mockito.when;
-
 import lcmc.host.domain.HostFactory;
+import lcmc.host.domain.Hosts;
+import lcmc.host.domain.parser.DistributionDetector;
+import lcmc.host.ui.HostBrowser;
+import lcmc.host.ui.TerminalPanel;
 import lcmc.robotest.RoboTest;
 import lcmc.vm.domain.VmsXml;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
 
 @RunWith(JUnitParamsRunner.class)
 public final class ToolsTest {
@@ -203,6 +207,7 @@ public final class ToolsTest {
         assertEquals(distString, Tools.getDistString(text, dist, version, arch));
     }
 
+    //TODO: move
     @Test
     public void commandShouldBeUndefined() {
         /*
@@ -214,11 +219,8 @@ public final class ToolsTest {
          boolean inBash
         */
         assertEquals("undefined",
-                     Tools.getDistCommand("undefined",
-                                          "debian",
-                                          "squeeze",
-                                          "i386",
-                                          null,
+                     getDistCommand("undefined",
+                                    null,
                                           false,
                                           false));
     }
@@ -226,11 +228,8 @@ public final class ToolsTest {
     @Test
     public void twoCommandsShouldBeUndefined() {
         assertEquals("undefined2;;;undefined3",
-                     Tools.getDistCommand("undefined2;;;undefined3",
-                                          "debian",
-                                          "squeeze",
-                                          "i386",
-                                          null,
+                     getDistCommand("undefined2;;;undefined3",
+                                    null,
                                           false,
                                           false));
     }
@@ -247,11 +246,8 @@ public final class ToolsTest {
     @Test
     public void commandWithoutBash() {
         assertEquals("sudo /etc/init.d/corosync start",
-                     Tools.getDistCommand("Corosync.startCorosync",
-                                          "debian",
-                                          "squeeze",
-                                          "i386",
-                                          getConvertCallback(),
+                     getDistCommand("Corosync.startCorosync",
+                                    getConvertCallback(),
                                           false,
                                           false));
     }
@@ -259,11 +255,8 @@ public final class ToolsTest {
     @Test
     public void commandWithBash() {
         assertEquals("sudo bash -c \"sudo /etc/init.d/corosync start\"",
-                     Tools.getDistCommand("Corosync.startCorosync",
-                                          "debian",
-                                          "squeeze",
-                                          "i386",
-                                          getConvertCallback(),
+                     getDistCommand("Corosync.startCorosync",
+                                    getConvertCallback(),
                                           true,
                                           true));
     }
@@ -271,12 +264,9 @@ public final class ToolsTest {
     @Test
     public void multipleCommands() {
         assertEquals("sudo /etc/init.d/corosync start" + ";;;sudo /etc/init.d/corosync start",
-                     Tools.getDistCommand("Corosync.startCorosync;;;"
+                     getDistCommand("Corosync.startCorosync;;;"
                                           + "Corosync.startCorosync",
-                                          "debian",
-                                          "squeeze",
-                                          "i386",
-                                          getConvertCallback(),
+                                    getConvertCallback(),
                                           false,
                                           false));
     }
@@ -284,12 +274,9 @@ public final class ToolsTest {
     @Test
     public void undefinedAndCommandShouldBeConverted() {
         assertEquals("undefined4" + ";;;sudo /etc/init.d/corosync start",
-                     Tools.getDistCommand("undefined4;;;"
+                     getDistCommand("undefined4;;;"
                                           + "Corosync.startCorosync",
-                                          "debian",
-                                          "squeeze",
-                                          "i386",
-                                          getConvertCallback(),
+                                    getConvertCallback(),
                                           false,
                                           false));
     }
@@ -297,17 +284,17 @@ public final class ToolsTest {
     @Test
     public void nullCommandShouldReturnNull() {
         assertNull("null command",
-                   Tools.getDistCommand(null, "debian", "squeeze", "i386", getConvertCallback(), false, false));
+                   getDistCommand(null, getConvertCallback(), false, false));
     }
 
     @Test
     public void nullCommandInBashShouldReturnNull() {
-        assertNull(Tools.getDistCommand(null, "debian", "squeeze", "i386", getConvertCallback(), true, true));
+        assertNull(getDistCommand(null, getConvertCallback(), true, true));
     }
 
     @Test
     public void nullCommandWithNullDistShouldReturnNull() {
-        assertNull(Tools.getDistCommand(null, null, null, null, null, true, true));
+        assertNull(getDistCommand(null, null, true, true));
     }
 
     @SuppressWarnings("unused")
@@ -1020,5 +1007,21 @@ public final class ToolsTest {
         assertTrue(
                 "" + collection1 + " == " + collection2,
                 !Tools.equalCollections(collection1, collection2));
+    }
+
+    private String getDistCommand(final String text,
+                                  final ConvertCmdCallback convertCmdCallback,
+                                  final boolean inBash,
+                                  final boolean inSudo) {
+        final DistributionDetector distributionDetector = new DistributionDetector(hostBrowser.getHost());
+        distributionDetector.detect(ImmutableList.of("Linux",
+                                                     "x86_64",
+                                                     "3.16.0-4-amd64",
+                                                     "8.6",
+                                                     "debian",
+                                                     "debian",
+                                                     "8.6"));
+
+        return distributionDetector.getDistCommand(text, convertCmdCallback, inBash, inSudo);
     }
 }
