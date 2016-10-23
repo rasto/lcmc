@@ -724,10 +724,7 @@ public class HostParser {
 
     /** Converts a string that is specific to the distribution distribution. */
     public String getDistString(final String commandString) {
-        return Tools.getDistString(commandString,
-                                   distributionDetector.getDistributionName(),
-                                   distributionDetector.getDistributionVersionString(),
-                                   distributionDetector.getArch());
+        return distributionDetector.getDistString(commandString);
     }
 
     /**
@@ -735,10 +732,7 @@ public class HostParser {
      *  distribution.
      */
     public List<String> getDistStrings(final String commandString) {
-        return Tools.getDistStrings(commandString,
-                                    distributionDetector.getDistributionName(),
-                                    distributionDetector.getDistributionVersionString(),
-                                    distributionDetector.getArch());
+        return distributionDetector.getDistStrings(commandString);
     }
 
 

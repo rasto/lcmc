@@ -20,14 +20,21 @@
 
 package lcmc.host.domain.parser;
 
+import static junitparams.JUnitParamsRunner.$;
+import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertThat;
 
 import com.google.common.collect.ImmutableList;
 
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import junitparams.JUnitParamsRunner;
+import junitparams.Parameters;
 import lcmc.common.domain.ConvertCmdCallback;
 
+@RunWith(JUnitParamsRunner.class)
 public class DistributionDetectorTest {
 
 	@Test
@@ -122,4 +129,122 @@ public class DistributionDetectorTest {
 		return distributionDetector.getDistCommand(text, convertCmdCallback, inBash, inSudo);
 	}
 
+	@SuppressWarnings("unused")
+	private Object[] parametersForDistStringShouldBeReturned() {
+		return $(
+				$(null, "none", "none", "none", "none"),
+				$("no", "Support", "none", "none", "none"),
+				$("no", "Support", "", "", ""),
+				$("debian", "Support", "debian", "", ""),
+				$("debian-SQUEEZE", "Support", "debian", "6", "x86_64"),
+				$("debian-SQUEEZE", "Support", "debian", "6", "a"),
+				$("i586", "PmInst.install", "suse", "", "i386")
+		);
+	}
+
+	@Test
+	@Parameters(method = "parametersForDistStringShouldBeReturned")
+	public void distStringShouldBeReturned(final String distString,
+										   final String text,
+										   final String dist,
+										   final String version,
+										   final String arch) {
+
+		final DistributionDetector distributionDetector = new DistributionDetector(null);
+		distributionDetector.detect(ImmutableList.of("Linux", arch, "3.16", version, dist));
+		assertThat(distributionDetector.getDistString(text), is(distString));
+	}
+
+	@SuppressWarnings("unused")
+	private Object[] parametersForDownloadDirShouldBeReturned() {
+		return $(
+				$("", "", "", "", ""),
+				$("2.6.32-28", "2.6.32-28-server", "ubuntu", "squeeze/sid/10.04", "x86_64"),
+				$("2.6.32-28", "2.6.32-28-server", "ubuntu", "squeeze/sid/10.04", "i386"),
+				$("2.6.24-28", "2.6.24-28-server", "ubuntu", "lenny/sid/8.04", "x86_64"),
+				$("2.6.32.27-0.2",
+				  "2.6.32.27-0.2-default",
+				  "suse",
+				  "SLES11",
+				  "x86_64"),
+				$("2.6.16.60-0.60.1",
+				  "2.6.16.60-0.60.1-default",
+				  "suse",
+				  "SLES10",
+				  "x86_64"),
+				$("2.6.18-194.8.1.el5",
+				  "2.6.18-194.8.1.el5",
+				  "redhatenterpriseserver",
+				  "5",
+				  "x86_64"),
+				$("2.6.32-71.18.1.el6.x86_64",
+				  "2.6.32-71.18.1.el6.x86_64",
+				  "redhatenterpriseserver",
+				  "6",
+				  "x86_64"),
+				$("2.6.26-2", "2.6.26-2-amd64", "debian", "5", "x86_64"),
+				$("2.6.32-5", "2.6.32-5-amd64", "debian", "6", "x86_64"),
+				$("2.6.32-5", "2.6.32-5-amd64", "debian", "", "x86_64"),
+				$("2.6.32-5-amd64",
+				  "2.6.32-5-amd64",
+				  "unknown",
+				  "unknown",
+				  "x86_64"),
+				$("", "", "unknown", "unknown", "x86_64"),
+				$("2.6.32-5-amd64", "2.6.32-5-amd64", "", "", "x86_64")
+		);
+	}
+
+	@Test
+	@Parameters(method = "parametersForDownloadDirShouldBeReturned")
+	public void downloadDirShouldBeReturned(final String kernelDir,
+											final String kernelVersion,
+											final String dist,
+											final String version,
+											final String arch) {
+		final DistributionDetector distributionDetector = new DistributionDetector(null);
+
+		distributionDetector.detect(ImmutableList.of("Linux", arch, "3.16", version, dist));
+
+		assertEquals(kernelDir, distributionDetector.getKernelDownloadDir(kernelVersion));
+	}
+
+	@SuppressWarnings("unused")
+	private Object[] parametersForDistVersionShouldBeReturned() {
+		return $(
+				$("LENNY", "debian", "5.0.8"),
+				$("SQUEEZE", "debian", "6.0"),
+				$("12", "fedora", "Fedora release 12 (Constantine)"),
+				$("13", "fedora", "Fedora release 13 (Goddard)"),
+				$("14", "fedora", "Fedora release 14 (Laughlin)"),
+				$("5", "redhat", "CentOS release 5.5 (Final)"),
+				$("5", "redhat", "CentOS release 5.5 (Final)"),
+				$("6",
+				  "redhatenterpriseserver",
+				  "Red Hat Enterprise Linux Server release 6.0 (Santiago)"),
+				$("5",
+				  "redhatenterpriseserver",
+				  "Red Hat Enterprise Linux Server release 5.5 (Tikanga)"),
+			/* maverick */
+				$("squeeze/sid/10.10", "ubuntu", "squeeze/sid/10.10"),
+				$("KARMIC", "ubuntu", "squeeze/sid/9.10"),
+				$("LUCID", "ubuntu", "squeeze/sid/10.04"),
+				$("HARDY", "ubuntu", "lenny/sid/8.04"),
+				$("SLES10", "suse", "SUSE Linux Enterprise Server 10 (x86_64)"),
+				$("SLES11", "suse", "SUSE Linux Enterprise Server 11 (x86_64)"),
+				$("OPENSUSE11_2", "suse", "openSUSE 11.2 (x86_64)"),
+				$("OPENSUSE11_3", "suse", "openSUSE 11.3 (x86_64)"),
+				$("OPENSUSE11_4", "suse", "openSUSE 11.4 (x86_64)"),
+				$("2", "openfiler", "Openfiler NSA 2.3")
+		);
+	}
+
+	@Test
+	@Parameters(method = "parametersForDistVersionShouldBeReturned")
+	public void distVersionShouldBeReturned(final String distVersion, final String dist, final String version) {
+		final DistributionDetector distributionDetector = new DistributionDetector(null);
+		distributionDetector.detect(ImmutableList.of("Linux", "", "3.16", version, dist));
+
+		assertThat(distributionDetector.getDistVersionString(version), is(distVersion));
+	}
 }

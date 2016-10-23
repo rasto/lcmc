@@ -48,10 +48,7 @@ final class DistDetection extends DialogHost {
         super.initDialogBeforeVisible();
         enableComponentsLater(new JComponent[]{buttonClass(nextButton())});
         val hostParser = getHost().getHostParser();
-        final String support = Tools.getDistString("Support",
-                                                   hostParser.getDistributionName(),
-                                                   hostParser.getDistributionVersionString(),
-                                                   hostParser.getArch());
+        final String support = hostParser.getDistString("Support");
         final String answerText = "\nversion: " + hostParser.getDetectedInfo() + " (support file: " + support + ')';
         answerPaneSetText(answerText);
     }

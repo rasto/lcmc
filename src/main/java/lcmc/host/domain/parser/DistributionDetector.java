@@ -20,11 +20,13 @@
 
 package lcmc.host.domain.parser;
 
-import static lcmc.common.domain.util.Tools.getDistString;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Locale;
+import java.util.ResourceBundle;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import lcmc.common.domain.ConvertCmdCallback;
 import lcmc.common.domain.util.Tools;
@@ -141,10 +143,10 @@ public class DistributionDetector {
 		if (!distributionName.equals(detectedDist)) {
 			LOG.appError("initDistInfo: dist: " + distributionName + " does not match " + detectedDist);
 		}
-		distributionVersionString = Tools.getDistVersionString(distributionName, distributionVersion);
-		distributionVersion = getDistString("distributiondir", detectedDist, distributionVersionString, null);
-		this.kernelVersion = Tools.getKernelDownloadDir(detectedKernelVersion, getDistributionName(), distributionVersionString, null);
-		String arch0 = getDistString("arch:" + detectedArch, getDistributionName(), distributionVersionString, null);
+		distributionVersionString = getDistVersionString(distributionVersion);
+		distributionVersion = getDistString("distributiondir");
+		this.kernelVersion = getKernelDownloadDir(detectedKernelVersion);
+		String arch0 = getDistString("arch:" + detectedArch);
 		if (arch0 == null) {
 			arch0 = detectedArch;
 		}
@@ -170,7 +172,7 @@ public class DistributionDetector {
 			return null;
 		}
 		LOG.debug1("getDistFromDistVersion:" + dV.replaceFirst("\\d.*", ""));
-		return getDistString("dist:" + dV.replaceFirst("\\d.*", ""), "", "", null);
+		return getDistString("dist:" + dV.replaceFirst("\\d.*", ""));
 	}
 
 	/**
@@ -188,7 +190,7 @@ public class DistributionDetector {
 		final List<String> results =  new ArrayList<String>();
 		int i = 0;
 		for (final String t : texts) {
-			String distString = getDistString(t, distributionName, distributionVersionString, arch);
+			String distString = getDistString(t);
 			if (distString == null) {
 				LOG.appWarning("getDistCommand: unknown command: " + t);
 				distString = t;
@@ -212,6 +214,111 @@ public class DistributionDetector {
 		}
 		if (convertCmdCallback != null && ret != null) {
 			ret = convertCmdCallback.convert(ret);
+		}
+		return ret;
+	}
+
+	/** Returns string that is specific to a distribution and version. */
+	public String getDistString(final String text) {
+		if (distributionName == null) {
+			distributionName = "";
+		}
+		if (distributionVersionString == null) {
+			distributionVersionString = "";
+		}
+		final Locale locale = new Locale(distributionName, distributionVersionString);
+		LOG.debug2("getDistString: text: " + text + " dist: " + distributionName + " version: " + distributionVersionString);
+		final ResourceBundle resourceString = ResourceBundle.getBundle("lcmc.configs.DistResource", locale);
+		String ret;
+		try {
+			ret = resourceString.getString(text + '.' + arch);
+		} catch (final Exception e) {
+			ret = null;
+		}
+		if (ret == null) {
+			try {
+				if (ret == null) {
+					ret = resourceString.getString(text);
+				}
+				LOG.debug2("getDistString: ret: " + ret);
+				return ret;
+			} catch (final RuntimeException e) {
+				return null;
+			}
+		}
+		return ret;
+	}
+
+	/**
+	 * Gets compact representation of distribution and version. Distribution
+	 * and version are joined with "_" and all spaces and '.' are replaced by
+	 * "_" as well.
+	 */
+	public String getDistVersionString(final String distributionVersion) {
+		if (distributionName == null) {
+			distributionName = "";
+		}
+		LOG.debug2("getDistVersionString: dist: " + distributionName + ", version: " + distributionVersion);
+		final Locale locale = new Locale(distributionName, "");
+		final ResourceBundle resourceCommand = ResourceBundle.getBundle("lcmc.configs.DistResource", locale);
+		String distVersion = null;
+		try {
+			distVersion = resourceCommand.getString("version:" + distributionVersion);
+		} catch (final Exception e) {
+            /* with wildcard */
+			final StringBuilder buf = new StringBuilder(distributionVersion);
+			for (int i = distributionVersion.length() - 1; i >= 0; i--) {
+				try {
+					distVersion = resourceCommand.getString("version:" + buf.toString() + '*');
+				} catch (final Exception e2) {
+					distVersion = null;
+				}
+				if (distVersion != null) {
+					break;
+				}
+				buf.setLength(i);
+			}
+			if (distVersion == null) {
+				distVersion = distributionVersion;
+			}
+		}
+		LOG.debug2("getDistVersionString: dist version: " + distVersion);
+		return distVersion;
+	}
+
+	/**
+	 * Converts kernelVersion as parsed from uname to a version that is used
+	 * in the download area on the website.
+	 */
+	public String getKernelDownloadDir(final CharSequence kernelVersion) {
+		final String regexp = getDistString("kerneldir");
+		if (regexp != null && kernelVersion != null) {
+			final Pattern p = Pattern.compile(regexp);
+			final Matcher m = p.matcher(kernelVersion);
+			if (m.matches()) {
+				return m.group(1);
+			}
+		}
+		return null;
+	}
+
+	/** Returns string that is specific to a distribution and version. */
+	@SuppressWarnings("unchecked")
+	public List<String> getDistStrings(final String text) {
+		if (distributionName == null) {
+			distributionName = "";
+		}
+		if (distributionVersionString == null) {
+			distributionVersionString = "";
+		}
+		final Locale locale = new Locale(distributionName, distributionVersionString);
+		LOG.debug2("getDistStrings: text: " + text + " dist: " + distributionName + " version: " + distributionVersionString);
+		final ResourceBundle resourceString = ResourceBundle.getBundle("lcmc.configs.DistResource", locale);
+		List<String> ret;
+		try {
+			ret = (List<String>) resourceString.getObject(text);
+		} catch (final Exception e) {
+			ret = new ArrayList<>();
 		}
 		return ret;
 	}

@@ -354,58 +354,6 @@ public final class Tools {
         }
     }
 
-    /** Returns string that is specific to a distribution and version. */
-    public static String getDistString(final String text, String dist, String version, final String arch) {
-        if (dist == null) {
-            dist = "";
-        }
-        if (version == null) {
-            version = "";
-        }
-        final Locale locale = new Locale(dist, version);
-        LOG.debug2("getDistString: text: " + text + " dist: " + dist + " version: " + version);
-        final ResourceBundle resourceString = ResourceBundle.getBundle("lcmc.configs.DistResource", locale);
-        String ret;
-        try {
-            ret = resourceString.getString(text + '.' + arch);
-        } catch (final Exception e) {
-            ret = null;
-        }
-        if (ret == null) {
-            try {
-                if (ret == null) {
-                    ret = resourceString.getString(text);
-                }
-                LOG.debug2("getDistString: ret: " + ret);
-                return ret;
-            } catch (final RuntimeException e) {
-                return null;
-            }
-        }
-        return ret;
-    }
-
-    /** Returns string that is specific to a distribution and version. */
-    @SuppressWarnings("unchecked")
-    public static List<String> getDistStrings(final String text, String dist, String version, final String arch) {
-        if (dist == null) {
-            dist = "";
-        }
-        if (version == null) {
-            version = "";
-        }
-        final Locale locale = new Locale(dist, version);
-        LOG.debug2("getDistStrings: text: " + text + " dist: " + dist + " version: " + version);
-        final ResourceBundle resourceString = ResourceBundle.getBundle("lcmc.configs.DistResource", locale);
-        List<String> ret;
-        try {
-            ret = (List<String>) resourceString.getObject(text);
-        } catch (final Exception e) {
-            ret = new ArrayList<String>();
-        }
-        return ret;
-    }
-
     /**
      * Returns service definiton from ServiceDefinitions resource bundle.
      */
@@ -418,62 +366,6 @@ public final class Tools {
             LOG.appWarning("getServiceDefinition: cannot get service definition for service: " + service, e);
             return new String[]{};
         }
-    }
-
-    /**
-     * Converts kernelVersion as parsed from uname to a version that is used
-     * in the download area on the website.
-     */
-    public static String getKernelDownloadDir(final CharSequence kernelVersion,
-                                              final String dist,
-                                              final String version,
-                                              final String arch) {
-        final String regexp = getDistString("kerneldir", dist, version, arch);
-        if (regexp != null && kernelVersion != null) {
-            final Pattern p = Pattern.compile(regexp);
-            final Matcher m = p.matcher(kernelVersion);
-            if (m.matches()) {
-                return m.group(1);
-            }
-        }
-        return null;
-    }
-
-    /**
-     * Gets compact representation of distribution and version. Distribution
-     * and version are joined with "_" and all spaces and '.' are replaced by
-     * "_" as well.
-     */
-    public static String getDistVersionString(String dist, final String version) {
-        if (dist == null) {
-            dist = "";
-        }
-        LOG.debug2("getDistVersionString: dist: " + dist + ", version: " + version);
-        final Locale locale = new Locale(dist, "");
-        final ResourceBundle resourceCommand = ResourceBundle.getBundle("lcmc.configs.DistResource", locale);
-        String distVersion = null;
-        try {
-            distVersion = resourceCommand.getString("version:" + version);
-        } catch (final Exception e) {
-            /* with wildcard */
-            final StringBuilder buf = new StringBuilder(version);
-            for (int i = version.length() - 1; i >= 0; i--) {
-                try {
-                    distVersion = resourceCommand.getString("version:" + buf.toString() + '*');
-                } catch (final Exception e2) {
-                    distVersion = null;
-                }
-                if (distVersion != null) {
-                    break;
-                }
-                buf.setLength(i);
-            }
-            if (distVersion == null) {
-                distVersion = version;
-            }
-        }
-        LOG.debug2("getDistVersionString: dist version: " + distVersion);
-        return distVersion;
     }
 
     /**
