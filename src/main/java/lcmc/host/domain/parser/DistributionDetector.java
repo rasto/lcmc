@@ -38,288 +38,284 @@ import lombok.Getter;
 
 public class DistributionDetector {
 
-	private final Host host;
-	/** Whether dist info was already logged. */
-	private boolean distInfoAlreadyLogged = false;
-	private String detectedKernelName = "";
-	private String detectedDistVersion = "";
-	@Getter
-	private String detectedKernelVersion = "";
-	private String detectedDist = "";
-	private String detectedArch = "";
-	@Getter
-	private String distributionName = "";
-	@Getter
-	private String distributionVersion = "";
-	@Getter
-	private String distributionVersionString = "";
-	@Getter
-	private String kernelName = "";
-	@Getter
-	private String kernelVersion = "";
-	@Getter
-	private String arch = "";
+    private final Host host;
+    /** Whether dist info was already logged. */
+    private boolean distInfoAlreadyLogged = false;
+    private String detectedKernelName = "";
+    private String detectedDistVersion = "";
+    @Getter
+    private String detectedKernelVersion = "";
+    private String detectedDist = "";
+    private String detectedArch = "";
+    @Getter
+    private String distributionName = "";
+    @Getter
+    private String distributionVersion = "";
+    @Getter
+    private String distributionVersionString = "";
+    @Getter
+    private String kernelName = "";
+    @Getter
+    private String kernelVersion = "";
+    @Getter
+    private String arch = "";
 
-	private static final Logger LOG = LoggerFactory.getLogger(Host.class);
+    private static final Logger LOG = LoggerFactory.getLogger(Host.class);
 
-	public DistributionDetector(final Host host) {
-		this.host = host;
-	}
+    public DistributionDetector(final Host host) {
+        this.host = host;
+    }
 
-	/**
-	 * Sets distribution info for this host from array of strings.
-	 * Array consists of: kernel name, kernel version, arch, os, version
-	 * and distribution.
-	 * @param lines
-	 */
-	@SuppressWarnings("fallthrough")
-	public void detect(final List<String> lines) {
-		if (lines == null) {
-			LOG.debug("setDistInfo: " + host.getName() + " dist info is null");
-			return;
-		}
-		if (!distInfoAlreadyLogged) {
-			for (final String di : lines) {
-				LOG.debug1("setDistInfo: dist info: " + di);
-			}
-		}
+    /**
+     * Sets distribution info for this host from array of strings.
+     * Array consists of: kernel name, kernel version, arch, os, version
+     * and distribution.
+     * @param lines
+     */
+    @SuppressWarnings("fallthrough")
+    public void detect(final List<String> lines) {
+        if (!distInfoAlreadyLogged) {
+            for (final String di : lines) {
+                LOG.debug1("setDistInfo: dist info: " + di);
+            }
+        }
 
         /* no breaks in the switch statement are intentional */
-		String lsbVersion = null;
-		String lsbDist = null;
-		switch (lines.size()) {
-			case 9:
-				lsbVersion = lines.get(8); // TODO: not used
-			case 8:
-				lsbDist = lines.get(7);
-			case 7:
-				lsbVersion = lines.get(6); // TODO: not used
-			case 6:
-				lsbDist = lines.get(5);
-			case 5:
-				if (lsbDist == null || "linux".equals(lsbDist)) {
-					detectedDist = lines.get(4);
-				} else {
-					detectedDist = lsbDist;
-				}
-			case 4:
-				if (lsbVersion == null) {
-					detectedDistVersion = lines.get(3);
-				} else {
-					detectedDistVersion = lines.get(3) + '/' + lsbVersion;
-				}
-			case 3:
-				detectedKernelVersion = lines.get(2);
-			case 2:
-				detectedArch = lines.get(1);
-			case 1:
-				detectedKernelName = lines.get(0);
-			case 0:
-				break;
-			default:
-				LOG.appError("setDistInfo: list: ", Arrays.asList(lines).toString());
-				break;
-		}
-		distributionName = detectedDist;
-		distributionVersion = detectedDistVersion;
-		initDistInfo();
-		if (!distInfoAlreadyLogged) {
-			LOG.debug1("setDistInfo: kernel name: " + detectedKernelName);
-			LOG.debug1("setDistInfo: kernel version: " + detectedKernelVersion);
-			LOG.debug1("setDistInfo: arch: " + detectedArch);
-			LOG.debug1("setDistInfo: dist version: " + detectedDistVersion);
-			LOG.debug1("setDistInfo: dist: " + detectedDist);
-		}
-		distInfoAlreadyLogged = true;
-	}
+        String lsbVersion = null;
+        String lsbDist = null;
+        switch (lines.size()) {
+            case 9:
+                lsbVersion = lines.get(8); // TODO: not used
+            case 8:
+                lsbDist = lines.get(7);
+            case 7:
+                lsbVersion = lines.get(6); // TODO: not used
+            case 6:
+                lsbDist = lines.get(5);
+            case 5:
+                if (lsbDist == null || "linux".equals(lsbDist)) {
+                    detectedDist = lines.get(4);
+                } else {
+                    detectedDist = lsbDist;
+                }
+            case 4:
+                if (lsbVersion == null) {
+                    detectedDistVersion = lines.get(3);
+                } else {
+                    detectedDistVersion = lines.get(3) + '/' + lsbVersion;
+                }
+            case 3:
+                detectedKernelVersion = lines.get(2);
+            case 2:
+                detectedArch = lines.get(1);
+            case 1:
+                detectedKernelName = lines.get(0);
+            case 0:
+                break;
+            default:
+                LOG.appError("setDistInfo: list: ", Arrays.asList(lines).toString());
+                break;
+        }
+        distributionName = detectedDist;
+        distributionVersion = detectedDistVersion;
+        initDistInfo();
+        if (!distInfoAlreadyLogged) {
+            LOG.debug1("setDistInfo: kernel name: " + detectedKernelName);
+            LOG.debug1("setDistInfo: kernel version: " + detectedKernelVersion);
+            LOG.debug1("setDistInfo: arch: " + detectedArch);
+            LOG.debug1("setDistInfo: dist version: " + detectedDistVersion);
+            LOG.debug1("setDistInfo: dist: " + detectedDist);
+        }
+        distInfoAlreadyLogged = true;
+    }
 
-	/** Initializes dist info. Must be called after setDistInfo. */
-	void initDistInfo() {
-		if (!"Linux".equals(detectedKernelName)) {
-			LOG.appWarning("initDistInfo: detected kernel not linux: " + detectedKernelName);
-		}
-		this.kernelName = "Linux";
+    /** Initializes dist info. Must be called after setDistInfo. */
+    void initDistInfo() {
+        if (!"Linux".equals(detectedKernelName)) {
+            LOG.appWarning("initDistInfo: detected kernel not linux: " + detectedKernelName);
+        }
+        this.kernelName = "Linux";
 
-		if (!distributionName.equals(detectedDist)) {
-			LOG.appError("initDistInfo: dist: " + distributionName + " does not match " + detectedDist);
-		}
-		distributionVersionString = getDistVersionString(distributionVersion);
-		distributionVersion = getDistString("distributiondir");
-		this.kernelVersion = getKernelDownloadDir(detectedKernelVersion);
-		String arch0 = getDistString("arch:" + detectedArch);
-		if (arch0 == null) {
-			arch0 = detectedArch;
-		}
-		this.arch = arch0;
-	}
+        if (!distributionName.equals(detectedDist)) {
+            LOG.appError("initDistInfo: dist: " + distributionName + " does not match " + detectedDist);
+        }
+        distributionVersionString = getDistVersionString(distributionVersion);
+        distributionVersion = getDistString("distributiondir");
+        this.kernelVersion = getKernelDownloadDir(detectedKernelVersion);
+        String arch0 = getDistString("arch:" + detectedArch);
+        if (arch0 == null) {
+            arch0 = detectedArch;
+        }
+        this.arch = arch0;
+    }
 
-	/** Returns the detected info to show. */
-	public String getDetectedInfo() {
-		return detectedDist + ' ' + detectedDistVersion;
-	}
+    /** Returns the detected info to show. */
+    public String getDetectedInfo() {
+        return detectedDist + ' ' + detectedDistVersion;
+    }
 
-	/**
-	 * Gets distribution name from distribution version. E.g. suse from sles9.
-	 * This is used only when the distribution is selected in the pulldown menu,
-	 * not when it is detected.
-	 * The conversion rules for distributions are defined in DistResource.java,
-	 * with 'dist:' prefix.
-	 * TODO: remove it?
-	 */
-	public String getDistFromDistVersion(final String dV) {
+    /**
+     * Gets distribution name from distribution version. E.g. suse from sles9.
+     * This is used only when the distribution is selected in the pulldown menu,
+     * not when it is detected.
+     * The conversion rules for distributions are defined in DistResource.java,
+     * with 'dist:' prefix.
+     * TODO: remove it?
+     */
+    public String getDistFromDistVersion(final String dV) {
         /* remove numbers */
-		if ("No Match".equals(dV)) {
-			return null;
-		}
-		LOG.debug1("getDistFromDistVersion:" + dV.replaceFirst("\\d.*", ""));
-		return getDistString("dist:" + dV.replaceFirst("\\d.*", ""));
-	}
+        if ("No Match".equals(dV)) {
+            return null;
+        }
+        LOG.debug1("getDistFromDistVersion:" + dV.replaceFirst("\\d.*", ""));
+        return getDistString("dist:" + dV.replaceFirst("\\d.*", ""));
+    }
 
-	/**
-	 * Returns command from DistResource resource bundle for specific
-	 * distribution and version.
-	 */
-	public String getDistCommand(final String text,
-								 final ConvertCmdCallback convertCmdCallback,
-								 final boolean inBash,
-								 final boolean inSudo) {
-		if (text == null) {
-			return null;
-		}
-		final String[] texts = text.split(";;;");
-		final List<String> results =  new ArrayList<String>();
-		int i = 0;
-		for (final String t : texts) {
-			String distString = getDistString(t);
-			if (distString == null) {
-				LOG.appWarning("getDistCommand: unknown command: " + t);
-				distString = t;
-			}
-			if (inBash && i == 0) {
-				String sudoS = "";
-				if (inSudo) {
-					sudoS = DistResource.SUDO;
-				}
-				results.add(sudoS + "bash -c \"" + Tools.escapeQuotes(distString, 1) + '"');
-			} else {
-				results.add(distString);
-			}
-			i++;
-		}
-		String ret;
-		if (results.isEmpty()) {
-			ret = text;
-		} else {
-			ret = Tools.join(";;;", results.toArray(new String[results.size()]));
-		}
-		if (convertCmdCallback != null && ret != null) {
-			ret = convertCmdCallback.convert(ret);
-		}
-		return ret;
-	}
+    /**
+     * Returns command from DistResource resource bundle for specific
+     * distribution and version.
+     */
+    public String getDistCommand(final String text,
+                                 final ConvertCmdCallback convertCmdCallback,
+                                 final boolean inBash,
+                                 final boolean inSudo) {
+        if (text == null) {
+            return null;
+        }
+        final String[] texts = text.split(";;;");
+        final List<String> results =  new ArrayList<String>();
+        int i = 0;
+        for (final String t : texts) {
+            String distString = getDistString(t);
+            if (distString == null) {
+                LOG.appWarning("getDistCommand: unknown command: " + t);
+                distString = t;
+            }
+            if (inBash && i == 0) {
+                String sudoS = "";
+                if (inSudo) {
+                    sudoS = DistResource.SUDO;
+                }
+                results.add(sudoS + "bash -c \"" + Tools.escapeQuotes(distString, 1) + '"');
+            } else {
+                results.add(distString);
+            }
+            i++;
+        }
+        String ret;
+        if (results.isEmpty()) {
+            ret = text;
+        } else {
+            ret = Tools.join(";;;", results.toArray(new String[results.size()]));
+        }
+        if (convertCmdCallback != null && ret != null) {
+            ret = convertCmdCallback.convert(ret);
+        }
+        return ret;
+    }
 
-	/** Returns string that is specific to a distribution and version. */
-	public String getDistString(final String text) {
-		if (distributionName == null) {
-			distributionName = "";
-		}
-		if (distributionVersionString == null) {
-			distributionVersionString = "";
-		}
-		final Locale locale = new Locale(distributionName, distributionVersionString);
-		LOG.debug2("getDistString: text: " + text + " dist: " + distributionName + " version: " + distributionVersionString);
-		final ResourceBundle resourceString = ResourceBundle.getBundle("lcmc.configs.DistResource", locale);
-		String ret;
-		try {
-			ret = resourceString.getString(text + '.' + arch);
-		} catch (final Exception e) {
-			ret = null;
-		}
-		if (ret == null) {
-			try {
-				if (ret == null) {
-					ret = resourceString.getString(text);
-				}
-				LOG.debug2("getDistString: ret: " + ret);
-				return ret;
-			} catch (final RuntimeException e) {
-				return null;
-			}
-		}
-		return ret;
-	}
+    /** Returns string that is specific to a distribution and version. */
+    public String getDistString(final String text) {
+        if (distributionName == null) {
+            distributionName = "";
+        }
+        if (distributionVersionString == null) {
+            distributionVersionString = "";
+        }
+        final Locale locale = new Locale(distributionName, distributionVersionString);
+        LOG.debug2("getDistString: text: " + text + " dist: " + distributionName + " version: " + distributionVersionString);
+        final ResourceBundle resourceString = ResourceBundle.getBundle("lcmc.configs.DistResource", locale);
+        String ret;
+        try {
+            ret = resourceString.getString(text + '.' + arch);
+        } catch (final Exception e) {
+            ret = null;
+        }
+        if (ret == null) {
+            try {
+                if (ret == null) {
+                    ret = resourceString.getString(text);
+                }
+                LOG.debug2("getDistString: ret: " + ret);
+                return ret;
+            } catch (final RuntimeException e) {
+                return null;
+            }
+        }
+        return ret;
+    }
 
-	/**
-	 * Gets compact representation of distribution and version. Distribution
-	 * and version are joined with "_" and all spaces and '.' are replaced by
-	 * "_" as well.
-	 */
-	public String getDistVersionString(final String distributionVersion) {
-		if (distributionName == null) {
-			distributionName = "";
-		}
-		LOG.debug2("getDistVersionString: dist: " + distributionName + ", version: " + distributionVersion);
-		final Locale locale = new Locale(distributionName, "");
-		final ResourceBundle resourceCommand = ResourceBundle.getBundle("lcmc.configs.DistResource", locale);
-		String distVersion = null;
-		try {
-			distVersion = resourceCommand.getString("version:" + distributionVersion);
-		} catch (final Exception e) {
+    /**
+     * Gets compact representation of distribution and version. Distribution
+     * and version are joined with "_" and all spaces and '.' are replaced by
+     * "_" as well.
+     */
+    public String getDistVersionString(final String distributionVersion) {
+        if (distributionName == null) {
+            distributionName = "";
+        }
+        LOG.debug2("getDistVersionString: dist: " + distributionName + ", version: " + distributionVersion);
+        final Locale locale = new Locale(distributionName, "");
+        final ResourceBundle resourceCommand = ResourceBundle.getBundle("lcmc.configs.DistResource", locale);
+        String distVersion = null;
+        try {
+            distVersion = resourceCommand.getString("version:" + distributionVersion);
+        } catch (final Exception e) {
             /* with wildcard */
-			final StringBuilder buf = new StringBuilder(distributionVersion);
-			for (int i = distributionVersion.length() - 1; i >= 0; i--) {
-				try {
-					distVersion = resourceCommand.getString("version:" + buf.toString() + '*');
-				} catch (final Exception e2) {
-					distVersion = null;
-				}
-				if (distVersion != null) {
-					break;
-				}
-				buf.setLength(i);
-			}
-			if (distVersion == null) {
-				distVersion = distributionVersion;
-			}
-		}
-		LOG.debug2("getDistVersionString: dist version: " + distVersion);
-		return distVersion;
-	}
+            final StringBuilder buf = new StringBuilder(distributionVersion);
+            for (int i = distributionVersion.length() - 1; i >= 0; i--) {
+                try {
+                    distVersion = resourceCommand.getString("version:" + buf.toString() + '*');
+                } catch (final Exception e2) {
+                    distVersion = null;
+                }
+                if (distVersion != null) {
+                    break;
+                }
+                buf.setLength(i);
+            }
+            if (distVersion == null) {
+                distVersion = distributionVersion;
+            }
+        }
+        LOG.debug2("getDistVersionString: dist version: " + distVersion);
+        return distVersion;
+    }
 
-	/**
-	 * Converts kernelVersion as parsed from uname to a version that is used
-	 * in the download area on the website.
-	 */
-	public String getKernelDownloadDir(final CharSequence kernelVersion) {
-		final String regexp = getDistString("kerneldir");
-		if (regexp != null && kernelVersion != null) {
-			final Pattern p = Pattern.compile(regexp);
-			final Matcher m = p.matcher(kernelVersion);
-			if (m.matches()) {
-				return m.group(1);
-			}
-		}
-		return null;
-	}
+    /**
+     * Converts kernelVersion as parsed from uname to a version that is used
+     * in the download area on the website.
+     */
+    public String getKernelDownloadDir(final CharSequence kernelVersion) {
+        final String regexp = getDistString("kerneldir");
+        if (regexp != null && kernelVersion != null) {
+            final Pattern p = Pattern.compile(regexp);
+            final Matcher m = p.matcher(kernelVersion);
+            if (m.matches()) {
+                return m.group(1);
+            }
+        }
+        return null;
+    }
 
-	/** Returns string that is specific to a distribution and version. */
-	@SuppressWarnings("unchecked")
-	public List<String> getDistStrings(final String text) {
-		if (distributionName == null) {
-			distributionName = "";
-		}
-		if (distributionVersionString == null) {
-			distributionVersionString = "";
-		}
-		final Locale locale = new Locale(distributionName, distributionVersionString);
-		LOG.debug2("getDistStrings: text: " + text + " dist: " + distributionName + " version: " + distributionVersionString);
-		final ResourceBundle resourceString = ResourceBundle.getBundle("lcmc.configs.DistResource", locale);
-		List<String> ret;
-		try {
-			ret = (List<String>) resourceString.getObject(text);
-		} catch (final Exception e) {
-			ret = new ArrayList<>();
-		}
-		return ret;
-	}
+    /** Returns string that is specific to a distribution and version. */
+    @SuppressWarnings("unchecked")
+    public List<String> getDistStrings(final String text) {
+        if (distributionName == null) {
+            distributionName = "";
+        }
+        if (distributionVersionString == null) {
+            distributionVersionString = "";
+        }
+        final Locale locale = new Locale(distributionName, distributionVersionString);
+        LOG.debug2("getDistStrings: text: " + text + " dist: " + distributionName + " version: " + distributionVersionString);
+        final ResourceBundle resourceString = ResourceBundle.getBundle("lcmc.configs.DistResource", locale);
+        List<String> ret;
+        try {
+            ret = (List<String>) resourceString.getObject(text);
+        } catch (final Exception e) {
+            ret = new ArrayList<>();
+        }
+        return ret;
+    }
 }
