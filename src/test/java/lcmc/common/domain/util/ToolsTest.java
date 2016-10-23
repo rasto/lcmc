@@ -19,8 +19,6 @@ import java.util.TreeSet;
 import javax.inject.Provider;
 import javax.swing.JPanel;
 
-import com.google.common.collect.ImmutableList;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -34,7 +32,6 @@ import lcmc.HwEventBus;
 import lcmc.cluster.service.ssh.Ssh;
 import lcmc.cluster.service.storage.BlockDeviceService;
 import lcmc.common.domain.Application;
-import lcmc.common.domain.ConvertCmdCallback;
 import lcmc.common.ui.main.MainData;
 import lcmc.common.ui.main.ProgressIndicator;
 import lcmc.common.ui.utils.SwingUtils;
@@ -43,7 +40,6 @@ import lcmc.drbd.ui.resource.GlobalInfo;
 import lcmc.host.domain.Host;
 import lcmc.host.domain.HostFactory;
 import lcmc.host.domain.Hosts;
-import lcmc.host.domain.parser.DistributionDetector;
 import lcmc.host.ui.HostBrowser;
 import lcmc.host.ui.TerminalPanel;
 import lcmc.robotest.RoboTest;
@@ -206,97 +202,6 @@ public final class ToolsTest {
                                            final String arch) {
         assertEquals(distString, Tools.getDistString(text, dist, version, arch));
     }
-
-    //TODO: move
-    @Test
-    public void commandShouldBeUndefined() {
-        /*
-         String text
-         String dist
-         String version
-         String arch
-         ConvertCmdCallback convertCmdCallback
-         boolean inBash
-        */
-        assertEquals("undefined",
-                     getDistCommand("undefined",
-                                    null,
-                                          false,
-                                          false));
-    }
-
-    @Test
-    public void twoCommandsShouldBeUndefined() {
-        assertEquals("undefined2;;;undefined3",
-                     getDistCommand("undefined2;;;undefined3",
-                                    null,
-                                          false,
-                                          false));
-    }
-
-    private ConvertCmdCallback getConvertCallback() {
-        return new ConvertCmdCallback() {
-            @Override
-            public String convert(final String command) {
-                return command.replaceAll(lcmc.configs.DistResource.SUDO, "sudo ");
-            }
-        };
-    }
-
-    @Test
-    public void commandWithoutBash() {
-        assertEquals("sudo /etc/init.d/corosync start",
-                     getDistCommand("Corosync.startCorosync",
-                                    getConvertCallback(),
-                                          false,
-                                          false));
-    }
-
-    @Test
-    public void commandWithBash() {
-        assertEquals("sudo bash -c \"sudo /etc/init.d/corosync start\"",
-                     getDistCommand("Corosync.startCorosync",
-                                    getConvertCallback(),
-                                          true,
-                                          true));
-    }
-
-    @Test
-    public void multipleCommands() {
-        assertEquals("sudo /etc/init.d/corosync start" + ";;;sudo /etc/init.d/corosync start",
-                     getDistCommand("Corosync.startCorosync;;;"
-                                          + "Corosync.startCorosync",
-                                    getConvertCallback(),
-                                          false,
-                                          false));
-    }
-
-    @Test
-    public void undefinedAndCommandShouldBeConverted() {
-        assertEquals("undefined4" + ";;;sudo /etc/init.d/corosync start",
-                     getDistCommand("undefined4;;;"
-                                          + "Corosync.startCorosync",
-                                    getConvertCallback(),
-                                          false,
-                                          false));
-    }
-
-    @Test
-    public void nullCommandShouldReturnNull() {
-        assertNull("null command",
-                   getDistCommand(null, getConvertCallback(), false, false));
-    }
-
-    @Test
-    public void nullCommandInBashShouldReturnNull() {
-        assertNull(getDistCommand(null, getConvertCallback(), true, true));
-    }
-
-    @Test
-    public void nullCommandWithNullDistShouldReturnNull() {
-        assertNull(getDistCommand(null, null, true, true));
-    }
-
     @SuppressWarnings("unused")
     private Object[] parametersForDownloadDirShouldBeReturned() {
         return $(
@@ -1007,21 +912,5 @@ public final class ToolsTest {
         assertTrue(
                 "" + collection1 + " == " + collection2,
                 !Tools.equalCollections(collection1, collection2));
-    }
-
-    private String getDistCommand(final String text,
-                                  final ConvertCmdCallback convertCmdCallback,
-                                  final boolean inBash,
-                                  final boolean inSudo) {
-        final DistributionDetector distributionDetector = new DistributionDetector(hostBrowser.getHost());
-        distributionDetector.detect(ImmutableList.of("Linux",
-                                                     "x86_64",
-                                                     "3.16.0-4-amd64",
-                                                     "8.6",
-                                                     "debian",
-                                                     "debian",
-                                                     "8.6"));
-
-        return distributionDetector.getDistCommand(text, convertCmdCallback, inBash, inSudo);
     }
 }
