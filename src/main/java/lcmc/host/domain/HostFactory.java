@@ -20,26 +20,27 @@
 
 package lcmc.host.domain;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Provider;
+import javax.inject.Singleton;
+
 import lcmc.HwEventBus;
 import lcmc.cluster.service.ssh.Ssh;
 import lcmc.cluster.service.storage.BlockDeviceService;
 import lcmc.common.domain.Application;
-import lcmc.host.domain.parser.HostParser;
-import lcmc.host.ui.TerminalPanel;
 import lcmc.common.ui.main.MainData;
 import lcmc.common.ui.main.ProgressIndicator;
 import lcmc.common.ui.utils.SwingUtils;
 import lcmc.drbd.domain.DrbdHost;
 import lcmc.drbd.domain.DrbdXml;
+import lcmc.host.domain.parser.DistributionDetector;
+import lcmc.host.domain.parser.HostParser;
 import lcmc.host.ui.HostBrowser;
+import lcmc.host.ui.TerminalPanel;
 import lcmc.robotest.RoboTest;
 import lcmc.vm.domain.VmsXml;
 import lombok.val;
-
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Provider;
-import javax.inject.Singleton;
 
 @Named
 @Singleton
@@ -92,6 +93,7 @@ public class HostFactory {
 
         terminalPanel.initWithHost(host);
         host.init();
+        val distributionDetector = new DistributionDetector(host);
         val hostParser = new HostParser(
                 host,
                 drbdHost,
@@ -99,7 +101,8 @@ public class HostFactory {
                 vmsXmlProvider,
                 drbdXmlProvider,
                 swingUtils,
-                application);
+                application,
+                distributionDetector);
 
         hostBrowser.init(host);
         host.setHostParser(hostParser);
