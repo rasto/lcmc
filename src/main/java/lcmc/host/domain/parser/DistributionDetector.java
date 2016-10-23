@@ -178,9 +178,9 @@ public class DistributionDetector {
 	 * distribution and version.
 	 */
 	public String getDistCommand(final String text,
-										final ConvertCmdCallback convertCmdCallback,
-										final boolean inBash,
-										final boolean inSudo) {
+								 final ConvertCmdCallback convertCmdCallback,
+								 final boolean inBash,
+								 final boolean inSudo) {
 		if (text == null) {
 			return null;
 		}

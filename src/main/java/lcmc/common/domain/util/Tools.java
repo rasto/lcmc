@@ -82,13 +82,11 @@ import com.google.common.base.Optional;
 
 import lcmc.Exceptions;
 import lcmc.cluster.domain.Cluster;
-import lcmc.common.domain.ConvertCmdCallback;
 import lcmc.common.domain.StringValue;
 import lcmc.common.domain.Value;
 import lcmc.common.ui.main.MainPresenter;
 import lcmc.crm.ui.resource.ServiceInfo;
 import lcmc.host.domain.Host;
-import lcmc.host.domain.parser.HostParser;
 import lcmc.logger.Logger;
 import lcmc.logger.LoggerFactory;
 
@@ -406,18 +404,6 @@ public final class Tools {
             ret = new ArrayList<String>();
         }
         return ret;
-    }
-
-    /**
-     * Returns command from DistResource resource bundle for specific
-     * distribution and version.
-     */
-    public static String getDistCommand(final String text,
-                                        final HostParser hostParser,
-                                        final ConvertCmdCallback convertCmdCallback,
-                                        final boolean inBash,
-                                        final boolean inSudo) {
-        return hostParser.getDistCommand(text, convertCmdCallback, inBash, inSudo);
     }
 
     /**

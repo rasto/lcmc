@@ -716,11 +716,10 @@ public class HostParser {
      * the convert command callback.
      */
     public String getDistCommand(final String commandString, final ConvertCmdCallback convertCmdCallback) {
-        return Tools.getDistCommand(commandString,
-                                    this,
-                                    convertCmdCallback,
-                                    false,  /* in bash */
-                                    false); /* sudo */
+        return getDistCommand(commandString,
+                              convertCmdCallback,
+                              false,  /* in bash */
+                              false); /* sudo */
     }
 
     /** Converts a string that is specific to the distribution distribution. */
@@ -748,9 +747,8 @@ public class HostParser {
      * what-with-what hash.
      */
     public String getDistCommand(final String commandString, final Map<String, String> replaceHash) {
-        return Tools.getDistCommand(
+        return getDistCommand(
                 commandString,
-				this,
                 command -> {
 					for (final String tag : replaceHash.keySet()) {
 						if (tag != null && command.contains(tag)) {
