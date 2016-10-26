@@ -152,7 +152,8 @@ public class DistributionDetectorTest {
                 $("redhatenterpriseserver-6", ImmutableList.of("Linux", "x86_64", "2.6.32-131.6.1.el6.x86_64", "Red Hat Enterprise Linux Server release 6.1 (Santiago)", "redhat", "redhatenterpriseserver", "6server")),
 
                 $("suse-OPENSUSE13_1", ImmutableList.of("Linux", "x86_64", "3.11.10-21-desktop", "openSUSE 13.1 (x86_64)", "SuSE", "suse", "13.1")),
-                $("suse-OPENSUSE13_1", ImmutableList.of("Linux", "x86_64", "3.16.6-2-desktop", "openSUSE 13.2 (x86_64)", "SuSE", "suse", "13.2"))
+                $("suse-OPENSUSE13_1", ImmutableList.of("Linux", "x86_64", "3.16.6-2-desktop", "openSUSE 13.2 (x86_64)", "SuSE", "suse", "13.2")),
+                $("suse-OPENSUSE13_1", ImmutableList.of("Linux", "x86_64", "4.1.34-33-default", "openSUSE 42.1 (x86_64)", "SuSE", "suse", "42.1"))
         );
     }
 
