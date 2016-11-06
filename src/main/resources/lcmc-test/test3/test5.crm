@@ -9,13 +9,14 @@ primitive res_Filesystem_xy Filesystem
 	op notify interval=0 timeout=60
 	meta
 primitive res_drbd_xy ocf:linbit:drbd 
-	params drbd_resource=r0 
+	params drbd_resource=r0 unfence_extra_args=false
 	operations $id=res_drbd_xy-operations 
 	op start interval=0 timeout=240 
 	op promote interval=0 timeout=90 
 	op demote interval=0 timeout=90 
 	op stop interval=0 timeout=100 
 	op monitor interval=10 timeout=20 start-delay=0 
+	op reload interval=0 timeout=30
 	op notify interval=0 timeout=90
 	meta
 ms ms_drbd_xy res_drbd_xy 

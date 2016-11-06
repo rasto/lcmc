@@ -2297,10 +2297,8 @@ sub gui_test {
 		# sort node lines
 		$cib =~
 	  	   s/(^node\s+.*$)\n(^node\s+.*$)/join "\n", sort ($1, $2)/me;
-	#	$crm_status = "TERM=dumb PATH=\$PATH:/usr/sbin /usr/sbin/crm status|sed 1,3d";
 		$crm_status = "crm_mon -1|sed 1,3d";
 		$status = _exec("$crm_status|grep -v 'Full list of resources:'");
-#		$status =~ s/((\d+) Nodes configured)$/$1, $2 expected votes/m;
 		$ret = $?;
 		if ($ret != 0) {
 			exit $ret;
@@ -2314,10 +2312,7 @@ sub gui_test {
 	$status =~ s/(Master\/Slave Set:.*?)\s+\[.*/$1/g;
 	$status =~ s/unknown( expected votes)/2$1/;
 	$status =~ s/\s+\(.*?\)(: standby)/$1/g;
-#	$status =~ s/(\d+ Resources configured)$/$1./m;
-#	if ($status !~ /============/) {
-#		$status =~ s/\n\n/\n============\n/;
-#	}
+	$status =~ s/(\d+ resources? configured):.*/$1/m;
 	$cib =~ s/\s*\n\s*attributes standby=off\s*/\n/g;
 	$cib =~ s/^node \d+: host/node host/gm;
 	$cib =~ s/^(node host)\s+$/$1/gm;
