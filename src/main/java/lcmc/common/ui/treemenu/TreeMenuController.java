@@ -33,7 +33,7 @@ import javax.annotation.Resource;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
-import javax.swing.*;
+import javax.swing.JTree;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.MutableTreeNode;
@@ -54,10 +54,14 @@ public class TreeMenuController {
     private static final Logger LOG = LoggerFactory.getLogger(TreeMenuController.class);
     private DefaultTreeModel treeModel;
     private JTree tree;
-    @Inject
-    private SwingUtils swingUtils;
+    private final SwingUtils swingUtils;
     @Resource(name="categoryInfo")
     private CategoryInfo resourcesCategory;
+
+    @Inject
+    public TreeMenuController(SwingUtils swingUtils) {
+        this.swingUtils = swingUtils;
+    }
 
     public final DefaultMutableTreeNode createMenuTreeTop() {
         resourcesCategory.init(Tools.getString("Browser.Resources"), null);
@@ -103,45 +107,36 @@ public class TreeMenuController {
     }
 
     public final void repaintMenuTree() {
-        swingUtils.invokeInEdt(new Runnable() {
-            @Override
-            public void run() {
-                final JTree t = tree;
-                if (t != null) {
-                    t.repaint();
-                }
+        swingUtils.invokeInEdt(() -> {
+            final JTree t = tree;
+            if (t != null) {
+                t.repaint();
             }
         });
     }
 
     public final void reloadNode(final TreeNode node, final boolean select) {
-        swingUtils.invokeInEdt(new Runnable() {
-            @Override
-            public void run() {
-                final DefaultMutableTreeNode oldNode = (DefaultMutableTreeNode) tree.getLastSelectedPathComponent();
-                if (node != null) {
-                    treeModel.reload(node);
-                }
-                if (!select && oldNode != null) {
-                    /* if don't want to select, we reselect the old path. */
-                    treeModel.reload(oldNode);
-                }
+        swingUtils.invokeInEdt(() -> {
+            final DefaultMutableTreeNode oldNode = (DefaultMutableTreeNode) tree.getLastSelectedPathComponent();
+            if (node != null) {
+                treeModel.reload(node);
+            }
+            if (!select && oldNode != null) {
+                /* if don't want to select, we reselect the old path. */
+                treeModel.reload(oldNode);
             }
         });
     }
 
     public final void nodeChanged(final DefaultMutableTreeNode node) {
         final String stacktrace = Tools.getStackTrace();
-        swingUtils.invokeInEdt(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    treeModel.nodeChanged(node);
-                } catch (final RuntimeException e) {
-                    LOG.appError("nodeChangedAndWait: " + node.getUserObject()
-                            + " node changed error:\n"
-                            + stacktrace + "\n\n", e);
-                }
+        swingUtils.invokeInEdt(() -> {
+            try {
+                treeModel.nodeChanged(node);
+            } catch (final RuntimeException e) {
+                LOG.appError("nodeChangedAndWait: " + node.getUserObject()
+                        + " node changed error:\n"
+                        + stacktrace + "\n\n", e);
             }
         });
     }
@@ -157,13 +152,10 @@ public class TreeMenuController {
     }
 
     public void selectPath(final Object[] path) {
-        swingUtils.invokeInEdt(new Runnable() {
-            @Override
-            public void run() {
-                final TreePath tp = new TreePath(path);
-                tree.expandPath(tp);
-                tree.setSelectionPath(tp);
-            }
+        swingUtils.invokeInEdt(() -> {
+            final TreePath tp = new TreePath(path);
+            tree.expandPath(tp);
+            tree.setSelectionPath(tp);
         });
     }
 
@@ -172,17 +164,14 @@ public class TreeMenuController {
     }
 
     public void moveNodeToPosition(final DefaultMutableTreeNode node, final int position) {
-        swingUtils.invokeAndWait(new Runnable() {
-            @Override
-            public void run() {
-                final MutableTreeNode parent = (MutableTreeNode) node.getParent();
-                if (parent != null) {
-                    final int i = parent.getIndex(node);
-                    if (i > position) {
-                        parent.remove(node);
-                        parent.insert(node, position);
-                        reloadNode(parent, false);
-                    }
+        swingUtils.invokeAndWait(() -> {
+            final MutableTreeNode parent = (MutableTreeNode) node.getParent();
+            if (parent != null) {
+                final int i = parent.getIndex(node);
+                if (i > position) {
+                    parent.remove(node);
+                    parent.insert(node, position);
+                    reloadNode(parent, false);
                 }
             }
         });
@@ -235,117 +224,82 @@ public class TreeMenuController {
     }
 
     public final void removeNode(final DefaultMutableTreeNode node) {
-        swingUtils.invokeInEdt(new Runnable() {
-            @Override
-            public void run() {
-                removeNodeAndSelectParent(node);
-            }
-        });
+        swingUtils.invokeInEdt(() -> removeNodeAndSelectParent(node));
     }
 
     @Deprecated //TODO
     public List<Info> nodesToInfos(final Enumeration<DefaultMutableTreeNode> e) {
-        final List<Info> list = new ArrayList<Info>();
-        swingUtils.invokeAndWait(new Runnable() {
-            public void run() {
-                while (e.hasMoreElements()) {
-                    final DefaultMutableTreeNode n = e.nextElement();
-                    list.add((Info) n.getUserObject());
-                }
+        final List<Info> list = new ArrayList<>();
+        swingUtils.invokeAndWait(() -> {
+            while (e.hasMoreElements()) {
+                final DefaultMutableTreeNode n = e.nextElement();
+                list.add((Info) n.getUserObject());
             }
         });
         return list;
     }
 
     public void addChild(final DefaultMutableTreeNode parent, final MutableTreeNode child) {
-        final DefaultMutableTreeNode parent0 = parent;
-        if (parent0 == null) {
+        if (parent == null) {
             LOG.appError("addChild: parent cannot be null");
             return;
         }
-        swingUtils.invokeInEdt(new Runnable() {
-            @Override
-            public void run() {
-                parent0.add(child);
-            }
-        });
+        swingUtils.invokeInEdt(() -> parent.add(child));
     }
 
     public int getIndex(final DefaultMutableTreeNode parent, final DefaultMutableTreeNode child) {
         final IntResult intResult = new IntResult();
-        swingUtils.invokeAndWait(new Runnable() {
-            @Override
-            public void run() {
-                intResult.set(parent.getIndex(child));
-            }
-        });
+        swingUtils.invokeAndWait(() -> intResult.set(parent.getIndex(child)));
         return intResult.get();
     }
 
     public int getChildCount(final DefaultMutableTreeNode parent) {
         final IntResult intResult = new IntResult();
-        swingUtils.invokeAndWait(new Runnable() {
-            @Override
-            public void run() {
-                intResult.set(parent.getChildCount());
-            }
-        });
+        swingUtils.invokeAndWait(() -> intResult.set(parent.getChildCount()));
         return intResult.get();
     }
 
     public void removeFromParent(final Collection<DefaultMutableTreeNode> nodes) {
-        swingUtils.invokeInEdt(new Runnable() {
-            @Override
-            public void run() {
-                for (final DefaultMutableTreeNode node : nodes) {
-                    removeNodeAndSelectParent(node);
-                }
+        swingUtils.invokeInEdt(() -> {
+            for (final DefaultMutableTreeNode node : nodes) {
+                removeNodeAndSelectParent(node);
             }
         });
     }
 
     public void sortChildrenWithNewUp(final DefaultMutableTreeNode parent) {
-        swingUtils.invokeInEdt(new Runnable() {
-            @Override
-            public void run() {
-                int i = 0;
-                for (int j = 0; j < parent.getChildCount(); j++) {
-                    final DefaultMutableTreeNode node = (DefaultMutableTreeNode) parent.getChildAt(j);
-                    final EditableInfo info = (EditableInfo) node.getUserObject();
-                    final String name = info.getName();
-                    if (i > 0) {
-                        final DefaultMutableTreeNode prev = (DefaultMutableTreeNode) parent.getChildAt(j - 1);
-                        final EditableInfo prevI = (EditableInfo) prev.getUserObject();
-                        if (prevI.getClass().getName().equals(info.getClass().getName())) {
-                            final String prevN = prevI.getName();
-                            if (!prevI.getResource().isNew()
-                                    && !info.getResource().isNew()
-                                    && (prevN != null && prevN.compareTo(name) > 0)) {
-                                parent.remove(j);
-                                parent.insert(node, j - 1);
-                            }
-                        } else {
-                            i = 0;
+        swingUtils.invokeInEdt(() -> {
+            int i = 0;
+            for (int j = 0; j < parent.getChildCount(); j++) {
+                final DefaultMutableTreeNode node = (DefaultMutableTreeNode) parent.getChildAt(j);
+                final EditableInfo info = (EditableInfo) node.getUserObject();
+                final String name = info.getName();
+                if (i > 0) {
+                    final DefaultMutableTreeNode prev = (DefaultMutableTreeNode) parent.getChildAt(j - 1);
+                    final EditableInfo prevI = (EditableInfo) prev.getUserObject();
+                    if (prevI.getClass().getName().equals(info.getClass().getName())) {
+                        final String prevN = prevI.getName();
+                        if (!prevI.getResource().isNew()
+                                && !info.getResource().isNew()
+                                && (prevN != null && prevN.compareTo(name) > 0)) {
+                            parent.remove(j);
+                            parent.insert(node, j - 1);
                         }
+                    } else {
+                        i = 0;
                     }
-                    i++;
                 }
+                i++;
             }
         });
     }
 
     public void removeChildren(final DefaultMutableTreeNode parent) {
-        swingUtils.invokeInEdt(new Runnable() {
-            @Override
-            public void run() {
-                parent.removeAllChildren();
-            }
-        });
+        swingUtils.invokeInEdt(parent::removeAllChildren);
     }
 
 
-    private void removeNodeAndSelectParent(DefaultMutableTreeNode node) {
-        final DefaultMutableTreeNode nodeToRemove = node;
+    private void removeNodeAndSelectParent(final DefaultMutableTreeNode nodeToRemove) {
         if (nodeToRemove == null) {
             return;
         }
@@ -361,15 +315,10 @@ public class TreeMenuController {
     }
 
     private void insertNode(final DefaultMutableTreeNode parent, final DefaultMutableTreeNode child, final int i) {
-        swingUtils.invokeInEdt(new Runnable() {
-            @Override
-            public void run() {
-                parent.insert(child, i);
-            }
-        });
+        swingUtils.invokeInEdt(() -> parent.insert(child, i));
     }
 
-    private class IntResult {
+    private static class IntResult {
         volatile int result = 0;
 
         void set(final int result) {
