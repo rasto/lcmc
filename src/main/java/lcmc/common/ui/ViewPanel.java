@@ -21,28 +21,23 @@
  */
 package lcmc.common.ui;
 
-import java.awt.BorderLayout;
-import java.awt.Dimension;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
+import lcmc.cluster.ui.network.InfoPresenter;
+import lcmc.common.domain.util.Tools;
+import lcmc.common.ui.treemenu.TreeMenuController;
+import lcmc.common.ui.utils.SwingUtils;
+
 import javax.inject.Inject;
 import javax.inject.Named;
-import javax.swing.JComponent;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JSplitPane;
-import javax.swing.JTree;
+import javax.swing.*;
 import javax.swing.event.TreeModelEvent;
 import javax.swing.event.TreeModelListener;
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreePath;
-
-import lcmc.cluster.ui.network.InfoPresenter;
-import lcmc.common.domain.util.Tools;
-import lcmc.common.ui.treemenu.TreeMenuController;
-import lcmc.common.ui.utils.SwingUtils;
+import java.awt.*;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * An implementation of a host view with tree of resources. This view is used
@@ -73,10 +68,8 @@ public class ViewPanel extends JPanel {
         setBackground(Tools.getDefaultColor("ViewPanel.Status.Background"));
     }
 
-    /** Returns the menu tree. */
-    public final JTree getTree(final Browser browser) {
-        treeMenuController.init();
-        final JTree tree = treeMenuController.getMenuTree();
+    public final JTree createPanels(final JTree tree) {
+
         final JScrollPane resourcesTreePane = new JScrollPane(tree);
 
         final JPanel resourceInfo = new JPanel();
@@ -88,6 +81,11 @@ public class ViewPanel extends JPanel {
         viewSP.setPreferredSize(MENU_TREE_SIZE);
         add(viewSP);
 
+        return tree;
+    }
+
+    public JTree createMenuTree(final Browser browser) {
+        final JTree tree = treeMenuController.getMenuTree();
         // Listen for when the selection changes.
         tree.addTreeSelectionListener(new TreeSelectionListener() {
             @Override
@@ -97,46 +95,46 @@ public class ViewPanel extends JPanel {
         });
 
         tree.getModel().addTreeModelListener(
-            new TreeModelListener() {
-                @Override
-                public void treeNodesChanged(final TreeModelEvent e) {
-                    if (!disabledDuringLoad) {
-                        final Object[] selected = e.getChildren();
-                        if (selected != null && selected.length > 0) {
-                            final Info info = (Info) ((DefaultMutableTreeNode) selected[0]).getUserObject();
-                            setRightComponentInView(browser, info);
+                new TreeModelListener() {
+                    @Override
+                    public void treeNodesChanged(final TreeModelEvent e) {
+                        if (!disabledDuringLoad) {
+                            final Object[] selected = e.getChildren();
+                            if (selected != null && selected.length > 0) {
+                                final Info info = (Info) ((DefaultMutableTreeNode) selected[0]).getUserObject();
+                                setRightComponentInView(browser, info);
+                            }
+                        }
+                    }
+
+                    @Override
+                    public void treeNodesInserted(final TreeModelEvent e) {
+                    /* do nothing */
+                    }
+
+                    @Override
+                    public void treeNodesRemoved(final TreeModelEvent e) {
+                    /* do nothing */
+                    }
+
+                    @Override
+                    public void treeStructureChanged(final TreeModelEvent e) {
+                        final Object[] path = e.getPath();
+                        if (!disabledDuringLoad) {
+                            final TreePath tp = new TreePath(path);
+                            final InfoPresenter infoPresenter =
+                                    (InfoPresenter) ((DefaultMutableTreeNode) tp.getLastPathComponent()).getUserObject();
+                            if (infoPresenter instanceof EditableInfo) {
+                                swingUtils.invokeInEdt(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        tree.setSelectionPath(tp);
+                                    }
+                                });
+                            }
                         }
                     }
                 }
-
-                @Override
-                public void treeNodesInserted(final TreeModelEvent e) {
-                    /* do nothing */
-                }
-
-                @Override
-                public void treeNodesRemoved(final TreeModelEvent e) {
-                    /* do nothing */
-                }
-
-                @Override
-                public void treeStructureChanged(final TreeModelEvent e) {
-                    final Object[] path = e.getPath();
-                    if (!disabledDuringLoad) {
-                        final TreePath tp = new TreePath(path);
-                        final InfoPresenter infoPresenter =
-                                (InfoPresenter) ((DefaultMutableTreeNode) tp.getLastPathComponent()).getUserObject();
-                        if (infoPresenter instanceof EditableInfo) {
-                           swingUtils.invokeInEdt(new Runnable() {
-                                                        @Override
-                                                        public void run() {
-                                                            tree.setSelectionPath(tp);
-                                                        }
-                                                    });
-                        }
-                    }
-                }
-            }
         );
         return tree;
     }

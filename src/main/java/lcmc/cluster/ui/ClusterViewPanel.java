@@ -20,14 +20,17 @@
  * the Free Software Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 package lcmc.cluster.ui;
-import java.awt.BorderLayout;
+
+import lcmc.cluster.domain.Cluster;
+import lcmc.common.domain.AllHostsUpdatable;
+import lcmc.common.ui.ViewPanel;
+import lcmc.common.ui.main.MainData;
+import lombok.val;
+
 import javax.inject.Inject;
 import javax.inject.Named;
-import javax.swing.Box;
-import lcmc.cluster.domain.Cluster;
-import lcmc.common.ui.main.MainData;
-import lcmc.common.ui.ViewPanel;
-import lcmc.common.domain.AllHostsUpdatable;
+import javax.swing.*;
+import java.awt.*;
 
 /**
  * An implementation of a custer view with tree of services.
@@ -46,7 +49,8 @@ public class ClusterViewPanel extends ViewPanel implements AllHostsUpdatable {
 
         clusterBrowser.init(cluster);
         cluster.setBrowser(clusterBrowser);
-        getTree(clusterBrowser);
+        val tree = createMenuTree(clusterBrowser);
+        createPanels(tree);
         cluster.getBrowser().initClusterBrowser();
         cluster.getBrowser().setClusterViewPanel(this);
         add(Box.createVerticalStrut(4), BorderLayout.PAGE_START);

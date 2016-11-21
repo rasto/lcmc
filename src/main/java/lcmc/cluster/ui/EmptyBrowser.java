@@ -21,20 +21,23 @@
  */
 package lcmc.cluster.ui;
 
-import java.util.TreeSet;
+import lcmc.cluster.domain.Cluster;
+import lcmc.common.domain.util.Tools;
+import lcmc.common.ui.Browser;
+import lcmc.common.ui.CategoryInfo;
+import lcmc.common.ui.treemenu.TreeMenuController;
+import lcmc.host.domain.Host;
+import lcmc.host.domain.Hosts;
+import lcmc.host.ui.AllHostsInfo;
+import lcmc.host.ui.HostBrowser;
+
+import javax.annotation.Resource;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.MutableTreeNode;
-
-import lcmc.cluster.domain.Cluster;
-import lcmc.common.ui.Browser;
-import lcmc.common.ui.treemenu.TreeMenuController;
-import lcmc.host.ui.HostBrowser;
-import lcmc.host.domain.Host;
-import lcmc.host.ui.AllHostsInfo;
-import lcmc.host.domain.Hosts;
+import java.util.TreeSet;
 
 /**
  * This class holds cluster resource data in a tree. It shows panels that allow
@@ -53,10 +56,13 @@ public final class EmptyBrowser extends Browser {
     private Hosts allHosts;
     @Inject
     private TreeMenuController treeMenuController;
+    @Resource(name="categoryInfo")
+    private CategoryInfo resourcesCategory;
 
     void init() {
         allHostsInfo.init(this);
-        treeTop = treeMenuController.createMenuTreeTop();
+        resourcesCategory.init(Tools.getString("Browser.Resources"), null);
+        treeTop = treeMenuController.createMenuTreeTop(resourcesCategory);
     }
 
     /** Adds small box with cluster possibility to load it and remove it. */

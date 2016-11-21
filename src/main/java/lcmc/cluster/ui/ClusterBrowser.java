@@ -325,6 +325,8 @@ public class ClusterBrowser extends Browser {
 
     @Inject
     private VMListInfo vmListInfo;
+    @Resource(name="categoryInfo")
+    private CategoryInfo resourcesCategory;
 
     public void init(final Cluster cluster) {
         this.cluster = cluster;
@@ -332,7 +334,8 @@ public class ClusterBrowser extends Browser {
         crmGraph.initGraph(this);
         drbdGraph.initGraph(this);
         globalInfo.einit(Tools.getString("ClusterBrowser.Drbd"), this);
-        treeTop = treeMenuController.createMenuTreeTop();
+        resourcesCategory.init(Tools.getString("Browser.Resources"), null);
+        treeTop = treeMenuController.createMenuTreeTop(resourcesCategory);
     }
 
     private void initOperations() {

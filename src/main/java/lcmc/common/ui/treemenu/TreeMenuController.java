@@ -22,25 +22,17 @@ package lcmc.common.ui.treemenu;
 
 import lcmc.cluster.ui.network.InfoPresenter;
 import lcmc.common.domain.util.Tools;
-import lcmc.common.ui.CategoryInfo;
 import lcmc.common.ui.EditableInfo;
 import lcmc.common.ui.Info;
 import lcmc.common.ui.utils.SwingUtils;
 import lcmc.logger.Logger;
 import lcmc.logger.LoggerFactory;
 
-import javax.annotation.Resource;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
-import javax.swing.JTree;
-import javax.swing.tree.DefaultMutableTreeNode;
-import javax.swing.tree.DefaultTreeModel;
-import javax.swing.tree.MutableTreeNode;
-import javax.swing.tree.TreeCellRenderer;
-import javax.swing.tree.TreeNode;
-import javax.swing.tree.TreePath;
-import javax.swing.tree.TreeSelectionModel;
+import javax.swing.*;
+import javax.swing.tree.*;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.util.ArrayList;
@@ -55,25 +47,63 @@ public class TreeMenuController {
     private DefaultTreeModel treeModel;
     private JTree tree;
     private final SwingUtils swingUtils;
-    @Resource(name="categoryInfo")
-    private CategoryInfo resourcesCategory;
 
     @Inject
-    public TreeMenuController(SwingUtils swingUtils) {
+    public TreeMenuController(final SwingUtils swingUtils) {
         this.swingUtils = swingUtils;
-    }
-
-    public final DefaultMutableTreeNode createMenuTreeTop() {
-        resourcesCategory.init(Tools.getString("Browser.Resources"), null);
-        final DefaultMutableTreeNode treeTop = new DefaultMutableTreeNode(resourcesCategory);
-        treeModel = new DefaultTreeModel(treeTop);
-        return treeTop;
     }
 
     public final DefaultMutableTreeNode createMenuTreeTop(final InfoPresenter infoPresenter) {
         final DefaultMutableTreeNode treeTop = new DefaultMutableTreeNode(infoPresenter);
         treeModel = new DefaultTreeModel(treeTop);
+        createTree();
         return treeTop;
+    }
+
+    private void createTree() {
+        tree = new JTree(treeModel);
+        tree.setOpaque(true);
+        tree.setBackground(Tools.getDefaultColor("ViewPanel.Background"));
+        tree.setToggleClickCount(2);
+        tree.addMouseListener(new MouseListener() {
+            @Override
+            public void mouseClicked(final MouseEvent e) {
+                    /* do nothing */
+            }
+
+            @Override
+            public void mouseEntered(final MouseEvent e) {
+                    /* do nothing */
+            }
+
+            @Override
+            public void mouseExited(final MouseEvent e) {
+                    /* do nothing */
+            }
+
+            @Override
+            public void mousePressed(final MouseEvent e) {
+                final int selRow = tree.getRowForLocation(e.getX(), e.getY());
+                final TreePath selPath = tree.getPathForLocation(e.getX(), e.getY());
+                if (selRow != -1 && e.getButton() > 1) {
+                    final InfoPresenter infoPresenter =
+                            (InfoPresenter) ((DefaultMutableTreeNode) selPath.getLastPathComponent()).getUserObject();
+                    if (infoPresenter != null) {
+                        infoPresenter.showPopup(tree, e.getX(), e.getY());
+                        tree.setSelectionPath(selPath);
+                    }
+                }
+            }
+
+            @Override
+            public void mouseReleased(final MouseEvent e) {
+                    /* do nothing */
+            }
+        });
+        tree.setRootVisible(false);
+        tree.setShowsRootHandles(true);
+        tree.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
+        tree.setCellRenderer(createCellRenderer());
     }
 
     public DefaultMutableTreeNode createMenuItem(
@@ -147,20 +177,12 @@ public class TreeMenuController {
         ((Info) node.getUserObject()).setNode(node);
     }
 
-    public final DefaultTreeModel getTreeModel() {
-        return treeModel;
-    }
-
     public void selectPath(final Object[] path) {
         swingUtils.invokeInEdt(() -> {
             final TreePath tp = new TreePath(path);
             tree.expandPath(tp);
             tree.setSelectionPath(tp);
         });
-    }
-
-    public final TreeCellRenderer createCellRenderer() {
-        return new CellRenderer();
     }
 
     public void moveNodeToPosition(final DefaultMutableTreeNode node, final int position) {
@@ -175,52 +197,6 @@ public class TreeMenuController {
                 }
             }
         });
-    }
-
-    public void init() {
-        tree = new JTree(getTreeModel());
-        tree.setOpaque(true);
-        tree.setBackground(Tools.getDefaultColor("ViewPanel.Background"));
-        tree.setToggleClickCount(2);
-        tree.addMouseListener(new MouseListener() {
-            @Override
-            public void mouseClicked(final MouseEvent e) {
-                    /* do nothing */
-            }
-
-            @Override
-            public void mouseEntered(final MouseEvent e) {
-                    /* do nothing */
-            }
-
-            @Override
-            public void mouseExited(final MouseEvent e) {
-                    /* do nothing */
-            }
-
-            @Override
-            public void mousePressed(final MouseEvent e) {
-                final int selRow = tree.getRowForLocation(e.getX(), e.getY());
-                final TreePath selPath = tree.getPathForLocation(e.getX(), e.getY());
-                if (selRow != -1 && e.getButton() > 1) {
-                    final InfoPresenter infoPresenter =
-                            (InfoPresenter) ((DefaultMutableTreeNode) selPath.getLastPathComponent()).getUserObject();
-                    if (infoPresenter != null) {
-                        infoPresenter.showPopup(tree, e.getX(), e.getY());
-                        tree.setSelectionPath(selPath);
-                    }
-                }
-            }
-
-            @Override
-            public void mouseReleased(final MouseEvent e) {
-                    /* do nothing */
-            }
-        });
-        tree.setRootVisible(false);
-        tree.setShowsRootHandles(true);
-        tree.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
-        tree.setCellRenderer(createCellRenderer());
     }
 
     public final void removeNode(final DefaultMutableTreeNode node) {
@@ -328,5 +304,9 @@ public class TreeMenuController {
         int get() {
             return result;
         }
+    }
+
+    private TreeCellRenderer createCellRenderer() {
+        return new CellRenderer();
     }
 }
