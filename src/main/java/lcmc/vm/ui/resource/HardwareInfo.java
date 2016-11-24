@@ -28,26 +28,14 @@ import lcmc.cluster.ui.ClusterBrowser;
 import lcmc.cluster.ui.widget.Check;
 import lcmc.cluster.ui.widget.Widget;
 import lcmc.cluster.ui.widget.WidgetFactory;
-import lcmc.common.domain.AccessMode;
-import lcmc.common.domain.Application;
-import lcmc.common.domain.EnablePredicate;
-import lcmc.common.domain.Predicate;
-import lcmc.common.domain.ResourceValue;
-import lcmc.common.domain.StringValue;
-import lcmc.common.domain.Unit;
-import lcmc.common.domain.Value;
+import lcmc.common.domain.*;
 import lcmc.common.domain.util.Tools;
 import lcmc.common.ui.Browser;
 import lcmc.common.ui.EditableInfo;
 import lcmc.common.ui.Info;
 import lcmc.common.ui.main.MainData;
-import lcmc.common.ui.treemenu.TreeMenuController;
-import lcmc.common.ui.utils.ComponentWithTest;
-import lcmc.common.ui.utils.MenuAction;
-import lcmc.common.ui.utils.MenuFactory;
-import lcmc.common.ui.utils.MyButton;
-import lcmc.common.ui.utils.SwingUtils;
-import lcmc.common.ui.utils.UpdatableItem;
+import lcmc.common.ui.treemenu.ClusterTreeMenu;
+import lcmc.common.ui.utils.*;
 import lcmc.host.domain.Host;
 import lcmc.logger.Logger;
 import lcmc.logger.LoggerFactory;
@@ -103,7 +91,7 @@ public abstract class HardwareInfo extends EditableInfo {
     @Inject
     private MainData mainData;
     @Inject
-    private TreeMenuController treeMenuController;
+    private ClusterTreeMenu clusterTreeMenu;
 
     void init(final String name, final Browser browser, final DomainInfo vmsVirtualDomainInfo) {
         super.einit(Optional.of(new ResourceValue(name)), name, browser);
@@ -368,7 +356,7 @@ public abstract class HardwareInfo extends EditableInfo {
         if (getResource().isNew()) {
             super.removeMyself(runMode);
             getResource().setNew(false);
-            treeMenuController.removeNode(getNode());
+            clusterTreeMenu.removeNode(getNode());
             return;
         }
         String desc = Tools.getString("HardwareInfo.confirmRemove.Description");

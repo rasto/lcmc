@@ -23,7 +23,6 @@ package lcmc.common.ui;
 
 import lcmc.cluster.ui.network.InfoPresenter;
 import lcmc.common.domain.util.Tools;
-import lcmc.common.ui.treemenu.TreeMenuController;
 import lcmc.common.ui.utils.SwingUtils;
 
 import javax.inject.Inject;
@@ -60,8 +59,6 @@ public class ViewPanel extends JPanel {
     private Info lastSelectedInfo = null;
     @Inject
     private SwingUtils swingUtils;
-    @Inject
-    private TreeMenuController treeMenuController;
 
     public ViewPanel() {
         super(new BorderLayout());
@@ -84,8 +81,7 @@ public class ViewPanel extends JPanel {
         return tree;
     }
 
-    public JTree createMenuTree(final Browser browser) {
-        final JTree tree = treeMenuController.getMenuTree();
+    public JTree createMenuTree(final Browser browser, final JTree tree) {
         // Listen for when the selection changes.
         tree.addTreeSelectionListener(new TreeSelectionListener() {
             @Override

@@ -25,6 +25,7 @@ import lcmc.cluster.domain.Cluster;
 import lcmc.common.domain.AllHostsUpdatable;
 import lcmc.common.ui.ViewPanel;
 import lcmc.common.ui.main.MainData;
+import lcmc.common.ui.treemenu.ClusterTreeMenu;
 import lombok.val;
 
 import javax.inject.Inject;
@@ -43,13 +44,15 @@ public class ClusterViewPanel extends ViewPanel implements AllHostsUpdatable {
     private ClusterBrowser clusterBrowser;
     @Inject
     private MainData mainData;
+    @Inject
+    private ClusterTreeMenu clusterTreeMenu;
 
     public void init(final Cluster cluster) {
         this.cluster = cluster;
 
         clusterBrowser.init(cluster);
         cluster.setBrowser(clusterBrowser);
-        val tree = createMenuTree(clusterBrowser);
+        val tree = createMenuTree(clusterBrowser, clusterTreeMenu.getMenuTree());
         createPanels(tree);
         cluster.getBrowser().initClusterBrowser();
         cluster.getBrowser().setClusterViewPanel(this);

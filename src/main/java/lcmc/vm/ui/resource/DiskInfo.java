@@ -21,43 +21,32 @@
  */
 package lcmc.vm.ui.resource;
 
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.TreeSet;
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.swing.ImageIcon;
-import javax.swing.JComponent;
-import javax.swing.JPanel;
+import lcmc.cluster.ui.widget.Widget;
+import lcmc.cluster.ui.widget.WidgetFactory;
 import lcmc.common.domain.AccessMode;
 import lcmc.common.domain.Application;
-import lcmc.common.ui.treemenu.TreeMenuController;
-import lcmc.common.ui.utils.SwingUtils;
-import lcmc.host.domain.Host;
 import lcmc.common.domain.StringValue;
+import lcmc.common.domain.Value;
+import lcmc.common.domain.util.Tools;
+import lcmc.common.ui.Browser;
+import lcmc.common.ui.treemenu.ClusterTreeMenu;
+import lcmc.common.ui.utils.MyButton;
+import lcmc.common.ui.utils.SwingUtils;
+import lcmc.drbd.ui.resource.BlockDevInfo;
+import lcmc.host.domain.Host;
+import lcmc.logger.Logger;
+import lcmc.logger.LoggerFactory;
 import lcmc.vm.domain.VMParams;
 import lcmc.vm.domain.VmsXml;
 import lcmc.vm.domain.data.DiskData;
-import lcmc.common.domain.Value;
-import lcmc.common.ui.Browser;
-import lcmc.drbd.ui.resource.BlockDevInfo;
-import lcmc.cluster.ui.widget.Widget;
-import lcmc.cluster.ui.widget.WidgetFactory;
-import lcmc.logger.Logger;
-import lcmc.logger.LoggerFactory;
-import lcmc.common.ui.utils.MyButton;
-import lcmc.common.domain.util.Tools;
 import org.w3c.dom.Node;
+
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.swing.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.*;
 
 /**
  * This class holds info about Virtual Disks.
@@ -408,7 +397,7 @@ public final class DiskInfo extends HardwareInfo {
     /** Table panel. */
     private JComponent tablePanel = null;
     @Inject
-    private TreeMenuController treeMenuController;
+    private ClusterTreeMenu clusterTreeMenu;
 
     public void init(final String name, final Browser browser, final DomainInfo vmsVirtualDomainInfo) {
         super.init(name, browser, vmsVirtualDomainInfo);
@@ -739,7 +728,7 @@ public final class DiskInfo extends HardwareInfo {
             }
         }
         getResource().setNew(false);
-        treeMenuController.reloadNode(getNode(), false);
+        clusterTreeMenu.reloadNode(getNode(), false);
         getBrowser().periodicalVmsUpdate(
                 getVMSVirtualDomainInfo().getDefinedOnHosts());
         swingUtils.invokeLater(new Runnable() {
@@ -1061,7 +1050,7 @@ public final class DiskInfo extends HardwareInfo {
         }
         getBrowser().periodicalVmsUpdate(
                 getVMSVirtualDomainInfo().getDefinedOnHosts());
-        treeMenuController.removeNode(getNode());
+        clusterTreeMenu.removeNode(getNode());
     }
 
     /** Returns string representation. */

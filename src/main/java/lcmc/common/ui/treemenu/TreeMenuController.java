@@ -28,9 +28,6 @@ import lcmc.common.ui.utils.SwingUtils;
 import lcmc.logger.Logger;
 import lcmc.logger.LoggerFactory;
 
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Singleton;
 import javax.swing.*;
 import javax.swing.tree.*;
 import java.awt.event.MouseEvent;
@@ -40,15 +37,13 @@ import java.util.Collection;
 import java.util.Enumeration;
 import java.util.List;
 
-@Named
-@Singleton
-public class TreeMenuController {
+abstract class TreeMenuController {
+
     private static final Logger LOG = LoggerFactory.getLogger(TreeMenuController.class);
     private DefaultTreeModel treeModel;
     private JTree tree;
     private final SwingUtils swingUtils;
 
-    @Inject
     public TreeMenuController(final SwingUtils swingUtils) {
         this.swingUtils = swingUtils;
     }

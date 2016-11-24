@@ -19,37 +19,29 @@
  */
 package lcmc.vm.ui.resource;
 
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.swing.ImageIcon;
-import javax.swing.JComponent;
-import javax.swing.JPanel;
-import lcmc.common.domain.AccessMode;
-import lcmc.common.domain.Application;
-import lcmc.common.ui.treemenu.TreeMenuController;
-import lcmc.common.ui.utils.SwingUtils;
-import lcmc.host.domain.Host;
-import lcmc.common.domain.StringValue;
-import lcmc.vm.domain.VmsXml;
-import lcmc.vm.domain.data.FilesystemData;
-import lcmc.common.domain.Value;
-import lcmc.common.ui.Browser;
-import lcmc.drbd.ui.resource.BlockDevInfo;
 import lcmc.cluster.ui.widget.Widget;
 import lcmc.cluster.ui.widget.WidgetFactory;
-import lcmc.common.ui.utils.MyButton;
+import lcmc.common.domain.AccessMode;
+import lcmc.common.domain.Application;
+import lcmc.common.domain.StringValue;
+import lcmc.common.domain.Value;
 import lcmc.common.domain.util.Tools;
+import lcmc.common.ui.Browser;
+import lcmc.common.ui.treemenu.ClusterTreeMenu;
+import lcmc.common.ui.utils.MyButton;
+import lcmc.common.ui.utils.SwingUtils;
+import lcmc.drbd.ui.resource.BlockDevInfo;
+import lcmc.host.domain.Host;
+import lcmc.vm.domain.VmsXml;
+import lcmc.vm.domain.data.FilesystemData;
 import org.w3c.dom.Node;
+
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.swing.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.*;
 
 /**
  * This class holds info about Virtual filesystem.
@@ -129,7 +121,7 @@ public final class FilesystemInfo extends HardwareInfo {
     /** Table panel. */
     private JComponent tablePanel = null;
     @Inject
-    private TreeMenuController treeMenuController;
+    private ClusterTreeMenu clusterTreeMenu;
 
     void init(final String name, final Browser browser, final DomainInfo domainInfo) {
         super.init(name, browser, domainInfo);
@@ -334,7 +326,7 @@ public final class FilesystemInfo extends HardwareInfo {
             }
         }
         getResource().setNew(false);
-        treeMenuController.reloadNode(getNode(), false);
+        clusterTreeMenu.reloadNode(getNode(), false);
         getBrowser().periodicalVmsUpdate(
                 getVMSVirtualDomainInfo().getDefinedOnHosts());
         swingUtils.invokeLater(new Runnable() {
@@ -480,7 +472,7 @@ public final class FilesystemInfo extends HardwareInfo {
         }
         getBrowser().periodicalVmsUpdate(
                 getVMSVirtualDomainInfo().getDefinedOnHosts());
-        treeMenuController.removeNode(getNode());
+        clusterTreeMenu.removeNode(getNode());
     }
 
     /** Returns string representation. */

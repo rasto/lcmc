@@ -33,36 +33,19 @@ import lcmc.common.domain.Application;
 import lcmc.common.domain.ExecCallback;
 import lcmc.common.domain.NewOutputCallback;
 import lcmc.common.domain.util.Tools;
-import lcmc.common.ui.Access;
-import lcmc.common.ui.Browser;
-import lcmc.common.ui.CallbackAction;
-import lcmc.common.ui.CategoryInfo;
-import lcmc.common.ui.Info;
-import lcmc.common.ui.ResourceGraph;
+import lcmc.common.ui.*;
 import lcmc.common.ui.main.MainData;
 import lcmc.common.ui.main.ProgressIndicator;
-import lcmc.common.ui.treemenu.TreeMenuController;
+import lcmc.common.ui.treemenu.ClusterTreeMenu;
 import lcmc.common.ui.utils.ButtonCallback;
 import lcmc.common.ui.utils.ComponentWithTest;
 import lcmc.common.ui.utils.SwingUtils;
-import lcmc.crm.domain.ClusterStatus;
-import lcmc.crm.domain.CrmXml;
-import lcmc.crm.domain.PtestData;
-import lcmc.crm.domain.ResourceAgent;
-import lcmc.crm.domain.Service;
+import lcmc.crm.domain.*;
 import lcmc.crm.service.CRM;
 import lcmc.crm.service.Heartbeat;
 import lcmc.crm.ui.CrmGraph;
-import lcmc.crm.ui.resource.AvailableServiceInfo;
-import lcmc.crm.ui.resource.AvailableServicesInfo;
-import lcmc.crm.ui.resource.CRMInfo;
-import lcmc.crm.ui.resource.GroupInfo;
-import lcmc.crm.ui.resource.HbConnectionInfo;
-import lcmc.crm.ui.resource.ResourceAgentClassInfo;
+import lcmc.crm.ui.resource.*;
 import lcmc.crm.ui.resource.update.ResourceUpdater;
-import lcmc.crm.ui.resource.RscDefaultsInfo;
-import lcmc.crm.ui.resource.ServiceInfo;
-import lcmc.crm.ui.resource.ServicesInfo;
 import lcmc.drbd.domain.DRBDtestData;
 import lcmc.drbd.domain.DrbdXml;
 import lcmc.drbd.service.DRBD;
@@ -94,17 +77,8 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreeNode;
 import java.awt.*;
 import java.awt.geom.Point2D;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
+import java.util.*;
 import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Set;
-import java.util.TreeMap;
-import java.util.TreeSet;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
@@ -232,7 +206,7 @@ public class ClusterBrowser extends Browser {
     @Inject
     private Provider<VmsXml> vmsXmlProvider;
     @Inject
-    private TreeMenuController treeMenuController;
+    private ClusterTreeMenu clusterTreeMenu;
     @Inject
     private ClusterEventBus clusterEventBus;
     @Inject
@@ -325,8 +299,6 @@ public class ClusterBrowser extends Browser {
 
     @Inject
     private VMListInfo vmListInfo;
-    @Resource(name="categoryInfo")
-    private CategoryInfo resourcesCategory;
 
     public void init(final Cluster cluster) {
         this.cluster = cluster;
@@ -334,8 +306,7 @@ public class ClusterBrowser extends Browser {
         crmGraph.initGraph(this);
         drbdGraph.initGraph(this);
         globalInfo.einit(Tools.getString("ClusterBrowser.Drbd"), this);
-        resourcesCategory.init(Tools.getString("Browser.Resources"), null);
-        treeTop = treeMenuController.createMenuTreeTop(resourcesCategory);
+        treeTop = clusterTreeMenu.createMenuTreeTop();
     }
 
     private void initOperations() {
@@ -488,8 +459,8 @@ public class ClusterBrowser extends Browser {
     void addVmsNode() {
         if (vmsNode == null) {
             vmListInfo.init(Tools.getString("ClusterBrowser.VMs"), this);
-            vmsNode = treeMenuController.createMenuItem(treeTop, vmListInfo);
-            treeMenuController.reloadNode(treeTop, true);
+            vmsNode = clusterTreeMenu.createMenuItem(treeTop, vmListInfo);
+            clusterTreeMenu.reloadNode(treeTop, true);
         }
     }
 
@@ -498,33 +469,33 @@ public class ClusterBrowser extends Browser {
         LOG.debug1("initClusterBrowser: start");
         /* hosts */
         clusterHostsInfo.init(Tools.getString("ClusterBrowser.ClusterHosts"), this);
-        clusterHostsNode = treeMenuController.createMenuItem(treeTop, clusterHostsInfo);
+        clusterHostsNode = clusterTreeMenu.createMenuItem(treeTop, clusterHostsInfo);
 
         /* networks */
         networksCategory.init(Tools.getString("ClusterBrowser.Networks"), this);
-        networksNode = treeMenuController.createMenuItem(treeTop, networksCategory);
+        networksNode = clusterTreeMenu.createMenuItem(treeTop, networksCategory);
         updateCommonNetworks(networkService.getCommonNetworks(cluster));
 
         /* drbd */
-        drbdNode = treeMenuController.createMenuItem(treeTop, globalInfo);
+        drbdNode = clusterTreeMenu.createMenuItem(treeTop, globalInfo);
 
         /* CRM */
         final CRMInfo crmInfo = crmInfoProvider.get();
         crmInfo.init(Tools.getString("ClusterBrowser.ClusterManager"), this);
-        crmNode = treeMenuController.createMenuItem(treeTop, crmInfo);
+        crmNode = clusterTreeMenu.createMenuItem(treeTop, crmInfo);
 
         /* available services */
         availableServicesInfo.init(Tools.getString("ClusterBrowser.availableServices"), this);
-        availableServicesNode = treeMenuController.createMenuItem(crmNode, availableServicesInfo);
+        availableServicesNode = clusterTreeMenu.createMenuItem(crmNode, availableServicesInfo);
 
         /* resource defaults */
         rscDefaultsInfo = rscDefaultsInfoProvider.get();
         rscDefaultsInfo.einit("rsc_defaults", this);
         /* services */
         servicesInfo.einit(Tools.getString("ClusterBrowser.Services"), this);
-        servicesNode = treeMenuController.createMenuItem(crmNode, servicesInfo);
+        servicesNode = clusterTreeMenu.createMenuItem(crmNode, servicesInfo);
         addVmsNode();
-        treeMenuController.selectPath(new Object[]{treeTop, crmNode});
+        clusterTreeMenu.selectPath(new Object[]{treeTop, crmNode});
         addDrbdProxyNodes();
         LOG.debug1("initClusterBrowser: end");
     }
@@ -542,15 +513,15 @@ public class ClusterBrowser extends Browser {
         LOG.debug1("start: update cluster resources");
 
         /* cluster hosts */
-        treeMenuController.removeChildren(clusterHostsNode);
+        clusterTreeMenu.removeChildren(clusterHostsNode);
         for (final Host clusterHost : clusterHosts) {
             final HostBrowser hostBrowser = clusterHost.getBrowser();
             final DefaultMutableTreeNode resource = hostBrowser.getTreeTop();
-            treeMenuController.addChild(clusterHostsNode, resource);
+            clusterTreeMenu.addChild(clusterHostsNode, resource);
             crmGraph.addHost(hostBrowser.getHostInfo());
         }
 
-        treeMenuController.reloadNode(clusterHostsNode, false);
+        clusterTreeMenu.reloadNode(clusterHostsNode, false);
 
         swingUtils.invokeLater(new Runnable() {
             @Override
@@ -955,7 +926,7 @@ public class ClusterBrowser extends Browser {
                                                new Runnable() {
                                                    @Override
                                                    public void run() {
-                                                       treeMenuController.repaintMenuTree();
+                                                       clusterTreeMenu.repaintMenuTree();
                                                    }
                                                }
                                            );
@@ -1026,7 +997,7 @@ public class ClusterBrowser extends Browser {
         final boolean oldStatus = host.isCrmStatusOk();
         host.setCrmStatusOk(status);
         if (oldStatus != status) {
-            treeMenuController.nodeChanged(servicesNode);
+            clusterTreeMenu.nodeChanged(servicesNode);
         }
     }
 
@@ -1083,7 +1054,7 @@ public class ClusterBrowser extends Browser {
                                         /* one more time so that id-refs work.*/
                                         resourceUpdaterProvider.get().updateAllResources(ssi, ssi.getBrowser(), clusterStatus0, runMode);
                                     }
-                                    treeMenuController.repaintMenuTree();
+                                    clusterTreeMenu.repaintMenuTree();
                                     clusterHostsInfo.updateTable(ClusterHostsInfo.MAIN_TABLE);
                                 }
                                 final String online = clusterStatus0.isOnlineNode(host.getName());
@@ -1201,17 +1172,17 @@ public class ClusterBrowser extends Browser {
     /** Updates available services. */
     private void updateAvailableServices() {
         LOG.debug("updateAvailableServices: start");
-        treeMenuController.removeChildren(availableServicesNode);
+        clusterTreeMenu.removeChildren(availableServicesNode);
         for (final String crmClass : CRM_CLASSES) {
             final ResourceAgentClassInfo raci = resourceAgentClassInfoProvider.get();
             raci.init(crmClass, this);
             classInfoMap.put(crmClass, raci);
-            final DefaultMutableTreeNode classNode = treeMenuController.createMenuItem(availableServicesNode, raci);
+            final DefaultMutableTreeNode classNode = clusterTreeMenu.createMenuItem(availableServicesNode, raci);
             for (final ResourceAgent resourceAgent : crmXml.getServices(crmClass)) {
                 final AvailableServiceInfo availableService = availableServiceInfoProvider.get();
                 availableService.init(resourceAgent, this);
                 availableServiceMap.put(resourceAgent, availableService);
-                treeMenuController.createMenuItem(classNode, availableService);
+                clusterTreeMenu.createMenuItem(classNode, availableService);
             }
         }
     }
@@ -1232,7 +1203,7 @@ public class ClusterBrowser extends Browser {
         mVmsUpdateLock.lock();
         boolean nodeChanged = false;
         if (vmsNode != null) {
-            for (final Object info : treeMenuController.nodesToInfos(vmsNode.children())) {
+            for (final Object info : clusterTreeMenu.nodesToInfos(vmsNode.children())) {
                 final DomainInfo domainInfo = (DomainInfo) info;
                 if (domainNames.contains(domainInfo.toString())) {
                     /* keeping */
@@ -1250,14 +1221,14 @@ public class ClusterBrowser extends Browser {
             }
         }
 
-        treeMenuController.removeFromParent(nodesToRemove);
+        clusterTreeMenu.removeFromParent(nodesToRemove);
         if (vmsNode == null) {
             mVmsUpdateLock.unlock();
             return;
         }
         for (final String domainName : domainNames) {
             int i = 0;
-            for (final Object info : treeMenuController.nodesToInfos(vmsNode.children())) {
+            for (final Object info : clusterTreeMenu.nodesToInfos(vmsNode.children())) {
                 final DomainInfo domainInfo = (DomainInfo) info;
                 final String name = domainInfo.getName();
                 if (domainName != null && name != null && domainName.compareTo(domainInfo.getName()) < 0) {
@@ -1269,13 +1240,13 @@ public class ClusterBrowser extends Browser {
             final DomainInfo domainInfo = domainInfoProvider.get();
             domainInfo.einit(domainName, this);
             currentVMSVDIs.add(domainInfo);
-            treeMenuController.createMenuItem(vmsNode, domainInfo, i);
+            clusterTreeMenu.createMenuItem(vmsNode, domainInfo, i);
             domainInfo.updateParameters();
             nodeChanged = true;
         }
         mVmsUpdateLock.unlock();
         if (nodeChanged) {
-            treeMenuController.reloadNode(vmsNode, false);
+            clusterTreeMenu.reloadNode(vmsNode, false);
         }
         for (final ServiceInfo si : getExistingServiceList(null)) {
             final DomainInfo vmsvdi = si.connectWithVMS();
@@ -1381,12 +1352,12 @@ public class ClusterBrowser extends Browser {
     }
 
     private void updateCommonNetworks(final Collection<Network> networks) {
-        treeMenuController.removeChildren(networksNode);
+        clusterTreeMenu.removeChildren(networksNode);
         for (final Network network : networks) {
             final NetworkPresenter networkPresenter = networkFactory.createPresenter(cluster, network);
-            treeMenuController.createMenuItem(networksNode, networkPresenter);
+            clusterTreeMenu.createMenuItem(networksNode, networkPresenter);
         }
-        treeMenuController.reloadNode(networksNode, false);
+        clusterTreeMenu.reloadNode(networksNode, false);
     }
 
     /**
@@ -1511,14 +1482,14 @@ public class ClusterBrowser extends Browser {
 
 
     void highlightDrbd() {
-        treeMenuController.reloadNode(drbdNode, true);
+        clusterTreeMenu.reloadNode(drbdNode, true);
     }
 
     public void highlightServices() {
         if (getClusterViewPanel().isDisabledDuringLoad()) {
             return;
         }
-        treeMenuController.selectPath(new Object[]{treeTop, crmNode, servicesNode});
+        clusterTreeMenu.selectPath(new Object[]{treeTop, crmNode, servicesNode});
     }
 
     public ServiceInfo getServiceInfoFromCRMId(final String crmId) {
@@ -1980,7 +1951,7 @@ public class ClusterBrowser extends Browser {
      */
     public DomainInfo findVMSVirtualDomainInfo(final String name) {
         if (vmsNode != null && name != null) {
-            for (final Object info : treeMenuController.nodesToInfos(vmsNode.children())) {
+            for (final Object info : clusterTreeMenu.nodesToInfos(vmsNode.children())) {
                 final DomainInfo domainInfo = (DomainInfo) info;
                 if (name.equals(domainInfo.getName())) {
                     return domainInfo;
@@ -2029,11 +2000,11 @@ public class ClusterBrowser extends Browser {
         }
 
         if (vmsNode != null) {
-            for (final Object info : treeMenuController.nodesToInfos(vmsNode.children())) {
+            for (final Object info : clusterTreeMenu.nodesToInfos(vmsNode.children())) {
                 final DomainInfo domainInfo = (DomainInfo) info;
                 domainInfo.checkResourceFields(null, domainInfo.getParametersFromXML());
                 domainInfo.updateAdvancedPanels();
-                for (final Object grandChild : treeMenuController.nodesToInfos(domainInfo.getNode().children())) {
+                for (final Object grandChild : clusterTreeMenu.nodesToInfos(domainInfo.getNode().children())) {
                     final HardwareInfo hardwareInfo = (HardwareInfo) grandChild;
                     hardwareInfo.checkResourceFields(null, hardwareInfo.getParametersFromXML());
                     hardwareInfo.updateAdvancedPanels();
@@ -2296,5 +2267,13 @@ public class ClusterBrowser extends Browser {
 
     public GlobalInfo getGlobalInfo() {
         return globalInfo;
+    }
+
+    @Override
+    public void fireEventInViewPanel(final DefaultMutableTreeNode node) {
+        if (node != null) {
+            clusterTreeMenu.reloadNode(node, true);
+            clusterTreeMenu.nodeChanged(node);
+        }
     }
 }

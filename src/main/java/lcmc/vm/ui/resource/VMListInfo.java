@@ -30,12 +30,8 @@ import lcmc.common.domain.util.Tools;
 import lcmc.common.ui.Browser;
 import lcmc.common.ui.CategoryInfo;
 import lcmc.common.ui.Info;
-import lcmc.common.ui.treemenu.TreeMenuController;
-import lcmc.common.ui.utils.MenuAction;
-import lcmc.common.ui.utils.MenuFactory;
-import lcmc.common.ui.utils.MyButton;
-import lcmc.common.ui.utils.SwingUtils;
-import lcmc.common.ui.utils.UpdatableItem;
+import lcmc.common.ui.treemenu.ClusterTreeMenu;
+import lcmc.common.ui.utils.*;
 import lcmc.host.domain.Host;
 import lcmc.host.ui.HostBrowser;
 import lcmc.vm.domain.VmsXml;
@@ -46,14 +42,8 @@ import javax.inject.Named;
 import javax.inject.Provider;
 import javax.swing.*;
 import java.awt.*;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
+import java.util.*;
 import java.util.List;
-import java.util.Map;
-import java.util.TreeSet;
 
 /**
  * This class shows a list of virtual machines.
@@ -94,7 +84,7 @@ public final class VMListInfo extends CategoryInfo {
     @Inject
     private WidgetFactory widgetFactory;
     @Inject
-    private TreeMenuController treeMenuController;
+    private ClusterTreeMenu clusterTreeMenu;
 
     /**
      * Returns browser object of this info.
@@ -292,11 +282,11 @@ public final class VMListInfo extends CategoryInfo {
         final DomainInfo domainInfo = domainInfoProvider.get();
         domainInfo.einit("domainInfo", getBrowser());
         domainInfo.getResource().setNew(true);
-        treeMenuController.createMenuItem(getNode(), domainInfo);
+        clusterTreeMenu.createMenuItem(getNode(), domainInfo);
         swingUtils.invokeInEdt(new Runnable() {
             @Override
             public void run() {
-                treeMenuController.reloadNode(getNode(), true);
+                clusterTreeMenu.reloadNode(getNode(), true);
                 domainInfo.getInfoPanel();
                 domainInfo.selectMyself();
                 final Thread t = new Thread(new Runnable() {

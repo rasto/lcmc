@@ -21,45 +21,40 @@
  */
 package lcmc.crm.ui.resource;
 
-import java.awt.Color;
+import lcmc.cluster.ui.widget.Check;
+import lcmc.cluster.ui.widget.Widget;
+import lcmc.common.domain.Application;
+import lcmc.common.domain.ColorText;
+import lcmc.common.domain.Value;
+import lcmc.common.domain.util.Tools;
+import lcmc.common.ui.Browser;
+import lcmc.common.ui.main.MainData;
+import lcmc.common.ui.treemenu.ClusterTreeMenu;
+import lcmc.common.ui.utils.MyButton;
+import lcmc.common.ui.utils.SwingUtils;
+import lcmc.common.ui.utils.UpdatableItem;
+import lcmc.crm.domain.ClusterStatus;
+import lcmc.crm.domain.CrmXml;
+import lcmc.crm.domain.ResourceAgent;
+import lcmc.crm.service.CRM;
+import lcmc.host.domain.Host;
+import lcmc.logger.Logger;
+import lcmc.logger.LoggerFactory;
+import lombok.val;
+
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Provider;
+import javax.swing.*;
+import javax.swing.tree.DefaultMutableTreeNode;
+import java.awt.*;
 import java.awt.geom.Point2D;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
+import java.util.*;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.regex.Matcher;
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Provider;
-import javax.swing.ImageIcon;
-import javax.swing.tree.DefaultMutableTreeNode;
-import lcmc.common.domain.Application;
-import lcmc.common.domain.ColorText;
-import lcmc.common.ui.main.MainData;
-import lcmc.common.ui.treemenu.TreeMenuController;
-import lcmc.common.ui.utils.SwingUtils;
-import lcmc.crm.domain.CrmXml;
-import lcmc.crm.domain.ClusterStatus;
-import lcmc.host.domain.Host;
-import lcmc.crm.domain.ResourceAgent;
-import lcmc.common.domain.Value;
-import lcmc.common.ui.Browser;
-import lcmc.cluster.ui.widget.Check;
-import lcmc.cluster.ui.widget.Widget;
-import lcmc.crm.service.CRM;
-import lcmc.logger.Logger;
-import lcmc.logger.LoggerFactory;
-import lcmc.common.ui.utils.MyButton;
-import lcmc.common.domain.util.Tools;
-import lcmc.common.ui.utils.UpdatableItem;
-import lombok.val;
 
 /**
  * GroupInfo class holds data for heartbeat group, that is in some ways
@@ -92,7 +87,7 @@ public class GroupInfo extends ServiceInfo {
     @Inject
     private SwingUtils swingUtils;
     @Inject
-    private TreeMenuController treeMenuController;
+    private ClusterTreeMenu clusterTreeMenu;
     @Inject
     private MainData mainData;
 
@@ -228,7 +223,7 @@ public class GroupInfo extends ServiceInfo {
                          runMode);
         if (Application.isLive(runMode)) {
             storeComboBoxValues(params);
-            treeMenuController.reloadNode(getNode(), false);
+            clusterTreeMenu.reloadNode(getNode(), false);
         }
         mGroupServiceWriteLock.lock();
         try {
@@ -375,7 +370,7 @@ public class GroupInfo extends ServiceInfo {
         }
         if (Application.isLive(runMode)) {
             storeComboBoxValues(params);
-            treeMenuController.reloadNode(getNode(), false);
+            clusterTreeMenu.reloadNode(getNode(), false);
         }
         for (final ServiceInfo child : getSubServices()) {
             final Check childCheck = child.checkResourceFields(null,
@@ -413,7 +408,7 @@ public class GroupInfo extends ServiceInfo {
         newServiceInfo.setGroupInfo(this);
         getBrowser().addNameToServiceInfoHash(newServiceInfo);
         getBrowser().addToHeartbeatIdList(newServiceInfo);
-        final DefaultMutableTreeNode newServiceNode = treeMenuController.createMenuItem(groupNode, newServiceInfo);
+        final DefaultMutableTreeNode newServiceNode = clusterTreeMenu.createMenuItem(groupNode, newServiceInfo);
         mGroupServiceWriteLock.lock();
         try {
             groupServices.add(newServiceInfo);
@@ -421,8 +416,8 @@ public class GroupInfo extends ServiceInfo {
             mGroupServiceWriteLock.unlock();
         }
         if (reloadNode) {
-            treeMenuController.reloadNode(groupNode, false);
-            treeMenuController.reloadNode(newServiceNode, true);
+            clusterTreeMenu.reloadNode(groupNode, false);
+            clusterTreeMenu.reloadNode(newServiceNode, true);
         }
     }
 

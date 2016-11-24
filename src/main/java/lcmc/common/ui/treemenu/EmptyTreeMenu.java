@@ -20,37 +20,29 @@
 
 package lcmc.common.ui.treemenu;
 
+import lcmc.common.domain.util.Tools;
 import lcmc.common.ui.CategoryInfo;
 import lcmc.common.ui.utils.SwingUtils;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
 
+import javax.annotation.Resource;
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
 import javax.swing.tree.DefaultMutableTreeNode;
 
-import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.assertThat;
+@Named
+@Singleton
+public class EmptyTreeMenu extends TreeMenuController {
+    @Resource(name="categoryInfo")
+    private CategoryInfo resourcesCategory;
 
-@RunWith(MockitoJUnitRunner.class)
-public class TreeMenuControllerTest {
-    @Mock
-    private SwingUtils swingUtils;
-    @Mock
-    private CategoryInfo categoryInfo;
-    @InjectMocks
-    private ClusterTreeMenu clusterTreeMenu = new ClusterTreeMenu(swingUtils);
-
-    @Before
-    public void setUp() {
+    @Inject
+    public EmptyTreeMenu(final SwingUtils swingUtils) {
+        super(swingUtils);
     }
 
-    @Test
-    public void categoryInfoShouldBeOnTopOfTheClusterTreeMenu() {
-        final DefaultMutableTreeNode menuTreeTop = clusterTreeMenu.createMenuTreeTop();
-
-        assertThat(menuTreeTop.getUserObject(), is(categoryInfo));
+    public final DefaultMutableTreeNode createMenuTreeTop() {
+        resourcesCategory.init(Tools.getString("Browser.Resources"), null);
+        return createMenuTreeTop(resourcesCategory);
     }
 }

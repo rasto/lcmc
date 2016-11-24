@@ -30,6 +30,7 @@ import lcmc.common.ui.Browser;
 import lcmc.common.ui.ViewPanel;
 import lcmc.common.ui.main.MainData;
 import lcmc.common.ui.main.MainPresenter;
+import lcmc.common.ui.treemenu.EmptyTreeMenu;
 import lcmc.common.ui.utils.MyButton;
 import lcmc.common.ui.utils.SwingUtils;
 import lcmc.host.domain.Host;
@@ -74,6 +75,8 @@ public final class EmptyViewPanel extends ViewPanel implements AllHostsUpdatable
     private SwingUtils swingUtils;
     @Inject
     private WidgetFactory widgetFactory;
+    @Inject
+    private EmptyTreeMenu emptyTreeMenu;
 
     public void init() {
         emptyBrowser.init();
@@ -156,7 +159,7 @@ public final class EmptyViewPanel extends ViewPanel implements AllHostsUpdatable
 
     /** creates cluster view and updates the tree. */
     private void createEmptyView() {
-        val tree = createMenuTree(emptyBrowser);
+        val tree = createMenuTree(emptyBrowser, emptyTreeMenu.getMenuTree());
         createPanels(tree);
         emptyBrowser.updateHosts();
     }

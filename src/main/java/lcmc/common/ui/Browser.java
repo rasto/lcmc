@@ -22,18 +22,18 @@
 
 package lcmc.common.ui;
 
-import java.awt.Color;
-import java.awt.Dimension;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.swing.*;
-
 import lcmc.cluster.ui.ClusterBrowser;
 import lcmc.cluster.ui.network.InfoPresenter;
 import lcmc.common.domain.Application;
 import lcmc.common.domain.util.Tools;
+
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.swing.*;
+import javax.swing.tree.DefaultMutableTreeNode;
+import java.awt.*;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * This class holds host and cluster resource data in a tree. It shows
@@ -117,4 +117,6 @@ public class Browser {
         }
     }
 
+    public void fireEventInViewPanel(final DefaultMutableTreeNode node) {
+    }
 }

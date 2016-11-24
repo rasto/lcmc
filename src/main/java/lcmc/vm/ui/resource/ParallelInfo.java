@@ -21,23 +21,22 @@
  */
 package lcmc.vm.ui.resource;
 
-import java.util.HashMap;
-import java.util.Map;
-
+import lcmc.cluster.ui.widget.Widget;
 import lcmc.common.domain.Application;
-import lcmc.common.ui.treemenu.TreeMenuController;
+import lcmc.common.domain.Value;
+import lcmc.common.domain.util.Tools;
+import lcmc.common.ui.Browser;
+import lcmc.common.ui.treemenu.ClusterTreeMenu;
+import lcmc.common.ui.utils.MyButton;
 import lcmc.host.domain.Host;
 import lcmc.vm.domain.VmsXml;
 import lcmc.vm.domain.data.ParallelData;
-import lcmc.common.domain.Value;
-import lcmc.common.ui.Browser;
-import lcmc.cluster.ui.widget.Widget;
-import lcmc.common.ui.utils.MyButton;
-import lcmc.common.domain.util.Tools;
 import org.w3c.dom.Node;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * This class holds info about virtual parallel device.
@@ -45,7 +44,7 @@ import javax.inject.Named;
 @Named
 final class ParallelInfo extends ParallelSerialInfo {
     @Inject
-    private TreeMenuController treeMenuController;
+    private ClusterTreeMenu clusterTreeMenu;
 
     void init(final String name, final Browser browser, final DomainInfo vmsVirtualDomainInfo) {
         super.init(name, browser, vmsVirtualDomainInfo);
@@ -142,7 +141,7 @@ final class ParallelInfo extends ParallelSerialInfo {
         }
         getBrowser().periodicalVmsUpdate(
                 getVMSVirtualDomainInfo().getDefinedOnHosts());
-        treeMenuController.removeNode(getNode());
+        clusterTreeMenu.removeNode(getNode());
     }
 
     /** Returns "add new" button. */

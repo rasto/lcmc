@@ -29,7 +29,6 @@ import lcmc.common.domain.Unit;
 import lcmc.common.domain.Value;
 import lcmc.common.domain.util.Tools;
 import lcmc.common.ui.main.MainData;
-import lcmc.common.ui.treemenu.TreeMenuController;
 import lcmc.common.ui.utils.ButtonCallback;
 import lcmc.common.ui.utils.ComponentWithTest;
 import lcmc.common.ui.utils.MyButton;
@@ -111,8 +110,6 @@ public class Info implements Comparable<Info>, Value, InfoPresenter {
     private Application application;
     @Inject
     private SwingUtils swingUtils;
-    @Inject
-    private TreeMenuController treeMenuController;
     @Inject
     private Access access;
     @Inject
@@ -363,12 +360,7 @@ public class Info implements Comparable<Info>, Value, InfoPresenter {
 
     /** Selects and highlights this node. */
     public void selectMyself() {
-        // this fires an event in ViewPanel.
-        final DefaultMutableTreeNode n = node;
-        if (n != null) {
-            treeMenuController.reloadNode(n, true);
-            treeMenuController.nodeChanged(n);
-        }
+        getBrowser().fireEventInViewPanel(node);
     }
 
     /**

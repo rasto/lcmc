@@ -22,16 +22,13 @@
 package lcmc.cluster.ui;
 
 import lcmc.cluster.domain.Cluster;
-import lcmc.common.domain.util.Tools;
 import lcmc.common.ui.Browser;
-import lcmc.common.ui.CategoryInfo;
-import lcmc.common.ui.treemenu.TreeMenuController;
+import lcmc.common.ui.treemenu.EmptyTreeMenu;
 import lcmc.host.domain.Host;
 import lcmc.host.domain.Hosts;
 import lcmc.host.ui.AllHostsInfo;
 import lcmc.host.ui.HostBrowser;
 
-import javax.annotation.Resource;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
@@ -55,14 +52,11 @@ public final class EmptyBrowser extends Browser {
     @Inject
     private Hosts allHosts;
     @Inject
-    private TreeMenuController treeMenuController;
-    @Resource(name="categoryInfo")
-    private CategoryInfo resourcesCategory;
+    private EmptyTreeMenu emptyTreeMenu;
 
     void init() {
         allHostsInfo.init(this);
-        resourcesCategory.init(Tools.getString("Browser.Resources"), null);
-        treeTop = treeMenuController.createMenuTreeTop(resourcesCategory);
+        treeTop = emptyTreeMenu.createMenuTreeTop();
     }
 
     /** Adds small box with cluster possibility to load it and remove it. */
@@ -78,19 +72,27 @@ public final class EmptyBrowser extends Browser {
 
     /** Initializes hosts tree for the empty view. */
     void initHosts() {
-        allHostsNode = treeMenuController.createMenuItem(treeTop, allHostsInfo);
+        allHostsNode = emptyTreeMenu.createMenuItem(treeTop, allHostsInfo);
     }
 
     /** Updates resources of a cluster in the tree. */
     void updateHosts() {
         final Iterable<Host> allHostsSorted = new TreeSet<Host>(allHosts.getHostSet());
-        treeMenuController.removeChildren(allHostsNode);
+        emptyTreeMenu.removeChildren(allHostsNode);
         for (final Host host : allHostsSorted) {
             final HostBrowser hostBrowser = host.getBrowser();
-            final MutableTreeNode resource = treeMenuController.createMenuItem(allHostsNode, hostBrowser.getHostInfo());
+            final MutableTreeNode resource = emptyTreeMenu.createMenuItem(allHostsNode, hostBrowser.getHostInfo());
         }
-        treeMenuController.reloadNode(allHostsNode, false);
-        treeMenuController.selectPath(new Object[]{treeTop, allHostsNode});
+        emptyTreeMenu.reloadNode(allHostsNode, false);
+        emptyTreeMenu.selectPath(new Object[]{treeTop, allHostsNode});
+    }
+
+    @Override
+    public void fireEventInViewPanel(final DefaultMutableTreeNode node) {
+        if (node != null) {
+            emptyTreeMenu.reloadNode(node, true);
+            emptyTreeMenu.nodeChanged(node);
+        }
     }
 }
 

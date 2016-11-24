@@ -25,7 +25,6 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import lcmc.cluster.ui.ClusterBrowser;
 import lcmc.common.domain.Application;
-import lcmc.common.ui.treemenu.TreeMenuController;
 import lcmc.crm.domain.ClusterStatus;
 import lcmc.crm.domain.CrmXml;
 import lcmc.crm.domain.ResourceAgent;
@@ -79,8 +78,6 @@ public class ResourceUpdaterTest {
     private ClusterBrowser clusterBrowser;
     @Mock
     private CrmGraph crmGraph;
-    @Mock
-    private TreeMenuController treeMenuController;
     @Mock
     private CrmServiceFactory crmServiceFactory;
 
