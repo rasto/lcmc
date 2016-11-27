@@ -27,6 +27,7 @@ import lcmc.common.ui.Info;
 import lcmc.common.ui.utils.SwingUtils;
 import lcmc.logger.Logger;
 import lcmc.logger.LoggerFactory;
+import lombok.val;
 
 import javax.swing.*;
 import javax.swing.tree.*;
@@ -51,59 +52,12 @@ abstract class TreeMenuController {
     public final DefaultMutableTreeNode createMenuTreeTop(final InfoPresenter infoPresenter) {
         final DefaultMutableTreeNode treeTop = new DefaultMutableTreeNode(infoPresenter);
         treeModel = new DefaultTreeModel(treeTop);
-        createTree();
+        tree = createTree(treeModel);
         return treeTop;
     }
 
-    private void createTree() {
-        tree = new JTree(treeModel);
-        tree.setOpaque(true);
-        tree.setBackground(Tools.getDefaultColor("ViewPanel.Background"));
-        tree.setToggleClickCount(2);
-        tree.addMouseListener(new MouseListener() {
-            @Override
-            public void mouseClicked(final MouseEvent e) {
-                    /* do nothing */
-            }
-
-            @Override
-            public void mouseEntered(final MouseEvent e) {
-                    /* do nothing */
-            }
-
-            @Override
-            public void mouseExited(final MouseEvent e) {
-                    /* do nothing */
-            }
-
-            @Override
-            public void mousePressed(final MouseEvent e) {
-                final int selRow = tree.getRowForLocation(e.getX(), e.getY());
-                final TreePath selPath = tree.getPathForLocation(e.getX(), e.getY());
-                if (selRow != -1 && e.getButton() > 1) {
-                    final InfoPresenter infoPresenter =
-                            (InfoPresenter) ((DefaultMutableTreeNode) selPath.getLastPathComponent()).getUserObject();
-                    if (infoPresenter != null) {
-                        infoPresenter.showPopup(tree, e.getX(), e.getY());
-                        tree.setSelectionPath(selPath);
-                    }
-                }
-            }
-
-            @Override
-            public void mouseReleased(final MouseEvent e) {
-                    /* do nothing */
-            }
-        });
-        tree.setRootVisible(false);
-        tree.setShowsRootHandles(true);
-        tree.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
-        tree.setCellRenderer(createCellRenderer());
-    }
-
-    public DefaultMutableTreeNode createMenuItem(
-            final DefaultMutableTreeNode parent,
-            final InfoPresenter infoPresenter) {
+    public DefaultMutableTreeNode createMenuItem(final DefaultMutableTreeNode parent,
+                                                 final InfoPresenter infoPresenter) {
         final DefaultMutableTreeNode child = createMenuItem(infoPresenter);
         addChild(parent, child);
         return child;
@@ -304,4 +258,58 @@ abstract class TreeMenuController {
     private TreeCellRenderer createCellRenderer() {
         return new CellRenderer();
     }
+
+    private JTree createTree(final DefaultTreeModel treeModel) {
+        val tree = new JTree(treeModel);
+        tree.setOpaque(true);
+        tree.setBackground(Tools.getDefaultColor("ViewPanel.Background"));
+        tree.setToggleClickCount(2);
+        tree.addMouseListener(new PopupListener());
+        tree.setRootVisible(false);
+        tree.setShowsRootHandles(true);
+        tree.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
+        tree.setCellRenderer(createCellRenderer());
+        return tree;
+    }
+
+    private class PopupListener implements MouseListener {
+        @Override
+        public void mouseClicked(final MouseEvent e) {
+                /* do nothing */
+        }
+
+        @Override
+        public void mouseEntered(final MouseEvent e) {
+                /* do nothing */
+        }
+
+        @Override
+        public void mouseExited(final MouseEvent e) {
+                /* do nothing */
+        }
+
+        @Override
+        public void mousePressed(final MouseEvent e) {
+//            final int selRow = tree.getRowForLocation(e.getX(), e.getY());
+            final TreePath selPath = getPathForLocation(e);
+            if (selPath != null && e.getButton() > 1) {
+                final InfoPresenter infoPresenter =
+                        (InfoPresenter) ((DefaultMutableTreeNode) selPath.getLastPathComponent()).getUserObject();
+                if (infoPresenter != null) {
+                    infoPresenter.showPopup(tree, e.getX(), e.getY());
+                    tree.setSelectionPath(selPath);
+                }
+            }
+        }
+
+        @Override
+        public void mouseReleased(final MouseEvent e) {
+                /* do nothing */
+        }
+    }
+
+    protected TreePath getPathForLocation(MouseEvent e) {
+        return tree.getPathForLocation(e.getX(), e.getY());
+    }
+
 }

@@ -29,16 +29,10 @@ import lcmc.common.domain.Unit;
 import lcmc.common.domain.Value;
 import lcmc.common.domain.util.Tools;
 import lcmc.common.ui.main.MainData;
-import lcmc.common.ui.utils.ButtonCallback;
-import lcmc.common.ui.utils.ComponentWithTest;
-import lcmc.common.ui.utils.MyButton;
-import lcmc.common.ui.utils.MyButtonCellRenderer;
-import lcmc.common.ui.utils.MyCellRenderer;
-import lcmc.common.ui.utils.MyMenu;
-import lcmc.common.ui.utils.SwingUtils;
-import lcmc.common.ui.utils.UpdatableItem;
+import lcmc.common.ui.utils.*;
 import lcmc.logger.Logger;
 import lcmc.logger.LoggerFactory;
+import lombok.val;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -57,13 +51,8 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.awt.geom.Point2D;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
+import java.util.*;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -376,25 +365,18 @@ public class Info implements Comparable<Info>, Value, InfoPresenter {
         return null;
     }
 
-    /** Shows the popup on the specified coordinates. */
     @Override
     public void showPopup(final JComponent c, final int x, final int y) {
-        final Thread thread = new Thread(new Runnable() {
-            @Override
-            public void run() {
-                final JPopupMenu pm = getPopup();
-                if (pm != null) {
-                    updateMenus(null);
-                    swingUtils.invokeLater(new Runnable() {
-                        @Override
-                        public void run() {
-                            if (!c.isShowing() || !c.isDisplayable()) {
-                                return;
-                            }
-                            pm.show(c, x, y);
-                        }
-                    });
-                }
+        val thread = new Thread(() -> {
+            final JPopupMenu pm = getPopup();
+            if (pm != null) {
+                updateMenus(null);
+                swingUtils.invokeLater(() -> {
+                    if (!c.isShowing() || !c.isDisplayable()) {
+                        return;
+                    }
+                    pm.show(c, x, y);
+                });
             }
         });
         thread.start();
@@ -437,17 +419,14 @@ public class Info implements Comparable<Info>, Value, InfoPresenter {
         LOG.debug1("ACTION: getPopup: " + getClass() + " name: " + getName());
         mPopupLock.lock();
         try {
-            swingUtils.invokeAndWait(new Runnable() {
-                @Override
-                public void run() {
-                    if (popup == null) {
-                        final List<UpdatableItem> items = createPopup();
-                        if (items != null) {
-                            registerAllMenuItems(items);
-                            popup = new JPopupMenu();
-                            for (final UpdatableItem u : items) {
-                                popup.add((JMenuItem) u);
-                            }
+            swingUtils.invokeAndWait(() -> {
+                if (popup == null) {
+                    final List<UpdatableItem> items = createPopup();
+                    if (items != null) {
+                        registerAllMenuItems(items);
+                        popup = new JPopupMenu();
+                        for (final UpdatableItem u : items) {
+                            popup.add((JMenuItem) u);
                         }
                     }
                 }

@@ -20,29 +20,17 @@
 
 package lcmc.common.ui.treemenu;
 
-import lcmc.common.domain.util.Tools;
-import lcmc.common.ui.CategoryInfo;
 import lcmc.common.ui.utils.SwingUtils;
 
-import javax.annotation.Resource;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
-import javax.swing.tree.DefaultMutableTreeNode;
 
 @Named
 @Singleton
 public class ClusterTreeMenu extends TreeMenuController {
-    @Resource(name="categoryInfo")
-    private CategoryInfo resourcesCategory;
-
     @Inject
     public ClusterTreeMenu(final SwingUtils swingUtils) {
         super(swingUtils);
-    }
-
-    public final DefaultMutableTreeNode createMenuTreeTop() {
-        resourcesCategory.init(Tools.getString("Browser.Resources"), null);
-        return createMenuTreeTop(resourcesCategory);
     }
 }
