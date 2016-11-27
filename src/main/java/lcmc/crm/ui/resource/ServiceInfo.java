@@ -2075,7 +2075,7 @@ public class ServiceInfo extends EditableInfo {
         ci.cleanup();
         setNode(node);
         clusterTreeMenu.addChild(getBrowser().getServicesNode(), node);
-        clusterTreeMenu.reloadNode(getBrowser().getServicesNode(), false);
+        clusterTreeMenu.reloadNodeDontSelect(getBrowser().getServicesNode());
         getBrowser().getCrmGraph().exchangeObjectInTheVertex(this, ci);
         getBrowser().mHeartbeatIdToServiceLock();
         getBrowser().getHeartbeatIdToServiceInfo().remove(ci.getService().getCrmId());
@@ -2084,7 +2084,7 @@ public class ServiceInfo extends EditableInfo {
         resetInfoPanel();
         infoPanel = null;
         getInfoPanel();
-        clusterTreeMenu.reloadNode(node, true);
+        clusterTreeMenu.reloadNode(node);
         clusterTreeMenu.nodeChanged(node);
         ciNode.setUserObject(null); /* would leak without it */
     }
@@ -3225,10 +3225,10 @@ public class ServiceInfo extends EditableInfo {
                     final DefaultMutableTreeNode node = getNode();
                     if (node != null) {
                         if (clInfo == null) {
-                            clusterTreeMenu.reloadNode(node, false);
+                            clusterTreeMenu.reloadNodeDontSelect(node);
                         } else {
-                            clusterTreeMenu.reloadNode(clInfo.getNode(), false);
-                            clusterTreeMenu.reloadNode(node, false);
+                            clusterTreeMenu.reloadNodeDontSelect(clInfo.getNode());
+                            clusterTreeMenu.reloadNodeDontSelect(node);
                         }
                         getBrowser().getCrmGraph().repaint();
                     }
@@ -3659,8 +3659,8 @@ public class ServiceInfo extends EditableInfo {
                             getBrowser().getServicesNode(),
                             serviceInfo);
                     if (reloadNode) {
-                        clusterTreeMenu.reloadNode(getBrowser().getServicesNode(), false);
-                        clusterTreeMenu.reloadNode(newServiceNode, false);
+                        clusterTreeMenu.reloadNodeDontSelect(getBrowser().getServicesNode());
+                        clusterTreeMenu.reloadNodeDontSelect(newServiceNode);
                     }
                 }
             });

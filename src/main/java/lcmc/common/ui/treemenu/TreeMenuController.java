@@ -94,7 +94,15 @@ abstract class TreeMenuController {
         });
     }
 
-    public final void reloadNode(final TreeNode node, final boolean select) {
+    public final void reloadNodeDontSelect(final TreeNode node) {
+        reloadNode(node, false);
+    }
+
+    public final void reloadNode(final TreeNode node) {
+        reloadNode(node, true);
+    }
+
+    private final void reloadNode(final TreeNode node, final boolean select) {
         swingUtils.invokeInEdt(() -> {
             final DefaultMutableTreeNode oldNode = (DefaultMutableTreeNode) tree.getLastSelectedPathComponent();
             if (node != null) {

@@ -84,7 +84,7 @@ public class TreeMenuControllerTest {
         clusterTreeMenu.createMenuItem(menuTreeTop, infoPresenter);
 
         final JTree menuTree = clusterTreeMenu.getMenuTree();
-        clusterTreeMenu.reloadNode(menuTreeTop, true);
+        clusterTreeMenu.reloadNode(menuTreeTop);
 
         assertThat(menuTree.getRowCount(), is(1));
         assertThat(clusterTreeMenu.getChildCount(menuTreeTop), is(1));
@@ -95,7 +95,7 @@ public class TreeMenuControllerTest {
         val menuItem = clusterTreeMenu.createMenuItem(menuTreeTop, infoPresenter);
 
         final JTree menuTree = clusterTreeMenu.getMenuTree();
-        clusterTreeMenu.reloadNode(menuTreeTop, true);
+        clusterTreeMenu.reloadNode(menuTreeTop);
         final int x = 100;
         final int y = 100;
         val mousePress = new MouseEvent(menuTree, 0, 0, 0, x, y, 1, true, 2);

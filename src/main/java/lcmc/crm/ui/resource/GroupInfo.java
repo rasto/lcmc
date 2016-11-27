@@ -223,7 +223,7 @@ public class GroupInfo extends ServiceInfo {
                          runMode);
         if (Application.isLive(runMode)) {
             storeComboBoxValues(params);
-            clusterTreeMenu.reloadNode(getNode(), false);
+            clusterTreeMenu.reloadNodeDontSelect(getNode());
         }
         mGroupServiceWriteLock.lock();
         try {
@@ -370,7 +370,7 @@ public class GroupInfo extends ServiceInfo {
         }
         if (Application.isLive(runMode)) {
             storeComboBoxValues(params);
-            clusterTreeMenu.reloadNode(getNode(), false);
+            clusterTreeMenu.reloadNodeDontSelect(getNode());
         }
         for (final ServiceInfo child : getSubServices()) {
             final Check childCheck = child.checkResourceFields(null,
@@ -416,8 +416,8 @@ public class GroupInfo extends ServiceInfo {
             mGroupServiceWriteLock.unlock();
         }
         if (reloadNode) {
-            clusterTreeMenu.reloadNode(groupNode, false);
-            clusterTreeMenu.reloadNode(newServiceNode, true);
+            clusterTreeMenu.reloadNodeDontSelect(groupNode);
+            clusterTreeMenu.reloadNode(newServiceNode);
         }
     }
 

@@ -464,7 +464,7 @@ public class ClusterBrowser extends Browser {
         if (vmsNode == null) {
             vmListInfo.init(Tools.getString("ClusterBrowser.VMs"), this);
             vmsNode = clusterTreeMenu.createMenuItem(treeTop, vmListInfo);
-            clusterTreeMenu.reloadNode(treeTop, true);
+            clusterTreeMenu.reloadNode(treeTop);
         }
     }
 
@@ -525,7 +525,7 @@ public class ClusterBrowser extends Browser {
             crmGraph.addHost(hostBrowser.getHostInfo());
         }
 
-        clusterTreeMenu.reloadNode(clusterHostsNode, false);
+        clusterTreeMenu.reloadNodeDontSelect(clusterHostsNode);
 
         swingUtils.invokeLater(new Runnable() {
             @Override
@@ -1250,7 +1250,7 @@ public class ClusterBrowser extends Browser {
         }
         mVmsUpdateLock.unlock();
         if (nodeChanged) {
-            clusterTreeMenu.reloadNode(vmsNode, false);
+            clusterTreeMenu.reloadNodeDontSelect(vmsNode);
         }
         for (final ServiceInfo si : getExistingServiceList(null)) {
             final DomainInfo vmsvdi = si.connectWithVMS();
@@ -1361,7 +1361,7 @@ public class ClusterBrowser extends Browser {
             final NetworkPresenter networkPresenter = networkFactory.createPresenter(cluster, network);
             clusterTreeMenu.createMenuItem(networksNode, networkPresenter);
         }
-        clusterTreeMenu.reloadNode(networksNode, false);
+        clusterTreeMenu.reloadNodeDontSelect(networksNode);
     }
 
     /**
@@ -1486,7 +1486,7 @@ public class ClusterBrowser extends Browser {
 
 
     void highlightDrbd() {
-        clusterTreeMenu.reloadNode(drbdNode, true);
+        clusterTreeMenu.reloadNode(drbdNode);
     }
 
     public void highlightServices() {
@@ -2276,7 +2276,7 @@ public class ClusterBrowser extends Browser {
     @Override
     public void fireEventInViewPanel(final DefaultMutableTreeNode node) {
         if (node != null) {
-            clusterTreeMenu.reloadNode(node, true);
+            clusterTreeMenu.reloadNode(node);
             clusterTreeMenu.nodeChanged(node);
         }
     }

@@ -548,8 +548,8 @@ public class ServicesInfo extends EditableInfo {
                     }
                     if (reloadNode) {
                         /* show it */
-                        clusterTreeMenu.reloadNode(getBrowser().getServicesNode(), false);
-                        clusterTreeMenu.reloadNode(newServiceNode, true);
+                        clusterTreeMenu.reloadNodeDontSelect(getBrowser().getServicesNode());
+                        clusterTreeMenu.reloadNode(newServiceNode);
                     }
                     getBrowser().reloadAllComboBoxes(newServiceInfo);
                     hg.scale();
@@ -734,7 +734,7 @@ public class ServicesInfo extends EditableInfo {
                                 newChild.getInfoPanel();
                                 copyPasteFields(oldChild, newChild);
                             }
-                            clusterTreeMenu.reloadNode(newGi.getNode(), false);
+                            clusterTreeMenu.reloadNodeDontSelect(newGi.getNode());
                         }
                     });
                 }
@@ -771,7 +771,7 @@ public class ServicesInfo extends EditableInfo {
     }
 
     public void reloadNode() {
-        clusterTreeMenu.reloadNode(getBrowser().getServicesNode(), false);
+        clusterTreeMenu.reloadNodeDontSelect(getBrowser().getServicesNode());
     }
 
     public void moveNodeToPosition(int pos, DefaultMutableTreeNode node) {

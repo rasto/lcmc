@@ -174,7 +174,7 @@ public final class AllHostsInfo extends Info {
                                 allClusterCheckboxes.remove(cluster);
                                 allLoadButtons.remove(cluster);
                                 mainPanel.remove(p);
-                                emptyTreeMenu.reloadNode(getNode(), false);
+                                emptyTreeMenu.reloadNodeDontSelect(getNode());
                                 emptyTreeMenu.repaintMenuTree();
                             }
                         }

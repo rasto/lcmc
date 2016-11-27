@@ -728,7 +728,7 @@ public final class DiskInfo extends HardwareInfo {
             }
         }
         getResource().setNew(false);
-        clusterTreeMenu.reloadNode(getNode(), false);
+        clusterTreeMenu.reloadNodeDontSelect(getNode());
         getBrowser().periodicalVmsUpdate(
                 getVMSVirtualDomainInfo().getDefinedOnHosts());
         swingUtils.invokeLater(new Runnable() {

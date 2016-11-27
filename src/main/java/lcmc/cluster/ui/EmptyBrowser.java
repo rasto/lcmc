@@ -83,14 +83,14 @@ public final class EmptyBrowser extends Browser {
             final HostBrowser hostBrowser = host.getBrowser();
             final MutableTreeNode resource = emptyTreeMenu.createMenuItem(allHostsNode, hostBrowser.getHostInfo());
         }
-        emptyTreeMenu.reloadNode(allHostsNode, false);
+        emptyTreeMenu.reloadNodeDontSelect(allHostsNode);
         emptyTreeMenu.selectPath(new Object[]{treeTop, allHostsNode});
     }
 
     @Override
     public void fireEventInViewPanel(final DefaultMutableTreeNode node) {
         if (node != null) {
-            emptyTreeMenu.reloadNode(node, true);
+            emptyTreeMenu.reloadNode(node);
             emptyTreeMenu.nodeChanged(node);
         }
     }

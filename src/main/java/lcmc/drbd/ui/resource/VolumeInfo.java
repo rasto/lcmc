@@ -478,7 +478,7 @@ public class VolumeInfo extends EditableInfo implements CommonDeviceInterface {
             }
         }
         super.removeMyself(runMode);
-        clusterTreeMenu.reloadNode(clusterBrowser.getDrbdNode(), true);
+        clusterTreeMenu.reloadNode(clusterBrowser.getDrbdNode());
 
         clusterBrowser.getDrbdDeviceHash().remove(getDevice());
         clusterBrowser.putDrbdDevHash();

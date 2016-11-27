@@ -448,10 +448,10 @@ public class GlobalInfo extends AbstractDrbdInfo {
     @Override
     public void selectMyself() {
         if (selectedBlockDevice == null || !selectedBlockDevice.getBlockDevice().isDrbd()) {
-            clusterTreeMenu.reloadNode(getNode(), true);
+            clusterTreeMenu.reloadNode(getNode());
             clusterTreeMenu.nodeChanged(getNode());
         } else {
-            clusterTreeMenu.reloadNode(selectedBlockDevice.getNode(), true);
+            clusterTreeMenu.reloadNode(selectedBlockDevice.getNode());
             clusterTreeMenu.nodeChanged(selectedBlockDevice.getNode());
         }
     }
@@ -571,8 +571,8 @@ public class GlobalInfo extends AbstractDrbdInfo {
         getBrowser().putDrbdResHash();
 
         final DefaultMutableTreeNode drbdResourceNode = clusterTreeMenu.createMenuItem(getBrowser().getDrbdNode(), dri);
-        clusterTreeMenu.reloadNode(getBrowser().getDrbdNode(), true);
-        clusterTreeMenu.reloadNode(drbdResourceNode, true);
+        clusterTreeMenu.reloadNode(getBrowser().getDrbdNode());
+        clusterTreeMenu.reloadNode(drbdResourceNode);
     }
 
     /** Add DRBD volume. */
@@ -611,8 +611,8 @@ public class GlobalInfo extends AbstractDrbdInfo {
         final DefaultMutableTreeNode drbdBDNode2 = clusterTreeMenu.createMenuItem(drbdVolumeNode, bdi2);
 
         getBrowser().getDrbdGraph().addDrbdVolume(dvi, bdi1, bdi2);
-        clusterTreeMenu.reloadNode(drbdVolumeNode.getParent(), false);
-        clusterTreeMenu.reloadNode(drbdVolumeNode, false);
+        clusterTreeMenu.reloadNodeDontSelect(drbdVolumeNode.getParent());
+        clusterTreeMenu.reloadNodeDontSelect(drbdVolumeNode);
         getBrowser().resetFilesystems();
     }
 
@@ -755,8 +755,8 @@ public class GlobalInfo extends AbstractDrbdInfo {
         proxyHostInfo = proxyHostInfoProvider.get();
         proxyHostInfo.init(host, host.getBrowser());
         final DefaultMutableTreeNode proxyHostNode = clusterTreeMenu.createMenuItem(getBrowser().getDrbdNode(), proxyHostInfo);
-        clusterTreeMenu.reloadNode(getBrowser().getDrbdNode(), true);
-        clusterTreeMenu.reloadNode(proxyHostNode, true);
+        clusterTreeMenu.reloadNode(getBrowser().getDrbdNode());
+        clusterTreeMenu.reloadNode(proxyHostNode);
     }
 
     /**

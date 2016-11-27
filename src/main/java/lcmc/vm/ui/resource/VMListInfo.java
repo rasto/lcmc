@@ -286,7 +286,7 @@ public final class VMListInfo extends CategoryInfo {
         swingUtils.invokeInEdt(new Runnable() {
             @Override
             public void run() {
-                clusterTreeMenu.reloadNode(getNode(), true);
+                clusterTreeMenu.reloadNode(getNode());
                 domainInfo.getInfoPanel();
                 domainInfo.selectMyself();
                 final Thread t = new Thread(new Runnable() {

@@ -82,8 +82,8 @@ public class CloneInfo extends ServiceInfo {
         final DefaultMutableTreeNode node = getNode();
         if (node != null) {
             final DefaultMutableTreeNode newServiceNode = clusterTreeMenu.createMenuItem(node, newServiceInfo);
-            clusterTreeMenu.reloadNode(node, false);
-            clusterTreeMenu.reloadNode(newServiceNode, true);
+            clusterTreeMenu.reloadNodeDontSelect(node);
+            clusterTreeMenu.reloadNode(newServiceNode);
         }
     }
 
@@ -96,8 +96,8 @@ public class CloneInfo extends ServiceInfo {
         newServiceInfo.setCloneInfo(this);
         final DefaultMutableTreeNode cloneNode = clusterTreeMenu.createMenuItem(getBrowser().getServicesNode(), this);
         clusterTreeMenu.addChild(cloneNode, newServiceInfo.getNode());
-        clusterTreeMenu.reloadNode(getBrowser().getServicesNode(), false);
-        clusterTreeMenu.reloadNode(cloneNode, true);
+        clusterTreeMenu.reloadNodeDontSelect(getBrowser().getServicesNode());
+        clusterTreeMenu.reloadNode(cloneNode);
     }
 
     @Override

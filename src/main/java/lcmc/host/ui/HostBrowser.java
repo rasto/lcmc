@@ -193,7 +193,7 @@ public class HostBrowser extends Browser {
             final FSInfo fileSystemInfo = clusterViewFactory.createFileSystemView(fileSystem, this);
             hostTreeMenu.createMenuItem(fileSystemsNode, fileSystemInfo);
         }
-        hostTreeMenu.reloadNode(fileSystemsNode, false);
+        hostTreeMenu.reloadNodeDontSelect(fileSystemsNode);
     }
 
     @Subscribe
@@ -234,7 +234,7 @@ public class HostBrowser extends Browser {
                     final BlockDevInfo bdi = bdEntry.getValue();
                     hostTreeMenu.createMenuItem(blockDevicesNode, bdi);
                 }
-                hostTreeMenu.reloadNode(blockDevicesNode, false);
+                hostTreeMenu.reloadNodeDontSelect(blockDevicesNode);
             } finally {
                 mBlockDevInfosWriteLock.unlock();
             }
@@ -252,7 +252,7 @@ public class HostBrowser extends Browser {
             final Info netInfo = clusterViewFactory.getNetView(netInterface, this);
             hostTreeMenu.createMenuItem(netInterfacesNode, netInfo);
         }
-        hostTreeMenu.reloadNode(netInterfacesNode, false);
+        hostTreeMenu.reloadNodeDontSelect(netInterfacesNode);
     }
 
 
@@ -406,7 +406,7 @@ public class HostBrowser extends Browser {
     @Override
     public void fireEventInViewPanel(final DefaultMutableTreeNode node) {
         if (node != null) {
-            hostTreeMenu.reloadNode(node, true);
+            hostTreeMenu.reloadNode(node);
             hostTreeMenu.nodeChanged(node);
         }
     }

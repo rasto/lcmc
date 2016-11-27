@@ -1608,7 +1608,7 @@ public class DomainInfo extends EditableInfo {
                     || serialNodeChanged
                     || parallelNodeChanged
                     || videoNodeChanged) {
-                    clusterTreeMenu.reloadNode(thisNode, false);
+                    clusterTreeMenu.reloadNodeDontSelect(thisNode);
                 }
             }
         });
@@ -2069,7 +2069,7 @@ public class DomainInfo extends EditableInfo {
             break;
         }
         clusterTreeMenu.createMenuItem(thisNode, diskInfo, i);
-        clusterTreeMenu.reloadNode(thisNode, true);
+        clusterTreeMenu.reloadNode(thisNode);
         diskInfo.selectMyself();
         return diskInfo;
     }
@@ -2091,7 +2091,7 @@ public class DomainInfo extends EditableInfo {
             break;
         }
         clusterTreeMenu.createMenuItem(thisNode, filesystemInfo, i);
-        clusterTreeMenu.reloadNode(thisNode, true);
+        clusterTreeMenu.reloadNode(thisNode);
         filesystemInfo.selectMyself();
         return filesystemInfo;
     }
@@ -2117,7 +2117,7 @@ public class DomainInfo extends EditableInfo {
         }
 
         clusterTreeMenu.createMenuItem(thisNode, interfaceInfo, i);
-        clusterTreeMenu.reloadNode(thisNode, true);
+        clusterTreeMenu.reloadNode(thisNode);
         interfaceInfo.selectMyself();
         return interfaceInfo;
     }
@@ -2144,7 +2144,7 @@ public class DomainInfo extends EditableInfo {
         }
 
         clusterTreeMenu.createMenuItem(thisNode, inputDevInfo, i);
-        clusterTreeMenu.reloadNode(thisNode, true);
+        clusterTreeMenu.reloadNode(thisNode);
         inputDevInfo.selectMyself();
     }
 
@@ -2170,7 +2170,7 @@ public class DomainInfo extends EditableInfo {
             break;
         }
         clusterTreeMenu.createMenuItem(thisNode, graphicsInfo, i);
-        clusterTreeMenu.reloadNode(thisNode, true);
+        clusterTreeMenu.reloadNode(thisNode);
         graphicsInfo.selectMyself();
         return graphicsInfo;
     }
@@ -2198,7 +2198,7 @@ public class DomainInfo extends EditableInfo {
         }
 
         clusterTreeMenu.createMenuItem(thisNode, soundInfo, i);
-        clusterTreeMenu.reloadNode(thisNode, true);
+        clusterTreeMenu.reloadNode(thisNode);
         soundInfo.selectMyself();
     }
 
@@ -2226,7 +2226,7 @@ public class DomainInfo extends EditableInfo {
         }
 
         clusterTreeMenu.createMenuItem(thisNode, serialInfo, i);
-        clusterTreeMenu.reloadNode(thisNode, true);
+        clusterTreeMenu.reloadNode(thisNode);
         serialInfo.selectMyself();
     }
 
@@ -2256,7 +2256,7 @@ public class DomainInfo extends EditableInfo {
         }
 
         clusterTreeMenu.createMenuItem(thisNode, parallelInfo, i);
-        clusterTreeMenu.reloadNode(thisNode, true);
+        clusterTreeMenu.reloadNode(thisNode);
         parallelInfo.selectMyself();
     }
 
@@ -2266,7 +2266,7 @@ public class DomainInfo extends EditableInfo {
         videoInfo.getResource().setNew(true);
         final DefaultMutableTreeNode thisNode = getNode();
         clusterTreeMenu.createMenuItem(thisNode, videoInfo);
-        clusterTreeMenu.reloadNode(thisNode, true);
+        clusterTreeMenu.reloadNode(thisNode);
         videoInfo.selectMyself();
     }
 
