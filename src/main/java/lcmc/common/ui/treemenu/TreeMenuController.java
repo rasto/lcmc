@@ -75,9 +75,7 @@ abstract class TreeMenuController {
 
     public DefaultMutableTreeNode createMenuItem(final InfoPresenter infoPresenter) {
         final DefaultMutableTreeNode node = new DefaultMutableTreeNode(infoPresenter);
-        if (infoPresenter instanceof Info) {
-            ((Info) infoPresenter).setNode(node);
-        }
+        infoPresenter.setNode(node);
         return node;
     }
 
@@ -105,10 +103,8 @@ abstract class TreeMenuController {
     private final void reloadNode(final TreeNode node, final boolean select) {
         swingUtils.invokeInEdt(() -> {
             final DefaultMutableTreeNode oldNode = (DefaultMutableTreeNode) tree.getLastSelectedPathComponent();
-            if (node != null) {
-                treeModel.reload(node);
-            }
-            if (!select && oldNode != null) {
+            treeModel.reload(node);
+            if (!select) {
                 /* if don't want to select, we reselect the old path. */
                 treeModel.reload(oldNode);
             }
@@ -128,13 +124,7 @@ abstract class TreeMenuController {
         });
     }
 
-    /** Sets node variable in the info object that this tree node points to. */
-    @Deprecated
-    public final void setNode(final DefaultMutableTreeNode node) {
-        ((Info) node.getUserObject()).setNode(node);
-    }
-
-    public void selectPath(final Object[] path) {
+    public void expandAndSelect(final Object[] path) {
         swingUtils.invokeInEdt(() -> {
             final TreePath tp = new TreePath(path);
             tree.expandPath(tp);
@@ -142,7 +132,7 @@ abstract class TreeMenuController {
         });
     }
 
-    public void moveNodeToPosition(final DefaultMutableTreeNode node, final int position) {
+    public void moveNodeUpToPosition(final DefaultMutableTreeNode node, final int position) {
         swingUtils.invokeAndWait(() -> {
             final MutableTreeNode parent = (MutableTreeNode) node.getParent();
             if (parent != null) {
@@ -200,29 +190,27 @@ abstract class TreeMenuController {
         });
     }
 
-    public void sortChildrenWithNewUp(final DefaultMutableTreeNode parent) {
+    public void sortChildrenLeavingNewUp(final DefaultMutableTreeNode parent) {
         swingUtils.invokeInEdt(() -> {
-            int i = 0;
+            int someVar = 0;
             for (int j = 0; j < parent.getChildCount(); j++) {
                 final DefaultMutableTreeNode node = (DefaultMutableTreeNode) parent.getChildAt(j);
                 final EditableInfo info = (EditableInfo) node.getUserObject();
                 final String name = info.getName();
-                if (i > 0) {
+                if (someVar > 0) {
                     final DefaultMutableTreeNode prev = (DefaultMutableTreeNode) parent.getChildAt(j - 1);
                     final EditableInfo prevI = (EditableInfo) prev.getUserObject();
                     if (prevI.getClass().getName().equals(info.getClass().getName())) {
                         final String prevN = prevI.getName();
-                        if (!prevI.getResource().isNew()
-                                && !info.getResource().isNew()
-                                && (prevN != null && prevN.compareTo(name) > 0)) {
+                        if (!prevI.isNew() && !info.isNew() && (prevN != null && prevN.compareTo(name) > 0)) {
                             parent.remove(j);
                             parent.insert(node, j - 1);
                         }
                     } else {
-                        i = 0;
+                        someVar = 0;
                     }
                 }
-                i++;
+                someVar++;
             }
         });
     }
@@ -238,7 +226,7 @@ abstract class TreeMenuController {
         }
         final MutableTreeNode parent = (MutableTreeNode) nodeToRemove.getParent();
         nodeToRemove.removeFromParent();
-        final Info info = (Info) nodeToRemove.getUserObject();
+        final InfoPresenter info = (InfoPresenter) nodeToRemove.getUserObject();
         if (info != null) {
             info.setNode(null);
         }

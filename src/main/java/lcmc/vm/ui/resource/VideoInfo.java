@@ -44,7 +44,7 @@ import java.util.*;
  * This class holds info about virtual video device.
  */
 @Named
-final class VideoInfo extends HardwareInfo {
+public class VideoInfo extends HardwareInfo {
     /** Parameters. */
     private static final String[] PARAMETERS = {VideoData.MODEL_TYPE,
                                                 VideoData.MODEL_VRAM,

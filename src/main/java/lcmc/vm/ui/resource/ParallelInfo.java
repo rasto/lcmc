@@ -42,7 +42,7 @@ import java.util.Map;
  * This class holds info about virtual parallel device.
  */
 @Named
-final class ParallelInfo extends ParallelSerialInfo {
+public class ParallelInfo extends ParallelSerialInfo {
     @Inject
     private ClusterTreeMenu clusterTreeMenu;
 

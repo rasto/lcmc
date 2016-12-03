@@ -946,7 +946,7 @@ public class DomainInfo extends EditableInfo {
             inputDevInfo.updateParameters();
         }
         /* Sort it. */
-        clusterTreeMenu.sortChildrenWithNewUp(thisNode);
+        clusterTreeMenu.sortChildrenLeavingNewUp(thisNode);
         return nodeChanged;
     }
 

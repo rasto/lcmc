@@ -321,6 +321,7 @@ public class Info implements Comparable<Info>, Value, InfoPresenter {
     }
 
     /** Sets node in the tree view for this resource or service. */
+    @Override
     public final void setNode(final DefaultMutableTreeNode node) {
         this.node = node;
     }

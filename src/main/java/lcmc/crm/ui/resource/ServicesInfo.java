@@ -775,6 +775,6 @@ public class ServicesInfo extends EditableInfo {
     }
 
     public void moveNodeToPosition(int pos, DefaultMutableTreeNode node) {
-        clusterTreeMenu.moveNodeToPosition(node, pos);
+        clusterTreeMenu.moveNodeUpToPosition(node, pos);
     }
 }

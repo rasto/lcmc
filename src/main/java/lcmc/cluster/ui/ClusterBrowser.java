@@ -499,7 +499,7 @@ public class ClusterBrowser extends Browser {
         servicesInfo.einit(Tools.getString("ClusterBrowser.Services"), this);
         servicesNode = clusterTreeMenu.createMenuItem(crmNode, servicesInfo);
         addVmsNode();
-        clusterTreeMenu.selectPath(new Object[]{treeTop, crmNode});
+        clusterTreeMenu.expandAndSelect(new Object[]{treeTop, crmNode});
         addDrbdProxyNodes();
         LOG.debug1("initClusterBrowser: end");
     }
@@ -926,14 +926,7 @@ public class ClusterBrowser extends Browser {
                                        public void run() {
                                            repaintSplitPane();
                                            drbdGraph.updatePopupMenus();
-                                           swingUtils.invokeInEdt(
-                                               new Runnable() {
-                                                   @Override
-                                                   public void run() {
-                                                       clusterTreeMenu.repaintMenuTree();
-                                                   }
-                                               }
-                                           );
+                                           clusterTreeMenu.repaintMenuTree();
                                        }
                                    });
                                thread.start();
@@ -1493,7 +1486,7 @@ public class ClusterBrowser extends Browser {
         if (getClusterViewPanel().isDisabledDuringLoad()) {
             return;
         }
-        clusterTreeMenu.selectPath(new Object[]{treeTop, crmNode, servicesNode});
+        clusterTreeMenu.expandAndSelect(new Object[]{treeTop, crmNode, servicesNode});
     }
 
     public ServiceInfo getServiceInfoFromCRMId(final String crmId) {
