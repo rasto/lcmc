@@ -36,7 +36,6 @@ import lcmc.common.ui.utils.SwingUtils;
 import lcmc.host.domain.Host;
 import lcmc.host.domain.HostFactory;
 import lcmc.host.ui.AddHostDialog;
-import lombok.val;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -159,7 +158,8 @@ public final class EmptyViewPanel extends ViewPanel implements AllHostsUpdatable
 
     /** creates cluster view and updates the tree. */
     private void createEmptyView() {
-        val tree = createMenuTree(emptyBrowser, emptyTreeMenu.getMenuTree());
+        final JTree tree = emptyTreeMenu.getMenuTree();
+        addListeners(emptyBrowser, tree);
         createPanels(tree);
         emptyBrowser.updateHosts();
     }

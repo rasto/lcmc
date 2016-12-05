@@ -24,17 +24,17 @@ package lcmc.common.ui;
 import lcmc.cluster.ui.network.InfoPresenter;
 import lcmc.common.domain.util.Tools;
 import lcmc.common.ui.utils.SwingUtils;
+import lombok.val;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.swing.*;
 import javax.swing.event.TreeModelEvent;
 import javax.swing.event.TreeModelListener;
-import javax.swing.event.TreeSelectionEvent;
-import javax.swing.event.TreeSelectionListener;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreePath;
 import java.awt.*;
+import java.util.Optional;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -81,13 +81,12 @@ public class ViewPanel extends JPanel {
         return tree;
     }
 
-    public JTree createMenuTree(final Browser browser, final JTree tree) {
+    public void addListeners(final Browser browser, final JTree tree) {
         // Listen for when the selection changes.
-        tree.addTreeSelectionListener(new TreeSelectionListener() {
-            @Override
-            public void valueChanged(final TreeSelectionEvent e) {
-                setRightComponentInView(tree, viewSP, browser);
-            }
+        tree.addTreeSelectionListener(e -> {
+            getUserObject(tree.getLastSelectedPathComponent()).ifPresent(nodeInfo -> {
+                setRightComponentInView(browser, (Info) nodeInfo);
+            });
         });
 
         tree.getModel().addTreeModelListener(
@@ -95,10 +94,11 @@ public class ViewPanel extends JPanel {
                     @Override
                     public void treeNodesChanged(final TreeModelEvent e) {
                         if (!disabledDuringLoad) {
-                            final Object[] selected = e.getChildren();
+                            val selected = e.getChildren();
                             if (selected != null && selected.length > 0) {
-                                final Info info = (Info) ((DefaultMutableTreeNode) selected[0]).getUserObject();
-                                setRightComponentInView(browser, info);
+                                getUserObject(selected[0]).ifPresent(info -> {
+                                    setRightComponentInView(browser, (Info) info);
+                                });
                             }
                         }
                     }
@@ -117,22 +117,16 @@ public class ViewPanel extends JPanel {
                     public void treeStructureChanged(final TreeModelEvent e) {
                         final Object[] path = e.getPath();
                         if (!disabledDuringLoad) {
-                            final TreePath tp = new TreePath(path);
-                            final InfoPresenter infoPresenter =
-                                    (InfoPresenter) ((DefaultMutableTreeNode) tp.getLastPathComponent()).getUserObject();
-                            if (infoPresenter instanceof EditableInfo) {
-                                swingUtils.invokeInEdt(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        tree.setSelectionPath(tp);
-                                    }
-                                });
-                            }
+                            val tp = new TreePath(path);
+                            getUserObject(tp.getLastPathComponent()).ifPresent(infoPresenter -> {
+                                if (infoPresenter instanceof EditableInfo) {
+                                    swingUtils.invokeInEdt(() -> tree.setSelectionPath(tp));
+                                }
+                            });
                         }
                     }
                 }
         );
-        return tree;
     }
 
     /** Returns whether expanding of paths is disabled during the initial load.
@@ -145,60 +139,22 @@ public class ViewPanel extends JPanel {
         this.disabledDuringLoad = disabledDuringLoad;
     }
 
-    /** Sets the right component in the view. */
-    private void setRightComponentInView(final JTree tree, final JSplitPane viewSP, final Browser browser) {
-        final DefaultMutableTreeNode node = (DefaultMutableTreeNode)tree.getLastSelectedPathComponent();
-        if (node == null) {
-            return;
-        }
-        if (node.getParent() == null) {
-            /* it's not shown. */
-            return;
-        }
-
-        final Object nodeInfo = node.getUserObject();
-        if (nodeInfo instanceof Info) {
-            lastSelectedInfo = (Info) nodeInfo;
-        }
-        if (nodeInfo != null) {
-            swingUtils.invokeInEdt(new Runnable() {
-                @Override
-                public void run() {
-                    if (!mSetPanelLock.tryLock()) {
-                        return;
-                    }
-                    final JComponent p = browser.getInfoPanel(nodeInfo, disabledDuringLoad);
-                    if (!disabledDuringLoad) {
-                        final int loc = viewSP.getDividerLocation();
-                        viewSP.setRightComponent(p);
-                        viewSP.setDividerLocation(loc);
-                    }
-                    mSetPanelLock.unlock();
-                }
-            });
-        }
-    }
-
-    /** Sets the right component in the view. */
     public final void setRightComponentInView(final Browser browser, final Info nodeInfo) {
         if (viewSP != null) {
-            swingUtils.invokeInEdt(new Runnable() {
-                @Override
-                public void run() {
-                    if (!mSetPanelLock.tryLock()) {
-                        return;
-                    }
-                    final JComponent p = browser.getInfoPanel(nodeInfo, disabledDuringLoad);
-                    lastSelectedInfo = nodeInfo;
-                    if (!disabledDuringLoad && p != null) {
-                        final int loc = viewSP.getDividerLocation();
-                        if (viewSP.getRightComponent() != p) {
-                            viewSP.setRightComponent(p);
-                        }
-                        viewSP.setDividerLocation(loc);
-                    }
-                    mSetPanelLock.unlock();
+            swingUtils.invokeInEdt(() -> {
+                if (!mSetPanelLock.tryLock()) {
+                    return;
                 }
+                final JComponent p = browser.getInfoPanel(nodeInfo, disabledDuringLoad);
+                lastSelectedInfo = nodeInfo;
+                if (!disabledDuringLoad && p != null) {
+                    final int loc = viewSP.getDividerLocation();
+                    if (viewSP.getRightComponent() != p) {
+                        viewSP.setRightComponent(p);
+                    }
+                    viewSP.setDividerLocation(loc);
+                }
+                mSetPanelLock.unlock();
             });
         }
     }
@@ -212,5 +168,20 @@ public class ViewPanel extends JPanel {
 
     public final Info getLastSelectedInfo() {
         return lastSelectedInfo;
+    }
+
+    private Optional<InfoPresenter> getUserObject(final Object nodeObject) {
+        if (nodeObject == null) {
+            return Optional.empty();
+        }
+        val node = (DefaultMutableTreeNode) nodeObject;
+        if (nodeNotShowing(node)) {
+            return Optional.empty();
+        }
+        return Optional.ofNullable((InfoPresenter) node.getUserObject());
+    }
+
+    private boolean nodeNotShowing(DefaultMutableTreeNode node) {
+        return node.getParent() == null;
     }
 }
