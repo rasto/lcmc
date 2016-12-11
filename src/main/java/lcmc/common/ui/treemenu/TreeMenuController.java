@@ -30,13 +30,13 @@ import lcmc.logger.LoggerFactory;
 import lombok.val;
 
 import javax.swing.*;
+import javax.swing.event.TreeModelEvent;
+import javax.swing.event.TreeModelListener;
 import javax.swing.tree.*;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Enumeration;
-import java.util.List;
+import java.util.*;
+import java.util.function.Consumer;
 
 abstract class TreeMenuController {
 
@@ -44,6 +44,9 @@ abstract class TreeMenuController {
     private DefaultTreeModel treeModel;
     private JTree tree;
     private final SwingUtils swingUtils;
+
+    private volatile boolean disableListeners = true;
+    private Consumer<InfoPresenter> onSelect;
 
     public TreeMenuController(final SwingUtils swingUtils) {
         this.swingUtils = swingUtils;
@@ -100,7 +103,7 @@ abstract class TreeMenuController {
         reloadNode(node, true);
     }
 
-    private final void reloadNode(final TreeNode node, final boolean select) {
+    private void reloadNode(final TreeNode node, final boolean select) {
         swingUtils.invokeInEdt(() -> {
             final DefaultMutableTreeNode oldNode = (DefaultMutableTreeNode) tree.getLastSelectedPathComponent();
             treeModel.reload(node);
@@ -112,19 +115,15 @@ abstract class TreeMenuController {
     }
 
     public final void nodeChanged(final DefaultMutableTreeNode node) {
-        final String stacktrace = Tools.getStackTrace();
-        swingUtils.invokeInEdt(() -> {
-            try {
-                treeModel.nodeChanged(node);
-            } catch (final RuntimeException e) {
-                LOG.appError("nodeChangedAndWait: " + node.getUserObject()
-                        + " node changed error:\n"
-                        + stacktrace + "\n\n", e);
-            }
-        });
+        if (onSelect != null) {
+            getUserObject(node).ifPresent(infoPresenter -> onSelect.accept(infoPresenter));
+        }
     }
 
     public void expandAndSelect(final Object[] path) {
+        if (disableListeners) {
+            return;
+        }
         swingUtils.invokeInEdt(() -> {
             final TreePath tp = new TreePath(path);
             tree.expandPath(tp);
@@ -308,4 +307,77 @@ abstract class TreeMenuController {
         return tree.getPathForLocation(e.getX(), e.getY());
     }
 
+    public void addListeners(final Consumer<InfoPresenter> onSelect) {
+        this.onSelect = onSelect;
+        // Listen for when the selection changes.
+        tree.addTreeSelectionListener(e -> {
+            getUserObject(tree.getLastSelectedPathComponent()).ifPresent(nodeInfo -> {
+                if (!disableListeners) {
+                    onSelect.accept(nodeInfo);
+                }
+            });
+        });
+
+        tree.getModel().addTreeModelListener(
+                new TreeModelListener() {
+                    @Override
+                    public void treeNodesChanged(final TreeModelEvent e) {
+                        val selected = e.getChildren();
+                        if (selected != null && selected.length > 0) {
+                            getUserObject(selected[0]).ifPresent(info -> {
+                                if (!disableListeners) {
+                                    onSelect.accept(info);
+                                }
+                            });
+                        }
+                    }
+
+                    @Override
+                    public void treeNodesInserted(final TreeModelEvent e) {
+                    /* do nothing */
+                    }
+
+                    @Override
+                    public void treeNodesRemoved(final TreeModelEvent e) {
+                    /* do nothing */
+                    }
+
+                    @Override
+                    public void treeStructureChanged(final TreeModelEvent e) {
+                        final Object[] path = e.getPath();
+                        if (!disableListeners) {
+                            val tp = new TreePath(path);
+                            getUserObject(tp.getLastPathComponent()).ifPresent(infoPresenter -> {
+                                if (infoPresenter instanceof EditableInfo) {
+                                    swingUtils.invokeInEdt(() -> tree.setSelectionPath(tp));
+                                }
+                            });
+                        }
+                    }
+                }
+        );
+    }
+
+    private Optional<InfoPresenter> getUserObject(final Object nodeObject) {
+        if (nodeObject == null) {
+            return Optional.empty();
+        }
+        val node = (DefaultMutableTreeNode) nodeObject;
+        if (nodeNotShowing(node)) {
+            return Optional.empty();
+        }
+        return Optional.ofNullable((InfoPresenter) node.getUserObject());
+    }
+
+    private boolean nodeNotShowing(DefaultMutableTreeNode node) {
+        return node.getParent() == null;
+    }
+
+    public final boolean isDisableListeners() {
+        return disableListeners;
+    }
+
+    public final void setDisableListeners(final boolean disableListeners) {
+        this.disableListeners = disableListeners;
+    }
 }

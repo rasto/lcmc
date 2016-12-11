@@ -386,7 +386,7 @@ public class ClusterBrowser extends Browser {
     }
 
     public void setRightComponentInView(final Info component) {
-        clusterViewPanel.setRightComponentInView(this, component);
+        clusterViewPanel.setRightComponentInView(this, component, clusterTreeMenu.isDisableListeners());
     }
 
     /**
@@ -553,7 +553,7 @@ public class ClusterBrowser extends Browser {
                 swingUtils.invokeInEdt(new Runnable() {
                     @Override
                     public void run() {
-                        getClusterViewPanel().setDisabledDuringLoad(false);
+                        setDisabledDuringLoad(false);
                         highlightServices();
                     }
                 });
@@ -1351,7 +1351,7 @@ public class ClusterBrowser extends Browser {
     private void updateCommonNetworks(final Collection<Network> networks) {
         clusterTreeMenu.removeChildren(networksNode);
         for (final Network network : networks) {
-            final NetworkPresenter networkPresenter = networkFactory.createPresenter(cluster, network);
+            final NetworkPresenter networkPresenter = networkFactory.createPresenter(cluster, network, this);
             clusterTreeMenu.createMenuItem(networksNode, networkPresenter);
         }
         clusterTreeMenu.reloadNodeDontSelect(networksNode);
@@ -1483,9 +1483,6 @@ public class ClusterBrowser extends Browser {
     }
 
     public void highlightServices() {
-        if (getClusterViewPanel().isDisabledDuringLoad()) {
-            return;
-        }
         clusterTreeMenu.expandAndSelect(new Object[]{treeTop, crmNode, servicesNode});
     }
 
@@ -2107,6 +2104,10 @@ public class ClusterBrowser extends Browser {
 
     public ResourceAgent getCloneResourceAgent() {
         return crmXml.getCloneResourceAgent();
+    }
+
+    public void setDisabledDuringLoad(boolean disable) {
+        clusterTreeMenu.setDisableListeners(disable);
     }
 
     /** Callback to service menu items, that show ptest results in tooltips. */

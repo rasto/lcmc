@@ -660,8 +660,8 @@ public class ServicesInfo extends EditableInfo {
         final String cn = getBrowser().getCluster().getName();
         progressIndicator.startProgressIndicator(cn, "paste");
         final ClusterBrowser otherBrowser = (ClusterBrowser) oldInfos.get(0).getBrowser();
-        getBrowser().getClusterViewPanel().setDisabledDuringLoad(true);
-        otherBrowser.getClusterViewPanel().setDisabledDuringLoad(true);
+        getBrowser().setDisabledDuringLoad(true);
+        otherBrowser.setDisabledDuringLoad(true);
         for (Info oldI : oldInfos) {
             CloneInfo oci = null;
             if (oldI instanceof CloneInfo) {
@@ -741,8 +741,8 @@ public class ServicesInfo extends EditableInfo {
             }
         }
         progressIndicator.stopProgressIndicator(cn, "paste");
-        otherBrowser.getClusterViewPanel().setDisabledDuringLoad(false);
-        getBrowser().getClusterViewPanel().setDisabledDuringLoad(false);
+        otherBrowser.setDisabledDuringLoad(false);
+        getBrowser().setDisabledDuringLoad(false);
     }
 
     public void exportGraphAsPng() {

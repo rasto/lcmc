@@ -56,6 +56,8 @@ public class TreeMenuControllerTest {
     private InfoPresenter infoPresenter;
     @Mock
     private InfoPresenter infoPresenter2;
+    @Mock
+    private EditableInfo editableInfo;
 
     private ClusterTreeMenu clusterTreeMenu;
     private DefaultMutableTreeNode menuTreeTop;
@@ -182,24 +184,15 @@ public class TreeMenuControllerTest {
     }
 
     @Test
-    public void nodeShouldTriggerTreeNodesChangesEvent() {
+    public void nodeChangedShouldTriggerTreeNodesChangesEvent() {
         val child = clusterTreeMenu.createMenuItem(menuTreeTop, infoPresenter);
-
-        final JTree menuTree = clusterTreeMenu.getMenuTree();
+        clusterTreeMenu.setDisableListeners(false);
 
         final Boolean[] eventTriggered = new Boolean[]{false};
-        menuTree.getModel().addTreeModelListener(
-                new TreeModelListener() {
-                    @Override
-                    public void treeNodesChanged(final TreeModelEvent e) {
-                        eventTriggered[0] = true;
-                    }
 
-                    @Override public void treeNodesInserted(final TreeModelEvent e) { }
-                    @Override public void treeNodesRemoved(final TreeModelEvent e) { }
-                    @Override public void treeStructureChanged(final TreeModelEvent e) { }
-                }
-        );
+        clusterTreeMenu.addListeners(infoPresenter -> {
+            eventTriggered[0] = true;
+        });
 
         clusterTreeMenu.nodeChanged(child);
 
@@ -301,6 +294,36 @@ public class TreeMenuControllerTest {
         assertThat(childAt(1), is(child1));
         assertThat(childAt(2), is(child4));
         assertThat(childAt(3), is(child3));
+    }
+
+    @Test
+    public void shouldCallOnSelectWhenSelectionChanges() {
+        val child1 = clusterTreeMenu.createMenuItem(menuTreeTop, infoPresenter);
+        clusterTreeMenu.setDisableListeners(false);
+
+        final InfoPresenter[] selected = {null};
+        clusterTreeMenu.addListeners(info -> {
+            selected[0] = info;
+        });
+
+        clusterTreeMenu.expandAndSelect(new Object[]{child1});
+
+        assertThat(selected[0], is(infoPresenter));
+    }
+
+    @Test
+    public void shouldCallOnSelectWhenNodeIsReloaded() {
+        val child1 = clusterTreeMenu.createMenuItem(menuTreeTop, editableInfo);
+        clusterTreeMenu.setDisableListeners(false);
+
+        final InfoPresenter[] selected = {null};
+        clusterTreeMenu.addListeners(info -> {
+            selected[0] = info;
+        });
+
+        clusterTreeMenu.reloadNode(child1);
+
+        assertThat(selected[0], is(editableInfo));
     }
 
     private DefaultMutableTreeNode childAt(int index) {

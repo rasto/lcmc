@@ -1,26 +1,26 @@
 package lcmc.cluster.ui;
 
-import java.io.File;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.concurrent.CountDownLatch;
-
 import lcmc.AppContext;
 import lcmc.common.domain.Application;
+import lcmc.common.domain.util.Tools;
 import lcmc.common.ui.main.MainPresenter;
 import lcmc.common.ui.main.ProgressIndicator;
 import lcmc.common.ui.utils.SwingUtils;
 import lcmc.host.domain.Host;
 import lcmc.testutils.IntegrationTestLauncher;
 import lcmc.testutils.annotation.type.IntegrationTest;
-import lcmc.common.domain.util.Tools;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
+
+import java.io.File;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.concurrent.CountDownLatch;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 @Category(IntegrationTest.class)
 public final class ClusterBrowserITest {
@@ -137,10 +137,10 @@ public final class ClusterBrowserITest {
             final Application.RunMode runMode = Application.RunMode.LIVE;
             for (final Host host : integrationTestLauncher.getHosts()) {
                 final ClusterBrowser cb = host.getBrowser().getClusterBrowser();
-                cb.getClusterViewPanel().setDisabledDuringLoad(true);
+                cb.setDisabledDuringLoad(true);
                 cb.parseClusterOutput(cib, new StringBuffer(""), host, firstTime, runMode);
                 swingUtils.waitForSwing();
-                cb.getClusterViewPanel().setDisabledDuringLoad(false);
+                cb.setDisabledDuringLoad(false);
                 cb.getCrmGraph().repaint();
             }
             progressIndicator.stopProgressIndicator(i + ": " + file);

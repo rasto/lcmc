@@ -94,5 +94,9 @@ public final class EmptyBrowser extends Browser {
             emptyTreeMenu.nodeChanged(node);
         }
     }
+
+    public void setDisabledDuringLoad(boolean disable) {
+        emptyTreeMenu.setDisableListeners(disable);
+    }
 }
 

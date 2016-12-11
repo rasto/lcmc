@@ -159,7 +159,7 @@ public final class EmptyViewPanel extends ViewPanel implements AllHostsUpdatable
     /** creates cluster view and updates the tree. */
     private void createEmptyView() {
         final JTree tree = emptyTreeMenu.getMenuTree();
-        addListeners(emptyBrowser, tree);
+        emptyTreeMenu.addListeners(info -> setRightComponentInView(emptyBrowser, info, emptyTreeMenu.isDisableListeners()));
         createPanels(tree);
         emptyBrowser.updateHosts();
     }

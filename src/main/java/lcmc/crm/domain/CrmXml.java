@@ -29,15 +29,9 @@ import lcmc.Exceptions;
 import lcmc.cluster.service.ssh.ExecCommandConfig;
 import lcmc.cluster.service.ssh.SshOutput;
 import lcmc.cluster.ui.ClusterBrowser;
-import lcmc.common.domain.AccessMode;
-import lcmc.common.domain.Application;
-import lcmc.common.domain.ConvertCmdCallback;
-import lcmc.common.domain.StringValue;
-import lcmc.common.domain.Unit;
-import lcmc.common.domain.Value;
-import lcmc.common.domain.XMLTools;
+import lcmc.cluster.ui.network.InfoPresenter;
+import lcmc.common.domain.*;
 import lcmc.common.domain.util.Tools;
-import lcmc.common.ui.Info;
 import lcmc.common.ui.main.ProgressIndicator;
 import lcmc.crm.ui.resource.ServiceInfo;
 import lcmc.crm.ui.resource.ServicesInfo;
@@ -55,18 +49,7 @@ import org.w3c.dom.NodeList;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Provider;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
@@ -744,7 +727,7 @@ public class CrmXml {
                 if (clusterStatus != null) {
                     resourceUpdaterProvider.get().updateAllResources(allServicesInfo, browser, clusterStatus, Application.RunMode.LIVE);
                 }
-                final Info lastSelectedInfo = browser.getClusterViewPanel().getLastSelectedInfo();
+                final InfoPresenter lastSelectedInfo = browser.getClusterViewPanel().getLastSelectedInfo();
                 if (lastSelectedInfo instanceof ServiceInfo || lastSelectedInfo instanceof ServicesInfo) {
                     browser.getClusterViewPanel().reloadRightComponent();
                 }
