@@ -36,7 +36,7 @@ import lcmc.common.ui.CategoryInfo;
 import lcmc.common.ui.CmdLog;
 import lcmc.common.ui.Info;
 import lcmc.common.ui.main.ProgressIndicator;
-import lcmc.common.ui.treemenu.HostTreeMenu;
+import lcmc.common.ui.treemenu.TreeMenuController;
 import lcmc.common.ui.utils.*;
 import lcmc.crm.ui.resource.HostInfo;
 import lcmc.drbd.domain.BlockDevice;
@@ -125,7 +125,7 @@ public class HostBrowser extends Browser {
     @Resource(name="categoryInfo")
     private CategoryInfo fileSystemsCategory;
     @Inject
-    private HostTreeMenu hostTreeMenu;
+    private TreeMenuController treeMenuController;
     @Inject
     private ClusterEventBus clusterEventBus;
     @Inject
@@ -135,7 +135,7 @@ public class HostBrowser extends Browser {
         this.host = host;
         hostInfo.init(host, this);
         hostDrbdInfo.init(host, this);
-        treeTop = hostTreeMenu.createMenuTreeTop(hostInfo);
+        treeTop = treeMenuController.createMenuTreeTop(hostInfo);
         swingUtils.invokeInEdt(new Runnable() {
             @Override
             public void run() {
@@ -163,15 +163,15 @@ public class HostBrowser extends Browser {
 
     public void initHostResources() {
         netInterfacesCategory.init(Tools.getString("HostBrowser.NetInterfaces"), this);
-        netInterfacesNode = hostTreeMenu.createMenuItem(treeTop, netInterfacesCategory);
+        netInterfacesNode = treeMenuController.createMenuItem(treeTop, netInterfacesCategory);
 
         /* block devices */
         blockDevicesCategory.init(Tools.getString("HostBrowser.BlockDevices"), this);
-        blockDevicesNode = hostTreeMenu.createMenuItem(treeTop, blockDevicesCategory);
+        blockDevicesNode = treeMenuController.createMenuItem(treeTop, blockDevicesCategory);
 
         /* file systems */
         fileSystemsCategory.init(Tools.getString("HostBrowser.FileSystems"), this);
-        fileSystemsNode = hostTreeMenu.createMenuItem(treeTop, fileSystemsCategory);
+        fileSystemsNode = treeMenuController.createMenuItem(treeTop, fileSystemsCategory);
     }
 
     public ClusterBrowser getClusterBrowser() {
@@ -188,12 +188,12 @@ public class HostBrowser extends Browser {
             return;
         }
         final Set<String> fileSystems = event.getFileSystems();
-        hostTreeMenu.removeChildren(fileSystemsNode);
+        treeMenuController.removeChildren(fileSystemsNode);
         for (final String fileSystem : fileSystems) {
             final FSInfo fileSystemInfo = clusterViewFactory.createFileSystemView(fileSystem, this);
-            hostTreeMenu.createMenuItem(fileSystemsNode, fileSystemInfo);
+            treeMenuController.createMenuItem(fileSystemsNode, fileSystemInfo);
         }
-        hostTreeMenu.reloadNodeDontSelect(fileSystemsNode);
+        treeMenuController.reloadNodeDontSelect(fileSystemsNode);
     }
 
     @Subscribe
@@ -229,12 +229,12 @@ public class HostBrowser extends Browser {
         if (changed) {
             mBlockDevInfosWriteLock.lock();
             try {
-                hostTreeMenu.removeChildren(blockDevicesNode);
+                treeMenuController.removeChildren(blockDevicesNode);
                 for (final Map.Entry<BlockDevice, BlockDevInfo> bdEntry : blockDevInfos.entrySet()) {
                     final BlockDevInfo bdi = bdEntry.getValue();
-                    hostTreeMenu.createMenuItem(blockDevicesNode, bdi);
+                    treeMenuController.createMenuItem(blockDevicesNode, bdi);
                 }
-                hostTreeMenu.reloadNodeDontSelect(blockDevicesNode);
+                treeMenuController.reloadNodeDontSelect(blockDevicesNode);
             } finally {
                 mBlockDevInfosWriteLock.unlock();
             }
@@ -247,12 +247,12 @@ public class HostBrowser extends Browser {
             return;
         }
         final Collection<NetInterface> netInterfaces = event.getNetInterfaces();
-        hostTreeMenu.removeChildren(netInterfacesNode);
+        treeMenuController.removeChildren(netInterfacesNode);
         for (final NetInterface netInterface : netInterfaces) {
             final Info netInfo = clusterViewFactory.getNetView(netInterface, this);
-            hostTreeMenu.createMenuItem(netInterfacesNode, netInfo);
+            treeMenuController.createMenuItem(netInterfacesNode, netInfo);
         }
-        hostTreeMenu.reloadNodeDontSelect(netInterfacesNode);
+        treeMenuController.reloadNodeDontSelect(netInterfacesNode);
     }
 
 
@@ -406,8 +406,8 @@ public class HostBrowser extends Browser {
     @Override
     public void fireEventInViewPanel(final DefaultMutableTreeNode node) {
         if (node != null) {
-            hostTreeMenu.reloadNode(node);
-            hostTreeMenu.nodeChanged(node);
+            treeMenuController.reloadNode(node);
+            treeMenuController.nodeChanged(node);
         }
     }
 }

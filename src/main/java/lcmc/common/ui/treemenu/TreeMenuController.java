@@ -29,6 +29,9 @@ import lcmc.logger.Logger;
 import lcmc.logger.LoggerFactory;
 import lombok.val;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
 import javax.swing.*;
 import javax.swing.event.TreeModelEvent;
 import javax.swing.event.TreeModelListener;
@@ -36,9 +39,11 @@ import javax.swing.tree.*;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.util.*;
-import java.util.function.Consumer;
+import java.util.function.BiConsumer;
 
-abstract class TreeMenuController {
+@Named
+@Singleton
+public class TreeMenuController {
 
     private static final Logger LOG = LoggerFactory.getLogger(TreeMenuController.class);
     private DefaultTreeModel treeModel;
@@ -46,8 +51,9 @@ abstract class TreeMenuController {
     private final SwingUtils swingUtils;
 
     private volatile boolean disableListeners = true;
-    private Consumer<InfoPresenter> onSelect;
+    private BiConsumer<InfoPresenter, Boolean> onSelect;
 
+    @Inject
     public TreeMenuController(final SwingUtils swingUtils) {
         this.swingUtils = swingUtils;
     }
@@ -116,7 +122,7 @@ abstract class TreeMenuController {
 
     public final void nodeChanged(final DefaultMutableTreeNode node) {
         if (onSelect != null) {
-            getUserObject(node).ifPresent(infoPresenter -> onSelect.accept(infoPresenter));
+            getUserObject(node).ifPresent(infoPresenter -> onSelect.accept(infoPresenter, disableListeners));
         }
     }
 
@@ -307,13 +313,13 @@ abstract class TreeMenuController {
         return tree.getPathForLocation(e.getX(), e.getY());
     }
 
-    public void addListeners(final Consumer<InfoPresenter> onSelect) {
+    public void addListeners(final BiConsumer<InfoPresenter, Boolean> onSelect) {
         this.onSelect = onSelect;
         // Listen for when the selection changes.
         tree.addTreeSelectionListener(e -> {
             getUserObject(tree.getLastSelectedPathComponent()).ifPresent(nodeInfo -> {
                 if (!disableListeners) {
-                    onSelect.accept(nodeInfo);
+                    onSelect.accept(nodeInfo, disableListeners);
                 }
             });
         });
@@ -326,7 +332,7 @@ abstract class TreeMenuController {
                         if (selected != null && selected.length > 0) {
                             getUserObject(selected[0]).ifPresent(info -> {
                                 if (!disableListeners) {
-                                    onSelect.accept(info);
+                                    onSelect.accept(info, disableListeners);
                                 }
                             });
                         }

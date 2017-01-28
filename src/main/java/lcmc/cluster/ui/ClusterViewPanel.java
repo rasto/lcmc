@@ -53,7 +53,7 @@ public class ClusterViewPanel extends ViewPanel implements AllHostsUpdatable {
         clusterBrowser.init(cluster);
         cluster.setBrowser(clusterBrowser);
         val tree = clusterTreeMenu.getMenuTree();
-        clusterTreeMenu.addListeners(info -> setRightComponentInView(clusterBrowser, info, clusterTreeMenu.isDisableListeners()));
+        clusterTreeMenu.addListeners((info, disableListeners) -> setRightComponentInView(clusterBrowser, info, disableListeners));
         createPanels(tree);
         cluster.getBrowser().initClusterBrowser();
         cluster.getBrowser().setClusterViewPanel(this);

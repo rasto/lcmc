@@ -190,7 +190,7 @@ public class TreeMenuControllerTest {
 
         final Boolean[] eventTriggered = new Boolean[]{false};
 
-        clusterTreeMenu.addListeners(infoPresenter -> {
+        clusterTreeMenu.addListeners((infoPresenter, disableListeners) -> {
             eventTriggered[0] = true;
         });
 
@@ -302,7 +302,7 @@ public class TreeMenuControllerTest {
         clusterTreeMenu.setDisableListeners(false);
 
         final InfoPresenter[] selected = {null};
-        clusterTreeMenu.addListeners(info -> {
+        clusterTreeMenu.addListeners((info, disableListeners) -> {
             selected[0] = info;
         });
 
@@ -317,7 +317,7 @@ public class TreeMenuControllerTest {
         clusterTreeMenu.setDisableListeners(false);
 
         final InfoPresenter[] selected = {null};
-        clusterTreeMenu.addListeners(info -> {
+        clusterTreeMenu.addListeners((info, disableListeners) -> {
             selected[0] = info;
         });
 
