@@ -27,6 +27,7 @@ import lcmc.ClusterEventBus;
 import lcmc.cluster.domain.Cluster;
 import lcmc.cluster.domain.Network;
 import lcmc.cluster.service.NetworkService;
+import lcmc.cluster.ui.network.InfoPresenter;
 import lcmc.cluster.ui.network.NetworkFactory;
 import lcmc.cluster.ui.network.NetworkPresenter;
 import lcmc.common.domain.Application;
@@ -84,6 +85,7 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
+import java.util.function.BiConsumer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -2110,6 +2112,20 @@ public class ClusterBrowser extends Browser {
         clusterTreeMenu.setDisableListeners(disable);
     }
 
+    public void setCloneMenu(final CloneInfo cloneInfo, final ServiceInfo newServiceInfo) {
+        final DefaultMutableTreeNode servicesNode = getServicesNode();
+        final DefaultMutableTreeNode cloneNode = clusterTreeMenu.createMenuItem(servicesNode, cloneInfo);
+        clusterTreeMenu.addChild(cloneNode, newServiceInfo.getNode());
+        clusterTreeMenu.reloadNodeDontSelect(servicesNode);
+        clusterTreeMenu.reloadNode(cloneNode);
+    }
+
+    public void addToCloneNode(final ServiceInfo newServiceInfo, final DefaultMutableTreeNode cloneNode) {
+        final DefaultMutableTreeNode newServiceNode = clusterTreeMenu.createMenuItem(cloneNode, newServiceInfo);
+        clusterTreeMenu.reloadNodeDontSelect(cloneNode);
+        clusterTreeMenu.reloadNode(newServiceNode);
+    }
+
     /** Callback to service menu items, that show ptest results in tooltips. */
     public class ClMenuItemCallback implements ButtonCallback {
         /** Host if over a menu item that belongs to a host. */
@@ -2273,5 +2289,11 @@ public class ClusterBrowser extends Browser {
             clusterTreeMenu.reloadNode(node);
             clusterTreeMenu.nodeChanged(node);
         }
+    }
+
+    JTree createTreeMenu(final BiConsumer<InfoPresenter, Boolean> listener) {
+        final JTree tree = clusterTreeMenu.getMenuTree();
+        clusterTreeMenu.addListeners(listener);
+        return tree;
     }
 }

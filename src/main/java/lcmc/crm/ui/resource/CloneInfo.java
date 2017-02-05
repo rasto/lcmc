@@ -27,8 +27,6 @@ import lcmc.common.domain.Application;
 import lcmc.common.domain.ColorText;
 import lcmc.common.domain.Value;
 import lcmc.common.domain.util.Tools;
-import lcmc.common.ui.Browser;
-import lcmc.common.ui.treemenu.ClusterTreeMenu;
 import lcmc.common.ui.utils.UpdatableItem;
 import lcmc.crm.domain.ClusterStatus;
 import lcmc.crm.domain.CrmXml;
@@ -44,13 +42,8 @@ import javax.swing.*;
 import javax.swing.tree.DefaultMutableTreeNode;
 import java.awt.*;
 import java.awt.geom.Point2D;
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
+import java.util.*;
 import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Set;
-import java.util.TreeSet;
 
 /**
  * This class holds clone service info object.
@@ -60,11 +53,11 @@ public class CloneInfo extends ServiceInfo {
     private ServiceInfo containedService = null;
     @Inject
     private CloneMenu cloneMenu;
-    @Inject
-    private ClusterTreeMenu clusterTreeMenu;
+    private ClusterBrowser clusterBrowser;
 
-    void init(final ResourceAgent ra, final String name, final boolean master, final Browser browser) {
-        super.init(name, ra, browser);
+    void init(final ResourceAgent ra, final String name, final boolean master, final ClusterBrowser clusterBrowser) {
+        this.clusterBrowser = clusterBrowser;
+        super.init(name, ra, this.clusterBrowser);
         getService().setMaster(master);
     }
 
@@ -79,11 +72,9 @@ public class CloneInfo extends ServiceInfo {
 
         getBrowser().addToHeartbeatIdList(newServiceInfo);
         getBrowser().addNameToServiceInfoHash(newServiceInfo);
-        final DefaultMutableTreeNode node = getNode();
-        if (node != null) {
-            final DefaultMutableTreeNode newServiceNode = clusterTreeMenu.createMenuItem(node, newServiceInfo);
-            clusterTreeMenu.reloadNodeDontSelect(node);
-            clusterTreeMenu.reloadNode(newServiceNode);
+        final DefaultMutableTreeNode cloneNode = getNode();
+        if (cloneNode != null) {
+            clusterBrowser.addToCloneNode(newServiceInfo, cloneNode);
         }
     }
 
@@ -94,10 +85,7 @@ public class CloneInfo extends ServiceInfo {
     void setCloneServicePanel(final ServiceInfo newServiceInfo) {
         containedService = newServiceInfo;
         newServiceInfo.setCloneInfo(this);
-        final DefaultMutableTreeNode cloneNode = clusterTreeMenu.createMenuItem(getBrowser().getServicesNode(), this);
-        clusterTreeMenu.addChild(cloneNode, newServiceInfo.getNode());
-        clusterTreeMenu.reloadNodeDontSelect(getBrowser().getServicesNode());
-        clusterTreeMenu.reloadNode(cloneNode);
+        clusterBrowser.setCloneMenu(this, newServiceInfo);
     }
 
     @Override

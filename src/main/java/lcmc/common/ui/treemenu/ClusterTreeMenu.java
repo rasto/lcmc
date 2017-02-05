@@ -20,17 +20,111 @@
 
 package lcmc.common.ui.treemenu;
 
-import lcmc.common.ui.utils.SwingUtils;
+import lcmc.cluster.ui.network.InfoPresenter;
+import lcmc.common.ui.Info;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
+import javax.swing.*;
+import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.MutableTreeNode;
+import javax.swing.tree.TreeNode;
+import java.util.Collection;
+import java.util.Enumeration;
+import java.util.List;
+import java.util.function.BiConsumer;
 
 @Named
 @Singleton
-public class ClusterTreeMenu extends TreeMenuController {
+public class ClusterTreeMenu {
     @Inject
-    public ClusterTreeMenu(final SwingUtils swingUtils) {
-        super(swingUtils);
+    private TreeMenuController treeMenuController;
+
+    public void addChild(final DefaultMutableTreeNode parent, final MutableTreeNode child) {
+        treeMenuController.addChild(parent, child);
+    }
+
+    public final void setDisableListeners(final boolean disableListeners) {
+        treeMenuController.setDisableListeners(disableListeners);
+    }
+
+    public final void reloadNodeDontSelect(final TreeNode node) {
+        treeMenuController.reloadNodeDontSelect(node);
+    }
+
+    public final void reloadNode(final TreeNode node) {
+        treeMenuController.reloadNode(node);
+    }
+
+    public DefaultMutableTreeNode createMenuItem(final DefaultMutableTreeNode parent, final InfoPresenter infoPresenter) {
+        return treeMenuController.createMenuItem(parent, infoPresenter);
+    }
+
+    public List<Info> nodesToInfos(final Enumeration<DefaultMutableTreeNode> e) {
+        return treeMenuController.nodesToInfos(e);
+    }
+
+    public void expandAndSelect(final Object[] path) {
+        treeMenuController.expandAndSelect(path);
+    }
+
+    public void nodeChanged(final DefaultMutableTreeNode node) {
+        treeMenuController.nodeChanged(node);
+    }
+
+    public final JTree getMenuTree() {
+        return treeMenuController.getMenuTree();
+    }
+
+    public void addListeners(final BiConsumer<InfoPresenter, Boolean> onSelect) {
+        treeMenuController.addListeners(onSelect);
+    }
+
+    public void removeChildren(final DefaultMutableTreeNode parent) {
+        treeMenuController.removeChildren(parent);
+    }
+
+    public DefaultMutableTreeNode createMenuItem(
+            final DefaultMutableTreeNode parent,
+            final InfoPresenter infoPresenter,
+            final int position) {
+        return treeMenuController.createMenuItem(parent, infoPresenter, position);
+    }
+
+    public boolean isDisableListeners() {
+        return treeMenuController.isDisableListeners();
+    }
+
+    public final void repaintMenuTree() {
+        treeMenuController.repaintMenuTree();
+    }
+
+    public final DefaultMutableTreeNode createMenuTreeTop(final InfoPresenter infoPresenter) {
+        return treeMenuController.createMenuTreeTop(infoPresenter);
+    }
+
+    public void moveNodeUpToPosition(final DefaultMutableTreeNode node, final int position) {
+        treeMenuController.moveNodeUpToPosition(node, position);
+    }
+
+    public void removeFromParent(final Collection<DefaultMutableTreeNode> nodes) {
+        treeMenuController.removeFromParent(nodes);
+    }
+
+    public final void removeNode(final DefaultMutableTreeNode node) {
+        treeMenuController.removeNode(node);
+    }
+
+    public void sortChildrenLeavingNewUp(final DefaultMutableTreeNode parent) {
+        treeMenuController.sortChildrenLeavingNewUp(parent);
+    }
+
+    public int getIndex(final DefaultMutableTreeNode parent, final DefaultMutableTreeNode child) {
+        return treeMenuController.getIndex(parent, child);
+    }
+
+    public int getChildCount(final DefaultMutableTreeNode parent) {
+        return treeMenuController.getChildCount(parent);
     }
 }

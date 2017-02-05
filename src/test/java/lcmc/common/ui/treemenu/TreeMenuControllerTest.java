@@ -59,7 +59,7 @@ public class TreeMenuControllerTest {
     @Mock
     private EditableInfo editableInfo;
 
-    private ClusterTreeMenu clusterTreeMenu;
+    private TreeMenuController clusterTreeMenu;
     private DefaultMutableTreeNode menuTreeTop;
     private TreePath treePath = null;
 
@@ -76,7 +76,7 @@ public class TreeMenuControllerTest {
                 runnable.run();
             }
         };
-        clusterTreeMenu = new ClusterTreeMenu(swingUtils) {
+        clusterTreeMenu = new TreeMenuController(swingUtils) {
             @Override
             protected TreePath getPathForLocation(MouseEvent e) {
                 return treePath;
