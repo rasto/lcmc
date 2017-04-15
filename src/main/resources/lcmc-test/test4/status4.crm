@@ -1,3 +1,6 @@
-2 nodes and 6 resources configured
-
-Online: [ host host ]
+ res_Dummy_1	(ocf::heartbeat:Dummy):	Stopped (disabled)
+ res_Dummy_2	(ocf::heartbeat:Dummy):	Stopped (disabled)
+ res_Dummy_3	(ocf::heartbeat:Dummy):	Stopped (disabled)
+ res_Dummy_4	(ocf::heartbeat:Dummy):	Stopped (disabled)
+ res_Dummy_5	(ocf::heartbeat:Dummy):	Stopped (disabled)
+ res_Dummy_6	(ocf::heartbeat:Dummy):	Stopped (disabled)

@@ -1,8 +1,4 @@
-2 nodes and 3 resources configured
-
-Online: [ host host ]
-
- Master/Slave Set: ms_drbd_1
-     Masters: [ host ]
-     Slaves: [ host ]
- res_Filesystem_1	(ocf::heartbeat:Filesystem):	Started host
+ Master/Slave Set: ms_drbd_1 [res_drbd_1]
+     Masters: [ test1 ]
+     Slaves: [ test2 ]
+ res_Filesystem_1	(ocf::heartbeat:Filesystem):	Started

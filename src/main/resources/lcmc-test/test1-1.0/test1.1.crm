@@ -1,4 +1,0 @@
-node host
-node host
-property $id="cib-bootstrap-options" 
-	no-quorum-policy="ignore"

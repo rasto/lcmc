@@ -1,3 +1,3 @@
-2 nodes and 4 resources configured
+Clone Set: cl_Group_1 [grp_1]
+ Stopped: [ test1 test2 ]
 
-Online: [ host host ]

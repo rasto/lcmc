@@ -1,5 +1,7 @@
-2 nodes and 5 resources configured
-
-Node host: standby
-Node host: standby
-
+ res_IPaddr2_1	(ocf::heartbeat:IPaddr2):	Stopped
+ Resource Group: grp_1
+     res_Dummy_1	(ocf::heartbeat:Dummy):	Stopped
+     res_Dummy_2	(ocf::heartbeat:Dummy):	Stopped
+     res_Dummy_3	(ocf::heartbeat:Dummy):	Stopped
+ Master/Slave Set: ms_Stateful_1 [res_Stateful_1]
+     Stopped: [ test1 test2 ]
