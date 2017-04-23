@@ -894,14 +894,15 @@ sub get_gui_options_info {
 sub get_version_info {
 	my $cmd = 
 	  'uname; uname -m; uname -r; '
-	 .'for d in redhat debian gentoo SuSE distro; do '
-	   .'v=`head -1 -q /etc/"$d"_version /etc/"$d"-release 2>/dev/null`; '
+	 .'for d in redhat debian gentoo SuSE SUSE distro; do '
+	   .'v=`head -1 -q /etc/"$d"_version /etc/"$d"-release /etc/"$d"-brand 2>/dev/null`; '
 	   .'if [ ! -z "$v" ]; then echo "$v"; echo "$d"; fi; '
-	 .'done '
+	 .'done |head -2'
 	 .'| sed "s/distro/openfiler/";'
 	 .'lsb_release -i -r 2>/dev/null '
 	 .'| sed "s/centos/redhat/I"|sed "s/SUSE LINUX/suse/" '
 	 .'| sed "s/openSUSE project/suse/" '
+	 .'| sed "s/openSUSE$/suse/" '
 	 .'| sed "s/enterprise_linux\|ScientificSL/redhatenterpriseserver/" '
 	 .'| perl -lne "print lc((split /:\s*/)[1])"'
 	 .'| sed "s/oracleserver/redhat/"; '
