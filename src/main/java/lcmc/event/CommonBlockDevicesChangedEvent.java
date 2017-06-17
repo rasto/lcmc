@@ -24,7 +24,6 @@ import lcmc.cluster.domain.Cluster;
 import lcmc.cluster.ui.resource.CommonBlockDevInfo;
 
 import java.util.Collection;
-import java.util.List;
 
 public class CommonBlockDevicesChangedEvent {
     private final Cluster cluster;

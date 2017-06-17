@@ -46,6 +46,7 @@ import javax.swing.SpringLayout;
 import lcmc.common.domain.AccessMode;
 import lcmc.common.domain.Application;
 import lcmc.cluster.domain.Cluster;
+import lcmc.common.ui.utils.SwingUtils;
 import lcmc.host.domain.Host;
 import lcmc.common.domain.StringValue;
 import lcmc.drbd.domain.BlockDevice;
@@ -69,7 +70,7 @@ public final class VGCreate extends LV {
     private Map<Host, JCheckBox> hostCheckBoxes = null;
     private Map<String, JCheckBox> pvCheckBoxes = null;
     @Inject
-    private Application application;
+    private SwingUtils swingUtils;
     @Inject
     private WidgetFactory widgetFactory;
     private MyButton createButton;
@@ -133,7 +134,7 @@ public final class VGCreate extends LV {
             } else if (hostCheckBoxes != null) {
                 for (final Map.Entry<Host, JCheckBox> hostEntry : hostCheckBoxes.entrySet()) {
                     if (hostEntry.getValue().isSelected()) {
-                        final Set<String> vgs = hostEntry.getKey().getVolumeGroupNames();
+                        final Set<String> vgs = hostEntry.getKey().getHostParser().getVolumeGroupNames();
                         if (vgs != null && vgs.contains(vgNameWi.getStringValue())) {
                             vgNameCorrect = false;
                             break;
@@ -153,7 +154,7 @@ public final class VGCreate extends LV {
 
     private Map<String, JCheckBox> getPVCheckBoxes(final Collection<String> selectedPVs) {
         final Map<String, JCheckBox> components = new LinkedHashMap<String, JCheckBox>();
-        for (final BlockDevice pv : host.getPhysicalVolumes()) {
+        for (final BlockDevice pv : host.getHostParser().getPhysicalVolumes()) {
             final String pvName = pv.getName();
             final JCheckBox button = new JCheckBox(pvName, selectedPVs.contains(pvName));
             button.setBackground(Tools.getDefaultColor("ConfigDialog.Background.Light"));
@@ -164,7 +165,7 @@ public final class VGCreate extends LV {
 
     private boolean hostHasPVSWithoutVGs(final Host host) {
         final Map<String, BlockDevice> oPVS = new HashMap<String, BlockDevice>();
-        for (final BlockDevice bd : host.getPhysicalVolumes()) {
+        for (final BlockDevice bd : host.getHostParser().getPhysicalVolumes()) {
             oPVS.put(bd.getName(), bd);
         }
         int selected = 0;
@@ -195,7 +196,7 @@ public final class VGCreate extends LV {
 
         /* find next free group volume name */
         String defaultName;
-        final Set<String> volumeGroups = host.getVolumeGroupNames();
+        final Set<String> volumeGroups = host.getHostParser().getVolumeGroupNames();
         int i = 0;
         while (true) {
             defaultName = "vg" + String.format("%02d", i);
@@ -324,7 +325,7 @@ public final class VGCreate extends LV {
     private class CreateRunnable implements Runnable {
         @Override
         public void run() {
-            application.invokeAndWait(new Runnable() {
+            swingUtils.invokeAndWait(new Runnable() {
                 @Override
                 public void run() {
                     enableCreateButton(false);
@@ -353,7 +354,7 @@ public final class VGCreate extends LV {
                 for (final Host h : hostCheckBoxes.keySet()) {
                     h.getBrowser().getClusterBrowser().updateHWInfo(h, Host.UPDATE_LVM);
                 }
-                application.invokeLater(new Runnable() {
+                swingUtils.invokeLater(new Runnable() {
                     @Override
                     public void run() {
                         checkButtons();

@@ -23,6 +23,21 @@
 
 package lcmc.crm.domain;
 
+import com.google.common.base.Optional;
+import com.google.common.collect.Table;
+import lcmc.cluster.service.ssh.ExecCommandConfig;
+import lcmc.cluster.service.ssh.SshOutput;
+import lcmc.common.domain.Application;
+import lcmc.common.domain.ConvertCmdCallback;
+import lcmc.common.domain.Value;
+import lcmc.common.domain.util.Tools;
+import lcmc.common.ui.Access;
+import lcmc.host.domain.Host;
+import lcmc.logger.Logger;
+import lcmc.logger.LoggerFactory;
+
+import javax.inject.Inject;
+import javax.inject.Named;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -30,26 +45,12 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
-import com.google.common.collect.Table;
-import lcmc.common.domain.Application;
-import lcmc.host.domain.Host;
-import lcmc.common.domain.Value;
-import lcmc.common.domain.ConvertCmdCallback;
-import lcmc.logger.Logger;
-import lcmc.logger.LoggerFactory;
-import lcmc.common.domain.util.Tools;
-import lcmc.cluster.service.ssh.ExecCommandConfig;
-import lcmc.cluster.service.ssh.SshOutput;
-
-import javax.inject.Inject;
-import javax.inject.Named;
-
 /**
  * This class parses pacemaker/heartbeat status, stores information
  * in the hashes and provides methods to get this information.
  */
 @Named
-public final class ClusterStatus {
+public class ClusterStatus {
     private static final Logger LOG = LoggerFactory.getLogger(ClusterStatus.class);
     private volatile CibQuery cibQuery = new CibQuery();
     private volatile CibQuery shadowCibQuery = new CibQuery();
@@ -63,6 +64,8 @@ public final class ClusterStatus {
     private Host host;
     @Inject
     private Application application;
+    @Inject
+    private Access access;
 
     /**
      * Gets and parses metadata from pengine and crmd.
@@ -70,7 +73,7 @@ public final class ClusterStatus {
     public void init(final Host host, final CrmXml crmXML) {
         this.host = host;
         this.crmXML = crmXML;
-        final String command = host.getDistCommand("Heartbeat.getClusterMetadata",
+        final String command = host.getHostParser().getDistCommand("Heartbeat.getClusterMetadata",
                                                    (ConvertCmdCallback) null);
         final SshOutput ret = host.captureCommandProgressIndicator(Tools.getString("Heartbeat.getClusterMetadata"),
                                                                    new ExecCommandConfig().command(command)
@@ -142,16 +145,16 @@ public final class ClusterStatus {
         return cibQuery.getResourceParameters().get(hbId);
     }
 
-    public Set<String> getAllGroups() {
+    public Set<String> getAllGroupsAndClones() {
         final Map<String, List<String>> groupsToResources = cibQuery.getGroupsToResources();
         return groupsToResources.keySet();
     }
 
-    public List<String> getGroupResources(final String group, final Application.RunMode runMode) {
+    public Optional<List<String>> getGroupResources(final String group, final Application.RunMode runMode) {
         if (ptestResult != null && Application.isTest(runMode)) {
-            return shadowCibQuery.getGroupsToResources().get(group);
+            return Optional.fromNullable(shadowCibQuery.getGroupsToResources().get(group));
         } else {
-            return cibQuery.getGroupsToResources().get(group);
+            return Optional.fromNullable(cibQuery.getGroupsToResources().get(group));
         }
     }
 
@@ -204,7 +207,7 @@ public final class ClusterStatus {
         return cibQuery.getOrderRsc();
     }
 
-    public List<CrmXml.RscSetConnectionData> getRscSetConnections() {
+    public List<RscSetConnectionData> getRscSetConnections() {
         return cibQuery.getRscSetConnections();
     }
 
@@ -459,7 +462,7 @@ public final class ClusterStatus {
                 }
             } else if ("cibadmin".equals(cmd)) {
                 final String cib = Tools.join("\n", data.toArray(new String[data.size()]));
-                final boolean advancedMode = application.isAdvancedMode();
+                final boolean advancedMode = access.isAdvancedMode();
                 if (!cib.equals(oldCib) || oldAdvancedMode != advancedMode) {
                     LOG.debug1("parseCommand: cib update: " + host.getName());
                     oldCib = cib;

@@ -22,9 +22,42 @@
 
 package lcmc.drbd.ui.resource;
 
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Dimension;
+import com.google.common.base.Optional;
+import lcmc.Exceptions;
+import lcmc.cluster.ui.ClusterBrowser;
+import lcmc.cluster.ui.widget.Check;
+import lcmc.cluster.ui.widget.Widget;
+import lcmc.common.domain.AccessMode;
+import lcmc.common.domain.Application;
+import lcmc.common.domain.ColorText;
+import lcmc.common.domain.ResourceValue;
+import lcmc.common.domain.StringValue;
+import lcmc.common.domain.Value;
+import lcmc.common.domain.util.Tools;
+import lcmc.common.ui.Browser;
+import lcmc.common.ui.EditableInfo;
+import lcmc.common.ui.Info;
+import lcmc.common.ui.MainPanel;
+import lcmc.common.ui.treemenu.TreeMenuController;
+import lcmc.common.ui.utils.ButtonCallback;
+import lcmc.common.ui.utils.ComponentWithTest;
+import lcmc.common.ui.utils.SwingUtils;
+import lcmc.common.ui.utils.UpdatableItem;
+import lcmc.drbd.domain.BlockDevice;
+import lcmc.drbd.domain.DRBDtestData;
+import lcmc.drbd.domain.DrbdXml;
+import lcmc.drbd.service.DRBD;
+import lcmc.drbd.ui.DrbdGraph;
+import lcmc.host.domain.Host;
+import lcmc.host.ui.HostBrowser;
+import lcmc.logger.Logger;
+import lcmc.logger.LoggerFactory;
+import lcmc.lvm.service.LVM;
+
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.swing.*;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.net.UnknownHostException;
@@ -37,41 +70,6 @@ import java.util.Set;
 import java.util.concurrent.CountDownLatch;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.swing.BoxLayout;
-import javax.swing.ImageIcon;
-import javax.swing.JComponent;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import lcmc.Exceptions;
-import lcmc.common.domain.AccessMode;
-import lcmc.common.ui.Browser;
-import lcmc.cluster.ui.ClusterBrowser;
-import lcmc.common.ui.treemenu.TreeMenuController;
-import lcmc.drbd.ui.DrbdGraph;
-import lcmc.common.ui.GUIData;
-import lcmc.host.ui.HostBrowser;
-import lcmc.common.domain.Application;
-import lcmc.common.domain.ColorText;
-import lcmc.host.domain.Host;
-import lcmc.common.domain.StringValue;
-import lcmc.common.domain.Value;
-import lcmc.drbd.domain.DRBDtestData;
-import lcmc.drbd.domain.DrbdXml;
-import lcmc.drbd.domain.BlockDevice;
-import lcmc.common.ui.EditableInfo;
-import lcmc.common.ui.Info;
-import lcmc.cluster.ui.widget.Check;
-import lcmc.cluster.ui.widget.Widget;
-import lcmc.common.ui.utils.ButtonCallback;
-import lcmc.common.ui.utils.ComponentWithTest;
-import lcmc.drbd.service.DRBD;
-import lcmc.lvm.service.LVM;
-import lcmc.logger.Logger;
-import lcmc.logger.LoggerFactory;
-import lcmc.common.domain.util.Tools;
-import lcmc.common.ui.utils.UpdatableItem;
 
 /**
  * This class holds info data for a block device.
@@ -102,17 +100,18 @@ public class BlockDevInfo extends EditableInfo {
 
     private static final String BY_UUID_PATH = "/dev/disk/by-uuid/";
     @Inject
-    private GUIData guiData;
+    private MainPanel mainPanel;
     @Inject
     private BlockDevMenu blockDevMenu;
     @Inject
     private Application application;
     @Inject
+    private SwingUtils swingUtils;
+    @Inject
     private TreeMenuController treeMenuController;
 
     public void init(final String name, final BlockDevice blockDevice, final Browser browser) {
-        super.init(name, browser);
-        setResource(blockDevice);
+        super.einit(Optional.<ResourceValue>of(blockDevice), name, browser);
     }
 
     /**
@@ -239,7 +238,7 @@ public class BlockDevInfo extends EditableInfo {
             vg = bd.getVolumeGroup();
         }
         if (vg != null) {
-            for (final BlockDevice pv : getHost().getPhysicalVolumes(vg)) {
+            for (final BlockDevice pv : getHost().getHostParser().getPhysicalVolumes(vg)) {
                 if (pv.getName().equals(selectedPV)) {
                     tt.append("<b>").append(tab).append(pv).append("</b>");
                 } else {
@@ -261,7 +260,7 @@ public class BlockDevInfo extends EditableInfo {
                 tt.append("    ").append(tab).append(vg).append('\n');
                 selectedLV = bd.getName();
             }
-            final Set<String> lvs = getHost().getLogicalVolumesFromVolumeGroup(vg);
+            final Set<String> lvs = getHost().getHostParser().getLogicalVolumesFromVolumeGroup(vg);
             if (lvs != null) {
                 for (final String lv : lvs) {
                     tt.append("        ").append(tab);
@@ -431,7 +430,7 @@ public class BlockDevInfo extends EditableInfo {
         } else {
             final Widget gwi = super.createWidget(param, prefix, width);
             paramWi = gwi;
-            application.invokeLater(new Runnable() {
+            swingUtils.invokeLater(new Runnable() {
                 @Override
                 public void run() {
                     gwi.setEditable(false);
@@ -448,7 +447,7 @@ public class BlockDevInfo extends EditableInfo {
             ret = false;
         } else if (DRBD_MD_PARAM.equals(param)) {
             if (infoPanel != null) {
-                if (!getHost().getWaitForServerStatusLatch()) {
+                if (!getHost().getHostParser().getWaitForServerStatusLatch()) {
                     final boolean internal = "internal".equals(newValue.getValueForConfig());
                     final Widget ind = getWidget(DRBD_MD_INDEX_PARAM, null);
                     final Widget indW = getWidget(DRBD_MD_INDEX_PARAM,
@@ -459,14 +458,14 @@ public class BlockDevInfo extends EditableInfo {
                             indW.setValue(DRBD_MD_TYPE_FLEXIBLE);
                         }
                     }
-                    application.invokeLater(new Runnable() {
+                    swingUtils.invokeLater(new Runnable() {
                         @Override
                         public void run() {
                             ind.setEnabled(!internal);
                         }
                     });
                     if (indW != null) {
-                        application.invokeLater(new Runnable() {
+                        swingUtils.invokeLater(new Runnable() {
                             @Override
                             public void run() {
                                 indW.setEnabled(!internal);
@@ -764,13 +763,13 @@ public class BlockDevInfo extends EditableInfo {
     @Override
     protected void setTerminalPanel() {
         if (getHost() != null) {
-            guiData.setTerminalPanel(getHost().getTerminalPanel());
+            mainPanel.setTerminalPanel(getHost().getTerminalPanel());
         }
     }
 
     @Override
     public JComponent getInfoPanel() {
-        application.isSwingThread();
+        swingUtils.isSwingThread();
         return getInfoPanelBD();
     }
 
@@ -787,7 +786,7 @@ public class BlockDevInfo extends EditableInfo {
     public void apply(final Application.RunMode runMode) {
         if (Application.isLive(runMode)) {
             final String[] params = getParametersFromXML();
-            application.invokeAndWait(new Runnable() {
+            swingUtils.invokeAndWait(new Runnable() {
                 @Override
                 public void run() {
                     getApplyButton().setEnabled(false);
@@ -816,7 +815,7 @@ public class BlockDevInfo extends EditableInfo {
 
     /** Returns block device panel. */
     JComponent getInfoPanelBD() {
-        application.isSwingThread();
+        swingUtils.isSwingThread();
         if (infoPanel != null) {
             infoPanelDone();
             return infoPanel;
@@ -907,7 +906,7 @@ public class BlockDevInfo extends EditableInfo {
                     final Thread thread = new Thread(new Runnable() {
                         @Override
                         public void run() {
-                            application.invokeAndWait(new Runnable() {
+                            swingUtils.invokeAndWait(new Runnable() {
                                 @Override
                                 public void run() {
                                     getApplyButton().setEnabled(false);
@@ -1234,7 +1233,7 @@ public class BlockDevInfo extends EditableInfo {
     }
 
     public void setParameters(final String resName) {
-        application.isSwingThread();
+        swingUtils.isSwingThread();
         getBlockDevice().setNew(false);
 
         final ClusterBrowser clusterBrowser = getBrowser().getClusterBrowser();
@@ -1319,7 +1318,7 @@ public class BlockDevInfo extends EditableInfo {
 
     /** Returns how much is free space in a volume group. */
     public Long getFreeInVolumeGroup() {
-        return getHost().getFreeInVolumeGroup(getBlockDevice().getVolumeGroup());
+        return getHost().getHostParser().getFreeInVolumeGroup(getBlockDevice().getVolumeGroup());
     }
 
     /** Returns true if this is the first volume in the resource. Returns true
@@ -1357,7 +1356,7 @@ public class BlockDevInfo extends EditableInfo {
                 return "ERROR";
             }
             if (pHost.isConnected()) {
-                if (pHost.isDrbdProxyUp(dri.getName())) {
+                if (pHost.getHostParser().isDrbdProxyUp(dri.getName())) {
                     return PROXY_UP;
                 } else {
                     return PROXY_DOWN;
@@ -1413,6 +1412,6 @@ public class BlockDevInfo extends EditableInfo {
             return false;
         }
         final String vg = bd.getVgOnPhysicalVolume();
-        return getHost().getLogicalVolumesFromVolumeGroup(vg) == null;
+        return getHost().getHostParser().getLogicalVolumesFromVolumeGroup(vg) == null;
     }
 }

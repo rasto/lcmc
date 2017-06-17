@@ -38,12 +38,12 @@ import javax.swing.text.AbstractDocument;
 import javax.swing.text.Document;
 import javax.swing.text.JTextComponent;
 import lcmc.common.domain.AccessMode;
-import lcmc.common.domain.Application;
 import lcmc.common.domain.StringValue;
 import lcmc.common.domain.Value;
 import lcmc.common.ui.utils.MyButton;
 import lcmc.common.ui.utils.PatternDocument;
 import lcmc.common.domain.util.Tools;
+import lcmc.common.ui.utils.SwingUtils;
 import lcmc.common.ui.utils.WidgetListener;
 
 /**
@@ -55,7 +55,7 @@ import lcmc.common.ui.utils.WidgetListener;
 public final class ComboBox extends GenericWidget<MComboBox<Value>> {
     private static final int CB_SCROLLBAR_MAX_ROWS = 10;
     @Inject
-    private Application application;
+    private SwingUtils swingUtils;
 
     protected static Value addItems(final Collection<Value> comboList, final Value selectedValue, final Value[] items) {
         Value selectedValueInfo = null;
@@ -140,7 +140,7 @@ public final class ComboBox extends GenericWidget<MComboBox<Value>> {
     /** Reloads combo box with items and selects supplied value. */
     @Override
     public void reloadComboBox(final Value selectedValue, final Value[] items) {
-        application.invokeLater(new Runnable() {
+        swingUtils.invokeLater(new Runnable() {
             @Override
             public void run() {
                 final MComboBox<Value> cb = getInternalComponent();
@@ -191,7 +191,7 @@ public final class ComboBox extends GenericWidget<MComboBox<Value>> {
     public void setEditable(final boolean editable) {
         super.setEditable(editable);
         final JComponent comp = getInternalComponent();
-        application.invokeInEdt(new Runnable() {
+        swingUtils.invokeInEdt(new Runnable() {
             @Override
             public void run() {
                 final Value v = getValue();
@@ -255,7 +255,7 @@ public final class ComboBox extends GenericWidget<MComboBox<Value>> {
     /** Clears the combo box. */
     @Override
     public void clear() {
-        application.invokeLater(new Runnable() {
+        swingUtils.invokeLater(new Runnable() {
             @Override
             public void run() {
                 getInternalComponent().removeAllItems();
@@ -272,7 +272,7 @@ public final class ComboBox extends GenericWidget<MComboBox<Value>> {
     /** Set item/value in the component and waits till it is set. */
     @Override
     protected void setValueAndWait0(final Value item) {
-        application.isSwingThread();
+        swingUtils.isSwingThread();
         final MComboBox<Value> cb = getInternalComponent();
         if (item == null) {
             cb.setSelectedItem(new StringValue());
@@ -308,7 +308,7 @@ public final class ComboBox extends GenericWidget<MComboBox<Value>> {
         }
         final int pos = p + 3;
         if (pos >= 0 && pos < ip.length()) {
-            application.invokeLater(new Runnable() {
+            swingUtils.invokeLater(new Runnable() {
                 @Override
                 public void run() {
                     tc.select(pos, ip.length());
@@ -331,7 +331,7 @@ public final class ComboBox extends GenericWidget<MComboBox<Value>> {
 
     @Override
     public void setBackgroundColor(final Color bg) {
-        application.invokeLater(new Runnable() {
+        swingUtils.invokeLater(new Runnable() {
             @Override
             public void run() {
                 setBackground(bg);

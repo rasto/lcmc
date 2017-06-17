@@ -25,7 +25,7 @@ package lcmc.drbd.domain;
 
 import lcmc.common.domain.StringValue;
 import lcmc.common.domain.Value;
-import lcmc.common.domain.Resource;
+import lcmc.common.domain.ResourceValue;
 import lcmc.logger.Logger;
 import lcmc.logger.LoggerFactory;
 
@@ -33,7 +33,7 @@ import lcmc.logger.LoggerFactory;
  * This class holds data of one block device, that is the same
  * on all hosts. Unless it is used by drbd.
  */
-public final class CommonBlockDevice extends Resource {
+public final class CommonBlockDevice extends ResourceValue {
     private static final Logger LOG = LoggerFactory.getLogger(CommonBlockDevice.class);
 
     public CommonBlockDevice(final String blockDeviceName) {

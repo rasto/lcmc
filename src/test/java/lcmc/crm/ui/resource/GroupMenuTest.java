@@ -23,9 +23,9 @@ package lcmc.crm.ui.resource;
 import java.util.List;
 
 import lcmc.common.domain.AccessMode;
-import lcmc.common.domain.Application;
+import lcmc.common.ui.main.MainData;
 import lcmc.host.domain.Host;
-import lcmc.common.domain.Resource;
+import lcmc.common.domain.ResourceValue;
 import lcmc.crm.domain.Service;
 import lcmc.cluster.ui.ClusterBrowser;
 
@@ -62,7 +62,7 @@ public class GroupMenuTest {
     @Mock
     private ClusterBrowser clusterBrowserStub;
     @Mock
-    private Resource resourceStub;
+    private ResourceValue resourceStub;
     @Mock
     private Service serviceStub;
     @Mock
@@ -72,9 +72,9 @@ public class GroupMenuTest {
     @Mock
     private MyMenuItem menuItemStub;
     @Mock
-    private Application application;
-    @Mock
     private MenuFactory menuFactoryStub;
+    @Mock
+    private MainData mainData;
     @InjectMocks
     private GroupMenu groupMenu;
 

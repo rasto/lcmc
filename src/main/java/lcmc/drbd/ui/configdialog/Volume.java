@@ -33,6 +33,7 @@ import javax.swing.JScrollPane;
 import lcmc.common.ui.WizardDialog;
 import lcmc.common.domain.Application;
 import lcmc.common.domain.util.Tools;
+import lcmc.common.ui.utils.SwingUtils;
 
 /**
  * An implementation of a dialog where user can enter drbd volume
@@ -47,11 +48,13 @@ public final class Volume extends DrbdConfig {
     private BlockDev blockDevDialog;
     @Inject
     private Application application;
+    @Inject
+    private SwingUtils swingUtils;
 
     /** Applies the changes and returns next dialog (BlockDev). */
     @Override
     public WizardDialog nextDialog() {
-        application.waitForSwing();
+        swingUtils.waitForSwing();
         blockDevDialog.init(this, getDrbdVolumeInfo(), getDrbdVolumeInfo().getFirstBlockDevInfo());
         return blockDevDialog;
     }

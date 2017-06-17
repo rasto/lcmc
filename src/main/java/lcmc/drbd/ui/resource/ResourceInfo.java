@@ -21,9 +21,50 @@
  */
 package lcmc.drbd.ui.resource;
 
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Dimension;
+import com.google.common.base.Optional;
+import lcmc.Exceptions;
+import lcmc.cluster.service.NetworkService;
+import lcmc.cluster.ui.ClusterBrowser;
+import lcmc.cluster.ui.resource.ClusterViewFactory;
+import lcmc.cluster.ui.resource.NetInfo;
+import lcmc.cluster.ui.widget.Check;
+import lcmc.cluster.ui.widget.Widget;
+import lcmc.cluster.ui.widget.WidgetFactory;
+import lcmc.common.domain.AccessMode;
+import lcmc.common.domain.Application;
+import lcmc.common.domain.ResourceValue;
+import lcmc.common.domain.StringValue;
+import lcmc.common.domain.Value;
+import lcmc.common.domain.util.Tools;
+import lcmc.common.ui.Browser;
+import lcmc.common.ui.Info;
+import lcmc.common.ui.SpringUtilities;
+import lcmc.common.ui.treemenu.TreeMenuController;
+import lcmc.common.ui.utils.ButtonCallback;
+import lcmc.common.ui.utils.ComponentWithTest;
+import lcmc.common.ui.utils.MyButton;
+import lcmc.common.ui.utils.SwingUtils;
+import lcmc.common.ui.utils.UpdatableItem;
+import lcmc.common.ui.utils.WidgetListener;
+import lcmc.configs.AppDefaults;
+import lcmc.crm.ui.resource.ServiceInfo;
+import lcmc.drbd.domain.DRBDtestData;
+import lcmc.drbd.domain.DrbdProxy;
+import lcmc.drbd.domain.DrbdResource;
+import lcmc.drbd.domain.DrbdXml;
+import lcmc.drbd.domain.DrbdXml.HostProxy;
+import lcmc.drbd.domain.NetInterface;
+import lcmc.drbd.service.DRBD;
+import lcmc.host.domain.Host;
+import lcmc.host.ui.HostBrowser;
+import lcmc.logger.Logger;
+import lcmc.logger.LoggerFactory;
+
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Provider;
+import javax.swing.*;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.net.UnknownHostException;
@@ -39,51 +80,6 @@ import java.util.Set;
 import java.util.concurrent.CountDownLatch;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Provider;
-import javax.swing.BoxLayout;
-import javax.swing.JComponent;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.SpringLayout;
-
-import lcmc.Exceptions;
-import lcmc.cluster.ui.resource.ClusterViewFactory;
-import lcmc.common.ui.treemenu.TreeMenuController;
-import lcmc.configs.AppDefaults;
-import lcmc.common.domain.AccessMode;
-import lcmc.common.domain.Application;
-import lcmc.host.domain.Host;
-import lcmc.common.domain.StringValue;
-import lcmc.common.domain.Value;
-import lcmc.drbd.domain.DRBDtestData;
-import lcmc.drbd.domain.DrbdProxy;
-import lcmc.drbd.domain.DrbdXml;
-import lcmc.drbd.domain.DrbdXml.HostProxy;
-import lcmc.drbd.domain.DrbdResource;
-import lcmc.drbd.domain.NetInterface;
-import lcmc.common.ui.Browser;
-import lcmc.cluster.ui.ClusterBrowser;
-import lcmc.cluster.service.NetworkService;
-import lcmc.host.ui.HostBrowser;
-import lcmc.common.ui.SpringUtilities;
-import lcmc.common.ui.Info;
-import lcmc.cluster.ui.resource.NetInfo;
-import lcmc.crm.ui.resource.ServiceInfo;
-import lcmc.cluster.ui.widget.Check;
-import lcmc.cluster.ui.widget.Widget;
-import lcmc.cluster.ui.widget.WidgetFactory;
-import lcmc.common.ui.utils.ButtonCallback;
-import lcmc.common.ui.utils.ComponentWithTest;
-import lcmc.drbd.service.DRBD;
-import lcmc.logger.Logger;
-import lcmc.logger.LoggerFactory;
-import lcmc.common.ui.utils.MyButton;
-import lcmc.common.domain.util.Tools;
-import lcmc.common.ui.utils.UpdatableItem;
-import lcmc.common.ui.utils.WidgetListener;
 
 /**
  * this class holds info data, menus and configuration
@@ -145,6 +141,8 @@ public class ResourceInfo extends AbstractDrbdInfo {
     @Inject
     private Application application;
     @Inject
+    private SwingUtils swingUtils;
+    @Inject
     private ResourceMenu resourceMenu;
     @Inject
     private WidgetFactory widgetFactory;
@@ -158,9 +156,8 @@ public class ResourceInfo extends AbstractDrbdInfo {
     private ClusterViewFactory clusterViewFactory;
 
     public void init(final String name, final Set<Host> hosts, final Browser browser) {
-        super.init(name, browser);
+        super.einit(Optional.<ResourceValue>of(new DrbdResource(name)), name, browser);
         this.hosts = hosts;
-        setResource(new DrbdResource(name));
         globalInfo = ((ClusterBrowser) browser).getGlobalInfo();
     }
 
@@ -442,7 +439,7 @@ public class ResourceInfo extends AbstractDrbdInfo {
     /** Returns panel with form to configure a drbd resource. */
     @Override
     public JComponent getInfoPanel() {
-        application.isSwingThread();
+        swingUtils.isSwingThread();
         if (infoPanel != null) {
             infoPanelDone();
             return infoPanel;
@@ -538,7 +535,7 @@ public class ResourceInfo extends AbstractDrbdInfo {
                 final Thread thread = new Thread(new Runnable() {
                     @Override
                     public void run() {
-                        application.invokeAndWait(new Runnable() {
+                        swingUtils.invokeAndWait(new Runnable() {
                             @Override
                             public void run() {
                                 getApplyButton().setEnabled(false);
@@ -804,7 +801,7 @@ public class ResourceInfo extends AbstractDrbdInfo {
     }
 
     public void setParameters() {
-        application.isSwingThread();
+        swingUtils.isSwingThread();
         getDrbdResource().setCommited(true);
         final DrbdXml dxml = getBrowser().getDrbdXml();
         final String resName = getResource().getName();
@@ -1694,7 +1691,7 @@ public class ResourceInfo extends AbstractDrbdInfo {
                         final int s = ProxyNetInfo.PROXY_PREFIX.length();
                         /* select the IP part */
                         wi.setAlwaysEditable(true);
-                        application.invokeLater(new Runnable() {
+                        swingUtils.invokeLater(new Runnable() {
                             @Override
                             public void run() {
                                 wi.select(s, s + NetInfo.IP_PLACEHOLDER.length());

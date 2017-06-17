@@ -36,27 +36,22 @@ import javax.annotation.Resource;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Provider;
-import javax.swing.*;
+import javax.swing.ImageIcon;
 import javax.swing.tree.DefaultMutableTreeNode;
-import javax.swing.tree.MutableTreeNode;
-import javax.swing.tree.TreeNode;
 
 import com.google.common.eventbus.Subscribe;
 import lcmc.ClusterEventBus;
 import lcmc.cluster.ui.ClusterBrowser;
 import lcmc.cluster.ui.resource.ClusterViewFactory;
 import lcmc.common.domain.AccessMode;
-import lcmc.common.domain.Application;
 import lcmc.cluster.domain.Cluster;
 import lcmc.common.ui.Browser;
-import lcmc.common.ui.GUIData;
+import lcmc.common.ui.main.ProgressIndicator;
 import lcmc.common.ui.treemenu.TreeMenuController;
+import lcmc.common.ui.utils.SwingUtils;
 import lcmc.drbd.ui.DrbdGraph;
 import lcmc.event.BlockDevicesChangedEvent;
-import lcmc.event.CommonFileSystemsChangedEvent;
 import lcmc.event.FileSystemsChangedEvent;
-import lcmc.event.HwBlockDevicesChangedEvent;
-import lcmc.event.HwNetInterfacesChangedEvent;
 import lcmc.event.NetInterfacesChangedEvent;
 import lcmc.host.domain.Host;
 import lcmc.drbd.domain.BlockDevice;
@@ -65,7 +60,6 @@ import lcmc.common.ui.CmdLog;
 import lcmc.common.ui.CategoryInfo;
 import lcmc.cluster.ui.resource.FSInfo;
 import lcmc.common.ui.Info;
-import lcmc.cluster.ui.resource.NetInfo;
 import lcmc.crm.ui.resource.HostInfo;
 import lcmc.drbd.ui.resource.BlockDevInfo;
 import lcmc.drbd.ui.resource.HostDrbdInfo;
@@ -109,7 +103,7 @@ public class HostBrowser extends Browser {
      */
     private final Collection<String> usedPorts = new HashSet<String>();
     private final Collection<String> usedProxyPorts = new HashSet<String>();
-    public Host host;
+    private Host host;
     @Inject
     private HostInfo hostInfo;
     /**
@@ -124,19 +118,13 @@ public class HostBrowser extends Browser {
     private final ReadWriteLock mBlockDevInfosLock = new ReentrantReadWriteLock();
     private final Lock mBlockDevInfosReadLock = mBlockDevInfosLock.readLock();
     private final Lock mBlockDevInfosWriteLock = mBlockDevInfosLock.writeLock();
-    private final ReadWriteLock mNetInfosLock = new ReentrantReadWriteLock();
-    private final Lock mNetInfosReadLock = mNetInfosLock.readLock();
-    private final Lock mNetInfosWriteLock = mNetInfosLock.writeLock();
-    private final ReadWriteLock mFileSystemsLock = new ReentrantReadWriteLock();
-    private final Lock mFileSystemsReadLock = mFileSystemsLock.readLock();
-    private final Lock mFileSystemsWriteLock = mFileSystemsLock.writeLock();
     private DefaultMutableTreeNode treeTop;
     @Inject
-    private GUIData guiData;
+    private ProgressIndicator progressIndicator;
     @Inject
     private Provider<BlockDevInfo> blockDevInfoFactory;
     @Inject
-    private Application application;
+    private SwingUtils swingUtils;
     @Inject
     private MenuFactory menuFactory;
     @Inject
@@ -159,7 +147,7 @@ public class HostBrowser extends Browser {
         hostInfo.init(host, this);
         hostDrbdInfo.init(host, this);
         treeTop = treeMenuController.createMenuTreeTop(hostInfo);
-        application.invokeInEdt(new Runnable() {
+        swingUtils.invokeInEdt(new Runnable() {
             @Override
             public void run() {
                 initHostResources();
@@ -211,23 +199,12 @@ public class HostBrowser extends Browser {
             return;
         }
         final Set<String> fileSystems = event.getFileSystems();
-        final Map<String, FSInfo> oldFileSystems = getFilesystemsMap();
-        mFileSystemsWriteLock.lock();
-        try {
-            treeMenuController.removeChildren(fileSystemsNode);
-            for (final String fileSystem : fileSystems) {
-                final FSInfo fileSystemInfo;
-                if (oldFileSystems.containsKey(fileSystem)) {
-                    fileSystemInfo = oldFileSystems.get(fileSystem);
-                } else {
-                    fileSystemInfo = clusterViewFactory.createFileSystemView(fileSystem, this);
-                }
-                treeMenuController.createMenuItem(fileSystemsNode, fileSystemInfo);
-            }
-            treeMenuController.reloadNode(fileSystemsNode, false);
-        } finally {
-            mFileSystemsWriteLock.unlock();
+        treeMenuController.removeChildren(fileSystemsNode);
+        for (final String fileSystem : fileSystems) {
+            final FSInfo fileSystemInfo = clusterViewFactory.createFileSystemView(fileSystem, this);
+            treeMenuController.createMenuItem(fileSystemsNode, fileSystemInfo);
         }
+        treeMenuController.reloadNode(fileSystemsNode, false);
     }
 
     @Subscribe
@@ -281,23 +258,12 @@ public class HostBrowser extends Browser {
             return;
         }
         final Collection<NetInterface> netInterfaces = event.getNetInterfaces();
-        final Map<NetInterface, NetInfo> oldNetInterfaces = getNetInterfacesMap();
-        mNetInfosWriteLock.lock();
-        try {
-            treeMenuController.removeChildren(netInterfacesNode);
-            for (final NetInterface netInterface : netInterfaces) {
-                final Info netInfo;
-                if (oldNetInterfaces.containsKey(netInterface)) {
-                    netInfo = oldNetInterfaces.get(netInterface);
-                } else {
-                    netInfo = clusterViewFactory.getNetView(netInterface, this);
-                }
-                final DefaultMutableTreeNode resource = treeMenuController.createMenuItem(netInterfacesNode, netInfo);
-            }
-            treeMenuController.reloadNode(netInterfacesNode, false);
-        } finally {
-            mNetInfosWriteLock.unlock();
+        treeMenuController.removeChildren(netInterfacesNode);
+        for (final NetInterface netInterface : netInterfaces) {
+            final Info netInfo = clusterViewFactory.getNetView(netInterface, this);
+            treeMenuController.createMenuItem(netInterfacesNode, netInfo);
         }
+        treeMenuController.reloadNode(netInterfacesNode, false);
     }
 
 
@@ -308,34 +274,6 @@ public class HostBrowser extends Browser {
         } finally {
             mBlockDevInfosReadLock.unlock();
         }
-    }
-
-    Map<NetInterface, NetInfo> getNetInterfacesMap() {
-        final Map<NetInterface, NetInfo> netInterfaces = new HashMap<NetInterface, NetInfo>();
-        mNetInfosReadLock.lock();
-        try {
-            for (final Object info : treeMenuController.nodesToInfos(netInterfacesNode.children())) {
-                final NetInfo netInfo = (NetInfo) info;
-                netInterfaces.put(netInfo.getNetInterface(), netInfo);
-            }
-        } finally {
-            mNetInfosReadLock.unlock();
-        }
-        return netInterfaces;
-    }
-
-    Map<String, FSInfo> getFilesystemsMap() {
-        final Map<String, FSInfo> filesystems = new HashMap<String, FSInfo>();
-        mFileSystemsReadLock.lock();
-        try {
-            for (final Object info : treeMenuController.nodesToInfos(fileSystemsNode.children())) {
-                final FSInfo fsInfo = (FSInfo) info;
-                filesystems.put(fsInfo.getName(), fsInfo);
-            }
-        } finally {
-            mFileSystemsReadLock.unlock();
-        }
-        return filesystems;
     }
 
     /**
@@ -393,9 +331,9 @@ public class HostBrowser extends Browser {
                     public void run(final String text) {
                         final String hostName = host.getName();
                         final String command = "MakeKernelPanic";
-                        guiData.startProgressIndicator(hostName, host.getDistString(command));
+                        progressIndicator.startProgressIndicator(hostName, host.getDistString(command));
                         host.execCommand(new ExecCommandConfig().commandString(command));
-                        guiData.stopProgressIndicator(hostName, host.getDistString(command));
+                        progressIndicator.stopProgressIndicator(hostName, host.getDistString(command));
                     }
                 });
         submenu.add(panicMenuItem);
@@ -421,97 +359,14 @@ public class HostBrowser extends Browser {
                     public void run(final String text) {
                         final String hostName = host.getName();
                         final String command = "MakeKernelReboot";
-                        guiData.startProgressIndicator(hostName, host.getDistString(command));
+                        progressIndicator.startProgressIndicator(hostName, host.getDistString(command));
                         host.execCommand(new ExecCommandConfig().commandString(command));
-                        guiData.stopProgressIndicator(hostName, host.getDistString(command));
+                        progressIndicator.stopProgressIndicator(hostName, host.getDistString(command));
                     }
                 });
         submenu.add(rebootMenuItem);
     }
 
-    /**
-     * Returns info string about Pacemaker installation.
-     */
-    public String getPacemakerInfo() {
-        final StringBuilder pacemakerInfo = new StringBuilder(40);
-        final String pmV = host.getPacemakerVersion();
-        final String hbV = host.getHeartbeatVersion();
-        final StringBuilder hbRunning = new StringBuilder(20);
-        if (host.isHeartbeatRunning()) {
-            hbRunning.append("running");
-            if (!host.isHeartbeatInRc()) {
-                hbRunning.append("/no rc.d");
-            }
-        } else {
-            hbRunning.append("not running");
-        }
-        if (host.isHeartbeatInRc()) {
-            hbRunning.append("/rc.d");
-        }
-        if (pmV == null) {
-            if (hbV != null) {
-                pacemakerInfo.append(" \nHeartbeat ");
-                pacemakerInfo.append(hbV);
-                pacemakerInfo.append(" (");
-                pacemakerInfo.append(hbRunning);
-                pacemakerInfo.append(')');
-            }
-        } else {
-            final String pmRunning;
-            if (host.isCrmStatusOk()) {
-                pmRunning = "running";
-            } else {
-                pmRunning = "not running";
-            }
-            pacemakerInfo.append(" \nPacemaker ");
-            pacemakerInfo.append(pmV);
-            pacemakerInfo.append(" (");
-            pacemakerInfo.append(pmRunning);
-            pacemakerInfo.append(')');
-            String corOrAis = null;
-            final String corV = host.getCorosyncVersion();
-            final String aisV = host.getOpenaisVersion();
-            if (corV != null) {
-                corOrAis = "Corosync " + corV;
-            } else if (aisV != null) {
-                corOrAis = "Openais " + aisV;
-            }
-
-            if (hbV != null && host.isHeartbeatRunning()) {
-                pacemakerInfo.append(" \nHeartbeat ");
-                pacemakerInfo.append(hbV);
-                pacemakerInfo.append(" (");
-                pacemakerInfo.append(hbRunning);
-                pacemakerInfo.append(')');
-            }
-            if (corOrAis != null) {
-                pacemakerInfo.append(" \n");
-                pacemakerInfo.append(corOrAis);
-                pacemakerInfo.append(" (");
-                if (host.isCorosyncRunning()
-                        || host.isOpenaisRunning()) {
-                    pacemakerInfo.append("running");
-                    if (!host.isCorosyncInRc() && !host.isOpenaisInRc()) {
-                        pacemakerInfo.append("/no rc.d");
-                    }
-                } else {
-                    pacemakerInfo.append("not running");
-                }
-                if (host.isCorosyncInRc() || host.isOpenaisInRc()) {
-                    pacemakerInfo.append("/rc.d");
-                }
-                pacemakerInfo.append(')');
-            }
-            if (hbV != null && !host.isHeartbeatRunning()) {
-                pacemakerInfo.append(" \nHeartbeat ");
-                pacemakerInfo.append(hbV);
-                pacemakerInfo.append(" (");
-                pacemakerInfo.append(hbRunning);
-                pacemakerInfo.append(')');
-            }
-        }
-        return pacemakerInfo.toString();
-    }
 
     public String getHostToolTip(final Host host) {
         final StringBuilder hostToolTip = new StringBuilder(80);
@@ -523,12 +378,12 @@ public class HostBrowser extends Browser {
         if (!host.isConnected()) {
             hostToolTip.append('\n');
             hostToolTip.append(Tools.getString("ClusterBrowser.Host.Disconnected"));
-        } else if (!host.isDrbdStatusOk() && !host.isCrmStatusOk()) {
+        } else if (!host.getHostParser().isDrbdStatusOk() && !host.isCrmStatusOk()) {
             hostToolTip.append('\n');
             hostToolTip.append(Tools.getString("ClusterBrowser.Host.Offline"));
         }
         hostToolTip.append(host.getDrbdInfoAboutInstallation());
-        hostToolTip.append(getPacemakerInfo());
+        hostToolTip.append(host.getPacemakerInfo());
         return hostToolTip.toString();
     }
 
@@ -557,9 +412,5 @@ public class HostBrowser extends Browser {
 
     public void unlockBlockDevInfosRead() {
         mBlockDevInfosReadLock.unlock();
-    }
-
-    public TreeNode getNetInterfacesNode() {
-        return netInterfacesNode;
     }
 }

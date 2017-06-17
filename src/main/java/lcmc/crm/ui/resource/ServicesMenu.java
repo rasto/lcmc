@@ -33,9 +33,10 @@ import javax.swing.JDialog;
 import lcmc.cluster.ui.wizard.EditClusterDialog;
 import lcmc.Exceptions;
 import lcmc.common.ui.CallbackAction;
-import lcmc.common.ui.GUIData;
+import lcmc.common.ui.main.MainData;
 import lcmc.common.domain.AccessMode;
 import lcmc.common.domain.Application;
+import lcmc.common.ui.utils.SwingUtils;
 import lcmc.crm.domain.CrmXml;
 import lcmc.host.domain.Host;
 import lcmc.crm.domain.ResourceAgent;
@@ -66,7 +67,7 @@ public class ServicesMenu {
     @Inject
     private EditClusterDialog editClusterDialog;
     @Inject
-    private GUIData guiData;
+    private MainData mainData;
     @Inject
     private Provider<ConstraintPHInfo> constraintPHInfoProvider;
     @Inject
@@ -75,6 +76,8 @@ public class ServicesMenu {
     private MenuFactory menuFactory;
     @Inject
     private Application application;
+    @Inject
+    private SwingUtils swingUtils;
     @Inject @Named("clusterLogs")
     private Provider<ClusterLogs> clusterLogsProvider;
 
@@ -135,7 +138,7 @@ public class ServicesMenu {
         addServiceMenuItem.onUpdate(new Runnable() {
             @Override
             public void run() {
-                application.isSwingThread();
+                swingUtils.isSwingThread();
                 addServiceMenuItem.removeAll();
                 final Point2D pos = addServiceMenuItem.getPos();
                 final CrmXml crmXML = servicesInfo.getBrowser().getCrmXml();
@@ -269,7 +272,7 @@ public class ServicesMenu {
                                     @Override
                                     public void run(final String text) {
                                         servicesInfo.hidePopup();
-                                        application.invokeLater(new Runnable() {
+                                        swingUtils.invokeLater(new Runnable() {
                                             @Override
                                             public void run() {
                                                 for (final JDialog otherP : popups) {
@@ -294,7 +297,7 @@ public class ServicesMenu {
                         mmi.setPos(pos);
                         dlm.addElement(mmi);
                     }
-                    final boolean ret = guiData.getScrollingMenu(
+                    final boolean ret = mainData.getScrollingMenu(
                             ClusterBrowser.getClassMenuName(cl),
                             null, /* options */
                             classItem,
@@ -343,7 +346,7 @@ public class ServicesMenu {
                 final PcmkRscSetsInfo rscSetsInfo = rscSetsInfoProvider.get();
                 rscSetsInfo.init(servicesInfo.getBrowser(), constraintPHInfo);
                 constraintPHInfo.setPcmkRscSetsInfo(rscSetsInfo);
-                application.invokeLater(new Runnable() {
+                swingUtils.invokeLater(new Runnable() {
                     @Override
                     public void run() {
                         hg.scale();
@@ -363,7 +366,7 @@ public class ServicesMenu {
                         .enablePredicate(new EnablePredicate() {
                             @Override
                             public String check() {
-                                final String pmV = servicesInfo.getBrowser().getDCHost().getPacemakerVersion();
+                                final String pmV = servicesInfo.getBrowser().getDCHost().getHostParser().getPacemakerVersion();
                                 try {
                                     //TODO: get this from constraints-.rng files
                                     if (pmV == null || Tools.compareVersions(pmV, "1.1.7") <= 0) {
@@ -392,7 +395,7 @@ public class ServicesMenu {
                 final PcmkRscSetsInfo rscSetsInfo = rscSetsInfoProvider.get();
                 rscSetsInfo.init(servicesInfo.getBrowser(), constraintPHInfo);
                 constraintPHInfo.setPcmkRscSetsInfo(rscSetsInfo);
-                application.invokeLater(new Runnable() {
+                swingUtils.invokeLater(new Runnable() {
                     @Override
                     public void run() {
                         hg.scale();

@@ -4,8 +4,9 @@ import java.util.Map;
 import javax.swing.JCheckBox;
 
 import lcmc.AppContext;
-import lcmc.common.ui.GUIData;
-import lcmc.common.domain.Application;
+import lcmc.common.domain.UserConfig;
+import lcmc.common.ui.main.MainPresenter;
+import lcmc.common.ui.main.ProgressIndicator;
 import lcmc.host.domain.Host;
 import lcmc.testutils.IntegrationTestLauncher;
 import lcmc.testutils.annotation.type.GuiTest;
@@ -22,15 +23,17 @@ import static org.junit.Assert.*;
 @Category(IntegrationTest.class)
 public final class ToolsITest {
     private IntegrationTestLauncher testSuite;
-    private GUIData guiData;
-    private Application application;
+    private MainPresenter mainPresenter;
+    private ProgressIndicator progressIndicator;
+    private UserConfig userConfig;
 
     @Before
     public void setUp() {
         testSuite = AppContext.getBean(IntegrationTestLauncher.class);
         testSuite.initTestCluster();
-        application = AppContext.getBean(Application.class);
-        guiData = AppContext.getBean(GUIData.class);
+        userConfig = AppContext.getBean(UserConfig.class);
+        mainPresenter = AppContext.getBean(MainPresenter.class);
+        progressIndicator = AppContext.getBean(ProgressIndicator.class);
     }
 
     @Test
@@ -84,10 +87,10 @@ public final class ToolsITest {
     @Test
     @Category(GuiTest.class)
     public void testLoadFile() {
-        assertNull(Tools.loadFile(guiData, "JUNIT_TEST_FILE_CLICK_OK", false));
+        assertNull(Tools.loadFile(mainPresenter, "JUNIT_TEST_FILE_CLICK_OK", false));
         final String testFile = "/tmp/lcmc-test-file";
-        application.saveConfig(testFile, false);
-        final String file = Tools.loadFile(guiData, testFile, false);
+        userConfig.saveConfig(testFile, false);
+        final String file = Tools.loadFile(mainPresenter, testFile, false);
         assertNotNull(file);
         assertFalse("".equals(file));
     }
@@ -96,37 +99,37 @@ public final class ToolsITest {
     @Category(GuiTest.class)
     public void testStartProgressIndicator() {
         for (int i = 0; i < 10; i++) {
-            guiData.startProgressIndicator(null);
-            guiData.startProgressIndicator("test");
-            guiData.startProgressIndicator("test2");
-            guiData.startProgressIndicator("test3");
-            guiData.startProgressIndicator(null, "test4");
-            guiData.startProgressIndicator("name", "test4");
-            guiData.startProgressIndicator("name2", "test4");
-            guiData.startProgressIndicator("name2", null);
-            guiData.startProgressIndicator(null, null);
-            guiData.stopProgressIndicator(null, null);
-            guiData.stopProgressIndicator("name2", null);
-            guiData.stopProgressIndicator("name2", "test4");
-            guiData.stopProgressIndicator("name", "test4");
-            guiData.stopProgressIndicator(null, "test4");
-            guiData.stopProgressIndicator("test3");
-            guiData.stopProgressIndicator("test2");
-            guiData.stopProgressIndicator("test");
-            guiData.stopProgressIndicator(null);
+            progressIndicator.startProgressIndicator(null);
+            progressIndicator.startProgressIndicator("test");
+            progressIndicator.startProgressIndicator("test2");
+            progressIndicator.startProgressIndicator("test3");
+            progressIndicator.startProgressIndicator(null, "test4");
+            progressIndicator.startProgressIndicator("name", "test4");
+            progressIndicator.startProgressIndicator("name2", "test4");
+            progressIndicator.startProgressIndicator("name2", null);
+            progressIndicator.startProgressIndicator(null, null);
+            progressIndicator.stopProgressIndicator(null, null);
+            progressIndicator.stopProgressIndicator("name2", null);
+            progressIndicator.stopProgressIndicator("name2", "test4");
+            progressIndicator.stopProgressIndicator("name", "test4");
+            progressIndicator.stopProgressIndicator(null, "test4");
+            progressIndicator.stopProgressIndicator("test3");
+            progressIndicator.stopProgressIndicator("test2");
+            progressIndicator.stopProgressIndicator("test");
+            progressIndicator.stopProgressIndicator(null);
         }
     }
 
     @Test
     @Category(GuiTest.class)
     public void testProgressIndicatorFailed() {
-        guiData.progressIndicatorFailed(null, "fail3");
-        guiData.progressIndicatorFailed("name", "fail2");
-        guiData.progressIndicatorFailed("name", null);
-        guiData.progressIndicatorFailed("fail1");
-        guiData.progressIndicatorFailed(null);
+        progressIndicator.progressIndicatorFailed(null, "fail3");
+        progressIndicator.progressIndicatorFailed("name", "fail2");
+        progressIndicator.progressIndicatorFailed("name", null);
+        progressIndicator.progressIndicatorFailed("fail1");
+        progressIndicator.progressIndicatorFailed(null);
 
-        guiData.progressIndicatorFailed("fail two seconds", 2);
+        progressIndicator.progressIndicatorFailed("fail two seconds", 2);
     }
 
     @Test

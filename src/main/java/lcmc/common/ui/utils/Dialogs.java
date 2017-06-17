@@ -23,7 +23,7 @@ package lcmc.common.ui.utils;
 import com.google.common.base.Optional;
 import lcmc.common.domain.Application;
 import lcmc.common.domain.util.Tools;
-import lcmc.common.ui.GUIData;
+import lcmc.common.ui.main.MainData;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -34,7 +34,7 @@ import java.io.File;
 @Named
 public class Dialogs {
     @Inject
-    private GUIData guiData;
+    private MainData mainData;
     @Inject
     private Application application;
 
@@ -80,7 +80,7 @@ public class Dialogs {
             }
         });
 
-        int r = chooser.showSaveDialog(guiData.getClustersPanel());
+        int r = chooser.showSaveDialog(mainData.getClustersPanel());
         if (r != JFileChooser.APPROVE_OPTION) {
             return Optional.absent();
         }
@@ -113,7 +113,7 @@ public class Dialogs {
             }
         };
         chooser.setFileFilter(filter);
-        final int ret = chooser.showOpenDialog(guiData.getMainFrame());
+        final int ret = chooser.showOpenDialog(mainData.getMainFrame());
         Optional<String> name = Optional.absent();
         if (ret == JFileChooser.APPROVE_OPTION) {
             name = Optional.of(chooser.getSelectedFile().getAbsolutePath());

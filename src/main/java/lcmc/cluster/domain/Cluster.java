@@ -32,15 +32,14 @@ import java.util.Set;
 
 import com.google.common.base.Optional;
 import lcmc.Exceptions;
-import lcmc.common.ui.GUIData;
-import lcmc.common.domain.Application;
+import lcmc.common.ui.main.MainData;
+import lcmc.common.ui.utils.SwingUtils;
 import lcmc.host.domain.Host;
 import lcmc.drbd.domain.BlockDevice;
 import lcmc.cluster.ui.ClusterBrowser;
 import lcmc.cluster.ui.ClusterTab;
 import lcmc.cluster.ui.SSHGui;
 import lcmc.cluster.service.storage.BlockDeviceService;
-import lcmc.cluster.service.NetworkService;
 import lcmc.logger.Logger;
 import lcmc.logger.LoggerFactory;
 import lcmc.common.domain.util.Tools;
@@ -59,28 +58,26 @@ public class Cluster implements Comparable<Cluster> {
     private final Set<Host> hosts = new LinkedHashSet<Host>();
     private ClusterTab clusterTab = null;
     /** Default colors of the hosts. */
-    private final Color[] defaultHostColors = {new Color(228, 228, 32),
-                                               new Color(102, 204, 255), /* blue */
-                                               Color.PINK,
-                                               new Color(255, 100, 0), /* orange */
-                                               Color.WHITE,
-                                              };
+    private static final Color[] DEFAULT_HOST_COLORS = {new Color(228, 228, 32),
+                                                   new Color(102, 204, 255), /* blue */
+                                                   Color.PINK,
+                                                   new Color(255, 100, 0), /* orange */
+                                                   Color.WHITE,
+                                                  };
     private boolean savable = true;
     private boolean clusterTabClosable = true;
 
     private ClusterBrowser clusterBrowser;
     @Inject
-    private GUIData guiData;
+    private MainData mainData;
+    @Inject
+    private SwingUtils swingUtils;
     /**
      * Proxy hosts. More can be added in the DRBD config
      * wizard. */
     private final Set<Host> proxyHosts = new LinkedHashSet<Host>();
     @Inject
-    private Application application;
-    @Inject
     private BlockDeviceService blockDeviceService;
-    @Inject
-    private NetworkService networkService;
 
     public void setName(final String name) {
         this.name = name;
@@ -107,8 +104,8 @@ public class Cluster implements Comparable<Cluster> {
     public void addHost(final Host host) {
         final int id = hosts.size();
         host.setPositionInTheCluster(id);
-        if (id < defaultHostColors.length) {
-            host.setColor(defaultHostColors[id]);
+        if (id < DEFAULT_HOST_COLORS.length) {
+            host.setColor(DEFAULT_HOST_COLORS[id]);
         }
         hosts.add(host);
         proxyHosts.add(host);
@@ -246,7 +243,7 @@ public class Cluster implements Comparable<Cluster> {
     public String getMinLibvirtVersion() {
         String minVersion = null;
         for (final Host host : hosts) {
-            final String version = host.getLibvirtVersion();
+            final String version = host.getHostParser().getLibvirtVersion();
             if (version == null) {
                 /* not installed */
                 continue;
@@ -310,10 +307,10 @@ public class Cluster implements Comparable<Cluster> {
             host.disconnect();
         }
         final Cluster thisCluster = this;
-        application.invokeLater(new Runnable() {
+        swingUtils.invokeLater(new Runnable() {
             @Override
             public void run() {
-                guiData.getClustersPanel().removeTabWithCluster(thisCluster);
+                mainData.getClustersPanel().removeTabWithCluster(thisCluster);
             }
         });
     }

@@ -24,13 +24,14 @@ import java.awt.Color;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.Locale;
+
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.swing.JColorChooser;
 
+import lcmc.common.ui.Access;
 import lcmc.common.ui.CallbackAction;
-import lcmc.common.ui.GUIData;
+import lcmc.common.ui.main.MainData;
 import lcmc.common.domain.AccessMode;
 import lcmc.common.domain.Application;
 import lcmc.crm.domain.ClusterStatus;
@@ -51,6 +52,8 @@ import lcmc.common.domain.Predicate;
 import lcmc.common.domain.util.Tools;
 import lcmc.common.ui.utils.UpdatableItem;
 import lcmc.common.domain.VisiblePredicate;
+import lcmc.host.domain.parser.HostParser;
+import lombok.val;
 
 @Named
 public class PcmkMultiSelectionMenu {
@@ -60,7 +63,9 @@ public class PcmkMultiSelectionMenu {
     @Inject
     private Application application;
     @Inject
-    private GUIData guiData;
+    private MainData mainData;
+    @Inject
+    private Access access;
 
     public List<UpdatableItem> getPulldownMenu(final PcmkMultiSelectionInfo pcmkMultiSelectionInfo) {
         this.pcmkMultiSelectionInfo = pcmkMultiSelectionInfo;
@@ -216,14 +221,14 @@ public class PcmkMultiSelectionMenu {
                             public boolean check() {
                     /* when both are running it's openais. */
                                 final HostInfo hi = selectedHostInfos.get(0);
-                                return hi.getHost().isCorosyncRunning() && !hi.getHost().isOpenaisRunning();
+                                return hi.getHost().getHostParser().isCorosyncRunning() && !hi.getHost().getHostParser().isOpenaisRunning();
                             }
                         })
                         .visiblePredicate(new VisiblePredicate() {
                             @Override
                             public boolean check() {
                                 for (final HostInfo hi : selectedHostInfos) {
-                                    if (hi.getHost().isCorosyncRunning() || hi.getHost().isOpenaisRunning()) {
+                                    if (hi.getHost().getHostParser().isCorosyncRunning() || hi.getHost().getHostParser().isOpenaisRunning()) {
                                         return true;
                                     }
                                 }
@@ -238,20 +243,21 @@ public class PcmkMultiSelectionMenu {
                                         Tools.getString("HostInfo.confirmCorosyncStop.Yes"),
                                         Tools.getString("HostInfo.confirmCorosyncStop.No"))) {
                                     for (final HostInfo hi : selectedHostInfos) {
-                                        hi.getHost().setCommLayerStopping(true);
+                                        hi.getHost().getHostParser().setCommLayerStopping(true);
                                     }
                                     for (final HostInfo hi : selectedHostInfos) {
-                                        final Host host = hi.getHost();
-                                        if (!host.isPcmkStartedByCorosync()
-                                                && host.hasPacemakerInitScript()
-                                                && host.isPacemakerRunning()) {
-                                            if (host.isCorosyncRunning() && !host.isOpenaisRunning()) {
+                                        val host = hi.getHost();
+                                        val hostParser = host.getHostParser();
+                                        if (!hostParser.isPcmkStartedByCorosync()
+                                                && hostParser.hasPacemakerInitScript()
+                                                && hostParser.isPacemakerRunning()) {
+                                            if (hostParser.isCorosyncRunning() && !hostParser.isOpenaisRunning()) {
                                                 Corosync.stopCorosyncWithPcmk(host);
                                             } else {
                                                 Openais.stopOpenaisWithPcmk(host);
                                             }
                                         } else {
-                                            if (host.isCorosyncRunning() && !host.isOpenaisRunning()) {
+                                            if (hostParser.isCorosyncRunning() && !hostParser.isOpenaisRunning()) {
                                                 Corosync.stopCorosync(host);
                                             } else {
                                                 Openais.stopOpenais(host);
@@ -291,7 +297,7 @@ public class PcmkMultiSelectionMenu {
                             @Override
                             public boolean check() {
                                 for (final HostInfo hi : selectedHostInfos) {
-                                    if (hi.getHost().isHeartbeatRunning()) {
+                                    if (hi.getHost().getHostParser().isHeartbeatRunning()) {
                                         return true;
                                     }
                                 }
@@ -307,7 +313,7 @@ public class PcmkMultiSelectionMenu {
                                         Tools.getString("HostInfo.confirmHeartbeatStop.Yes"),
                                         Tools.getString("HostInfo.confirmHeartbeatStop.No"))) {
                                     for (final HostInfo hi : selectedHostInfos) {
-                                        hi.getHost().setCommLayerStopping(true);
+                                        hi.getHost().getHostParser().setCommLayerStopping(true);
                                     }
                                     for (final HostInfo hi : selectedHostInfos) {
                                         final Host host = hi.getHost();
@@ -346,7 +352,7 @@ public class PcmkMultiSelectionMenu {
                             @Override
                             public boolean check() {
                                 for (final HostInfo hi : selectedHostInfos) {
-                                    final Host h = hi.getHost();
+                                    final HostParser h = hi.getHost().getHostParser();
                                     if (h.isCorosyncInstalled()
                                             && h.hasCorosyncInitScript()
                                             && h.corosyncOrOpenaisConfigExists()
@@ -364,8 +370,8 @@ public class PcmkMultiSelectionMenu {
                             @Override
                             public String check() {
                                 for (final HostInfo hi : selectedHostInfos) {
-                                    final Host h = hi.getHost();
-                                    if (h.isOpenaisInRc() && !h.isCorosyncInRc()) {
+                                    final HostParser hostParser = hi.getHost().getHostParser();
+                                    if (hostParser.isOpenaisInRc() && !hostParser.isCorosyncInRc()) {
                                         return "Openais is in rc.d";
                                     }
                                 }
@@ -376,11 +382,11 @@ public class PcmkMultiSelectionMenu {
                             @Override
                             public void run(final String text) {
                                 for (final HostInfo hi : selectedHostInfos) {
-                                    hi.getHost().setCommLayerStarting(true);
+                                    hi.getHost().getHostParser().setCommLayerStarting(true);
                                 }
                                 for (final HostInfo hi : selectedHostInfos) {
                                     final Host h = hi.getHost();
-                                    if (h.isPacemakerInRc()) {
+                                    if (h.getHostParser().isPacemakerInRc()) {
                                         Corosync.startCorosyncWithPcmk(h);
                                     } else {
                                         Corosync.startCorosync(h);
@@ -413,13 +419,13 @@ public class PcmkMultiSelectionMenu {
                             @Override
                             public boolean check() {
                                 for (final HostInfo hi : selectedHostInfos) {
-                                    final Host h = hi.getHost();
-                                    if (h.hasOpenaisInitScript()
-                                            && h.corosyncOrOpenaisConfigExists()
-                                            && !h.isCorosyncRunning()
-                                            && !h.isOpenaisRunning()
-                                            && !h.isHeartbeatRunning()
-                                            && !h.isHeartbeatInRc()) {
+                                    val hostParser = hi.getHost().getHostParser();
+                                    if (hostParser.hasOpenaisInitScript()
+                                            && hostParser.corosyncOrOpenaisConfigExists()
+                                            && !hostParser.isCorosyncRunning()
+                                            && !hostParser.isOpenaisRunning()
+                                            && !hostParser.isHeartbeatRunning()
+                                            && !hostParser.isHeartbeatInRc()) {
                                         return true;
                                     }
                                 }
@@ -431,7 +437,7 @@ public class PcmkMultiSelectionMenu {
                             public String check() {
                                 for (final HostInfo hi : selectedHostInfos) {
                                     final Host h = hi.getHost();
-                                    if (h.isCorosyncInRc() && !h.isOpenaisInRc()) {
+                                    if (h.getHostParser().isCorosyncInRc() && !h.getHostParser().isOpenaisInRc()) {
                                         return "Corosync is in rc.d";
                                     }
                                 }
@@ -442,7 +448,7 @@ public class PcmkMultiSelectionMenu {
                             @Override
                             public void run(final String text) {
                                 for (final HostInfo hi : selectedHostInfos) {
-                                    hi.getHost().setCommLayerStarting(true);
+                                    hi.getHost().getHostParser().setCommLayerStarting(true);
                                     Openais.startOpenais(hi.getHost());
                                 }
                                 for (final HostInfo hi : selectedHostInfos) {
@@ -473,12 +479,12 @@ public class PcmkMultiSelectionMenu {
                             @Override
                             public boolean check() {
                                 for (final HostInfo hi : selectedHostInfos) {
-                                    final Host h = hi.getHost();
-                                    if (h.hasHeartbeatInitScript()
-                                            && h.heartbeatConfigExists()
-                                            && !h.isCorosyncRunning()
-                                            && !h.isOpenaisRunning()
-                                            && !h.isHeartbeatRunning()) {
+                                    val hostParser = hi.getHost().getHostParser();
+                                    if (hostParser.hasHeartbeatInitScript()
+                                            && hostParser.heartbeatConfigExists()
+                                            && !hostParser.isCorosyncRunning()
+                                            && !hostParser.isOpenaisRunning()
+                                            && !hostParser.isHeartbeatRunning()) {
                                         return true;
                                     }
                                 }
@@ -489,7 +495,7 @@ public class PcmkMultiSelectionMenu {
                             @Override
                             public void run(final String text) {
                                 for (final HostInfo hi : selectedHostInfos) {
-                                    hi.getHost().setCommLayerStarting(true);
+                                    hi.getHost().getHostParser().setCommLayerStarting(true);
                                 }
                                 for (final HostInfo hi : selectedHostInfos) {
                                     Heartbeat.startHeartbeat(hi.getHost());
@@ -523,11 +529,11 @@ public class PcmkMultiSelectionMenu {
                             @Override
                             public boolean check() {
                                 for (final HostInfo hi : selectedHostInfos) {
-                                    final Host h = hi.getHost();
-                                    if (!h.isPcmkStartedByCorosync()
-                                            && !h.isPacemakerRunning()
-                                            && (h.isCorosyncRunning() || h.isOpenaisRunning())
-                                            && !h.isHeartbeatRunning()) {
+                                    val hostParser = hi.getHost().getHostParser();
+                                    if (!hostParser.isPcmkStartedByCorosync()
+                                            && !hostParser.isPacemakerRunning()
+                                            && (hostParser.isCorosyncRunning() || hostParser.isOpenaisRunning())
+                                            && !hostParser.isHeartbeatRunning()) {
                                         return true;
                                     }
                                 }
@@ -568,7 +574,7 @@ public class PcmkMultiSelectionMenu {
                             public void run(final String text) {
                                 final Host firstHost = selectedHostInfos.get(0).getHost();
                                 final Color newColor = JColorChooser.showDialog(
-                                        guiData.getMainFrame(),
+                                        mainData.getMainFrame(),
                                         "Choose " + selectedHostInfos + " color",
                                         firstHost.getPmColors()[0]);
                                 for (final HostInfo hi : selectedHostInfos) {
@@ -944,12 +950,12 @@ public class PcmkMultiSelectionMenu {
                                             return false;
                                         }
                                         final List<String> runningOnNodes = si.getRunningOnNodes(Application.RunMode.LIVE);
-                                        if (runningOnNodes == null || runningOnNodes.size() < 1) {
+                                        if (runningOnNodes == null || runningOnNodes.isEmpty()) {
                                             return false;
                                         }
                                         boolean runningOnNode = false;
                                         for (final String ron : runningOnNodes) {
-                                            if (hostName.toLowerCase(Locale.US).equals(ron.toLowerCase(Locale.US))) {
+                                            if (hostName.equalsIgnoreCase(ron)) {
                                                 runningOnNode = true;
                                                 break;
                                             }
@@ -1063,19 +1069,19 @@ public class PcmkMultiSelectionMenu {
                                 continue;
                             } else if (si.getService().isRemoved()) {
                                 return ServiceInfo.IS_BEING_REMOVED_STRING;
-                            } else if (si.isRunning(Application.RunMode.LIVE) && !application.isAdvancedMode()) {
+                            } else if (si.isRunning(Application.RunMode.LIVE) && !access.isAdvancedMode()) {
                                 return "cannot remove running resource<br>(advanced mode only)";
                             }
                             final GroupInfo gi = si.getGroupInfo();
                             if (gi == null) {
                                 continue;
                             }
-                            final List<String> gr = cs.getGroupResources(
+                            val groupResources = cs.getGroupResources(
                                     gi.getHeartbeatId(Application.RunMode.LIVE),
                                     Application.RunMode.LIVE);
 
 
-                            if (gr == null || gr.size() <= 1) {
+                            if (!groupResources.isPresent() || groupResources.get().size() <= 1) {
                                 return "you can remove the group";
                             }
                         }

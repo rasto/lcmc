@@ -51,7 +51,7 @@ import lcmc.common.ui.utils.UpdatableItem;
  * It can be order, colocation or both.
  */
 @Named
-final class PcmkRscSetsInfo extends HbConnectionInfo {
+public class PcmkRscSetsInfo extends HbConnectionInfo {
     private final Collection<ConstraintPHInfo> constraintPHInfos = new LinkedHashSet<ConstraintPHInfo>();
     private final Lock mConstraintPHLock = new ReentrantLock();
     @Inject
@@ -68,7 +68,7 @@ final class PcmkRscSetsInfo extends HbConnectionInfo {
     }
 
     /** Adds a new rsc set colocation. */
-    void addColocation(final String colId, final ConstraintPHInfo cphi) {
+    public void addColocation(final String colId, final ConstraintPHInfo cphi) {
         mConstraintPHLock.lock();
         try {
             constraintPHInfos.add(cphi);
@@ -79,7 +79,7 @@ final class PcmkRscSetsInfo extends HbConnectionInfo {
     }
 
     /** Adds a new rsc set order. */
-    void addOrder(final String ordId, final ConstraintPHInfo cphi) {
+    public void addOrder(final String ordId, final ConstraintPHInfo cphi) {
         mConstraintPHLock.lock();
         try {
             constraintPHInfos.add(cphi);

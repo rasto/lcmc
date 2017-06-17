@@ -26,13 +26,13 @@ package lcmc.crm.domain;
 import lcmc.drbd.domain.NetInterface;
 import lcmc.host.domain.Host;
 import lcmc.common.domain.Value;
-import lcmc.common.domain.Resource;
+import lcmc.common.domain.ResourceValue;
 import lcmc.common.domain.Unit;
 
 /**
  * This class holds data of one ucast link for heartbeat.
  */
-public final class UcastLink extends Resource implements Value {
+public final class UcastLink extends ResourceValue implements Value {
     private final Host host;
     private final NetInterface netInterface;
 

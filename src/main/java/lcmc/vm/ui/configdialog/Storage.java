@@ -33,8 +33,9 @@ import javax.swing.JScrollPane;
 
 import lcmc.common.domain.Application;
 import lcmc.common.domain.StringValue;
-import lcmc.vm.domain.VmsXml;
-import lcmc.vm.domain.DiskData;
+import lcmc.common.ui.utils.SwingUtils;
+import lcmc.vm.domain.VMParams;
+import lcmc.vm.domain.data.DiskData;
 import lcmc.common.ui.WizardDialog;
 import lcmc.vm.ui.resource.DiskInfo;
 import lcmc.common.domain.util.Tools;
@@ -68,6 +69,8 @@ final class Storage extends VMConfig {
     private Network networkDialog;
     @Inject
     private Application application;
+    @Inject
+    private SwingUtils swingUtils;
 
     @Override
     public WizardDialog nextDialog() {
@@ -107,7 +110,7 @@ final class Storage extends VMConfig {
     @Override
     protected void initDialogAfterVisible() {
         enableComponents();
-        application.invokeLater(new Runnable() {
+        swingUtils.invokeLater(new Runnable() {
             @Override
             public void run() {
                 final boolean enable = diskInfo.checkResourceFields(null, diskInfo.getRealParametersFromXML())
@@ -134,7 +137,7 @@ final class Storage extends VMConfig {
         diskInfo.getResource().setValue(DiskData.TARGET_DEVICE, new StringValue("hda"));
         diskInfo.getResource().setValue(DiskData.DRIVER_TYPE, new StringValue("raw"));
         diskInfo.getResource().setValue(DiskData.DRIVER_CACHE, new StringValue("default"));
-        if ("xen".equals(getVMSVirtualDomainInfo().getWidget(VmsXml.VM_PARAM_DOMAIN_TYPE, null).getStringValue())) {
+        if ("xen".equals(getVMSVirtualDomainInfo().getWidget(VMParams.VM_PARAM_DOMAIN_TYPE, null).getStringValue())) {
             diskInfo.getResource().setValue(DiskData.DRIVER_NAME, new StringValue("file"));
         } else {
             diskInfo.getResource().setValue(DiskData.DRIVER_NAME, new StringValue("qemu"));
@@ -142,7 +145,7 @@ final class Storage extends VMConfig {
         diskInfo.getResource().setValue(
                                     DiskData.SOURCE_FILE,
                                     new StringValue("/var/lib/libvirt/images/"
-                                                    + getVMSVirtualDomainInfo().getComboBoxValue(VmsXml.VM_PARAM_NAME)
+                                                    + getVMSVirtualDomainInfo().getComboBoxValue(VMParams.VM_PARAM_NAME)
                                                     + ".img"));
         diskInfo.addWizardParams(optionsPanel,
                                  PARAMS,

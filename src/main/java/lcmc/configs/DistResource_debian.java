@@ -36,6 +36,7 @@ public final class DistResource_debian extends ListResourceBundle {
         {"version:3*",          "3"},
         {"version:5*",          "LENNY"},
         {"version:6*",          "SQUEEZE"},
+        {"version:8*",          "JESSIE"},
         {"version:debian-etch", "ETCH"},
         {"version:4*",          "ETCH"},
 
@@ -72,6 +73,7 @@ public final class DistResource_debian extends ListResourceBundle {
         {"DrbdInst.install.text.2",
          "from the source tarball"},
 
+        {"DrbdInst.install.staging.2", "true"},
         {"DrbdInst.install.method.2",
          "source"},
 

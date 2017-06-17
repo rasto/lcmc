@@ -20,39 +20,36 @@
  */
 package lcmc.crm.ui.resource;
 
-import java.awt.BorderLayout;
-import java.awt.Dimension;
+import com.google.common.base.Optional;
+import lcmc.cluster.ui.ClusterBrowser;
+import lcmc.common.domain.AccessMode;
+import lcmc.common.domain.Application;
+import lcmc.common.domain.ResourceValue;
+import lcmc.common.domain.Value;
+import lcmc.common.domain.util.Tools;
+import lcmc.common.ui.Browser;
+import lcmc.common.ui.EditableInfo;
+import lcmc.common.ui.Info;
+import lcmc.common.ui.main.MainData;
+import lcmc.common.ui.utils.ButtonCallback;
+import lcmc.common.ui.utils.ComponentWithTest;
+import lcmc.common.ui.utils.SwingUtils;
+import lcmc.common.ui.utils.UpdatableItem;
+import lcmc.crm.domain.ClusterStatus;
+import lcmc.crm.domain.PtestData;
+import lcmc.crm.service.CRM;
+import lcmc.host.domain.Host;
+import lcmc.logger.Logger;
+import lcmc.logger.LoggerFactory;
+
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.swing.*;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.swing.AbstractButton;
-import javax.swing.BoxLayout;
-import javax.swing.JComponent;
-import javax.swing.JMenuBar;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-
-import lcmc.common.domain.AccessMode;
-import lcmc.common.ui.GUIData;
-import lcmc.common.domain.Application;
-import lcmc.crm.domain.ClusterStatus;
-import lcmc.host.domain.Host;
-import lcmc.crm.domain.PtestData;
-import lcmc.common.domain.Value;
-import lcmc.common.ui.Browser;
-import lcmc.cluster.ui.ClusterBrowser;
-import lcmc.common.ui.EditableInfo;
-import lcmc.common.ui.Info;
-import lcmc.common.ui.utils.ButtonCallback;
-import lcmc.crm.service.CRM;
-import lcmc.common.ui.utils.ComponentWithTest;
-import lcmc.logger.Logger;
-import lcmc.logger.LoggerFactory;
-import lcmc.common.domain.util.Tools;
-import lcmc.common.ui.utils.UpdatableItem;
 
 /**
  * This class provides menus for service and host multi selection.
@@ -65,15 +62,17 @@ public class PcmkMultiSelectionInfo extends EditableInfo {
     private PcmkMultiSelectionMenu pcmkMultiSelectionMenu;
     @Inject
     private Application application;
+    @Inject
+    private SwingUtils swingUtils;
 
     public void init(final List<Info> selectedInfos, final Browser browser) {
-        super.init("selection", browser);
+        super.einit(Optional.<ResourceValue>absent(), "selection", browser);
         this.selectedInfos = selectedInfos;
     }
 
     @Override
     protected String getInfoMimeType() {
-        return GUIData.MIME_TYPE_TEXT_HTML;
+        return MainData.MIME_TYPE_TEXT_HTML;
     }
 
     @Override
@@ -195,7 +194,7 @@ public class PcmkMultiSelectionInfo extends EditableInfo {
 
     @Override
     public JComponent getInfoPanel() {
-        application.isSwingThread();
+        swingUtils.isSwingThread();
         final boolean abExisted = getApplyButton() != null;
         final ButtonCallback buttonCallback = new ButtonCallback() {
             private volatile boolean mouseStillOver = false;
@@ -311,7 +310,7 @@ public class PcmkMultiSelectionInfo extends EditableInfo {
         addApplyButton(buttonPanel);
         addRevertButton(buttonPanel);
         final String[] params = getParametersFromXML();
-        application.invokeLater(new Runnable() {
+        swingUtils.invokeLater(new Runnable() {
             @Override
             public void run() {
                 /* invoke later on purpose  */

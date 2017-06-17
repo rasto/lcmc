@@ -22,8 +22,10 @@
 
 package lcmc.host.ui;
 
-import lcmc.common.ui.GUIData;
+import lcmc.common.ui.main.MainPresenter;
 import lcmc.common.domain.Application;
+import lcmc.common.ui.MainPanel;
+import lcmc.common.ui.utils.SwingUtils;
 import lcmc.host.domain.Host;
 import lcmc.drbd.domain.DrbdInstallation;
 import lcmc.logger.Logger;
@@ -43,15 +45,19 @@ public final class AddHostDialog {
     @Resource(name="newHostDialog")
     private NewHostDialog newHostDialog;
     @Inject
-    private GUIData guiData;
+    private MainPresenter mainPresenter;
+    @Inject
+    private MainPanel mainPanel;
     @Inject
     private Application application;
+    @Inject
+    private SwingUtils swingUtils;
 
     public void showDialogs(final Host host) {
-        guiData.enableAddHostButtons(false);
+        mainPresenter.enableAddHostButtons(false);
         DialogHost dialog = newHostDialog;
         dialog.init(null, host, new DrbdInstallation());
-        guiData.expandTerminalSplitPane(GUIData.TerminalSize.EXPAND);
+        mainPanel.expandTerminalSplitPane(MainPanel.TerminalSize.EXPAND);
         while (true) {
             LOG.debug1("showDialogs: dialog: " + dialog.getClass().getName());
             final DialogHost newdialog = (DialogHost) dialog.showDialog();
@@ -60,26 +66,26 @@ public final class AddHostDialog {
                 host.disconnect();
                 application.removeHostFromHosts(host);
                 dialog.cancelDialog();
-                guiData.enableAddHostButtons(true);
-                guiData.expandTerminalSplitPane(GUIData.TerminalSize.COLLAPSE);
+                mainPresenter.enableAddHostButtons(true);
+                mainPanel.expandTerminalSplitPane(MainPanel.TerminalSize.COLLAPSE);
                 if (newdialog == null) {
                     LOG.debug1("showDialogs: dialog: " + dialog.getClass().getName() + " canceled");
                     return;
                 }
             } else if (dialog.isPressedFinishButton()) {
                 LOG.debug1("showDialogs: dialog: " + dialog.getClass().getName() + " finished");
-                guiData.allHostsUpdate();
-                application.invokeLater(new Runnable() {
+                mainPresenter.allHostsUpdate();
+                swingUtils.invokeLater(new Runnable() {
                     @Override
                     public void run() {
-                        guiData.checkAddClusterButtons();
+                        mainPresenter.checkAddClusterButtons();
                     }
                 });
                 break;
             }
             dialog = newdialog;
         }
-        guiData.expandTerminalSplitPane(GUIData.TerminalSize.COLLAPSE);
-        guiData.enableAddHostButtons(true);
+        mainPanel.expandTerminalSplitPane(MainPanel.TerminalSize.COLLAPSE);
+        mainPresenter.enableAddHostButtons(true);
     }
 }

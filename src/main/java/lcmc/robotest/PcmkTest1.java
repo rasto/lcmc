@@ -50,7 +50,7 @@ final class PcmkTest1 {
         roboTest.setAborted(false);
         /* create IPaddr2 with 192.168.100.100 ip */
         String testName = "test1";
-        final String pmV = cluster.getHostsArray()[0].getPacemakerVersion();
+        final String pmV = cluster.getHostsArray()[0].getHostParser().getPacemakerVersion();
         try {
             if (pmV != null && Tools.compareVersions(pmV, "1.1.6") < 0) {
                 testName = "test1-1.0";
@@ -77,8 +77,6 @@ final class PcmkTest1 {
         roboTest.press(KeyEvent.VK_B);
         roboTest.press(KeyEvent.VK_D);
         roboTest.press(KeyEvent.VK_ENTER);
-        roboTest.moveTo(Tools.getString("ConfirmDialog.Yes"));
-        roboTest.leftClick();
         roboTest.removeResource(ipX, ipY + 200, !CONFIRM_REMOVE);
 
         roboTest.moveTo(ipX, ipY + 200);
@@ -256,7 +254,7 @@ final class PcmkTest1 {
         roboTest.checkTest(testName, 3.1); /* 3.1 */
 
         try {
-            if (pmV != null && Tools.compareVersions(pmV, "1.0.8") > 0) {
+            if (false && pmV != null && Tools.compareVersions(pmV, "1.0.8") > 0) {
                 /* move up, move down */
                 for (int i = 0; i < 2; i++) {
                     roboTest.moveToMenu("Dummy (3)");

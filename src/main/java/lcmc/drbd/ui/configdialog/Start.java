@@ -38,6 +38,7 @@ import lcmc.common.domain.StringValue;
 import lcmc.common.domain.Value;
 import lcmc.common.ui.SpringUtilities;
 import lcmc.common.ui.WizardDialog;
+import lcmc.common.ui.utils.SwingUtils;
 import lcmc.drbd.ui.resource.BlockDevInfo;
 import lcmc.drbd.ui.resource.GlobalInfo;
 import lcmc.drbd.ui.resource.ResourceInfo;
@@ -64,6 +65,8 @@ public final class Start extends WizardDialog {
     private GlobalInfo globalInfo;
     @Inject
     private Application application;
+    @Inject
+    private SwingUtils swingUtils;
     @Inject
     private WidgetFactory widgetFactory;
 
@@ -93,7 +96,7 @@ public final class Start extends WizardDialog {
         final VolumeInfo dvi = globalInfo.getNewDrbdVolume(
                                              resourceInfo,
                                              new ArrayList<BlockDevInfo>(Arrays.asList(blockDevInfo1, blockDevInfo2)));
-        application.invokeLater(new Runnable() {
+        swingUtils.invokeLater(new Runnable() {
             @Override
             public void run() {
                 resourceInfo.addDrbdVolume(dvi);

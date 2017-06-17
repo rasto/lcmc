@@ -37,8 +37,10 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import lcmc.cluster.ui.wizard.AddClusterDialog;
 import lcmc.common.ui.Browser;
-import lcmc.common.ui.GUIData;
+import lcmc.common.ui.main.MainPresenter;
+import lcmc.common.ui.main.MainData;
 import lcmc.common.ui.ViewPanel;
+import lcmc.common.ui.utils.SwingUtils;
 import lcmc.host.ui.AddHostDialog;
 import lcmc.cluster.ui.widget.WidgetFactory;
 import lcmc.common.domain.Application;
@@ -68,9 +70,13 @@ public final class EmptyViewPanel extends ViewPanel implements AllHostsUpdatable
     @Inject
     private HostFactory hostFactory;
     @Inject
-    private GUIData guiData;
+    private MainData mainData;
+    @Inject
+    private MainPresenter mainPresenter;
     @Inject
     private Application application;
+    @Inject
+    private SwingUtils swingUtils;
     @Inject
     private WidgetFactory widgetFactory;
 
@@ -115,12 +121,12 @@ public final class EmptyViewPanel extends ViewPanel implements AllHostsUpdatable
                 thread.start();
             }
         });
-        guiData.registerAddHostButton(addHostButton);
+        mainData.registerAddHostButton(addHostButton);
         buttonPanel.add(addHostButton);
         createEmptyView();
         add(logoPanel, BorderLayout.PAGE_END);
-        guiData.registerAllHostsUpdate(this);
-        guiData.allHostsUpdate();
+        mainData.registerAllHostsUpdate(this);
+        mainPresenter.allHostsUpdate();
 
         /* add new cluster button */
         final MyButton addClusterButton = widgetFactory.createButton(Tools.getString("ClusterTab.AddNewCluster"), CLUSTER_ICON);
@@ -140,11 +146,11 @@ public final class EmptyViewPanel extends ViewPanel implements AllHostsUpdatable
                 thread.start();
             }
         });
-        guiData.registerAddClusterButton(addClusterButton);
-        guiData.checkAddClusterButtons();
+        mainData.registerAddClusterButton(addClusterButton);
+        mainPresenter.checkAddClusterButtons();
         buttonPanel.add(addClusterButton);
         if (!application.getAutoHosts().isEmpty()) {
-            application.invokeLater(new Runnable() {
+            swingUtils.invokeLater(new Runnable() {
                 @Override
                 public void run() {
                     addHostButton.pressButton();

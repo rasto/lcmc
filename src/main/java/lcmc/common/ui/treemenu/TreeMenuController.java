@@ -21,10 +21,11 @@
 package lcmc.common.ui.treemenu;
 
 import lcmc.cluster.ui.network.InfoPresenter;
-import lcmc.common.domain.Application;
 import lcmc.common.domain.util.Tools;
 import lcmc.common.ui.CategoryInfo;
+import lcmc.common.ui.EditableInfo;
 import lcmc.common.ui.Info;
+import lcmc.common.ui.utils.SwingUtils;
 import lcmc.logger.Logger;
 import lcmc.logger.LoggerFactory;
 
@@ -54,7 +55,7 @@ public class TreeMenuController {
     private DefaultTreeModel treeModel;
     private JTree tree;
     @Inject
-    private Application application;
+    private SwingUtils swingUtils;
     @Resource(name="categoryInfo")
     private CategoryInfo resourcesCategory;
 
@@ -102,7 +103,7 @@ public class TreeMenuController {
     }
 
     public final void repaintMenuTree() {
-        application.invokeInEdt(new Runnable() {
+        swingUtils.invokeInEdt(new Runnable() {
             @Override
             public void run() {
                 final JTree t = tree;
@@ -114,7 +115,7 @@ public class TreeMenuController {
     }
 
     public final void reloadNode(final TreeNode node, final boolean select) {
-        application.invokeInEdt(new Runnable() {
+        swingUtils.invokeInEdt(new Runnable() {
             @Override
             public void run() {
                 final DefaultMutableTreeNode oldNode = (DefaultMutableTreeNode) tree.getLastSelectedPathComponent();
@@ -131,7 +132,7 @@ public class TreeMenuController {
 
     public final void nodeChanged(final DefaultMutableTreeNode node) {
         final String stacktrace = Tools.getStackTrace();
-        application.invokeInEdt(new Runnable() {
+        swingUtils.invokeInEdt(new Runnable() {
             @Override
             public void run() {
                 try {
@@ -156,7 +157,7 @@ public class TreeMenuController {
     }
 
     public void selectPath(final Object[] path) {
-        application.invokeInEdt(new Runnable() {
+        swingUtils.invokeInEdt(new Runnable() {
             @Override
             public void run() {
                 final TreePath tp = new TreePath(path);
@@ -171,7 +172,7 @@ public class TreeMenuController {
     }
 
     public void moveNodeToPosition(final DefaultMutableTreeNode node, final int position) {
-        application.invokeAndWait(new Runnable() {
+        swingUtils.invokeAndWait(new Runnable() {
             @Override
             public void run() {
                 final MutableTreeNode parent = (MutableTreeNode) node.getParent();
@@ -234,7 +235,7 @@ public class TreeMenuController {
     }
 
     public final void removeNode(final DefaultMutableTreeNode node) {
-        application.invokeInEdt(new Runnable() {
+        swingUtils.invokeInEdt(new Runnable() {
             @Override
             public void run() {
                 removeNodeAndSelectParent(node);
@@ -245,7 +246,7 @@ public class TreeMenuController {
     @Deprecated //TODO
     public List<Info> nodesToInfos(final Enumeration<DefaultMutableTreeNode> e) {
         final List<Info> list = new ArrayList<Info>();
-        application.invokeAndWait(new Runnable() {
+        swingUtils.invokeAndWait(new Runnable() {
             public void run() {
                 while (e.hasMoreElements()) {
                     final DefaultMutableTreeNode n = e.nextElement();
@@ -262,7 +263,7 @@ public class TreeMenuController {
             LOG.appError("addChild: parent cannot be null");
             return;
         }
-        application.invokeInEdt(new Runnable() {
+        swingUtils.invokeInEdt(new Runnable() {
             @Override
             public void run() {
                 parent0.add(child);
@@ -272,7 +273,7 @@ public class TreeMenuController {
 
     public int getIndex(final DefaultMutableTreeNode parent, final DefaultMutableTreeNode child) {
         final IntResult intResult = new IntResult();
-        application.invokeAndWait(new Runnable() {
+        swingUtils.invokeAndWait(new Runnable() {
             @Override
             public void run() {
                 intResult.set(parent.getIndex(child));
@@ -283,7 +284,7 @@ public class TreeMenuController {
 
     public int getChildCount(final DefaultMutableTreeNode parent) {
         final IntResult intResult = new IntResult();
-        application.invokeAndWait(new Runnable() {
+        swingUtils.invokeAndWait(new Runnable() {
             @Override
             public void run() {
                 intResult.set(parent.getChildCount());
@@ -293,7 +294,7 @@ public class TreeMenuController {
     }
 
     public void removeFromParent(final Collection<DefaultMutableTreeNode> nodes) {
-        application.invokeInEdt(new Runnable() {
+        swingUtils.invokeInEdt(new Runnable() {
             @Override
             public void run() {
                 for (final DefaultMutableTreeNode node : nodes) {
@@ -304,17 +305,17 @@ public class TreeMenuController {
     }
 
     public void sortChildrenWithNewUp(final DefaultMutableTreeNode parent) {
-        application.invokeInEdt(new Runnable() {
+        swingUtils.invokeInEdt(new Runnable() {
             @Override
             public void run() {
                 int i = 0;
                 for (int j = 0; j < parent.getChildCount(); j++) {
                     final DefaultMutableTreeNode node = (DefaultMutableTreeNode) parent.getChildAt(j);
-                    final Info info = (Info) node.getUserObject();
+                    final EditableInfo info = (EditableInfo) node.getUserObject();
                     final String name = info.getName();
                     if (i > 0) {
                         final DefaultMutableTreeNode prev = (DefaultMutableTreeNode) parent.getChildAt(j - 1);
-                        final Info prevI = (Info) prev.getUserObject();
+                        final EditableInfo prevI = (EditableInfo) prev.getUserObject();
                         if (prevI.getClass().getName().equals(info.getClass().getName())) {
                             final String prevN = prevI.getName();
                             if (!prevI.getResource().isNew()
@@ -334,7 +335,7 @@ public class TreeMenuController {
     }
 
     public void removeChildren(final DefaultMutableTreeNode parent) {
-        application.invokeInEdt(new Runnable() {
+        swingUtils.invokeInEdt(new Runnable() {
             @Override
             public void run() {
                 parent.removeAllChildren();
@@ -360,7 +361,7 @@ public class TreeMenuController {
     }
 
     private void insertNode(final DefaultMutableTreeNode parent, final DefaultMutableTreeNode child, final int i) {
-        application.invokeInEdt(new Runnable() {
+        swingUtils.invokeInEdt(new Runnable() {
             @Override
             public void run() {
                 parent.insert(child, i);

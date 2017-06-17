@@ -22,9 +22,11 @@
 
 package lcmc.cluster.ui.wizard;
 
-import lcmc.common.ui.GUIData;
+import lcmc.common.ui.main.MainPresenter;
 import lcmc.common.domain.Application;
 import lcmc.cluster.domain.Cluster;
+import lcmc.common.ui.MainPanel;
+import lcmc.common.ui.utils.SwingUtils;
 import lcmc.host.domain.Hosts;
 import lcmc.logger.Logger;
 import lcmc.logger.LoggerFactory;
@@ -42,11 +44,15 @@ public final class AddClusterDialog {
     @Inject
     Name nameDialog;
     @Inject
-    private GUIData guiData;
+    private MainPresenter mainPresenter;
+    @Inject
+    private MainPanel mainPanel;
     @Inject
     private Cluster cluster;
     @Inject
     private Application application;
+    @Inject
+    private SwingUtils swingUtils;
     @Inject
     private Hosts allHosts;
 
@@ -54,26 +60,26 @@ public final class AddClusterDialog {
      * Must always be called from new thread.
      */
     public void showDialogs() {
-        guiData.enableAddClusterButtons(false);
+        mainPresenter.enableAddClusterButtons(false);
         cluster.setClusterTabClosable(false);
         DialogCluster dialog = nameDialog;
         dialog.init(null, cluster);
-        guiData.expandTerminalSplitPane(GUIData.TerminalSize.EXPAND);
+        mainPanel.expandTerminalSplitPane(MainPanel.TerminalSize.EXPAND);
         while (true) {
             LOG.debug1("showDialogs: dialog: " + dialog.getClass().getName());
             final DialogCluster newDialog = (DialogCluster) dialog.showDialog();
             if (dialog.isPressedCancelButton()) {
-                guiData.removeSelectedClusterTab();
+                mainPresenter.removeSelectedClusterTab();
                 allHosts.removeHostsFromCluster(cluster);
                 application.removeClusterFromClusters(cluster);
                 dialog.cancelDialog();
-                application.invokeLater(new Runnable() {
+                swingUtils.invokeLater(new Runnable() {
                     @Override
                     public void run() {
-                        guiData.checkAddClusterButtons();
+                        mainPresenter.checkAddClusterButtons();
                     }
                 });
-                guiData.expandTerminalSplitPane(GUIData.TerminalSize.COLLAPSE);
+                mainPanel.expandTerminalSplitPane(MainPanel.TerminalSize.COLLAPSE);
                 if (newDialog == null) {
                     LOG.debug1("showDialogs: dialog: " + dialog.getClass().getName() + " canceled");
                     cluster.setClusterTabClosable(true);
@@ -87,18 +93,18 @@ public final class AddClusterDialog {
                 dialog = newDialog;
             }
         }
-        guiData.expandTerminalSplitPane(GUIData.TerminalSize.COLLAPSE);
-        application.invokeLater(new Runnable() {
+        mainPanel.expandTerminalSplitPane(MainPanel.TerminalSize.COLLAPSE);
+        swingUtils.invokeLater(new Runnable() {
             @Override
             public void run() {
                 cluster.getClusterTab().addClusterView();
                 cluster.getClusterTab().requestFocus();
             }
         });
-        application.invokeLater(new Runnable() {
+        swingUtils.invokeLater(new Runnable() {
             @Override
             public void run() {
-                guiData.checkAddClusterButtons();
+                mainPresenter.checkAddClusterButtons();
             }
         });
         cluster.setClusterTabClosable(true);

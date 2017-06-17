@@ -31,7 +31,8 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
 import lcmc.common.domain.Application;
-import lcmc.vm.domain.FilesystemData;
+import lcmc.common.ui.utils.SwingUtils;
+import lcmc.vm.domain.data.FilesystemData;
 import lcmc.common.ui.WizardDialog;
 import lcmc.vm.ui.resource.FilesystemInfo;
 import lcmc.common.domain.util.Tools;
@@ -53,6 +54,8 @@ final class Filesystem extends VMConfig {
     private Network networkDialog;
     @Inject
     private Application application;
+    @Inject
+    private SwingUtils swingUtils;
 
     @Override
     public WizardDialog nextDialog() {
@@ -92,7 +95,7 @@ final class Filesystem extends VMConfig {
     @Override
     protected void initDialogAfterVisible() {
         enableComponents();
-        application.invokeLater(new Runnable() {
+        swingUtils.invokeLater(new Runnable() {
             @Override
             public void run() {
                 final boolean enable = filesystemInfo.checkResourceFields(null, filesystemInfo.getRealParametersFromXML())

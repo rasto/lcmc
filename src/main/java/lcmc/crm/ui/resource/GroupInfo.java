@@ -42,7 +42,9 @@ import javax.swing.ImageIcon;
 import javax.swing.tree.DefaultMutableTreeNode;
 import lcmc.common.domain.Application;
 import lcmc.common.domain.ColorText;
+import lcmc.common.ui.main.MainData;
 import lcmc.common.ui.treemenu.TreeMenuController;
+import lcmc.common.ui.utils.SwingUtils;
 import lcmc.crm.domain.CrmXml;
 import lcmc.crm.domain.ClusterStatus;
 import lcmc.host.domain.Host;
@@ -57,6 +59,7 @@ import lcmc.logger.LoggerFactory;
 import lcmc.common.ui.utils.MyButton;
 import lcmc.common.domain.util.Tools;
 import lcmc.common.ui.utils.UpdatableItem;
+import lombok.val;
 
 /**
  * GroupInfo class holds data for heartbeat group, that is in some ways
@@ -87,7 +90,11 @@ public class GroupInfo extends ServiceInfo {
     @Inject
     private Application application;
     @Inject
+    private SwingUtils swingUtils;
+    @Inject
     private TreeMenuController treeMenuController;
+    @Inject
+    private MainData mainData;
 
     void init(final ResourceAgent ra, final Browser browser) {
         super.init(Application.PACEMAKER_GROUP_NAME, ra, browser);
@@ -100,7 +107,7 @@ public class GroupInfo extends ServiceInfo {
                     final Application.RunMode runMode) {
         final String[] params = getParametersFromXML();
         if (Application.isLive(runMode)) {
-            application.invokeAndWait(new Runnable() {
+            swingUtils.invokeAndWait(new Runnable() {
                 @Override
                 public void run() {
                     final MyButton ab = getApplyButton();
@@ -147,14 +154,14 @@ public class GroupInfo extends ServiceInfo {
             if (gsi == null) {
                 continue;
             }
-            application.invokeAndWait(new Runnable() {
+            swingUtils.invokeAndWait(new Runnable() {
                 @Override
                 public void run() {
                     gsi.getInfoPanel();
                 }
             });
         }
-        application.waitForSwing();
+        swingUtils.waitForSwing();
         for (final ServiceInfo gsi : servicesInNewOrder) {
             if (gsi == null) {
                 continue;
@@ -237,7 +244,7 @@ public class GroupInfo extends ServiceInfo {
     @Override
     public void apply(final Host dcHost, final Application.RunMode runMode) {
         if (Application.isLive(runMode)) {
-            application.invokeAndWait(new Runnable() {
+            swingUtils.invokeAndWait(new Runnable() {
                 @Override
                 public void run() {
                     getApplyButton().setEnabled(false);
@@ -249,7 +256,7 @@ public class GroupInfo extends ServiceInfo {
         waitForInfoPanel();
         final String[] params = getParametersFromXML();
         if (Application.isLive(runMode)) {
-            application.invokeLater(new Runnable() {
+            swingUtils.invokeLater(new Runnable() {
                 @Override
                 public void run() {
                     getApplyButton().setToolTipText("");
@@ -397,7 +404,7 @@ public class GroupInfo extends ServiceInfo {
      * @param newServiceInfo
      *      service info object of the new service
      */
-    void addGroupServicePanel(final ServiceInfo newServiceInfo, final boolean reloadNode) {
+    public void addGroupServicePanel(final ServiceInfo newServiceInfo, final boolean reloadNode) {
         final DefaultMutableTreeNode groupNode = getNode();
         if (groupNode == null) {
             return;
@@ -452,10 +459,10 @@ public class GroupInfo extends ServiceInfo {
     @Override
     protected List<String> getRunningOnNodes(final Application.RunMode runMode) {
         final ClusterStatus cs = getBrowser().getClusterStatus();
-        final List<String> resources = cs.getGroupResources(getHeartbeatId(runMode), runMode);
+        val resources = cs.getGroupResources(getHeartbeatId(runMode), runMode);
         final List<String> allNodes = new ArrayList<String>();
-        if (resources != null) {
-            for (final String hbId : resources) {
+        if (resources.isPresent()) {
+            for (final String hbId : resources.get()) {
                 final List<String> ns = cs.getRunningOnNodes(hbId, runMode);
                 if (ns != null) {
                     for (final String n : ns) {
@@ -473,10 +480,10 @@ public class GroupInfo extends ServiceInfo {
     @Override
     List<String> getMasterOnNodes(final Application.RunMode runMode) {
         final ClusterStatus cs = getBrowser().getClusterStatus();
-        final List<String> resources = cs.getGroupResources(getHeartbeatId(runMode), runMode);
+        final val resources = cs.getGroupResources(getHeartbeatId(runMode), runMode);
         final List<String> allNodes = new ArrayList<String>();
-        if (resources != null) {
-            for (final String hbId : resources) {
+        if (resources.isPresent()) {
+            for (final String hbId : resources.get()) {
                 final List<String> ns = cs.getMasterOnNodes(hbId, runMode);
                 if (ns != null) {
                     for (final String n : ns) {
@@ -898,7 +905,7 @@ public class GroupInfo extends ServiceInfo {
     @Override
     public void updateMenus(final Point2D pos) {
         super.updateMenus(pos);
-        if (!application.isSlow()) {
+        if (!mainData.isSlow()) {
             for (final ServiceInfo child : getSubServices()) {
                 child.updateMenus(pos);
             }

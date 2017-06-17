@@ -36,6 +36,8 @@ import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+
+import lcmc.common.ui.utils.SwingUtils;
 import lcmc.configs.AppDefaults;
 import lcmc.cluster.ui.widget.WidgetFactory;
 import lcmc.common.domain.Application;
@@ -72,8 +74,7 @@ public final class Resource extends DrbdConfig {
     private static final String PROXY_PLUGIN_ZLIB_PARAM = "plugin-zlib";
     private static final String PROXY_PLUGIN_LZMA_PARAM = "plugin-lzma";
 
-    private static final String[] COMMON_PARAMS = {DrbdXml.PROTOCOL_PARAM,
-                                                   DrbdXml.PING_TIMEOUT_PARAM,
+    private static final String[] COMMON_PARAMS = {DrbdXml.PING_TIMEOUT_PARAM,
                                                    CRAM_HMAC_ALG_PARAM,
                                                    SHARED_SECRET_PARAM,
                                                    WFC_TIMEOUT_PARAM,
@@ -104,6 +105,8 @@ public final class Resource extends DrbdConfig {
     private Volume volumeDialog;
     @Inject
     private Application application;
+    @Inject
+    private SwingUtils swingUtils;
     @Inject
     private WidgetFactory widgetFactory;
 
@@ -176,7 +179,7 @@ public final class Resource extends DrbdConfig {
             /* don't enable */
             enableComponents(new JComponent[]{buttonClass(nextButton())});
         }
-        application.invokeLater(new Runnable() {
+        swingUtils.invokeLater(new Runnable() {
             @Override
             public void run() {
                 makeDefaultButton(buttonClass(nextButton()));
@@ -275,7 +278,7 @@ public final class Resource extends DrbdConfig {
                 final Thread t = new Thread(new Runnable() {
                     @Override
                     public void run() {
-                        application.invokeLater(new Runnable() {
+                        swingUtils.invokeLater(new Runnable() {
                             @Override
                             public void run() {
                                 btn.setEnabled(false);

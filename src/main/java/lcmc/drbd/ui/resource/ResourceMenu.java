@@ -28,9 +28,9 @@ import javax.inject.Named;
 import javax.swing.JMenuItem;
 
 import lcmc.common.domain.AccessMode;
-import lcmc.common.domain.Application;
 import lcmc.common.ui.utils.MenuFactory;
 import lcmc.common.ui.utils.MyMenu;
+import lcmc.common.ui.utils.SwingUtils;
 import lcmc.common.ui.utils.UpdatableItem;
 
 @Named
@@ -39,7 +39,7 @@ public class ResourceMenu {
     @Inject
     private MenuFactory menuFactory;
     @Inject
-    private Application application;
+    private SwingUtils swingUtils;
 
     public List<UpdatableItem> getPulldownMenu(final ResourceInfo resourceInfo) {
         this.resourceInfo = resourceInfo;
@@ -52,7 +52,7 @@ public class ResourceMenu {
             volumesMenu.onUpdate(new Runnable() {
                 @Override
                 public void run() {
-                    application.isSwingThread();
+                    swingUtils.isSwingThread();
                     volumesMenu.removeAll();
                     final Collection<UpdatableItem> volumeMenus = new ArrayList<UpdatableItem>();
                     for (final UpdatableItem u : dvi.createPopup()) {

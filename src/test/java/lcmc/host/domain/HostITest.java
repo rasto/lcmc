@@ -40,6 +40,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
+import lombok.val;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
@@ -182,50 +183,51 @@ public final class HostITest {
     @Test
     public void testGetCryptoModules() {
         for (final Host host : integrationTestLauncher.getHosts()) {
-            assertTrue(host.getAvailableCryptoModules().size() > 0);
-            assertTrue(noValueIsNull(host.getAvailableCryptoModules()));
+            assertTrue(host.getHostParser().getAvailableCryptoModules().size() > 0);
+            assertTrue(noValueIsNull(host.getHostParser().getAvailableCryptoModules()));
         }
     }
 
     @Test
     public void testGetQemuKeymaps() {
         for (final Host host : integrationTestLauncher.getHosts()) {
-            assertTrue(host.getAvailableQemuKeymaps().size() >= 0);
-            assertTrue(noValueIsNull(host.getAvailableQemuKeymaps()));
+            assertTrue(host.getHostParser().getAvailableQemuKeymaps().size() >= 0);
+            assertTrue(noValueIsNull(host.getHostParser().getAvailableQemuKeymaps()));
         }
     }
 
     @Test
     public void testGetCPUMapsModels() {
         for (final Host host : integrationTestLauncher.getHosts()) {
-            assertTrue(host.getCPUMapModels().size() > 0);
-            assertTrue(noValueIsNull(host.getCPUMapModels()));
+            assertTrue(host.getHostParser().getCPUMapModels().size() > 0);
+            assertTrue(noValueIsNull(host.getHostParser().getCPUMapModels()));
         }
     }
 
     @Test
     public void testGetCPUMapVendor() {
         for (final Host host : integrationTestLauncher.getHosts()) {
-            assertTrue(host.getCPUMapVendors().size() > 0);
-            assertTrue(noValueIsNull(host.getCPUMapVendors()));
+            assertTrue(host.getHostParser().getCPUMapVendors().size() > 0);
+            assertTrue(noValueIsNull(host.getHostParser().getCPUMapVendors()));
         }
     }
 
     @Test
     public void testGetDistFromDistVersion() {
         for (final Host host : integrationTestLauncher.getHosts()) {
-            assertEquals(host.getDistFromDistVersion("ubuntu-lucid"), "ubuntu");
-            assertEquals(host.getDistFromDistVersion("fc"), "fedora");
-            assertEquals(host.getDistFromDistVersion("rhel"), "rhel");
-            assertEquals(host.getDistFromDistVersion("centos"), "rhel");
-            assertEquals(host.getDistFromDistVersion("xy"), null);
+            val hostParser = host.getHostParser();
+            assertEquals(hostParser.getDistFromDistVersion("ubuntu-lucid"), "ubuntu");
+            assertEquals(hostParser.getDistFromDistVersion("fc"), "fedora");
+            assertEquals(hostParser.getDistFromDistVersion("rhel"), "rhel");
+            assertEquals(hostParser.getDistFromDistVersion("centos"), "rhel");
+            assertEquals(hostParser.getDistFromDistVersion("xy"), null);
         }
     }
 
     @Test
     public void testGetKernelName() {
         for (final Host host : integrationTestLauncher.getHosts()) {
-            assertEquals(host.getKernelName(), "Linux");
+            assertEquals(host.getHostParser().getKernelName(), "Linux");
         }
     }
 
@@ -234,15 +236,15 @@ public final class HostITest {
         for (final Host host : integrationTestLauncher.getHosts()) {
 
             if ("openSUSE 12.1 (x86_64)/12.1".equals(
-                                            host.getDistributionVersionString())) {
+                                            host.getHostParser().getDistributionVersionString())) {
                 assertTrue("kernel version"
-                           + "(" + host.getDistributionVersionString() + ")",
-                           host.getKernelVersion() == null);
+                           + "(" + host.getHostParser().getDistributionVersionString() + ")",
+                           host.getHostParser().getKernelVersion() == null);
             } else {
-                assertTrue("kernel version: " + host.getKernelVersion()
-                           + "(" + host.getDistributionVersionString() + ")",
+                assertTrue("kernel version: " + host.getHostParser().getKernelVersion()
+                           + "(" + host.getHostParser().getDistributionVersionString() + ")",
                            Character.isDigit(
-                                        host.getKernelVersion().charAt(0)));
+                                        host.getHostParser().getKernelVersion().charAt(0)));
             }
         }
     }
@@ -251,14 +253,14 @@ public final class HostITest {
     public void testGetDetectedKernelVersion() {
         for (final Host host : integrationTestLauncher.getHosts()) {
             assertTrue(
-                Character.isDigit(host.getDetectedKernelVersion().charAt(0)));
+                Character.isDigit(host.getHostParser().getDetectedKernelVersion().charAt(0)));
         }
     }
 
     @Test
     public void testGetHeartbeatLibPath() {
         for (final Host host : integrationTestLauncher.getHosts()) {
-            assertTrue(host.getHeartbeatLibPath().indexOf("/usr/") == 0);
+            assertTrue(host.getHostParser().getHeartbeatLibPath().indexOf("/usr/") == 0);
         }
     }
 
@@ -272,7 +274,7 @@ public final class HostITest {
                                                                      "debian",
                                                                      "ubuntu"));
         for (final Host host : integrationTestLauncher.getHosts()) {
-            assertTrue("unknown: " + host.getDistributionName(), values.contains(host.getDistributionName()));
+            assertTrue("unknown: " + host.getHostParser().getDistributionName(), values.contains(host.getHostParser().getDistributionName()));
         }
     }
 
@@ -286,19 +288,20 @@ public final class HostITest {
                                                                      "rhel7"
                                                                      ));
         for (final Host host : integrationTestLauncher.getHosts()) {
-            assertTrue("unknown: " + host.getDistributionVersion() + "(" + host.getDistributionName() + ")",
-                    values.contains(host.getDistributionVersion())
-                            || "fedora".equals(host.getDistributionName())
-                            || "suse".equals(host.getDistributionName())
-                            || "debian".equals(host.getDistributionName())
-                            || "ubuntu".equals(host.getDistributionName()));
+            val hostParser = host.getHostParser();
+            assertTrue("unknown: " + hostParser.getDistributionVersion() + "(" + hostParser.getDistributionName() + ")",
+                    values.contains(hostParser.getDistributionVersion())
+                            || "fedora".equals(hostParser.getDistributionName())
+                            || "suse".equals(hostParser.getDistributionName())
+                            || "debian".equals(hostParser.getDistributionName())
+                            || "ubuntu".equals(hostParser.getDistributionName()));
         }
     }
 
     @Test
     public void testGetDistVersionString() {
         for (final Host host : integrationTestLauncher.getHosts()) {
-            assertNotNull("cannot be null: ", host.getDistributionVersionString());
+            assertNotNull("cannot be null: ", host.getHostParser().getDistributionVersionString());
         }
     }
 

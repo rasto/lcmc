@@ -48,6 +48,7 @@ import javax.swing.SpringLayout;
 import lcmc.cluster.ui.widget.WidgetFactory;
 import lcmc.common.domain.Application;
 import lcmc.cluster.domain.Cluster;
+import lcmc.common.ui.utils.SwingUtils;
 import lcmc.host.domain.Host;
 import lcmc.drbd.domain.BlockDevice;
 import lcmc.common.ui.Browser;
@@ -71,7 +72,7 @@ public final class VGRemove extends LV {
     private Map<Host, JCheckBox> hostCheckBoxes = null;
     private boolean multiSelection;
     @Inject
-    private Application application;
+    private SwingUtils swingUtils;
 
     public void init(final BlockDevInfo bdi) {
         super.init(null);
@@ -169,7 +170,7 @@ public final class VGRemove extends LV {
                 }
             }
             if (bdi.getBlockDevice().isDrbd()) {
-                for (final BlockDevice bd : bdi.getHost().getDrbdBlockDevices()) {
+                for (final BlockDevice bd : bdi.getHost().getHostParser().getDrbdBlockDevices()) {
                     final String thisVG = bd.getVgOnPhysicalVolume();
                     if (vgNames.get(bdi.getHost()).contains(thisVG)) {
                         bds.add(bd.getName());
@@ -228,7 +229,7 @@ public final class VGRemove extends LV {
             final Thread thread = new Thread(new Runnable() {
                 @Override
                 public void run() {
-                    application.invokeAndWait(new Runnable() {
+                    swingUtils.invokeAndWait(new Runnable() {
                         @Override
                         public void run() {
                             removeButton.setEnabled(false);
@@ -269,7 +270,7 @@ public final class VGRemove extends LV {
                     }
                     enableComponents();
                     if (oneFailed) {
-                        application.invokeLater(new Runnable() {
+                        swingUtils.invokeLater(new Runnable() {
                             @Override
                             public void run() {
                                 removeButton.setEnabled(true);

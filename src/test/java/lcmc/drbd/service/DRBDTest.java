@@ -33,7 +33,7 @@ public final class DRBDTest {
     @SuppressWarnings("unused")
     private Object[] parametersForVersionsShouldNotBeCompatible() {
         return $( 
-            $("8.4.3", "9.0.5"),
+            $("8.4.2", "9.0.5"),
             $("8.3.13", "8.4.3"),
             $("8.3.11", "8.4.3"),
             $("8.3.11", "8.4.3"),
@@ -45,7 +45,7 @@ public final class DRBDTest {
     @Test
     @Parameters(method="parametersForVersionsShouldNotBeCompatible")
     public void versionsShouldNotBeCompatible(final String versionOne, final String versionTwo) {
-        assertFalse(DRBD.compatibleVersions(versionOne, versionTwo));
-        assertFalse(DRBD.compatibleVersions(versionTwo, versionOne));
+        assertFalse(versionTwo + " not compatible with " + versionOne, DRBD.compatibleVersions(versionOne, versionTwo));
+        assertFalse(versionOne + " not compatible with " + versionTwo, DRBD.compatibleVersions(versionTwo, versionOne));
     }
 }

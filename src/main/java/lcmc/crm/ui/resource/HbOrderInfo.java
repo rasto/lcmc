@@ -22,30 +22,32 @@
 
 package lcmc.crm.ui.resource;
 
+import com.google.common.base.Optional;
+import lcmc.Exceptions;
+import lcmc.cluster.ui.ClusterBrowser;
+import lcmc.cluster.ui.widget.Check;
+import lcmc.cluster.ui.widget.Widget;
+import lcmc.common.domain.AccessMode;
+import lcmc.common.domain.Application;
+import lcmc.common.domain.ResourceValue;
+import lcmc.common.domain.StringValue;
+import lcmc.common.domain.Value;
+import lcmc.common.domain.util.Tools;
+import lcmc.common.ui.Browser;
+import lcmc.common.ui.EditableInfo;
+import lcmc.crm.domain.ClusterStatus;
+import lcmc.crm.domain.CrmXml;
+import lcmc.crm.domain.Service;
+import lcmc.crm.service.CRM;
+import lcmc.host.domain.Host;
+import lcmc.logger.Logger;
+import lcmc.logger.LoggerFactory;
+
+import javax.inject.Named;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.regex.Matcher;
-import lcmc.Exceptions;
-import lcmc.common.domain.AccessMode;
-import lcmc.common.domain.Application;
-import lcmc.crm.domain.CrmXml;
-import lcmc.crm.domain.ClusterStatus;
-import lcmc.host.domain.Host;
-import lcmc.common.domain.StringValue;
-import lcmc.common.domain.Value;
-import lcmc.crm.domain.Service;
-import lcmc.common.ui.Browser;
-import lcmc.cluster.ui.ClusterBrowser;
-import lcmc.common.ui.EditableInfo;
-import lcmc.cluster.ui.widget.Check;
-import lcmc.cluster.ui.widget.Widget;
-import lcmc.crm.service.CRM;
-import lcmc.logger.Logger;
-import lcmc.logger.LoggerFactory;
-import lcmc.common.domain.util.Tools;
-
-import javax.inject.Named;
 
 /**
  * Object that holds an order constraint information.
@@ -63,8 +65,7 @@ final class HbOrderInfo extends EditableInfo implements HbConstraintInterface {
               final ServiceInfo serviceInfoParent,
               final ServiceInfo serviceInfoChild,
               final Browser browser) {
-        super.init("Order", browser);
-        setResource(new Service("Order"));
+        super.einit(Optional.<ResourceValue>of(new Service("Order")), "Order", browser);
         this.connectionInfo = connectionInfo;
         this.serviceInfoParent = serviceInfoParent;
         this.serviceInfoChild = serviceInfoChild;
@@ -380,7 +381,7 @@ final class HbOrderInfo extends EditableInfo implements HbConstraintInterface {
     @Override
     protected String isEnabled(final String param) {
         if (CrmXml.REQUIRE_ALL_ATTR.equals(param)) {
-            final String pmV = getBrowser().getDCHost().getPacemakerVersion();
+            final String pmV = getBrowser().getDCHost().getHostParser().getPacemakerVersion();
             try {
                 //TODO: get this from constraints-.rng files
                 if (pmV == null || Tools.compareVersions(pmV, "1.1.7") <= 0) {

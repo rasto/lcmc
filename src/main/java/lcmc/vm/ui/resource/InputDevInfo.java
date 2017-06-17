@@ -31,14 +31,14 @@ import javax.inject.Named;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 
-import lcmc.cluster.ui.widget.WidgetFactory;
 import lcmc.common.domain.AccessMode;
 import lcmc.common.domain.Application;
 import lcmc.common.ui.treemenu.TreeMenuController;
+import lcmc.common.ui.utils.SwingUtils;
 import lcmc.host.domain.Host;
 import lcmc.common.domain.StringValue;
 import lcmc.vm.domain.VmsXml;
-import lcmc.vm.domain.InputDevData;
+import lcmc.vm.domain.data.InputDevData;
 import lcmc.common.domain.Value;
 import lcmc.common.ui.Browser;
 import lcmc.cluster.ui.widget.Widget;
@@ -86,9 +86,7 @@ final class InputDevInfo extends HardwareInfo {
     }
 
     @Inject
-    private static WidgetFactory widgetFactory;
-    @Inject
-    private Application application;
+    private SwingUtils swingUtils;
 
     /** Table panel. */
     private JComponent tablePanel = null;
@@ -106,7 +104,7 @@ final class InputDevInfo extends HardwareInfo {
                                    DomainInfo.INPUTDEVS_TABLE,
                                    getVMSVirtualDomainInfo().getNewInputDevBtn());
         if (getResource().isNew()) {
-            application.invokeLater(new Runnable() {
+            swingUtils.invokeLater(new Runnable() {
                 @Override
                 public void run() {
                     tablePanel.setVisible(false);
@@ -216,7 +214,7 @@ final class InputDevInfo extends HardwareInfo {
         if (Application.isTest(runMode)) {
             return;
         }
-        application.invokeAndWait(new Runnable() {
+        swingUtils.invokeAndWait(new Runnable() {
             @Override
             public void run() {
                 getApplyButton().setEnabled(false);
@@ -259,7 +257,7 @@ final class InputDevInfo extends HardwareInfo {
         treeMenuController.reloadNode(getNode(), false);
         getBrowser().periodicalVmsUpdate(
                 getVMSVirtualDomainInfo().getDefinedOnHosts());
-        application.invokeLater(new Runnable() {
+        swingUtils.invokeLater(new Runnable() {
             @Override
             public void run() {
                 tablePanel.setVisible(true);

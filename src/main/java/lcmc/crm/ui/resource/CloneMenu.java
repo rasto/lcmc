@@ -29,6 +29,7 @@ import javax.swing.JMenuItem;
 import lcmc.common.ui.CallbackAction;
 import lcmc.common.domain.AccessMode;
 import lcmc.common.domain.Application;
+import lcmc.common.ui.utils.SwingUtils;
 import lcmc.host.domain.Host;
 import lcmc.cluster.ui.ClusterBrowser;
 import lcmc.common.ui.utils.ButtonCallback;
@@ -47,7 +48,7 @@ public class CloneMenu extends ServiceMenu {
     @Inject
     private MenuFactory menuFactory;
     @Inject
-    private Application application;
+    private SwingUtils swingUtils;
 
     @Override
     public List<UpdatableItem> getPulldownMenu(final ServiceInfo serviceInfo) {
@@ -63,7 +64,7 @@ public class CloneMenu extends ServiceMenu {
         csMenu.onUpdate(new Runnable() {
             @Override
             public void run() {
-                application.isSwingThread();
+                swingUtils.isSwingThread();
                 csMenu.removeAll();
                 final ServiceInfo cs0 = cloneInfo.getContainedService();
                 if (cs0 != null) {
@@ -114,12 +115,12 @@ public class CloneMenu extends ServiceMenu {
                                         return false;
                                     }
                                     final List<String> runningOnNodes = cloneInfo.getRunningOnNodes(runMode);
-                                    if (runningOnNodes == null || runningOnNodes.size() < 1) {
+                                    if (runningOnNodes == null || runningOnNodes.isEmpty()) {
                                         return false;
                                     }
                                     boolean runningOnNode = false;
                                     for (final String ron : runningOnNodes) {
-                                        if (hostName.toLowerCase(Locale.US).equals(ron.toLowerCase(Locale.US))) {
+                                        if (hostName.equalsIgnoreCase(ron)) {
                                             runningOnNode = true;
                                             break;
                                         }

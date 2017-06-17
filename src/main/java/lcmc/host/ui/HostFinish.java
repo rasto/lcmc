@@ -33,12 +33,13 @@ import javax.swing.JCheckBox;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 import lcmc.cluster.ui.wizard.AddClusterDialog;
-import lcmc.common.ui.GUIData;
+import lcmc.common.domain.UserConfig;
+import lcmc.common.ui.main.MainPresenter;
 import lcmc.cluster.ui.widget.WidgetFactory;
 import lcmc.common.domain.Application;
+import lcmc.common.ui.utils.SwingUtils;
 import lcmc.host.domain.Host;
 import lcmc.host.domain.HostFactory;
-import lcmc.common.domain.UserConfig;
 import lcmc.common.ui.WizardDialog;
 import lcmc.common.ui.utils.MyButton;
 import lcmc.common.domain.util.Tools;
@@ -59,19 +60,21 @@ final class HostFinish extends DialogHost {
     private final JCheckBox saveCheckBox = new JCheckBox(Tools.getString("Dialog.Host.Finish.Save"), true);
     private NewHostDialog newHostDialog;
     @Inject
-    private UserConfig userConfig;
-    @Inject
     private HostFactory hostFactory;
     @Inject
     private AddClusterDialog addClusterDialog;
     @Inject
-    private GUIData guiData;
+    private MainPresenter mainPresenter;
     @Inject @Named("newHostDialog")
     private Provider<NewHostDialog> newHostDialogFactory;
     @Inject
     private Application application;
     @Inject
+    private SwingUtils swingUtils;
+    @Inject
     private WidgetFactory widgetFactory;
+    @Inject
+    private UserConfig userConfig;
 
     @Override
     public WizardDialog nextDialog() {
@@ -82,7 +85,7 @@ final class HostFinish extends DialogHost {
     protected void finishDialog() {
         if (saveCheckBox.isSelected()) {
             final String saveFile = application.getDefaultSaveFile();
-            application.saveConfig(saveFile, false);
+            userConfig.saveConfig(saveFile, false);
         }
     }
 
@@ -104,7 +107,7 @@ final class HostFinish extends DialogHost {
         if (application.getAutoHosts().isEmpty()) {
             if (!application.getAutoClusters().isEmpty()) {
                 Tools.sleep(1000);
-                application.invokeLater(new Runnable() {
+                swingUtils.invokeLater(new Runnable() {
                     @Override
                     public void run() {
                         configureClusterButton.pressButton();
@@ -113,7 +116,7 @@ final class HostFinish extends DialogHost {
             }
         } else {
             Tools.sleep(1000);
-            application.invokeLater(new Runnable() {
+            swingUtils.invokeLater(new Runnable() {
                 @Override
                 public void run() {
                     addAnotherHostButton.pressButton();
@@ -151,8 +154,8 @@ final class HostFinish extends DialogHost {
                                 getHost().getSSH().getLastSuccessfulPassword());
                         newHostDialog = newHostDialogFactory.get();
                         newHostDialog.init(thisClass, newHost, getDrbdInstallation());
-                        guiData.allHostsUpdate();
-                        application.invokeLater(new Runnable() {
+                        mainPresenter.allHostsUpdate();
+                        swingUtils.invokeLater(new Runnable() {
                             @Override
                             public void run() {
                                 addAnotherHostButton.setEnabled(false);
@@ -174,7 +177,7 @@ final class HostFinish extends DialogHost {
                 final Thread t = new Thread(new Runnable() {
                     @Override
                     public void run() {
-                        application.invokeLater(new Runnable() {
+                        swingUtils.invokeLater(new Runnable() {
                             @Override
                             public void run() {
                                 configureClusterButton.setEnabled(false);

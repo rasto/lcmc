@@ -60,6 +60,7 @@ final class PcmkTestF {
         for (int i = count; i > 0; i--) {
             roboTest.info("I: " + i);
             /* create dummy */
+            Tools.sleep(1000);
             roboTest.moveToMenu("Group (1)");
             roboTest.rightClick(); /* group popup */
             roboTest.moveTo(Tools.getString("ClusterBrowser.Hb.AddGroupService"));

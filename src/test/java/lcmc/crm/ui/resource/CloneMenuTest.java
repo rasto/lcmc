@@ -24,7 +24,7 @@ import java.util.List;
 
 import lcmc.common.domain.AccessMode;
 import lcmc.host.domain.Host;
-import lcmc.common.domain.Resource;
+import lcmc.common.domain.ResourceValue;
 import lcmc.crm.domain.Service;
 import lcmc.cluster.ui.ClusterBrowser;
 
@@ -61,7 +61,7 @@ public class CloneMenuTest {
     @Mock
     private ClusterBrowser clusterBrowserStub;
     @Mock
-    private Resource resourceStub;
+    private ResourceValue resourceStub;
     @Mock
     private Service serviceStub;
     @Mock

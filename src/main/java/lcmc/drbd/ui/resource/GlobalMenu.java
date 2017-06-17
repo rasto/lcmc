@@ -26,7 +26,6 @@ import java.util.List;
 import lcmc.cluster.ui.wizard.EditClusterDialog;
 import lcmc.drbd.ui.ProxyHostWizard;
 import lcmc.common.domain.AccessMode;
-import lcmc.common.domain.Application;
 import lcmc.host.domain.Host;
 import lcmc.cluster.ui.wizard.DrbdLogs;
 import lcmc.host.domain.HostFactory;

@@ -22,7 +22,7 @@ package lcmc.drbd.ui.resource;
 
 import java.util.List;
 
-import lcmc.common.ui.GUIData;
+import lcmc.common.ui.main.MainData;
 import lcmc.common.domain.AccessMode;
 import lcmc.host.domain.Host;
 
@@ -56,7 +56,7 @@ public class ProxyHostMenuITest {
     @Mock
     private Host hostStub;
     @Mock
-    private GUIData guiData;
+    private MainData mainData;
     @Mock
     private MyMenuItem menuItemStub;
     @Mock

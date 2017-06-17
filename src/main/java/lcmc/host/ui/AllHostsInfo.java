@@ -57,8 +57,9 @@ import javax.swing.border.TitledBorder;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
+import lcmc.common.ui.main.MainPresenter;
 import lcmc.common.ui.Info;
-import lcmc.common.ui.GUIData;
+import lcmc.common.ui.main.MainData;
 import lcmc.cluster.ui.widget.WidgetFactory;
 import lcmc.common.ui.Browser;
 import lcmc.cluster.ui.widget.GenericWidget.MTextField;
@@ -67,6 +68,7 @@ import lcmc.common.domain.Application;
 import lcmc.cluster.domain.Cluster;
 import lcmc.cluster.domain.Clusters;
 import lcmc.common.ui.treemenu.TreeMenuController;
+import lcmc.common.ui.utils.SwingUtils;
 import lcmc.host.domain.Host;
 import lcmc.host.domain.HostFactory;
 import lcmc.common.domain.UserConfig;
@@ -112,13 +114,17 @@ public final class AllHostsInfo extends Info {
     @Inject
     private HostFactory hostFactory;
     @Inject
-    private GUIData guiData;
+    private MainData mainData;
+    @Inject
+    private MainPresenter mainPresenter;
     @Inject
     private Provider<Cluster> clusterProvider;
     @Inject
     private Clusters allClusters;
     @Inject
     private Application application;
+    @Inject
+    private SwingUtils swingUtils;
     @Inject
     private MenuFactory menuFactory;
     @Inject
@@ -168,7 +174,7 @@ public final class AllHostsInfo extends Info {
                                          Tools.getString("EmptyBrowser.confirmRemoveMarkedClusters.No"))) {
                     return;
                 }
-                application.invokeLater(new Runnable() {
+                swingUtils.invokeLater(new Runnable() {
                     @Override
                     public void run() {
                         removeMarkedClustersButton.setEnabled(false);
@@ -179,9 +185,9 @@ public final class AllHostsInfo extends Info {
                 Tools.stopClusters(selectedRunningClusters);
                 application.removeClusters(selectedClusters);
                 final String saveFile = application.getDefaultSaveFile();
-                application.saveConfig(saveFile, false);
+                userConfig.saveConfig(saveFile, false);
                 mainPanel.repaint();
-                application.invokeLater(new Runnable() {
+                swingUtils.invokeLater(new Runnable() {
                     @Override
                     public void run() {
                         for (final Cluster cluster : selectedClusters) {
@@ -308,7 +314,7 @@ public final class AllHostsInfo extends Info {
             public void run() {
                 Tools.sleep(3000);
                 if (application.getAutoHosts().isEmpty() && !application.getAutoClusters().isEmpty()) {
-                    application.invokeLater(new Runnable() {
+                    swingUtils.invokeLater(new Runnable() {
                         @Override
                         public void run() {
                             for (final Map.Entry<Cluster, MyButton> clusterEntry : allLoadButtons.entrySet()) {
@@ -385,7 +391,7 @@ public final class AllHostsInfo extends Info {
                 final Thread thread = new Thread(new Runnable() {
                     @Override
                     public void run() {
-                        application.invokeAndWait(new Runnable() {
+                        swingUtils.invokeAndWait(new Runnable() {
                             @Override
                             public void run() {
                                 loadClusterBtn.setEnabled(false);
@@ -398,7 +404,7 @@ public final class AllHostsInfo extends Info {
                         if (cluster.getClusterTab() == null) {
                             loadClusterBtn.setEnabled(true);
                         } else {
-                            application.invokeLater(new Runnable() {
+                            swingUtils.invokeLater(new Runnable() {
                                 @Override
                                 public void run() {
                                     clusterBoxBackgrounds.get(cluster).setBackground(Color.GREEN);
@@ -521,7 +527,7 @@ public final class AllHostsInfo extends Info {
                             host.setHostname(hostName);
                             cluster.addHost(host);
                             application.addHostToHosts(host);
-                            guiData.allHostsUpdate();
+                            mainPresenter.allHostsUpdate();
                         }
                         application.addClusterToClusters(cluster);
                         final Collection<Cluster> selectedClusters = new ArrayList<Cluster>();
@@ -544,7 +550,7 @@ public final class AllHostsInfo extends Info {
     private void textfieldListener(final JTextField textfield, final MyButton button) {
         textfield.getDocument().addDocumentListener(new DocumentListener() {
                     private void check() {
-                        application.invokeLater(new Runnable() {
+                        swingUtils.invokeLater(new Runnable() {
                             @Override
                             public void run() {
                                 button.setEnabled(true);
@@ -578,7 +584,7 @@ public final class AllHostsInfo extends Info {
         if (loadButton == null) {
             return;
         }
-        application.invokeLater(new Runnable() {
+        swingUtils.invokeLater(new Runnable() {
             @Override
             public void run() {
                 loadButton.setEnabled(false);
@@ -590,7 +596,7 @@ public final class AllHostsInfo extends Info {
     public void setDisconnected(final Cluster cluster) {
         final MyButton loadButton = allLoadButtons.get(cluster);
         if (loadButton != null) {
-            application.invokeLater(new Runnable() {
+            swingUtils.invokeLater(new Runnable() {
                 @Override
                 public void run() {
                     loadButton.setEnabled(true);
@@ -617,7 +623,7 @@ public final class AllHostsInfo extends Info {
     }
 
     private void loadMarkedClusters() {
-        application.invokeLater(new Runnable() {
+        swingUtils.invokeLater(new Runnable() {
             @Override
             public void run() {
                 loadMarkedClustersButton.setEnabled(false);
@@ -633,7 +639,7 @@ public final class AllHostsInfo extends Info {
                 } else if (checkBoxEntry.getKey().getClusterTab() == null) {
                     final MyButton loadButton = allLoadButtons.get(checkBoxEntry.getKey());
                     if (loadButton != null) {
-                        application.invokeLater(new Runnable() {
+                        swingUtils.invokeLater(new Runnable() {
                             @Override
                             public void run() {
                                 loadButton.setEnabled(true);
@@ -644,7 +650,7 @@ public final class AllHostsInfo extends Info {
             }
         }
         userConfig.startClusters(selectedClusters);
-        application.invokeLater(new Runnable() {
+        swingUtils.invokeLater(new Runnable() {
             @Override
             public void run() {
                 for (final Map.Entry<Cluster, JCheckBox> checkBoxEntry : allClusterCheckboxes.entrySet()) {
@@ -657,7 +663,7 @@ public final class AllHostsInfo extends Info {
     }
 
     private void unloadMarkedClusters(final Iterable<Cluster> clusters) {
-        application.invokeAndWait(new Runnable() {
+        swingUtils.invokeAndWait(new Runnable() {
             @Override
             public void run() {
                 unloadMarkedClustersButton.setEnabled(false);
@@ -668,7 +674,7 @@ public final class AllHostsInfo extends Info {
             if (cluster.getClusterTab() != null) {
                 final JCheckBox wi = allClusterCheckboxes.get(cluster);
                 if (wi.isSelected()) {
-                    application.invokeLater(new Runnable() {
+                    swingUtils.invokeLater(new Runnable() {
                         @Override
                         public void run() {
                             clusterBoxBackgrounds.get(cluster).setBackground(Color.WHITE);
@@ -700,7 +706,7 @@ public final class AllHostsInfo extends Info {
         final int notRunningCount = nrc;
         if (wi.isSelected()) {
             /* disable all start cluster buttons */
-            application.invokeLater(new Runnable() {
+            swingUtils.invokeLater(new Runnable() {
                 @Override
                 public void run() {
                     if (notRunningCount >= 1) {
@@ -722,16 +728,14 @@ public final class AllHostsInfo extends Info {
             });
         } else {
             /* deselecting */
-            application.invokeLater(new Runnable() {
+            swingUtils.invokeLater(new Runnable() {
                 @Override
                 public void run() {
                     if (notRunningCount == 0) {
                         for (final Cluster cluster : allClusterCheckboxes.keySet()) {
                             final MyButton loadButton = allLoadButtons.get(cluster);
-                            if (loadButton != null) {
-                                if (cluster.getClusterTab() == null) {
-                                    loadButton.setEnabled(true);
-                                }
+                            if (loadButton != null && cluster.getClusterTab() == null) {
+                                loadButton.setEnabled(true);
                             }
                         }
                         loadMarkedClustersButton.setEnabled(false);
@@ -772,7 +776,7 @@ public final class AllHostsInfo extends Info {
                     addHostDialog.showDialogs(host);
                 }});
         items.add(newHostWizardItem);
-        guiData.registerAddHostButton(newHostWizardItem);
+        mainData.registerAddHostButton(newHostWizardItem);
         return items;
     }
 }

@@ -49,7 +49,7 @@ import javax.swing.text.Document;
 import lcmc.common.ui.SpringUtilities;
 import lcmc.common.ui.Browser;
 import lcmc.cluster.ui.ClusterBrowser;
-import lcmc.common.ui.treemenu.TreeMenuController;
+import lcmc.common.ui.utils.SwingUtils;
 import lcmc.crm.ui.CrmGraph;
 import lcmc.host.ui.HostBrowser;
 import lcmc.cluster.ui.widget.WidgetFactory;
@@ -107,9 +107,9 @@ public class HostInfo extends Info {
     @Inject
     private Application application;
     @Inject
-    private WidgetFactory widgetFactory;
+    private SwingUtils swingUtils;
     @Inject
-    private TreeMenuController treeMenuController;
+    private WidgetFactory widgetFactory;
 
     public void init(final Host host, final Browser browser) {
         super.init(host.getName(), browser);
@@ -172,7 +172,7 @@ public class HostInfo extends Info {
                 @Override
                 public void done(final String answer) {
                     ta.setText(answer);
-                    application.invokeLater(new Runnable() {
+                    swingUtils.invokeLater(new Runnable() {
                     @Override
                         public void run() {
                             crmConfigureShowButton.setEnabled(true);
@@ -186,7 +186,7 @@ public class HostInfo extends Info {
                 public void doneError(final String answer, final int errorCode) {
                     ta.setText(answer);
                     LOG.sshError(host, "", answer, "", errorCode);
-                    application.invokeLater(new Runnable() {
+                    swingUtils.invokeLater(new Runnable() {
                     @Override
                         public void run() {
                             crmConfigureCommitButton.setEnabled(false);
@@ -203,7 +203,7 @@ public class HostInfo extends Info {
                 hostInfoButton.setEnabled(false);
                 crmConfigureCommitButton.setEnabled(false);
                 String command = "HostBrowser.getHostInfo";
-                if (!host.hasCorosyncInitScript()) {
+                if (!host.getHostParser().hasCorosyncInitScript()) {
                     command = "HostBrowser.getHostInfoHeartbeat";
                 }
                 host.execCommand(new ExecCommandConfig().commandString(command)
@@ -356,7 +356,7 @@ public class HostInfo extends Info {
         mainPanel.add(new JLabel(Tools.getString("HostInfo.crmShellInfo")));
         mainPanel.add(new JScrollPane(ta));
         String command = "HostBrowser.getHostInfo";
-        if (!host.hasCorosyncInitScript()) {
+        if (!host.getHostParser().hasCorosyncInitScript()) {
             command = "HostBrowser.getHostInfoHeartbeat";
         }
         host.execCommand(new ExecCommandConfig().commandString(command)
@@ -434,11 +434,11 @@ public class HostInfo extends Info {
     }
 
     public ColorText getRightCornerTextForGraph(final Application.RunMode runMode) {
-        if (getHost().isCommLayerStopping()) {
+        if (getHost().getHostParser().isCommLayerStopping()) {
             return STOPPING_COLOR_TEXT;
-        } else if (getHost().isCommLayerStarting()) {
+        } else if (getHost().getHostParser().isCommLayerStarting()) {
             return STARTING_COLOR_TEXT;
-        } else if (getHost().isPacemakerStarting()) {
+        } else if (getHost().getHostParser().isPacemakerStarting()) {
             return STARTING_COLOR_TEXT;
         }
         final ClusterStatus cs = getClusterStatus();
@@ -451,7 +451,7 @@ public class HostInfo extends Info {
                 return ONLINE_COLOR_TEXT;
             }
         } else if (getHost().isConnected()) {
-            final Boolean running = getHost().getCorosyncOrHeartbeatRunning();
+            final Boolean running = getHost().getHostParser().getCorosyncOrHeartbeatRunning();
             if (running == null) {
                 return UNKNOWN_COLOR_TEXT;
             } else if (!running) {
@@ -459,7 +459,7 @@ public class HostInfo extends Info {
             }
             if (cs != null && cs.isPendingNode(host.getName())) {
                 return PENDING_COLOR_TEXT;
-            } else if (!getHost().isPacemakerRunning()) {
+            } else if (!getHost().getHostParser().isPacemakerRunning()) {
                 return PCMK_STOPPED_COLOR_TEXT;
             } else if (cs != null && "no".equals(cs.isOnlineNode(host.getName()))) {
                 return OFFLINE_COLOR_TEXT;

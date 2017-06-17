@@ -23,8 +23,9 @@ package lcmc.drbd.ui.resource;
 import java.util.ArrayList;
 import java.util.List;
 
+import lcmc.common.ui.main.MainPresenter;
 import lcmc.drbd.ui.ProxyHostWizard;
-import lcmc.common.ui.GUIData;
+import lcmc.common.ui.main.MainData;
 import lcmc.common.domain.AccessMode;
 import lcmc.common.domain.Application;
 import lcmc.host.domain.Host;
@@ -54,7 +55,9 @@ public class ProxyHostMenu {
 
     private ProxyHostInfo proxyHostInfo;
     @Inject
-    private GUIData guiData;
+    private MainData mainData;
+    @Inject
+    private MainPresenter mainPresenter;
     @Inject
     private ProxyHostWizard proxyHostWizard;
     @Inject
@@ -124,7 +127,7 @@ public class ProxyHostMenu {
                             }
                         });
         items.add(hostWizardItem);
-        guiData.registerAddHostButton(hostWizardItem);
+        mainData.registerAddHostButton(hostWizardItem);
         final Application.RunMode runMode = Application.RunMode.LIVE;
 
         /* proxy start/stop */
@@ -256,7 +259,7 @@ public class ProxyHostMenu {
                             public void run(final String text) {
                                 getHost().disconnect();
                                 application.removeHostFromHosts(getHost());
-                                guiData.allHostsUpdate();
+                                mainPresenter.allHostsUpdate();
                             }
                         });
         items.add(removeHostItem);

@@ -33,7 +33,9 @@ import javax.swing.SpringLayout;
 
 import lcmc.AppContext;
 import lcmc.Exceptions;
-import lcmc.common.ui.GUIData;
+import lcmc.common.ui.main.MainData;
+import lcmc.common.ui.MainPanel;
+import lcmc.common.ui.utils.SwingUtils;
 import lcmc.drbd.ui.resource.GlobalInfo;
 import lcmc.common.domain.Application;
 import lcmc.cluster.ui.ClusterBrowser;
@@ -56,12 +58,16 @@ final class BlockDev extends DrbdConfig {
     private static final Logger LOG = LoggerFactory.getLogger(BlockDev.class);
     private BlockDevInfo blockDevInfo;
     @Inject
-    private GUIData guiData;
+    private MainData mainData;
+    @Inject
+    private MainPanel mainPanel;
     @Inject
     private CreateMD createMDDialog;
     private GlobalInfo globalInfo;
     @Inject
     private Application application;
+    @Inject
+    private SwingUtils swingUtils;
 
     void init(final WizardDialog previousDialog, final VolumeInfo dli, final BlockDevInfo blockDevInfo) {
         init(previousDialog, dli);
@@ -73,7 +79,7 @@ final class BlockDev extends DrbdConfig {
 
     @Override
     protected void finishDialog() {
-        application.waitForSwing();
+        swingUtils.waitForSwing();
     }
 
     /** Calls drbdadm get-gi, to find out if there is meta-data area. */
@@ -105,7 +111,7 @@ final class BlockDev extends DrbdConfig {
                 final VolumeInfo dvi = getDrbdVolumeInfo();
                 globalInfo.apply(runMode);
                 final ResourceInfo dri = dvi.getDrbdResourceInfo();
-                application.invokeAndWait(new Runnable() {
+                swingUtils.invokeAndWait(new Runnable() {
                     @Override
                     public void run() {
                         dri.getInfoPanel();
@@ -114,7 +120,7 @@ final class BlockDev extends DrbdConfig {
                 dri.waitForInfoPanel();
                 dri.apply(runMode);
 
-                application.invokeAndWait(new Runnable() {
+                swingUtils.invokeAndWait(new Runnable() {
                     @Override
                     public void run() {
                         dvi.getInfoPanel();
@@ -134,8 +140,8 @@ final class BlockDev extends DrbdConfig {
                 }
                 final ClusterBrowser browser = getDrbdVolumeInfo().getDrbdResourceInfo().getBrowser();
                 browser.reloadAllComboBoxes(null);
-                guiData.expandTerminalSplitPane(GUIData.TerminalSize.COLLAPSE);
-                guiData.getMainFrame().requestFocus();
+                mainPanel.expandTerminalSplitPane(MainPanel.TerminalSize.COLLAPSE);
+                mainData.getMainFrame().requestFocus();
             } catch (final Exceptions.DrbdConfigException dce) {
                 LOG.appError("nextDialog: config failed", dce);
             } catch (final UnknownHostException e) {
@@ -159,7 +165,7 @@ final class BlockDev extends DrbdConfig {
     @Override
     protected void initDialogAfterVisible() {
         final String[] params = blockDevInfo.getParametersFromXML();
-        application.invokeLater(new Runnable() {
+        swingUtils.invokeLater(new Runnable() {
             @Override
             public void run() {
                 buttonClass(nextButton()).setEnabled(

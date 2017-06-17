@@ -52,6 +52,8 @@ public final class DistResource_redhat extends ListResourceBundle {
         {"DrbdInst.install.method.2",
          "source"},
 
+        {"DrbdInst.install.staging.2", "true"},
+
         {"DrbdInst.install.2",
          "/bin/mkdir -p /tmp/drbdinst && "
          + "/usr/bin/wget --directory-prefix=/tmp/drbdinst/"

@@ -37,11 +37,13 @@ import javax.swing.JPanel;
 import javax.swing.tree.DefaultMutableTreeNode;
 
 import lcmc.AppContext;
+import lcmc.common.ui.Access;
 import lcmc.common.ui.CallbackAction;
-import lcmc.common.ui.GUIData;
+import lcmc.common.ui.main.MainData;
 import lcmc.common.domain.AccessMode;
 import lcmc.common.domain.Application;
 import lcmc.common.ui.treemenu.TreeMenuController;
+import lcmc.common.ui.utils.SwingUtils;
 import lcmc.crm.domain.CrmXml;
 import lcmc.crm.domain.ClusterStatus;
 import lcmc.host.domain.Host;
@@ -64,11 +66,12 @@ import lcmc.common.domain.Predicate;
 import lcmc.common.domain.util.Tools;
 import lcmc.common.ui.utils.UpdatableItem;
 import lcmc.common.domain.VisiblePredicate;
+import lombok.val;
 
 @Named
 public class ServiceMenu {
     @Inject
-    private GUIData drbdGui;
+    private MainData drbdGui;
     @Inject
     private EditConfig editDialog;
     @Inject
@@ -76,9 +79,13 @@ public class ServiceMenu {
     @Inject
     private Application application;
     @Inject
+    private SwingUtils swingUtils;
+    @Inject
     private Provider<ServiceLogs> serviceLogsProvider;
     @Inject
     private TreeMenuController treeMenuController;
+    @Inject
+    private Access access;
 
     public List<UpdatableItem> getPulldownMenu(final ServiceInfo serviceInfo) {
         final List<UpdatableItem> items = new ArrayList<UpdatableItem>();
@@ -388,19 +395,19 @@ public class ServiceMenu {
                                 return ClusterBrowser.UNKNOWN_CLUSTER_STATUS_STRING;
                             } else if (serviceInfo.getService().isRemoved()) {
                                 return ServiceInfo.IS_BEING_REMOVED_STRING;
-                            } else if (serviceInfo.isRunning(runMode) && !application.isAdvancedMode()) {
+                            } else if (serviceInfo.isRunning(runMode) && !access.isAdvancedMode()) {
                                 return "cannot remove running resource<br>(advanced mode only)";
                             }
                             if (serviceInfo.getGroupInfo() == null) {
                                 return null;
                             }
                             final ClusterStatus cs = serviceInfo.getBrowser().getClusterStatus();
-                            final List<String> gr = cs.getGroupResources(
+                            val groupResources = cs.getGroupResources(
                                                           serviceInfo.getGroupInfo().getHeartbeatId(runMode),
                                                           runMode);
 
 
-                            if (gr != null && gr.size() > 1) {
+                            if (groupResources.isPresent() && groupResources.get().size() > 1) {
                                 return null;
                             } else {
                                 return "you can remove the group";
@@ -493,8 +500,8 @@ public class ServiceMenu {
         filesSubmenu.onUpdate(new Runnable() {
             @Override
             public void run() {
-                application.isSwingThread();
-                application.invokeLater(new Runnable() {
+                swingUtils.isSwingThread();
+                swingUtils.invokeLater(new Runnable() {
                     @Override
                     public void run() {
                         filesSubmenu.removeAll();
@@ -536,7 +543,7 @@ public class ServiceMenu {
         serviceMenu.onUpdate(new Runnable() {
             @Override
             public void run() {
-                application.isSwingThread();
+                swingUtils.isSwingThread();
                 serviceMenu.removeAll();
                 final Point2D pos = serviceMenu.getPos();
                 final CrmXml crmXML = serviceInfo.getBrowser().getCrmXml();
@@ -648,12 +655,12 @@ public class ServiceMenu {
                                         return false;
                                     }
                                     final List<String> runningOnNodes = serviceInfo.getRunningOnNodes(runMode);
-                                    if (runningOnNodes == null || runningOnNodes.size() < 1) {
+                                    if (runningOnNodes == null || runningOnNodes.isEmpty()) {
                                         return false;
                                     }
                                     boolean runningOnNode = false;
                                     for (final String ron : runningOnNodes) {
-                                        if (hostName.toLowerCase(Locale.US).equals(ron.toLowerCase(Locale.US))) {
+                                        if (hostName.equalsIgnoreCase(ron)) {
                                             runningOnNode = true;
                                             break;
                                         }
@@ -774,7 +781,7 @@ public class ServiceMenu {
                                             return false;
                                         }
                                     }
-                                    if (hostName.toLowerCase(Locale.US).equals(runningOnNode)) {
+                                    if (hostName.equalsIgnoreCase(runningOnNode)) {
                                         return false;
                                     } else {
                                         return true;
@@ -835,7 +842,7 @@ public class ServiceMenu {
                                     final String runningOnNode = runningOnNodes.get(0).toLowerCase(Locale.US);
                                     if (!serviceInfo.getBrowser().crmStatusFailed()
                                         && serviceInfo.getService().isAvailable()
-                                        && !hostName.toLowerCase(Locale.US).equals(runningOnNode)
+                                        && !hostName.equalsIgnoreCase(runningOnNode)
                                         && host.isCrmStatusOk()) {
                                         return true;
                                     } else {
@@ -879,8 +886,8 @@ public class ServiceMenu {
             raName = cs.getResourceAgent().getRAString();
         }
         final Host[] hosts = serviceInfo.getBrowser().getCluster().getHostsArray();
-        final List<String> cfs = new ArrayList<String>(hosts[0].getDistStrings(raName + ".files"));
-        final Collection<String> params = new ArrayList<String>(hosts[0].getDistStrings(raName + ".params"));
+        final List<String> cfs = new ArrayList<String>(hosts[0].getHostParser().getDistStrings(raName + ".files"));
+        final Collection<String> params = new ArrayList<String>(hosts[0].getHostParser().getDistStrings(raName + ".params"));
         params.add("configfile");
         params.add("config");
         params.add("conffile");
@@ -971,7 +978,7 @@ public class ServiceMenu {
                     @Override
                     public void run() {
                         serviceInfo.hidePopup();
-                        application.invokeLater(new Runnable() {
+                        swingUtils.invokeLater(new Runnable() {
                             @Override
                             public void run() {
                                 for (final JDialog otherP : popups) {
@@ -986,7 +993,7 @@ public class ServiceMenu {
                                                     true,
                                                     serviceInfo.getBrowser().getDCHost(),
                                                     runMode);
-                        application.invokeLater(new Runnable() {
+                        swingUtils.invokeLater(new Runnable() {
                             @Override
                             public void run() {
                                 existingServiceMenu.repaint();
@@ -1046,7 +1053,7 @@ public class ServiceMenu {
         serviceMenu.onUpdate(new Runnable() {
             @Override
             public void run() {
-                application.isSwingThread();
+                swingUtils.isSwingThread();
                 final JCheckBox colocationWi = new JCheckBox("Colo", true);
                 final JCheckBox orderWi = new JCheckBox("Order", true);
                 colocationWi.setBackground(ClusterBrowser.STATUS_BACKGROUND);
@@ -1278,7 +1285,7 @@ public class ServiceMenu {
             @Override
             public void run(final String text) {
                 serviceInfo.hidePopup();
-                application.invokeLater(new Runnable() {
+                swingUtils.invokeLater(new Runnable() {
                     @Override
                     public void run() {
                         for (final JDialog otherP : popups) {

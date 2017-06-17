@@ -30,12 +30,15 @@ import java.util.List;
 
 import lcmc.LCMC;
 import lcmc.cluster.service.storage.FileSystemService;
-import lcmc.common.ui.GUIData;
-import lcmc.common.ui.ProgressIndicatorPanel;
+import lcmc.common.domain.UserConfig;
+import lcmc.common.ui.main.MainPresenter;
+import lcmc.common.ui.MainPanel;
 import lcmc.common.domain.Application;
 import lcmc.cluster.domain.Cluster;
+import lcmc.common.ui.utils.SwingUtils;
 import lcmc.host.domain.Host;
 import lcmc.cluster.service.NetworkService;
+import lcmc.host.domain.HostFactory;
 import lcmc.logger.LoggerFactory;
 import lcmc.common.domain.util.Tools;
 import lcmc.cluster.ui.ClusterTabFactory;
@@ -62,15 +65,17 @@ public class IntegrationTestLauncher {
     private volatile boolean clusterLoaded = false;
 
     @Inject
-    private GUIData guiData;
+    private MainPresenter mainPresenter;
+    @Inject
+    private MainPanel mainPanel;
     @Inject
     private Application application;
     @Inject
-    private Provider<Host> hostProvider;
+    private SwingUtils swingUtils;
+    @Inject
+    private HostFactory hostFactory;
     @Inject
     private Provider<Cluster> clusterProvider;
-    @Inject
-    private ProgressIndicatorPanel glassPane;
     @Inject
     private LCMC lcmc;
     @Inject
@@ -79,10 +84,12 @@ public class IntegrationTestLauncher {
     private NetworkService networkService;
     @Inject
     private FileSystemService fileSystemService;
+    @Inject
+    private UserConfig userConfig;
 
     public void initTestCluster() {
         initCluster();
-        application.waitForSwing();
+        swingUtils.waitForSwing();
     }
 
     /** Returns test hosts. */
@@ -102,7 +109,7 @@ public class IntegrationTestLauncher {
 
     private synchronized void initMain() {
         lcmc.launch(new String[]{"--no-upgrade-check"});
-        application.waitForSwing();
+        swingUtils.waitForSwing();
     }
 
     /** Adds test cluster to the GUI. */
@@ -111,7 +118,7 @@ public class IntegrationTestLauncher {
             return;
         }
         initMain();
-        application.waitForSwing();
+        swingUtils.waitForSwing();
 
         LoggerFactory.setDebugLevel(-1);
         final String username = TEST_USERNAME;
@@ -120,7 +127,7 @@ public class IntegrationTestLauncher {
         cluster.setName("test");
         for (int i = 1; i <= NUMBER_OF_HOSTS; i++) {
             final String hostName = "test" + i;
-            final Host host = hostProvider.get();
+            final Host host = hostFactory.createInstance();
             host.init();
 
             initHost(host, hostName, username, useSudo);
@@ -128,7 +135,7 @@ public class IntegrationTestLauncher {
             host.setCluster(cluster);
             cluster.addHost(host);
             final String saveFile = application.getDefaultSaveFile();
-            application.saveConfig(saveFile, false);
+            userConfig.saveConfig(saveFile, false);
         }
         for (final Host host : hosts) {
             host.disconnect();
@@ -147,24 +154,23 @@ public class IntegrationTestLauncher {
             }
         }
         application.addClusterToClusters(cluster);
-        application.invokeAndWait(new Runnable() {
+        swingUtils.invokeAndWait(new Runnable() {
             @Override
             public void run() {
                 clusterTabFactory.createClusterTab(cluster);
             }
         });
         
-        //guiData.getEmptyBrowser().addClusterBox(cluster);
         final String saveFile = application.getDefaultSaveFile();
-        application.saveConfig(saveFile, false);
-        guiData.refreshClustersPanel();
+        userConfig.saveConfig(saveFile, false);
+        mainPresenter.refreshClustersPanel();
         
-        guiData.expandTerminalSplitPane(GUIData.TerminalSize.COLLAPSE);
+        mainPanel.expandTerminalSplitPane(MainPanel.TerminalSize.COLLAPSE);
         cluster.getClusterTab().addClusterView();
         cluster.getClusterTab().requestFocus();
-        guiData.checkAddClusterButtons();
+        mainPresenter.checkAddClusterButtons();
         for (final Host host : hosts) {
-            host.waitForServerStatusLatch();
+            host.getHostParser().waitForServerStatusLatch();
         }
         clusterLoaded = true;
     }

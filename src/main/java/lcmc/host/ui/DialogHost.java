@@ -32,6 +32,7 @@ import javax.swing.JPanel;
 
 import lcmc.common.domain.AccessMode;
 import lcmc.common.domain.Application;
+import lcmc.common.ui.utils.SwingUtils;
 import lcmc.host.domain.Host;
 import lcmc.common.domain.Value;
 import lcmc.drbd.domain.DrbdInstallation;
@@ -56,6 +57,8 @@ public abstract class DialogHost extends WizardDialog {
     private DrbdInstallation drbdInstallation;
     @Inject
     private Application application;
+    @Inject
+    private SwingUtils swingUtils;
     @Inject
     private WidgetFactory widgetFactory;
 
@@ -195,7 +198,7 @@ public abstract class DialogHost extends WizardDialog {
                        new AccessMode(AccessMode.RO, AccessMode.NORMAL),
                        Widget.NO_BUTTON);
         if (application.getAutoOptionHost(autoOption) != null) {
-            application.invokeLater(new Runnable() {
+            swingUtils.invokeLater(new Runnable() {
                 @Override
                 public void run() {
                     instMethodWidget.setSelectedIndex(
@@ -208,7 +211,7 @@ public abstract class DialogHost extends WizardDialog {
             public void check(final Value value) {
                 final InstallMethods method = (InstallMethods) instMethodWidget.getValue();
                 final String toolTip = getInstToolTip(prefix, method.getIndex());
-                application.invokeLater(new Runnable() {
+                swingUtils.invokeLater(new Runnable() {
                     @Override
                     public void run() {
                         instMethodWidget.setToolTipText(toolTip);
@@ -232,7 +235,7 @@ public abstract class DialogHost extends WizardDialog {
 
     protected void enableNextButtons(final List<String> incorrect, final List<String> changed) {
         final Check check = new Check(incorrect, changed);
-        application.invokeLater(new Runnable() {
+        swingUtils.invokeLater(new Runnable() {
             @Override
             public void run() {
                 buttonClass(nextButton()).setEnabledCorrect(check);

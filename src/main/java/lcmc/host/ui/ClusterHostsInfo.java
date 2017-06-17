@@ -61,8 +61,8 @@ public final class ClusterHostsInfo extends CategoryInfo {
             final MyButton hostLabel = widgetFactory.createButton(host.getName(), HostBrowser.HOST_ICON_LARGE);
             hostLabel.setOpaque(true);
             rows.add(new Object[]{hostLabel,
-                                  host.getBrowser().host.getDrbdInfoAboutInstallation(),
-                                  host.getBrowser().getPacemakerInfo()});
+                                  host.getDrbdInfoAboutInstallation(),
+                                  host.getPacemakerInfo()});
         }
         return rows.toArray(new Object[rows.size()][]);
     }

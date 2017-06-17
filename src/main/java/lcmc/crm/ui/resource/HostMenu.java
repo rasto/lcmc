@@ -28,9 +28,11 @@ import javax.inject.Named;
 import javax.inject.Provider;
 import javax.swing.JColorChooser;
 
+import lcmc.common.ui.main.MainPresenter;
+import lcmc.host.domain.parser.HostParser;
 import lcmc.host.ui.EditHostDialog;
 import lcmc.common.ui.CallbackAction;
-import lcmc.common.ui.GUIData;
+import lcmc.common.ui.main.MainData;
 import lcmc.common.domain.AccessMode;
 import lcmc.common.domain.Application;
 import lcmc.host.domain.Host;
@@ -51,6 +53,7 @@ import lcmc.common.domain.Predicate;
 import lcmc.common.domain.util.Tools;
 import lcmc.common.ui.utils.UpdatableItem;
 import lcmc.common.domain.VisiblePredicate;
+import lombok.val;
 
 @Named
 public class HostMenu {
@@ -59,7 +62,9 @@ public class HostMenu {
     @Inject
     private EditHostDialog editHostDialog;
     @Inject
-    private GUIData guiData;
+    private MainData mainData;
+    @Inject
+    private MainPresenter mainPresenter;
     @Inject
     private MenuFactory menuFactory;
     @Inject
@@ -83,7 +88,7 @@ public class HostMenu {
                             }
                         });
         items.add(hostWizardItem);
-        guiData.registerAddHostButton(hostWizardItem);
+        mainData.registerAddHostButton(hostWizardItem);
         /* cluster manager standby on/off */
         final Application.RunMode runMode = Application.RunMode.LIVE;
         final MyMenuItem standbyItem =
@@ -216,13 +221,13 @@ public class HostMenu {
                             @Override
                             public boolean check() {
                     /* when both are running it's openais. */
-                                return hostInfo.getHost().isCorosyncRunning() && !hostInfo.getHost().isOpenaisRunning();
+                                return hostInfo.getHost().getHostParser().isCorosyncRunning() && !hostInfo.getHost().getHostParser().isOpenaisRunning();
                             }
                         })
                         .visiblePredicate(new VisiblePredicate() {
                             @Override
                             public boolean check() {
-                                return hostInfo.getHost().isCorosyncRunning() || hostInfo.getHost().isOpenaisRunning();
+                                return hostInfo.getHost().getHostParser().isCorosyncRunning() || hostInfo.getHost().getHostParser().isOpenaisRunning();
                             }
                         })
                         .addAction(new MenuAction() {
@@ -233,17 +238,18 @@ public class HostMenu {
                                         Tools.getString("HostInfo.confirmCorosyncStop.Yes"),
                                         Tools.getString("HostInfo.confirmCorosyncStop.No"))) {
                                     final Host thisHost = hostInfo.getHost();
-                                    thisHost.setCommLayerStopping(true);
-                                    if (!thisHost.isPcmkStartedByCorosync()
-                                            && thisHost.hasPacemakerInitScript()
-                                            && thisHost.isPacemakerRunning()) {
-                                        if (hostInfo.getHost().isCorosyncRunning() && !hostInfo.getHost().isOpenaisRunning()) {
+                                    val hostParser = thisHost.getHostParser();
+                                    hostParser.setCommLayerStopping(true);
+                                    if (!hostParser.isPcmkStartedByCorosync()
+                                            && hostParser.hasPacemakerInitScript()
+                                            && hostParser.isPacemakerRunning()) {
+                                        if (hostParser.isCorosyncRunning() && !hostParser.isOpenaisRunning()) {
                                             Corosync.stopCorosyncWithPcmk(thisHost);
                                         } else {
                                             Openais.stopOpenaisWithPcmk(thisHost);
                                         }
                                     } else {
-                                        if (hostInfo.getHost().isCorosyncRunning() && !hostInfo.getHost().isOpenaisRunning()) {
+                                        if (hostParser.isCorosyncRunning() && !hostParser.isOpenaisRunning()) {
                                             Corosync.stopCorosync(thisHost);
                                         } else {
                                             Openais.stopOpenais(thisHost);
@@ -277,7 +283,7 @@ public class HostMenu {
                         .visiblePredicate(new VisiblePredicate() {
                             @Override
                             public boolean check() {
-                                return hostInfo.getHost().isHeartbeatRunning();
+                                return hostInfo.getHost().getHostParser().isHeartbeatRunning();
                             }
                         })
                         .enablePredicate(new EnablePredicate() {
@@ -297,7 +303,7 @@ public class HostMenu {
                                         Tools.getString("HostInfo.confirmHeartbeatStop.Desc"),
                                         Tools.getString("HostInfo.confirmHeartbeatStop.Yes"),
                                         Tools.getString("HostInfo.confirmHeartbeatStop.No"))) {
-                                    hostInfo.getHost().setCommLayerStopping(true);
+                                    hostInfo.getHost().getHostParser().setCommLayerStopping(true);
                                     Heartbeat.stopHeartbeat(hostInfo.getHost());
                                     updateClusterView(hostInfo.getHost(), hostInfo);
                                 }
@@ -327,24 +333,25 @@ public class HostMenu {
                         .visiblePredicate(new VisiblePredicate() {
                             @Override
                             public boolean check() {
-                                final Host h = hostInfo.getHost();
-                                return h.isCorosyncInstalled()
-                                        && h.hasCorosyncInitScript()
-                                        && h.corosyncOrOpenaisConfigExists()
-                                        && !h.isCorosyncRunning()
-                                        && !h.isOpenaisRunning()
-                                        && !h.isHeartbeatRunning()
-                                        && !h.isHeartbeatInRc();
+                                final HostParser hostParser = hostInfo.getHost().getHostParser();
+                                return hostParser.isCorosyncInstalled()
+                                        && hostParser.hasCorosyncInitScript()
+                                        && hostParser.corosyncOrOpenaisConfigExists()
+                                        && !hostParser.isCorosyncRunning()
+                                        && !hostParser.isOpenaisRunning()
+                                        && !hostParser.isHeartbeatRunning()
+                                        && !hostParser.isHeartbeatInRc();
                             }
                         })
                         .enablePredicate(new EnablePredicate() {
                             @Override
                             public String check() {
-                                final Host h = hostInfo.getHost();
-                                if (!h.isInCluster()) {
+                                val host = hostInfo.getHost();
+                                val hostParser = host.getHostParser();
+                                if (!host.isInCluster()) {
                                     return NOT_IN_CLUSTER;
                                 }
-                                if (h.isOpenaisInRc() && !h.isCorosyncInRc()) {
+                                if (hostParser.isOpenaisInRc() && !hostParser.isCorosyncInRc()) {
                                     return "Openais is in rc.d";
                                 }
                                 return null;
@@ -353,8 +360,9 @@ public class HostMenu {
                         .addAction(new MenuAction() {
                             @Override
                             public void run(final String text) {
-                                hostInfo.getHost().setCommLayerStarting(true);
-                                if (hostInfo.getHost().isPacemakerInRc()) {
+                                val hostParser = hostInfo.getHost().getHostParser();
+                                hostParser.setCommLayerStarting(true);
+                                if (hostParser.isPacemakerInRc()) {
                                     Corosync.startCorosyncWithPcmk(hostInfo.getHost());
                                 } else {
                                     Corosync.startCorosync(hostInfo.getHost());
@@ -384,23 +392,24 @@ public class HostMenu {
                         .visiblePredicate(new VisiblePredicate() {
                             @Override
                             public boolean check() {
-                                final Host h = hostInfo.getHost();
-                                return h.hasOpenaisInitScript()
-                                        && h.corosyncOrOpenaisConfigExists()
-                                        && !h.isCorosyncRunning()
-                                        && !h.isOpenaisRunning()
-                                        && !h.isHeartbeatRunning()
-                                        && !h.isHeartbeatInRc();
+                                val hostParser = hostInfo.getHost().getHostParser();
+                                return hostParser.hasOpenaisInitScript()
+                                        && hostParser.corosyncOrOpenaisConfigExists()
+                                        && !hostParser.isCorosyncRunning()
+                                        && !hostParser.isOpenaisRunning()
+                                        && !hostParser.isHeartbeatRunning()
+                                        && !hostParser.isHeartbeatInRc();
                             }
                         })
                         .enablePredicate(new EnablePredicate() {
                             @Override
                             public String check() {
-                                final Host h = hostInfo.getHost();
-                                if (!h.isInCluster()) {
+                                val host = hostInfo.getHost();
+                                val hostParser = host.getHostParser();
+                                if (!host.isInCluster()) {
                                     return NOT_IN_CLUSTER;
                                 }
-                                if (h.isCorosyncInRc() && !h.isOpenaisInRc()) {
+                                if (hostParser.isCorosyncInRc() && !hostParser.isOpenaisInRc()) {
                                     return "Corosync is in rc.d";
                                 }
                                 return null;
@@ -409,7 +418,7 @@ public class HostMenu {
                         .addAction(new MenuAction() {
                             @Override
                             public void run(final String text) {
-                                hostInfo.getHost().setCommLayerStarting(true);
+                                hostInfo.getHost().getHostParser().setCommLayerStarting(true);
                                 Openais.startOpenais(hostInfo.getHost());
                                 updateClusterView(hostInfo.getHost(), hostInfo);
                             }
@@ -436,12 +445,13 @@ public class HostMenu {
                         .visiblePredicate(new VisiblePredicate() {
                             @Override
                             public boolean check() {
-                                final Host h = hostInfo.getHost();
-                                return h.hasHeartbeatInitScript()
-                                        && h.heartbeatConfigExists()
-                                        && !h.isCorosyncRunning()
-                                        && !h.isOpenaisRunning()
-                                        && !h.isHeartbeatRunning();
+                                val host = hostInfo.getHost();
+                                val hostParser = host.getHostParser();
+                                return hostParser.hasHeartbeatInitScript()
+                                        && hostParser.heartbeatConfigExists()
+                                        && !hostParser.isCorosyncRunning()
+                                        && !hostParser.isOpenaisRunning()
+                                        && !hostParser.isHeartbeatRunning();
                                 //&& !h.isAisRc()
                                 //&& !h.isCsRc(); TODO should check /etc/defaults/
                             }
@@ -459,7 +469,7 @@ public class HostMenu {
                         .addAction(new MenuAction() {
                             @Override
                             public void run(final String text) {
-                                hostInfo.getHost().setCommLayerStarting(true);
+                                hostInfo.getHost().getHostParser().setCommLayerStarting(true);
                                 Heartbeat.startHeartbeat(hostInfo.getHost());
                                 updateClusterView(hostInfo.getHost(), hostInfo);
                             }
@@ -487,11 +497,11 @@ public class HostMenu {
                         .visiblePredicate(new VisiblePredicate() {
                             @Override
                             public boolean check() {
-                                final Host h = hostInfo.getHost();
-                                return !h.isPcmkStartedByCorosync()
-                                        && !h.isPacemakerRunning()
-                                        && (h.isCorosyncRunning() || h.isOpenaisRunning())
-                                        && !h.isHeartbeatRunning();
+                                val hostParser = hostInfo.getHost().getHostParser();
+                                return !hostParser.isPcmkStartedByCorosync()
+                                        && !hostParser.isPacemakerRunning()
+                                        && (hostParser.isCorosyncRunning() || hostParser.isOpenaisRunning())
+                                        && !hostParser.isHeartbeatRunning();
                             }
                         })
                         .enablePredicate(new EnablePredicate() {
@@ -507,9 +517,10 @@ public class HostMenu {
                         .addAction(new MenuAction() {
                             @Override
                             public void run(final String text) {
-                                hostInfo.getHost().setPacemakerStarting(true);
-                                Corosync.startPacemaker(hostInfo.getHost());
-                                updateClusterView(hostInfo.getHost(), hostInfo);
+                                val host = hostInfo.getHost();
+                                host.getHostParser().setPacemakerStarting(true);
+                                Corosync.startPacemaker(host);
+                                updateClusterView(host, hostInfo);
                             }
                         });
         if (cb != null) {
@@ -534,7 +545,7 @@ public class HostMenu {
                             @Override
                             public void run(final String text) {
                                 final Color newColor = JColorChooser.showDialog(
-                                        guiData.getMainFrame(),
+                                        mainData.getMainFrame(),
                                         "Choose " + hostInfo.getHost().getName() + " color",
                                         hostInfo.getHost().getPmColors()[0]);
                                 if (newColor != null) {
@@ -613,10 +624,10 @@ public class HostMenu {
                                 hostInfo.getHost().disconnect();
                                 final ClusterBrowser b = hostInfo.getBrowser().getClusterBrowser();
                                 if (b != null) {
-                                    guiData.unregisterAllHostsUpdate(b.getClusterViewPanel());
+                                    mainData.unregisterAllHostsUpdate(b.getClusterViewPanel());
                                 }
                                 application.removeHostFromHosts(hostInfo.getHost());
-                                guiData.allHostsUpdate();
+                                mainPresenter.allHostsUpdate();
                             }
                         });
         items.add(removeHostItem);
@@ -627,7 +638,7 @@ public class HostMenu {
         final ClusterBrowser cb = hostInfo.getBrowser().getClusterBrowser();
         if (cb == null) {
             host.setIsLoading();
-            host.getHWInfo(!Host.UPDATE_LVM);
+            host.getHostParser().getHWInfo(!Host.UPDATE_LVM);
         } else {
             cb.updateHWInfo(host, !Host.UPDATE_LVM);
         }

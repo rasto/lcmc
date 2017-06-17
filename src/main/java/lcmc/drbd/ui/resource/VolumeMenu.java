@@ -23,6 +23,7 @@ package lcmc.drbd.ui.resource;
 import java.util.ArrayList;
 import java.util.List;
 
+import lcmc.common.ui.Access;
 import lcmc.common.ui.CallbackAction;
 import lcmc.common.domain.AccessMode;
 import lcmc.common.domain.Application;
@@ -48,6 +49,8 @@ public class VolumeMenu {
     private MenuFactory menuFactory;
     @Inject
     private Application application;
+    @Inject
+    private Access access;
 
     public List<UpdatableItem> getPulldownMenu(final VolumeInfo volumeInfo) {
         this.volumeInfo = volumeInfo;
@@ -73,7 +76,7 @@ public class VolumeMenu {
                 .enablePredicate(new EnablePredicate() {
                     @Override
                     public String check() {
-                        if (!application.isAdvancedMode() && getResourceInfo().isUsedByCRM()) {
+                        if (!access.isAdvancedMode() && getResourceInfo().isUsedByCRM()) {
                             return VolumeInfo.IS_USED_BY_CRM_STRING;
                         }
                         if (volumeInfo.isSyncing()) {
@@ -246,7 +249,7 @@ public class VolumeMenu {
                     @Override
                     public String check() {
                         final DrbdXml dxml = getBrowser().getDrbdXml();
-                        if (!application.isAdvancedMode() && getResourceInfo().isUsedByCRM()) {
+                        if (!access.isAdvancedMode() && getResourceInfo().isUsedByCRM()) {
                             return VolumeInfo.IS_USED_BY_CRM_STRING;
                         } else if (dxml.isDrbdDisabled()) {
                             return "disabled because of config";

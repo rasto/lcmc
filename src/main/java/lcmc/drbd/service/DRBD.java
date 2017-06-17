@@ -808,7 +808,7 @@ public final class DRBD {
         }
         try {
             if (Tools.compareVersions(uV, "8.9") >= 0) {
-                return Tools.compareVersions(moduleV, "8.4.5") >= 0;
+                return Tools.compareVersions(moduleV, "8.4.3") >= 0;
             }
             return Tools.compareVersions(mV, uV) == 0;
         } catch (final IllegalVersionException e) {

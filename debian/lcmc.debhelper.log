@@ -7,6 +7,7 @@ dh_installman
 dh_installinfo
 dh_installmenu
 dh_installcron
+dh_systemd_enable
 dh_installinit
 dh_installdebconf
 dh_installemacsen
@@ -19,10 +20,12 @@ dh_installudev
 dh_lintian
 dh_bugfiles
 dh_install
+dh_systemd_start
 dh_link
 dh_installmime
 dh_installgsettings
 dh_strip
+dh_strip_nondeterminism
 dh_compress
 dh_fixperms
 dh_makeshlibs

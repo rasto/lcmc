@@ -42,10 +42,11 @@ import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.text.Document;
 import lcmc.common.domain.AccessMode;
-import lcmc.common.domain.Application;
 import lcmc.common.domain.StringValue;
 import lcmc.common.domain.Value;
+import lcmc.common.ui.Access;
 import lcmc.common.ui.utils.MyButton;
+import lcmc.common.ui.utils.SwingUtils;
 import lcmc.common.ui.utils.WidgetListener;
 
 /**
@@ -64,7 +65,9 @@ public final class RadioGroup extends GenericWidget<JComponent> {
     private final Lock mComponentsReadLock = mComponentsLock.readLock();
     private final Lock mComponentsWriteLock = mComponentsLock.writeLock();
     @Inject
-    private Application application;
+    private SwingUtils swingUtils;
+    @Inject
+    private Access access;
 
     public void init(final Value selectedValue,
                      final Value[] items,
@@ -119,7 +122,7 @@ public final class RadioGroup extends GenericWidget<JComponent> {
      */
     @Override
     public void setEnabled(final String s, final boolean enabled) {
-        final boolean accessible = application.isAccessible(getEnableAccessMode());
+        final boolean accessible = access.isAccessible(getEnableAccessMode());
         mComponentsReadLock.lock();
         final JComponent c;
         try {
@@ -128,7 +131,7 @@ public final class RadioGroup extends GenericWidget<JComponent> {
             mComponentsReadLock.unlock();
         }
         if (c != null) {
-            application.invokeLater(new Runnable() {
+            swingUtils.invokeLater(new Runnable() {
                 @Override
                 public void run() {
                     c.setEnabled(isEnablePredicate() && accessible);
@@ -185,7 +188,7 @@ public final class RadioGroup extends GenericWidget<JComponent> {
     protected void setComponentsVisible(final boolean visible) {
         final JComponent comp = getInternalComponent();
         final JLabel label = getLabel();
-        application.invokeLater(new Runnable() {
+        swingUtils.invokeLater(new Runnable() {
             @Override
             public void run() {
                 if (label != null) {
@@ -262,7 +265,7 @@ public final class RadioGroup extends GenericWidget<JComponent> {
     @Override
     public void setBackgroundColor(final Color bg) {
         final JComponent comp = getInternalComponent();
-        application.invokeLater(new Runnable() {
+        swingUtils.invokeLater(new Runnable() {
             @Override
             public void run() {
                 setBackground(bg);

@@ -45,6 +45,8 @@ public final class DistResource_debian_ETCH extends ListResourceBundle {
         {"DrbdInst.install.text.2",
          "from the source tarball"},
 
+        {"DrbdInst.install.staging.2", "true"},
+
         {"DrbdInst.install.method.2",
          "source"},
 

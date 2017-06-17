@@ -33,7 +33,7 @@ import java.awt.Toolkit;
 import java.awt.image.BufferedImage;
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileReader;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
@@ -45,7 +45,6 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
@@ -80,15 +79,14 @@ import javax.swing.table.TableColumnModel;
 import javax.swing.text.html.HTMLDocument;
 
 import com.google.common.base.Optional;
+
 import lcmc.Exceptions;
-import lcmc.common.domain.ConvertCmdCallback;
-import lcmc.common.domain.StringValue;
-import lcmc.configs.DistResource;
 import lcmc.cluster.domain.Cluster;
-import lcmc.host.domain.Host;
+import lcmc.common.domain.StringValue;
 import lcmc.common.domain.Value;
-import lcmc.common.ui.GUIData;
+import lcmc.common.ui.main.MainPresenter;
 import lcmc.crm.ui.resource.ServiceInfo;
+import lcmc.host.domain.Host;
 import lcmc.logger.Logger;
 import lcmc.logger.LoggerFactory;
 
@@ -226,25 +224,28 @@ public final class Tools {
      * Loads the save file and returns its content as string. Return null, if
      * nothing was loaded.
      */
-    public static String loadFile(GUIData guiData, final String filename, final boolean showError) {
-        final BufferedReader in;
+    public static String loadFile(MainPresenter mainPresenter, final String filename, final boolean showError) {
+        BufferedReader in = null;
         final StringBuilder content = new StringBuilder("");
         try {
-            in = new BufferedReader(new FileReader(filename));
+            in = new BufferedReader(new InputStreamReader(new FileInputStream(new File(filename)), "UTF-8"));
             String line;
             while ((line = in.readLine()) != null) {
                 content.append(line);
             }
         } catch (final IOException ex) {
             if (showError) {
-                guiData.infoDialog("Load Error", "The file " + filename + " failed to load", ex.getMessage());
+                mainPresenter.infoDialog("Load Error", "The file " + filename + " failed to load", ex.getMessage());
             }
             return null;
-        }
-        try {
-            in.close();
-        } catch (final IOException ex) {
-            LOG.appError("loadFile: could not close: " + filename, ex);
+        } finally {
+            if(in != null) {
+                try {
+                    in.close();
+                } catch (final IOException ex) {
+                    LOG.appError("loadFile: could not close: " + filename, ex);
+                }
+            }
         }
         return content.toString();
     }
@@ -353,104 +354,6 @@ public final class Tools {
         }
     }
 
-    /** Returns string that is specific to a distribution and version. */
-    public static String getDistString(final String text, String dist, String version, final String arch) {
-        if (dist == null) {
-            dist = "";
-        }
-        if (version == null) {
-            version = "";
-        }
-        final Locale locale = new Locale(dist, version);
-        LOG.debug2("getDistString: text: " + text + " dist: " + dist + " version: " + version);
-        final ResourceBundle resourceString = ResourceBundle.getBundle("lcmc.configs.DistResource", locale);
-        String ret;
-        try {
-            ret = resourceString.getString(text + '.' + arch);
-        } catch (final Exception e) {
-            ret = null;
-        }
-        if (ret == null) {
-            try {
-                if (ret == null) {
-                    ret = resourceString.getString(text);
-                }
-                LOG.debug2("getDistString: ret: " + ret);
-                return ret;
-            } catch (final RuntimeException e) {
-                return null;
-            }
-        }
-        return ret;
-    }
-
-    /** Returns string that is specific to a distribution and version. */
-    @SuppressWarnings("unchecked")
-    public static List<String> getDistStrings(final String text, String dist, String version, final String arch) {
-        if (dist == null) {
-            dist = "";
-        }
-        if (version == null) {
-            version = "";
-        }
-        final Locale locale = new Locale(dist, version);
-        LOG.debug2("getDistStrings: text: " + text + " dist: " + dist + " version: " + version);
-        final ResourceBundle resourceString = ResourceBundle.getBundle("lcmc.configs.DistResource", locale);
-        List<String> ret;
-        try {
-            ret = (List<String>) resourceString.getObject(text);
-        } catch (final Exception e) {
-            ret = new ArrayList<String>();
-        }
-        return ret;
-    }
-
-    /**
-     * Returns command from DistResource resource bundle for specific
-     * distribution and version.
-     */
-    public static String getDistCommand(final String text,
-                                        final String dist,
-                                        final String version,
-                                        final String arch,
-                                        final ConvertCmdCallback convertCmdCallback,
-                                        final boolean inBash,
-                                        final boolean inSudo) {
-        if (text == null) {
-            return null;
-        }
-        final String[] texts = text.split(";;;");
-        final List<String> results =  new ArrayList<String>();
-        int i = 0;
-        for (final String t : texts) {
-            String distString = getDistString(t, dist, version, arch);
-            if (distString == null) {
-                LOG.appWarning("getDistCommand: unknown command: " + t);
-                distString = t;
-            }
-            if (inBash && i == 0) {
-                String sudoS = "";
-                if (inSudo) {
-                    sudoS = DistResource.SUDO;
-                }
-                results.add(sudoS + "bash -c \"" + Tools.escapeQuotes(distString, 1) + '"');
-            } else {
-                results.add(distString);
-            }
-            i++;
-        }
-        String ret;
-        if (results.isEmpty()) {
-            ret = text;
-        } else {
-            ret = Tools.join(";;;", results.toArray(new String[results.size()]));
-        }
-        if (convertCmdCallback != null && ret != null) {
-            ret = convertCmdCallback.convert(ret);
-        }
-        return ret;
-    }
-
     /**
      * Returns service definiton from ServiceDefinitions resource bundle.
      */
@@ -463,62 +366,6 @@ public final class Tools {
             LOG.appWarning("getServiceDefinition: cannot get service definition for service: " + service, e);
             return new String[]{};
         }
-    }
-
-    /**
-     * Converts kernelVersion as parsed from uname to a version that is used
-     * in the download area on the website.
-     */
-    public static String getKernelDownloadDir(final CharSequence kernelVersion,
-                                              final String dist,
-                                              final String version,
-                                              final String arch) {
-        final String regexp = getDistString("kerneldir", dist, version, arch);
-        if (regexp != null && kernelVersion != null) {
-            final Pattern p = Pattern.compile(regexp);
-            final Matcher m = p.matcher(kernelVersion);
-            if (m.matches()) {
-                return m.group(1);
-            }
-        }
-        return null;
-    }
-
-    /**
-     * Gets compact representation of distribution and version. Distribution
-     * and version are joined with "_" and all spaces and '.' are replaced by
-     * "_" as well.
-     */
-    public static String getDistVersionString(String dist, final String version) {
-        if (dist == null) {
-            dist = "";
-        }
-        LOG.debug2("getDistVersionString: dist: " + dist + ", version: " + version);
-        final Locale locale = new Locale(dist, "");
-        final ResourceBundle resourceCommand = ResourceBundle.getBundle("lcmc.configs.DistResource", locale);
-        String distVersion = null;
-        try {
-            distVersion = resourceCommand.getString("version:" + version);
-        } catch (final Exception e) {
-            /* with wildcard */
-            final StringBuilder buf = new StringBuilder(version);
-            for (int i = version.length() - 1; i >= 0; i--) {
-                try {
-                    distVersion = resourceCommand.getString("version:" + buf.toString() + '*');
-                } catch (final Exception e2) {
-                    distVersion = null;
-                }
-                if (distVersion != null) {
-                    break;
-                }
-                buf.setLength(i);
-            }
-            if (distVersion == null) {
-                distVersion = version;
-            }
-        }
-        LOG.debug2("getDistVersionString: dist version: " + distVersion);
-        return distVersion;
     }
 
     /**
@@ -580,26 +427,6 @@ public final class Tools {
         }
         final String f = s.substring(0, 1);
         return s.replaceFirst(".", f.toUpperCase(Locale.US));
-    }
-
-    /**
-     * Returns intersection of two string lists as List of string.
-     */
-    @Deprecated
-    public static Set<String> getIntersection(final Set<String> setA, final Set<String> setB) {
-        final Set<String> resultSet = new TreeSet<String>();
-        if (setB == null) {
-            return setA;
-        }
-        if (setA == null) {
-            return setB;
-        }
-        for (final String item : setA) {
-            if (setB.contains(item)) {
-                resultSet.add(item);
-            }
-        }
-        return resultSet;
     }
 
     /**
@@ -815,7 +642,7 @@ public final class Tools {
             return null;
         }
         try {
-            final BufferedReader br = new BufferedReader(new InputStreamReader(url.openStream()));
+            final BufferedReader br = new BufferedReader(new InputStreamReader(url.openStream(), "UTF-8"));
             final StringBuilder content = new StringBuilder("");
             while (br.ready()) {
                 content.append(br.readLine());
@@ -851,7 +678,7 @@ public final class Tools {
         String info = null;
         try {
             final String url = "http://lcmc.sourceforge.net/version.html?lcmc-check-" + getRelease();
-            final BufferedReader reader = new BufferedReader(new InputStreamReader(new URL(url).openStream()));
+            final BufferedReader reader = new BufferedReader(new InputStreamReader(new URL(url).openStream(), "UTF-8"));
             int rate = 0;
             do {
                 final String line = reader.readLine();
@@ -958,24 +785,6 @@ public final class Tools {
         }
     }
 
-    /**
-     * Returns value unit pair extracting from string. E.g. "10min" becomes 10
-     * and "min" pair.
-     */
-    @Deprecated
-    public static String[] extractUnit(final CharSequence time) {
-        final String[] o = new String[]{null, null};
-        if (time == null) {
-            return o;
-        }
-        final Matcher m = UNIT_PATTERN.matcher(time);
-        if (m.matches()) {
-            o[0] = m.group(1);
-            o[1] = m.group(2);
-        }
-        return o;
-    }
-
     /** Returns random secret of the specified lenght. */
     public static String getRandomSecret(final int len) {
         final Random rand = new Random();
@@ -1006,32 +815,6 @@ public final class Tools {
         } catch (final java.net.UnknownHostException e) {
             return false;
         }
-    }
-
-    /** Converts value with units. */
-    @Deprecated
-    public static long convertUnits(final CharSequence value) {
-        final String[] v = Tools.extractUnit(value);
-        if (v.length == 2 && Tools.isNumber(v[0])) {
-            long num = Long.parseLong(v[0]);
-            final String unit = v[1];
-            if ("P".equalsIgnoreCase(unit)) {
-                num = num * 1024 * 1024 * 1024 * 1024 * 1024;
-            } else if ("T".equalsIgnoreCase(unit)) {
-                num = num * 1024 * 1024 * 1024 * 1024;
-            } else if ("G".equalsIgnoreCase(unit)) {
-                num = num * 1024 * 1024 * 1024;
-            } else if ("M".equalsIgnoreCase(unit)) {
-                num = num * 1024 * 1024;
-            } else if ("K".equalsIgnoreCase(unit)) {
-                num *= 1024;
-            } else if ("".equalsIgnoreCase(unit)) {
-            } else {
-                return -1;
-            }
-            return num;
-        }
-        return -1;
     }
 
     /** Resize table. */
@@ -1318,10 +1101,9 @@ public final class Tools {
      * Returns true if the hb version on the host is smaller or equal
      * Heartbeat 2.1.4.
      */
-    public static boolean versionBeforePacemaker(
-        final Host host) {
-        final String hbV = host.getHeartbeatVersion();
-        final String pcmkV = host.getPacemakerVersion();
+    public static boolean versionBeforePacemaker(final Host host) {
+        final String hbV = host.getHostParser().getHeartbeatVersion();
+        final String pcmkV = host.getHostParser().getPacemakerVersion();
         try {
             return pcmkV == null && hbV != null && Tools.compareVersions(hbV, "2.99.0") < 0;
         } catch (final Exceptions.IllegalVersionException e) {

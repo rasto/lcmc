@@ -690,6 +690,8 @@ sub get_disk_info {
 			} else {
 				$device = "/dev/$name";
 			}
+		} elsif ($major == 1) {
+			next; # ramdisk
 		} elsif ($major == 3
 		         || $major == 8
 		         || $major == 72
@@ -944,7 +946,7 @@ sub do_drbd_events {
 		return;
 	} else {
 		while (<EVENTS>) {
-			if ($_ && $_ !~ /\d+\s+ZZ/) {
+			if ($_ && $_ !~ /\d+\s+(ZZ|\?\?)/) {
 				my $drbd_info = get_drbd_dump_xml();
 				if ($drbd_info ne $prev_drbd_info) {
 					print "--drbd-info-start--"
@@ -1002,7 +1004,11 @@ sub get_hb_lib_path {
 
 sub get_crmd_lib_path {
 	my $hb_lib_path = get_hb_lib_path();
-	for ("/usr/lib64/pacemaker", "/usr/libexec/pacemaker", $hb_lib_path) {
+	for ("/usr/lib64/pacemaker",
+		 "/usr/libexec/pacemaker",
+		 "/usr/lib/x86_64-linux-gnu/pacemaker",
+		 "/usr/lib/pacemaker",
+		 $hb_lib_path) {
 		if (-e "$_/crmd") {
 			return $_;
 		}
@@ -1047,13 +1053,12 @@ sub do_cluster_events {
 	my $libpath = get_hb_lib_path();
 	my $hb_version = _exec("$libpath/heartbeat -V 2>/dev/null") || "";
 	my $info = get_cluster_info($hb_version);
+	my $pcmk_path = "/usr/libexec/pacemaker:/usr/lib/heartbeat:/usr/lib64/heartbeat:/usr/lib/pacemaker:/usr/lib64/pacemaker:/usr/lib/x86_64-linux-gnu/pacemaker";
 	my $command =
-		"PATH=/usr/libexec/pacemaker:/usr/lib/heartbeat:/usr/lib64/heartbeat:/usr/lib/pacemaker:/usr/lib64/pacemaker"
-		." exec cibmon -udVVVV -m1 2>&1";
+		"PATH=$pcmk_path exec cibmon -udVVVV -m1 2>&1";
 	if ($hb_version && (compare_versions($hb_version, "2.1.4") <= 0)) {
 		$command =
-			" PATH=/usr/libexec/pacemaker:/usr/lib/heartbeat:/usr/lib64/heartbeat"
-			." exec cibmon -dV -m1 2>&1";
+			" PATH=$pcmk_path exec cibmon -dV -m1 2>&1";
 	}
 	if ($info) {
 		print "---start---\n";
@@ -1187,6 +1192,7 @@ sub get_resource_status {
 		  	# unmanaged
 			$res = $1;
 			my $state = $2;
+			$state =~ s/\(.*\)\s+//;
 			if ($res =~/(.*):\d+$/) {
 				$res = $1;
 			}
@@ -1821,7 +1827,7 @@ sub is_script_rc {
 	my $script = shift;
 	return 
 	  "(/bin/systemctl is-enabled $script.service|grep enabled"
-	 ." || /usr/sbin/update-rc.d -n -f $script remove 2>&1|grep '/rc[0-9]\.d'"
+	 ." || /usr/sbin/update-rc.d -n -f $script remove 2>&1|grep '/rc[0-9]\.d.*$script\\>'"
          ." || /sbin/chkconfig --list $script 2>/dev/null"
          ."|grep ':on') 2>/dev/null"
          ."|sed s/.*/on/|uniq";
@@ -2263,11 +2269,12 @@ sub gui_test {
 	} else {
 		my $crm_show = 
 			"TERM=dumb PATH=\$PATH:/usr/sbin /usr/sbin/crm configure show"
-			."|grep -v 'expected-quorum-votes=\"2\"'"
+			."|grep -v 'expected-quorum-votes=2'"
 			."|grep -v 'unknown-expected-votes'"
-			."|grep -v 'dc-version=\"'"
-			."|grep -v 'cluster-infrastructure=\"'"
-			."|grep -v 'last-lrm-refresh='";
+			."|grep -v 'dc-version='"
+			."|grep -v 'cluster-infrastructure='"
+			."|grep -v 'last-lrm-refresh='"
+			."|grep -v 'have-watchdog='";
 		$cib = _exec("$crm_show");
 		my $ret = $?;
 		if ($ret != 0) {
@@ -2285,21 +2292,13 @@ sub gui_test {
 		}
 		# older crm shell had _rsc_set_
 		$cib =~ s/_rsc_set_ //g;
-		$cib =~ s/(start-delay="\d+") (timeout="\d+")/$2 $1/g;
+		$cib =~ s/(start-delay=\d+) (timeout=\d+)/$2 $1/g;
 		$cib =~ s/(node)\s+\$id=".*?"/$1/g;
 		# sort node lines
 		$cib =~
 	  	   s/(^node\s+.*$)\n(^node\s+.*$)/join "\n", sort ($1, $2)/me;
-		if (pcmk_version_smaller_than("1.1.6")
-		    || pcmk_version_greater_than("1.1.7")) {
-			$crm_status =
-				"TERM=dumb PATH=\$PATH:/usr/sbin /usr/sbin/crm status|sed 1,5d";
-		} else {
-			$crm_status =
-				"TERM=dumb PATH=\$PATH:/usr/sbin /usr/sbin/crm status|sed 1,6d";
-		}
-		$status = _exec("$crm_status");
-		$status =~ s/((\d+) Nodes configured)$/$1, $2 expected votes/m;
+		$crm_status = "crm_mon -1|sed 1,3d";
+		$status = _exec("$crm_status|grep -v 'Full list of resources:'");
 		$ret = $?;
 		if ($ret != 0) {
 			exit $ret;
@@ -2313,11 +2312,9 @@ sub gui_test {
 	$status =~ s/(Master\/Slave Set:.*?)\s+\[.*/$1/g;
 	$status =~ s/unknown( expected votes)/2$1/;
 	$status =~ s/\s+\(.*?\)(: standby)/$1/g;
-	$status =~ s/(\d+ Resources configured)$/$1./m;
-	if ($status !~ /============/) {
-		$status =~ s/\n\n/\n============\n/;
-	}
-	$cib =~ s/\s*\n\s*attributes standby="off"\s*/\n/g;
+	$status =~ s/(\d+ resources? configured):.*/$1/m;
+	$cib =~ s/\s*\n\s*attributes standby=off\s*/\n/g;
+	$cib =~ s/^node \d+: host/node host/gm;
 	$cib =~ s/^(node host)\s+$/$1/gm;
       	if (pcmk_version_smaller_than("1.1.6")) {
 	      $status =~ s/(Clone Set:.*?)\s+\[.*\]/$1/g;

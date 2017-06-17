@@ -38,7 +38,7 @@ import javax.inject.Singleton;
  */
 @Named
 @Singleton
-public final class Hosts {
+public class Hosts {
     private static final Logger LOG = LoggerFactory.getLogger(Hosts.class);
     private final Set<Host> hosts = new LinkedHashSet<Host>();
 

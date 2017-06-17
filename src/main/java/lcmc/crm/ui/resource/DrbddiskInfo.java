@@ -33,7 +33,7 @@ import javax.inject.Named;
  * treated in special way.
  */
 @Named
-public final class DrbddiskInfo extends ServiceInfo {
+public class DrbddiskInfo extends ServiceInfo {
     /** Returns string representation of the drbddisk service. */
     @Override
     public String toString() {
@@ -56,7 +56,7 @@ public final class DrbddiskInfo extends ServiceInfo {
     }
 
     @Override
-    protected void setParameters(final Map<String, String> resourceNode) {
+    public void setParameters(final Map<String, String> resourceNode) {
         super.setParameters(resourceNode);
         final ResourceInfo dri = getBrowser().getDrbdResourceNameHash().get(getResourceName());
         getBrowser().putDrbdResHash();

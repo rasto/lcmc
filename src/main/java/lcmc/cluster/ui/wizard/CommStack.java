@@ -34,6 +34,7 @@ import javax.swing.SpringLayout;
 
 import lcmc.common.domain.AccessMode;
 import lcmc.common.domain.Application;
+import lcmc.common.ui.utils.SwingUtils;
 import lcmc.host.domain.Host;
 import lcmc.common.domain.StringValue;
 import lcmc.common.domain.Value;
@@ -47,6 +48,7 @@ import lcmc.logger.LoggerFactory;
 import lcmc.cluster.service.ssh.ExecCommandConfig;
 import lcmc.cluster.service.ssh.ExecCommandThread;
 import lcmc.common.domain.util.Tools;
+import lombok.val;
 
 /**
  * An implementation of a dialog where user can choose cluster stack, that can
@@ -63,6 +65,8 @@ final class CommStack extends DialogCluster {
     private CoroConfig coroConfigDialog;
     @Inject
     private Application application;
+    @Inject
+    private SwingUtils swingUtils;
     @Inject
     private WidgetFactory widgetFactory;
 
@@ -110,7 +114,7 @@ final class CommStack extends DialogCluster {
                                                       @Override
                                                       public void done(final String answer) {
                                                           for (final String line : answer.split("\\r?\\n")) {
-                                                              host.parseInstallationInfo(line);
+                                                              host.getHostParser().parseInstallationInfo(line);
                                                           }
                                                       }
                                                       @Override
@@ -138,10 +142,11 @@ final class CommStack extends DialogCluster {
         boolean aisIsPossible = true;
         boolean hbIsPossible = true;
         for (final Host host : hosts) {
-            if (host.getCorosyncVersion() == null && host.getOpenaisVersion() == null) {
+            val hostParser = host.getHostParser();
+            if (hostParser.getCorosyncVersion() == null && hostParser.getOpenaisVersion() == null) {
                 aisIsPossible = false;
             }
-            if (host.getHeartbeatVersion() == null) {
+            if (hostParser.getHeartbeatVersion() == null) {
                 hbIsPossible = false;
             }
         }
@@ -151,7 +156,7 @@ final class CommStack extends DialogCluster {
         final boolean ais = aisIsPossible;
         final boolean hb = hbIsPossible;
         if (ais || hb) {
-            application.invokeLater(new Runnable() {
+            swingUtils.invokeLater(new Runnable() {
                 @Override
                 public void run() {
                     if (ais) {
@@ -165,7 +170,7 @@ final class CommStack extends DialogCluster {
         }
         enableComponents();
         if (ais || hb) {
-            application.invokeLater(new Runnable() {
+            swingUtils.invokeLater(new Runnable() {
                 @Override
                 public void run() {
                     buttonClass(nextButton()).setEnabled(true);
@@ -191,23 +196,24 @@ final class CommStack extends DialogCluster {
         int aisIsRunning = 0;
         int hbIsRunning = 0;
         for (final Host host : hosts) {
-            if (host.getHeartbeatVersion() == null) {
+            val hostParser = host.getHostParser();
+            if (hostParser.getHeartbeatVersion() == null) {
                 hbImpossible = true;
             }
-            if (host.getCorosyncVersion() == null
-                && host.getOpenaisVersion() == null) {
+            if (hostParser.getCorosyncVersion() == null
+                && hostParser.getOpenaisVersion() == null) {
                 aisImpossible = true;
             }
-            if (host.isCorosyncInRc() || host.isOpenaisInRc()) {
+            if (hostParser.isCorosyncInRc() || hostParser.isOpenaisInRc()) {
                 aisIsRc++;
             }
-            if (host.isHeartbeatInRc()) {
+            if (hostParser.isHeartbeatInRc()) {
                 hbIsRc++;
             }
-            if (host.isCorosyncRunning() || host.isOpenaisRunning()) {
+            if (hostParser.isCorosyncRunning() || hostParser.isOpenaisRunning()) {
                 aisIsRunning++;
             }
-            if (host.isHeartbeatRunning()) {
+            if (hostParser.isHeartbeatRunning()) {
                 hbIsRunning++;
             }
         }

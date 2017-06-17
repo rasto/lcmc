@@ -41,6 +41,7 @@ public final class DistResource_suse extends ListResourceBundle {
         {"version:openSUSE 11.3*",    "OPENSUSE11_3"}, // detected
         {"version:openSUSE 11.4*",    "OPENSUSE11_4"}, // detected
         {"version:openSUSE 13.*",     "OPENSUSE13_1"}, // detected
+        {"version:openSUSE 42.*",     "OPENSUSE13_1"}, // detected
         {"version:SUSE Linux Enterprise Server 11*", "SLES11"}, // detected
         {"version:sles9",  "SLES9"}, // chosen
         {"version:sles10", "SLES10"}, // chosen
@@ -112,6 +113,7 @@ public final class DistResource_suse extends ListResourceBundle {
         {"DrbdInst.install.method.3",
          "source"},
 
+        {"DrbdInst.install.staging.3", "true"},
         {"DrbdInst.install.3",
          "/bin/mkdir -p /tmp/drbdinst && "
          + "/usr/bin/wget --directory-prefix=/tmp/drbdinst/"

@@ -21,10 +21,45 @@
  */
 package lcmc.vm.ui.resource;
 
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.FlowLayout;
+import com.google.common.base.Optional;
+import lcmc.cluster.service.ssh.ExecCommandConfig;
+import lcmc.cluster.service.ssh.SshOutput;
+import lcmc.cluster.ui.ClusterBrowser;
+import lcmc.cluster.ui.widget.Check;
+import lcmc.cluster.ui.widget.Widget;
+import lcmc.cluster.ui.widget.WidgetFactory;
+import lcmc.common.domain.AccessMode;
+import lcmc.common.domain.Application;
+import lcmc.common.domain.EnablePredicate;
+import lcmc.common.domain.Predicate;
+import lcmc.common.domain.ResourceValue;
+import lcmc.common.domain.StringValue;
+import lcmc.common.domain.Unit;
+import lcmc.common.domain.Value;
+import lcmc.common.domain.util.Tools;
+import lcmc.common.ui.Browser;
+import lcmc.common.ui.EditableInfo;
+import lcmc.common.ui.Info;
+import lcmc.common.ui.main.MainData;
+import lcmc.common.ui.treemenu.TreeMenuController;
+import lcmc.common.ui.utils.ComponentWithTest;
+import lcmc.common.ui.utils.MenuAction;
+import lcmc.common.ui.utils.MenuFactory;
+import lcmc.common.ui.utils.MyButton;
+import lcmc.common.ui.utils.SwingUtils;
+import lcmc.common.ui.utils.UpdatableItem;
+import lcmc.host.domain.Host;
+import lcmc.logger.Logger;
+import lcmc.logger.LoggerFactory;
+import lcmc.vm.domain.LinuxFile;
+import lcmc.vm.domain.VmsXml;
+import org.w3c.dom.Node;
+
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.swing.*;
+import javax.swing.filechooser.FileSystemView;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
@@ -34,51 +69,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.swing.BoxLayout;
-import javax.swing.ImageIcon;
-import javax.swing.JComponent;
-import javax.swing.JFileChooser;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTable;
-import javax.swing.SwingConstants;
-import javax.swing.filechooser.FileSystemView;
-
-import lcmc.common.ui.GUIData;
-import lcmc.cluster.ui.widget.WidgetFactory;
-import lcmc.common.domain.AccessMode;
-import lcmc.common.domain.Application;
-import lcmc.common.ui.treemenu.TreeMenuController;
-import lcmc.host.domain.Host;
-import lcmc.vm.domain.LinuxFile;
-import lcmc.common.domain.StringValue;
-import lcmc.vm.domain.VmsXml;
-import lcmc.common.domain.Value;
-import lcmc.common.domain.Resource;
-import lcmc.common.ui.Browser;
-import lcmc.cluster.ui.ClusterBrowser;
-import lcmc.common.ui.EditableInfo;
-import lcmc.common.ui.Info;
-import lcmc.cluster.ui.widget.Check;
-import lcmc.cluster.ui.widget.Widget;
-import lcmc.common.ui.utils.ComponentWithTest;
-import lcmc.common.domain.EnablePredicate;
-import lcmc.logger.Logger;
-import lcmc.logger.LoggerFactory;
-import lcmc.common.ui.utils.MenuAction;
-import lcmc.common.ui.utils.MenuFactory;
-import lcmc.common.ui.utils.MyButton;
-import lcmc.common.domain.Predicate;
-import lcmc.common.domain.util.Tools;
-import lcmc.common.domain.Unit;
-import lcmc.common.ui.utils.UpdatableItem;
-import lcmc.cluster.service.ssh.ExecCommandConfig;
-import lcmc.cluster.service.ssh.SshOutput;
-
-import org.w3c.dom.Node;
 
 /**
  * This class holds info about Virtual Hardware.
@@ -105,17 +95,18 @@ public abstract class HardwareInfo extends EditableInfo {
     @Inject
     private Application application;
     @Inject
+    private SwingUtils swingUtils;
+    @Inject
     private MenuFactory menuFactory;
     @Inject
     private WidgetFactory widgetFactory;
     @Inject
-    private GUIData guiData;
+    private MainData mainData;
     @Inject
     private TreeMenuController treeMenuController;
 
     void init(final String name, final Browser browser, final DomainInfo vmsVirtualDomainInfo) {
-        super.init(name, browser);
-        setResource(new Resource(name));
+        super.einit(Optional.of(new ResourceValue(name)), name, browser);
         this.vmsVirtualDomainInfo = vmsVirtualDomainInfo;
     }
 
@@ -126,7 +117,7 @@ public abstract class HardwareInfo extends EditableInfo {
 
     @Override
     public final JComponent getInfoPanel() {
-        application.isSwingThread();
+        swingUtils.isSwingThread();
         if (infoPanel != null) {
             return infoPanel;
         }
@@ -219,7 +210,7 @@ public abstract class HardwareInfo extends EditableInfo {
         newPanel.add(getMoreOptionsPanel(application.getServiceLabelWidth()
                                          + application.getServiceFieldWidth() * 2 + 4));
         newPanel.add(new JScrollPane(mainPanel));
-        application.invokeLater(new Runnable() {
+        swingUtils.invokeLater(new Runnable() {
             @Override
             public void run() {
                 getApplyButton().setVisible(!getVMSVirtualDomainInfo().getResource().isNew());
@@ -425,7 +416,7 @@ public abstract class HardwareInfo extends EditableInfo {
     }
 
     protected Map<String, String> getHWParameters(final boolean allParams) {
-        application.invokeAndWait(new Runnable() {
+        swingUtils.invokeAndWait(new Runnable() {
             @Override
             public void run() {
                 getInfoPanel();
@@ -583,7 +574,7 @@ public abstract class HardwareInfo extends EditableInfo {
         fc.setDialogTitle(Tools.getString("DiskInfo.FileChooserTitle") + host.getName());
         fc.setApproveButtonToolTipText(Tools.getString("DiskInfo.Approve.ToolTip"));
         fc.putClientProperty("FileChooser.useShellFolder", Boolean.FALSE);
-        final int ret = fc.showDialog(guiData.getMainFrame(), Tools.getString("DiskInfo.Approve"));
+        final int ret = fc.showDialog(mainData.getMainFrame(), Tools.getString("DiskInfo.Approve"));
         linuxFileCache.clear();
         if (ret == JFileChooser.APPROVE_OPTION && fc.getSelectedFile() != null) {
             final String name = fc.getSelectedFile().getAbsolutePath();

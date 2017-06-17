@@ -6,7 +6,7 @@
 JAVA_CLASSPATH="/usr/lib/jni:/usr/lib/java"
 LCMC_BIN="/usr/bin/lcmc"
 
-find_java_runtime sunmin5 openjdk
+find_java_runtime oracle8 java8
 
 find_jars LCMC
 

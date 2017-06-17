@@ -36,10 +36,11 @@ import javax.swing.JPanel;
 import lcmc.common.domain.AccessMode;
 import lcmc.common.domain.Application;
 import lcmc.common.ui.treemenu.TreeMenuController;
+import lcmc.common.ui.utils.SwingUtils;
 import lcmc.host.domain.Host;
 import lcmc.common.domain.StringValue;
 import lcmc.vm.domain.VmsXml;
-import lcmc.vm.domain.ParallelSerialData;
+import lcmc.vm.domain.data.ParallelSerialData;
 import lcmc.common.domain.Value;
 import lcmc.common.ui.Browser;
 import lcmc.cluster.ui.widget.Widget;
@@ -180,7 +181,7 @@ public abstract class ParallelSerialInfo extends HardwareInfo {
     /** Table panel. */
     private JComponent tablePanel = null;
     @Inject
-    private Application application;
+    private SwingUtils swingUtils;
     @Inject
     private WidgetFactory widgetFactory;
     @Inject
@@ -197,7 +198,7 @@ public abstract class ParallelSerialInfo extends HardwareInfo {
                                    getTableName(),
                                    getNewBtn0(getVMSVirtualDomainInfo()));
         if (getResource().isNew()) {
-            application.invokeLater(new Runnable() {
+            swingUtils.invokeLater(new Runnable() {
                 @Override
                 public void run() {
                     tablePanel.setVisible(false);
@@ -307,7 +308,7 @@ public abstract class ParallelSerialInfo extends HardwareInfo {
         if (Application.isTest(runMode)) {
             return;
         }
-        application.invokeAndWait(new Runnable() {
+        swingUtils.invokeAndWait(new Runnable() {
             @Override
             public void run() {
                 getApplyButton().setEnabled(false);
@@ -342,7 +343,7 @@ public abstract class ParallelSerialInfo extends HardwareInfo {
         treeMenuController.reloadNode(getNode(), false);
         getBrowser().periodicalVmsUpdate(
                 getVMSVirtualDomainInfo().getDefinedOnHosts());
-        application.invokeLater(new Runnable() {
+        swingUtils.invokeLater(new Runnable() {
             @Override
             public void run() {
                 tablePanel.setVisible(true);
@@ -358,7 +359,7 @@ public abstract class ParallelSerialInfo extends HardwareInfo {
     /** Returns device parameters. */
     @Override
     protected Map<String, String> getHWParameters(final boolean allParams) {
-        application.invokeAndWait(new Runnable() {
+        swingUtils.invokeAndWait(new Runnable() {
             @Override
             public void run() {
                 getInfoPanel();
@@ -418,7 +419,7 @@ public abstract class ParallelSerialInfo extends HardwareInfo {
     protected final boolean checkParam(final String param,
                                        final Value newValue) {
         if (ParallelSerialData.TYPE.equals(param)) {
-            application.invokeLater(new Runnable() {
+            swingUtils.invokeLater(new Runnable() {
                 @Override
                 public void run() {
                     for (final String thisParam : PARAMETERS) {

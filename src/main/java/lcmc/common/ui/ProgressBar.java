@@ -33,8 +33,8 @@ import javax.swing.JProgressBar;
 import javax.swing.border.TitledBorder;
 
 import lcmc.cluster.ui.widget.WidgetFactory;
-import lcmc.common.domain.Application;
 import lcmc.common.domain.CancelCallback;
+import lcmc.common.ui.utils.SwingUtils;
 import lcmc.logger.Logger;
 import lcmc.logger.LoggerFactory;
 import lcmc.common.ui.utils.MyButton;
@@ -58,7 +58,7 @@ public final class ProgressBar implements ActionListener {
     /** Progress bar panel. */
     private JPanel pbPanel;
     @Inject
-    private Application application;
+    private SwingUtils swingUtils;
     private volatile boolean stopNow = false;
     /** Whether to hold the progress bar. */
     private boolean holdIt = false;
@@ -78,7 +78,7 @@ public final class ProgressBar implements ActionListener {
 
     void init(final String title, final CancelCallback cancelCallback, final int width, final int height) {
         this.cancelCallback = cancelCallback;
-        application.isSwingThread();
+        swingUtils.isSwingThread();
         progressBar = new JProgressBar(0, MAX_PB_VALUE);
         progressBar.setPreferredSize(new Dimension(width, height));
         progressBar.setBackground(Tools.getDefaultColor("ProgressBar.Background"));
@@ -155,7 +155,7 @@ public final class ProgressBar implements ActionListener {
                         /* show progress bar after delay */
                         if (time > progressBarDelay && !isVisible) {
                             isVisible = true;
-                            application.invokeLater(new Runnable() {
+                            swingUtils.invokeLater(new Runnable() {
                                 @Override
                                 public void run() {
                                     progressBar.setVisible(true);
@@ -166,7 +166,7 @@ public final class ProgressBar implements ActionListener {
                             });
                         }
                         if (!holdIt) {
-                            application.invokeLater(new Runnable() {
+                            swingUtils.invokeLater(new Runnable() {
                                 @Override
                                 public void run() {
                                     progressBar.setValue(progress * MAX_PB_VALUE / timeout);
@@ -182,7 +182,7 @@ public final class ProgressBar implements ActionListener {
                         }
                         if (progress >= timeout) {
                             /* premature end */
-                            application.invokeLater(new Runnable() {
+                            swingUtils.invokeLater(new Runnable() {
                                 @Override
                                 public void run() {
                                     progressBar.setIndeterminate(true);
@@ -190,7 +190,7 @@ public final class ProgressBar implements ActionListener {
                             });
                         }
                     }
-                    application.invokeLater(new Runnable() {
+                    swingUtils.invokeLater(new Runnable() {
                         @Override
                         public void run() {
                             progressBar.setIndeterminate(false);
@@ -220,7 +220,7 @@ public final class ProgressBar implements ActionListener {
         }
         stopNow = true;
         progress = timeout;
-        application.invokeLater(new Runnable() {
+        swingUtils.invokeLater(new Runnable() {
             @Override
             public void run() {
                 progressBar.setIndeterminate(false);
@@ -236,7 +236,7 @@ public final class ProgressBar implements ActionListener {
         }
         stopNow = true;
         progress = 0;
-        application.invokeLater(new Runnable() {
+        swingUtils.invokeLater(new Runnable() {
             @Override
             public void run() {
                 progressBar.setIndeterminate(false);
@@ -250,7 +250,7 @@ public final class ProgressBar implements ActionListener {
      * state.
      */
     public void hold() {
-        application.invokeLater(new Runnable() {
+        swingUtils.invokeLater(new Runnable() {
             @Override
             public void run() {
                 progressBar.setVisible(true);
@@ -268,7 +268,7 @@ public final class ProgressBar implements ActionListener {
      * hold().
      */
     public void cont() {
-        application.invokeLater(new Runnable() {
+        swingUtils.invokeLater(new Runnable() {
             @Override
             public void run() {
                 progressBar.setIndeterminate(false);

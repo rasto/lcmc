@@ -26,15 +26,15 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import lcmc.common.ui.GUIData;
+import lcmc.common.ui.MainPanel;
 import lcmc.common.ui.WizardDialog;
+import lcmc.common.ui.utils.SwingUtils;
 import lcmc.drbd.ui.configdialog.Resource;
 import lcmc.drbd.ui.configdialog.Start;
 import lcmc.drbd.ui.resource.BlockDevInfo;
 import lcmc.drbd.ui.resource.GlobalInfo;
 import lcmc.drbd.ui.resource.ResourceInfo;
 import lcmc.drbd.ui.resource.VolumeInfo;
-import lcmc.common.domain.Application;
 import lcmc.logger.Logger;
 import lcmc.logger.LoggerFactory;
 
@@ -52,13 +52,13 @@ public final class AddDrbdConfigDialog {
     private BlockDevInfo blockDevInfo1;
     private BlockDevInfo blockDevInfo2;
     @Inject
-    private GUIData guiData;
+    private MainPanel mainPanel;
     @Inject
     private Start startDialog;
     @Inject
     private Resource resourceDialog;
     @Inject
-    private Application application;
+    private SwingUtils swingUtils;
 
     public void init(final GlobalInfo globalInfo, final BlockDevInfo blockDevInfo1, final BlockDevInfo blockDevInfo2) {
         this.globalInfo = globalInfo;
@@ -79,7 +79,7 @@ public final class AddDrbdConfigDialog {
             final VolumeInfo dvi = globalInfo.getNewDrbdVolume(resourceInfo, blockDevices);
             resourceInfo.addDrbdVolume(dvi);
             globalInfo.addDrbdResource(resourceInfo);
-            application.invokeAndWait(new Runnable() {
+            swingUtils.invokeAndWait(new Runnable() {
                 @Override
                 public void run() {
                     globalInfo.addDrbdVolume(dvi);
@@ -88,14 +88,14 @@ public final class AddDrbdConfigDialog {
             resourceDialog.init(null, dvi);
             dialog = resourceDialog;
         }
-        guiData.expandTerminalSplitPane(GUIData.TerminalSize.EXPAND);
+        mainPanel.expandTerminalSplitPane(MainPanel.TerminalSize.EXPAND);
         while (true) {
             LOG.debug1("showDialogs: dialog: " + dialog.getClass().getName());
             final WizardDialog newdialog = (WizardDialog) dialog.showDialog();
             if (dialog.isPressedCancelButton()) {
                 dialog.cancelDialog();
                 wizardCanceled = true;
-                guiData.expandTerminalSplitPane(GUIData.TerminalSize.COLLAPSE);
+                mainPanel.expandTerminalSplitPane(MainPanel.TerminalSize.COLLAPSE);
                 if (newdialog == null) {
                     LOG.debug1("showDialogs: dialog: " + dialog.getClass().getName() + " canceled");
                     return;

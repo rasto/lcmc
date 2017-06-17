@@ -44,8 +44,9 @@ import javax.swing.JScrollPane;
 import javax.swing.Scrollable;
 import javax.swing.SwingConstants;
 
-import lcmc.common.ui.GUIData;
+import lcmc.common.ui.main.MainPresenter;
 import lcmc.common.domain.Application;
+import lcmc.common.ui.utils.SwingUtils;
 import lcmc.host.domain.Host;
 import lcmc.host.domain.Hosts;
 import lcmc.common.ui.WizardDialog;
@@ -69,9 +70,11 @@ final class ClusterHosts extends DialogCluster {
     @Inject
     private Connect connectDialog;
     @Inject
-    private GUIData guiData;
+    private MainPresenter mainPresenter;
     @Inject
     private Application application;
+    @Inject
+    private SwingUtils swingUtils;
     @Inject
     private Hosts allHosts;
 
@@ -86,7 +89,7 @@ final class ClusterHosts extends DialogCluster {
                 getCluster().addHost(host);
             }
         }
-        guiData.refreshClustersPanel();
+        mainPresenter.refreshClustersPanel();
     }
 
     @Override
@@ -136,7 +139,7 @@ final class ClusterHosts extends DialogCluster {
             }
         }
         final boolean enableButton = enable;
-        application.invokeLater(new Runnable() {
+        swingUtils.invokeLater(new Runnable() {
             @Override
             public void run() {
                 buttonClass(nextButton()).setEnabled(enableButton);
@@ -264,7 +267,7 @@ final class ClusterHosts extends DialogCluster {
         public int getScrollableUnitIncrement(final Rectangle visibleRect, final int orientation, final int direction) {
             final int hundredth = (orientation ==  SwingConstants.VERTICAL
                     ? getParent().getHeight() : getParent().getWidth()) / 100;
-            return (hundredth == 0 ? 1 : hundredth);
+            return hundredth == 0 ? 1 : hundredth;
         }
 
         @Override

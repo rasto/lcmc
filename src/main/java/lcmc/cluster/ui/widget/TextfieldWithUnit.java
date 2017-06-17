@@ -39,13 +39,14 @@ import javax.swing.text.AbstractDocument;
 import javax.swing.text.Document;
 import javax.swing.text.JTextComponent;
 import lcmc.common.domain.AccessMode;
-import lcmc.common.domain.Application;
 import lcmc.common.domain.StringValue;
 import lcmc.common.domain.Value;
+import lcmc.common.ui.Access;
 import lcmc.common.ui.SpringUtilities;
 import lcmc.common.ui.utils.MyButton;
 import lcmc.common.ui.utils.PatternDocument;
 import lcmc.common.domain.Unit;
+import lcmc.common.ui.utils.SwingUtils;
 import lcmc.common.ui.utils.WidgetListener;
 
 /**
@@ -56,7 +57,9 @@ import lcmc.common.ui.utils.WidgetListener;
 @Named
 public final class TextfieldWithUnit extends GenericWidget<JComponent> {
     @Inject
-    private Application application;
+    private SwingUtils swingUtils;
+    @Inject
+    private Access access;
     /** Text field in widget with units. */
     private JTextField textFieldPart;
     private MComboBox<Unit> unitComboBox;
@@ -154,7 +157,7 @@ public final class TextfieldWithUnit extends GenericWidget<JComponent> {
             public void focusGained(final FocusEvent e) {
                 final Value v = getValue();
                 if (v.isNothingSelected()) {
-                    application.invokeLater(new Runnable() {
+                    swingUtils.invokeLater(new Runnable() {
                         @Override
                         public void run() {
                             editor.setText("");
@@ -199,12 +202,12 @@ public final class TextfieldWithUnit extends GenericWidget<JComponent> {
                 unit.setPlural(!"1".equals(text));
                 unitComboBox.repaint();
             }
-            final boolean accessible = application.isAccessible(getEnableAccessMode());
+            final boolean accessible = access.isAccessible(getEnableAccessMode());
             if (text == null || text.isEmpty()) {
                 if (!unit.isEmpty()) {
                     unit.setEmpty(true);
                     unitEnabled = false;
-                    application.invokeLater(new Runnable() {
+                    swingUtils.invokeLater(new Runnable() {
                         @Override
                         public void run() {
                             unitComboBox.repaint();
@@ -217,7 +220,7 @@ public final class TextfieldWithUnit extends GenericWidget<JComponent> {
                     unit.setEmpty(false);
                     if (textFieldPart.isEnabled()) {
                         unitEnabled = true;
-                        application.invokeLater(new Runnable() {
+                        swingUtils.invokeLater(new Runnable() {
                             @Override
                             public void run() {
                                 unitComboBox.repaint();
@@ -238,7 +241,7 @@ public final class TextfieldWithUnit extends GenericWidget<JComponent> {
     @Override
     protected void setComponentsVisible(final boolean visible) {
         super.setComponentsEnabled(visible);
-        application.invokeLater(new Runnable() {
+        swingUtils.invokeLater(new Runnable() {
             @Override
             public void run() {
                 textFieldPart.setVisible(visible);
@@ -299,7 +302,7 @@ public final class TextfieldWithUnit extends GenericWidget<JComponent> {
 
     @Override
     public void setBackgroundColor(final Color bg) {
-        application.invokeLater(new Runnable() {
+        swingUtils.invokeLater(new Runnable() {
             @Override
             public void run() {
                 setBackground(bg);

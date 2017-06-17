@@ -4,7 +4,7 @@
     <groupId>lcmc</groupId>
     <artifactId>LCMC</artifactId>
     <packaging>jar</packaging>
-    <version>1.7.6</version>
+    <version>1.7.13</version>
     <name>lcmc</name>
     <url>lcmc.sf.net</url>
     <properties>
@@ -36,6 +36,12 @@
         </profile>
     </profiles>
     <dependencies>
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <version>1.16.4</version>
+            <scope>provided</scope>
+        </dependency>
         <dependency>
             <groupId>net.sourceforge.collections</groupId>
             <artifactId>collections-generic</artifactId>
@@ -206,10 +212,11 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>2.3.2</version>
+                <version>3.3</version>
                 <configuration>
-                    <source>1.6</source>
-                    <target>1.6</target>
+                    <source>1.8</source>
+                    <target>1.8</target>
+                    <optimize>true</optimize>
                     <showWarnings>true</showWarnings>
                     <showDeprecation>true</showDeprecation>
                     <compilerArgument>-Xlint:all</compilerArgument>
@@ -577,7 +584,7 @@
                             </classPath>
                             <icon>scripts/lcmc.ico</icon>
                             <jre>
-                                <minVersion>1.6.0</minVersion>
+                                <minVersion>1.8.0</minVersion>
                                 <maxVersion></maxVersion>
                                 <initialHeapSize>128</initialHeapSize>
                                 <maxHeapSize>1024</maxHeapSize>

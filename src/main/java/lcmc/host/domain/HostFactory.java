@@ -20,24 +20,95 @@
 
 package lcmc.host.domain;
 
-import lcmc.cluster.service.storage.BlockDeviceService;
-
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Provider;
 import javax.inject.Singleton;
 
+import lcmc.HwEventBus;
+import lcmc.cluster.service.ssh.Ssh;
+import lcmc.cluster.service.storage.BlockDeviceService;
+import lcmc.common.domain.Application;
+import lcmc.common.ui.main.MainData;
+import lcmc.common.ui.main.ProgressIndicator;
+import lcmc.common.ui.utils.SwingUtils;
+import lcmc.drbd.domain.DrbdHost;
+import lcmc.drbd.domain.DrbdXml;
+import lcmc.host.domain.parser.DistributionDetector;
+import lcmc.host.domain.parser.HostParser;
+import lcmc.host.ui.HostBrowser;
+import lcmc.host.ui.TerminalPanel;
+import lcmc.robotest.RoboTest;
+import lcmc.vm.domain.VmsXml;
+import lombok.val;
+
 @Named
 @Singleton
 public class HostFactory {
     @Inject
-    private Provider<Host> hostProvider;
+    private HwEventBus hwEventBus;
     @Inject
-    private Provider<BlockDeviceService> blockDeviceServiceProvider;
+    private SwingUtils swingUtils;
+    @Inject
+    private Application application;
+    @Inject
+    private MainData mainData;
+    @Inject
+    private ProgressIndicator progressIndicator;
+    @Inject
+    private Hosts allHosts;
+    @Inject
+    private RoboTest roboTest;
+    @Inject
+    private BlockDeviceService blockDeviceService;
+    @Inject
+    private Provider<VmsXml> vmsXmlProvider;
+    @Inject
+    private Provider<DrbdXml> drbdXmlProvider;
+    @Inject
+    private Provider<TerminalPanel> terminalPanelProvider;
+    @Inject
+    private Provider<Ssh> sshProvider;
+    @Inject
+    private Provider<HostBrowser> hostBrowserProvider;
 
     public Host createInstance() {
-        final Host host = hostProvider.get();
+        val drbdHost = new DrbdHost();
+        val hostBrowser = hostBrowserProvider.get();
+        val terminalPanel = terminalPanelProvider.get();
+        val ssh = sshProvider.get();
+
+        val host = new Host(
+                drbdHost,
+                terminalPanel,
+                mainData,
+                progressIndicator,
+                ssh,
+                hostBrowser,
+                allHosts,
+                application,
+                roboTest,
+                blockDeviceService,
+                swingUtils);
+
+        terminalPanel.initWithHost(host);
         host.init();
+        val distributionDetector = new DistributionDetector(host);
+        val hostParser = new HostParser(
+                host,
+                drbdHost,
+                hwEventBus,
+                vmsXmlProvider,
+                drbdXmlProvider,
+                swingUtils,
+                application,
+                distributionDetector);
+
+        hostBrowser.init(host);
+        host.setHostParser(hostParser);
+        hwEventBus.register(hostParser);
+
+        host.setHostParser(hostParser);
         return host;
     }
 

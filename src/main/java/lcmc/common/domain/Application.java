@@ -27,20 +27,15 @@ import ch.ethz.ssh2.KnownHosts;
 import java.awt.Font;
 import java.awt.Insets;
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
-import java.util.regex.Matcher;
 
 import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.Table;
 import lcmc.cluster.domain.Cluster;
 import lcmc.cluster.domain.Clusters;
-import lcmc.cluster.ui.ClusterBrowser;
-import lcmc.common.ui.GUIData;
 import lcmc.common.ui.ConfirmDialog;
 import lcmc.host.domain.Host;
 import lcmc.host.domain.Hosts;
@@ -54,7 +49,6 @@ import javax.inject.Named;
 import javax.inject.Provider;
 import javax.inject.Singleton;
 import javax.swing.AbstractButton;
-import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.plaf.FontUIResource;
 
@@ -73,7 +67,6 @@ public class Application {
     public static final String PM_CLONE_SET_NAME = "Clone Set";
     public static final String PM_MASTER_SLAVE_SET_NAME = "Master/Slave Set";
     public static final String PACEMAKER_GROUP_NAME = "Group";
-    public static final float DEFAULT_ANIM_FPS = 20.0f;
     public static boolean isLive(final RunMode runMode) {
         return RunMode.LIVE == runMode;
     }
@@ -87,7 +80,6 @@ public class Application {
     private String savedDownloadPassword = "";
     private boolean loginSave = true;
 
-    private boolean advancedMode = false;
     private String defaultSaveFile = Tools.getDefault("MainMenu.DrbdGuiFiles.Default");
     private final KnownHosts knownHosts = new KnownHosts();
     private String knownHostPath;
@@ -112,9 +104,6 @@ public class Application {
     private boolean stagingDrbd = false;
     private boolean stagingPacemaker = false;
     private boolean hideLRM = false;
-    private float animFPS = DEFAULT_ANIM_FPS;
-    private AccessMode.Type accessType = AccessMode.ADMIN;
-    private AccessMode.Type maxAccessType = AccessMode.ADMIN;
     private boolean upgradeCheckEnabled = true;
     private boolean bigDRBDConf = false;
     private boolean oneHostCluster = false;
@@ -123,15 +112,11 @@ public class Application {
     private boolean embedApplet = Tools.isLinux();
     private boolean cmdLog = false;
     private Test autoTest = null;
-    private boolean checkSwing = false;
+
     @Inject
     private Hosts allHosts;
     @Inject
     private Clusters allClusters;
-    @Inject
-    private GUIData guiData;
-    @Inject
-    private UserConfig userConfig;
     @Inject
     private Provider<ConfirmDialog> confirmDialogProvider;
 
@@ -196,47 +181,6 @@ public class Application {
         }
     }
 
-    /** Removes all the hosts and clusters from all the panels and data. */
-    public void removeEverything() {
-        guiData.startProgressIndicator(Tools.getString("MainMenu.RemoveEverything"));
-        disconnectAllHosts();
-        guiData.getClustersPanel().removeAllTabs();
-        guiData.stopProgressIndicator(Tools.getString("MainMenu.RemoveEverything"));
-    }
-
-    /**
-     * @param saveAll whether to save clusters specified from the command line
-     */
-    public void saveConfig(final String filename,
-                           final boolean saveAll) {
-        LOG.debug1("save: start");
-        final String text = Tools.getString("Tools.Saving").replaceAll("@FILENAME@",
-                                            Matcher.quoteReplacement(filename));
-        guiData.startProgressIndicator(text);
-        try {
-            final FileOutputStream fileOut = new FileOutputStream(filename);
-            userConfig.saveXML(fileOut, saveAll);
-            LOG.debug("save: filename: " + filename);
-        } catch (final IOException e) {
-            LOG.appError("save: error saving: " + filename, "", e);
-        } finally {
-            try {
-                Thread.sleep(1000);
-            } catch (final InterruptedException e) {
-                Thread.currentThread().interrupt();
-            }
-
-            for (final Cluster cluster : allClusters.getClusterSet()) {
-                final ClusterBrowser cb = cluster.getBrowser();
-                if (cb != null) {
-                    cb.saveGraphPositions();
-                }
-            }
-            guiData.stopProgressIndicator(text);
-        }
-    }
-
-
     public void addHostToHosts(final Host host) {
         allHosts.addHost(host);
     }
@@ -259,14 +203,6 @@ public class Application {
 
     public void disconnectAllHosts() {
         allHosts.disconnectAllHosts();
-    }
-
-    public void setAdvancedMode(final boolean advancedMode) {
-        this.advancedMode = advancedMode;
-    }
-
-    public boolean isAdvancedMode() {
-        return advancedMode;
     }
 
     public void setDefaultSaveFile(final String defaultSaveFile) {
@@ -507,55 +443,6 @@ public class Application {
         return useRealvnc;
     }
 
-    public float getAnimFPS() {
-        return animFPS;
-    }
-
-    public boolean isSlow() {
-        return animFPS < DEFAULT_ANIM_FPS;
-    }
-
-    public boolean isFast() {
-        return animFPS > DEFAULT_ANIM_FPS;
-    }
-
-    public void setAnimFPS(final float animFPS) {
-        this.animFPS = animFPS;
-    }
-
-    public void setAccessType(final AccessMode.Type accessType) {
-        this.accessType = accessType;
-    }
-
-    public AccessMode.Type getAccessType() {
-        return accessType;
-    }
-
-    AccessMode.Type getMaxAccessType() {
-        return maxAccessType;
-    }
-
-    /**
-     * Returns true if the access type is greater than the one that is
-     * required and advanced mode is required and we are not in advanced mode.
-     */
-    public boolean isAccessible(final AccessMode required) {
-        return getAccessType().compareTo(required.getType()) > 0
-               || (getAccessType().compareTo(required.getType()) == 0
-                   && (advancedMode || !required.isAdvancedMode()));
-    }
-
-    public String[] getOperatingModes() {
-        final List<String> modes = new ArrayList<String>();
-        for (final AccessMode.Type at : AccessMode.OP_MODES_MAP.keySet()) {
-            modes.add(AccessMode.OP_MODES_MAP.get(at));
-            if (at.equals(maxAccessType)) {
-                break;
-            }
-        }
-        return modes.toArray(new String[modes.size()]);
-    }
-
     public void setUpgradeCheckEnabled(final boolean upgradeCheckEnabled) {
         this.upgradeCheckEnabled = upgradeCheckEnabled;
     }
@@ -624,14 +511,6 @@ public class Application {
 
     public boolean isCmdLog() {
         return cmdLog;
-    }
-
-    public boolean isCheckSwing() {
-        return checkSwing;
-    }
-
-    public void setCheckSwing(final boolean checkSwing) {
-        this.checkSwing = checkSwing;
     }
 
     /**
@@ -764,85 +643,6 @@ public class Application {
                 UIManager.put(key, new FontUIResource(f.getName(), f.getStyle(), scaled(f.getSize())));
             }
         }
-    }
-
-    public void setMaxAccessType(final AccessMode.Type maxAccessType) {
-        this.maxAccessType = maxAccessType;
-        setAccessType(maxAccessType);
-        checkAccessOfEverything();
-    }
-
-    public void checkAccessOfEverything() {
-        for (final Cluster c : allClusters.getClusterSet()) {
-            final ClusterBrowser cb = c.getBrowser();
-            if (cb != null) {
-                cb.checkAccessOfEverything();
-            }
-        }
-    }
-
-    /**
-     * Print stack trace if it's not in a swing thread.
-     */
-    public void isSwingThread() {
-        if (!isCheckSwing()) {
-            return;
-        }
-        if (!SwingUtilities.isEventDispatchThread()) {
-            System.out.println("not a swing thread: " + Tools.getStackTrace());
-        }
-    }
-
-    /**
-     * Print stack trace if it's in a swing thread.
-     */
-    public void isNotSwingThread() {
-        if (!isCheckSwing()) {
-            return;
-        }
-        if (SwingUtilities.isEventDispatchThread()) {
-            System.out.println("swing thread: " + Tools.getStackTrace());
-        }
-    }
-
-    /** Wait for next swing threads to finish. It's used for synchronization */
-    public void waitForSwing() {
-        invokeAndWait(new Runnable() {
-            @Override
-            public void run() {
-                /* just wait */
-            }
-        });
-    }
-
-    /**
-     * Convenience invoke and wait function if not already in an event
-     * dispatch thread.
-     */
-    public void invokeAndWait(final Runnable runnable) {
-        if (SwingUtilities.isEventDispatchThread()) {
-            runnable.run();
-        } else {
-            try {
-                SwingUtilities.invokeAndWait(runnable);
-            } catch (final InterruptedException ix) {
-                Thread.currentThread().interrupt();
-            } catch (final InvocationTargetException x) {
-                LOG.appError("invokeAndWait: exception", x);
-            }
-        }
-    }
-
-    public void invokeInEdt(final Runnable runnable) {
-        if (SwingUtilities.isEventDispatchThread()) {
-            runnable.run();
-        } else {
-            SwingUtilities.invokeLater(runnable);
-        }
-    }
-
-    public void invokeLater(final Runnable runnable) {
-        SwingUtilities.invokeLater(runnable);
     }
 
     public int getServiceLabelWidth() {

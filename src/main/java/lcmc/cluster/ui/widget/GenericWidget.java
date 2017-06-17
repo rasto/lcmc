@@ -53,9 +53,10 @@ import javax.swing.event.DocumentListener;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
 import lcmc.common.domain.AccessMode;
-import lcmc.common.domain.Application;
 import lcmc.common.domain.Value;
+import lcmc.common.ui.Access;
 import lcmc.common.ui.SpringUtilities;
+import lcmc.common.ui.utils.SwingUtils;
 import lcmc.logger.Logger;
 import lcmc.logger.LoggerFactory;
 import lcmc.common.ui.utils.MyButton;
@@ -94,7 +95,9 @@ public abstract class GenericWidget<T extends JComponent> extends JPanel impleme
     /** Whether the combobox was never set. */
     private boolean newFlag = true;
     @Inject
-    private Application application;
+    private SwingUtils swingUtils;
+    @Inject
+    private Access access;
 
     public void init(final String regexp, final AccessMode enableAccessMode) {
         this.init(regexp, enableAccessMode, NO_BUTTON);
@@ -155,7 +158,7 @@ public abstract class GenericWidget<T extends JComponent> extends JPanel impleme
             text = text + "<br>" + disabledReason0;
         }
         if (enableAccessMode.getType() != AccessMode.NEVER) {
-            final boolean accessible = application.isAccessible(enableAccessMode);
+            final boolean accessible = access.isAccessible(enableAccessMode);
             if (!accessible) {
                 text = text + "<br>" + getDisabledTooltip();
             }
@@ -174,7 +177,7 @@ public abstract class GenericWidget<T extends JComponent> extends JPanel impleme
         }
         String disabledTooltip = null;
         if (enableAccessMode.getType() != AccessMode.NEVER) {
-            final boolean accessible = application.isAccessible(enableAccessMode);
+            final boolean accessible = access.isAccessible(enableAccessMode);
             if (!accessible) {
                 disabledTooltip = getDisabledTooltip();
             }
@@ -268,7 +271,7 @@ public abstract class GenericWidget<T extends JComponent> extends JPanel impleme
         }
         final JComponent comp = c;
         super.setVisible(visible);
-        application.invokeLater(new Runnable() {
+        swingUtils.invokeLater(new Runnable() {
             @Override
             public void run() {
                 if (label != null) {
@@ -290,7 +293,7 @@ public abstract class GenericWidget<T extends JComponent> extends JPanel impleme
     @Override
     public final void setEnabled(final boolean enabled) {
         enablePredicate = enabled;
-        setComponentsEnabled(enablePredicate && application.isAccessible(enableAccessMode));
+        setComponentsEnabled(enablePredicate && access.isAccessible(enableAccessMode));
     }
 
     /** Sets extra button enabled. */
@@ -366,7 +369,7 @@ public abstract class GenericWidget<T extends JComponent> extends JPanel impleme
         if (Tools.areEqual(item, getValue())) {
             return;
         }
-        application.invokeLater(new Runnable() {
+        swingUtils.invokeLater(new Runnable() {
             @Override
             public void run() {
                 mValueWriteLock.lock();
@@ -603,7 +606,7 @@ public abstract class GenericWidget<T extends JComponent> extends JPanel impleme
 
     @Override
     public void setBackgroundColor(final Color bg) {
-        application.invokeLater(new Runnable() {
+        swingUtils.invokeLater(new Runnable() {
             @Override
             public void run() {
                 setBackground(bg);
@@ -625,7 +628,7 @@ public abstract class GenericWidget<T extends JComponent> extends JPanel impleme
     /** Sets this item enabled and visible according to its access type. */
     @Override
     public final void processAccessMode() {
-        final boolean accessible = application.isAccessible(enableAccessMode);
+        final boolean accessible = access.isAccessible(enableAccessMode);
         setComponentsEnabled(enablePredicate && accessible);
         if (toolTipText != null) {
             setToolTipText(toolTipText);

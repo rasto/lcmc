@@ -21,11 +21,33 @@
  */
 package lcmc.common.ui;
 
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.FlowLayout;
-import java.awt.Font;
+import com.google.common.base.Optional;
+import com.google.common.collect.HashBasedTable;
+import com.google.common.collect.Table;
+import lcmc.cluster.ui.widget.Check;
+import lcmc.cluster.ui.widget.Label;
+import lcmc.cluster.ui.widget.Widget;
+import lcmc.cluster.ui.widget.WidgetFactory;
+import lcmc.common.domain.AccessMode;
+import lcmc.common.domain.Application;
+import lcmc.common.domain.ResourceValue;
+import lcmc.common.domain.Unit;
+import lcmc.common.domain.Value;
+import lcmc.common.domain.util.Tools;
+import lcmc.common.ui.utils.ButtonCallback;
+import lcmc.common.ui.utils.MyButton;
+import lcmc.common.ui.utils.SwingUtils;
+import lcmc.common.ui.utils.WidgetListener;
+import lcmc.crm.domain.CrmXml;
+import lcmc.logger.Logger;
+import lcmc.logger.LoggerFactory;
+import org.apache.commons.collections15.map.MultiKeyMap;
+
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.swing.*;
+import javax.swing.border.TitledBorder;
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -37,33 +59,6 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.swing.BoxLayout;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.SpringLayout;
-import javax.swing.border.TitledBorder;
-
-import com.google.common.collect.HashBasedTable;
-import com.google.common.collect.Table;
-import lcmc.common.domain.AccessMode;
-import lcmc.common.domain.Application;
-import lcmc.crm.domain.CrmXml;
-import lcmc.common.domain.Value;
-import lcmc.common.domain.Resource;
-import lcmc.cluster.ui.widget.Check;
-import lcmc.cluster.ui.widget.Label;
-import lcmc.cluster.ui.widget.Widget;
-import lcmc.cluster.ui.widget.WidgetFactory;
-import lcmc.common.ui.utils.ButtonCallback;
-import lcmc.logger.Logger;
-import lcmc.logger.LoggerFactory;
-import lcmc.common.ui.utils.MyButton;
-import lcmc.common.domain.util.Tools;
-import lcmc.common.domain.Unit;
-import lcmc.common.ui.utils.WidgetListener;
-import org.apache.commons.collections15.map.MultiKeyMap;
 
 /**
  * This class provides textfields, combo boxes etc. for editable info objects.
@@ -92,7 +87,18 @@ public abstract class EditableInfo extends Info {
     @Inject
     private Application application;
     @Inject
+    private SwingUtils swingUtils;
+    @Inject
     private WidgetFactory widgetFactory;
+    @Inject
+    private Access access;
+
+    private Optional<ResourceValue> resource;
+
+    public void einit(final Optional<ResourceValue> resource, final String name, final Browser browser) {
+        super.init(name, browser);
+        this.resource = resource;
+    }
 
     protected abstract String getSection(String param);
 
@@ -254,7 +260,7 @@ public abstract class EditableInfo extends Info {
                            final int leftWidth,
                            final int rightWidth,
                            final Map<String, Widget> sameAsFields) {
-        application.isSwingThread();
+        swingUtils.isSwingThread();
         if (params == null) {
             return;
         }
@@ -283,7 +289,7 @@ public abstract class EditableInfo extends Info {
                 panel.setBackground(getSectionColor(section));
                 if (advanced) {
                     advancedPanelList.add(panel);
-                    panel.setVisible(application.isAdvancedMode());
+                    panel.setVisible(access.isAdvancedMode());
                 }
                 panelPartsMap.put(section, accessTypeString, advancedString, panel);
                 panelPartsList.add(new PanelPart(section, accessType, advanced));
@@ -393,10 +399,10 @@ public abstract class EditableInfo extends Info {
             }
             if (!notAdvancedSections.contains(sectionPanel)) {
                 advancedOnlySectionList.add(sectionEntry.getKey());
-                sectionPanel.setVisible(application.isAdvancedMode() && isSectionEnabled(sectionEntry.getKey()));
+                sectionPanel.setVisible(access.isAdvancedMode() && isSectionEnabled(sectionEntry.getKey()));
             }
         }
-        moreOptionsPanel.setVisible(advanced && !application.isAdvancedMode());
+        moreOptionsPanel.setVisible(advanced && !access.isAdvancedMode());
     }
 
 
@@ -428,10 +434,10 @@ public abstract class EditableInfo extends Info {
             public void run() {
                 final Check check;
                 if (realParamWi == null) {
-                    application.waitForSwing();
+                    swingUtils.waitForSwing();
                     check = checkResourceFields(param, params);
                 } else {
-                    application.invokeLater(new Runnable() {
+                    swingUtils.invokeLater(new Runnable() {
                         @Override
                         public void run() {
                             if (paramWi.getValue() == null || paramWi.getValue().isNothingSelected()) {
@@ -442,13 +448,13 @@ public abstract class EditableInfo extends Info {
                             }
                         }
                     });
-                    application.waitForSwing();
+                    swingUtils.waitForSwing();
                     check = checkResourceFields(param, params);
                 }
-                application.invokeLater(new Runnable() {
+                swingUtils.invokeLater(new Runnable() {
                     @Override
                     public void run() {
-                        if (getResource().isNew()) {
+                        if (resource.get().isNew()) {
                             check.addChanged("new resource");
                         }
                         if (thisApplyButton == applyButton) {
@@ -489,7 +495,7 @@ public abstract class EditableInfo extends Info {
     public void storeComboBoxValues(final String[] params) {
         for (final String param : params) {
             final Value value = getComboBoxValue(param);
-            getResource().setValue(param, value);
+            resource.get().setValue(param, value);
             final Widget wi = getWidget(param, null);
             if (wi != null) {
                 wi.setToolTipText(getToolTipText(param, wi));
@@ -499,21 +505,21 @@ public abstract class EditableInfo extends Info {
 
     /** Returns combo box for one parameter. */
     protected Widget createWidget(final String param, final String prefix, final int width) {
-        getResource().setPossibleChoices(param, getParamPossibleChoices(param));
+        resource.get().setPossibleChoices(param, getParamPossibleChoices(param));
         /* set default value */
         Value initValue = getPreviouslySelected(param, prefix);
         if (initValue == null) {
             final Value value = getParamSaved(param);
             if (value == null || value.isNothingSelected()) {
-                if (getResource().isNew()) {
-                    initValue = getResource().getPreferredValue(param);
+                if (resource.get().isNew()) {
+                    initValue = resource.get().getPreferredValue(param);
                     if (initValue == null) {
                         initValue = getParamPreferred(param);
                     }
                 }
                 if (initValue == null) {
                     initValue = getParamDefault(param);
-                    getResource().setValue(param, initValue);
+                    resource.get().setValue(param, initValue);
                 }
             } else {
                 initValue = value;
@@ -611,11 +617,11 @@ public abstract class EditableInfo extends Info {
     protected abstract Value getParamDefault(String param);
 
     public Value getParamSaved(final String param) {
-        return getResource().getValue(param);
+        return resource.get().getValue(param);
     }
 
     protected String getParamSavedForConfig(final String param) {
-        final Value v = getResource().getValue(param);
+        final Value v = resource.get().getValue(param);
         if (v == null) {
             return null;
         } else {
@@ -634,7 +640,7 @@ public abstract class EditableInfo extends Info {
      * null, instead of combo box a text field will be generated.
      */
     protected Value[] getPossibleChoices(final String param) {
-        return getResource().getPossibleChoices(param);
+        return resource.get().getPossibleChoices(param);
     }
 
     /**
@@ -686,13 +692,12 @@ public abstract class EditableInfo extends Info {
     /** Enables and disabled apply and revert button. */
     public final void setApplyButtons(final String param, final String[] params) {
         final Check check = checkResourceFields(param, params);
-        application.invokeLater(new Runnable() {
+        swingUtils.invokeLater(new Runnable() {
             @Override
             public void run() {
                 final MyButton ab = getApplyButton();
-                final Resource r = getResource();
                 if (ab != null) {
-                    if (r != null && r.isNew()) {
+                    if (resource.isPresent() && resource.get().isNew()) {
                         check.addChanged("new resource");
                     }
                     ab.setEnabled(check);
@@ -814,10 +819,10 @@ public abstract class EditableInfo extends Info {
     @Override
     public void updateAdvancedPanels() {
         super.updateAdvancedPanels();
-        final boolean advancedMode = application.isAdvancedMode();
+        final boolean advancedMode = access.isAdvancedMode();
         boolean advanced = false;
         for (final JPanel apl : advancedPanelList) {
-            application.invokeLater(new Runnable() {
+            swingUtils.invokeLater(new Runnable() {
                 @Override
                 public void run() {
                     apl.setVisible(advancedMode);
@@ -828,7 +833,7 @@ public abstract class EditableInfo extends Info {
         for (final String section : advancedOnlySectionList) {
             final JPanel p = sectionPanels.get(section, Boolean.toString(!WIZARD));
             final JPanel pw = sectionPanels.get(section, Boolean.toString(WIZARD));
-            application.invokeLater(new Runnable() {
+            swingUtils.invokeLater(new Runnable() {
                 @Override
                 public void run() {
                     final boolean v = advancedMode && isSectionEnabled(section);
@@ -841,7 +846,7 @@ public abstract class EditableInfo extends Info {
             advanced = true;
         }
         final boolean a = advanced;
-        application.invokeLater(new Runnable() {
+        swingUtils.invokeLater(new Runnable() {
             @Override
             public void run() {
                 moreOptionsPanel.setVisible(a && !advancedMode);
@@ -971,6 +976,10 @@ public abstract class EditableInfo extends Info {
         return "";
     }
 
+    public ResourceValue getResource() {
+        return resource.get();
+    }
+
     /**
      * This class holds a part of the panel within the same section, access
      * type and advanced mode setting.
@@ -999,4 +1008,5 @@ public abstract class EditableInfo extends Info {
             return advanced;
         }
     }
+
 }

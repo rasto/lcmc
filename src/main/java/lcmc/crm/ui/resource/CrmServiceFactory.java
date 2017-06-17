@@ -48,8 +48,6 @@ public class CrmServiceFactory {
     private Provider<CloneInfo> cloneInfoProvider;
     @Inject @Named("serviceInfo")
     private Provider<ServiceInfo> serviceInfoProvider;
-    @Inject
-    private Application application;
 
     public ServiceInfo createFromResourceAgent(
             final ResourceAgent newResourceAgent,

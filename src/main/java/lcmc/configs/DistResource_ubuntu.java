@@ -33,6 +33,7 @@ public final class DistResource_ubuntu extends ListResourceBundle {
     private static final Object[][] contents = {
         {"Support",                       "ubuntu"},
         {"version:7.04",                  ""},
+        {"version:jessie/sid/15.*",       "VIVID"},
         {"version:squeeze/sid/10.04",     "LUCID"},
         {"version:squeeze/sid/9.10",      "KARMIC"},
         {"version:5.0/9.04",              "JAUNTY"},
@@ -48,7 +49,7 @@ public final class DistResource_ubuntu extends ListResourceBundle {
 
         /* pacemaker heartbeat install method 1 */
         {"HbPmInst.install.text.1",
-         "apt-get install: 1.0.x / 3.0.x"},
+         "apt-get install"},
 
         {"HbPmInst.install.1",
          "apt-get update && /usr/bin/apt-get -y install -o"
@@ -57,19 +58,19 @@ public final class DistResource_ubuntu extends ListResourceBundle {
 
         /* pacemaker corosync install method 1 */
         {"PmInst.install.text.1",
-         "apt-get install: 1.0.x / 1.2.x"},
+         "apt-get install"},
 
         {"PmInst.install.1",
          "apt-get update && /usr/bin/apt-get -y install -o"
          + " 'DPkg::Options::force=--force-confnew' pacemaker corosync "
          + " && mkdir /var/log/cluster"
-         + " && (grep 'START=no' /etc/default/corosync && echo 'START=yes'>>/etc/default/corosync)"
+         + " && (grep 'START=no' /etc/default/corosync && echo 'START=yes'>>/etc/default/corosync; true)"
          + " && if [ -e /etc/corosync/corosync.conf ];then"
          + " mv /etc/corosync/corosync.conf /etc/corosync/corosync.conf.orig; fi"},
 
         /* Drbd install method 2 */
         {"DrbdInst.install.text.2",
-         "apt-get install: 8.3.x"},
+         "apt-get install"},
 
         {"DrbdInst.install.2",
          "apt-get update && /usr/bin/apt-get -y install -o "
@@ -83,6 +84,7 @@ public final class DistResource_ubuntu extends ListResourceBundle {
         {"DrbdInst.install.method.3",
          "source"},
 
+        {"DrbdInst.install.staging.3", "true"},
         {"DrbdInst.install.3",
          "/bin/mkdir -p /tmp/drbdinst && "
          + "/usr/bin/wget --directory-prefix=/tmp/drbdinst/"

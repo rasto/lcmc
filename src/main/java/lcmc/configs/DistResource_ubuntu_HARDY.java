@@ -42,7 +42,7 @@ public final class DistResource_ubuntu_HARDY extends ListResourceBundle {
          + " > /etc/apt/sources.list.d/ha-clustering.list "
          + " && apt-get update"
          + " && apt-get -y -q  --allow-unauthenticated install -o 'DPkg::Options::force=--force-confnew' pacemaker-openais"
-         + " && (grep 'START=no' /etc/default/corosync && echo 'START=yes'>>/etc/default/corosync)"
+         + " && (grep 'START=no' /etc/default/corosync && echo 'START=yes'>>/etc/default/corosync; true)"
          + " && if [ -e /etc/ais/openais.conf ];then"
          + " mv /etc/ais/openais.conf /etc/ais/openais.conf.orig; fi"
          + " && if [ -e /etc/corosync/corosync.conf ];then"
@@ -65,6 +65,7 @@ public final class DistResource_ubuntu_HARDY extends ListResourceBundle {
         {"DrbdInst.install.text.2",
          "from the source tarball"},
 
+        {"DrbdInst.install.staging.2", "true"},
         {"DrbdInst.install.2",
          "/bin/mkdir -p /tmp/drbdinst && "
          + "/usr/bin/wget --directory-prefix=/tmp/drbdinst/"

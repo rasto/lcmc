@@ -35,6 +35,7 @@ import lcmc.cluster.service.storage.FileSystemService;
 import lcmc.cluster.service.storage.MountPointService;
 import lcmc.common.ui.Browser;
 import lcmc.common.ui.treemenu.TreeMenuController;
+import lcmc.common.ui.utils.SwingUtils;
 import lcmc.configs.DistResource;
 import lcmc.common.domain.AccessMode;
 import lcmc.common.domain.Application;
@@ -66,7 +67,7 @@ import javax.swing.tree.DefaultMutableTreeNode;
  * drbd device is selected, the drbddisk service will be added too.
  */
 @Named
-public final class FilesystemRaInfo extends ServiceInfo {
+public class FilesystemRaInfo extends ServiceInfo {
     /** Name of the device parameter in the file system. */
     private static final String FS_RES_PARAM_DEV = "device";
     private static final String FS_RES_PARAM_DIRECTORY = "directory";
@@ -79,6 +80,8 @@ public final class FilesystemRaInfo extends ServiceInfo {
     private boolean drbddiskIsPreferred = false;
     @Inject
     private Application application;
+    @Inject
+    private SwingUtils swingUtils;
     @Inject
     private WidgetFactory widgetFactory;
     @Inject
@@ -159,7 +162,7 @@ public final class FilesystemRaInfo extends ServiceInfo {
     @Override
     public void apply(final Host dcHost, final Application.RunMode runMode) {
         if (Application.isLive(runMode)) {
-            application.invokeAndWait(new Runnable() {
+            swingUtils.invokeAndWait(new Runnable() {
                 @Override
                 public void run() {
                     getApplyButton().setEnabled(false);

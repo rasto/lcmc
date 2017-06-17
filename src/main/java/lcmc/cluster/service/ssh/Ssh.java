@@ -30,8 +30,11 @@ import java.io.IOException;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
+import lcmc.common.ui.main.MainData;
+import lcmc.common.ui.MainPanel;
+import lcmc.common.ui.main.ProgressIndicator;
+import lcmc.common.ui.utils.SwingUtils;
 import lcmc.configs.DistResource;
-import lcmc.common.ui.GUIData;
 import lcmc.common.domain.Application;
 import lcmc.host.domain.Host;
 import lcmc.common.ui.ProgressBar;
@@ -47,7 +50,7 @@ import javax.inject.Named;
 import javax.inject.Provider;
 
 @Named
-public final class Ssh {
+public class Ssh {
     private static final Logger LOG = LoggerFactory.getLogger(Ssh.class);
     public static final int DEFAULT_COMMAND_TIMEOUT = Tools.getDefaultInt("SSH.Command.Timeout");
     public static final int DEFAULT_COMMAND_TIMEOUT_LONG =
@@ -75,14 +78,20 @@ public final class Ssh {
     private final Lock mConnectionThreadLock = new ReentrantLock();
     private LocalPortForwarder localPortForwarder = null;
     @Inject
-    private GUIData guiData;
+    private MainData mainData;
+    @Inject
+    private MainPanel mainPanel;
+    @Inject
+    private ProgressIndicator progressIndicator;
     @Inject
     private Application application;
+    @Inject
+    private SwingUtils swingUtils;
     @Inject
     private Provider<Authentication> authenticationProvider;
 
     boolean reconnect() {
-        application.isNotSwingThread();
+        swingUtils.isNotSwingThread();
         mConnectionThreadLock.lock();
         if (connectionThread == null) {
             mConnectionThreadLock.unlock();
@@ -105,7 +114,7 @@ public final class Ssh {
             LOG.debug1("reconnect: connecting: " + host.getName());
             this.connectionCallback = NO_CONNECTION_CALLBACK;
             this.progressBar = NO_PROGRESS_BAR;
-            this.sshGui = new SSHGui(guiData.getMainFrame(), host, null);
+            this.sshGui = new SSHGui(mainData.getMainFrame(), host, null);
             authenticateAndConnect();
         }
         return true;
@@ -322,7 +331,7 @@ public final class Ssh {
                          .connectionThread(connectionThread)
                          .sshGui(sshGui)
                          .execCallback(execCallback)
-                         .execute(guiData).block();
+                         .execute(mainPanel, progressIndicator).block();
         return new SshOutput(answer[0], exitCode[0]);
     }
 
@@ -336,7 +345,7 @@ public final class Ssh {
         return execCommandConfig.host(host)
                                 .connectionThread(connectionThread)
                                 .sshGui(sshGui)
-                                .execute(guiData);
+                                .execute(mainPanel, progressIndicator);
     }
 
     public SshOutput captureCommand(final ExecCommandConfig execCommandConfig) {
@@ -344,7 +353,7 @@ public final class Ssh {
         return execCommandConfig.host(host)
                                 .connectionThread(connectionThread)
                                 .sshGui(sshGui)
-                                .capture(guiData);
+                                .capture(mainPanel, progressIndicator);
     }
 
     /** Installs gui-helper on the remote host. */
@@ -367,8 +376,12 @@ public final class Ssh {
         final String fileName = "lcmc-test.tar";
         final String file = Tools.getFile('/' + fileName);
         try {
+<<<<<<< HEAD
             scpClient.put(file, (new File(file)).length(),"/tmp",null);
             
+=======
+            scpClient.put(file.getBytes("UTF-8"), fileName, "/tmp");
+>>>>>>> 05561f78704c05e35bfe654e474b93f7f00172bf
         } catch (final IOException e) {
             LOG.appError("installTestFiles: could not copy: " + fileName, "", e);
             return;
@@ -507,7 +520,7 @@ public final class Ssh {
              new Runnable() {
                  @Override
                  public void run() {
-                     guiData.progressIndicatorFailed(host.getName(), line, 3000);
+                     progressIndicator.progressIndicatorFailed(host.getName(), line, 3000);
                  }
              });
              t.start();

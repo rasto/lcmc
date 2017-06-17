@@ -33,9 +33,10 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SpringLayout;
 
-import lcmc.common.ui.GUIData;
 import lcmc.common.domain.AccessMode;
 import lcmc.common.domain.Application;
+import lcmc.common.ui.MainPanel;
+import lcmc.common.ui.utils.SwingUtils;
 import lcmc.host.domain.Host;
 import lcmc.common.domain.StringValue;
 import lcmc.common.domain.Value;
@@ -67,9 +68,11 @@ public class NewHostDialog extends DialogHost {
     @Resource(name="configuration")
     private Configuration configuration;
     @Inject
-    private GUIData guiData;
+    private MainPanel mainPanel;
     @Inject
     private Application application;
+    @Inject
+    private SwingUtils swingUtils;
     @Inject
     private WidgetFactory widgetFactory;
 
@@ -89,7 +92,7 @@ public class NewHostDialog extends DialogHost {
         application.setLastEnteredUseSudo("true".equals(useSudoString));
         if (!application.existsHost(getHost())) {
             application.addHostToHosts(getHost());
-            guiData.setTerminalPanel(getHost().getTerminalPanel());
+            mainPanel.setTerminalPanel(getHost().getTerminalPanel());
         }
     }
 
@@ -104,9 +107,9 @@ public class NewHostDialog extends DialogHost {
         final String hs = hostField.getStringValue().trim();
         final String us = usernameField.getStringValue().trim();
         final String ps = sshPortField.getStringValue().trim();
-        boolean hf = (!hs.isEmpty());
-        boolean uf = (!us.isEmpty());
-        final boolean pf = (!ps.isEmpty());
+        boolean hf = !hs.isEmpty();
+        boolean uf = !us.isEmpty();
+        final boolean pf = !ps.isEmpty();
         final int hc = Tools.charCount(hs, ',');
         final int uc = Tools.charCount(us, ',');
         final List<String> incorrect = new ArrayList<String>();
@@ -136,7 +139,7 @@ public class NewHostDialog extends DialogHost {
         }
 
         if (hf) {
-            application.invokeLater(new Runnable() {
+            swingUtils.invokeLater(new Runnable() {
                 @Override
                 public void run() {
                     hostField.setBackground(new StringValue(getHost().getEnteredHostOrIp()),
@@ -150,7 +153,7 @@ public class NewHostDialog extends DialogHost {
         }
 
         if (uf) {
-            application.invokeLater(new Runnable() {
+            swingUtils.invokeLater(new Runnable() {
                 @Override
                 public void run() {
                     usernameField.setBackground(new StringValue(getHost().getUsername()),
@@ -173,7 +176,7 @@ public class NewHostDialog extends DialogHost {
         }
 
         if (pf) {
-            application.invokeLater(new Runnable() {
+            swingUtils.invokeLater(new Runnable() {
                 @Override
                 public void run() {
                     sshPortField.setBackground(new StringValue(getHost().getSSHPort()),
@@ -210,14 +213,14 @@ public class NewHostDialog extends DialogHost {
         enableComponents();
         makeDefaultButton(buttonClass(nextButton()));
         checkFields(null);
-        application.invokeLater(new Runnable() {
+        swingUtils.invokeLater(new Runnable() {
             @Override
             public void run() {
                 hostField.requestFocus();
             }
         });
         if (!application.getAutoHosts().isEmpty()) {
-            application.invokeLater(new Runnable() {
+            swingUtils.invokeLater(new Runnable() {
                 @Override
                 public void run() {
                     hostField.setValue(new StringValue(application.getAutoHosts().get(0)));

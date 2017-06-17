@@ -72,7 +72,6 @@ import java.awt.geom.Path2D;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
-import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.ConcurrentModificationException;
@@ -84,7 +83,6 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
-import javax.imageio.ImageIO;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.swing.ImageIcon;
@@ -96,6 +94,9 @@ import javax.swing.JScrollBar;
 import lcmc.common.domain.Application;
 import lcmc.common.domain.ColorText;
 import lcmc.cluster.ui.ClusterBrowser;
+import lcmc.common.ui.main.MainData;
+import lcmc.common.ui.main.ProgressIndicator;
+import lcmc.common.ui.utils.SwingUtils;
 import lcmc.host.domain.Host;
 import lcmc.logger.Logger;
 import lcmc.logger.LoggerFactory;
@@ -168,16 +169,20 @@ public abstract class ResourceGraph {
     private final Lock mTestEdgeLock = new ReentrantLock();
     @Inject
     private Application application;
+    @Inject
+    private SwingUtils swingUtils;
     private final Map<String, TextLayout> textLayoutCache = new HashMap<String, TextLayout>();
     private double scaledSoFar = 1.0;
 
     private ClusterBrowser clusterBrowser;
     @Inject
-    private GUIData guiData;
+    private MainData mainData;
+    @Inject
+    private ProgressIndicator progressIndicator;
 
     /** Starts the animation if vertex is being updated. */
     public final void startAnimation(final Info info) {
-        final int animInterval = (int) (1000 / application.getAnimFPS());
+        final int animInterval = (int) (1000 / mainData.getAnimFPS());
         mAnimationListLock.lock();
         if (animationList.isEmpty()) {
             /* start animation thread */
@@ -229,12 +234,12 @@ public abstract class ResourceGraph {
 
     /** Starts the animation if vertex is being tested. */
     public final void startTestAnimation(final JComponent component, final CountDownLatch startTestLatch) {
-        final int animInterval = (int) (1000 / application.getAnimFPS());
+        final int animInterval = (int) (1000 / mainData.getAnimFPS());
         mTestAnimationListLock.lock();
         mRunModeFlag.lock();
         runModeFlag = Application.RunMode.LIVE;
         mRunModeFlag.unlock();
-        application.invokeLater(new Runnable() {
+        swingUtils.invokeLater(new Runnable() {
             @Override
             public void run() {
                 Tools.setMenuOpaque(component, false);
@@ -646,7 +651,7 @@ public abstract class ResourceGraph {
     protected final void showPopup(final JPopupMenu popup, final Point2D p) {
         final int posX = (int) p.getX();
         final int posY = (int) p.getY();
-        application.invokeAndWait(new Runnable() {
+        swingUtils.invokeAndWait(new Runnable() {
             @Override
             public void run() {
                 if (visualizationViewer.isShowing() && visualizationViewer.isDisplayable()) {
@@ -858,7 +863,7 @@ public abstract class ResourceGraph {
         final Host[] hosts = clusterBrowser.getClusterHosts();
         Point2D p = null;
         for (final Host host : hosts) {
-            p = host.getGraphPosition(getId(info));
+            p = host.getHostParser().getGraphPosition(getId(info));
             if (p != null) {
                 break;
             }
@@ -870,7 +875,7 @@ public abstract class ResourceGraph {
     public final void resetSavedPosition(final Info info) {
         final Host[] hosts = clusterBrowser.getClusterHosts();
         for (final Host host : hosts) {
-            host.resetGraphPosition(getId(info));
+            host.getHostParser().resetGraphPosition(getId(info));
         }
     }
 
@@ -880,7 +885,7 @@ public abstract class ResourceGraph {
         if (ctl != null) {
             return ctl;
         }
-        final Font font = guiData.getMainFrame().getFont();
+        final Font font = mainData.getMainFrame().getFont();
         final FontRenderContext context = g2d.getFontRenderContext();
         final TextLayout tl = new TextLayout(text,
                                              new Font(font.getName(),
@@ -936,7 +941,7 @@ public abstract class ResourceGraph {
 
     protected final void removeTestEdge() {
         if (testEdge != null) {
-            application.invokeLater(new Runnable() {
+            swingUtils.invokeLater(new Runnable() {
                 @Override
                 public void run() {
                     mTestEdgeLock.lock();
@@ -957,7 +962,7 @@ public abstract class ResourceGraph {
         if (vP == null || v == null) {
             throw new IllegalArgumentException("addTestEdge: vP: " + vP + ", v: " + v);
         }
-        application.invokeLater(new Runnable() {
+        swingUtils.invokeLater(new Runnable() {
             @Override
             public void run() {
                 if (!mTestEdgeLock.tryLock()) {
@@ -1042,7 +1047,7 @@ public abstract class ResourceGraph {
             public void scale(final VisualizationServer vv, final float amount, final Point2D from) {
                 final JScrollBar sbV = getScrollPane().getVerticalScrollBar();
                 final JScrollBar sbH = getScrollPane().getHorizontalScrollBar();
-                application.invokeLater(new Runnable() {
+                swingUtils.invokeLater(new Runnable() {
                     @Override
                     public void run() {
                         final Point2D prevPoint = getVisualizationViewer().getRenderContext()
@@ -1113,13 +1118,13 @@ public abstract class ResourceGraph {
     /** Get selected components for copy/paste. */
     public List<Info> getSelectedComponents() {
         final String cn = clusterBrowser.getCluster().getName();
-        guiData.startProgressIndicator(cn, "copy");
+        progressIndicator.startProgressIndicator(cn, "copy");
         final List<Info> selected = new ArrayList<Info>();
         for (final Vertex v : getPickedVertices()) {
             final Info i = getInfo(v);
             selected.add(i);
         }
-        guiData.stopProgressIndicator(cn, "copy");
+        progressIndicator.stopProgressIndicator(cn, "copy");
         return selected;
     }
 
@@ -1620,7 +1625,7 @@ public abstract class ResourceGraph {
                         y -= (oldShapeHeight - getVertexHeight((Vertex) v)) / 2;
                     }
                     pos.setLocation(x, y);
-                    application.invokeLater(new Runnable() {
+                    swingUtils.invokeLater(new Runnable() {
                                           @Override
                                           public void run() {
                                               scale();

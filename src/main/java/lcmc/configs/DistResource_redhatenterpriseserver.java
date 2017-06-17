@@ -55,6 +55,7 @@ public final class DistResource_redhatenterpriseserver
         {"DrbdInst.install.text.2",
          "from the source tarball"},
 
+        {"DrbdInst.install.staging.2", "true"},
         {"DrbdInst.install.method.2",
          "source"},
 

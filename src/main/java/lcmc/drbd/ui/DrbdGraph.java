@@ -36,11 +36,13 @@ import java.util.Map;
 import java.util.Set;
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Provider;
 import javax.swing.ImageIcon;
 import javax.swing.JPopupMenu;
 
-import lcmc.common.ui.GUIData;
+import lcmc.common.ui.MainPanel;
 import lcmc.common.ui.ResourceGraph;
+import lcmc.common.ui.utils.SwingUtils;
 import lcmc.drbd.ui.resource.BlockDevInfo;
 import lcmc.drbd.ui.resource.HostDrbdInfo;
 import lcmc.drbd.ui.resource.MultiSelectionInfo;
@@ -98,14 +100,15 @@ public class DrbdGraph extends ResourceGraph {
     private final Map<VolumeInfo, Edge> drbdVolumeToEdgeMap = new LinkedHashMap<VolumeInfo, Edge>();
 
     @Inject
-    private MultiSelectionInfo multiSelectionInfo = null;
+    private Provider<MultiSelectionInfo> multiSelectionInfoProvider;
+    private MultiSelectionInfo multiSelectionInfo;
 
     /** The first X position of the host. */
     private int hostDefaultXPos = 10;
     @Inject
-    private GUIData guiData;
+    private MainPanel mainPanel;
     @Inject
-    private Application application;
+    private SwingUtils swingUtils;
 
     @Override
     public void initGraph(final ClusterBrowser clusterBrowser) {
@@ -171,7 +174,7 @@ public class DrbdGraph extends ResourceGraph {
                         removeDrbdVolume(dvi);
                         dvi.getDrbdResourceInfo().removeDrbdVolumeFromHashes(dvi);
                     }
-                    application.invokeLater(new Runnable() {
+                    swingUtils.invokeLater(new Runnable() {
                         @Override
                         public void run() {
                             lockGraph();
@@ -330,7 +333,7 @@ public class DrbdGraph extends ResourceGraph {
                 if (sourceBDI.isWFConnection(runMode)
                     && !destBDI.isWFConnection(runMode)) {
                     edge.setDirection(dest, source);
-                    application.invokeLater(new Runnable() {
+                    swingUtils.invokeLater(new Runnable() {
                         @Override
                         public void run() {
                             repaint();
@@ -340,7 +343,7 @@ public class DrbdGraph extends ResourceGraph {
                 }
             } else if (!sourceBD.isPrimary() && destBD.isPrimary()) {
                 edge.setDirection(dest, source);
-                application.invokeLater(new Runnable() {
+                swingUtils.invokeLater(new Runnable() {
                     @Override
                     public void run() {
                         repaint();
@@ -603,7 +606,7 @@ public class DrbdGraph extends ResourceGraph {
         if (hi == null) {
             return;
         }
-        guiData.setTerminalPanel(hi.getHost().getTerminalPanel());
+        mainPanel.setTerminalPanel(hi.getHost().getTerminalPanel());
     }
 
     /** Is called when one block device vertex was pressed. */
@@ -1021,6 +1024,7 @@ public class DrbdGraph extends ResourceGraph {
                 selectedInfos.add(i);
             }
         }
+        multiSelectionInfo = multiSelectionInfoProvider.get();
         multiSelectionInfo.init(selectedInfos, getClusterBrowser());
         getClusterBrowser().setRightComponentInView(multiSelectionInfo);
     }

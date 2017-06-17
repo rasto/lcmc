@@ -25,11 +25,12 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
+import lcmc.common.ui.Access;
 import lcmc.common.ui.CallbackAction;
-import lcmc.common.ui.GUIData;
 import lcmc.common.domain.AccessMode;
 import lcmc.common.domain.Application;
 import lcmc.cluster.domain.Cluster;
+import lcmc.common.ui.main.ProgressIndicator;
 import lcmc.drbd.domain.DrbdXml;
 import lcmc.host.domain.Host;
 import lcmc.drbd.domain.BlockDevice;
@@ -81,7 +82,7 @@ public class BlockDevMenu {
 
     private BlockDevInfo blockDevInfo;
     @Inject
-    private GUIData guiData;
+    private ProgressIndicator progressIndicator;
     @Inject
     private MenuFactory menuFactory;
     @Inject
@@ -98,6 +99,8 @@ public class BlockDevMenu {
     private Provider<LVSnapshot> lvSnapshotProvider;
     @Inject
     private Provider<DrbdLog> drbdLogProvider;
+    @Inject
+    private Access access;
 
     public List<UpdatableItem> getPulldownMenu(final BlockDevInfo blockDevInfo) {
         this.blockDevInfo = blockDevInfo;
@@ -240,7 +243,7 @@ public class BlockDevMenu {
                                 if (!getBlockDevice().isDrbd()) {
                                     return BlockDevInfo.NO_DRBD_RESOURCE_STRING;
                                 }
-                                if (!application.isAdvancedMode() && getDrbdResourceInfo().isUsedByCRM()) {
+                                if (!access.isAdvancedMode() && getDrbdResourceInfo().isUsedByCRM()) {
                                     return VolumeInfo.IS_USED_BY_CRM_STRING;
                                 }
                                 if (getBlockDevice().isSyncing()) {
@@ -304,7 +307,7 @@ public class BlockDevMenu {
                                 if (!getBlockDevice().isDrbd()) {
                                     return BlockDevInfo.NO_DRBD_RESOURCE_STRING;
                                 }
-                                if (!application.isAdvancedMode() && getDrbdResourceInfo().isUsedByCRM()) {
+                                if (!access.isAdvancedMode() && getDrbdResourceInfo().isUsedByCRM()) {
                                     return VolumeInfo.IS_USED_BY_CRM_STRING;
                                 }
                                 if (!getBlockDevice().isSyncing()
@@ -378,7 +381,7 @@ public class BlockDevMenu {
                                 if (!getBlockDevice().isDrbd()) {
                                     return BlockDevInfo.NO_DRBD_RESOURCE_STRING;
                                 }
-                                if (!application.isAdvancedMode() && getDrbdResourceInfo().isUsedByCRM()) {
+                                if (!access.isAdvancedMode() && getDrbdResourceInfo().isUsedByCRM()) {
                                     return VolumeInfo.IS_USED_BY_CRM_STRING;
                                 }
                                 if (!getBlockDevice().isSecondary()) {
@@ -421,7 +424,7 @@ public class BlockDevMenu {
                                 if (!getBlockDevice().isDrbd()) {
                                     return BlockDevInfo.NO_DRBD_RESOURCE_STRING;
                                 }
-                                if (!application.isAdvancedMode() && getDrbdResourceInfo().isUsedByCRM()) {
+                                if (!access.isAdvancedMode() && getDrbdResourceInfo().isUsedByCRM()) {
                                     return VolumeInfo.IS_USED_BY_CRM_STRING;
                                 }
                                 if (!getBlockDevice().isPrimary()) {
@@ -457,7 +460,7 @@ public class BlockDevMenu {
                                 if (!getBlockDevice().isDrbd()) {
                                     return BlockDevInfo.NO_DRBD_RESOURCE_STRING;
                                 }
-                                if (!application.isAdvancedMode() && getDrbdResourceInfo().isUsedByCRM()) {
+                                if (!access.isAdvancedMode() && getDrbdResourceInfo().isUsedByCRM()) {
                                     return VolumeInfo.IS_USED_BY_CRM_STRING;
                                 }
                                 return null;
@@ -491,7 +494,7 @@ public class BlockDevMenu {
                                 if (!getBlockDevice().isDrbd()) {
                                     return BlockDevInfo.NO_DRBD_RESOURCE_STRING;
                                 }
-                                if (!application.isAdvancedMode() && getDrbdResourceInfo().isUsedByCRM()) {
+                                if (!access.isAdvancedMode() && getDrbdResourceInfo().isUsedByCRM()) {
                                     return VolumeInfo.IS_USED_BY_CRM_STRING;
                                 }
                                 if (getBlockDevice().isSyncing()) {
@@ -541,7 +544,7 @@ public class BlockDevMenu {
                                 if (!getBlockDevice().isDrbd()) {
                                     return BlockDevInfo.NO_DRBD_RESOURCE_STRING;
                                 }
-                                if (!application.isAdvancedMode() && getDrbdResourceInfo().isUsedByCRM()) {
+                                if (!access.isAdvancedMode() && getDrbdResourceInfo().isUsedByCRM()) {
                                     return VolumeInfo.IS_USED_BY_CRM_STRING;
                                 }
                                 if (!getBlockDevice().isSyncing()) {
@@ -581,7 +584,7 @@ public class BlockDevMenu {
                                 if (!getBlockDevice().isDrbd()) {
                                     return BlockDevInfo.NO_DRBD_RESOURCE_STRING;
                                 }
-                                if (!application.isAdvancedMode() && getDrbdResourceInfo().isUsedByCRM()) {
+                                if (!access.isAdvancedMode() && getDrbdResourceInfo().isUsedByCRM()) {
                                     return VolumeInfo.IS_USED_BY_CRM_STRING;
                                 }
                                 if (getBlockDevice().isSyncing()) {
@@ -617,7 +620,7 @@ public class BlockDevMenu {
                                 if (!getBlockDevice().isDrbd()) {
                                     return BlockDevInfo.NO_DRBD_RESOURCE_STRING;
                                 }
-                                if (!application.isAdvancedMode() && getDrbdResourceInfo().isUsedByCRM()) {
+                                if (!access.isAdvancedMode() && getDrbdResourceInfo().isUsedByCRM()) {
                                     return VolumeInfo.IS_USED_BY_CRM_STRING;
                                 }
                                 if (getBlockDevice().isSyncing()) {
@@ -688,7 +691,7 @@ public class BlockDevMenu {
                                     return false;
                                 }
                                 if (getBlockDevice().isDrbd()) {
-                                    return pHost.isDrbdProxyUp(getDrbdResourceInfo().getName());
+                                    return pHost.getHostParser().isDrbdProxyUp(getDrbdResourceInfo().getName());
                                 } else {
                                     return true;
                                 }
@@ -699,7 +702,7 @@ public class BlockDevMenu {
                             public void run(final String text) {
                                 final ResourceInfo dri = getDrbdResourceInfo();
                                 final Host pHost = dri.getProxyHost(getHost(), !ResourceInfo.WIZARD);
-                                if (pHost.isDrbdProxyUp(getDrbdResourceInfo().getName())) {
+                                if (pHost.getHostParser().isDrbdProxyUp(getDrbdResourceInfo().getName())) {
                                     DRBD.proxyDown(pHost, getDrbdResourceInfo().getName(), getDrbdVolumeInfo().getName(), runMode);
                                 } else {
                                     DRBD.proxyUp(pHost, getDrbdResourceInfo().getName(), getDrbdVolumeInfo().getName(), runMode);
@@ -812,7 +815,7 @@ public class BlockDevMenu {
                     public void run(final String text) {
                         final boolean ret = blockDevInfo.pvCreate(Application.RunMode.LIVE);
                         if (!ret) {
-                            guiData.progressIndicatorFailed(Tools.getString("BlockDevInfo.PVCreate.Failed",
+                            progressIndicator.progressIndicatorFailed(Tools.getString("BlockDevInfo.PVCreate.Failed",
                                     blockDevInfo.getName()));
                         }
                         getClusterBrowser().updateHWInfo(getHost(), Host.UPDATE_LVM);
@@ -847,7 +850,7 @@ public class BlockDevMenu {
                     public void run(final String text) {
                         final boolean ret = blockDevInfo.pvRemove(Application.RunMode.LIVE);
                         if (!ret) {
-                            guiData.progressIndicatorFailed(
+                            progressIndicator.progressIndicatorFailed(
                                     Tools.getString("BlockDevInfo.PVRemove.Failed", blockDevInfo.getName()));
                         }
                         getClusterBrowser().updateHWInfo(getHost(), Host.UPDATE_LVM);
@@ -939,7 +942,7 @@ public class BlockDevMenu {
                         } else {
                             vg = drbdBD.getVgOnPhysicalVolume();
                         }
-                        if (getHost().getLogicalVolumesFromVolumeGroup(vg) != null) {
+                        if (getHost().getHostParser().getLogicalVolumesFromVolumeGroup(vg) != null) {
                             return "has LV on it";
                         }
                         return null;
@@ -980,7 +983,7 @@ public class BlockDevMenu {
                     @Override
                     public boolean check() {
                         final String vg = blockDevInfo.getVGName();
-                        return vg != null && !"".equals(vg) && getHost().getVolumeGroupNames().contains(vg);
+                        return vg != null && !"".equals(vg) && getHost().getHostParser().getVolumeGroupNames().contains(vg);
                     }
                 })
                 .enablePredicate(new EnablePredicate() {

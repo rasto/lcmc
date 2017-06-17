@@ -22,6 +22,17 @@
 
 package lcmc.crm.service;
 
+import lcmc.cluster.service.ssh.ExecCommandConfig;
+import lcmc.cluster.service.ssh.SshOutput;
+import lcmc.common.domain.Application;
+import lcmc.common.domain.util.Tools;
+import lcmc.configs.DistResource;
+import lcmc.crm.domain.CrmXml;
+import lcmc.crm.domain.HostLocation;
+import lcmc.host.domain.Host;
+import lcmc.logger.Logger;
+import lcmc.logger.LoggerFactory;
+
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -32,17 +43,6 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.regex.Matcher;
-
-import lcmc.configs.DistResource;
-import lcmc.common.domain.Application;
-import lcmc.crm.domain.CrmXml;
-import lcmc.host.domain.Host;
-import lcmc.crm.domain.HostLocation;
-import lcmc.logger.Logger;
-import lcmc.logger.LoggerFactory;
-import lcmc.common.domain.util.Tools;
-import lcmc.cluster.service.ssh.ExecCommandConfig;
-import lcmc.cluster.service.ssh.SshOutput;
 
 /**
  * This class provides cib commands. There are commands that use cibadmin and
@@ -86,7 +86,9 @@ public final class CRM {
             final String testCmd =
                 "if [ ! -e " + LCMC_TEST_FILE + " ]; "
              + "then " + DistResource.SUDO + "/usr/sbin/cibadmin -Ql > "
-             + LCMC_TEST_FILE + ";fi;"
+             + LCMC_TEST_FILE + ".new"
+             + ";mv " + LCMC_TEST_FILE + ".new " + LCMC_TEST_FILE
+             + ";fi;"
              + "export CIB_file=" + LCMC_TEST_FILE + ';';
             return host.captureCommand(new ExecCommandConfig().command(testCmd + command)
                                                               .silentCommand()

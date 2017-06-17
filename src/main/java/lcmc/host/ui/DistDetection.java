@@ -31,6 +31,7 @@ import lcmc.common.ui.SpringUtilities;
 import lcmc.common.ui.WizardDialog;
 import lcmc.common.domain.Application;
 import lcmc.common.domain.util.Tools;
+import lombok.val;
 
 /**
  * An implementation of a dialog that shows which distribution was detected.
@@ -46,11 +47,9 @@ final class DistDetection extends DialogHost {
     protected void initDialogBeforeVisible() {
         super.initDialogBeforeVisible();
         enableComponentsLater(new JComponent[]{buttonClass(nextButton())});
-        final String support = Tools.getDistString("Support",
-                                                   getHost().getDistributionName(),
-                                                   getHost().getDistributionVersionString(),
-                                                   getHost().getArch());
-        final String answerText = "\nversion: " + getHost().getDetectedInfo() + " (support file: " + support + ')';
+        val hostParser = getHost().getHostParser();
+        final String support = hostParser.getDistString("Support");
+        final String answerText = "\nversion: " + hostParser.getDetectedInfo() + " (support file: " + support + ')';
         answerPaneSetText(answerText);
     }
 

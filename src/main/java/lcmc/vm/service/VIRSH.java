@@ -60,10 +60,8 @@ public final class VIRSH {
     private static boolean execCommand(final Host[] hosts, final Map<Host, String> hostCommands) {
         for (final Host host : hosts) {
             final String commands = hostCommands.get(host);
-            if (!commands.isEmpty()) {
-                if (!execCommand(host, commands)) {
-                    return false;
-                }
+            if (!commands.isEmpty() && !execCommand(host, commands)) {
+                return false;
             }
         }
         return true;

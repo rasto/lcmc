@@ -21,7 +21,7 @@
 package lcmc.cluster.ui.resource;
 
 import lcmc.cluster.domain.Cluster;
-import lcmc.common.domain.Resource;
+import lcmc.common.domain.ResourceValue;
 import lcmc.common.ui.Browser;
 import lcmc.common.ui.Info;
 import lcmc.drbd.domain.NetInterface;
@@ -44,7 +44,7 @@ public class ClusterViewFactory {
     @Inject
     private Provider<FSInfo> fsInfoProvider;
 
-    private final ConcurrentMap<Resource, Info> viewByResource = new ConcurrentHashMap<Resource, Info>();
+    private final ConcurrentMap<ResourceValue, Info> viewByResource = new ConcurrentHashMap<ResourceValue, Info>();
     private final ConcurrentMap<String, Info> viewByFileSystemName = new ConcurrentHashMap<String, Info>();
 
     private final Lock viewLock = new ReentrantLock();

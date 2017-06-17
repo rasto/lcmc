@@ -58,7 +58,7 @@ import javax.swing.text.SimpleAttributeSet;
 import javax.swing.text.StyleConstants;
 
 import lcmc.cluster.ui.widget.WidgetFactory;
-import lcmc.common.domain.Application;
+import lcmc.common.ui.utils.SwingUtils;
 import lcmc.host.domain.Host;
 import lcmc.common.domain.ExecCallback;
 import lcmc.logger.Logger;
@@ -78,7 +78,7 @@ public class Logs extends ConfigDialog {
     private final Lock mRefreshLock = new ReentrantLock();
     private final Collection<JComponent> additionalComponents = new ArrayList<JComponent>();
     @Inject
-    private Application application;
+    private SwingUtils swingUtils;
     @Inject
     private WidgetFactory widgetFactory;
 
@@ -138,7 +138,7 @@ public class Logs extends ConfigDialog {
     }
 
     protected void enableAllComponents(final boolean enable) {
-        application.invokeLater(new Runnable() {
+        swingUtils.invokeLater(new Runnable() {
             @Override
             public void run() {
                 for (final Map.Entry<String, JCheckBox> checkBoxEntry : patternToCheckBoxMap.entrySet()) {
@@ -174,7 +174,7 @@ public class Logs extends ConfigDialog {
         final String stacktrace = Tools.getStackTrace();
         for (final Host host : hosts) {
             final int index = i;
-            final String command = host.getDistCommand(logFileCommand(), replaceHash);
+            final String command = host.getHostParser().getDistCommand(logFileCommand(), replaceHash);
             threads[index] = host.execCommand(new ExecCommandConfig()
                                                    .command(command)
                                                    .execCallback(new ExecCallback() {
@@ -224,17 +224,17 @@ public class Logs extends ConfigDialog {
                                 final int month1 = monthsHash.get(m1.group(1));
                                 final int month2 = monthsHash.get(m2.group(1));
 
-                                final int day1 = Integer.valueOf(m1.group(2));
-                                final int day2 = Integer.valueOf(m2.group(2));
+                                final int day1 = Integer.parseInt(m1.group(2));
+                                final int day2 = Integer.parseInt(m2.group(2));
 
-                                final int hour1 = Integer.valueOf(m1.group(3));
-                                final int hour2 = Integer.valueOf(m2.group(3));
+                                final int hour1 = Integer.parseInt(m1.group(3));
+                                final int hour2 = Integer.parseInt(m2.group(3));
 
-                                final int min1 = Integer.valueOf(m1.group(4));
-                                final int min2 = Integer.valueOf(m2.group(4));
+                                final int min1 = Integer.parseInt(m1.group(4));
+                                final int min2 = Integer.parseInt(m2.group(4));
 
-                                final int sec1 = Integer.valueOf(m1.group(5));
-                                final int sec2 = Integer.valueOf(m2.group(5));
+                                final int sec1 = Integer.parseInt(m1.group(5));
+                                final int sec2 = Integer.parseInt(m2.group(5));
 
                                 if (month1 != month2) {
                                     return month1 < month2 ? -1 : 1;

@@ -25,14 +25,14 @@ package lcmc.crm.domain;
 
 import lcmc.common.domain.Application;
 import lcmc.common.domain.StringValue;
-import lcmc.common.domain.Resource;
+import lcmc.common.domain.ResourceValue;
 import lcmc.logger.Logger;
 import lcmc.logger.LoggerFactory;
 
 /**
  * This class holds data of a service.
  */
-public class Service extends Resource {
+public class Service extends ResourceValue {
     private static final Logger LOG = LoggerFactory.getLogger(Service.class);
     public static final String RES_ID_PREFIX = "res_";
     public static final String STONITH_ID_PREFIX = "stonith_";

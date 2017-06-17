@@ -34,7 +34,7 @@ import javax.inject.Named;
  * treated in special way.
  */
 @Named
-public final class LinbitDrbdInfo extends ServiceInfo {
+public class LinbitDrbdInfo extends ServiceInfo {
     /** Returns string representation of the linbit::drbd service. */
     @Override
     public String toString() {
@@ -80,7 +80,7 @@ public final class LinbitDrbdInfo extends ServiceInfo {
 
     /** Sets service parameters with values from resourceNode hash. */
     @Override
-    protected void setParameters(final Map<String, String> resourceNode) {
+    public void setParameters(final Map<String, String> resourceNode) {
         super.setParameters(resourceNode);
         final ResourceInfo dri =
                         getBrowser().getDrbdResourceNameHash().get(getResourceName());

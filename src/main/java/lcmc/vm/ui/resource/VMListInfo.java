@@ -21,9 +21,31 @@
  */
 package lcmc.vm.ui.resource;
 
-import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.FlowLayout;
+import lcmc.cluster.ui.ClusterBrowser;
+import lcmc.cluster.ui.widget.WidgetFactory;
+import lcmc.common.domain.AccessMode;
+import lcmc.common.domain.Application;
+import lcmc.common.domain.Value;
+import lcmc.common.domain.util.Tools;
+import lcmc.common.ui.Browser;
+import lcmc.common.ui.CategoryInfo;
+import lcmc.common.ui.Info;
+import lcmc.common.ui.treemenu.TreeMenuController;
+import lcmc.common.ui.utils.MenuAction;
+import lcmc.common.ui.utils.MenuFactory;
+import lcmc.common.ui.utils.MyButton;
+import lcmc.common.ui.utils.SwingUtils;
+import lcmc.common.ui.utils.UpdatableItem;
+import lcmc.host.domain.Host;
+import lcmc.host.ui.HostBrowser;
+import lcmc.vm.domain.VmsXml;
+import lcmc.vm.ui.AddVMConfigDialog;
+
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Provider;
+import javax.swing.*;
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -32,34 +54,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeSet;
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Provider;
-import javax.swing.AbstractButton;
-import javax.swing.ImageIcon;
-import javax.swing.JComponent;
-import javax.swing.JPanel;
-import javax.swing.SwingConstants;
-import javax.swing.tree.DefaultMutableTreeNode;
-
-import lcmc.common.ui.treemenu.TreeMenuController;
-import lcmc.vm.ui.AddVMConfigDialog;
-import lcmc.cluster.ui.widget.WidgetFactory;
-import lcmc.common.domain.AccessMode;
-import lcmc.common.domain.Application;
-import lcmc.host.domain.Host;
-import lcmc.vm.domain.VmsXml;
-import lcmc.common.domain.Value;
-import lcmc.common.ui.Browser;
-import lcmc.cluster.ui.ClusterBrowser;
-import lcmc.host.ui.HostBrowser;
-import lcmc.common.ui.CategoryInfo;
-import lcmc.common.ui.Info;
-import lcmc.common.ui.utils.MenuAction;
-import lcmc.common.ui.utils.MenuFactory;
-import lcmc.common.ui.utils.MyButton;
-import lcmc.common.domain.util.Tools;
-import lcmc.common.ui.utils.UpdatableItem;
 
 /**
  * This class shows a list of virtual machines.
@@ -95,6 +89,8 @@ public final class VMListInfo extends CategoryInfo {
     private MenuFactory menuFactory;
     @Inject
     private Application application;
+    @Inject
+    private SwingUtils swingUtils;
     @Inject
     private WidgetFactory widgetFactory;
     @Inject
@@ -294,10 +290,10 @@ public final class VMListInfo extends CategoryInfo {
      */
     public void addDomainPanel() {
         final DomainInfo domainInfo = domainInfoProvider.get();
-        domainInfo.init(null, getBrowser());
+        domainInfo.einit("domainInfo", getBrowser());
         domainInfo.getResource().setNew(true);
         treeMenuController.createMenuItem(getNode(), domainInfo);
-        application.invokeInEdt(new Runnable() {
+        swingUtils.invokeInEdt(new Runnable() {
             @Override
             public void run() {
                 treeMenuController.reloadNode(getNode(), true);

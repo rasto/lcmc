@@ -8,7 +8,9 @@ import java.util.concurrent.CountDownLatch;
 
 import lcmc.AppContext;
 import lcmc.common.domain.Application;
-import lcmc.common.ui.GUIData;
+import lcmc.common.ui.main.MainPresenter;
+import lcmc.common.ui.main.ProgressIndicator;
+import lcmc.common.ui.utils.SwingUtils;
 import lcmc.host.domain.Host;
 import lcmc.testutils.IntegrationTestLauncher;
 import lcmc.testutils.annotation.type.IntegrationTest;
@@ -23,15 +25,17 @@ import org.junit.experimental.categories.Category;
 @Category(IntegrationTest.class)
 public final class ClusterBrowserITest {
     private IntegrationTestLauncher integrationTestLauncher;
-    private GUIData guiData;
-    private Application application;
+    private MainPresenter mainPresenter;
+    private SwingUtils swingUtils;
+    private ProgressIndicator progressIndicator;
 
     @Before
     public void setUp() {
         integrationTestLauncher = AppContext.getBean(IntegrationTestLauncher.class);
         integrationTestLauncher.initTestCluster();
-        guiData = AppContext.getBean(GUIData.class);
-        application = AppContext.getBean(Application.class);
+        mainPresenter = AppContext.getBean(MainPresenter.class);
+        swingUtils = AppContext.getBean(SwingUtils.class);
+        progressIndicator = AppContext.getBean(ProgressIndicator.class);
     }
 
     @Test
@@ -105,8 +109,8 @@ public final class ClusterBrowserITest {
         Collections.sort(files);
         for (String file : files) {
             i++;
-            guiData.startProgressIndicator(i + ": " + file);
-            String xml = Tools.loadFile(guiData, file, true);
+            progressIndicator.startProgressIndicator(i + ": " + file);
+            String xml = Tools.loadFile(mainPresenter, file, true);
             xml = xml.replaceAll("<nodes/>", nodes.toString())
                      .replaceAll("<nodes>.*?</nodes>", nodes.toString())
                      .replaceAll("<status>.*?</status>", status.toString())
@@ -135,16 +139,16 @@ public final class ClusterBrowserITest {
                 final ClusterBrowser cb = host.getBrowser().getClusterBrowser();
                 cb.getClusterViewPanel().setDisabledDuringLoad(true);
                 cb.parseClusterOutput(cib, new StringBuffer(""), host, firstTime, runMode);
-                application.waitForSwing();
+                swingUtils.waitForSwing();
                 cb.getClusterViewPanel().setDisabledDuringLoad(false);
                 cb.getCrmGraph().repaint();
             }
-            guiData.stopProgressIndicator(i + ": " + file);
+            progressIndicator.stopProgressIndicator(i + ": " + file);
             for (final Host host : integrationTestLauncher.getHosts()) {
                 final ClusterBrowser cb = host.getBrowser().getClusterBrowser();
-                application.waitForSwing();
+                swingUtils.waitForSwing();
                 cb.parseClusterOutput(emptyCib, new StringBuffer(""), host, firstTime, runMode);
-                application.waitForSwing();
+                swingUtils.waitForSwing();
             }
         }
     }

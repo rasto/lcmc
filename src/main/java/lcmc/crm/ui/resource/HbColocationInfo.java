@@ -22,28 +22,29 @@
 
 package lcmc.crm.ui.resource;
 
+import com.google.common.base.Optional;
+import lcmc.cluster.ui.ClusterBrowser;
+import lcmc.cluster.ui.widget.Check;
+import lcmc.cluster.ui.widget.Widget;
+import lcmc.common.domain.AccessMode;
+import lcmc.common.domain.Application;
+import lcmc.common.domain.ResourceValue;
+import lcmc.common.domain.StringValue;
+import lcmc.common.domain.Value;
+import lcmc.common.domain.util.Tools;
+import lcmc.common.ui.Browser;
+import lcmc.common.ui.EditableInfo;
+import lcmc.crm.domain.ClusterStatus;
+import lcmc.crm.domain.CrmXml;
+import lcmc.crm.domain.Service;
+import lcmc.crm.service.CRM;
+import lcmc.host.domain.Host;
+
+import javax.inject.Named;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.regex.Matcher;
-
-import lcmc.common.domain.AccessMode;
-import lcmc.common.domain.Application;
-import lcmc.crm.domain.CrmXml;
-import lcmc.crm.domain.ClusterStatus;
-import lcmc.host.domain.Host;
-import lcmc.common.domain.StringValue;
-import lcmc.common.domain.Value;
-import lcmc.crm.domain.Service;
-import lcmc.common.ui.Browser;
-import lcmc.cluster.ui.ClusterBrowser;
-import lcmc.common.ui.EditableInfo;
-import lcmc.cluster.ui.widget.Check;
-import lcmc.cluster.ui.widget.Widget;
-import lcmc.crm.service.CRM;
-import lcmc.common.domain.util.Tools;
-
-import javax.inject.Named;
 
 /**
  * Object that holds a colocation constraint information.
@@ -58,8 +59,7 @@ final class HbColocationInfo extends EditableInfo implements HbConstraintInterfa
               final ServiceInfo serviceInfoRsc,
               final ServiceInfo serviceInfoWithRsc,
               final Browser browser) {
-        super.init("Colocation", browser);
-        setResource(new Service("Colocation"));
+        super.einit(Optional.<ResourceValue>of(new Service("Colocation")), "Colocation", browser);
         this.connectionInfo = connectionInfo;
         this.serviceInfoRsc = serviceInfoRsc;
         this.serviceInfoWithRsc = serviceInfoWithRsc;

@@ -45,6 +45,7 @@ import javax.swing.JToolTip;
 import lcmc.common.domain.AccessMode;
 import lcmc.common.domain.Application;
 import lcmc.common.domain.EnablePredicate;
+import lcmc.common.ui.Access;
 import lcmc.logger.Logger;
 import lcmc.logger.LoggerFactory;
 import lcmc.common.domain.Predicate;
@@ -81,6 +82,10 @@ implements ActionListener, UpdatableItem, ComponentWithTest {
     private String origToolTipText = "";
     @Inject
     private Application application;
+    @Inject
+    private SwingUtils swingUtils;
+    @Inject
+    private Access access;
 
     private MenuAction menuAction;
 
@@ -127,7 +132,7 @@ implements ActionListener, UpdatableItem, ComponentWithTest {
         this.robot = createRobot();
         processAccessMode();
         setIconAndTooltip();
-        application.isSwingThread();
+        swingUtils.isSwingThread();
     }
 
     protected void init(final String text,
@@ -154,7 +159,7 @@ implements ActionListener, UpdatableItem, ComponentWithTest {
         robot = createRobot();
         processAccessMode();
         setIconAndTooltip();
-        application.isSwingThread();
+        swingUtils.isSwingThread();
     }
 
     private Robot createRobot() {
@@ -223,7 +228,7 @@ implements ActionListener, UpdatableItem, ComponentWithTest {
         final String name = font.getFontName();
         final int style   = Font.PLAIN;
         final int size    = font.getSize();
-        application.invokeLater(new Runnable() {
+        swingUtils.invokeLater(new Runnable() {
             @Override
             public void run() {
                 setFont(new Font(name, style, size));
@@ -237,7 +242,7 @@ implements ActionListener, UpdatableItem, ComponentWithTest {
         final String name = font.getFontName();
         final int style   = Font.ITALIC;
         final int size    = font.getSize();
-        application.invokeLater(new Runnable() {
+        swingUtils.invokeLater(new Runnable() {
             @Override
             public void run() {
                 setFont(new Font(name, style, size));
@@ -306,11 +311,11 @@ implements ActionListener, UpdatableItem, ComponentWithTest {
 
     /** Sets this item enabled and visible according to its access type. */
     private void processAccessMode() {
-        final boolean accessible = application.isAccessible(enableAccessMode);
+        final boolean accessible = access.isAccessible(enableAccessMode);
         final String disableTooltip = enablePredicate.check();
         final boolean visible = visiblePredicate.check();
         setEnabled(disableTooltip == null && accessible);
-        setVisible(visible && application.isAccessible(visibleAccessMode));
+        setVisible(visible && access.isAccessible(visibleAccessMode));
         if (toolTip != null && isVisible()) {
             if (!accessible && enableAccessMode.getType() != AccessMode.NEVER) {
                 String advanced = "";

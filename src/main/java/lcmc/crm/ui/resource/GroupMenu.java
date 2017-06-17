@@ -31,9 +31,10 @@ import javax.swing.JCheckBox;
 import javax.swing.JDialog;
 import javax.swing.JMenuItem;
 
-import lcmc.common.ui.GUIData;
+import lcmc.common.ui.main.MainData;
 import lcmc.common.domain.AccessMode;
 import lcmc.common.domain.Application;
+import lcmc.common.ui.utils.SwingUtils;
 import lcmc.crm.domain.ResourceAgent;
 import lcmc.cluster.ui.ClusterBrowser;
 import lcmc.common.ui.utils.ButtonCallback;
@@ -50,14 +51,16 @@ import lcmc.common.ui.utils.UpdatableItem;
 @Named
 public class GroupMenu extends ServiceMenu {
 
-    @Inject
-    private GUIData drbdGui;
     @Inject @Named("serviceMenu")
     private Provider<ServiceMenu> serviceMenuProvider;
     @Inject
     private MenuFactory menuFactory;
     @Inject
     private Application application;
+    @Inject
+    private SwingUtils swingUtils;
+    @Inject
+    private MainData mainData;
 
     @Override
     public List<UpdatableItem> getPulldownMenu(final ServiceInfo serviceInfo) {
@@ -81,7 +84,7 @@ public class GroupMenu extends ServiceMenu {
         addGroupServiceMenuItem.onUpdate(new Runnable() {
             @Override
             public void run() {
-                application.isSwingThread();
+                swingUtils.isSwingThread();
                 addGroupServiceMenuItem.removeAll();
                 final Collection<JDialog> popups = new ArrayList<JDialog>();
                 for (final String cl : ClusterBrowser.CRM_CLASSES) {
@@ -105,7 +108,7 @@ public class GroupMenu extends ServiceMenu {
                                         ci.hidePopup();
                                     }
                                     groupInfo.hidePopup();
-                                    application.invokeLater(new Runnable() {
+                                    swingUtils.invokeLater(new Runnable() {
                                         @Override
                                         public void run() {
                                             for (final JDialog otherP : popups) {
@@ -122,7 +125,7 @@ public class GroupMenu extends ServiceMenu {
                             });
                         dlm.addElement(mmi);
                     }
-                    final boolean ret = drbdGui.getScrollingMenu(
+                    final boolean ret = mainData.getScrollingMenu(
                             ClusterBrowser.CRM_CLASS_MENU.get(cl),
                             null, /* options */
                             classItem,
@@ -147,7 +150,7 @@ public class GroupMenu extends ServiceMenu {
         }
 
         /* group services */
-        if (!application.isSlow()) {
+        if (!mainData.isSlow()) {
             for (final ServiceInfo child : groupInfo.getSubServices()) {
                 final MyMenu groupServicesMenu = menuFactory.createMenu(
                         child.toString(),
@@ -156,7 +159,7 @@ public class GroupMenu extends ServiceMenu {
                 groupServicesMenu.onUpdate(new Runnable() {
                     @Override
                     public void run() {
-                        application.isSwingThread();
+                        swingUtils.isSwingThread();
                         groupServicesMenu.removeAll();
                         final Collection<UpdatableItem> serviceMenus = new ArrayList<UpdatableItem>();
                         for (final UpdatableItem u : child.createPopup()) {

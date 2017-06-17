@@ -1,51 +1,100 @@
 package lcmc.common.domain.util;
 
-import java.awt.Dimension;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.TreeSet;
-import java.util.Vector;
-import javax.swing.JPanel;
-import junitparams.JUnitParamsRunner;
 import static junitparams.JUnitParamsRunner.$;
-import junitparams.Parameters;
-import lcmc.Exceptions;
-import lcmc.common.domain.ConvertCmdCallback;
-import lcmc.common.ui.GUIData;
-import lcmc.common.ui.TerminalPanel;
-import lcmc.drbd.ui.resource.GlobalInfo;
-import lcmc.host.domain.Host;
-import lcmc.drbd.domain.DrbdHost;
-import org.junit.Assert;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.when;
+
+import java.awt.Dimension;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
+import java.util.TreeSet;
+
+import javax.inject.Provider;
+import javax.swing.JPanel;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import junitparams.JUnitParamsRunner;
+import junitparams.Parameters;
+import lcmc.Exceptions;
+import lcmc.HwEventBus;
+import lcmc.cluster.service.ssh.Ssh;
+import lcmc.cluster.service.storage.BlockDeviceService;
+import lcmc.common.domain.Application;
+import lcmc.common.ui.main.MainData;
+import lcmc.common.ui.main.ProgressIndicator;
+import lcmc.common.ui.utils.SwingUtils;
+import lcmc.drbd.domain.DrbdXml;
+import lcmc.drbd.ui.resource.GlobalInfo;
+import lcmc.host.domain.Host;
+import lcmc.host.domain.HostFactory;
+import lcmc.host.domain.Hosts;
+import lcmc.host.ui.HostBrowser;
+import lcmc.host.ui.TerminalPanel;
+import lcmc.robotest.RoboTest;
+import lcmc.vm.domain.VmsXml;
 
 @RunWith(JUnitParamsRunner.class)
 public final class ToolsTest {
+    @InjectMocks
+    private HostFactory hostFactory;
     @Mock
-    private DrbdHost drbdHostStub;
+    private HwEventBus hwEventBus;
     @Mock
-    private TerminalPanel terminalPanelStub;
+    private SwingUtils swingUtils;
+    @Mock
+    private Application application;
+    @Mock
+    private MainData mainData;
+    @Mock
+    private ProgressIndicator progressIndicator;
+    @Mock
+    private Hosts allHosts;
+    @Mock
+    private RoboTest roboTest;
+    @Mock
+    private BlockDeviceService blockDeviceService;
 
-    private final GUIData guiData = new GUIData();
-
+    @Mock
+    private Provider<VmsXml> vmsXmlProvider;
+    @Mock
+    private VmsXml vmsXml;
+    @Mock
+    private Provider<DrbdXml> drbdXmlProvider;
+    @Mock
+    private DrbdXml drbdXml;
+    @Mock
+    private Provider<TerminalPanel> terminalPanelProvider;
+    @Mock
+    private TerminalPanel terminalPanel;
+    @Mock
+    private Provider<Ssh> sshProvider;
+    @Mock
+    private Ssh ssh;
+    @Mock
+    private Provider<HostBrowser> hostBrowserProvider;
+    @Mock
+    private HostBrowser hostBrowser;
 
     @Before
     public void setUp() {
         MockitoAnnotations.initMocks(this);
+        when(vmsXmlProvider.get()).thenReturn(vmsXml);
+        when(drbdXmlProvider.get()).thenReturn(drbdXml);
+        when(terminalPanelProvider.get()).thenReturn(terminalPanel);
+        when(sshProvider.get()).thenReturn(ssh);
+        when(hostBrowserProvider.get()).thenReturn(hostBrowser);
         Tools.init();
     }
 
@@ -132,222 +181,6 @@ public final class ToolsTest {
     }
 
     @SuppressWarnings("unused")
-    private Object[] parametersForDistStringShouldBeReturned() {
-        return $(
-            $(null, "none", "none", "none", "none"),
-            $("no", "Support", "none", "none", "none"),
-            $("no", "Support", null, null, null),
-            $("debian", "Support", "debian", null, null),
-            $("debian-SQUEEZE", "Support", "debian", "SQUEEZE", null),
-            $("debian-SQUEEZE", "Support", "debian", "SQUEEZE", "a"),
-            $("i586", "PmInst.install", "suse", null, "i386")
-        );
-    }
-
-    @Test
-    @Parameters(method="parametersForDistStringShouldBeReturned")
-    public void distStringShouldBeReturned(final String distString,
-                                           final String text,
-                                           final String dist,
-                                           final String version,
-                                           final String arch) {
-        assertEquals(distString, Tools.getDistString(text, dist, version, arch));
-    }
-
-    @Test
-    public void commandShouldBeUndefined() {
-        /*
-         String text
-         String dist
-         String version
-         String arch
-         ConvertCmdCallback convertCmdCallback
-         boolean inBash
-        */
-        assertEquals("undefined",
-                     Tools.getDistCommand("undefined",
-                                          "debian",
-                                          "squeeze",
-                                          "i386",
-                                          null,
-                                          false,
-                                          false));
-    }
-
-    @Test
-    public void twoCommandsShouldBeUndefined() {
-        assertEquals("undefined2;;;undefined3",
-                     Tools.getDistCommand("undefined2;;;undefined3",
-                                          "debian",
-                                          "squeeze",
-                                          "i386",
-                                          null,
-                                          false,
-                                          false));
-    }
-
-    private ConvertCmdCallback getConvertCallback() {
-        return new ConvertCmdCallback() {
-            @Override
-            public String convert(final String command) {
-                return command.replaceAll(lcmc.configs.DistResource.SUDO, "sudo ");
-            }
-        };
-    }
-
-    @Test
-    public void commandWithoutBash() {
-        assertEquals("sudo /etc/init.d/corosync start",
-                     Tools.getDistCommand("Corosync.startCorosync",
-                                          "debian",
-                                          "squeeze",
-                                          "i386",
-                                          getConvertCallback(),
-                                          false,
-                                          false));
-    }
-
-    @Test
-    public void commandWithBash() {
-        assertEquals("sudo bash -c \"sudo /etc/init.d/corosync start\"",
-                     Tools.getDistCommand("Corosync.startCorosync",
-                                          "debian",
-                                          "squeeze",
-                                          "i386",
-                                          getConvertCallback(),
-                                          true,
-                                          true));
-    }
-
-    @Test
-    public void multipleCommands() {
-        assertEquals("sudo /etc/init.d/corosync start" + ";;;sudo /etc/init.d/corosync start",
-                     Tools.getDistCommand("Corosync.startCorosync;;;"
-                                          + "Corosync.startCorosync",
-                                          "debian",
-                                          "squeeze",
-                                          "i386",
-                                          getConvertCallback(),
-                                          false,
-                                          false));
-    }
-
-    @Test
-    public void undefinedAndCommandShouldBeConverted() {
-        assertEquals("undefined4" + ";;;sudo /etc/init.d/corosync start",
-                     Tools.getDistCommand("undefined4;;;"
-                                          + "Corosync.startCorosync",
-                                          "debian",
-                                          "squeeze",
-                                          "i386",
-                                          getConvertCallback(),
-                                          false,
-                                          false));
-    }
-
-    @Test
-    public void nullCommandShouldReturnNull() {
-        assertNull("null command",
-                   Tools.getDistCommand(null, "debian", "squeeze", "i386", getConvertCallback(), false, false));
-    }
-
-    @Test
-    public void nullCommandInBashShouldReturnNull() {
-        assertNull(Tools.getDistCommand(null, "debian", "squeeze", "i386", getConvertCallback(), true, true));
-    }
-
-    @Test
-    public void nullCommandWithNullDistShouldReturnNull() {
-        assertNull(Tools.getDistCommand(null, null, null, null, null, true, true));
-    }
-
-    @SuppressWarnings("unused")
-    private Object[] parametersForDownloadDirShouldBeReturned() {
-        return $(
-            $(null, null, null, null, null),
-            $("2.6.32-28", "2.6.32-28-server", "ubuntu", "lucid", "x86_64"),
-            $("2.6.32-28", "2.6.32-28-server", "ubuntu", "lucid", "i386"),
-            $("2.6.24-28", "2.6.24-28-server", "ubuntu", "hardy", "x86_64"),
-            $("2.6.32.27-0.2",
-              "2.6.32.27-0.2-default",
-              "suse",
-              "SLES11",
-              "x86_64"),
-            $("2.6.16.60-0.60.1", 
-              "2.6.16.60-0.60.1-default",
-              "suse",
-              "SLES10",
-              "x86_64"),
-            $("2.6.18-194.8.1.el5",
-              "2.6.18-194.8.1.el5",
-              "redhatenterpriseserver",
-              "5",
-              "x86_64"),
-            $("2.6.32-71.18.1.el6.x86_64",
-              "2.6.32-71.18.1.el6.x86_64",
-              "redhatenterpriseserver",
-              "6",
-              "x86_64"),
-            $("2.6.26-2", "2.6.26-2-amd64", "debian", "lenny", "x86_64"),
-            $("2.6.32-5", "2.6.32-5-amd64", "debian", "squeeze", "x86_64"),
-            $("2.6.32-5", "2.6.32-5-amd64", "debian", "unknown", "x86_64"),
-            $("2.6.32-5-amd64",
-              "2.6.32-5-amd64",
-              "unknown",
-              "unknown",
-              "x86_64"),
-            $(null, null, "unknown", "unknown", "x86_64"),
-            $("2.6.32-5-amd64", "2.6.32-5-amd64", null, null, "x86_64")
-        );
-    }
-
-    @Test
-    @Parameters(method="parametersForDownloadDirShouldBeReturned")
-    public void downloadDirShouldBeReturned(final String kernelDir,
-                                            final String kernelVersion,
-                                            final String dist,
-                                            final String version,
-                                            final String arch) {
-         assertEquals(kernelDir, Tools.getKernelDownloadDir(kernelVersion, dist, version, arch));
-    }
-
-    @SuppressWarnings("unused")
-    private Object[] parametersForDistVersionShouldBeReturned() {
-        return $(
-            $("LENNY", "debian", "5.0.8"),
-            $("SQUEEZE", "debian", "6.0"),
-            $("12", "fedora", "Fedora release 12 (Constantine)"),
-            $("13", "fedora", "Fedora release 13 (Goddard)"),
-            $("14", "fedora", "Fedora release 14 (Laughlin)"),
-            $("5", "redhat", "CentOS release 5.5 (Final)"),
-            $("5", "redhat", "CentOS release 5.5 (Final)"),
-            $("6",
-              "redhatenterpriseserver",
-              "Red Hat Enterprise Linux Server release 6.0 (Santiago)"),
-            $("5",
-              "redhatenterpriseserver",
-              "Red Hat Enterprise Linux Server release 5.5 (Tikanga)"),
-            /* maverick */ 
-            $("squeeze/sid/10.10", "ubuntu", "squeeze/sid/10.10"),
-            $("KARMIC", "ubuntu", "squeeze/sid/9.10"),
-            $("LUCID", "ubuntu", "squeeze/sid/10.04"),
-            $("HARDY", "ubuntu", "lenny/sid/8.04"),
-            $("SLES10", "suse", "SUSE Linux Enterprise Server 10 (x86_64)"),
-            $("SLES11", "suse", "SUSE Linux Enterprise Server 11 (x86_64)"),
-            $("OPENSUSE11_2", "suse", "openSUSE 11.2 (x86_64)"),
-            $("OPENSUSE11_3", "suse", "openSUSE 11.3 (x86_64)"),
-            $("OPENSUSE11_4", "suse", "openSUSE 11.4 (x86_64)"),
-            $("2", "openfiler", "Openfiler NSA 2.3")
-        );
-    }
-
-    @Test
-    @Parameters(method="parametersForDistVersionShouldBeReturned")
-    public void distVersionShouldBeReturned(final String distVersion, final String dist, final String version) {
-        assertEquals(distVersion, Tools.getDistVersionString(dist, version));
-    }
-
-    @SuppressWarnings("unused")
     private Object[] parametersForTestJoin() {
         return $(
             $("a,b",   ",",  new String[]{"a", "b"}),
@@ -430,56 +263,6 @@ public final class ToolsTest {
         assertEquals("", Tools.ucfirst(""));
     }
 
-    @SuppressWarnings("unused")
-    private Object[] parametersForTestIntersections() {
-        return $( 
-            $(new HashSet<String>(Arrays.asList("b")),
-              new HashSet<String>(Arrays.asList("a", "b")),
-              new HashSet<String>(Arrays.asList("b", "c"))),
-
-            $(new HashSet<String>(Arrays.asList("a", "b")),
-              new HashSet<String>(Arrays.asList("a", "b")),
-              new HashSet<String>(Arrays.asList("a", "b"))),
-
-            $(new HashSet<String>(Arrays.asList("a", "b")),
-              new HashSet<String>(Arrays.asList("a", "b")),
-              new HashSet<String>(Arrays.asList("b", "a"))),
-
-            $(new HashSet<String>(),
-              new HashSet<String>(Arrays.asList("a", "b")),
-              new HashSet<String>(Arrays.asList("c", "d"))),
-
-            $(new HashSet<String>(Arrays.asList("a")),
-              new HashSet<String>(Arrays.asList("a", "a")),
-              new HashSet<String>(Arrays.asList("a", "a"))),
-
-            $(new HashSet<String>(Arrays.asList("a", "c")),
-              new HashSet<String>(Arrays.asList("a", "b", "c")),
-              new HashSet<String>(Arrays.asList("a", "d", "c"))),
-
-            $(new HashSet<String>(Arrays.asList("a", "b", "c")),
-              new HashSet<String>(Arrays.asList("a", "b", "c")),
-              null),
-
-            $(new HashSet<String>(Arrays.asList("a", "b", "c")),
-              null,
-              new HashSet<String>(Arrays.asList("a", "b", "c"))),
-
-            $(null, null, null)
-        );
-    }
-
-
-    @Test
-    @Parameters(method="parametersForTestIntersections")
-    public void testIntersections(final Set<String> expected, final Set<String> arrayOne, final Set<String> arrayTwo) {
-        assertEquals(expected, Tools.getIntersection(arrayOne, arrayTwo));
-    }
-
-    @Test
-    public void nullIntersectionShouldBeNull() {
-        assertEquals(null, Tools.getIntersection((Set<String>) null, (Set<String>) null));
-    }
 
     @SuppressWarnings("unused")
     private Object[] parametersForHtmlShouldBeCreated() {
@@ -780,12 +563,6 @@ public final class ToolsTest {
     }
 
     @Test
-    @Parameters(method="parametersForUnitShouldBeExtracted")
-    public void unitShouldBeExtracted(final String value, final String unit, final String valueWithUnit) {
-        Assert.assertArrayEquals(new Object[]{value, unit}, Tools.extractUnit(valueWithUnit));
-    }
-
-    @Test
     public void testGetRandomSecret() {
         for (int i = 0; i < 100; i++) {
             final String s = Tools.getRandomSecret(2000);
@@ -876,10 +653,10 @@ public final class ToolsTest {
     @Parameters(method="parametersForTestVersionBeforePacemaker")
     public void testVersionBeforePacemaker(final String pcmkVersion, final String hbVersion) {
         final GlobalInfo globalInfo = new GlobalInfo();
-        final Host host = new Host();
+        final Host host = hostFactory.createInstance();
 
-        host.setPacemakerVersion(pcmkVersion);
-        host.setHeartbeatVersion(hbVersion);
+        host.getHostParser().setPacemakerVersion(pcmkVersion);
+        host.getHostParser().setHeartbeatVersion(hbVersion);
         assertTrue(Tools.versionBeforePacemaker(host));
     }
 
@@ -897,10 +674,10 @@ public final class ToolsTest {
     @Test
     @Parameters(method="parametersForTestVersionAfterPacemaker")
     public void testVersionAfterPacemaker(final String pcmkVersion, final String hbVersion) {
-        final Host host = new Host();
+        final Host host = hostFactory.createInstance();
 
-        host.setPacemakerVersion(pcmkVersion);
-        host.setHeartbeatVersion(hbVersion);
+        host.getHostParser().setPacemakerVersion(pcmkVersion);
+        host.getHostParser().setHeartbeatVersion(hbVersion);
         assertFalse(Tools.versionBeforePacemaker(host));
     }
 

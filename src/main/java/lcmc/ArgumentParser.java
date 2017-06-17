@@ -23,6 +23,9 @@ package lcmc;
 import lcmc.common.domain.AccessMode;
 import lcmc.common.domain.Application;
 import lcmc.cluster.domain.Cluster;
+import lcmc.common.ui.Access;
+import lcmc.common.ui.main.MainData;
+import lcmc.common.ui.utils.SwingUtils;
 import lcmc.host.domain.Host;
 import lcmc.host.domain.HostOptions;
 import lcmc.common.domain.UserConfig;
@@ -113,6 +116,12 @@ public class ArgumentParser {
     private Provider<Cluster> clusterProvider;
     @Inject
     private Application application;
+    @Inject
+    private SwingUtils swingUtils;
+    @Inject
+    private Access access;
+    @Inject
+    private MainData mainData;
 
     public void parseOptionsAndReturnAutoArguments(String[] args) {
         final Options options = new Options();
@@ -199,7 +208,7 @@ public class ArgumentParser {
                 }
             }
             final boolean advanced = cmd.hasOption(ADVANCED_OP);
-            application.setAdvancedMode(advanced);
+            access.setAdvancedMode(advanced);
             application.setUseTightvnc(tightvnc);
             application.setUseUltravnc(ultravnc);
             application.setUseRealvnc(realvnc);
@@ -222,7 +231,7 @@ public class ArgumentParser {
                 application.setCmdLog(true);
             }
             if (cmd.hasOption(CHECK_SWING_OP)) {
-                application.setCheckSwing(true);
+                swingUtils.setCheckSwing(true);
             }
             final String pwd = System.getProperty("user.home");
             final String scaleOp = cmd.getOptionValue(SCALE_OP, "100");
@@ -254,18 +263,18 @@ public class ArgumentParser {
                 System.exit(0);
             }
             if (cmd.hasOption("ro") || "ro".equals(opMode)) {
-                application.setAccessType(AccessMode.RO);
-                application.setMaxAccessType(AccessMode.RO);
+                access.setAccessType(AccessMode.RO);
+                access.setMaxAccessType(AccessMode.RO);
             } else if (cmd.hasOption("op") || "op".equals(opMode)) {
-                application.setAccessType(AccessMode.OP);
-                application.setMaxAccessType(AccessMode.OP);
+                access.setAccessType(AccessMode.OP);
+                access.setMaxAccessType(AccessMode.OP);
             } else if (cmd.hasOption("admin") || "admin".equals(opMode)) {
-                application.setAccessType(AccessMode.ADMIN);
-                application.setMaxAccessType(AccessMode.ADMIN);
+                access.setAccessType(AccessMode.ADMIN);
+                access.setMaxAccessType(AccessMode.ADMIN);
             } else if (opMode != null) {
                 LOG.appWarning("initApp: unknown operating mode: " + opMode);
             }
-            float fps = Application.DEFAULT_ANIM_FPS;
+            float fps = MainData.DEFAULT_ANIM_FPS;
             if (cmd.hasOption(SLOW_OP)) {
                 fps /= 2;
             }
@@ -278,7 +287,7 @@ public class ArgumentParser {
             if (vncPortOffsetString != null && lcmc.common.domain.util.Tools.isNumber(vncPortOffsetString)) {
                 application.setVncPortOffset(Integer.parseInt(vncPortOffsetString));
             }
-            application.setAnimFPS(fps);
+            mainData.setAnimFPS(fps);
             if (cmd.hasOption(CLUSTER_OP) || cmd.hasOption(HOST_OP)) {
                 parseClusterOptionsAndCreateClusterButton(cmd);
             }
@@ -388,7 +397,7 @@ public class ArgumentParser {
         }
         for (final Map.Entry<String, List<HostOptions>> clusterEntry : clusters.entrySet()) {
             final List<HostOptions> hostOptions = clusterEntry.getValue();
-            if (hostOptions.size() < 1 || (hostOptions.size() == 1 && !application.isOneHostCluster())) {
+            if (hostOptions.isEmpty() || (hostOptions.size() == 1 && !application.isOneHostCluster())) {
                 throw new ParseException("not enough hosts for cluster: " + clusterEntry.getKey());
             }
         }

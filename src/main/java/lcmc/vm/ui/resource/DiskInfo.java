@@ -42,10 +42,12 @@ import javax.swing.JPanel;
 import lcmc.common.domain.AccessMode;
 import lcmc.common.domain.Application;
 import lcmc.common.ui.treemenu.TreeMenuController;
+import lcmc.common.ui.utils.SwingUtils;
 import lcmc.host.domain.Host;
 import lcmc.common.domain.StringValue;
+import lcmc.vm.domain.VMParams;
 import lcmc.vm.domain.VmsXml;
-import lcmc.vm.domain.DiskData;
+import lcmc.vm.domain.data.DiskData;
 import lcmc.common.domain.Value;
 import lcmc.common.ui.Browser;
 import lcmc.drbd.ui.resource.BlockDevInfo;
@@ -354,6 +356,8 @@ public final class DiskInfo extends HardwareInfo {
     @Inject
     private Application application;
     @Inject
+    private SwingUtils swingUtils;
+    @Inject
     private WidgetFactory widgetFactory;
 
     /** Source file combo box, so that it can be disabled, depending on type. */
@@ -423,7 +427,7 @@ public final class DiskInfo extends HardwareInfo {
     protected void addHardwareTable(final JPanel mainPanel) {
         tablePanel = getTablePanel("Disk", DomainInfo.DISK_TABLE, getVMSVirtualDomainInfo().getNewDiskBtn());
         if (getResource().isNew()) {
-            application.invokeLater(new Runnable() {
+            swingUtils.invokeLater(new Runnable() {
                 @Override
                 public void run() {
                     tablePanel.setVisible(false);
@@ -460,7 +464,7 @@ public final class DiskInfo extends HardwareInfo {
     protected Value getParamPreferred(final String param) {
         final String domainType =
                         getVMSVirtualDomainInfo().getWidget(
-                            VmsXml.VM_PARAM_DOMAIN_TYPE, null).getStringValue();
+                            VMParams.VM_PARAM_DOMAIN_TYPE, null).getStringValue();
         if (DiskData.DRIVER_NAME.equals(param)
             && DomainInfo.DOMAIN_TYPE_KVM.equals(domainType)) {
             return DRIVER_NAME_QEMU;
@@ -593,7 +597,7 @@ public final class DiskInfo extends HardwareInfo {
     /** Returns device parameters. */
     @Override
     protected Map<String, String> getHWParameters(final boolean allParams) {
-        application.invokeAndWait(new Runnable() {
+        swingUtils.invokeAndWait(new Runnable() {
             @Override
             public void run() {
                 getInfoPanel();
@@ -696,7 +700,7 @@ public final class DiskInfo extends HardwareInfo {
         if (Application.isTest(runMode)) {
             return;
         }
-        application.invokeAndWait(new Runnable() {
+        swingUtils.invokeAndWait(new Runnable() {
             @Override
             public void run() {
                 getApplyButton().setEnabled(false);
@@ -738,7 +742,7 @@ public final class DiskInfo extends HardwareInfo {
         treeMenuController.reloadNode(getNode(), false);
         getBrowser().periodicalVmsUpdate(
                 getVMSVirtualDomainInfo().getDefinedOnHosts());
-        application.invokeLater(new Runnable() {
+        swingUtils.invokeLater(new Runnable() {
             @Override
             public void run() {
                 tablePanel.setVisible(true);
@@ -794,7 +798,7 @@ public final class DiskInfo extends HardwareInfo {
     @Override
     protected boolean checkParam(final String param, final Value newValue) {
         if (DiskData.TYPE.equals(param)) {
-            application.invokeLater(new Runnable() {
+            swingUtils.invokeLater(new Runnable() {
                 @Override
                 public void run() {
                     final boolean file = FILE_TYPE.equals(newValue);
@@ -933,7 +937,7 @@ public final class DiskInfo extends HardwareInfo {
         updateTable(DomainInfo.HEADER_TABLE);
         updateTable(DomainInfo.DISK_TABLE);
         setApplyButtons(null, getRealParametersFromXML());
-        application.invokeLater(new Runnable() {
+        swingUtils.invokeLater(new Runnable() {
             @Override
             public void run() {
                 if (tablePanel != null) {

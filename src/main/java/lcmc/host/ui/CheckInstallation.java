@@ -22,33 +22,30 @@
 
 package lcmc.host.ui;
 
-import java.awt.Color;
+import lcmc.cluster.service.ssh.ExecCommandConfig;
+import lcmc.cluster.ui.widget.Widget;
+import lcmc.cluster.ui.widget.WidgetFactory;
+import lcmc.common.domain.Application;
+import lcmc.common.domain.ExecCallback;
+import lcmc.common.domain.util.Tools;
+import lcmc.common.ui.SpringUtilities;
+import lcmc.common.ui.WizardDialog;
+import lcmc.common.ui.utils.MyButton;
+import lcmc.common.ui.utils.SwingUtils;
+import lcmc.drbd.domain.DrbdInstallation;
+import lcmc.host.domain.Host;
+import lcmc.logger.Logger;
+import lcmc.logger.LoggerFactory;
+import lombok.val;
+
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.swing.*;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.List;
-
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.swing.ImageIcon;
-import javax.swing.JComponent;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.SpringLayout;
-
-import lcmc.cluster.ui.widget.WidgetFactory;
-import lcmc.common.domain.Application;
-import lcmc.common.ui.SpringUtilities;
-import lcmc.common.ui.WizardDialog;
-import lcmc.cluster.ui.widget.Widget;
-import lcmc.host.domain.Host;
-import lcmc.drbd.domain.DrbdInstallation;
-import lcmc.common.domain.ExecCallback;
-import lcmc.logger.Logger;
-import lcmc.logger.LoggerFactory;
-import lcmc.common.ui.utils.MyButton;
-import lcmc.common.domain.util.Tools;
-import lcmc.cluster.service.ssh.ExecCommandConfig;
 
 /**
  * An implementation of a dialog where
@@ -114,6 +111,8 @@ final class CheckInstallation extends DialogHost {
     private PacemakerInst pacemakerInstDialog;
     @Inject
     private Application application;
+    @Inject
+    private SwingUtils swingUtils;
 
     @Override
     public void init(final WizardDialog previousDialog, final Host host, final DrbdInstallation drbdInstallation) {
@@ -141,7 +140,7 @@ final class CheckInstallation extends DialogHost {
         nextDialogObject = hostFinishDialog;
 
         final CheckInstallation thisClass = this;
-        application.invokeLater(new Runnable() {
+        swingUtils.invokeLater(new Runnable() {
             @Override
             public void run() {
                 installDrbdButton.setBackgroundColor(Tools.getDefaultColor("ConfigDialog.Button"));
@@ -173,7 +172,7 @@ final class CheckInstallation extends DialogHost {
                             getDrbdInstallation().setDrbdInstallMethodIndex(im.getIndex());
                         }
                         nextDialogObject.init(thisClass, getHost(), getDrbdInstallation());
-                        application.invokeLater(new Runnable() {
+                        swingUtils.invokeLater(new Runnable() {
                             @Override
                             public void run() {
                                 buttonClass(nextButton()).pressButton();
@@ -193,7 +192,7 @@ final class CheckInstallation extends DialogHost {
                     nextDialogObject.init(thisClass, getHost(), getDrbdInstallation());
                     final InstallMethods im = (InstallMethods) heartbeatPacemakerInstMethodWidget.getValue();
                     getHost().setHeartbeatPacemakerInstallMethodIndex(im.getIndex());
-                    application.invokeLater(new Runnable() {
+                    swingUtils.invokeLater(new Runnable() {
                         @Override
                         public void run() {
                             buttonClass(nextButton()).pressButton();
@@ -212,7 +211,7 @@ final class CheckInstallation extends DialogHost {
                     nextDialogObject.init(thisClass, getHost(), getDrbdInstallation());
                     final InstallMethods im = (InstallMethods) pacemakerInstMethodWidget.getValue();
                     getHost().setPacemakerInstallMethodIndex(im.getIndex());
-                    application.invokeLater(new Runnable() {
+                    swingUtils.invokeLater(new Runnable() {
                         @Override
                         public void run() {
                             buttonClass(nextButton()).pressButton();
@@ -244,7 +243,7 @@ final class CheckInstallation extends DialogHost {
      */
     void checkDrbd(final String ans) {
         if (ans != null && ans.isEmpty() || "\n".equals(ans)) {
-            application.invokeLater(new Runnable() {
+            swingUtils.invokeLater(new Runnable() {
                 @Override
                 public void run() {
                     checkingDrbdLabel.setText(": " + Tools.getString("Dialog.Host.CheckInstallation.DrbdNotInstalled"));
@@ -258,7 +257,7 @@ final class CheckInstallation extends DialogHost {
             });
         } else {
             drbdInstallationOk = true;
-            application.invokeLater(new Runnable() {
+            swingUtils.invokeLater(new Runnable() {
                 @Override
                 @SuppressWarnings("DeadBranch")
                 public void run() {
@@ -299,20 +298,21 @@ final class CheckInstallation extends DialogHost {
     }
 
     void checkAisHbPm(final String ans) {
-        getHost().setPacemakerVersion(null);
-        getHost().setOpenaisVersion(null);
-        getHost().setHeartbeatVersion(null);
-        getHost().setCorosyncVersion(null);
+        final val hostParser = getHost().getHostParser();
+        hostParser.setPacemakerVersion(null);
+        hostParser.setOpenaisVersion(null);
+        hostParser.setHeartbeatVersion(null);
+        hostParser.setCorosyncVersion(null);
         if (ans != null && !ans.isEmpty() && !"\n".equals(ans)) {
             for (final String line : ans.split("\n")) {
-                getHost().parseInstallationInfo(line);
+                hostParser.parseInstallationInfo(line);
             }
         }
-        final String aisVersion = getHost().getOpenaisVersion();
-        final String corosyncVersion = getHost().getCorosyncVersion();
-        String hbVersion = getHost().getHeartbeatVersion();
+        final String aisVersion = hostParser.getOpenaisVersion();
+        final String corosyncVersion = hostParser.getCorosyncVersion();
+        String hbVersion = hostParser.getHeartbeatVersion();
         if (hbVersion == null
-            && (getHost().getPacemakerVersion() == null || (corosyncVersion == null && aisVersion == null))) {
+            && (hostParser.getPacemakerVersion() == null || (corosyncVersion == null && aisVersion == null))) {
             final InstallMethods hbim = (InstallMethods) heartbeatPacemakerInstMethodWidget.getValue();
             if (hbim != null) {
                 installHeartbeatPacemakerButton.setEnabled(true);
@@ -332,7 +332,7 @@ final class CheckInstallation extends DialogHost {
         }
         if (hbVersion == null) {
             /* hb */
-            application.invokeLater(new Runnable() {
+            swingUtils.invokeLater(new Runnable() {
                 @Override
                 public void run() {
                     heartbeatPacemakerIcon.setIcon(NOT_INSTALLED_ICON);
@@ -344,31 +344,31 @@ final class CheckInstallation extends DialogHost {
             heartbeatPacemakerInstallationOk = true;
             final String text;
             if ("2.1.3".equals(hbVersion)
-                && "sles10".equals(getHost().getDistributionVersion())) {
+                && "sles10".equals(hostParser.getDistributionVersion())) {
                 /* sles10 heartbeat 2.1.3 looks like hb 2.1.4 */
                 hbVersion = "2.1.4";
                 text = "2.1.3 (2.1.4)";
             } else {
                 text = hbVersion;
             }
-            getHost().setHeartbeatVersion(hbVersion);
-            application.invokeLater(new Runnable() {
+            hostParser.setHeartbeatVersion(hbVersion);
+            swingUtils.invokeLater(new Runnable() {
                 @Override
                 public void run() {
-                    if (getHost().getPacemakerVersion() == null
-                        || getHost().getHeartbeatVersion().equals(getHost().getPacemakerVersion())) {
+                    if (hostParser.getPacemakerVersion() == null
+                        || hostParser.getHeartbeatVersion().equals(hostParser.getPacemakerVersion())) {
                         heartbeatPacemakerLabel.setText("Heartbeat");
                         checkingHeartbeatPacemakerLabel.setText(": " + text);
                     } else {
-                        checkingHeartbeatPacemakerLabel.setText(": " + getHost().getPacemakerVersion() + '/' + text);
+                        checkingHeartbeatPacemakerLabel.setText(": " + hostParser.getPacemakerVersion() + '/' + text);
                     }
                     heartbeatPacemakerIcon.setIcon(ALREADY_INSTALLED_ICON);
                 }
             });
         }
-        if (getHost().getPacemakerVersion() == null || (aisVersion == null && corosyncVersion == null)) {
+        if (hostParser.getPacemakerVersion() == null || (aisVersion == null && corosyncVersion == null)) {
             /* corosync */
-            application.invokeLater(new Runnable() {
+            swingUtils.invokeLater(new Runnable() {
                 @Override
                 public void run() {
                     checkingPacemakerIcon.setIcon(NOT_INSTALLED_ICON);
@@ -379,7 +379,7 @@ final class CheckInstallation extends DialogHost {
             });
         } else {
             pacemakerInstallationOk = true;
-            application.invokeLater(new Runnable() {
+            swingUtils.invokeLater(new Runnable() {
                 @Override
                 public void run() {
                     checkingPacemakerIcon.setIcon(ALREADY_INSTALLED_ICON);
@@ -392,7 +392,7 @@ final class CheckInstallation extends DialogHost {
                         coroAisVersion = aisVersion;
                     }
                     pacemakerLabel.repaint();
-                    checkingPacemakerLabel.setText(": " + getHost().getPacemakerVersion() + '/' + coroAisVersion);
+                    checkingPacemakerLabel.setText(": " + hostParser.getPacemakerVersion() + '/' + coroAisVersion);
                 }
             });
         }
@@ -400,7 +400,7 @@ final class CheckInstallation extends DialogHost {
         final List<String> incorrect = new ArrayList<String>();
         if (drbdInstallationOk && (heartbeatPacemakerInstallationOk || pacemakerInstallationOk)) {
             progressBarDone();
-            application.invokeLater(new Runnable() {
+            swingUtils.invokeLater(new Runnable() {
                 @Override
                 public void run() {
                     answerPaneSetText(Tools.getString("Dialog.Host.CheckInstallation.AllOk"));
@@ -410,7 +410,7 @@ final class CheckInstallation extends DialogHost {
                 || application.getAutoOptionHost("hbinst") != null
                 || application.getAutoOptionHost("pminst") != null) {
                 Tools.sleep(1000);
-                application.invokeLater(new Runnable() {
+                swingUtils.invokeLater(new Runnable() {
                     @Override
                     public void run() {
                         pressNextButton();
@@ -432,7 +432,11 @@ final class CheckInstallation extends DialogHost {
         final List<String> changed = new ArrayList<String>();
         enableComponents();
         enableNextButtons(incorrect, changed);
-        makeDefaultAndRequestFocus(buttonClass(nextButton()));
+        swingUtils.invokeLater(new Runnable() {
+            public void run() {
+                makeDefaultAndRequestFocus(buttonClass(nextButton()));
+            }
+        });
         if (!drbdInstallationOk && application.getAutoOptionHost("drbdinst") != null) {
             Tools.sleep(1000);
             installDrbdButton.pressButton();

@@ -95,9 +95,9 @@ final class ProxyInst extends DialogHost {
     }
 
     private void installProxy() {
-        String arch = getHost().getDistString("ProxyInst.install." + getHost().getArch());
+        String arch = getHost().getDistString("ProxyInst.install." + getHost().getHostParser().getArch());
         if (arch == null) {
-            arch = getHost().getArch();
+            arch = getHost().getHostParser().getArch();
         }
         final String archString = arch.replaceAll("i686", "i386");
 

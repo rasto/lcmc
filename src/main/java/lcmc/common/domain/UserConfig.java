@@ -23,6 +23,7 @@
 
 package lcmc.common.domain;
 
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.ArrayList;
@@ -50,7 +51,9 @@ import javax.xml.transform.stream.StreamResult;
 
 import lcmc.cluster.domain.Cluster;
 import lcmc.cluster.domain.Clusters;
+import lcmc.cluster.ui.ClusterBrowser;
 import lcmc.cluster.ui.ClusterTab;
+import lcmc.common.ui.utils.SwingUtils;
 import lcmc.host.domain.Host;
 import lcmc.host.domain.HostFactory;
 import lcmc.host.domain.Hosts;
@@ -69,8 +72,8 @@ import org.w3c.dom.NodeList;
  */
 @Named
 @Singleton
-public final class UserConfig extends XML {
-    private static final Logger LOG = LoggerFactory.getLogger(XML.class);
+public final class UserConfig extends XMLTools {
+    private static final Logger LOG = LoggerFactory.getLogger(XMLTools.class);
     private static final String HOST_NAME_ATTR = "name";
     private static final String HOST_SSHPORT_ATTR = "ssh";
     private static final String HOST_COLOR_ATTR = "color";
@@ -94,12 +97,41 @@ public final class UserConfig extends XML {
     @Inject
     private Application application;
     @Inject
+    private SwingUtils swingUtils;
+    @Inject
     private Hosts allHosts;
     @Inject
     private Clusters allClusters;
+    /**
+     * @param saveAll whether to save clusters specified from the command line
+     */
+    public void saveConfig(final String filename, final boolean saveAll) {
+        try {
+            final FileOutputStream fileOut = new FileOutputStream(filename);
+            saveXML(fileOut, saveAll);
+            LOG.debug("save: filename: " + filename);
+        } catch (final IOException e) {
+            LOG.appError("save: error saving: " + filename, "", e);
+        } finally {
+            try {
+                Thread.sleep(1000);
+            } catch (final InterruptedException e) {
+                Thread.currentThread().interrupt();
+            }
+
+            for (final Cluster cluster : allClusters.getClusterSet()) {
+                final ClusterBrowser cb = cluster.getBrowser();
+                if (cb != null) {
+                    cb.saveGraphPositions();
+                }
+            }
+        }
+    }
+
+
 
     /** Saves data about clusters and hosts to the supplied output stream. */
-    public String saveXML(final OutputStream outputStream, final boolean saveAll) throws IOException {
+    private String saveXML(final OutputStream outputStream, final boolean saveAll) throws IOException {
         LOG.debug1("saveXML: start");
         final DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
 
@@ -187,7 +219,7 @@ public final class UserConfig extends XML {
                 if (selectedClusters != null && !selectedClusters.contains(cluster)) {
                     continue;
                 }
-                application.invokeLater(new Runnable() {
+                swingUtils.invokeLater(new Runnable() {
                     @Override
                     public void run() {
                         clusterTabFactory.createClusterTab(cluster);
@@ -198,7 +230,7 @@ public final class UserConfig extends XML {
                 }
                 final boolean ok = cluster.connect(null, true, 1);
                 if (!ok) {
-                    application.invokeLater(new Runnable() {
+                    swingUtils.invokeLater(new Runnable() {
                         @Override
                         public void run() {
                             clustersPanel.removeTabWithCluster(cluster);
@@ -212,7 +244,7 @@ public final class UserConfig extends XML {
                         for (final Host host : cluster.getHosts()) {
                             host.waitOnLoading();
                         }
-                        application.invokeLater(new Runnable() {
+                        swingUtils.invokeLater(new Runnable() {
                             @Override
                             public void run() {
                                 final ClusterTab clusterTab = cluster.getClusterTab();

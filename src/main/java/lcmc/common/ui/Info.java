@@ -21,11 +21,38 @@
  */
 package lcmc.common.ui;
 
-import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.FlowLayout;
-import java.awt.Font;
-import java.awt.Point;
+import lcmc.cluster.ui.network.InfoPresenter;
+import lcmc.cluster.ui.widget.Widget;
+import lcmc.common.domain.AccessMode;
+import lcmc.common.domain.Application;
+import lcmc.common.domain.Unit;
+import lcmc.common.domain.Value;
+import lcmc.common.domain.util.Tools;
+import lcmc.common.ui.main.MainData;
+import lcmc.common.ui.treemenu.TreeMenuController;
+import lcmc.common.ui.utils.ButtonCallback;
+import lcmc.common.ui.utils.ComponentWithTest;
+import lcmc.common.ui.utils.MyButton;
+import lcmc.common.ui.utils.MyButtonCellRenderer;
+import lcmc.common.ui.utils.MyCellRenderer;
+import lcmc.common.ui.utils.MyMenu;
+import lcmc.common.ui.utils.SwingUtils;
+import lcmc.common.ui.utils.UpdatableItem;
+import lcmc.logger.Logger;
+import lcmc.logger.LoggerFactory;
+
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.swing.*;
+import javax.swing.border.TitledBorder;
+import javax.swing.event.PopupMenuEvent;
+import javax.swing.event.PopupMenuListener;
+import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableCellRenderer;
+import javax.swing.table.TableRowSorter;
+import javax.swing.text.JTextComponent;
+import javax.swing.tree.DefaultMutableTreeNode;
+import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
@@ -40,49 +67,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.swing.AbstractButton;
-import javax.swing.BoxLayout;
-import javax.swing.ImageIcon;
-import javax.swing.JComponent;
-import javax.swing.JEditorPane;
-import javax.swing.JMenu;
-import javax.swing.JMenuItem;
-import javax.swing.JPanel;
-import javax.swing.JPopupMenu;
-import javax.swing.JScrollPane;
-import javax.swing.JTable;
-import javax.swing.JToggleButton;
-import javax.swing.SwingConstants;
-import javax.swing.SwingUtilities;
-import javax.swing.border.TitledBorder;
-import javax.swing.event.PopupMenuEvent;
-import javax.swing.event.PopupMenuListener;
-import javax.swing.table.DefaultTableModel;
-import javax.swing.table.TableCellRenderer;
-import javax.swing.table.TableRowSorter;
-import javax.swing.text.JTextComponent;
-import javax.swing.tree.DefaultMutableTreeNode;
-
-import lcmc.cluster.ui.network.InfoPresenter;
-import lcmc.common.domain.AccessMode;
-import lcmc.common.domain.Application;
-import lcmc.common.domain.Value;
-import lcmc.common.domain.Resource;
-import lcmc.cluster.ui.widget.Widget;
-import lcmc.common.ui.treemenu.TreeMenuController;
-import lcmc.common.ui.utils.ButtonCallback;
-import lcmc.common.ui.utils.ComponentWithTest;
-import lcmc.logger.Logger;
-import lcmc.logger.LoggerFactory;
-import lcmc.common.ui.utils.MyButton;
-import lcmc.common.ui.utils.MyButtonCellRenderer;
-import lcmc.common.ui.utils.MyCellRenderer;
-import lcmc.common.ui.utils.MyMenu;
-import lcmc.common.domain.util.Tools;
-import lcmc.common.domain.Unit;
-import lcmc.common.ui.utils.UpdatableItem;
 
 /**
  * This class holds info data for resources, services, hosts, clusters
@@ -98,8 +82,6 @@ public class Info implements Comparable<Info>, Value, InfoPresenter {
     private DefaultMutableTreeNode node = null;
     /** Name of the object. */
     private String name;
-    /** Resource object as found in data/resources associated with this object. */
-    private Resource resource;
     /** TODL: Checking for leak. */
     private int maxMenuList = 0;
 
@@ -128,7 +110,13 @@ public class Info implements Comparable<Info>, Value, InfoPresenter {
     @Inject
     private Application application;
     @Inject
+    private SwingUtils swingUtils;
+    @Inject
     private TreeMenuController treeMenuController;
+    @Inject
+    private Access access;
+    @Inject
+    private MainData mainData;
 
     public void init(final String name, final Browser browser) {
         this.name = name;
@@ -154,10 +142,6 @@ public class Info implements Comparable<Info>, Value, InfoPresenter {
 
     public String getToolTipText(final Application.RunMode runMode) {
         return "no tooltip";
-    }
-
-    protected final void setResource(final Resource resource) {
-        this.resource = resource;
     }
 
     /** Adds the widget for parameter. */
@@ -229,7 +213,7 @@ public class Info implements Comparable<Info>, Value, InfoPresenter {
      * than 100.
      */
     public final void incAnimationIndex() {
-        animationIndex += 3.0 * 20.0 / application.getAnimFPS();
+        animationIndex += 3.0 * 20.0 / mainData.getAnimFPS();
         if (animationIndex > 100) {
             animationIndex = 0;
         }
@@ -255,7 +239,7 @@ public class Info implements Comparable<Info>, Value, InfoPresenter {
             final String newInfo = getInfo();
             if (newInfo != null && !newInfo.equals(infoCache)) {
                 infoCache = newInfo;
-                application.invokeLater(new Runnable() {
+                swingUtils.invokeLater(new Runnable() {
                     @Override
                     public void run() {
                         ria.setText(newInfo);
@@ -275,7 +259,7 @@ public class Info implements Comparable<Info>, Value, InfoPresenter {
 
     /** Returns type of the info text. text/plain or text/html. */
     protected String getInfoMimeType() {
-        return GUIData.MIME_TYPE_TEXT_PLAIN;
+        return MainData.MIME_TYPE_TEXT_PLAIN;
     }
 
     protected JComponent getBackButton() {
@@ -346,7 +330,7 @@ public class Info implements Comparable<Info>, Value, InfoPresenter {
     }
 
     /** Gets node of this resource or service. */
-    public final DefaultMutableTreeNode getNode() {
+    public DefaultMutableTreeNode getNode() {
         return node;
     }
 
@@ -387,11 +371,6 @@ public class Info implements Comparable<Info>, Value, InfoPresenter {
         }
     }
 
-    /** Returns resource object. */
-    public Resource getResource() {
-        return resource;
-    }
-
     /**
      * this method is used for values that are stored and can be different
      * than their appearance, which is taken from toString() method.
@@ -414,7 +393,7 @@ public class Info implements Comparable<Info>, Value, InfoPresenter {
                 final JPopupMenu pm = getPopup();
                 if (pm != null) {
                     updateMenus(null);
-                    application.invokeLater(new Runnable() {
+                    swingUtils.invokeLater(new Runnable() {
                         @Override
                         public void run() {
                             if (!c.isShowing() || !c.isDisplayable()) {
@@ -449,7 +428,7 @@ public class Info implements Comparable<Info>, Value, InfoPresenter {
             mPopupLock.unlock();
         }
         if (popup0 != null) {
-            application.invokeLater(new Runnable() {
+            swingUtils.invokeLater(new Runnable() {
                 @Override
                 public void run() {
                     popup0.setVisible(false);
@@ -466,7 +445,7 @@ public class Info implements Comparable<Info>, Value, InfoPresenter {
         LOG.debug1("ACTION: getPopup: " + getClass() + " name: " + getName());
         mPopupLock.lock();
         try {
-            application.invokeAndWait(new Runnable() {
+            swingUtils.invokeAndWait(new Runnable() {
                 @Override
                 public void run() {
                     if (popup == null) {
@@ -492,7 +471,7 @@ public class Info implements Comparable<Info>, Value, InfoPresenter {
         pm.addPopupMenuListener(new PopupMenuListener() {
             @Override
             public void popupMenuCanceled(final PopupMenuEvent e) {
-                application.invokeLater(new Runnable() {
+                swingUtils.invokeLater(new Runnable() {
                     @Override
                     public void run() {
                         b.setSelected(false);
@@ -501,7 +480,7 @@ public class Info implements Comparable<Info>, Value, InfoPresenter {
             }
             @Override
             public void popupMenuWillBecomeInvisible(final PopupMenuEvent e) {
-                application.invokeLater(new Runnable() {
+                swingUtils.invokeLater(new Runnable() {
                     @Override
                     public void run() {
                         b.setSelected(false);
@@ -539,7 +518,7 @@ public class Info implements Comparable<Info>, Value, InfoPresenter {
                 public void mousePressed(final MouseEvent e) {
                     final JToggleButton source = (JToggleButton) (e.getSource());
                     if (source.isSelected()) {
-                        application.invokeLater(new Runnable() {
+                        swingUtils.invokeLater(new Runnable() {
                         @Override
                             public void run() {
                                 b.setSelected(true);
@@ -552,7 +531,7 @@ public class Info implements Comparable<Info>, Value, InfoPresenter {
                                 final JPopupMenu pm = getPopup();
                                 if (pm != null) {
                                     updateMenus(null);
-                                    application.invokeLater(new Runnable() {
+                                    swingUtils.invokeLater(new Runnable() {
                                     @Override
                                         public void run() {
                                             showPopup(pm, b);
@@ -584,14 +563,14 @@ public class Info implements Comparable<Info>, Value, InfoPresenter {
 
     /** Update menus with positions and calles their update methods. */
     public void updateMenus(final Point2D pos) {
-        application.isNotSwingThread();
+        swingUtils.isNotSwingThread();
         mMenuListLock.lock();
         if (menuList == null) {
             mMenuListLock.unlock();
         } else {
             final Collection<UpdatableItem> menuListCopy = new ArrayList<UpdatableItem>(menuList);
             mMenuListLock.unlock();
-            application.invokeAndWait(new Runnable() {
+            swingUtils.invokeAndWait(new Runnable() {
                 @Override
                 public void run() {
                     for (final UpdatableItem i : menuListCopy) {
@@ -606,7 +585,7 @@ public class Info implements Comparable<Info>, Value, InfoPresenter {
             });
             for (final UpdatableItem i : menuListCopy) {
                 if (i instanceof MyMenu) {
-                    application.invokeAndWait(new Runnable() {
+                    swingUtils.invokeAndWait(new Runnable() {
                         @Override
                         public void run() {
                             i.updateAndWait();
@@ -974,7 +953,7 @@ public class Info implements Comparable<Info>, Value, InfoPresenter {
         if (tableModel != null) {
             final String[] colNames = getColumnNames(tableName);
             if (colNames != null && colNames.length > 0) {
-                application.invokeLater(new Runnable() {
+                swingUtils.invokeLater(new Runnable() {
                     @Override
                     public void run() {
                         final Object[][] data = getTableData(tableName);
@@ -1046,11 +1025,11 @@ public class Info implements Comparable<Info>, Value, InfoPresenter {
     /** Process access lists. TODO: rename.*/
     public void updateAdvancedPanels() {
         for (final Map.Entry<JComponent, AccessMode> componentEntry : componentToEnableAccessMode.entrySet()) {
-            final boolean accessible = application.isAccessible(componentEntry.getValue());
+            final boolean accessible = access.isAccessible(componentEntry.getValue());
             componentEntry.getKey().setEnabled(accessible);
         }
         for (final Map.Entry<JTextComponent, AccessMode> componentEntry : componentToEditAccessMode.entrySet()) {
-            final boolean accessible = application.isAccessible(componentEntry.getValue());
+            final boolean accessible = access.isAccessible(componentEntry.getValue());
             componentEntry.getKey().setEditable(accessible);
         }
     }

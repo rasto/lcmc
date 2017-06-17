@@ -1,126 +1,127 @@
 node host
 node host
-primitive res_Dummy_1 ocf:heartbeat:Dummy 
-	operations $id="res_Dummy_1-operations" 
-	op start interval="0" timeout="200" 
-	op stop interval="0" timeout="192" 
-	op monitor interval="121" timeout="154" start-delay="0" 
-	op migrate_to interval="0" timeout="123" 
-	op migrate_from interval="0" timeout="122" 
-	meta target-role="stopped"
-primitive res_Dummy_10 ocf:heartbeat:Dummy 
-	operations $id="res_Dummy_10-operations" 
-	op start interval="0" timeout="200" 
-	op stop interval="0" timeout="192" 
-	op monitor interval="121" timeout="154" start-delay="0" 
-	op migrate_to interval="0" timeout="123" 
-	op migrate_from interval="0" timeout="122" 
-	meta target-role="stopped"
-primitive res_Dummy_11 ocf:heartbeat:Dummy 
-	operations $id="res_Dummy_11-operations" 
-	op start interval="0" timeout="200" 
-	op stop interval="0" timeout="192" 
-	op monitor interval="121" timeout="154" start-delay="0" 
-	op migrate_to interval="0" timeout="123" 
-	op migrate_from interval="0" timeout="122" 
-	meta target-role="stopped"
-primitive res_Dummy_12 ocf:heartbeat:Dummy 
-	operations $id="res_Dummy_12-operations" 
-	op start interval="0" timeout="200" 
-	op stop interval="0" timeout="192" 
-	op monitor interval="121" timeout="154" start-delay="0" 
-	op migrate_to interval="0" timeout="123" 
-	op migrate_from interval="0" timeout="122" 
-	meta target-role="stopped"
-primitive res_Dummy_13 ocf:heartbeat:Dummy 
-	operations $id="res_Dummy_13-operations" 
-	op start interval="0" timeout="200" 
-	op stop interval="0" timeout="192" 
-	op monitor interval="121" timeout="154" start-delay="0" 
-	op migrate_to interval="0" timeout="123" 
-	op migrate_from interval="0" timeout="122" 
-	meta target-role="stopped"
-primitive res_Dummy_14 ocf:heartbeat:Dummy 
-	operations $id="res_Dummy_14-operations" 
-	op start interval="0" timeout="200" 
-	op stop interval="0" timeout="192" 
-	op monitor interval="121" timeout="154" start-delay="0" 
-	op migrate_to interval="0" timeout="123" 
-	op migrate_from interval="0" timeout="122" 
-	meta target-role="stopped"
-primitive res_Dummy_15 ocf:heartbeat:Dummy 
-	operations $id="res_Dummy_15-operations" 
-	op start interval="0" timeout="200" 
-	op stop interval="0" timeout="192" 
-	op monitor interval="121" timeout="154" start-delay="0" 
-	op migrate_to interval="0" timeout="123" 
-	op migrate_from interval="0" timeout="122" 
-	meta target-role="stopped"
-primitive res_Dummy_2 ocf:heartbeat:Dummy 
-	operations $id="res_Dummy_2-operations" 
-	op start interval="0" timeout="200" 
-	op stop interval="0" timeout="192" 
-	op monitor interval="121" timeout="154" start-delay="0" 
-	op migrate_to interval="0" timeout="123" 
-	op migrate_from interval="0" timeout="122" 
-	meta target-role="stopped"
-primitive res_Dummy_3 ocf:heartbeat:Dummy 
-	operations $id="res_Dummy_3-operations" 
-	op start interval="0" timeout="200" 
-	op stop interval="0" timeout="192" 
-	op monitor interval="121" timeout="154" start-delay="0" 
-	op migrate_to interval="0" timeout="123" 
-	op migrate_from interval="0" timeout="122" 
-	meta target-role="stopped"
-primitive res_Dummy_4 ocf:heartbeat:Dummy 
-	operations $id="res_Dummy_4-operations" 
-	op start interval="0" timeout="200" 
-	op stop interval="0" timeout="192" 
-	op monitor interval="121" timeout="154" start-delay="0" 
-	op migrate_to interval="0" timeout="123" 
-	op migrate_from interval="0" timeout="122" 
-	meta target-role="stopped"
-primitive res_Dummy_5 ocf:heartbeat:Dummy 
-	operations $id="res_Dummy_5-operations" 
-	op start interval="0" timeout="200" 
-	op stop interval="0" timeout="192" 
-	op monitor interval="121" timeout="154" start-delay="0" 
-	op migrate_to interval="0" timeout="123" 
-	op migrate_from interval="0" timeout="122" 
-	meta target-role="stopped"
-primitive res_Dummy_6 ocf:heartbeat:Dummy 
-	operations $id="res_Dummy_6-operations" 
-	op start interval="0" timeout="200" 
-	op stop interval="0" timeout="192" 
-	op monitor interval="121" timeout="154" start-delay="0" 
-	op migrate_to interval="0" timeout="123" 
-	op migrate_from interval="0" timeout="122" 
-	meta target-role="stopped"
-primitive res_Dummy_7 ocf:heartbeat:Dummy 
-	operations $id="res_Dummy_7-operations" 
-	op start interval="0" timeout="200" 
-	op stop interval="0" timeout="192" 
-	op monitor interval="121" timeout="154" start-delay="0" 
-	op migrate_to interval="0" timeout="123" 
-	op migrate_from interval="0" timeout="122" 
-	meta target-role="stopped"
-primitive res_Dummy_8 ocf:heartbeat:Dummy 
-	operations $id="res_Dummy_8-operations" 
-	op start interval="0" timeout="200" 
-	op stop interval="0" timeout="192" 
-	op monitor interval="121" timeout="154" start-delay="0" 
-	op migrate_to interval="0" timeout="123" 
-	op migrate_from interval="0" timeout="122" 
-	meta target-role="stopped"
-primitive res_Dummy_9 ocf:heartbeat:Dummy 
-	operations $id="res_Dummy_9-operations" 
-	op start interval="0" timeout="200" 
-	op stop interval="0" timeout="192" 
-	op monitor interval="121" timeout="154" start-delay="0" 
-	op migrate_to interval="0" timeout="123" 
-	op migrate_from interval="0" timeout="122" 
-	meta target-role="stopped"
+primitive res_Dummy_1 Dummy 
+	operations $id=res_Dummy_1-operations 
+	op start interval=0 timeout=200 
+	op stop interval=0 timeout=192 
+	op monitor interval=121 timeout=154 start-delay=0 
+	op migrate_to interval=0 timeout=123 
+	op migrate_from interval=0 timeout=122 
+	meta target-role=stopped
+primitive res_Dummy_10 Dummy 
+	operations $id=res_Dummy_10-operations 
+	op start interval=0 timeout=200 
+	op stop interval=0 timeout=192 
+	op monitor interval=121 timeout=154 start-delay=0 
+	op migrate_to interval=0 timeout=123 
+	op migrate_from interval=0 timeout=122 
+	meta target-role=stopped
+primitive res_Dummy_11 Dummy 
+	operations $id=res_Dummy_11-operations 
+	op start interval=0 timeout=200 
+	op stop interval=0 timeout=192 
+	op monitor interval=121 timeout=154 start-delay=0 
+	op migrate_to interval=0 timeout=123 
+	op migrate_from interval=0 timeout=122 
+	meta target-role=stopped
+primitive res_Dummy_12 Dummy 
+	operations $id=res_Dummy_12-operations 
+	op start interval=0 timeout=200 
+	op stop interval=0 timeout=192 
+	op monitor interval=121 timeout=154 start-delay=0 
+	op migrate_to interval=0 timeout=123 
+	op migrate_from interval=0 timeout=122 
+	meta target-role=stopped
+primitive res_Dummy_13 Dummy 
+	operations $id=res_Dummy_13-operations 
+	op start interval=0 timeout=200 
+	op stop interval=0 timeout=192 
+	op monitor interval=121 timeout=154 start-delay=0 
+	op migrate_to interval=0 timeout=123 
+	op migrate_from interval=0 timeout=122 
+	meta target-role=stopped
+primitive res_Dummy_14 Dummy 
+	operations $id=res_Dummy_14-operations 
+	op start interval=0 timeout=200 
+	op stop interval=0 timeout=192 
+	op monitor interval=121 timeout=154 start-delay=0 
+	op migrate_to interval=0 timeout=123 
+	op migrate_from interval=0 timeout=122 
+	meta target-role=stopped
+primitive res_Dummy_15 Dummy 
+	operations $id=res_Dummy_15-operations 
+	op start interval=0 timeout=200 
+	op stop interval=0 timeout=192 
+	op monitor interval=121 timeout=154 start-delay=0 
+	op migrate_to interval=0 timeout=123 
+	op migrate_from interval=0 timeout=122 
+	meta target-role=stopped
+primitive res_Dummy_2 Dummy 
+	operations $id=res_Dummy_2-operations 
+	op start interval=0 timeout=200 
+	op stop interval=0 timeout=192 
+	op monitor interval=121 timeout=154 start-delay=0 
+	op migrate_to interval=0 timeout=123 
+	op migrate_from interval=0 timeout=122 
+	meta target-role=stopped
+primitive res_Dummy_3 Dummy 
+	operations $id=res_Dummy_3-operations 
+	op start interval=0 timeout=200 
+	op stop interval=0 timeout=192 
+	op monitor interval=121 timeout=154 start-delay=0 
+	op migrate_to interval=0 timeout=123 
+	op migrate_from interval=0 timeout=122 
+	meta target-role=stopped
+primitive res_Dummy_4 Dummy 
+	operations $id=res_Dummy_4-operations 
+	op start interval=0 timeout=200 
+	op stop interval=0 timeout=192 
+	op monitor interval=121 timeout=154 start-delay=0 
+	op migrate_to interval=0 timeout=123 
+	op migrate_from interval=0 timeout=122 
+	meta target-role=stopped
+primitive res_Dummy_5 Dummy 
+	operations $id=res_Dummy_5-operations 
+	op start interval=0 timeout=200 
+	op stop interval=0 timeout=192 
+	op monitor interval=121 timeout=154 start-delay=0 
+	op migrate_to interval=0 timeout=123 
+	op migrate_from interval=0 timeout=122 
+	meta target-role=stopped
+primitive res_Dummy_6 Dummy 
+	operations $id=res_Dummy_6-operations 
+	op start interval=0 timeout=200 
+	op stop interval=0 timeout=192 
+	op monitor interval=121 timeout=154 start-delay=0 
+	op migrate_to interval=0 timeout=123 
+	op migrate_from interval=0 timeout=122 
+	meta target-role=stopped
+primitive res_Dummy_7 Dummy 
+	operations $id=res_Dummy_7-operations 
+	op start interval=0 timeout=200 
+	op stop interval=0 timeout=192 
+	op monitor interval=121 timeout=154 start-delay=0 
+	op migrate_to interval=0 timeout=123 
+	op migrate_from interval=0 timeout=122 
+	meta target-role=stopped
+primitive res_Dummy_8 Dummy 
+	operations $id=res_Dummy_8-operations 
+	op start interval=0 timeout=200 
+	op stop interval=0 timeout=192 
+	op monitor interval=121 timeout=154 start-delay=0 
+	op migrate_to interval=0 timeout=123 
+	op migrate_from interval=0 timeout=122 
+	meta target-role=stopped
+primitive res_Dummy_9 Dummy 
+	operations $id=res_Dummy_9-operations 
+	op start interval=0 timeout=200 
+	op stop interval=0 timeout=192 
+	op monitor interval=121 timeout=154 start-delay=0 
+	op migrate_to interval=0 timeout=123 
+	op migrate_from interval=0 timeout=122 
+	meta target-role=stopped
 group grp_1 res_Dummy_1 res_Dummy_2 res_Dummy_3 res_Dummy_4 res_Dummy_5 res_Dummy_6 res_Dummy_7 res_Dummy_8 res_Dummy_9 res_Dummy_10 res_Dummy_11 res_Dummy_12 res_Dummy_13 res_Dummy_14 res_Dummy_15
-property $id="cib-bootstrap-options" 
-	stonith-enabled="false" 
-	no-quorum-policy="ignore"
+property cib-bootstrap-options:
+        stonith-enabled=false
+        no-quorum-policy=ignore
+rsc_defaults rsc-options:

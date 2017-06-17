@@ -32,7 +32,8 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import lcmc.common.domain.Application;
 import lcmc.common.domain.StringValue;
-import lcmc.vm.domain.DiskData;
+import lcmc.common.ui.utils.SwingUtils;
+import lcmc.vm.domain.data.DiskData;
 import lcmc.common.ui.WizardDialog;
 import lcmc.vm.ui.resource.DiskInfo;
 import lcmc.common.domain.util.Tools;
@@ -66,6 +67,8 @@ final class InstallationDisk extends VMConfig {
     private Storage storageDialog;
     @Inject
     private Application application;
+    @Inject
+    private SwingUtils swingUtils;
 
     @Override
     public WizardDialog nextDialog() {
@@ -109,7 +112,7 @@ final class InstallationDisk extends VMConfig {
     protected void initDialogAfterVisible() {
         enableComponents();
         final boolean enable = diskInfo.checkResourceFields(null, PARAMS).isCorrect();
-        application.invokeLater(new Runnable() {
+        swingUtils.invokeLater(new Runnable() {
             @Override
             public void run() {
                 buttonClass(nextButton()).setEnabled(enable);

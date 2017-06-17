@@ -1,44 +1,51 @@
 node host
 node host
-primitive res_Dummy_1 ocf:heartbeat:Dummy 
-	operations $id="res_Dummy_1-operations" 
-	op start interval="0" timeout="200" 
-	op stop interval="0" timeout="192" 
-	op monitor interval="121" timeout="154" start-delay="0" 
-	op migrate_to interval="0" timeout="123" 
-	op migrate_from interval="0" timeout="122"
-primitive res_Dummy_2 ocf:heartbeat:Dummy 
-	operations $id="res_Dummy_2-operations" 
-	op start interval="0" timeout="200" 
-	op stop interval="0" timeout="192" 
-	op monitor interval="121" timeout="154" start-delay="0" 
-	op migrate_to interval="0" timeout="123" 
-	op migrate_from interval="0" timeout="122"
-primitive res_Dummy_3 ocf:heartbeat:Dummy 
-	operations $id="res_Dummy_3-operations" 
-	op start interval="0" timeout="200" 
-	op stop interval="0" timeout="192" 
-	op monitor interval="121" timeout="154" start-delay="0" 
-	op migrate_to interval="0" timeout="123" 
-	op migrate_from interval="0" timeout="122"
-primitive res_IPaddr2_1 ocf:heartbeat:IPaddr2 
-	params ip="192.168.133.100" cidr_netmask="24" 
-	operations $id="res_IPaddr2_1-operations" 
-	op start interval="0" timeout="200" 
-	op stop interval="0" timeout="192" 
-	op monitor interval="121" timeout="154" start-delay="0" 
-	meta target-role="started" is-managed="false"
-primitive res_Stateful_1 ocf:heartbeat:Stateful 
-	operations $id="res_Stateful_1-operations" 
-	op start interval="0" timeout="200" 
-	op stop interval="0" timeout="192" 
-	op monitor interval="121" timeout="154" start-delay="0" 
-	meta target-role="started" is-managed="true"
+primitive res_Dummy_1 Dummy 
+	operations $id=res_Dummy_1-operations 
+	op start interval=0 timeout=200 
+	op stop interval=0 timeout=192 
+	op monitor interval=121 timeout=154 start-delay=0 
+	op migrate_to interval=0 timeout=123 
+	op migrate_from interval=0 timeout=122
+	meta
+primitive res_Dummy_2 Dummy 
+	operations $id=res_Dummy_2-operations 
+	op start interval=0 timeout=200 
+	op stop interval=0 timeout=192 
+	op monitor interval=121 timeout=154 start-delay=0 
+	op migrate_to interval=0 timeout=123 
+	op migrate_from interval=0 timeout=122
+	meta
+primitive res_Dummy_3 Dummy 
+	operations $id=res_Dummy_3-operations 
+	op start interval=0 timeout=200 
+	op stop interval=0 timeout=192 
+	op monitor interval=121 timeout=154 start-delay=0 
+	op migrate_to interval=0 timeout=123 
+	op migrate_from interval=0 timeout=122
+	meta
+primitive res_IPaddr2_1 IPaddr2 
+	params ip=192.168.133.100 cidr_netmask=24 
+	operations $id=res_IPaddr2_1-operations 
+	op start interval=0 timeout=200 
+	op stop interval=0 timeout=192 
+	op monitor interval=121 timeout=154 start-delay=0 
+	meta target-role=started is-managed=false
+primitive res_Stateful_1 Stateful 
+	operations $id=res_Stateful_1-operations 
+	op start interval=0 timeout=200 
+	op promote interval=0 timeout=20 
+	op demote interval=0 timeout=20 
+	op stop interval=0 timeout=192 
+	op monitor interval=121 timeout=154 start-delay=0 
+	meta
 group grp_1 res_Dummy_1 res_Dummy_2 res_Dummy_3
+	meta
 ms ms_Stateful_1 res_Stateful_1 
-	meta clone-max="1" notify="true" interleave="true"
+	meta clone-max=1 notify=true interleave=true target-role=started is-managed=true
 colocation col_res_IPaddr2_1_grp_1 inf: res_IPaddr2_1 grp_1
 order ord_grp_1_res_IPaddr2_1 inf: grp_1 res_IPaddr2_1
-property $id="cib-bootstrap-options" 
-	stonith-enabled="false" 
-	no-quorum-policy="ignore"
+property cib-bootstrap-options:
+	stonith-enabled=false
+	no-quorum-policy=ignore
+rsc_defaults rsc-options:

@@ -21,7 +21,28 @@
  */
 package lcmc.crm.ui.resource;
 
-import java.awt.Color;
+import lcmc.cluster.ui.ClusterBrowser;
+import lcmc.cluster.ui.widget.Check;
+import lcmc.common.domain.Application;
+import lcmc.common.domain.ColorText;
+import lcmc.common.domain.Value;
+import lcmc.common.domain.util.Tools;
+import lcmc.common.ui.Browser;
+import lcmc.common.ui.treemenu.TreeMenuController;
+import lcmc.common.ui.utils.UpdatableItem;
+import lcmc.crm.domain.ClusterStatus;
+import lcmc.crm.domain.CrmXml;
+import lcmc.crm.domain.HostLocation;
+import lcmc.crm.domain.ResourceAgent;
+import lcmc.crm.service.CRM;
+import lcmc.host.domain.Host;
+import lombok.val;
+
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.swing.*;
+import javax.swing.tree.DefaultMutableTreeNode;
+import java.awt.*;
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -30,27 +51,6 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.swing.ImageIcon;
-import javax.swing.JComponent;
-import javax.swing.JPanel;
-import javax.swing.tree.DefaultMutableTreeNode;
-import lcmc.common.domain.Application;
-import lcmc.common.domain.ColorText;
-import lcmc.common.ui.treemenu.TreeMenuController;
-import lcmc.crm.domain.CrmXml;
-import lcmc.crm.domain.ClusterStatus;
-import lcmc.host.domain.Host;
-import lcmc.crm.domain.HostLocation;
-import lcmc.crm.domain.ResourceAgent;
-import lcmc.common.domain.Value;
-import lcmc.common.ui.Browser;
-import lcmc.cluster.ui.ClusterBrowser;
-import lcmc.cluster.ui.widget.Check;
-import lcmc.crm.service.CRM;
-import lcmc.common.domain.util.Tools;
-import lcmc.common.ui.utils.UpdatableItem;
 
 /**
  * This class holds clone service info object.
@@ -60,8 +60,6 @@ public class CloneInfo extends ServiceInfo {
     private ServiceInfo containedService = null;
     @Inject
     private CloneMenu cloneMenu;
-    @Inject
-    private Application application;
     @Inject
     private TreeMenuController treeMenuController;
 
@@ -74,7 +72,7 @@ public class CloneInfo extends ServiceInfo {
      * Adds service to this clone set. Adds it in the submenu in
      * the menu tree and initializes it.
      */
-    void addCloneServicePanel(final ServiceInfo newServiceInfo) {
+    public void addCloneServicePanel(final ServiceInfo newServiceInfo) {
         containedService = newServiceInfo;
         newServiceInfo.getService().setResourceClass(newServiceInfo.getResourceAgent().getResourceClass());
         newServiceInfo.setCloneInfo(this);
@@ -162,12 +160,12 @@ public class CloneInfo extends ServiceInfo {
             return null;
         }
         if (cs.getResourceAgent().isGroup()) {
-            final List<String> resources = clStatus.getGroupResources(cs.getHeartbeatId(runMode), runMode);
-            if (resources == null) {
+            val resources = clStatus.getGroupResources(cs.getHeartbeatId(runMode), runMode);
+            if (!resources.isPresent()) {
                 return null;
             }
             final Set<String> slaves = new TreeSet<String>();
-            for (final String hbId : resources) {
+            for (final String hbId : resources.get()) {
                 final List<String> slNodes = clStatus.getSlaveOnNodes(hbId, runMode);
                 if (slNodes != null) {
                     slaves.addAll(slNodes);
@@ -251,9 +249,9 @@ public class CloneInfo extends ServiceInfo {
         final ServiceInfo cs = getContainedService();
         if (cs != null && cs.getResourceAgent().isGroup()) {
             final ClusterStatus clStatus = getBrowser().getClusterStatus();
-            final List<String> resources = clStatus.getGroupResources(cs.getHeartbeatId(runMode), runMode);
-            if (resources != null) {
-                for (final String hbId : resources) {
+            val resources = clStatus.getGroupResources(cs.getHeartbeatId(runMode), runMode);
+            if (resources.isPresent()) {
+                for (final String hbId : resources.get()) {
                     final ServiceInfo si = getBrowser().getServiceInfoFromCRMId(hbId);
                     if (si == null) {
                         texts.add(new ColorText("   unknown", null, Color.BLACK));
@@ -607,7 +605,10 @@ public class CloneInfo extends ServiceInfo {
 
     public List<ServiceInfo> getSubServices() {
         final List<ServiceInfo> services = new ArrayList<ServiceInfo>();
-        services.add(containedService);
+        final ServiceInfo cs = containedService;
+        if (cs != null) {
+            services.add(cs);
+        }
         return services;
     }
 }

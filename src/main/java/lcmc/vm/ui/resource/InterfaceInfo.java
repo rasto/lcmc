@@ -34,15 +34,15 @@ import javax.swing.ImageIcon;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 
-import lcmc.cluster.ui.widget.WidgetFactory;
 import lcmc.common.domain.AccessMode;
 import lcmc.common.domain.Application;
 import lcmc.common.ui.treemenu.TreeMenuController;
+import lcmc.common.ui.utils.SwingUtils;
 import lcmc.host.domain.Host;
 import lcmc.common.domain.StringValue;
 import lcmc.cluster.service.NetworkService;
 import lcmc.vm.domain.VmsXml;
-import lcmc.vm.domain.InterfaceData;
+import lcmc.vm.domain.data.InterfaceData;
 import lcmc.common.domain.Value;
 import lcmc.common.ui.Browser;
 import lcmc.cluster.ui.resource.NetInfo;
@@ -138,9 +138,7 @@ public final class InterfaceInfo extends HardwareInfo {
     }
 
     @Inject
-    private Application application;
-    @Inject
-    private WidgetFactory widgetFactory;
+    private SwingUtils swingUtils;
     @Inject
     private NetworkService networkService;
 
@@ -168,7 +166,7 @@ public final class InterfaceInfo extends HardwareInfo {
                                    DomainInfo.INTERFACES_TABLE,
                                    getVMSVirtualDomainInfo().getNewInterfaceBtn());
         if (getResource().isNew()) {
-            application.invokeLater(new Runnable() {
+            swingUtils.invokeLater(new Runnable() {
                 @Override
                 public void run() {
                     tablePanel.setVisible(false);
@@ -206,10 +204,8 @@ public final class InterfaceInfo extends HardwareInfo {
             mac = Tools.generateVMMacAddress();
             for (final Host h : getBrowser().getClusterHosts()) {
                 final VmsXml vmsXml = getBrowser().getVmsXml(h);
-                if (vmsXml != null) {
-                    if (vmsXml.getUsedMacAddresses().contains(mac)) {
-                        continue LOOP;
-                    }
+                if (vmsXml != null && vmsXml.getUsedMacAddresses().contains(mac)) {
+                    continue LOOP;
                 }
             }
             break;
@@ -330,7 +326,7 @@ public final class InterfaceInfo extends HardwareInfo {
     /** Returns device parameters. */
     @Override
     protected Map<String, String> getHWParameters(final boolean allParams) {
-        application.invokeAndWait(new Runnable() {
+        swingUtils.invokeAndWait(new Runnable() {
             @Override
             public void run() {
                 getInfoPanel();
@@ -373,7 +369,7 @@ public final class InterfaceInfo extends HardwareInfo {
         if (Application.isTest(runMode)) {
             return;
         }
-        application.invokeAndWait(new Runnable() {
+        swingUtils.invokeAndWait(new Runnable() {
             @Override
             public void run() {
                 getApplyButton().setEnabled(false);
@@ -402,7 +398,7 @@ public final class InterfaceInfo extends HardwareInfo {
         treeMenuController.reloadNode(getNode(), false);
         getBrowser().periodicalVmsUpdate(
                 getVMSVirtualDomainInfo().getDefinedOnHosts());
-        application.invokeLater(new Runnable() {
+        swingUtils.invokeLater(new Runnable() {
             @Override
             public void run() {
                 tablePanel.setVisible(true);

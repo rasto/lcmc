@@ -1,5 +1,6 @@
 node host
 node host
-property $id="cib-bootstrap-options" 
-	stonith-enabled="false" 
-	no-quorum-policy="ignore"
+property cib-bootstrap-options:
+        stonith-enabled=false
+        no-quorum-policy=ignore
+rsc_defaults rsc-options:

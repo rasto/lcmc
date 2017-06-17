@@ -22,29 +22,31 @@
 
 package lcmc.crm.ui.resource;
 
+import lcmc.common.domain.AccessMode;
+import lcmc.common.domain.Application;
+import lcmc.common.domain.ColorText;
+import lcmc.common.domain.StringValue;
+import lcmc.common.domain.Value;
+import lcmc.common.domain.util.Tools;
+import lcmc.common.ui.Browser;
+import lcmc.common.ui.utils.SwingUtils;
+import lcmc.common.ui.utils.UpdatableItem;
+import lcmc.crm.domain.ClusterStatus;
+import lcmc.crm.domain.CrmXml;
+import lcmc.crm.domain.RscSetConnectionData;
+import lcmc.crm.service.CRM;
+import lcmc.host.domain.Host;
+import lcmc.logger.Logger;
+import lcmc.logger.LoggerFactory;
+
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.swing.*;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.swing.JComponent;
-
-import lcmc.common.domain.AccessMode;
-import lcmc.common.domain.Application;
-import lcmc.common.domain.ColorText;
-import lcmc.host.domain.Host;
-import lcmc.common.domain.StringValue;
-import lcmc.common.domain.Value;
-import lcmc.crm.domain.CrmXml;
-import lcmc.crm.domain.ClusterStatus;
-import lcmc.common.ui.Browser;
-import lcmc.crm.service.CRM;
-import lcmc.logger.Logger;
-import lcmc.logger.LoggerFactory;
-import lcmc.common.domain.util.Tools;
-import lcmc.common.ui.utils.UpdatableItem;
 
 /**
  * Object that holds an order constraint information.
@@ -52,11 +54,11 @@ import lcmc.common.ui.utils.UpdatableItem;
 @Named
 public class ConstraintPHInfo extends ServiceInfo {
     private static final Logger LOG = LoggerFactory.getLogger(ConstraintPHInfo.class);
-    static final String NAME = "Placeholder";
+    public static final String NAME = "Placeholder";
     private static final String CONSTRAINT_PLACEHOLDER_AND = Tools.getString("ConstraintPHInfo.And");
     private static final String CONSTRAINT_PLACEHOLDER_OR = Tools.getString("ConstraintPHInfo.Or");
-    private CrmXml.RscSetConnectionData rscSetConnectionDataColocation = null;
-    private CrmXml.RscSetConnectionData rscSetConnectionDataOrder = null;
+    private RscSetConnectionData rscSetConnectionDataColocation = null;
+    private RscSetConnectionData rscSetConnectionDataOrder = null;
     /** Whether the direction of colocation should be reversed, meaning it is
      * from this placeholder, when it was new. */
     private boolean reverseCol = false;
@@ -76,11 +78,13 @@ public class ConstraintPHInfo extends ServiceInfo {
     private ConstraintPHMenu constraintPHMenu;
     @Inject
     private Application application;
+    @Inject
+    private SwingUtils swingUtils;
 
 
-    void init(final Browser browser,
-              final CrmXml.RscSetConnectionData rscSetConnectionData,
-              final Preference preference) {
+    public void init(final Browser browser,
+                     final RscSetConnectionData rscSetConnectionData,
+                     final Preference preference) {
         super.init(NAME, null, browser);
         this.preference = preference;
         if (rscSetConnectionData != null) {
@@ -92,27 +96,27 @@ public class ConstraintPHInfo extends ServiceInfo {
         }
     }
 
-    CrmXml.RscSetConnectionData getRscSetConnectionDataColocation() {
+    public RscSetConnectionData getRscSetConnectionDataColocation() {
         return rscSetConnectionDataColocation;
     }
 
-    CrmXml.RscSetConnectionData getRscSetConnectionDataOrder() {
+    public RscSetConnectionData getRscSetConnectionDataOrder() {
         return rscSetConnectionDataOrder;
     }
 
 
     public void resetRscSetConnectionData() {
-        final CrmXml.RscSetConnectionData rodata = rscSetConnectionDataOrder;
+        final RscSetConnectionData rodata = rscSetConnectionDataOrder;
         if (rodata != null && rodata.isEmpty()) {
             rscSetConnectionDataOrder = null;
         }
-        final CrmXml.RscSetConnectionData rcdata = rscSetConnectionDataColocation;
+        final RscSetConnectionData rcdata = rscSetConnectionDataColocation;
         if (rcdata != null && rcdata.isEmpty()) {
             rscSetConnectionDataColocation = null;
         }
     }
 
-    void setRscSetConnectionData(final CrmXml.RscSetConnectionData rscSetConnectionData) {
+    public void setRscSetConnectionData(final RscSetConnectionData rscSetConnectionData) {
         if (rscSetConnectionData.isColocation()) {
             if (reverseCol) {
                 if (rscSetConnectionData.getRscSet2() == null && rscSetConnectionData.getRscSet1() != null) {
@@ -296,11 +300,11 @@ public class ConstraintPHInfo extends ServiceInfo {
     @Override
     public String getId() {
         String ordId = "";
-        final CrmXml.RscSetConnectionData rodata = rscSetConnectionDataOrder;
+        final RscSetConnectionData rodata = rscSetConnectionDataOrder;
         if (rodata != null) {
             ordId = rodata.getConstraintId() + '-' + rodata.getConnectionPos();
         }
-        final CrmXml.RscSetConnectionData rcdata = rscSetConnectionDataColocation;
+        final RscSetConnectionData rcdata = rscSetConnectionDataColocation;
         String colId = "";
         if (rcdata != null) {
             colId = rcdata.getConstraintId() + '-' + rcdata.getConnectionPos();
@@ -337,7 +341,7 @@ public class ConstraintPHInfo extends ServiceInfo {
                 }
                 getService().setNew(false);
                 getBrowser().removeFromServiceInfoHash(this);
-                application.invokeLater(new Runnable() {
+                swingUtils.invokeLater(new Runnable() {
                     @Override
                     public void run() {
                         getBrowser().getCrmGraph().killRemovedVertices();
@@ -430,8 +434,8 @@ public class ConstraintPHInfo extends ServiceInfo {
                                       final boolean force,
                                       final Application.RunMode runMode) {
         String colId = null;
-        final CrmXml.RscSetConnectionData rdataCol = getRscSetConnectionDataColocation();
-        final CrmXml.RscSetConnectionData rdataOrd = getRscSetConnectionDataOrder();
+        final RscSetConnectionData rdataCol = getRscSetConnectionDataColocation();
+        final RscSetConnectionData rdataOrd = getRscSetConnectionDataOrder();
         CrmXml.RscSet colRscSet1 = null;
         CrmXml.RscSet colRscSet2 = null;
 
@@ -730,25 +734,25 @@ public class ConstraintPHInfo extends ServiceInfo {
 
     /** Whether the id of this constraint is the same or there is no id in this
      * object. */
-    boolean sameConstraintId(final CrmXml.RscSetConnectionData otherRdata) {
+    public boolean sameConstraintId(final RscSetConnectionData otherRdata) {
         if (otherRdata.isColocation()) {
-            final CrmXml.RscSetConnectionData rdataCol = rscSetConnectionDataColocation;
+            final RscSetConnectionData rdataCol = rscSetConnectionDataColocation;
             return rdataCol == null
                    || rdataCol.getConstraintId() == null
                    || rdataCol.getConstraintId().equals(otherRdata.getConstraintId());
         } else {
-            final CrmXml.RscSetConnectionData rdataOrd = rscSetConnectionDataOrder;
+            final RscSetConnectionData rdataOrd = rscSetConnectionDataOrder;
             return rdataOrd == null
                    || rdataOrd.getConstraintId() == null
                    || rdataOrd.getConstraintId().equals(otherRdata.getConstraintId());
         }
     }
 
-    void setPcmkRscSetsInfo(final PcmkRscSetsInfo pcmkRscSetsInfo) {
+    public void setPcmkRscSetsInfo(final PcmkRscSetsInfo pcmkRscSetsInfo) {
         this.pcmkRscSetsInfo = pcmkRscSetsInfo;
     }
 
-    PcmkRscSetsInfo getPcmkRscSetsInfo() {
+    public PcmkRscSetsInfo getPcmkRscSetsInfo() {
         return pcmkRscSetsInfo;
     }
 
@@ -763,17 +767,17 @@ public class ConstraintPHInfo extends ServiceInfo {
     }
 
     /** Returns whether the placeholder has any connections at all. */
-    boolean isEmpty() {
-        final CrmXml.RscSetConnectionData rdataOrd = getRscSetConnectionDataOrder();
-        final CrmXml.RscSetConnectionData rdataCol = getRscSetConnectionDataColocation();
+    public boolean isEmpty() {
+        final RscSetConnectionData rdataOrd = getRscSetConnectionDataOrder();
+        final RscSetConnectionData rdataCol = getRscSetConnectionDataColocation();
         return (rdataOrd == null || rdataOrd.isEmpty()) && (rdataCol == null || rdataCol.isEmpty());
     }
 
     /** Returns attributes for resource_set tag. */
-    void getAttributes(final boolean isCol,
-                       final boolean first,
-                       final Map<CrmXml.RscSet, Map<String, String>> rscSetsAttrs) {
-        final CrmXml.RscSetConnectionData rscd;
+    public void getAttributes(final boolean isCol,
+                              final boolean first,
+                              final Map<CrmXml.RscSet, Map<String, String>> rscSetsAttrs) {
+        final RscSetConnectionData rscd;
         if (isCol) {
             rscd = rscSetConnectionDataColocation;
         } else {
@@ -793,7 +797,7 @@ public class ConstraintPHInfo extends ServiceInfo {
 
     /** Returns resource that is next in sequence in the resource set. */
     public ServiceInfo nextInSequence(final ServiceInfo si, final boolean isCol) {
-        final CrmXml.RscSetConnectionData rscd;
+        final RscSetConnectionData rscd;
         if (isCol) {
             rscd = rscSetConnectionDataColocation;
         } else {
@@ -821,7 +825,7 @@ public class ConstraintPHInfo extends ServiceInfo {
 
     /** Returns resource that is before in sequence in the resource set. */
     public ServiceInfo prevInSequence(final ServiceInfo si, final boolean isCol) {
-        final CrmXml.RscSetConnectionData rscd;
+        final RscSetConnectionData rscd;
         if (isCol) {
             rscd = rscSetConnectionDataColocation;
         } else {
@@ -850,7 +854,7 @@ public class ConstraintPHInfo extends ServiceInfo {
 
     @Override
     public String getMainTextForGraph() {
-        final CrmXml.RscSetConnectionData rscd = rscSetConnectionDataOrder;
+        final RscSetConnectionData rscd = rscSetConnectionDataOrder;
         if (getService().isNew()) {
             return (preference == Preference.AND) ? CONSTRAINT_PLACEHOLDER_AND : CONSTRAINT_PLACEHOLDER_OR;
         }

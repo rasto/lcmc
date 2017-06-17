@@ -39,6 +39,7 @@ import java.util.Set;
 import java.util.concurrent.CountDownLatch;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Provider;
@@ -51,33 +52,34 @@ import javax.swing.JScrollPane;
 import javax.swing.tree.DefaultMutableTreeNode;
 
 import com.google.common.base.Optional;
-import lcmc.common.ui.treemenu.TreeMenuController;
-import lcmc.common.ui.utils.Dialogs;
-import lcmc.drbd.ui.AddDrbdConfigDialog;
+
 import lcmc.Exceptions;
-import lcmc.configs.AppDefaults;
-import lcmc.common.ui.GUIData;
-import lcmc.common.domain.Application;
-import lcmc.common.domain.Application.RunMode;
 import lcmc.cluster.domain.Cluster;
-import lcmc.host.domain.Host;
-import lcmc.host.domain.HostFactory;
-import lcmc.common.domain.StringValue;
-import lcmc.common.domain.Value;
-import lcmc.drbd.domain.DRBDtestData;
-import lcmc.drbd.domain.DrbdXml;
-import lcmc.common.domain.Resource;
-import lcmc.common.ui.Browser;
 import lcmc.cluster.ui.ClusterBrowser;
 import lcmc.cluster.ui.widget.Check;
 import lcmc.cluster.ui.widget.Widget;
+import lcmc.common.domain.Application;
+import lcmc.common.domain.Application.RunMode;
+import lcmc.common.domain.ResourceValue;
+import lcmc.common.domain.StringValue;
+import lcmc.common.domain.Value;
+import lcmc.common.domain.util.Tools;
+import lcmc.common.ui.Browser;
+import lcmc.common.ui.treemenu.TreeMenuController;
 import lcmc.common.ui.utils.ButtonCallback;
 import lcmc.common.ui.utils.ComponentWithTest;
+import lcmc.common.ui.utils.Dialogs;
+import lcmc.common.ui.utils.SwingUtils;
+import lcmc.common.ui.utils.UpdatableItem;
+import lcmc.configs.AppDefaults;
+import lcmc.drbd.domain.DRBDtestData;
+import lcmc.drbd.domain.DrbdXml;
 import lcmc.drbd.service.DRBD;
+import lcmc.drbd.ui.AddDrbdConfigDialog;
+import lcmc.host.domain.Host;
+import lcmc.host.domain.HostFactory;
 import lcmc.logger.Logger;
 import lcmc.logger.LoggerFactory;
-import lcmc.common.domain.util.Tools;
-import lcmc.common.ui.utils.UpdatableItem;
 
 /**
  * This class provides drbd info. For one it shows the editable global
@@ -101,8 +103,6 @@ public class GlobalInfo extends AbstractDrbdInfo {
     @Inject
     private Provider<VolumeInfo> volumeInfoProvider;
     @Inject
-    private GUIData guiData;
-    @Inject
     private Provider<AddDrbdConfigDialog> addDrbdConfigDialogProvider;
     private ProxyHostInfo proxyHostInfo = null;
     @Inject
@@ -114,13 +114,14 @@ public class GlobalInfo extends AbstractDrbdInfo {
     @Inject
     private Application application;
     @Inject
+    private SwingUtils swingUtils;
+    @Inject
     private TreeMenuController treeMenuController;
     @Inject
     private Dialogs dialogs;
 
-    public void init(final String name, final Browser browser) {
-        super.init(name, browser);
-        setResource(new Resource(name));
+    public void einit(final String name, final Browser browser) {
+        super.einit(Optional.of(new ResourceValue(name)), name, browser);
     }
 
     public void setParameters() {
@@ -236,7 +237,7 @@ public class GlobalInfo extends AbstractDrbdInfo {
         if (Application.isLive(runMode)) {
             final String[] params = getParametersFromXML();
             storeComboBoxValues(params);
-            application.invokeLater(new Runnable() {
+            swingUtils.invokeLater(new Runnable() {
                 @Override
                 public void run() {
                     for (final ResourceInfo dri : getDrbdResources()) {
@@ -375,7 +376,7 @@ public class GlobalInfo extends AbstractDrbdInfo {
                     final Thread thread = new Thread(new Runnable() {
                         @Override
                         public void run() {
-                            application.invokeAndWait(new Runnable() {
+                            swingUtils.invokeAndWait(new Runnable() {
                                 @Override
                                 public void run() {
                                     getApplyButton().setEnabled(false);
@@ -603,7 +604,7 @@ public class GlobalInfo extends AbstractDrbdInfo {
 
         bdi1.setDrbd(true);
         bdi1.setDrbdVolumeInfo(dvi);
-        bdi1.getBlockDevice().setDrbdBlockDevice(bdi1.getHost().getDrbdBlockDevice(device));
+        bdi1.getBlockDevice().setDrbdBlockDevice(bdi1.getHost().getHostParser().getDrbdBlockDevice(device));
         bdi1.cleanup();
         bdi1.resetInfoPanel();
         bdi1.setInfoPanel(null); /* reload panel */
@@ -612,7 +613,7 @@ public class GlobalInfo extends AbstractDrbdInfo {
 
         bdi2.setDrbd(true);
         bdi2.setDrbdVolumeInfo(dvi);
-        bdi2.getBlockDevice().setDrbdBlockDevice(bdi2.getHost().getDrbdBlockDevice(device));
+        bdi2.getBlockDevice().setDrbdBlockDevice(bdi2.getHost().getHostParser().getDrbdBlockDevice(device));
         bdi2.cleanup();
         bdi2.resetInfoPanel();
         bdi2.setInfoPanel(null); /* reload panel */
@@ -623,13 +624,14 @@ public class GlobalInfo extends AbstractDrbdInfo {
                 dvi.getDrbdResourceInfo().getNode(),
                 dvi);
 
-        application.isSwingThread();
+        swingUtils.isSwingThread();
 
         final DefaultMutableTreeNode drbdBDNode1 = treeMenuController.createMenuItem(drbdVolumeNode, bdi1);
         final DefaultMutableTreeNode drbdBDNode2 = treeMenuController.createMenuItem(drbdVolumeNode, bdi2);
 
         getBrowser().getDrbdGraph().addDrbdVolume(dvi, bdi1, bdi2);
-        treeMenuController.reloadNode(drbdVolumeNode, true);
+        treeMenuController.reloadNode(drbdVolumeNode.getParent(), false);
+        treeMenuController.reloadNode(drbdVolumeNode, false);
         getBrowser().resetFilesystems();
     }
 

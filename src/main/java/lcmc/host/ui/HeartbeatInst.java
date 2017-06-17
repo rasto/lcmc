@@ -79,9 +79,9 @@ final class HeartbeatInst extends DialogHost {
     }
 
     private void installHeartbeat() {
-        String arch = getHost().getDistString("HbPmInst.install." + getHost().getArch());
+        String arch = getHost().getDistString("HbPmInst.install." + getHost().getHostParser().getArch());
         if (arch == null) {
-            arch = getHost().getArch();
+            arch = getHost().getHostParser().getArch();
         }
         final String archString = arch.replaceAll("i686", "i386");
 

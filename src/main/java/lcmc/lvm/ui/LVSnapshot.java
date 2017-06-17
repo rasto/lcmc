@@ -33,6 +33,7 @@ import javax.swing.JPanel;
 import javax.swing.SpringLayout;
 import lcmc.common.domain.AccessMode;
 import lcmc.common.domain.Application;
+import lcmc.common.ui.utils.SwingUtils;
 import lcmc.host.domain.Host;
 import lcmc.common.domain.StringValue;
 import lcmc.vm.domain.VmsXml;
@@ -57,7 +58,7 @@ public final class LVSnapshot extends LV {
     private Widget sizeWi;
     private Widget maxSizeWi;
     @Inject
-    private Application application;
+    private SwingUtils swingUtils;
     @Inject
     private WidgetFactory widgetFactory;
     private MyButton snapshotButton;
@@ -90,7 +91,7 @@ public final class LVSnapshot extends LV {
     }
 
     protected void checkButtons() {
-        application.invokeLater(new EnableSnapshotRunnable(true));
+        swingUtils.invokeLater(new EnableSnapshotRunnable(true));
     }
 
     private void setComboBoxes() {
@@ -113,7 +114,7 @@ public final class LVSnapshot extends LV {
         inputPane.add(new JLabel());
         /* find next free logical volume name */
         String defaultName;
-        final Set<String> volumeGroups = blockDevInfo.getHost().getLogicalVolumesFromVolumeGroup(volumeGroup);
+        final Set<String> volumeGroups = blockDevInfo.getHost().getHostParser().getLogicalVolumesFromVolumeGroup(volumeGroup);
         int i = 0;
         while (true) {
             defaultName = "lvol" + i;
@@ -164,7 +165,7 @@ public final class LVSnapshot extends LV {
                 final Thread thread = new Thread(new Runnable() {
                     @Override
                     public void run() {
-                        application.invokeAndWait(new EnableSnapshotRunnable(false));
+                        swingUtils.invokeAndWait(new EnableSnapshotRunnable(false));
                         disableComponents();
                         getProgressBar().start(SNAPSHOT_TIMEOUT);
                         final boolean ret = lvSnapshot(lvNameWi.getStringValue(), sizeWi.getStringValue());
@@ -236,7 +237,7 @@ public final class LVSnapshot extends LV {
 
     private String getMaxBlockSizeAvailableInGroup() {
         final String volumeGroup = blockDevInfo.getBlockDevice().getVolumeGroup();
-        final long free = blockDevInfo.getHost().getFreeInVolumeGroup(volumeGroup) / 1024;
+        final long free = blockDevInfo.getHost().getHostParser().getFreeInVolumeGroup(volumeGroup) / 1024;
         return Long.toString(free);
     }
 
@@ -258,7 +259,7 @@ public final class LVSnapshot extends LV {
                 } else if (size <= 0) {
                     e = false;
                 } else {
-                    final Set<String> lvs = blockDevInfo.getHost().getLogicalVolumesFromVolumeGroup(
+                    final Set<String> lvs = blockDevInfo.getHost().getHostParser().getLogicalVolumesFromVolumeGroup(
                                                                       blockDevInfo.getBlockDevice().getVolumeGroup());
                     if (lvs != null && lvs.contains(lvNameWi.getStringValue())) {
                         e = false;

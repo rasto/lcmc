@@ -35,9 +35,8 @@ import javax.swing.SwingUtilities;
 
 import lcmc.AppContext;
 import lcmc.common.domain.AccessMode;
-import lcmc.common.ui.GUIData;
+import lcmc.common.ui.main.MainData;
 import lcmc.common.ui.MainMenu;
-import lcmc.common.domain.Application;
 import lcmc.cluster.domain.Cluster;
 import lcmc.host.domain.Host;
 import lcmc.common.ui.BugReport;
@@ -133,11 +132,11 @@ public final class Logger {
         final String msg0 = ERROR_STRING + msg;
         System.out.println(msg0);
         LoggerFactory.LOG_BUFFER.add(msg0);
-        final GUIData guiData = AppContext.getBean(GUIData.class);
+        final MainData mainData = AppContext.getBean(MainData.class);
         SwingUtilities.invokeLater(new Runnable() {
             @Override
             public void run() {
-                JOptionPane.showMessageDialog(guiData.getMainFrame(),
+                JOptionPane.showMessageDialog(mainData.getMainFrame(),
                                               new JScrollPane(new JTextArea(msg, 20, 60)),
                                               Tools.getString("Error.Title"),
                                               JOptionPane.ERROR_MESSAGE);
