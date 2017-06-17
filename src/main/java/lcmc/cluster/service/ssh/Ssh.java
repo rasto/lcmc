@@ -24,8 +24,6 @@ package lcmc.cluster.service.ssh;
 
 import ch.ethz.ssh2.LocalPortForwarder;
 import ch.ethz.ssh2.SCPClient;
-
-import java.io.File;
 import java.io.IOException;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
@@ -376,12 +374,7 @@ public class Ssh {
         final String fileName = "lcmc-test.tar";
         final String file = Tools.getFile('/' + fileName);
         try {
-<<<<<<< HEAD
-            scpClient.put(file, (new File(file)).length(),"/tmp",null);
-            
-=======
             scpClient.put(file.getBytes("UTF-8"), fileName, "/tmp");
->>>>>>> 05561f78704c05e35bfe654e474b93f7f00172bf
         } catch (final IOException e) {
             LOG.appError("installTestFiles: could not copy: " + fileName, "", e);
             return;
