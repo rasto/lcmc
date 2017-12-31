@@ -38,6 +38,7 @@ public final class DistResource_redhatenterpriseserver
         {"version:Red Hat Enterprise Linux ES release 4 (Nahant*", "4"},
         {"version:Red Hat Enterprise Linux Server release 5*", "5"},
         {"version:Red Hat Enterprise Linux Server release 6*", "6"},
+        {"version:Red Hat Enterprise Linux Server release 7*", "7"},
         {"version:Scientific Linux release 5*", "5"},
         {"version:Scientific Linux SL release 5*", "5"},
         {"version:Scientific Linux release 6*", "6"},
