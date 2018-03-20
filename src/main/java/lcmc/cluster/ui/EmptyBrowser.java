@@ -21,20 +21,26 @@
  */
 package lcmc.cluster.ui;
 
-import java.util.TreeSet;
+import lcmc.cluster.domain.Cluster;
+import lcmc.cluster.ui.network.InfoPresenter;
+import lcmc.common.domain.util.Tools;
+import lcmc.common.ui.Browser;
+import lcmc.common.ui.CategoryInfo;
+import lcmc.common.ui.treemenu.TreeMenuController;
+import lcmc.host.domain.Host;
+import lcmc.host.domain.Hosts;
+import lcmc.host.ui.AllHostsInfo;
+import lcmc.host.ui.HostBrowser;
+
+import javax.annotation.Resource;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
+import javax.swing.*;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.MutableTreeNode;
-
-import lcmc.cluster.domain.Cluster;
-import lcmc.common.ui.Browser;
-import lcmc.common.ui.treemenu.TreeMenuController;
-import lcmc.host.ui.HostBrowser;
-import lcmc.host.domain.Host;
-import lcmc.host.ui.AllHostsInfo;
-import lcmc.host.domain.Hosts;
+import java.util.TreeSet;
+import java.util.function.BiConsumer;
 
 /**
  * This class holds cluster resource data in a tree. It shows panels that allow
@@ -53,10 +59,13 @@ public final class EmptyBrowser extends Browser {
     private Hosts allHosts;
     @Inject
     private TreeMenuController treeMenuController;
+    @Resource(name="categoryInfo")
+    private CategoryInfo resourcesCategory;
 
     void init() {
         allHostsInfo.init(this);
-        treeTop = treeMenuController.createMenuTreeTop();
+        resourcesCategory.init(Tools.getString("Browser.Resources"), null);
+        treeTop = treeMenuController.createMenuTreeTop(resourcesCategory);
     }
 
     /** Adds small box with cluster possibility to load it and remove it. */
@@ -83,8 +92,31 @@ public final class EmptyBrowser extends Browser {
             final HostBrowser hostBrowser = host.getBrowser();
             final MutableTreeNode resource = treeMenuController.createMenuItem(allHostsNode, hostBrowser.getHostInfo());
         }
-        treeMenuController.reloadNode(allHostsNode, false);
-        treeMenuController.selectPath(new Object[]{treeTop, allHostsNode});
+        treeMenuController.reloadNodeDontSelect(allHostsNode);
+        treeMenuController.expandAndSelect(new Object[]{treeTop, allHostsNode});
+    }
+
+    @Override
+    public void fireEventInViewPanel(final DefaultMutableTreeNode node) {
+        if (node != null) {
+            treeMenuController.reloadNode(node);
+            treeMenuController.nodeChanged(node);
+        }
+    }
+
+    public void setDisabledDuringLoad(boolean disable) {
+        treeMenuController.setDisableListeners(disable);
+    }
+
+    public void reloadTreeMenu(final DefaultMutableTreeNode node) {
+        treeMenuController.reloadNodeDontSelect(node);
+        treeMenuController.repaintMenuTree();
+    }
+
+    JTree createTreeMenu(final BiConsumer<InfoPresenter, Boolean> listener) {
+        final JTree tree = treeMenuController.getMenuTree();
+        treeMenuController.addListeners(listener);
+        return tree;
     }
 }
 

@@ -894,14 +894,15 @@ sub get_gui_options_info {
 sub get_version_info {
 	my $cmd = 
 	  'uname; uname -m; uname -r; '
-	 .'for d in redhat debian gentoo SuSE distro; do '
-	   .'v=`head -1 -q /etc/"$d"_version /etc/"$d"-release 2>/dev/null`; '
+	 .'for d in redhat debian gentoo SuSE SUSE distro; do '
+	   .'v=`head -1 -q /etc/"$d"_version /etc/"$d"-release /etc/"$d"-brand 2>/dev/null`; '
 	   .'if [ ! -z "$v" ]; then echo "$v"; echo "$d"; fi; '
-	 .'done '
+	 .'done |head -2'
 	 .'| sed "s/distro/openfiler/";'
 	 .'lsb_release -i -r 2>/dev/null '
 	 .'| sed "s/centos/redhat/I"|sed "s/SUSE LINUX/suse/" '
 	 .'| sed "s/openSUSE project/suse/" '
+	 .'| sed "s/openSUSE$/suse/" '
 	 .'| sed "s/enterprise_linux\|ScientificSL/redhatenterpriseserver/" '
 	 .'| perl -lne "print lc((split /:\s*/)[1])"'
 	 .'| sed "s/oracleserver/redhat/"; '
@@ -2184,7 +2185,6 @@ sub gui_test_compare {
 	$realconf =~ s/\s+$//mg;
 	my $diff = "";
 	do {
-
 		if ($try > 1) {
 			$testfile = "$testfile_part-$try";
 		} else {
@@ -2237,88 +2237,47 @@ sub gui_test {
 		$hb_version =~ s/\s+.*//;
 		chomp $hb_version;
 	}
-	my $crm_show;
-	my $crm_status;
 	my $cib;
-	my $status;
-	if ($hb_version eq "2.1.3" || $hb_version eq "2.1.4") {
-		$crm_status = "TERM=dumb /usr/sbin/crm_mon -1|sed 1,5d";
-		my $first_o = 1;
-		my @o_nodes = ();
-		for (_exec("$crm_status")) {
-			if (/^Node:\s+(\S+).*online$/) {
-				push @o_nodes, $1;
-				if ($first_o) {
-					$status .= "!ONLINE!";
-					$first_o = 0;
-				}
-				next;
-			}
-			if ($first_o || /^\s*$/) {
-				$status .= $_;
-			} else {
-				$status .= " $_";
-			}
+	my $crm_show = 
+		"TERM=dumb PATH=\$PATH:/usr/sbin /usr/sbin/crm configure show"
+		."|grep -v 'expected-quorum-votes=2'"
+		."|grep -v 'unknown-expected-votes'"
+		."|grep -v 'dc-version='"
+		."|grep -v 'cluster-infrastructure='"
+		."|grep -v 'last-lrm-refresh='"
+		."|grep -v 'have-watchdog='";
+	$cib = _exec("$crm_show");
+	my $ret = $?;
+	if ($ret != 0) {
+		exit $ret;
+	}
+	for ($cib) {
+		s/\\$//mg;
+		s/^\s+//;
+		s/\s+$//;
+		my $i = 1;
+		for my $host (@hosts) {
+			s/$host\b/host/gi;
+			$i++;
 		}
-		my $ret = $?;
-		if ($ret != 0) {
-			exit $ret;
-		}
-		$status =~ s/((\d+) Nodes configured)\./$1, $2 expected votes/;
-		$status =~ s/!ONLINE!/Online: [ @o_nodes ]\n/;
-	} else {
-		my $crm_show = 
-			"TERM=dumb PATH=\$PATH:/usr/sbin /usr/sbin/crm configure show"
-			."|grep -v 'expected-quorum-votes=2'"
-			."|grep -v 'unknown-expected-votes'"
-			."|grep -v 'dc-version='"
-			."|grep -v 'cluster-infrastructure='"
-			."|grep -v 'last-lrm-refresh='"
-			."|grep -v 'have-watchdog='";
-		$cib = _exec("$crm_show");
-		my $ret = $?;
-		if ($ret != 0) {
-			exit $ret;
-		}
-		for ($cib) {
-			s/\\$//mg;
-			s/^\s+//;
-			s/\s+$//;
-			my $i = 1;
-			for my $host (@hosts) {
-				s/$host\b/host/gi;
-				$i++;
-			}
-		}
-		# older crm shell had _rsc_set_
-		$cib =~ s/_rsc_set_ //g;
-		$cib =~ s/(start-delay=\d+) (timeout=\d+)/$2 $1/g;
-		$cib =~ s/(node)\s+\$id=".*?"/$1/g;
-		# sort node lines
-		$cib =~
-	  	   s/(^node\s+.*$)\n(^node\s+.*$)/join "\n", sort ($1, $2)/me;
-		$crm_status = "crm_mon -1|sed 1,3d";
-		$status = _exec("$crm_status|grep -v 'Full list of resources:'");
-		$ret = $?;
-		if ($ret != 0) {
-			exit $ret;
-		}
+	}
+	# older crm shell had _rsc_set_
+	$cib =~ s/_rsc_set_ //g;
+	$cib =~ s/(start-delay=\d+) (timeout=\d+)/$2 $1/g;
+	$cib =~ s/(node)\s+\$id=".*?"/$1/g;
+	# sort node lines
+	$cib =~
+	   s/(^node\s+.*$)\n(^node\s+.*$)/join "\n", sort ($1, $2)/me;
+	my $crm_status = "crm_resource --list";
+	my $status = _exec($crm_status);
+	$ret = $?;
+	if ($ret != 0) {
+		exit $ret;
 	}
 
-	$status =~ s/\\$//mg;
-	for my $host (@hosts) {
-		$status =~ s/$host\b/host/gi;
-	}
-	$status =~ s/(Master\/Slave Set:.*?)\s+\[.*/$1/g;
-	$status =~ s/unknown( expected votes)/2$1/;
-	$status =~ s/\s+\(.*?\)(: standby)/$1/g;
-	$status =~ s/(\d+ resources? configured):.*/$1/m;
 	$cib =~ s/\s*\n\s*attributes standby=off\s*/\n/g;
 	$cib =~ s/^node \d+: host/node host/gm;
 	$cib =~ s/^(node host)\s+$/$1/gm;
-      	if (pcmk_version_smaller_than("1.1.6")) {
-	      $status =~ s/(Clone Set:.*?)\s+\[.*\]/$1/g;
-	}
 
 	gui_test_compare("/tmp/lcmc-test/$testname/test$index.crm", $cib);
 	gui_test_compare("/tmp/lcmc-test/$testname/status$index.crm", $status);

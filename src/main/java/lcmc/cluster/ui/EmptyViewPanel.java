@@ -21,34 +21,28 @@
  */
 package lcmc.cluster.ui;
 
-import java.awt.BorderLayout;
-import java.awt.CardLayout;
-import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.FlowLayout;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+import lcmc.cluster.ui.widget.WidgetFactory;
+import lcmc.cluster.ui.wizard.AddClusterDialog;
+import lcmc.common.domain.AllHostsUpdatable;
+import lcmc.common.domain.Application;
+import lcmc.common.domain.util.Tools;
+import lcmc.common.ui.Browser;
+import lcmc.common.ui.ViewPanel;
+import lcmc.common.ui.main.MainData;
+import lcmc.common.ui.main.MainPresenter;
+import lcmc.common.ui.utils.MyButton;
+import lcmc.common.ui.utils.SwingUtils;
+import lcmc.host.domain.Host;
+import lcmc.host.domain.HostFactory;
+import lcmc.host.ui.AddHostDialog;
+
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Provider;
-import javax.swing.BoxLayout;
-import javax.swing.ImageIcon;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import lcmc.cluster.ui.wizard.AddClusterDialog;
-import lcmc.common.ui.Browser;
-import lcmc.common.ui.main.MainPresenter;
-import lcmc.common.ui.main.MainData;
-import lcmc.common.ui.ViewPanel;
-import lcmc.common.ui.utils.SwingUtils;
-import lcmc.host.ui.AddHostDialog;
-import lcmc.cluster.ui.widget.WidgetFactory;
-import lcmc.common.domain.Application;
-import lcmc.host.domain.Host;
-import lcmc.host.domain.HostFactory;
-import lcmc.common.domain.AllHostsUpdatable;
-import lcmc.common.ui.utils.MyButton;
-import lcmc.common.domain.util.Tools;
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 /**
  * An implementation of an empty tab panel with new cluster and host button.
@@ -161,7 +155,8 @@ public final class EmptyViewPanel extends ViewPanel implements AllHostsUpdatable
 
     /** creates cluster view and updates the tree. */
     private void createEmptyView() {
-        getTree(emptyBrowser);
+        final JTree tree = emptyBrowser.createTreeMenu((info, disableListeners) -> setRightComponentInView(emptyBrowser, info, disableListeners));
+        createPanels(tree);
         emptyBrowser.updateHosts();
     }
 

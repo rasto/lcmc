@@ -1,3 +1,5 @@
-2 nodes and 4 resources configured
+Master/Slave Set: ms_Stateful_1 [res_Stateful_1]
+ Stopped (disabled): [ test1 test2 ]
+Master/Slave Set: ms_Stateful_2 [res_Stateful_2]
+ Stopped (disabled): [ test1 test2 ]
 
-Online: [ host host ]

@@ -21,65 +21,42 @@
  */
 package lcmc.host.ui;
 
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.FlowLayout;
-import java.awt.Font;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.Insets;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.regex.Matcher;
+import lcmc.cluster.domain.Cluster;
+import lcmc.cluster.domain.Clusters;
+import lcmc.cluster.ui.EmptyBrowser;
+import lcmc.cluster.ui.widget.GenericWidget.MTextField;
+import lcmc.cluster.ui.widget.WidgetFactory;
+import lcmc.common.domain.AccessMode;
+import lcmc.common.domain.Application;
+import lcmc.common.domain.UserConfig;
+import lcmc.common.domain.util.Tools;
+import lcmc.common.ui.Browser;
+import lcmc.common.ui.Info;
+import lcmc.common.ui.main.MainData;
+import lcmc.common.ui.main.MainPresenter;
+import lcmc.common.ui.utils.*;
+import lcmc.host.domain.Host;
+import lcmc.host.domain.HostFactory;
+import lcmc.logger.Logger;
+import lcmc.logger.LoggerFactory;
+
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Provider;
 import javax.inject.Singleton;
-import javax.swing.BoxLayout;
-import javax.swing.ImageIcon;
-import javax.swing.JCheckBox;
-import javax.swing.JComponent;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTextField;
+import javax.swing.*;
 import javax.swing.border.LineBorder;
 import javax.swing.border.TitledBorder;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
-
-import lcmc.common.ui.main.MainPresenter;
-import lcmc.common.ui.Info;
-import lcmc.common.ui.main.MainData;
-import lcmc.cluster.ui.widget.WidgetFactory;
-import lcmc.common.ui.Browser;
-import lcmc.cluster.ui.widget.GenericWidget.MTextField;
-import lcmc.common.domain.AccessMode;
-import lcmc.common.domain.Application;
-import lcmc.cluster.domain.Cluster;
-import lcmc.cluster.domain.Clusters;
-import lcmc.common.ui.treemenu.TreeMenuController;
-import lcmc.common.ui.utils.SwingUtils;
-import lcmc.host.domain.Host;
-import lcmc.host.domain.HostFactory;
-import lcmc.common.domain.UserConfig;
-import lcmc.logger.Logger;
-import lcmc.logger.LoggerFactory;
-import lcmc.common.ui.utils.MenuAction;
-import lcmc.common.ui.utils.MenuFactory;
-import lcmc.common.ui.utils.MyButton;
-import lcmc.common.ui.utils.MyMenuItem;
-import lcmc.common.domain.util.Tools;
-import lcmc.common.ui.utils.UpdatableItem;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
+import java.util.*;
+import java.util.List;
+import java.util.regex.Matcher;
 
 /**
  * This class holds all hosts that are added to the GUI as opposite to all
@@ -127,11 +104,11 @@ public final class AllHostsInfo extends Info {
     private SwingUtils swingUtils;
     @Inject
     private MenuFactory menuFactory;
-    @Inject
-    private TreeMenuController treeMenuController;
+    private EmptyBrowser emptyBrowser;
 
-    public void init(final Browser browser) {
-        super.init(Tools.getString("ClusterBrowser.AllHosts"), browser);
+    public void init(final EmptyBrowser emptyBrowser) {
+        this.emptyBrowser = emptyBrowser;
+        super.init(Tools.getString("ClusterBrowser.AllHosts"), this.emptyBrowser);
         loadMarkedClustersButton = widgetFactory.createButton(
                 Tools.getString("EmptyBrowser.LoadMarkedClusters"),
                 CLUSTER_ICON,
@@ -197,8 +174,7 @@ public final class AllHostsInfo extends Info {
                                 allClusterCheckboxes.remove(cluster);
                                 allLoadButtons.remove(cluster);
                                 mainPanel.remove(p);
-                                treeMenuController.reloadNode(getNode(), false);
-                                treeMenuController.repaintMenuTree();
+                                emptyBrowser.reloadTreeMenu(getNode());
                             }
                         }
                     }

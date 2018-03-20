@@ -980,6 +980,10 @@ public abstract class EditableInfo extends Info {
         return resource.get();
     }
 
+    public boolean isNew() {
+        return getResource().isNew();
+    }
+
     /**
      * This class holds a part of the panel within the same section, access
      * type and advanced mode setting.

@@ -21,45 +21,40 @@
  */
 package lcmc.crm.ui.resource;
 
-import java.util.ArrayList;
-import java.util.Enumeration;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
 import com.google.common.base.Optional;
 import com.google.common.eventbus.Subscribe;
 import lcmc.ClusterEventBus;
+import lcmc.cluster.service.ssh.ExecCommandConfig;
+import lcmc.cluster.service.ssh.SshOutput;
 import lcmc.cluster.service.storage.BlockDeviceService;
 import lcmc.cluster.service.storage.FileSystemService;
 import lcmc.cluster.service.storage.MountPointService;
-import lcmc.common.ui.Browser;
-import lcmc.common.ui.treemenu.TreeMenuController;
-import lcmc.common.ui.utils.SwingUtils;
-import lcmc.configs.DistResource;
-import lcmc.common.domain.AccessMode;
-import lcmc.common.domain.Application;
-import lcmc.crm.domain.ResourceAgent;
-import lcmc.drbd.ui.resource.ResourceInfo;
-import lcmc.event.CommonBlockDevicesChangedEvent;
-import lcmc.event.CommonMountPointsEvent;
-import lcmc.host.domain.Host;
-import lcmc.common.domain.StringValue;
-import lcmc.common.domain.Value;
 import lcmc.cluster.ui.resource.CommonDeviceInterface;
-import lcmc.common.ui.Info;
-import lcmc.drbd.ui.resource.VolumeInfo;
 import lcmc.cluster.ui.widget.Check;
 import lcmc.cluster.ui.widget.Widget;
 import lcmc.cluster.ui.widget.WidgetFactory;
+import lcmc.common.domain.AccessMode;
+import lcmc.common.domain.Application;
+import lcmc.common.domain.StringValue;
+import lcmc.common.domain.Value;
 import lcmc.common.domain.util.Tools;
+import lcmc.common.ui.Browser;
+import lcmc.common.ui.Info;
+import lcmc.common.ui.treemenu.ClusterTreeMenu;
+import lcmc.common.ui.utils.SwingUtils;
 import lcmc.common.ui.utils.WidgetListener;
-import lcmc.cluster.service.ssh.ExecCommandConfig;
-import lcmc.cluster.service.ssh.SshOutput;
+import lcmc.configs.DistResource;
+import lcmc.crm.domain.ResourceAgent;
+import lcmc.drbd.ui.resource.ResourceInfo;
+import lcmc.drbd.ui.resource.VolumeInfo;
+import lcmc.event.CommonBlockDevicesChangedEvent;
+import lcmc.event.CommonMountPointsEvent;
+import lcmc.host.domain.Host;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.swing.tree.DefaultMutableTreeNode;
+import java.util.*;
 
 /**
  * This class holds info about Filesystem service. It is treated in special
@@ -91,7 +86,7 @@ public class FilesystemRaInfo extends ServiceInfo {
     @Inject
     private ClusterEventBus clusterEventBus;
     @Inject
-    private TreeMenuController treeMenuController;
+    private ClusterTreeMenu clusterTreeMenu;
     @Inject
     private FileSystemService fileSystemService;
 
@@ -522,7 +517,7 @@ public class FilesystemRaInfo extends ServiceInfo {
         if (defaultValue != null) {
             list.add(defaultValue);
         }
-        for (final Info drbdRes : treeMenuController.nodesToInfos(drbdResources)) {
+        for (final Info drbdRes : clusterTreeMenu.nodesToInfos(drbdResources)) {
             if (!(drbdRes instanceof ResourceInfo)) {
                 continue;
             }
@@ -530,7 +525,7 @@ public class FilesystemRaInfo extends ServiceInfo {
             if (drbdResNode != null) {
                 @SuppressWarnings("unchecked")
                 final Enumeration<DefaultMutableTreeNode> drbdVolumes = drbdResNode.children();
-                for (final Value drbdVol : treeMenuController.nodesToInfos(drbdVolumes)) {
+                for (final Value drbdVol : clusterTreeMenu.nodesToInfos(drbdVolumes)) {
                     list.add(drbdVol);
                 }
             }

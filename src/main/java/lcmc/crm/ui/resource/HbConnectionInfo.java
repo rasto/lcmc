@@ -33,7 +33,7 @@ import lcmc.common.ui.Browser;
 import lcmc.common.ui.EditableInfo;
 import lcmc.common.ui.Info;
 import lcmc.common.ui.SpringUtilities;
-import lcmc.common.ui.treemenu.TreeMenuController;
+import lcmc.common.ui.treemenu.ClusterTreeMenu;
 import lcmc.common.ui.utils.ButtonCallback;
 import lcmc.common.ui.utils.ComponentWithTest;
 import lcmc.common.ui.utils.SwingUtils;
@@ -51,11 +51,8 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.LinkedHashMap;
+import java.util.*;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
@@ -90,7 +87,7 @@ public class HbConnectionInfo extends EditableInfo {
     @Inject
     private HbConnectionMenu hbConnectionMenu;
     @Inject
-    private TreeMenuController treeMenuController;
+    private ClusterTreeMenu clusterTreeMenu;
 
     public void init(final Browser browser) {
         super.einit(Optional.<ResourceValue>absent(), "HbConnectionInfo", browser);
@@ -633,7 +630,7 @@ public class HbConnectionInfo extends EditableInfo {
     @Override
     public final void selectMyself() {
         super.selectMyself();
-        final DefaultMutableTreeNode node = (DefaultMutableTreeNode) treeMenuController.getMenuTree().getLastSelectedPathComponent();
+        final DefaultMutableTreeNode node = (DefaultMutableTreeNode) clusterTreeMenu.getMenuTree().getLastSelectedPathComponent();
         if (node != null) {
             // TODO: do this differently, don't need to select it, only reload
             final Info prev = (Info) node.getUserObject();

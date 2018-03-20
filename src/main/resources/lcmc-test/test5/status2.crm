@@ -1,6 +1,2 @@
-2 nodes and 2 resources configured
-
-Online: [ host host ]
-
- res_Dummy_1	(ocf::heartbeat:Dummy):	Started host
- res_Dummy_2	(ocf::heartbeat:Dummy):	Started host
+ res_Dummy_1	(ocf::heartbeat:Dummy):	Started
+ res_Dummy_2	(ocf::heartbeat:Dummy):	Started

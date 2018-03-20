@@ -26,23 +26,15 @@ import com.google.common.base.Optional;
 import lcmc.cluster.ui.ClusterBrowser;
 import lcmc.cluster.ui.widget.Check;
 import lcmc.cluster.ui.widget.Widget;
-import lcmc.common.domain.AccessMode;
-import lcmc.common.domain.Application;
-import lcmc.common.domain.ResourceValue;
-import lcmc.common.domain.StringValue;
-import lcmc.common.domain.Value;
+import lcmc.common.domain.*;
 import lcmc.common.domain.util.Tools;
 import lcmc.common.ui.Browser;
 import lcmc.common.ui.EditableInfo;
 import lcmc.common.ui.Info;
 import lcmc.common.ui.main.MainData;
 import lcmc.common.ui.main.ProgressIndicator;
-import lcmc.common.ui.treemenu.TreeMenuController;
-import lcmc.common.ui.utils.ButtonCallback;
-import lcmc.common.ui.utils.ComponentWithTest;
-import lcmc.common.ui.utils.Dialogs;
-import lcmc.common.ui.utils.SwingUtils;
-import lcmc.common.ui.utils.UpdatableItem;
+import lcmc.common.ui.treemenu.ClusterTreeMenu;
+import lcmc.common.ui.utils.*;
 import lcmc.crm.domain.ClusterStatus;
 import lcmc.crm.domain.CrmXml;
 import lcmc.crm.domain.PtestData;
@@ -62,11 +54,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.geom.Point2D;
 import java.awt.image.BufferedImage;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
+import java.util.*;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.CountDownLatch;
 
 /**
@@ -89,7 +78,7 @@ public class ServicesInfo extends EditableInfo {
     @Inject
     private SwingUtils swingUtils;
     @Inject
-    private TreeMenuController treeMenuController;
+    private ClusterTreeMenu clusterTreeMenu;
     @Inject
     private CrmServiceFactory crmServiceFactory;
     @Inject
@@ -546,7 +535,7 @@ public class ServicesInfo extends EditableInfo {
                                     false, /* colocation only */
                                     false, /* order only */
                                     runMode)) {
-                    final DefaultMutableTreeNode newServiceNode = treeMenuController.createMenuItem(
+                    final DefaultMutableTreeNode newServiceNode = clusterTreeMenu.createMenuItem(
                             getBrowser().getServicesNode(),
                             newServiceInfo);
                     if (interactive) {
@@ -559,8 +548,8 @@ public class ServicesInfo extends EditableInfo {
                     }
                     if (reloadNode) {
                         /* show it */
-                        treeMenuController.reloadNode(getBrowser().getServicesNode(), false);
-                        treeMenuController.reloadNode(newServiceNode, true);
+                        clusterTreeMenu.reloadNodeDontSelect(getBrowser().getServicesNode());
+                        clusterTreeMenu.reloadNode(newServiceNode);
                     }
                     getBrowser().reloadAllComboBoxes(newServiceInfo);
                     hg.scale();
@@ -671,8 +660,8 @@ public class ServicesInfo extends EditableInfo {
         final String cn = getBrowser().getCluster().getName();
         progressIndicator.startProgressIndicator(cn, "paste");
         final ClusterBrowser otherBrowser = (ClusterBrowser) oldInfos.get(0).getBrowser();
-        getBrowser().getClusterViewPanel().setDisabledDuringLoad(true);
-        otherBrowser.getClusterViewPanel().setDisabledDuringLoad(true);
+        getBrowser().setDisabledDuringLoad(true);
+        otherBrowser.setDisabledDuringLoad(true);
         for (Info oldI : oldInfos) {
             CloneInfo oci = null;
             if (oldI instanceof CloneInfo) {
@@ -745,15 +734,15 @@ public class ServicesInfo extends EditableInfo {
                                 newChild.getInfoPanel();
                                 copyPasteFields(oldChild, newChild);
                             }
-                            treeMenuController.reloadNode(newGi.getNode(), false);
+                            clusterTreeMenu.reloadNodeDontSelect(newGi.getNode());
                         }
                     });
                 }
             }
         }
         progressIndicator.stopProgressIndicator(cn, "paste");
-        otherBrowser.getClusterViewPanel().setDisabledDuringLoad(false);
-        getBrowser().getClusterViewPanel().setDisabledDuringLoad(false);
+        otherBrowser.setDisabledDuringLoad(false);
+        getBrowser().setDisabledDuringLoad(false);
     }
 
     public void exportGraphAsPng() {
@@ -769,7 +758,7 @@ public class ServicesInfo extends EditableInfo {
     }
 
     public void cleanupServiceMenu(final List<ServiceInfo> groupServiceIsPresent) {
-        for (final Object info : treeMenuController.nodesToInfos(getNode().children())) {
+        for (final Object info : clusterTreeMenu.nodesToInfos(getNode().children())) {
             final ServiceInfo serviceInfo = (ServiceInfo) info;
             for (final ServiceInfo subService : serviceInfo.getSubServices()) {
                 if (!groupServiceIsPresent.contains(subService) && !subService.getService().isNew()) { //TODO: NPE
@@ -782,10 +771,10 @@ public class ServicesInfo extends EditableInfo {
     }
 
     public void reloadNode() {
-        treeMenuController.reloadNode(getBrowser().getServicesNode(), false);
+        clusterTreeMenu.reloadNodeDontSelect(getBrowser().getServicesNode());
     }
 
     public void moveNodeToPosition(int pos, DefaultMutableTreeNode node) {
-        treeMenuController.moveNodeToPosition(node, pos);
+        clusterTreeMenu.moveNodeUpToPosition(node, pos);
     }
 }

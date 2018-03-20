@@ -20,53 +20,33 @@
 
 package lcmc.crm.ui.resource;
 
-import java.awt.FlowLayout;
-import java.awt.geom.Point2D;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
+import lcmc.AppContext;
+import lcmc.cluster.ui.ClusterBrowser;
+import lcmc.cluster.ui.widget.Widget;
+import lcmc.common.domain.*;
+import lcmc.common.domain.util.Tools;
+import lcmc.common.ui.Access;
+import lcmc.common.ui.CallbackAction;
+import lcmc.common.ui.EditConfig;
+import lcmc.common.ui.main.MainData;
+import lcmc.common.ui.treemenu.ClusterTreeMenu;
+import lcmc.common.ui.utils.*;
+import lcmc.crm.domain.ClusterStatus;
+import lcmc.crm.domain.CrmXml;
+import lcmc.crm.domain.ResourceAgent;
+import lcmc.crm.ui.ServiceLogs;
+import lcmc.host.domain.Host;
+import lombok.val;
+
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Provider;
-import javax.swing.JCheckBox;
-import javax.swing.JDialog;
-import javax.swing.JPanel;
+import javax.swing.*;
 import javax.swing.tree.DefaultMutableTreeNode;
-
-import lcmc.AppContext;
-import lcmc.common.ui.Access;
-import lcmc.common.ui.CallbackAction;
-import lcmc.common.ui.main.MainData;
-import lcmc.common.domain.AccessMode;
-import lcmc.common.domain.Application;
-import lcmc.common.ui.treemenu.TreeMenuController;
-import lcmc.common.ui.utils.SwingUtils;
-import lcmc.crm.domain.CrmXml;
-import lcmc.crm.domain.ClusterStatus;
-import lcmc.host.domain.Host;
-import lcmc.crm.domain.ResourceAgent;
-import lcmc.common.domain.Value;
-import lcmc.cluster.ui.ClusterBrowser;
-import lcmc.common.ui.EditConfig;
-import lcmc.crm.ui.ServiceLogs;
-import lcmc.cluster.ui.widget.Widget;
-import lcmc.common.ui.utils.ButtonCallback;
-import lcmc.common.ui.utils.ComponentWithTest;
-import lcmc.common.domain.EnablePredicate;
-import lcmc.common.ui.utils.MenuAction;
-import lcmc.common.ui.utils.MenuFactory;
-import lcmc.common.ui.utils.MyList;
-import lcmc.common.ui.utils.MyListModel;
-import lcmc.common.ui.utils.MyMenu;
-import lcmc.common.ui.utils.MyMenuItem;
-import lcmc.common.domain.Predicate;
-import lcmc.common.domain.util.Tools;
-import lcmc.common.ui.utils.UpdatableItem;
-import lcmc.common.domain.VisiblePredicate;
-import lombok.val;
+import java.awt.*;
+import java.awt.geom.Point2D;
+import java.util.*;
+import java.util.List;
 
 @Named
 public class ServiceMenu {
@@ -83,7 +63,7 @@ public class ServiceMenu {
     @Inject
     private Provider<ServiceLogs> serviceLogsProvider;
     @Inject
-    private TreeMenuController treeMenuController;
+    private ClusterTreeMenu clusterTreeMenu;
     @Inject
     private Access access;
 
@@ -200,7 +180,7 @@ public class ServiceMenu {
                                 if (node == null) {
                                     return "no";
                                 }
-                                final int index = treeMenuController.getIndex(giNode, node);
+                                final int index = clusterTreeMenu.getIndex(giNode, node);
                                 if (index == 0) {
                                     return "already up";
                                 }
@@ -260,8 +240,8 @@ public class ServiceMenu {
                                 if (node == null) {
                                     return "no";
                                 }
-                                final int index = treeMenuController.getIndex(giNode, node);
-                                final int groupChildCount = treeMenuController.getChildCount(giNode);
+                                final int index = clusterTreeMenu.getIndex(giNode, node);
+                                final int groupChildCount = clusterTreeMenu.getChildCount(giNode);
                                 if (index >= groupChildCount - 1) {
                                     return "already down";
                                 }

@@ -21,8 +21,10 @@
 package lcmc.cluster.ui.network;
 
 import lcmc.common.domain.Application;
+import lcmc.common.ui.Browser;
 
 import javax.swing.*;
+import javax.swing.tree.DefaultMutableTreeNode;
 
 public interface InfoPresenter {
     void show(JComponent panel);
@@ -34,4 +36,9 @@ public interface InfoPresenter {
     JPanel getGraphicalView();
 
     void showPopup(JComponent tree, int x, int y);
+
+    default void setNode(DefaultMutableTreeNode node) {
+    }
+
+    Browser getBrowser();
 }

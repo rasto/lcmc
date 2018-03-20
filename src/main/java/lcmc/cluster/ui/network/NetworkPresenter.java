@@ -25,8 +25,10 @@ import com.google.common.eventbus.Subscribe;
 import lcmc.ClusterEventBus;
 import lcmc.cluster.domain.Cluster;
 import lcmc.cluster.domain.Network;
+import lcmc.cluster.ui.ClusterBrowser;
 import lcmc.common.domain.Application;
 import lcmc.common.domain.util.Tools;
+import lcmc.common.ui.Browser;
 import lcmc.event.NetInterfacesChangedEvent;
 import lcmc.cluster.service.NetworkService;
 
@@ -42,6 +44,7 @@ public class NetworkPresenter implements InfoPresenter {
     private final Cluster cluster;
     private ClusterEventBus clusterEventBus;
     private NetworkService networkService;
+    private final ClusterBrowser clusterBrowser;
 
     private static final ImageIcon NETWORK_ICON = Tools.createImageIcon(Tools.getDefault("ClusterBrowser.NetworkIcon"));
 
@@ -51,13 +54,14 @@ public class NetworkPresenter implements InfoPresenter {
             final NetworkView view,
             final ClusterEventBus clusterEventBus,
             final Cluster cluster,
-            final NetworkService networkService) {
+            final NetworkService networkService, ClusterBrowser clusterBrowser) {
         this.network = network;
         this.model = model;
         this.view = view;
         this.clusterEventBus = clusterEventBus;
         this.cluster = cluster;
         this.networkService = networkService;
+        this.clusterBrowser = clusterBrowser;
     }
 
     @Override
@@ -108,6 +112,11 @@ public class NetworkPresenter implements InfoPresenter {
     @Override
     public void showPopup(JComponent tree, int x, int y) {
 
+    }
+
+    @Override
+    public Browser getBrowser() {
+        return clusterBrowser;
     }
 
     @Override

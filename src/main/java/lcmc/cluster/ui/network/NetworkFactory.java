@@ -24,6 +24,7 @@ import lcmc.ClusterEventBus;
 import lcmc.cluster.domain.Cluster;
 import lcmc.cluster.domain.Network;
 import lcmc.cluster.service.NetworkService;
+import lcmc.cluster.ui.ClusterBrowser;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -35,7 +36,7 @@ public class NetworkFactory {
     @Inject
     private NetworkService networkService;
 
-    public NetworkPresenter createPresenter(final Cluster cluster, final Network network) {
+    public NetworkPresenter createPresenter(final Cluster cluster, final Network network, ClusterBrowser clusterBrowser) {
         final NetworkModel model = new NetworkModel();
         final NetworkView view = new NetworkView(model);
         return new NetworkPresenter(
@@ -44,6 +45,7 @@ public class NetworkFactory {
                 view,
                 clusterEventBus,
                 cluster,
-                networkService);
+                networkService,
+                clusterBrowser);
     }
 }

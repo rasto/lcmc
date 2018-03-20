@@ -35,7 +35,7 @@ import lcmc.common.domain.Value;
 import lcmc.common.domain.util.Tools;
 import lcmc.common.ui.Browser;
 import lcmc.common.ui.EditableInfo;
-import lcmc.common.ui.treemenu.TreeMenuController;
+import lcmc.common.ui.treemenu.ClusterTreeMenu;
 import lcmc.common.ui.utils.ButtonCallback;
 import lcmc.common.ui.utils.ComponentWithTest;
 import lcmc.common.ui.utils.SwingUtils;
@@ -152,7 +152,7 @@ public class VolumeInfo extends EditableInfo implements CommonDeviceInterface {
     @Inject
     private Provider<DrbdLogs> drbdLogsProvider;
     @Inject
-    private TreeMenuController treeMenuController;
+    private ClusterTreeMenu clusterTreeMenu;
 
     void init(final String name,
               final String device,
@@ -478,7 +478,7 @@ public class VolumeInfo extends EditableInfo implements CommonDeviceInterface {
             }
         }
         super.removeMyself(runMode);
-        treeMenuController.reloadNode(clusterBrowser.getDrbdNode(), true);
+        clusterTreeMenu.reloadNode(clusterBrowser.getDrbdNode());
 
         clusterBrowser.getDrbdDeviceHash().remove(getDevice());
         clusterBrowser.putDrbdDevHash();
@@ -522,7 +522,7 @@ public class VolumeInfo extends EditableInfo implements CommonDeviceInterface {
                     @Override
                     public void run() {
                         clusterBrowser.getDrbdGraph().updatePopupMenus();
-                        treeMenuController.removeNode(getNode());
+                        clusterTreeMenu.removeNode(getNode());
                         clusterBrowser.getDrbdGraph().scale();
                     }
                 });

@@ -28,19 +28,14 @@ import lcmc.cluster.ui.resource.NetInfo;
 import lcmc.cluster.ui.widget.Check;
 import lcmc.cluster.ui.widget.Widget;
 import lcmc.cluster.ui.widget.WidgetFactory;
-import lcmc.common.domain.AccessMode;
-import lcmc.common.domain.Application;
-import lcmc.common.domain.ResourceValue;
-import lcmc.common.domain.StringValue;
-import lcmc.common.domain.Unit;
-import lcmc.common.domain.Value;
+import lcmc.common.domain.*;
 import lcmc.common.domain.util.Tools;
 import lcmc.common.ui.Browser;
 import lcmc.common.ui.EditableInfo;
 import lcmc.common.ui.Info;
 import lcmc.common.ui.SpringUtilities;
 import lcmc.common.ui.main.ProgressIndicator;
-import lcmc.common.ui.treemenu.TreeMenuController;
+import lcmc.common.ui.treemenu.ClusterTreeMenu;
 import lcmc.common.ui.utils.MyButton;
 import lcmc.common.ui.utils.SwingUtils;
 import lcmc.common.ui.utils.UpdatableItem;
@@ -53,15 +48,7 @@ import lcmc.logger.Logger;
 import lcmc.logger.LoggerFactory;
 import lcmc.vm.domain.VMParams;
 import lcmc.vm.domain.VmsXml;
-import lcmc.vm.domain.data.DiskData;
-import lcmc.vm.domain.data.FilesystemData;
-import lcmc.vm.domain.data.GraphicsData;
-import lcmc.vm.domain.data.InputDevData;
-import lcmc.vm.domain.data.InterfaceData;
-import lcmc.vm.domain.data.ParallelData;
-import lcmc.vm.domain.data.SerialData;
-import lcmc.vm.domain.data.SoundData;
-import lcmc.vm.domain.data.VideoData;
+import lcmc.vm.domain.data.*;
 import lcmc.vm.service.VIRSH;
 import org.w3c.dom.Node;
 
@@ -73,18 +60,8 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedHashSet;
+import java.util.*;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.TreeMap;
-import java.util.UUID;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantLock;
@@ -620,7 +597,7 @@ public class DomainInfo extends EditableInfo {
     @Inject
     private WidgetFactory widgetFactory;
     @Inject
-    private TreeMenuController treeMenuController;
+    private ClusterTreeMenu clusterTreeMenu;
 
     public void einit(final String name, final Browser browser) {
         super.einit(Optional.of(new ResourceValue(name)), name, browser);
@@ -669,7 +646,7 @@ public class DomainInfo extends EditableInfo {
         }
         final Collection<DefaultMutableTreeNode> nodesToRemove = new ArrayList<DefaultMutableTreeNode>();
         boolean nodeChanged = false;
-        for (final Object info : treeMenuController.nodesToInfos(thisNode.children())) {
+        for (final Object info : clusterTreeMenu.nodesToInfos(thisNode.children())) {
             if (!(info instanceof DiskInfo)) {
                 continue;
             }
@@ -701,11 +678,11 @@ public class DomainInfo extends EditableInfo {
 
         /* remove nodes */
         swingUtils.isSwingThread();
-        treeMenuController.removeFromParent(nodesToRemove);
+        clusterTreeMenu.removeFromParent(nodesToRemove);
 
         for (final String disk : diskNames) {
             int i = 0;
-            for (final Object info : treeMenuController.nodesToInfos(thisNode.children())) {
+            for (final Object info : clusterTreeMenu.nodesToInfos(thisNode.children())) {
                 if (!(info instanceof DiskInfo)) {
                     continue;
                 }
@@ -726,7 +703,7 @@ public class DomainInfo extends EditableInfo {
                 mDiskToInfoLock.unlock();
             }
             diskInfo.updateParameters();
-            treeMenuController.createMenuItem(thisNode, diskInfo, i);
+            clusterTreeMenu.createMenuItem(thisNode, diskInfo, i);
             nodeChanged = true;
         }
         return nodeChanged;
@@ -747,7 +724,7 @@ public class DomainInfo extends EditableInfo {
         }
         final Collection<DefaultMutableTreeNode> nodesToRemove = new ArrayList<DefaultMutableTreeNode>();
         boolean nodeChanged = false;
-        for (final Object info : treeMenuController.nodesToInfos(thisNode.children())) {
+        for (final Object info : clusterTreeMenu.nodesToInfos(thisNode.children())) {
             if (!(info instanceof FilesystemInfo)) {
                 continue;
             }
@@ -779,11 +756,11 @@ public class DomainInfo extends EditableInfo {
 
         /* remove nodes */
         swingUtils.isSwingThread();
-        treeMenuController.removeFromParent(nodesToRemove);
+        clusterTreeMenu.removeFromParent(nodesToRemove);
 
         for (final String filesystem : filesystemNames) {
             int i = 0;
-            for (final Object info : treeMenuController.nodesToInfos(thisNode.children())) {
+            for (final Object info : clusterTreeMenu.nodesToInfos(thisNode.children())) {
                 if (!(info instanceof FilesystemInfo)) {
                     continue;
                 }
@@ -804,7 +781,7 @@ public class DomainInfo extends EditableInfo {
                 mFilesystemToInfoLock.unlock();
             }
             filesystemInfo.updateParameters();
-            treeMenuController.createMenuItem(thisNode, filesystemInfo, i);
+            clusterTreeMenu.createMenuItem(thisNode, filesystemInfo, i);
             nodeChanged = true;
         }
         return nodeChanged;
@@ -826,7 +803,7 @@ public class DomainInfo extends EditableInfo {
         final Collection<DefaultMutableTreeNode> nodesToRemove = new ArrayList<DefaultMutableTreeNode>();
         boolean nodeChanged = false;
         InterfaceInfo emptySlot = null; /* for generated mac address. */
-        for (final Object info : treeMenuController.nodesToInfos(thisNode.children())) {
+        for (final Object info : clusterTreeMenu.nodesToInfos(thisNode.children())) {
             if (!(info instanceof InterfaceInfo)) {
                 continue;
             }
@@ -854,13 +831,13 @@ public class DomainInfo extends EditableInfo {
 
         /* remove nodes */
         swingUtils.isSwingThread();
-        treeMenuController.removeFromParent(nodesToRemove);
+        clusterTreeMenu.removeFromParent(nodesToRemove);
 
         for (final String interf : interfaceNames) {
             final InterfaceInfo interfaceInfo;
             if (emptySlot == null) {
                 int i = 0;
-                for (final Object info : treeMenuController.nodesToInfos(thisNode.children())) {
+                for (final Object info : clusterTreeMenu.nodesToInfos(thisNode.children())) {
                     if (!(info instanceof InterfaceInfo)) {
                         if (info instanceof DiskInfo || info instanceof FilesystemInfo) {
                             i++;
@@ -878,7 +855,7 @@ public class DomainInfo extends EditableInfo {
                 /* add new vm interface */
                 interfaceInfo = interfaceInfoProvider.get();
                 interfaceInfo.init(interf, getBrowser(), this);
-                treeMenuController.createMenuItem(thisNode, interfaceInfo, i);
+                clusterTreeMenu.createMenuItem(thisNode, interfaceInfo, i);
                 nodeChanged = true;
             } else {
                 interfaceInfo = emptySlot;
@@ -911,7 +888,7 @@ public class DomainInfo extends EditableInfo {
         }
         final Collection<DefaultMutableTreeNode> nodesToRemove = new ArrayList<DefaultMutableTreeNode>();
         boolean nodeChanged = false;
-        for (final Object info : treeMenuController.nodesToInfos(thisNode.children())) {
+        for (final Object info : clusterTreeMenu.nodesToInfos(thisNode.children())) {
             if (!(info instanceof InputDevInfo)) {
                 continue;
             }
@@ -937,11 +914,11 @@ public class DomainInfo extends EditableInfo {
 
         /* remove nodes */
         swingUtils.isSwingThread();
-        treeMenuController.removeFromParent(nodesToRemove);
+        clusterTreeMenu.removeFromParent(nodesToRemove);
 
         for (final String inputDev : inputDevNames) {
             int i = 0;
-            for (final Object info : treeMenuController.nodesToInfos(thisNode.children())) {
+            for (final Object info : clusterTreeMenu.nodesToInfos(thisNode.children())) {
                 if (!(info instanceof InputDevInfo)) {
                     if (info instanceof DiskInfo || info instanceof FilesystemInfo || info instanceof InterfaceInfo) {
                         i++;
@@ -958,7 +935,7 @@ public class DomainInfo extends EditableInfo {
             /* add new vm input device */
             final InputDevInfo inputDevInfo = inputDevInfoProvider.get();
             inputDevInfo.init(inputDev, getBrowser(), this);
-            treeMenuController.createMenuItem(thisNode, inputDevInfo, i);
+            clusterTreeMenu.createMenuItem(thisNode, inputDevInfo, i);
             nodeChanged = true;
             mInputDevToInfoLock.lock();
             try {
@@ -969,7 +946,7 @@ public class DomainInfo extends EditableInfo {
             inputDevInfo.updateParameters();
         }
         /* Sort it. */
-        treeMenuController.sortChildrenWithNewUp(thisNode);
+        clusterTreeMenu.sortChildrenLeavingNewUp(thisNode);
         return nodeChanged;
     }
 
@@ -988,7 +965,7 @@ public class DomainInfo extends EditableInfo {
         }
         final Collection<DefaultMutableTreeNode> nodesToRemove = new ArrayList<DefaultMutableTreeNode>();
         boolean nodeChanged = false;
-        for (final Object info : treeMenuController.nodesToInfos(thisNode.children())) {
+        for (final Object info : clusterTreeMenu.nodesToInfos(thisNode.children())) {
             if (!(info instanceof GraphicsInfo)) {
                 continue;
             }
@@ -1020,11 +997,11 @@ public class DomainInfo extends EditableInfo {
 
         /* remove nodes */
         swingUtils.isSwingThread();
-        treeMenuController.removeFromParent(nodesToRemove);
+        clusterTreeMenu.removeFromParent(nodesToRemove);
 
         for (final String graphicDisplay : graphicsNames) {
             int i = 0;
-            for (final Object info : treeMenuController.nodesToInfos(thisNode.children())) {
+            for (final Object info : clusterTreeMenu.nodesToInfos(thisNode.children())) {
                 if (!(info instanceof GraphicsInfo)) {
                     if (info instanceof DiskInfo
                         || info instanceof FilesystemInfo
@@ -1044,7 +1021,7 @@ public class DomainInfo extends EditableInfo {
             /* add new vm graphics device */
             final GraphicsInfo graphicsInfo = graphicsInfoProvider.get();
             graphicsInfo.init(graphicDisplay, getBrowser(), this);
-            treeMenuController.createMenuItem(thisNode, graphicsInfo, i);
+            clusterTreeMenu.createMenuItem(thisNode, graphicsInfo, i);
             nodeChanged = true;
             mGraphicsToInfoLock.lock();
             try {
@@ -1072,7 +1049,7 @@ public class DomainInfo extends EditableInfo {
         }
         final Collection<DefaultMutableTreeNode> nodesToRemove = new ArrayList<DefaultMutableTreeNode>();
         boolean nodeChanged = false;
-        for (final Object info : treeMenuController.nodesToInfos(thisNode.children())) {
+        for (final Object info : clusterTreeMenu.nodesToInfos(thisNode.children())) {
             if (!(info instanceof SoundInfo)) {
                 continue;
             }
@@ -1104,11 +1081,11 @@ public class DomainInfo extends EditableInfo {
 
         /* remove nodes */
         swingUtils.isSwingThread();
-        treeMenuController.removeFromParent(nodesToRemove);
+        clusterTreeMenu.removeFromParent(nodesToRemove);
 
         for (final String sound : soundNames) {
             int i = 0;
-            for (final Object info : treeMenuController.nodesToInfos(thisNode.children())) {
+            for (final Object info : clusterTreeMenu.nodesToInfos(thisNode.children())) {
                 if (!(info instanceof SoundInfo)) {
                     if (info instanceof DiskInfo
                         || info instanceof FilesystemInfo
@@ -1129,7 +1106,7 @@ public class DomainInfo extends EditableInfo {
             /* add new vm sound device */
             final SoundInfo soundInfo = soundInfoProvider.get();
             soundInfo.init(sound, getBrowser(), this);
-            treeMenuController.createMenuItem(thisNode, soundInfo, i);
+            clusterTreeMenu.createMenuItem(thisNode, soundInfo, i);
             nodeChanged = true;
             mSoundToInfoLock.lock();
             try {
@@ -1158,7 +1135,7 @@ public class DomainInfo extends EditableInfo {
         final Collection<DefaultMutableTreeNode> nodesToRemove = new ArrayList<DefaultMutableTreeNode>();
         boolean nodeChanged = false;
         SerialInfo emptySlot = null; /* for generated target port. */
-        for (final Object info : treeMenuController.nodesToInfos(thisNode.children())) {
+        for (final Object info : clusterTreeMenu.nodesToInfos(thisNode.children())) {
             if (!(info instanceof SerialInfo)) {
                 continue;
             }
@@ -1186,13 +1163,13 @@ public class DomainInfo extends EditableInfo {
 
         /* remove nodes */
         swingUtils.isSwingThread();
-        treeMenuController.removeFromParent(nodesToRemove);
+        clusterTreeMenu.removeFromParent(nodesToRemove);
 
         for (final String serial : serialNames) {
             final SerialInfo serialInfo;
             if (emptySlot == null) {
                 int i = 0;
-                for (final Object info : treeMenuController.nodesToInfos(thisNode.children())) {
+                for (final Object info : clusterTreeMenu.nodesToInfos(thisNode.children())) {
                     if (!(info instanceof SerialInfo)) {
                         if (info instanceof DiskInfo
                             || info instanceof FilesystemInfo
@@ -1214,7 +1191,7 @@ public class DomainInfo extends EditableInfo {
                 /* add new vm serial device */
                 serialInfo = serialInfoProvider.get();
                 serialInfo.init(serial, getBrowser(), this);
-                treeMenuController.createMenuItem(thisNode, serialInfo, i);
+                clusterTreeMenu.createMenuItem(thisNode, serialInfo, i);
                 nodeChanged = true;
             } else {
                 serialInfo = emptySlot;
@@ -1248,7 +1225,7 @@ public class DomainInfo extends EditableInfo {
         final Collection<DefaultMutableTreeNode> nodesToRemove = new ArrayList<DefaultMutableTreeNode>();
         boolean nodeChanged = false;
         ParallelInfo emptySlot = null; /* for generated target port. */
-        for (final Object info : treeMenuController.nodesToInfos(thisNode.children())) {
+        for (final Object info : clusterTreeMenu.nodesToInfos(thisNode.children())) {
             if (!(info instanceof ParallelInfo)) {
                 continue;
             }
@@ -1276,13 +1253,13 @@ public class DomainInfo extends EditableInfo {
 
         /* remove nodes */
         swingUtils.isSwingThread();
-        treeMenuController.removeFromParent(nodesToRemove);
+        clusterTreeMenu.removeFromParent(nodesToRemove);
 
         for (final String parallel : parallelNames) {
             final ParallelInfo parallelInfo;
             if (emptySlot == null) {
                 int i = 0;
-                for (final Object info : treeMenuController.nodesToInfos(thisNode.children())) {
+                for (final Object info : clusterTreeMenu.nodesToInfos(thisNode.children())) {
                     if (!(info instanceof ParallelInfo)) {
                         if (info instanceof DiskInfo
                             || info instanceof FilesystemInfo
@@ -1305,7 +1282,7 @@ public class DomainInfo extends EditableInfo {
                 /* add new vm parallel device */
                 parallelInfo = parallelInfoProvider.get();
                 parallelInfo.init(parallel, getBrowser(), this);
-                treeMenuController.createMenuItem(thisNode, parallelInfo, i);
+                clusterTreeMenu.createMenuItem(thisNode, parallelInfo, i);
                 nodeChanged = true;
             } else {
                 parallelInfo = emptySlot;
@@ -1338,7 +1315,7 @@ public class DomainInfo extends EditableInfo {
         }
         final Collection<DefaultMutableTreeNode> nodesToRemove = new ArrayList<DefaultMutableTreeNode>();
         boolean nodeChanged = false;
-        for (final Object info : treeMenuController.nodesToInfos(thisNode.children())) {
+        for (final Object info : clusterTreeMenu.nodesToInfos(thisNode.children())) {
             if (!(info instanceof VideoInfo)) {
                 continue;
             }
@@ -1370,11 +1347,11 @@ public class DomainInfo extends EditableInfo {
 
         /* remove nodes */
         swingUtils.isSwingThread();
-        treeMenuController.removeFromParent(nodesToRemove);
+        clusterTreeMenu.removeFromParent(nodesToRemove);
 
         for (final String video : videoNames) {
             int i = 0;
-            for (final Object info : treeMenuController.nodesToInfos(thisNode.children())) {
+            for (final Object info : clusterTreeMenu.nodesToInfos(thisNode.children())) {
                 if (!(info instanceof VideoInfo)) {
                     if (info instanceof DiskInfo
                         || info instanceof FilesystemInfo
@@ -1398,7 +1375,7 @@ public class DomainInfo extends EditableInfo {
             /* add new vm video device */
             final VideoInfo videoInfo = videoInfoProvider.get();
             videoInfo.init(video, getBrowser(), this);
-            treeMenuController.createMenuItem(thisNode, videoInfo, i);
+            clusterTreeMenu.createMenuItem(thisNode, videoInfo, i);
             nodeChanged = true;
             mVideoToInfoLock.lock();
             try {
@@ -1631,7 +1608,7 @@ public class DomainInfo extends EditableInfo {
                     || serialNodeChanged
                     || parallelNodeChanged
                     || videoNodeChanged) {
-                    treeMenuController.reloadNode(thisNode, false);
+                    clusterTreeMenu.reloadNodeDontSelect(thisNode);
                 }
             }
         });
@@ -1649,7 +1626,7 @@ public class DomainInfo extends EditableInfo {
             @Override
             public void run() {
                 setApplyButtons(null, getParametersFromXML());
-                treeMenuController.repaintMenuTree();
+                clusterTreeMenu.repaintMenuTree();
             }
         });
     }
@@ -2084,15 +2061,15 @@ public class DomainInfo extends EditableInfo {
             return diskInfo;
         }
         int i = 0;
-        for (final Object info : treeMenuController.nodesToInfos(thisNode.children())) {
+        for (final Object info : clusterTreeMenu.nodesToInfos(thisNode.children())) {
             if (info instanceof DiskInfo) {
                 i++;
                 continue;
             }
             break;
         }
-        treeMenuController.createMenuItem(thisNode, diskInfo, i);
-        treeMenuController.reloadNode(thisNode, true);
+        clusterTreeMenu.createMenuItem(thisNode, diskInfo, i);
+        clusterTreeMenu.reloadNode(thisNode);
         diskInfo.selectMyself();
         return diskInfo;
     }
@@ -2106,15 +2083,15 @@ public class DomainInfo extends EditableInfo {
             return filesystemInfo;
         }
         int i = 0;
-        for (final Object info : treeMenuController.nodesToInfos(thisNode.children())) {
+        for (final Object info : clusterTreeMenu.nodesToInfos(thisNode.children())) {
             if (info instanceof FilesystemInfo) {
                 i++;
                 continue;
             }
             break;
         }
-        treeMenuController.createMenuItem(thisNode, filesystemInfo, i);
-        treeMenuController.reloadNode(thisNode, true);
+        clusterTreeMenu.createMenuItem(thisNode, filesystemInfo, i);
+        clusterTreeMenu.reloadNode(thisNode);
         filesystemInfo.selectMyself();
         return filesystemInfo;
     }
@@ -2129,7 +2106,7 @@ public class DomainInfo extends EditableInfo {
             return interfaceInfo;
         }
         int i = 0;
-        for (final Object info : treeMenuController.nodesToInfos(thisNode.children())) {
+        for (final Object info : clusterTreeMenu.nodesToInfos(thisNode.children())) {
             if (info instanceof DiskInfo
                 || info instanceof FilesystemInfo
                 || info instanceof InterfaceInfo) {
@@ -2139,8 +2116,8 @@ public class DomainInfo extends EditableInfo {
             break;
         }
 
-        treeMenuController.createMenuItem(thisNode, interfaceInfo, i);
-        treeMenuController.reloadNode(thisNode, true);
+        clusterTreeMenu.createMenuItem(thisNode, interfaceInfo, i);
+        clusterTreeMenu.reloadNode(thisNode);
         interfaceInfo.selectMyself();
         return interfaceInfo;
     }
@@ -2155,7 +2132,7 @@ public class DomainInfo extends EditableInfo {
             return;
         }
         int i = 0;
-        for (final Object info : treeMenuController.nodesToInfos(thisNode.children())) {
+        for (final Object info : clusterTreeMenu.nodesToInfos(thisNode.children())) {
             if (info instanceof DiskInfo
                 || info instanceof FilesystemInfo
                 || info instanceof InterfaceInfo
@@ -2166,8 +2143,8 @@ public class DomainInfo extends EditableInfo {
             break;
         }
 
-        treeMenuController.createMenuItem(thisNode, inputDevInfo, i);
-        treeMenuController.reloadNode(thisNode, true);
+        clusterTreeMenu.createMenuItem(thisNode, inputDevInfo, i);
+        clusterTreeMenu.reloadNode(thisNode);
         inputDevInfo.selectMyself();
     }
 
@@ -2181,7 +2158,7 @@ public class DomainInfo extends EditableInfo {
             return graphicsInfo;
         }
         int i = 0;
-        for (final Object info : treeMenuController.nodesToInfos(thisNode.children())) {
+        for (final Object info : clusterTreeMenu.nodesToInfos(thisNode.children())) {
             if (info instanceof DiskInfo
                 || info instanceof FilesystemInfo
                 || info instanceof InterfaceInfo
@@ -2192,8 +2169,8 @@ public class DomainInfo extends EditableInfo {
             }
             break;
         }
-        treeMenuController.createMenuItem(thisNode, graphicsInfo, i);
-        treeMenuController.reloadNode(thisNode, true);
+        clusterTreeMenu.createMenuItem(thisNode, graphicsInfo, i);
+        clusterTreeMenu.reloadNode(thisNode);
         graphicsInfo.selectMyself();
         return graphicsInfo;
     }
@@ -2207,7 +2184,7 @@ public class DomainInfo extends EditableInfo {
             return;
         }
         int i = 0;
-        for (final Object info : treeMenuController.nodesToInfos(thisNode.children())) {
+        for (final Object info : clusterTreeMenu.nodesToInfos(thisNode.children())) {
             if (info instanceof DiskInfo
                 || info instanceof FilesystemInfo
                 || info instanceof InterfaceInfo
@@ -2220,8 +2197,8 @@ public class DomainInfo extends EditableInfo {
             break;
         }
 
-        treeMenuController.createMenuItem(thisNode, soundInfo, i);
-        treeMenuController.reloadNode(thisNode, true);
+        clusterTreeMenu.createMenuItem(thisNode, soundInfo, i);
+        clusterTreeMenu.reloadNode(thisNode);
         soundInfo.selectMyself();
     }
 
@@ -2234,7 +2211,7 @@ public class DomainInfo extends EditableInfo {
             return;
         }
         int i = 0;
-        for (final Object info : treeMenuController.nodesToInfos(thisNode.children())) {
+        for (final Object info : clusterTreeMenu.nodesToInfos(thisNode.children())) {
             if (info instanceof DiskInfo
                 || info instanceof FilesystemInfo
                 || info instanceof InterfaceInfo
@@ -2248,8 +2225,8 @@ public class DomainInfo extends EditableInfo {
             break;
         }
 
-        treeMenuController.createMenuItem(thisNode, serialInfo, i);
-        treeMenuController.reloadNode(thisNode, true);
+        clusterTreeMenu.createMenuItem(thisNode, serialInfo, i);
+        clusterTreeMenu.reloadNode(thisNode);
         serialInfo.selectMyself();
     }
 
@@ -2263,7 +2240,7 @@ public class DomainInfo extends EditableInfo {
             return;
         }
         int i = 0;
-        for (final Object info : treeMenuController.nodesToInfos(thisNode.children())) {
+        for (final Object info : clusterTreeMenu.nodesToInfos(thisNode.children())) {
             if (info instanceof DiskInfo
                 || info instanceof FilesystemInfo
                 || info instanceof InterfaceInfo
@@ -2278,8 +2255,8 @@ public class DomainInfo extends EditableInfo {
             break;
         }
 
-        treeMenuController.createMenuItem(thisNode, parallelInfo, i);
-        treeMenuController.reloadNode(thisNode, true);
+        clusterTreeMenu.createMenuItem(thisNode, parallelInfo, i);
+        clusterTreeMenu.reloadNode(thisNode);
         parallelInfo.selectMyself();
     }
 
@@ -2288,8 +2265,8 @@ public class DomainInfo extends EditableInfo {
         videoInfo.init(null, getBrowser(), this);
         videoInfo.getResource().setNew(true);
         final DefaultMutableTreeNode thisNode = getNode();
-        treeMenuController.createMenuItem(thisNode, videoInfo);
-        treeMenuController.reloadNode(thisNode, true);
+        clusterTreeMenu.createMenuItem(thisNode, videoInfo);
+        clusterTreeMenu.reloadNode(thisNode);
         videoInfo.selectMyself();
     }
 
@@ -2674,7 +2651,7 @@ public class DomainInfo extends EditableInfo {
         if (getResource().isNew()) {
             final DefaultMutableTreeNode thisNode = getNode();
             if (thisNode != null) {
-                for (final Object info : treeMenuController.nodesToInfos(thisNode.children())) {
+                for (final Object info : clusterTreeMenu.nodesToInfos(thisNode.children())) {
                     final HardwareInfo hardwareInfo = (HardwareInfo) info;
                     if (hardwareInfo != null) {
                         final MyButton applyButton = hardwareInfo.getApplyButton();
@@ -2718,7 +2695,7 @@ public class DomainInfo extends EditableInfo {
         if (thisNode == null) {
             return allParamaters;
         }
-        for (final Object info : treeMenuController.nodesToInfos(thisNode.children())) {
+        for (final Object info : clusterTreeMenu.nodesToInfos(thisNode.children())) {
             final HardwareInfo hardwareInfo = (HardwareInfo) info;
             allParamaters.put(hardwareInfo, hardwareInfo.getHWParameters(allParams));
         }
@@ -3782,7 +3759,7 @@ public class DomainInfo extends EditableInfo {
         @SuppressWarnings("unchecked")
         final Check check = new Check(incorrect, changed);
         check.addCheck(super.checkResourceFields(param, params));
-        for (final Object info : treeMenuController.nodesToInfos(thisNode.children())) {
+        for (final Object info : clusterTreeMenu.nodesToInfos(thisNode.children())) {
             final HardwareInfo hardwareInfo = (HardwareInfo) info;
             check.addCheck(hardwareInfo.checkResourceFields(null, hardwareInfo.getRealParametersFromXML(), true));
         }
@@ -3804,7 +3781,7 @@ public class DomainInfo extends EditableInfo {
         if (getResource().isNew()) {
             super.removeMyself(runMode);
             getResource().setNew(false);
-            treeMenuController.removeNode(getNode());
+            clusterTreeMenu.removeNode(getNode());
             return;
         }
         String desc = Tools.getString("DomainInfo.confirmRemove.Description");
@@ -3832,7 +3809,7 @@ public class DomainInfo extends EditableInfo {
             }
         }
         getBrowser().periodicalVmsUpdate(getBrowser().getClusterHosts());
-        treeMenuController.removeNode(getNode());
+        clusterTreeMenu.removeNode(getNode());
     }
 
     /** Returns whether the column is a button, 0 column is always a button. */
@@ -4032,7 +4009,7 @@ public class DomainInfo extends EditableInfo {
             }
             hostWi.setValue(savedValue);
         }
-        for (final Object info : treeMenuController.nodesToInfos(thisNode.children())) {
+        for (final Object info : clusterTreeMenu.nodesToInfos(thisNode.children())) {
             final HardwareInfo hardwareInfo = (HardwareInfo) info;
             if (hardwareInfo.checkResourceFields(null, hardwareInfo.getRealParametersFromXML(), true).isChanged()) {
                 hardwareInfo.revert();

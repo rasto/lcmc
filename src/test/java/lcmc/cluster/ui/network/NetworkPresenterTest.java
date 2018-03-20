@@ -25,6 +25,7 @@ import lcmc.ClusterEventBus;
 import lcmc.cluster.domain.Cluster;
 import lcmc.cluster.domain.Network;
 import lcmc.cluster.service.NetworkService;
+import lcmc.cluster.ui.ClusterBrowser;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -47,6 +48,8 @@ public class NetworkPresenterTest {
     private NetworkView view;
     @Mock
     private NetworkService networkService;
+    @Mock
+    private ClusterBrowser clusterBrowser;
 
     private final ClusterEventBus clusterEventBus = new ClusterEventBus();
 
@@ -60,7 +63,8 @@ public class NetworkPresenterTest {
                 view,
                 clusterEventBus,
                 cluster,
-                networkService);
+                networkService,
+                clusterBrowser);
 
     }
 

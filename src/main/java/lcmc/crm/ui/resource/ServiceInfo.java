@@ -42,7 +42,7 @@ import lcmc.common.ui.EditableInfo;
 import lcmc.common.ui.Info;
 import lcmc.common.ui.SpringUtilities;
 import lcmc.common.ui.main.ProgressIndicator;
-import lcmc.common.ui.treemenu.TreeMenuController;
+import lcmc.common.ui.treemenu.ClusterTreeMenu;
 import lcmc.common.ui.utils.ButtonCallback;
 import lcmc.common.ui.utils.ComponentWithTest;
 import lcmc.common.ui.utils.SwingUtils;
@@ -206,7 +206,7 @@ public class ServiceInfo extends EditableInfo {
     @Inject
     private WidgetFactory widgetFactory;
     @Inject
-    private TreeMenuController treeMenuController;
+    private ClusterTreeMenu clusterTreeMenu;
     @Inject
     private CrmServiceFactory crmServiceFactory;
     @Inject
@@ -2030,7 +2030,7 @@ public class ServiceInfo extends EditableInfo {
                 cloneInfo.getScoreComboBoxHash().put(hostInfoWidgetEntry.getKey(), hostInfoWidgetEntry.getValue());
             }
         } else {
-            treeMenuController.removeNode(oldCI.getNode());
+            clusterTreeMenu.removeNode(oldCI.getNode());
             cloneInfo.getService().setId(oldCI.getWidget(GUI_ID, null).getStringValue());
             getBrowser().addNameToServiceInfoHash(cloneInfo);
             getBrowser().addToHeartbeatIdList(cloneInfo);
@@ -2069,13 +2069,13 @@ public class ServiceInfo extends EditableInfo {
         }
         final DefaultMutableTreeNode node = getNode();
         final DefaultMutableTreeNode ciNode = ci.getNode();
-        treeMenuController.removeNode(getNode());
-        treeMenuController.removeNode(ci.getNode());
+        clusterTreeMenu.removeNode(getNode());
+        clusterTreeMenu.removeNode(ci.getNode());
         cleanup();
         ci.cleanup();
         setNode(node);
-        treeMenuController.addChild(getBrowser().getServicesNode(), node);
-        treeMenuController.reloadNode(getBrowser().getServicesNode(), false);
+        clusterTreeMenu.addChild(getBrowser().getServicesNode(), node);
+        clusterTreeMenu.reloadNodeDontSelect(getBrowser().getServicesNode());
         getBrowser().getCrmGraph().exchangeObjectInTheVertex(this, ci);
         getBrowser().mHeartbeatIdToServiceLock();
         getBrowser().getHeartbeatIdToServiceInfo().remove(ci.getService().getCrmId());
@@ -2084,8 +2084,8 @@ public class ServiceInfo extends EditableInfo {
         resetInfoPanel();
         infoPanel = null;
         getInfoPanel();
-        treeMenuController.reloadNode(node, true);
-        treeMenuController.nodeChanged(node);
+        clusterTreeMenu.reloadNode(node);
+        clusterTreeMenu.nodeChanged(node);
         ciNode.setUserObject(null); /* would leak without it */
     }
 
@@ -3225,10 +3225,10 @@ public class ServiceInfo extends EditableInfo {
                     final DefaultMutableTreeNode node = getNode();
                     if (node != null) {
                         if (clInfo == null) {
-                            treeMenuController.reloadNode(node, false);
+                            clusterTreeMenu.reloadNodeDontSelect(node);
                         } else {
-                            treeMenuController.reloadNode(clInfo.getNode(), false);
-                            treeMenuController.reloadNode(node, false);
+                            clusterTreeMenu.reloadNodeDontSelect(clInfo.getNode());
+                            clusterTreeMenu.reloadNodeDontSelect(node);
                         }
                         getBrowser().getCrmGraph().repaint();
                     }
@@ -3655,12 +3655,12 @@ public class ServiceInfo extends EditableInfo {
             swingUtils.invokeInEdt(new Runnable() {
                 @Override
                 public void run() {
-                    final DefaultMutableTreeNode newServiceNode = treeMenuController.createMenuItem(
+                    final DefaultMutableTreeNode newServiceNode = clusterTreeMenu.createMenuItem(
                             getBrowser().getServicesNode(),
                             serviceInfo);
                     if (reloadNode) {
-                        treeMenuController.reloadNode(getBrowser().getServicesNode(), false);
-                        treeMenuController.reloadNode(newServiceNode, false);
+                        clusterTreeMenu.reloadNodeDontSelect(getBrowser().getServicesNode());
+                        clusterTreeMenu.reloadNodeDontSelect(newServiceNode);
                     }
                 }
             });
@@ -3914,9 +3914,9 @@ public class ServiceInfo extends EditableInfo {
         swingUtils.invokeInEdt(new Runnable() {
             @Override
             public void run() {
-                treeMenuController.removeNode(getNode());
+                clusterTreeMenu.removeNode(getNode());
                 if (ci != null) {
-                    treeMenuController.removeNode(ci.getNode());
+                    clusterTreeMenu.removeNode(ci.getNode());
                 }
             }
         });

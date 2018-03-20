@@ -1,6 +1,2 @@
-2 nodes and 2 resources configured
-
-Online: [ host host ]
-
  Clone Set: cl_Dummy_1 [res_Dummy_1]
-     Started: [ host host ]
+     Started: [ test1 test2 ]

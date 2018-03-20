@@ -1,6 +1,2 @@
-2 nodes and 1 resource configured
-
-Online: [ host host ]
-
  Resource Group: grp_1
-     res_Dummy_1	(ocf::heartbeat:Dummy):	Started host
+     res_Dummy_1	(ocf::heartbeat:Dummy):	Started

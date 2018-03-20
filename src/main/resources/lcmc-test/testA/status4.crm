@@ -1,3 +1,5 @@
-2 nodes and 2 resources configured
+Resource Group: grp_1
+ res_Dummy_1	(ocf::heartbeat:Dummy):	Stopped (disabled)
+Resource Group: grp_2
+ res_Dummy_2	(ocf::heartbeat:Dummy):	Stopped (disabled)
 
-Online: [ host host ]

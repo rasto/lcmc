@@ -21,55 +21,44 @@
  */
 package lcmc.host.ui;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.Set;
-import java.util.TreeSet;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReadWriteLock;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
+import com.google.common.eventbus.Subscribe;
+import lcmc.ClusterEventBus;
+import lcmc.cluster.domain.Cluster;
+import lcmc.cluster.service.ssh.ExecCommandConfig;
+import lcmc.cluster.ui.ClusterBrowser;
+import lcmc.cluster.ui.resource.ClusterViewFactory;
+import lcmc.cluster.ui.resource.FSInfo;
+import lcmc.common.domain.AccessMode;
+import lcmc.common.domain.EnablePredicate;
+import lcmc.common.domain.util.Tools;
+import lcmc.common.ui.Browser;
+import lcmc.common.ui.CategoryInfo;
+import lcmc.common.ui.CmdLog;
+import lcmc.common.ui.Info;
+import lcmc.common.ui.main.ProgressIndicator;
+import lcmc.common.ui.treemenu.TreeMenuController;
+import lcmc.common.ui.utils.*;
+import lcmc.crm.ui.resource.HostInfo;
+import lcmc.drbd.domain.BlockDevice;
+import lcmc.drbd.domain.NetInterface;
+import lcmc.drbd.ui.DrbdGraph;
+import lcmc.drbd.ui.resource.BlockDevInfo;
+import lcmc.drbd.ui.resource.HostDrbdInfo;
+import lcmc.event.BlockDevicesChangedEvent;
+import lcmc.event.FileSystemsChangedEvent;
+import lcmc.event.NetInterfacesChangedEvent;
+import lcmc.host.domain.Host;
 
 import javax.annotation.Resource;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Provider;
-import javax.swing.ImageIcon;
+import javax.swing.*;
 import javax.swing.tree.DefaultMutableTreeNode;
-
-import com.google.common.eventbus.Subscribe;
-import lcmc.ClusterEventBus;
-import lcmc.cluster.ui.ClusterBrowser;
-import lcmc.cluster.ui.resource.ClusterViewFactory;
-import lcmc.common.domain.AccessMode;
-import lcmc.cluster.domain.Cluster;
-import lcmc.common.ui.Browser;
-import lcmc.common.ui.main.ProgressIndicator;
-import lcmc.common.ui.treemenu.TreeMenuController;
-import lcmc.common.ui.utils.SwingUtils;
-import lcmc.drbd.ui.DrbdGraph;
-import lcmc.event.BlockDevicesChangedEvent;
-import lcmc.event.FileSystemsChangedEvent;
-import lcmc.event.NetInterfacesChangedEvent;
-import lcmc.host.domain.Host;
-import lcmc.drbd.domain.BlockDevice;
-import lcmc.drbd.domain.NetInterface;
-import lcmc.common.ui.CmdLog;
-import lcmc.common.ui.CategoryInfo;
-import lcmc.cluster.ui.resource.FSInfo;
-import lcmc.common.ui.Info;
-import lcmc.crm.ui.resource.HostInfo;
-import lcmc.drbd.ui.resource.BlockDevInfo;
-import lcmc.drbd.ui.resource.HostDrbdInfo;
-import lcmc.common.domain.EnablePredicate;
-import lcmc.common.ui.utils.MenuAction;
-import lcmc.common.ui.utils.MenuFactory;
-import lcmc.common.ui.utils.MyMenu;
-import lcmc.common.ui.utils.MyMenuItem;
-import lcmc.common.domain.util.Tools;
-import lcmc.cluster.service.ssh.ExecCommandConfig;
+import java.util.*;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReadWriteLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 /**
  * This class holds host resource data in a tree. It shows panels that allow
@@ -204,7 +193,7 @@ public class HostBrowser extends Browser {
             final FSInfo fileSystemInfo = clusterViewFactory.createFileSystemView(fileSystem, this);
             treeMenuController.createMenuItem(fileSystemsNode, fileSystemInfo);
         }
-        treeMenuController.reloadNode(fileSystemsNode, false);
+        treeMenuController.reloadNodeDontSelect(fileSystemsNode);
     }
 
     @Subscribe
@@ -245,7 +234,7 @@ public class HostBrowser extends Browser {
                     final BlockDevInfo bdi = bdEntry.getValue();
                     treeMenuController.createMenuItem(blockDevicesNode, bdi);
                 }
-                treeMenuController.reloadNode(blockDevicesNode, false);
+                treeMenuController.reloadNodeDontSelect(blockDevicesNode);
             } finally {
                 mBlockDevInfosWriteLock.unlock();
             }
@@ -263,7 +252,7 @@ public class HostBrowser extends Browser {
             final Info netInfo = clusterViewFactory.getNetView(netInterface, this);
             treeMenuController.createMenuItem(netInterfacesNode, netInfo);
         }
-        treeMenuController.reloadNode(netInterfacesNode, false);
+        treeMenuController.reloadNodeDontSelect(netInterfacesNode);
     }
 
 
@@ -412,5 +401,13 @@ public class HostBrowser extends Browser {
 
     public void unlockBlockDevInfosRead() {
         mBlockDevInfosReadLock.unlock();
+    }
+
+    @Override
+    public void fireEventInViewPanel(final DefaultMutableTreeNode node) {
+        if (node != null) {
+            treeMenuController.reloadNode(node);
+            treeMenuController.nodeChanged(node);
+        }
     }
 }

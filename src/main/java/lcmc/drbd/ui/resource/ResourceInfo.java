@@ -39,7 +39,7 @@ import lcmc.common.domain.util.Tools;
 import lcmc.common.ui.Browser;
 import lcmc.common.ui.Info;
 import lcmc.common.ui.SpringUtilities;
-import lcmc.common.ui.treemenu.TreeMenuController;
+import lcmc.common.ui.treemenu.ClusterTreeMenu;
 import lcmc.common.ui.utils.ButtonCallback;
 import lcmc.common.ui.utils.ComponentWithTest;
 import lcmc.common.ui.utils.MyButton;
@@ -149,7 +149,7 @@ public class ResourceInfo extends AbstractDrbdInfo {
     @Inject
     private Provider<ProxyNetInfo> proxyNetInfoProvider;
     @Inject
-    private TreeMenuController treeMenuController;
+    private ClusterTreeMenu clusterTreeMenu;
     @Inject
     private NetworkService networkService;
     @Inject
@@ -1815,7 +1815,7 @@ public class ResourceInfo extends AbstractDrbdInfo {
             dri.setName(null);
         }
         if (Application.isLive(runMode)) {
-            treeMenuController.removeNode(getNode());
+            clusterTreeMenu.removeNode(getNode());
         }
         globalInfo.reloadDRBDResourceComboBoxes();
     }

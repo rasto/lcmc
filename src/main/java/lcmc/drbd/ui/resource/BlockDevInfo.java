@@ -38,7 +38,7 @@ import lcmc.common.ui.Browser;
 import lcmc.common.ui.EditableInfo;
 import lcmc.common.ui.Info;
 import lcmc.common.ui.MainPanel;
-import lcmc.common.ui.treemenu.TreeMenuController;
+import lcmc.common.ui.treemenu.ClusterTreeMenu;
 import lcmc.common.ui.utils.ButtonCallback;
 import lcmc.common.ui.utils.ComponentWithTest;
 import lcmc.common.ui.utils.SwingUtils;
@@ -108,7 +108,7 @@ public class BlockDevInfo extends EditableInfo {
     @Inject
     private SwingUtils swingUtils;
     @Inject
-    private TreeMenuController treeMenuController;
+    private ClusterTreeMenu clusterTreeMenu;
 
     public void init(final String name, final BlockDevice blockDevice, final Browser browser) {
         super.einit(Optional.<ResourceValue>of(blockDevice), name, browser);
@@ -170,7 +170,7 @@ public class BlockDevInfo extends EditableInfo {
         getBlockDevice().setValue(DRBD_MD_INDEX_PARAM, null);
         super.removeMyself(runMode);
         if (Application.isLive(runMode)) {
-            treeMenuController.removeNode(getNode());
+            clusterTreeMenu.removeNode(getNode());
         }
         infoPanel = null;
     }

@@ -21,38 +21,7 @@
  */
 package lcmc.drbd.ui.resource;
 
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.image.BufferedImage;
-import java.net.UnknownHostException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.CountDownLatch;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Provider;
-import javax.swing.BoxLayout;
-import javax.swing.ImageIcon;
-import javax.swing.JComponent;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.tree.DefaultMutableTreeNode;
-
 import com.google.common.base.Optional;
-
 import lcmc.Exceptions;
 import lcmc.cluster.domain.Cluster;
 import lcmc.cluster.ui.ClusterBrowser;
@@ -65,12 +34,8 @@ import lcmc.common.domain.StringValue;
 import lcmc.common.domain.Value;
 import lcmc.common.domain.util.Tools;
 import lcmc.common.ui.Browser;
-import lcmc.common.ui.treemenu.TreeMenuController;
-import lcmc.common.ui.utils.ButtonCallback;
-import lcmc.common.ui.utils.ComponentWithTest;
-import lcmc.common.ui.utils.Dialogs;
-import lcmc.common.ui.utils.SwingUtils;
-import lcmc.common.ui.utils.UpdatableItem;
+import lcmc.common.ui.treemenu.ClusterTreeMenu;
+import lcmc.common.ui.utils.*;
 import lcmc.configs.AppDefaults;
 import lcmc.drbd.domain.DRBDtestData;
 import lcmc.drbd.domain.DrbdXml;
@@ -80,6 +45,22 @@ import lcmc.host.domain.Host;
 import lcmc.host.domain.HostFactory;
 import lcmc.logger.Logger;
 import lcmc.logger.LoggerFactory;
+
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Provider;
+import javax.swing.*;
+import javax.swing.tree.DefaultMutableTreeNode;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.image.BufferedImage;
+import java.net.UnknownHostException;
+import java.util.*;
+import java.util.List;
+import java.util.concurrent.CountDownLatch;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * This class provides drbd info. For one it shows the editable global
@@ -116,7 +97,7 @@ public class GlobalInfo extends AbstractDrbdInfo {
     @Inject
     private SwingUtils swingUtils;
     @Inject
-    private TreeMenuController treeMenuController;
+    private ClusterTreeMenu clusterTreeMenu;
     @Inject
     private Dialogs dialogs;
 
@@ -467,11 +448,11 @@ public class GlobalInfo extends AbstractDrbdInfo {
     @Override
     public void selectMyself() {
         if (selectedBlockDevice == null || !selectedBlockDevice.getBlockDevice().isDrbd()) {
-            treeMenuController.reloadNode(getNode(), true);
-            treeMenuController.nodeChanged(getNode());
+            clusterTreeMenu.reloadNode(getNode());
+            clusterTreeMenu.nodeChanged(getNode());
         } else {
-            treeMenuController.reloadNode(selectedBlockDevice.getNode(), true);
-            treeMenuController.nodeChanged(selectedBlockDevice.getNode());
+            clusterTreeMenu.reloadNode(selectedBlockDevice.getNode());
+            clusterTreeMenu.nodeChanged(selectedBlockDevice.getNode());
         }
     }
 
@@ -589,9 +570,9 @@ public class GlobalInfo extends AbstractDrbdInfo {
         getBrowser().getDrbdResourceNameHash().put(name, dri);
         getBrowser().putDrbdResHash();
 
-        final DefaultMutableTreeNode drbdResourceNode = treeMenuController.createMenuItem(getBrowser().getDrbdNode(), dri);
-        treeMenuController.reloadNode(getBrowser().getDrbdNode(), true);
-        treeMenuController.reloadNode(drbdResourceNode, true);
+        final DefaultMutableTreeNode drbdResourceNode = clusterTreeMenu.createMenuItem(getBrowser().getDrbdNode(), dri);
+        clusterTreeMenu.reloadNode(getBrowser().getDrbdNode());
+        clusterTreeMenu.reloadNode(drbdResourceNode);
     }
 
     /** Add DRBD volume. */
@@ -620,18 +601,18 @@ public class GlobalInfo extends AbstractDrbdInfo {
 
         bdi2.getInfoPanel();
 
-        final DefaultMutableTreeNode drbdVolumeNode = treeMenuController.createMenuItem(
+        final DefaultMutableTreeNode drbdVolumeNode = clusterTreeMenu.createMenuItem(
                 dvi.getDrbdResourceInfo().getNode(),
                 dvi);
 
         swingUtils.isSwingThread();
 
-        final DefaultMutableTreeNode drbdBDNode1 = treeMenuController.createMenuItem(drbdVolumeNode, bdi1);
-        final DefaultMutableTreeNode drbdBDNode2 = treeMenuController.createMenuItem(drbdVolumeNode, bdi2);
+        final DefaultMutableTreeNode drbdBDNode1 = clusterTreeMenu.createMenuItem(drbdVolumeNode, bdi1);
+        final DefaultMutableTreeNode drbdBDNode2 = clusterTreeMenu.createMenuItem(drbdVolumeNode, bdi2);
 
         getBrowser().getDrbdGraph().addDrbdVolume(dvi, bdi1, bdi2);
-        treeMenuController.reloadNode(drbdVolumeNode.getParent(), false);
-        treeMenuController.reloadNode(drbdVolumeNode, false);
+        clusterTreeMenu.reloadNodeDontSelect(drbdVolumeNode.getParent());
+        clusterTreeMenu.reloadNodeDontSelect(drbdVolumeNode);
         getBrowser().resetFilesystems();
     }
 
@@ -773,9 +754,9 @@ public class GlobalInfo extends AbstractDrbdInfo {
     public void addProxyHostNode(final Host host) {
         proxyHostInfo = proxyHostInfoProvider.get();
         proxyHostInfo.init(host, host.getBrowser());
-        final DefaultMutableTreeNode proxyHostNode = treeMenuController.createMenuItem(getBrowser().getDrbdNode(), proxyHostInfo);
-        treeMenuController.reloadNode(getBrowser().getDrbdNode(), true);
-        treeMenuController.reloadNode(proxyHostNode, true);
+        final DefaultMutableTreeNode proxyHostNode = clusterTreeMenu.createMenuItem(getBrowser().getDrbdNode(), proxyHostInfo);
+        clusterTreeMenu.reloadNode(getBrowser().getDrbdNode());
+        clusterTreeMenu.reloadNode(proxyHostNode);
     }
 
     /**

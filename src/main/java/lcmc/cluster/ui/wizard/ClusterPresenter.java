@@ -47,4 +47,8 @@ public class ClusterPresenter {
         });
         t.start();
     }
+
+    public void setDisabledDuringLoad(boolean disable) {
+        emptyBrowser.setDisabledDuringLoad(disable);
+    }
 }
