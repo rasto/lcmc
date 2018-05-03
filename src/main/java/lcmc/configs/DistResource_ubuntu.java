@@ -52,7 +52,7 @@ public final class DistResource_ubuntu extends ListResourceBundle {
          "apt-get install"},
 
         {"HbPmInst.install.1",
-         "apt-get update && /usr/bin/apt-get -y install -o"
+         "apt-get update && DEBIAN_FRONTEND=noninteractive DEBIAN_FRONTEND=noninteractive /usr/bin/apt-get -y install -o"
          + " 'DPkg::Options::force=--force-confnew' pacemaker heartbeat"
          + " && /usr/sbin/update-rc.d -f corosync remove"},
 
@@ -61,7 +61,7 @@ public final class DistResource_ubuntu extends ListResourceBundle {
          "apt-get install"},
 
         {"PmInst.install.1",
-         "apt-get update && /usr/bin/apt-get -y install -o"
+         "apt-get update && DEBIAN_FRONTEND=noninteractive /usr/bin/apt-get -y install -o"
          + " 'DPkg::Options::force=--force-confnew' pacemaker corosync "
          + " && mkdir /var/log/cluster"
          + " && (grep 'START=no' /etc/default/corosync && echo 'START=yes'>>/etc/default/corosync; true)"
@@ -73,7 +73,7 @@ public final class DistResource_ubuntu extends ListResourceBundle {
          "apt-get install"},
 
         {"DrbdInst.install.2",
-         "apt-get update && /usr/bin/apt-get -y install -o "
+         "apt-get update && DEBIAN_FRONTEND=noninteractive /usr/bin/apt-get -y install -o "
          + "'DPkg::Options::force=--force-confnew'"
          + "  drbd8-utils"},
 
@@ -93,11 +93,11 @@ public final class DistResource_ubuntu extends ListResourceBundle {
          + "/bin/tar xfzp drbd-@VERSION@.tar.gz && "
          + "cd drbd-@VERSION@ && "
          + "/usr/bin/apt-get update && "
-         + "/usr/bin/apt-get -y install make flex linux-headers-`uname -r` && "
+         + "DEBIAN_FRONTEND=noninteractive /usr/bin/apt-get -y install make flex linux-headers-`uname -r` && "
          + "make && make install && "
 
          + "if [[ @UTIL-VERSION@ ]]; then "
-         + "  /usr/bin/apt-get -y install xsltproc && "
+         + "  DEBIAN_FRONTEND=noninteractive /usr/bin/apt-get -y install xsltproc && "
          + "  /usr/bin/wget --directory-prefix=/tmp/drbdinst/ http://oss.linbit.com/drbd/@UTIL-VERSIONSTRING@ && "
          + "  cd /tmp/drbdinst && "
          + "  /bin/tar xfzp drbd-utils-@UTIL-VERSION@.tar.gz && "
@@ -146,7 +146,7 @@ public final class DistResource_ubuntu extends ListResourceBundle {
          + "export CLUSTER_USER=hacluster;"
          + "export CLUSTER_GROUP=haclient;"
          + "apt-get update"
-         + " && apt-get -y -q  --allow-unauthenticated install"
+         + " && DEBIAN_FRONTEND=noninteractive apt-get -y -q  --allow-unauthenticated install"
          + " -o 'DPkg::Options::force=--force-confnew'"
          + " automake libtool make pkg-config libglib2.0-dev libxml2-dev"
          + " libbz2-dev uuid-dev libsnmp-dev subversion libxslt1-dev"
@@ -212,7 +212,7 @@ public final class DistResource_ubuntu extends ListResourceBundle {
          "apt-get install"},
 
         {"ProxyInst.install.1",
-         "apt-get install -y drbd-proxy"},
+         "DEBIAN_FRONTEND=noninteractive apt-get install -y drbd-proxy"},
 
         {"ProxyCheck.version",
          "dpkg-query -W -f '${status}:${version}' drbd-proxy"
