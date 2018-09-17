@@ -692,6 +692,8 @@ sub get_disk_info {
 			}
 		} elsif ($major == 1) {
 			next; # ramdisk
+		} elsif ($major == 7) {
+			next; # loop device
 		} elsif ($major == 3
 		         || $major == 8
 		         || $major == 72
