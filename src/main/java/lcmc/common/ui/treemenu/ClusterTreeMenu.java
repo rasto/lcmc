@@ -61,7 +61,7 @@ public class ClusterTreeMenu {
         return treeMenuController.createMenuItem(parent, infoPresenter);
     }
 
-    public List<Info> nodesToInfos(final Enumeration<DefaultMutableTreeNode> e) {
+    public List<Info> nodesToInfos(final Enumeration<TreeNode> e) {
         return treeMenuController.nodesToInfos(e);
     }
 

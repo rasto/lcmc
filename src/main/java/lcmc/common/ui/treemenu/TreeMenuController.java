@@ -156,11 +156,11 @@ public class TreeMenuController {
     }
 
     @Deprecated //TODO
-    public List<Info> nodesToInfos(final Enumeration<DefaultMutableTreeNode> e) {
+    public List<Info> nodesToInfos(final Enumeration<TreeNode> e) {
         final List<Info> list = new ArrayList<>();
         swingUtils.invokeAndWait(() -> {
             while (e.hasMoreElements()) {
-                final DefaultMutableTreeNode n = e.nextElement();
+                final DefaultMutableTreeNode n = (DefaultMutableTreeNode) e.nextElement();
                 list.add((Info) n.getUserObject());
             }
         });

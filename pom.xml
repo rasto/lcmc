@@ -17,7 +17,7 @@
         <iss.file>scripts/lcmc.iss</iss.file>
         <rpm.wrapper.script>scripts/lcmc</rpm.wrapper.script>
         <junit.category.exclude>lcmc.testutils.annotation.type.GuiTest,lcmc.testutils.annotation.type.IntegrationTest</junit.category.exclude>
-        <spring.version>4.0.5.RELEASE</spring.version>
+        <spring.version>5.1.0.RELEASE</spring.version>
         <maven.build.timestamp.format>MMM d yyyy</maven.build.timestamp.format>
         <release>${project.version}</release>
     </properties>
@@ -147,7 +147,7 @@
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-test</artifactId>
-            <version>4.0.6.RELEASE</version>
+            <version>5.1.0.RELEASE</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -191,7 +191,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.3</version>
+                <version>3.8.0</version>
                 <configuration>
                     <source>1.8</source>
                     <target>1.8</target>
@@ -200,6 +200,12 @@
                     <showDeprecation>true</showDeprecation>
                     <compilerArgument>-Xlint:all</compilerArgument>
                     <optimize>true</optimize>
+<!--
+					<compilerArgs>
+						<arg>\-\-add-modules</arg>
+			            <arg>java.xml.ws.annotation</arg>
+        			</compilerArgs>
+-->
                 </configuration>
             </plugin>
             <!-- surefire -->

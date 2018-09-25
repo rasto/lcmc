@@ -40,8 +40,8 @@ import static com.google.common.collect.Lists.newArrayList;
 import static java.util.Arrays.asList;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.core.Is.is;
+import static org.junit.Assert.assertThat;
 import static org.mockito.BDDMockito.given;
-import static org.springframework.test.util.MatcherAssertionErrors.assertThat;
 
 @RunWith(MockitoJUnitRunner.class)
 public class DrbdXmlTest {

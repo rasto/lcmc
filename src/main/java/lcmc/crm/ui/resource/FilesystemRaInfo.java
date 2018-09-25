@@ -54,6 +54,7 @@ import lcmc.host.domain.Host;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.TreeNode;
 import java.util.*;
 
 /**
@@ -512,7 +513,7 @@ public class FilesystemRaInfo extends ServiceInfo {
 
         /* drbd resources */
         @SuppressWarnings("unchecked")
-        final Enumeration<DefaultMutableTreeNode> drbdResources = getBrowser().getDrbdNode().children();
+        final Enumeration<TreeNode> drbdResources = getBrowser().getDrbdNode().children();
 
         if (defaultValue != null) {
             list.add(defaultValue);
@@ -524,7 +525,7 @@ public class FilesystemRaInfo extends ServiceInfo {
             final DefaultMutableTreeNode drbdResNode = drbdRes.getNode();
             if (drbdResNode != null) {
                 @SuppressWarnings("unchecked")
-                final Enumeration<DefaultMutableTreeNode> drbdVolumes = drbdResNode.children();
+                final Enumeration<TreeNode> drbdVolumes = drbdResNode.children();
                 for (final Value drbdVol : clusterTreeMenu.nodesToInfos(drbdVolumes)) {
                     list.add(drbdVol);
                 }
