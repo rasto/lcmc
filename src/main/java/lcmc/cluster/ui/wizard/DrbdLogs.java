@@ -35,7 +35,6 @@ import javax.inject.Named;
 /**
  * An implementation of an dialog with log files from many hosts.
  */
-@Named
 public final class DrbdLogs extends ClusterLogs {
     /** Name of the drbd device. */
     private String drbdDeviceName;

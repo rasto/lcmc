@@ -21,37 +21,29 @@ package lcmc.cluster.ui.widget;
 
 import java.awt.Color;
 import java.util.Map;
+import java.util.function.Supplier;
+
 import lcmc.common.domain.AccessMode;
 import lcmc.common.domain.Value;
 import lcmc.logger.Logger;
 import lcmc.logger.LoggerFactory;
 import lcmc.common.ui.utils.MyButton;
 import lcmc.common.domain.Unit;
+import lombok.RequiredArgsConstructor;
 
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Provider;
-import javax.inject.Singleton;
 import javax.swing.Icon;
 
-@Named
-@Singleton
+@RequiredArgsConstructor
 public final class WidgetFactory {
+    private final Supplier<Label> labelProvider;
+    private final Supplier<ComboBox> comboBoxProvider;
+    private final Supplier<Passwdfield> passwdFieldProvider;
+    private final Supplier<Textfield> textfieldInstance;
+    private final Supplier<TextfieldWithUnit> textFieldWithUnitProvider;
+    private final Supplier<RadioGroup> radioGroupProvider;
+    private final Supplier<Checkbox> checkboxProvider;
+
     private final Logger LOG = LoggerFactory.getLogger(WidgetFactory.class);
-    @Inject
-    private Provider<Label> labelProvider;
-    @Inject
-    private Provider<ComboBox> comboBoxProvider;
-    @Inject @Named("passwdfield")
-    private Provider<Passwdfield> passwdFieldProvider;
-    @Inject @Named("textfield")
-    private Provider<Textfield> textfieldInstance;
-    @Inject
-    private Provider<TextfieldWithUnit> textFieldWithUnitProvider;
-    @Inject
-    private Provider<RadioGroup> radioGroupProvider;
-    @Inject
-    private Provider<Checkbox> checkboxProvider;
 
     /** Without units. */
     public Widget createInstance(final Widget.Type type,

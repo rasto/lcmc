@@ -36,8 +36,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import javax.inject.Inject;
-import javax.inject.Named;
+import java.util.function.Supplier;
 import javax.swing.JCheckBox;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
@@ -48,6 +47,8 @@ import javax.swing.SpringLayout;
 import lcmc.cluster.ui.widget.WidgetFactory;
 import lcmc.common.domain.Application;
 import lcmc.cluster.domain.Cluster;
+import lcmc.common.ui.ProgressBar;
+import lcmc.common.ui.main.MainData;
 import lcmc.common.ui.utils.SwingUtils;
 import lcmc.host.domain.Host;
 import lcmc.drbd.domain.BlockDevice;
@@ -61,18 +62,21 @@ import lcmc.common.domain.util.Tools;
 /**
  * This class implements VG Remove dialog.
  */
-@Named
 public final class VGRemove extends LV {
+    private final SwingUtils swingUtils;
+    private final WidgetFactory widgetFactory;
     private static final int REMOVE_TIMEOUT = 5000;
     private static final String VG_REMOVE_DESCRIPTION = "Remove a volume group.";
-    @Inject
-    private WidgetFactory widgetFactory;
     private MyButton removeButton;
     private final List<BlockDevInfo> blockDevInfos = new ArrayList<BlockDevInfo>();
     private Map<Host, JCheckBox> hostCheckBoxes = null;
     private boolean multiSelection;
-    @Inject
-    private SwingUtils swingUtils;
+
+    public VGRemove(Supplier<ProgressBar> progressBarProvider, Application application, SwingUtils swingUtils, WidgetFactory widgetFactory, MainData mainData) {
+        super(progressBarProvider, application, swingUtils, widgetFactory, mainData);
+        this.swingUtils = swingUtils;
+        this.widgetFactory = widgetFactory;
+    }
 
     public void init(final BlockDevInfo bdi) {
         super.init(null);

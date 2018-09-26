@@ -22,6 +22,7 @@ package lcmc.robotest;
 
 import static lcmc.robotest.RoboTest.HOST_Y;
 import lcmc.common.domain.util.Tools;
+import lombok.RequiredArgsConstructor;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -30,11 +31,9 @@ import javax.inject.Singleton;
 /**
  * This class is used to test the GUI.
  */
-@Named
-@Singleton
+@RequiredArgsConstructor
 final class PcmkTestE {
-    @Inject
-    private RoboTest roboTest;
+    private final RoboTest roboTest;
 
     /** Host wizard deadlock. */
     void start(final int count) {

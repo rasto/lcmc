@@ -31,6 +31,7 @@ import java.util.Map;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
+import java.util.function.Supplier;
 
 import javax.inject.Named;
 import javax.inject.Provider;
@@ -70,23 +71,21 @@ import lcmc.vm.service.VIRSH;
 import lcmc.cluster.service.ssh.ExecCommandConfig;
 import lcmc.cluster.service.ssh.SshOutput;
 
+import lombok.RequiredArgsConstructor;
 import lombok.val;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-@Named
+@RequiredArgsConstructor
 public class VmsXml {
+    private final NetworkParser networkParser;
+    private final VMParser vmParser;
+    private final Supplier<VMCreator> vmCreatorProvider;
+
     private static final Logger LOG = LoggerFactory.getLogger(VmsXml.class);
 
-    @Autowired
-    private NetworkParser networkParser;
-    @Autowired
-    private VMParser vmParser;
-    @Autowired
-    private Provider<VMCreator> vmCreatorProvider;
 
     private final Map<String, String> namesToConfigs = new HashMap<String, String>();
 

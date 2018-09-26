@@ -53,23 +53,21 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Supplier;
 
-@Named
+@RequiredArgsConstructor
 public class ResourceUpdater {
+    private final Supplier<ConstraintPHInfo> constraintPHInfoProvider;
+    private final Supplier<PcmkRscSetsInfo> pcmkRscSetsInfoProvider;
+    private final Application application;
+    private final CrmServiceFactory crmServiceFactory;
+
     private static final Logger LOG = LoggerFactory.getLogger(ResourceUpdater.class);
 
     private ClusterBrowser browser;
     private ClusterStatus clusterStatus;
     private Application.RunMode runMode;
     private ServicesInfo servicesInfo;
-    @Inject
-    private Provider<ConstraintPHInfo> constraintPHInfoProvider;
-    @Inject
-    private Provider<PcmkRscSetsInfo> pcmkRscSetsInfoProvider;
-    @Inject
-    private Application application;
-    @Inject
-    private CrmServiceFactory crmServiceFactory;
     private CrmGraph crmGraph;
     private Set<String> allGroupsAndClones;
     private List<ServiceInfo> groupServiceIsPresent = Lists.newArrayList();

@@ -41,23 +41,22 @@ import lcmc.cluster.ui.ClusterBrowser;
 import lcmc.common.ui.utils.MyButton;
 import lcmc.common.domain.util.Tools;
 import lcmc.common.ui.utils.UpdatableItem;
+import lombok.RequiredArgsConstructor;
 
 /**
  * This class holds the information about heartbeat service from the ocfs,
  * to show it to the user.
  */
-@Named
+@RequiredArgsConstructor
 public class AvailableServiceInfo extends HbCategoryInfo {
+    private final Application application;
+    private final AvailableServiceMenu availableServiceInfo;
+    private final WidgetFactory widgetFactory;
+
     private static final ImageIcon AVAIL_SERVICES_ICON =
                                     Tools.createImageIcon(Tools.getDefault("ServiceInfo.ServiceStartedIconSmall"));
     private static final ImageIcon BACK_TO_OVERVIEW_ICON = Tools.createImageIcon(Tools.getDefault("BackIcon"));
     private ResourceAgent resourceAgent;
-    @Inject
-    private Application application;
-    @Inject
-    private AvailableServiceMenu availableServiceInfo;
-    @Inject
-    private WidgetFactory widgetFactory;
 
     public void init(final ResourceAgent resourceAgent, final Browser browser) {
         super.init(resourceAgent.getServiceName(), browser);

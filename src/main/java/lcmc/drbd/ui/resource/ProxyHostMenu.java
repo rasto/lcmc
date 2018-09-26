@@ -22,6 +22,7 @@ package lcmc.drbd.ui.resource;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Supplier;
 
 import lcmc.common.ui.main.MainPresenter;
 import lcmc.drbd.ui.ProxyHostWizard;
@@ -41,34 +42,23 @@ import lcmc.common.domain.Predicate;
 import lcmc.common.domain.util.Tools;
 import lcmc.common.ui.utils.UpdatableItem;
 import lcmc.common.domain.VisiblePredicate;
+import lombok.RequiredArgsConstructor;
 
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Provider;
-
-@Named
+@RequiredArgsConstructor
 public class ProxyHostMenu {
+
+    private final MainData mainData;
+    private final MainPresenter mainPresenter;
+    private final ProxyHostWizard proxyHostWizard;
+    private final MenuFactory menuFactory;
+    private final Application application;
+    private final Supplier<DrbdsLog> drbdsLogProvider;
     /**
      * Not connectable.
      */
     private static final String NOT_CONNECTABLE_STRING = Tools.getString("ProxyHostInfo.NotConnectable");
 
     private ProxyHostInfo proxyHostInfo;
-    @Inject
-    private MainData mainData;
-    @Inject
-    private MainPresenter mainPresenter;
-    @Inject
-    private ProxyHostWizard proxyHostWizard;
-    @Inject
-    private MenuFactory menuFactory;
-    @Inject
-    private Application application;
-    @Inject
-    private Provider<DrbdsLog> drbdsLogProvider;
-
-    public ProxyHostMenu() {
-    }
 
     public List<UpdatableItem> getPulldownMenu(final ProxyHostInfo proxyHostInfo) {
         this.proxyHostInfo = proxyHostInfo;

@@ -38,6 +38,7 @@ import lcmc.crm.service.CRM;
 import lcmc.host.domain.Host;
 import lcmc.logger.Logger;
 import lcmc.logger.LoggerFactory;
+import lombok.RequiredArgsConstructor;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -51,8 +52,12 @@ import java.util.Map;
 /**
  * Object that holds an order constraint information.
  */
-@Named
+@RequiredArgsConstructor
 public class ConstraintPHInfo extends ServiceInfo {
+    private final ConstraintPHMenu constraintPHMenu;
+    private final Application application;
+    private final SwingUtils swingUtils;
+
     private static final Logger LOG = LoggerFactory.getLogger(ConstraintPHInfo.class);
     public static final String NAME = "Placeholder";
     private static final String CONSTRAINT_PLACEHOLDER_AND = Tools.getString("ConstraintPHInfo.And");
@@ -74,12 +79,6 @@ public class ConstraintPHInfo extends ServiceInfo {
     private volatile PcmkRscSetsInfo pcmkRscSetsInfo = null;
     /** Whether the all resources are required to be started. */
     private Preference preference;
-    @Inject
-    private ConstraintPHMenu constraintPHMenu;
-    @Inject
-    private Application application;
-    @Inject
-    private SwingUtils swingUtils;
 
 
     public void init(final Browser browser,

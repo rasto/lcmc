@@ -24,19 +24,14 @@ import java.awt.event.KeyEvent;
 import lcmc.cluster.ui.widget.MComboBox;
 import static lcmc.robotest.RoboTest.CONFIRM_REMOVE;
 import lcmc.common.domain.util.Tools;
-
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Singleton;
+import lombok.RequiredArgsConstructor;
 
 /**
  * This class is used to test the GUI.
  */
-@Named
-@Singleton
+@RequiredArgsConstructor
 final class PcmkTestH {
-    @Inject
-    private RoboTest roboTest;
+    private final RoboTest roboTest;
     /** Create ipmi resource. */
     private void chooseIpmi(final int x, final int y, final boolean apply) {
         roboTest.moveTo(x, y);

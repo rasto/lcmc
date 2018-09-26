@@ -36,8 +36,6 @@ import java.util.EventObject;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
-import javax.inject.Inject;
-import javax.inject.Named;
 import javax.swing.Box;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
@@ -62,14 +60,18 @@ import lcmc.logger.LoggerFactory;
 import lcmc.common.ui.utils.MyButton;
 import lcmc.common.domain.util.Tools;
 import lcmc.common.ui.utils.WidgetListener;
+import lombok.RequiredArgsConstructor;
 
 /**
  * An implementation of a field where user can enter new value. The
  * field can be Textfield or combo box, depending if there are values
  * too choose from.
  */
-@Named
+@RequiredArgsConstructor
 public abstract class GenericWidget<T extends JComponent> extends JPanel implements Widget {
+    private final SwingUtils swingUtils;
+    private final Access access;
+
     private static final Logger LOG = LoggerFactory.getLogger(GenericWidget.class);
     private T component;
     private boolean editable = false;
@@ -94,10 +96,6 @@ public abstract class GenericWidget<T extends JComponent> extends JPanel impleme
     private final Collection<WidgetListener> widgetListeners = new ArrayList<WidgetListener>();
     /** Whether the combobox was never set. */
     private boolean newFlag = true;
-    @Inject
-    private SwingUtils swingUtils;
-    @Inject
-    private Access access;
 
     public void init(final String regexp, final AccessMode enableAccessMode) {
         this.init(regexp, enableAccessMode, NO_BUTTON);

@@ -24,10 +24,8 @@ import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.function.Supplier;
 
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Provider;
 import javax.swing.JDialog;
 
 import lcmc.cluster.ui.wizard.EditClusterDialog;
@@ -58,28 +56,21 @@ import lcmc.common.ui.utils.MyMenuItem;
 import lcmc.common.domain.util.Tools;
 import lcmc.common.ui.utils.UpdatableItem;
 import lcmc.common.domain.VisiblePredicate;
+import lombok.RequiredArgsConstructor;
 
-@Named
+@RequiredArgsConstructor
 public class ServicesMenu {
 
-    private static final Logger LOG = LoggerFactory.getLogger(ServicesInfo.class);
+    private final EditClusterDialog editClusterDialog;
+    private final MainData mainData;
+    private final Supplier<ConstraintPHInfo> constraintPHInfoProvider;
+    private final Supplier<PcmkRscSetsInfo> rscSetsInfoProvider;
+    private final MenuFactory menuFactory;
+    private final Application application;
+    private final SwingUtils swingUtils;
+    private final Supplier<ClusterLogs> clusterLogsProvider;
 
-    @Inject
-    private EditClusterDialog editClusterDialog;
-    @Inject
-    private MainData mainData;
-    @Inject
-    private Provider<ConstraintPHInfo> constraintPHInfoProvider;
-    @Inject
-    private Provider<PcmkRscSetsInfo> rscSetsInfoProvider;
-    @Inject
-    private MenuFactory menuFactory;
-    @Inject
-    private Application application;
-    @Inject
-    private SwingUtils swingUtils;
-    @Inject @Named("clusterLogs")
-    private Provider<ClusterLogs> clusterLogsProvider;
+    private static final Logger LOG = LoggerFactory.getLogger(ServicesInfo.class);
 
     public List<UpdatableItem> getPulldownMenu(final ServicesInfo servicesInfo) {
         final List<UpdatableItem> items = new ArrayList<UpdatableItem>();

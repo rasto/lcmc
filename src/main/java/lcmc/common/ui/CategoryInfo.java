@@ -21,7 +21,6 @@
  */
 package lcmc.common.ui;
 
-import javax.inject.Named;
 import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
 import javax.swing.JComponent;
@@ -33,7 +32,6 @@ import lcmc.common.domain.util.Tools;
 /**
  * This class holds info data for a category.
  */
-@Named
 public class CategoryInfo extends Info {
     public static final String MAIN_TABLE = "main";
     private JComponent infoPanel = null;

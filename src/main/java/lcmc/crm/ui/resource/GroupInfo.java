@@ -40,6 +40,7 @@ import lcmc.crm.service.CRM;
 import lcmc.host.domain.Host;
 import lcmc.logger.Logger;
 import lcmc.logger.LoggerFactory;
+import lombok.RequiredArgsConstructor;
 import lombok.val;
 
 import javax.inject.Inject;
@@ -54,42 +55,34 @@ import java.util.List;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
+import java.util.function.Supplier;
 import java.util.regex.Matcher;
 
 /**
  * GroupInfo class holds data for heartbeat group, that is in some ways
  * like normal service, but it can contain other services.
  */
-@Named
+@RequiredArgsConstructor
 public class GroupInfo extends ServiceInfo {
+
+    private final GroupMenu groupMenu;
+    private final Supplier<ServiceInfo> serviceInfoProvider;
+    private final Supplier<FilesystemRaInfo> filesystemInfoProvider;
+    private final Supplier<LinbitDrbdInfo> linbitDrbdInfoProvider;
+    private final Supplier<DrbddiskInfo> drbddiskInfoProvider;
+    private final Supplier<IPaddrInfo> ipaddrInfoProvider;
+    private final Supplier<VirtualDomainInfo> virtualDomainInfoProvider;
+    private final Application application;
+    private final SwingUtils swingUtils;
+    private final ClusterTreeMenu clusterTreeMenu;
+    private final MainData mainData;
+
     private static final Logger LOG = LoggerFactory.getLogger(GroupInfo.class);
     private final List<ServiceInfo> groupServices = new ArrayList<ServiceInfo>();
 
     private final ReadWriteLock mGroupServiceLock = new ReentrantReadWriteLock();
     private final Lock mGroupServiceReadLock = mGroupServiceLock.readLock();
     private final Lock mGroupServiceWriteLock = mGroupServiceLock.writeLock();
-    @Inject
-    private GroupMenu groupMenu;
-    @Inject @Named("serviceInfo")
-    private Provider<ServiceInfo> serviceInfoProvider;
-    @Inject
-    private Provider<FilesystemRaInfo> filesystemInfoProvider;
-    @Inject
-    private Provider<LinbitDrbdInfo> linbitDrbdInfoProvider;
-    @Inject
-    private Provider<DrbddiskInfo> drbddiskInfoProvider;
-    @Inject
-    private Provider<IPaddrInfo> ipaddrInfoProvider;
-    @Inject
-    private Provider<VirtualDomainInfo> virtualDomainInfoProvider;
-    @Inject
-    private Application application;
-    @Inject
-    private SwingUtils swingUtils;
-    @Inject
-    private ClusterTreeMenu clusterTreeMenu;
-    @Inject
-    private MainData mainData;
 
     void init(final ResourceAgent ra, final Browser browser) {
         super.init(Application.PACEMAKER_GROUP_NAME, ra, browser);

@@ -33,20 +33,17 @@ import lcmc.cluster.ui.ClustersPanel;
 import lcmc.common.ui.utils.SwingUtils;
 import lcmc.host.domain.Host;
 import lcmc.host.domain.HostFactory;
+import lombok.RequiredArgsConstructor;
 
 /**
  * The very main panel, where everything is inside.
  */
-@Named
-@Singleton
+@RequiredArgsConstructor
 public final class MainPanel extends JPanel {
 
-    @Inject
-    private ClustersPanel clustersPanel;
-    @Inject
-    private HostFactory hostFactory;
-    @Inject
-    private SwingUtils swingUtils;
+    private final ClustersPanel clustersPanel;
+    private final HostFactory hostFactory;
+    private final SwingUtils swingUtils;
 
     private JSplitPane terminalSplitPane;
     private boolean terminalAreaExpanded = true;

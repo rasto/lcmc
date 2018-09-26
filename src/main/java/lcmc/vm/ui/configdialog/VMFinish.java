@@ -26,7 +26,7 @@ package lcmc.vm.ui.configdialog;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import javax.inject.Inject;
+import java.util.function.Supplier;
 import javax.inject.Named;
 import javax.swing.BoxLayout;
 import javax.swing.JComponent;
@@ -35,7 +35,9 @@ import javax.swing.JScrollPane;
 
 import lcmc.cluster.ui.widget.WidgetFactory;
 import lcmc.common.domain.Application;
+import lcmc.common.ui.ProgressBar;
 import lcmc.common.ui.WizardDialog;
+import lcmc.common.ui.main.MainData;
 import lcmc.common.ui.utils.SwingUtils;
 import lcmc.vm.ui.resource.DomainInfo;
 import lcmc.cluster.ui.widget.Widget;
@@ -47,11 +49,15 @@ import lcmc.common.domain.util.Tools;
  */
 @Named
 final class VMFinish extends VMConfig {
+    private final SwingUtils swingUtils;
+    private final WidgetFactory widgetFactory;
     private JComponent inputPane = null;
-    @Inject
-    private SwingUtils swingUtils;
-    @Inject
-    private WidgetFactory widgetFactory;
+
+    public VMFinish(Supplier<ProgressBar> progressBarProvider, Application application, SwingUtils swingUtils, WidgetFactory widgetFactory, MainData mainData) {
+        super(progressBarProvider, application, swingUtils, widgetFactory, mainData);
+        this.swingUtils = swingUtils;
+        this.widgetFactory = widgetFactory;
+    }
 
     @Override
     public WizardDialog nextDialog() {

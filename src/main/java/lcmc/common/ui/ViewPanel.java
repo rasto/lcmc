@@ -36,7 +36,6 @@ import java.util.concurrent.locks.ReentrantLock;
  * An implementation of a host view with tree of resources. This view is used
  * in the host tab as well in the cluster tab.
  */
-@Named
 public class ViewPanel extends JPanel {
     private static final Dimension MENU_TREE_MIN_SIZE = new Dimension(200, 200);
     private static final Dimension INFO_PANEL_MIN_SIZE = new Dimension(200, 200);
@@ -57,11 +56,11 @@ public class ViewPanel extends JPanel {
      * Last selected info object in the right pane.
      */
     private InfoPresenter lastSelectedInfo = null;
-    @Inject
-    private SwingUtils swingUtils;
+    private final SwingUtils swingUtils;
 
-    public ViewPanel() {
+    public ViewPanel(SwingUtils swingUtils) {
         super(new BorderLayout());
+        this.swingUtils = swingUtils;
         setBackground(Tools.getDefaultColor("ViewPanel.Status.Background"));
     }
 

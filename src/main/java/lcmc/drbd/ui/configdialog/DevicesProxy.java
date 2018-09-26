@@ -26,6 +26,7 @@ import lcmc.common.ui.WizardDialog;
 import lcmc.host.ui.Devices;
 import lcmc.drbd.ui.resource.VolumeInfo;
 import lcmc.common.ui.utils.MyButton;
+import lombok.RequiredArgsConstructor;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -33,13 +34,13 @@ import javax.inject.Named;
 /**
  * An implementation of a dialog where hardware information is collected.
  */
-@Named
+@RequiredArgsConstructor
 final class DevicesProxy extends Devices {
+    private final ProxyCheckInstallation proxyCheckInstallationDialog;
+
     private VolumeInfo volumeInfo;
     private WizardDialog origDialog;
     private WizardDialog nextDialogObject = null;
-    @Inject
-    private ProxyCheckInstallation proxyCheckInstallationDialog;
 
     void init(final WizardDialog previousDialog,
               final Host host,

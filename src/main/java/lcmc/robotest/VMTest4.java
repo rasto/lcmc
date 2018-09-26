@@ -24,19 +24,14 @@ import java.awt.Color;
 import java.awt.event.KeyEvent;
 import java.awt.geom.Point2D;
 import lcmc.cluster.ui.widget.GenericWidget.MTextField;
-
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Singleton;
+import lombok.RequiredArgsConstructor;
 
 /**
  * This class is used to test the GUI.
  */
-@Named
-@Singleton
+@RequiredArgsConstructor
 final class VMTest4 {
-    @Inject
-    private RoboTest roboTest;
+    private final RoboTest roboTest;
 
     /** Cluster wizard locked until focus is lost. */
     void start(final String vmTest, final int count) {

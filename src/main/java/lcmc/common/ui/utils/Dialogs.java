@@ -24,19 +24,16 @@ import com.google.common.base.Optional;
 import lcmc.common.domain.Application;
 import lcmc.common.domain.util.Tools;
 import lcmc.common.ui.main.MainData;
+import lombok.RequiredArgsConstructor;
 
-import javax.inject.Inject;
-import javax.inject.Named;
 import javax.swing.*;
 import javax.swing.filechooser.FileFilter;
 import java.io.File;
 
-@Named
+@RequiredArgsConstructor
 public class Dialogs {
-    @Inject
-    private MainData mainData;
-    @Inject
-    private Application application;
+    private final MainData mainData;
+    private final Application application;
 
     public Optional<String> getFileName(final String filePrefix) {
         final File defaultFile = getNextAvailableFile(filePrefix);

@@ -32,14 +32,14 @@ import lcmc.common.ui.utils.MenuFactory;
 import lcmc.common.ui.utils.MyMenu;
 import lcmc.common.ui.utils.SwingUtils;
 import lcmc.common.ui.utils.UpdatableItem;
+import lombok.RequiredArgsConstructor;
 
-@Named
+@RequiredArgsConstructor
 public class ResourceMenu {
+    private final MenuFactory menuFactory;
+    private final SwingUtils swingUtils;
+
     private ResourceInfo resourceInfo;
-    @Inject
-    private MenuFactory menuFactory;
-    @Inject
-    private SwingUtils swingUtils;
 
     public List<UpdatableItem> getPulldownMenu(final ResourceInfo resourceInfo) {
         this.resourceInfo = resourceInfo;

@@ -22,29 +22,32 @@
 package lcmc.vm.ui.resource;
 
 import lcmc.cluster.ui.widget.Widget;
+import lcmc.cluster.ui.widget.WidgetFactory;
 import lcmc.common.domain.AccessMode;
 import lcmc.common.domain.Application;
 import lcmc.common.domain.StringValue;
 import lcmc.common.domain.Value;
 import lcmc.common.domain.util.Tools;
 import lcmc.common.ui.Browser;
+import lcmc.common.ui.main.MainData;
 import lcmc.common.ui.treemenu.ClusterTreeMenu;
+import lcmc.common.ui.utils.MenuFactory;
 import lcmc.common.ui.utils.SwingUtils;
 import lcmc.host.domain.Host;
 import lcmc.vm.domain.VmsXml;
 import lcmc.vm.domain.data.SoundData;
 import org.w3c.dom.Node;
 
-import javax.inject.Inject;
-import javax.inject.Named;
 import javax.swing.*;
 import java.util.*;
 
 /**
  * This class holds info about virtual sound device.
  */
-@Named
 final class SoundInfo extends HardwareInfo {
+
+    private final SwingUtils swingUtils;
+    private final ClusterTreeMenu clusterTreeMenu;
     /** Parameters. */
     private static final String[] PARAMETERS = {SoundData.MODEL};
 
@@ -74,13 +77,14 @@ final class SoundInfo extends HardwareInfo {
                                         new StringValue("sb16")});
     }
 
-    @Inject
-    private SwingUtils swingUtils;
-
     /** Table panel. */
     private JComponent tablePanel = null;
-    @Inject
-    private ClusterTreeMenu clusterTreeMenu;
+
+    public SoundInfo(Application application, SwingUtils swingUtils, MenuFactory menuFactory, WidgetFactory widgetFactory, MainData mainData, ClusterTreeMenu clusterTreeMenu) {
+        super(application, swingUtils, menuFactory, widgetFactory, mainData, clusterTreeMenu);
+        this.swingUtils = swingUtils;
+        this.clusterTreeMenu = clusterTreeMenu;
+    }
 
     void init(final String name, final Browser browser, final DomainInfo vmsVirtualDomainInfo) {
         super.init(name, browser, vmsVirtualDomainInfo);

@@ -27,9 +27,7 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
-import javax.annotation.Resource;
-import javax.inject.Inject;
-import javax.inject.Named;
+import java.util.function.Supplier;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -38,10 +36,12 @@ import lcmc.common.domain.AccessMode;
 import lcmc.common.domain.Application;
 import lcmc.common.domain.StringValue;
 import lcmc.common.domain.Value;
+import lcmc.common.ui.ProgressBar;
 import lcmc.common.ui.SpringUtilities;
 import lcmc.common.ui.WizardDialog;
 import lcmc.cluster.ui.widget.Widget;
 import lcmc.cluster.ui.widget.WidgetFactory;
+import lcmc.common.ui.main.MainData;
 import lcmc.common.ui.utils.SwingUtils;
 import lcmc.logger.Logger;
 import lcmc.logger.LoggerFactory;
@@ -51,8 +51,14 @@ import lcmc.common.domain.util.Tools;
  * An implementation of a dialog where entered ip or the host is looked up
  * with dns.
  */
-@Named
 public class Configuration extends DialogHost {
+
+    private final Devices devices;
+    private final SSH sshDialog;
+    private final Application application;
+    private final SwingUtils swingUtils;
+    private final WidgetFactory widgetFactory;
+
     private static final Logger LOG = LoggerFactory.getLogger(Configuration.class);
     private static final int MAX_HOPS = Tools.getDefaultInt("MaxHops");
     private static final int COMBO_BOX_WIDTH = 180;
@@ -61,16 +67,15 @@ public class Configuration extends DialogHost {
     private final Widget[] ipCombo = new Widget[MAX_HOPS];
     private String[] hostnames = new String[MAX_HOPS];
     private volatile boolean hostnameOk = false;
-    @Inject
-    private Devices devices;
-    @Resource(name="SSH")
-    private SSH sshDialog;
-    @Inject
-    private Application application;
-    @Inject
-    private SwingUtils swingUtils;
-    @Inject
-    private WidgetFactory widgetFactory;
+
+    public Configuration(Supplier<ProgressBar> progressBarProvider, Application application, SwingUtils swingUtils, WidgetFactory widgetFactory, MainData mainData, Devices devices, SSH sshDialog) {
+        super(progressBarProvider, application, swingUtils, widgetFactory, mainData);
+        this.devices = devices;
+        this.sshDialog = sshDialog;
+        this.application = application;
+        this.swingUtils = swingUtils;
+        this.widgetFactory = widgetFactory;
+    }
 
     /** Finishes the dialog and stores the values. */
     @Override

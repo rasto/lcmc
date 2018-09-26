@@ -34,20 +34,19 @@ import lcmc.common.domain.UserConfig;
 import lcmc.common.ui.WizardDialog;
 import lcmc.common.domain.Application;
 import lcmc.common.domain.util.Tools;
+import lombok.RequiredArgsConstructor;
 
 /**
  * Cluster finish dialog. Shows some text and let's the user press the finish
  * button.
  */
-@Named
+@RequiredArgsConstructor
 final class Finish extends DialogCluster {
+    private final EmptyBrowser emptyBrowser;
+    private final Application application;
+    private final UserConfig userConfig;
+
     private final JCheckBox saveCheckBox = new JCheckBox(Tools.getString("Dialog.Cluster.Finish.Save"), true);
-    @Inject
-    private EmptyBrowser emptyBrowser;
-    @Inject
-    private Application application;
-    @Inject
-    private UserConfig userConfig;
 
     @Override
     public WizardDialog nextDialog() {

@@ -41,9 +41,9 @@ import lcmc.common.ui.utils.WidgetListener;
 import lcmc.crm.domain.CrmXml;
 import lcmc.logger.Logger;
 import lcmc.logger.LoggerFactory;
+import lombok.RequiredArgsConstructor;
 import org.apache.commons.collections15.map.MultiKeyMap;
 
-import javax.inject.Inject;
 import javax.inject.Named;
 import javax.swing.*;
 import javax.swing.border.TitledBorder;
@@ -63,8 +63,13 @@ import java.util.regex.Pattern;
 /**
  * This class provides textfields, combo boxes etc. for editable info objects.
  */
-@Named
+@RequiredArgsConstructor
 public abstract class EditableInfo extends Info {
+    private final Application application;
+    private final SwingUtils swingUtils;
+    private final WidgetFactory widgetFactory;
+    private final Access access;
+
     private static final Logger LOG = LoggerFactory.getLogger(EditableInfo.class);
     /** Whether is's a wizard element. */
     public static final boolean WIZARD = true;
@@ -84,14 +89,6 @@ public abstract class EditableInfo extends Info {
     private boolean dialogStarted = false;
     /** Disabled section, not visible. */
     private final Collection<String> disabledSections = new HashSet<String>();
-    @Inject
-    private Application application;
-    @Inject
-    private SwingUtils swingUtils;
-    @Inject
-    private WidgetFactory widgetFactory;
-    @Inject
-    private Access access;
 
     private Optional<ResourceValue> resource;
 

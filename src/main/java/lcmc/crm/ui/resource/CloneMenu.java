@@ -41,14 +41,14 @@ import lcmc.common.domain.Predicate;
 import lcmc.common.domain.util.Tools;
 import lcmc.common.ui.utils.UpdatableItem;
 import lcmc.common.domain.VisiblePredicate;
+import lombok.RequiredArgsConstructor;
 
-@Named
+@RequiredArgsConstructor
 public class CloneMenu extends ServiceMenu {
+    private final MenuFactory menuFactory;
+    private final SwingUtils swingUtils;
+
     private CloneInfo cloneInfo;
-    @Inject
-    private MenuFactory menuFactory;
-    @Inject
-    private SwingUtils swingUtils;
 
     @Override
     public List<UpdatableItem> getPulldownMenu(final ServiceInfo serviceInfo) {

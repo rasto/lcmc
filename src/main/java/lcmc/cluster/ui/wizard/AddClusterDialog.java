@@ -30,6 +30,7 @@ import lcmc.common.ui.utils.SwingUtils;
 import lcmc.host.domain.Hosts;
 import lcmc.logger.Logger;
 import lcmc.logger.LoggerFactory;
+import lombok.RequiredArgsConstructor;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -37,24 +38,18 @@ import javax.inject.Named;
 /**
  * Shows step by step dialogs that add and configure new cluster.
  */
-@Named
+@RequiredArgsConstructor
 public final class AddClusterDialog {
-    private static final Logger LOG = LoggerFactory.getLogger(AddClusterDialog.class);
 
-    @Inject
-    Name nameDialog;
-    @Inject
-    private MainPresenter mainPresenter;
-    @Inject
-    private MainPanel mainPanel;
-    @Inject
-    private Cluster cluster;
-    @Inject
-    private Application application;
-    @Inject
-    private SwingUtils swingUtils;
-    @Inject
-    private Hosts allHosts;
+    private final Name nameDialog;
+    private final MainPresenter mainPresenter;
+    private final MainPanel mainPanel;
+    private final Cluster cluster;
+    private final Application application;
+    private final SwingUtils swingUtils;
+    private final Hosts allHosts;
+
+    private static final Logger LOG = LoggerFactory.getLogger(AddClusterDialog.class);
 
     /**
      * Must always be called from new thread.

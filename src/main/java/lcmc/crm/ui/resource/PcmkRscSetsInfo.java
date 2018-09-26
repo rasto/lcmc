@@ -31,12 +31,13 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
-import javax.inject.Inject;
-import javax.inject.Named;
+import java.util.function.Supplier;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.SpringLayout;
 import lcmc.common.domain.Application;
+import lcmc.common.ui.treemenu.ClusterTreeMenu;
+import lcmc.common.ui.utils.SwingUtils;
 import lcmc.crm.domain.CrmXml;
 import lcmc.host.domain.Host;
 import lcmc.common.ui.Browser;
@@ -50,12 +51,16 @@ import lcmc.common.ui.utils.UpdatableItem;
  * This class describes a connection between two heartbeat services.
  * It can be order, colocation or both.
  */
-@Named
 public class PcmkRscSetsInfo extends HbConnectionInfo {
+    private final Application application;
+
     private final Collection<ConstraintPHInfo> constraintPHInfos = new LinkedHashSet<ConstraintPHInfo>();
     private final Lock mConstraintPHLock = new ReentrantLock();
-    @Inject
-    private Application application;
+
+    public PcmkRscSetsInfo(Supplier<HbColocationInfo> colocationInfoProvider, Supplier<HbOrderInfo> orderInfoProvider, Application application, SwingUtils swingUtils, HbConnectionMenu hbConnectionMenu, ClusterTreeMenu clusterTreeMenu) {
+        super(colocationInfoProvider, orderInfoProvider, application, swingUtils, hbConnectionMenu, clusterTreeMenu);
+        this.application = application;
+    }
 
     void init(final Browser browser, final ConstraintPHInfo cphi) {
         super.init(browser);

@@ -38,15 +38,16 @@ import lcmc.cluster.ui.widget.Widget;
 import lcmc.common.ui.utils.MyButton;
 import lcmc.common.domain.util.Tools;
 import lcmc.common.domain.Unit;
+import lombok.RequiredArgsConstructor;
 
 /**
  * An implementation of an dialog with log files.
  */
-@Named
+@RequiredArgsConstructor
 public final class CmdLog extends HostLogs {
+    private final WidgetFactory widgetFactory;
+
     private static final Value DEFAULT_TIME = new StringValue("5m");
-    @Inject
-    private WidgetFactory widgetFactory;
 
     protected static Unit[] getUnits() {
         return new Unit[]{

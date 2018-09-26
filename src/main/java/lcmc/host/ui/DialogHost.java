@@ -25,13 +25,14 @@ package lcmc.host.ui;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Supplier;
 
-import javax.inject.Inject;
-import javax.inject.Named;
 import javax.swing.JPanel;
 
 import lcmc.common.domain.AccessMode;
 import lcmc.common.domain.Application;
+import lcmc.common.ui.ProgressBar;
+import lcmc.common.ui.main.MainData;
 import lcmc.common.ui.utils.SwingUtils;
 import lcmc.host.domain.Host;
 import lcmc.common.domain.Value;
@@ -49,18 +50,21 @@ import lcmc.common.domain.Unit;
 import lcmc.common.ui.utils.WidgetListener;
 import lcmc.cluster.service.ssh.ExecCommandThread;
 
-@Named
 public abstract class DialogHost extends WizardDialog {
+    private final Application application;
+    private final SwingUtils swingUtils;
+    private final WidgetFactory widgetFactory;
     private Host host;
     private ExecCommandThread commandThread = null;
 
     private DrbdInstallation drbdInstallation;
-    @Inject
-    private Application application;
-    @Inject
-    private SwingUtils swingUtils;
-    @Inject
-    private WidgetFactory widgetFactory;
+
+    public DialogHost(Supplier<ProgressBar> progressBarProvider, Application application, SwingUtils swingUtils, WidgetFactory widgetFactory, MainData mainData) {
+        super(progressBarProvider, application, swingUtils, widgetFactory, mainData);
+        this.application = application;
+        this.swingUtils = swingUtils;
+        this.widgetFactory = widgetFactory;
+    }
 
     public void init(final WizardDialog previousDialog, final Host host, final DrbdInstallation drbdInstallation) {
         setPreviousDialog(previousDialog);

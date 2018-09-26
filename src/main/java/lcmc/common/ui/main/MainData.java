@@ -71,15 +71,18 @@ import lcmc.common.ui.utils.MyMenuItem;
 import lcmc.cluster.ui.ClusterTab;
 import lcmc.cluster.ui.ClustersPanel;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 
 /**
  * Holds global GUI data, so that they can be retrieved easily throughout
  * the application and some functions that use this data.
  */
-@Named
-@Singleton
+@RequiredArgsConstructor
 public class MainData {
+
+    private final SwingUtils swingUtils;
+
     private ClustersPanel clustersPanel;
     /** Invisible panel with progress indicator. */
     private final ReadWriteLock mAddClusterButtonListLock = new ReentrantReadWriteLock();
@@ -101,9 +104,6 @@ public class MainData {
     private static volatile int prevScrollingMenuIndex = -1;
 
     private Container mainFrame;
-
-    @Inject
-    private SwingUtils swingUtils;
 
     public static final String MIME_TYPE_TEXT_HTML = "text/html";
     public static final String MIME_TYPE_TEXT_PLAIN = "text/plain";

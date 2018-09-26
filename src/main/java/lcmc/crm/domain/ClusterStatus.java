@@ -35,6 +35,7 @@ import lcmc.common.ui.Access;
 import lcmc.host.domain.Host;
 import lcmc.logger.Logger;
 import lcmc.logger.LoggerFactory;
+import lombok.RequiredArgsConstructor;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -49,8 +50,11 @@ import java.util.Set;
  * This class parses pacemaker/heartbeat status, stores information
  * in the hashes and provides methods to get this information.
  */
-@Named
+@RequiredArgsConstructor
 public class ClusterStatus {
+    private final Application application;
+    private final Access access;
+
     private static final Logger LOG = LoggerFactory.getLogger(ClusterStatus.class);
     private volatile CibQuery cibQuery = new CibQuery();
     private volatile CibQuery shadowCibQuery = new CibQuery();
@@ -62,10 +66,6 @@ public class ClusterStatus {
     private String oldCib = null;
     private boolean oldAdvancedMode = false;
     private Host host;
-    @Inject
-    private Application application;
-    @Inject
-    private Access access;
 
     /**
      * Gets and parses metadata from pengine and crmd.

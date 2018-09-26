@@ -25,8 +25,7 @@ package lcmc.host.ui;
 import java.awt.BorderLayout;
 import java.util.ArrayList;
 import java.util.List;
-import javax.annotation.Resource;
-import javax.inject.Inject;
+import java.util.function.Supplier;
 import javax.inject.Named;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
@@ -36,6 +35,8 @@ import javax.swing.SpringLayout;
 import lcmc.common.domain.AccessMode;
 import lcmc.common.domain.Application;
 import lcmc.common.ui.MainPanel;
+import lcmc.common.ui.ProgressBar;
+import lcmc.common.ui.main.MainData;
 import lcmc.common.ui.utils.SwingUtils;
 import lcmc.host.domain.Host;
 import lcmc.common.domain.StringValue;
@@ -50,8 +51,14 @@ import lcmc.common.domain.util.Tools;
  * An implementation of a dialog where user can enter either ip or hostname of
  * the host and user name.
  */
-@Named
 public class NewHostDialog extends DialogHost {
+
+    private final Configuration configuration;
+    private final MainPanel mainPanel;
+    private final Application application;
+    private final SwingUtils swingUtils;
+    private final WidgetFactory widgetFactory;
+
     private static final int FIELD_WIDTH = 120;
     private static final int BIG_FIELD_WIDTH = 400;
     private static final String DEFAULT_SSH_ROOT_USER = Tools.getDefault("SSH.User");
@@ -65,16 +72,15 @@ public class NewHostDialog extends DialogHost {
     private boolean bigFields = false;
     /** Enable hostname after it was enabled at least once. */
     private boolean enableHostname = false;
-    @Resource(name="configuration")
-    private Configuration configuration;
-    @Inject
-    private MainPanel mainPanel;
-    @Inject
-    private Application application;
-    @Inject
-    private SwingUtils swingUtils;
-    @Inject
-    private WidgetFactory widgetFactory;
+
+    public NewHostDialog(Supplier<ProgressBar> progressBarProvider, Application application, SwingUtils swingUtils, WidgetFactory widgetFactory, MainData mainData, Configuration configuration, MainPanel mainPanel) {
+        super(progressBarProvider, application, swingUtils, widgetFactory, mainData);
+        this.configuration = configuration;
+        this.mainPanel = mainPanel;
+        this.application = application;
+        this.swingUtils = swingUtils;
+        this.widgetFactory = widgetFactory;
+    }
 
     /** Finishes the dialog, stores the values and adds the host tab. */
     @Override

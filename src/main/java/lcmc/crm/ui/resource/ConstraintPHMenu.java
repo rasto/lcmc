@@ -35,16 +35,16 @@ import lcmc.common.ui.utils.MenuFactory;
 import lcmc.common.ui.utils.MyMenuItem;
 import lcmc.common.domain.util.Tools;
 import lcmc.common.ui.utils.UpdatableItem;
+import lombok.RequiredArgsConstructor;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 
-@Named
+@RequiredArgsConstructor
 public class ConstraintPHMenu extends ServiceMenu {
+    private final MenuFactory menuFactory;
 
     private ConstraintPHInfo constraintPHInfo;
-    @Inject
-    private MenuFactory menuFactory;
 
     @Override
     public List<UpdatableItem> getPulldownMenu(final ServiceInfo serviceInfo) {

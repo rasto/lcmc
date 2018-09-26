@@ -31,14 +31,12 @@ import lombok.val;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import javax.inject.Named;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-@Named
 public class NetworkParser {
     private static final Logger LOG = LoggerFactory.getLogger(NetworkParser.class);
 

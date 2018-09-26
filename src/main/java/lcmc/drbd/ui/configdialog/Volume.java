@@ -24,32 +24,38 @@
 package lcmc.drbd.ui.configdialog;
 
 import java.awt.Dimension;
-import javax.inject.Inject;
-import javax.inject.Named;
+import java.util.function.Supplier;
 import javax.swing.BoxLayout;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+
+import lcmc.cluster.ui.widget.WidgetFactory;
+import lcmc.common.ui.ProgressBar;
 import lcmc.common.ui.WizardDialog;
 import lcmc.common.domain.Application;
 import lcmc.common.domain.util.Tools;
+import lcmc.common.ui.main.MainData;
 import lcmc.common.ui.utils.SwingUtils;
 
 /**
  * An implementation of a dialog where user can enter drbd volume
  * information.
  */
-@Named
 public final class Volume extends DrbdConfig {
+    private final BlockDev blockDevDialog;
+    private final Application application;
+    private final SwingUtils swingUtils;
 
     /** Configuration options of the drbd volume. */
     private static final String[] PARAMS = {"number", "device"};
-    @Inject
-    private BlockDev blockDevDialog;
-    @Inject
-    private Application application;
-    @Inject
-    private SwingUtils swingUtils;
+
+    public Volume(BlockDev blockDevDialog, Supplier<ProgressBar> progressBarProvider, Application application, SwingUtils swingUtils, WidgetFactory widgetFactory, MainData mainData) {
+        super(progressBarProvider, application, swingUtils, widgetFactory, mainData);
+        this.blockDevDialog = blockDevDialog;
+        this.application = application;
+        this.swingUtils = swingUtils;
+    }
 
     /** Applies the changes and returns next dialog (BlockDev). */
     @Override

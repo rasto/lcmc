@@ -51,26 +51,23 @@ import lcmc.common.domain.ExecCallback;
 import lcmc.common.ui.utils.MyButton;
 import lcmc.common.domain.util.Tools;
 import lcmc.common.ui.utils.WidgetListener;
+import lombok.RequiredArgsConstructor;
 
 /**
  * An implementation of a dialog where drbd block devices are initialized.
  * information.
  */
-@Named
+@RequiredArgsConstructor
 final class CreateMD extends DrbdConfig {
+    private final ProgressIndicator progressIndicator;
+    private final CreateFS createFSDialog;
+    private final Application application;
+    private final SwingUtils swingUtils;
+    private final WidgetFactory widgetFactory;
+
     private static final int COMBOBOX_WIDTH = 250;
     private static final int CREATE_MD_FS_ALREADY_THERE_RC = 40;
     private Widget metadataWidget;
-    @Inject
-    private ProgressIndicator progressIndicator;
-    @Inject
-    private CreateFS createFSDialog;
-    @Inject
-    private Application application;
-    @Inject
-    private SwingUtils swingUtils;
-    @Inject
-    private WidgetFactory widgetFactory;
     private MyButton makeMetaDataButton;
 
     private void createMetadataAndCheckResult(final boolean destroyData) {

@@ -49,7 +49,6 @@ import java.util.regex.Matcher;
 /**
  * Object that holds a colocation constraint information.
  */
-@Named
 final class HbColocationInfo extends EditableInfo implements HbConstraintInterface {
     private ServiceInfo serviceInfoRsc;
     private ServiceInfo serviceInfoWithRsc;

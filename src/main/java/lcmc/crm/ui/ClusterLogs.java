@@ -28,8 +28,12 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
 
+import lcmc.cluster.ui.widget.WidgetFactory;
+import lcmc.common.domain.Application;
 import lcmc.common.ui.Logs;
 import lcmc.cluster.domain.Cluster;
+import lcmc.common.ui.main.MainData;
+import lcmc.common.ui.utils.SwingUtils;
 import lcmc.host.domain.Host;
 
 import javax.inject.Named;
@@ -37,9 +41,12 @@ import javax.inject.Named;
 /**
  * An implementation of an dialog with log files from many hosts.
  */
-@Named
 public class ClusterLogs extends Logs {
     private Cluster cluster;
+
+    public ClusterLogs(Application application, SwingUtils swingUtils, WidgetFactory widgetFactory, MainData mainData) {
+        super(application, swingUtils, widgetFactory, mainData);
+    }
 
     public void init(final Cluster cluster) {
         this.cluster = cluster;

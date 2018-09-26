@@ -27,6 +27,7 @@ import lcmc.common.ui.WizardDialog;
 import lcmc.host.ui.Configuration;
 import lcmc.drbd.ui.resource.VolumeInfo;
 import lcmc.common.ui.utils.MyButton;
+import lombok.RequiredArgsConstructor;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -35,13 +36,13 @@ import javax.inject.Named;
  * An implementation of a dialog where entered ip or the host is looked up
  * with dns.
  */
-@Named
+@RequiredArgsConstructor
 final class ConfigurationProxy extends Configuration {
+    private final SSHProxy sshProxyDialog;
+
     private VolumeInfo volumeInfo;
     private WizardDialog origDialog;
     private WizardDialog nextDialogObject = null;
-    @Inject
-    private SSHProxy sshProxyDialog;
 
     void init(final WizardDialog previousDialog,
               final Host host,

@@ -31,7 +31,6 @@ import lcmc.common.domain.util.Tools;
 /**
  * This class holds data that describe the crm as whole.
  */
-@Named
 public final class CRMInfo extends HbCategoryInfo {
     /** Cluster manager icon. */
     private static final ImageIcon CRM_ICON =

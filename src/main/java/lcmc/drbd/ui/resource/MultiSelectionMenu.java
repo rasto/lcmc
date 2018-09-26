@@ -29,6 +29,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Supplier;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Provider;
@@ -56,32 +57,25 @@ import lcmc.common.ui.utils.MyMenuItem;
 import lcmc.common.domain.util.Tools;
 import lcmc.common.ui.utils.UpdatableItem;
 import lcmc.common.domain.VisiblePredicate;
+import lombok.RequiredArgsConstructor;
 
-@Named
+@RequiredArgsConstructor
 public class MultiSelectionMenu {
+
+    private final MainData mainData;
+    private final ProgressIndicator progressIndicator;
+    private final MenuFactory menuFactory;
+    private final Application application;
+    private final Access access;
+    private final Supplier<VGCreate> vgCreateProvider;
+    private final Supplier<VGRemove> vgRemoveProvider;
+    private final Supplier<LVCreate> lvCreateProvider;
+
     private static final String LV_CREATE_MENU_ITEM = Tools.getString("MultiSelectionInfo.LVCreate");
     
     private MultiSelectionInfo multiSelectionInfo;
 
     private List<Info> selectedInfos;
-
-    @Inject
-    private MainData mainData;
-    @Inject
-    private ProgressIndicator progressIndicator;
-    @Inject
-    private MenuFactory menuFactory;
-    @Inject
-    private Application application;
-    @Inject
-    private Access access;
-    @Inject
-    private Provider<VGCreate> vgCreateProvider;
-    @Inject
-    private Provider<VGRemove> vgRemoveProvider;
-    @Inject
-    private Provider<LVCreate> lvCreateProvider;
-
     public List<UpdatableItem> getPulldownMenu(final MultiSelectionInfo multiSelectionInfo,
                                                final List<Info> selectedInfos) {
         this.multiSelectionInfo = multiSelectionInfo;

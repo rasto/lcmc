@@ -40,37 +40,26 @@ import lcmc.host.ui.HostBrowser;
 import lcmc.host.ui.TerminalPanel;
 import lcmc.robotest.RoboTest;
 import lcmc.vm.domain.VmsXml;
+import lombok.RequiredArgsConstructor;
 import lombok.val;
 
-@Named
-@Singleton
+import java.util.function.Supplier;
+
+@RequiredArgsConstructor
 public class HostFactory {
-    @Inject
-    private HwEventBus hwEventBus;
-    @Inject
-    private SwingUtils swingUtils;
-    @Inject
-    private Application application;
-    @Inject
-    private MainData mainData;
-    @Inject
-    private ProgressIndicator progressIndicator;
-    @Inject
-    private Hosts allHosts;
-    @Inject
-    private RoboTest roboTest;
-    @Inject
-    private BlockDeviceService blockDeviceService;
-    @Inject
-    private Provider<VmsXml> vmsXmlProvider;
-    @Inject
-    private Provider<DrbdXml> drbdXmlProvider;
-    @Inject
-    private Provider<TerminalPanel> terminalPanelProvider;
-    @Inject
-    private Provider<Ssh> sshProvider;
-    @Inject
-    private Provider<HostBrowser> hostBrowserProvider;
+    private final HwEventBus hwEventBus;
+    private final SwingUtils swingUtils;
+    private final Application application;
+    private final MainData mainData;
+    private final ProgressIndicator progressIndicator;
+    private final Hosts allHosts;
+    private final RoboTest roboTest;
+    private final BlockDeviceService blockDeviceService;
+    private final Supplier<VmsXml> vmsXmlProvider;
+    private final Supplier<DrbdXml> drbdXmlProvider;
+    private final Supplier<TerminalPanel> terminalPanelProvider;
+    private final Supplier<Ssh> sshProvider;
+    private final Supplier<HostBrowser> hostBrowserProvider;
 
     public Host createInstance() {
         val drbdHost = new DrbdHost();

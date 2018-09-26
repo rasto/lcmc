@@ -42,21 +42,21 @@ import lcmc.common.ui.Browser;
 import lcmc.cluster.ui.ClusterBrowser;
 import lcmc.common.ui.utils.MyButton;
 import lcmc.common.domain.util.Tools;
+import lombok.RequiredArgsConstructor;
 
 /**
  * This class holds the information about resource agent class and its
  * services.
  */
-@Named
+@RequiredArgsConstructor
 public final class ResourceAgentClassInfo extends HbCategoryInfo {
+    private final Application application;
+    private final WidgetFactory widgetFactory;
+
     private static final ImageIcon BACK_TO_OVERVIEW_ICON = Tools.createImageIcon(Tools.getDefault("BackIcon"));
     /** Map from ResourceAgent name to its object. It is possible only within
      * a class. */
     private final Map<String, ResourceAgent> raMap = new HashMap<String, ResourceAgent>();
-    @Inject
-    private Application application;
-    @Inject
-    private WidgetFactory widgetFactory;
 
     public void init(final String name, final Browser browser) {
         super.init(name, browser);

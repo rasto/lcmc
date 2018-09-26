@@ -66,13 +66,23 @@ import lcmc.logger.Logger;
 import lcmc.logger.LoggerFactory;
 import lcmc.common.domain.util.Tools;
 import lcmc.cluster.service.ssh.ExecCommandConfig;
+import lombok.RequiredArgsConstructor;
 
 /**
  * An implementation of a terminal panel that show commands and output from
  * remote host. It is also possible to write commands and execute them.
  */
-@Named
+@RequiredArgsConstructor
 public class TerminalPanel extends JScrollPane {
+    private final RoboTest roboTest;
+    private final MainMenu mainMenu;
+    private final MainData mainData;
+    private final ProgressIndicator progressIndicator;
+    private final Application application;
+    private final SwingUtils swingUtils;
+    private final StartTests srartTests;
+    private final Access access;
+
     private static final Logger LOG = LoggerFactory.getLogger(TerminalPanel.class);
     /** Command to list all the cheats. */
     private static final String CHEAT_LIST  = "cheatlist";
@@ -115,10 +125,7 @@ public class TerminalPanel extends JScrollPane {
     private static final String REGISTER_MOVEMENT = "registermovement";
     /** List of cheats, with positions while typing them. */
     private static final Map<String, Integer> CHEATS_MAP = new LinkedHashMap<String, Integer>();
-    @Inject
-    private RoboTest roboTest;
-    @Inject
-    private MainMenu mainMenu;
+
     private static final Map<String, Test> TEST_CHEATS = new HashMap<String, Test>();
     static {
         for (final StartTests.Type type : new StartTests.Type[]{StartTests.Type.PCMK,
@@ -176,18 +183,6 @@ public class TerminalPanel extends JScrollPane {
     /** Terminal output colors. */
     private final Map<String, Color> terminalColor = new HashMap<String, Color>();
     private Color defaultOutputColor;
-    @Inject
-    private MainData mainData;
-    @Inject
-    private ProgressIndicator progressIndicator;
-    @Inject
-    private Application application;
-    @Inject
-    private SwingUtils swingUtils;
-    @Inject
-    private StartTests srartTests;
-    @Inject
-    private Access access;
 
     public void initWithHost(final Host host0) {
         host = host0;

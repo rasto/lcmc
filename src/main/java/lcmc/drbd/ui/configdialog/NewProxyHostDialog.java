@@ -27,21 +27,19 @@ import lcmc.host.ui.NewHostDialog;
 import lcmc.drbd.ui.resource.VolumeInfo;
 import lcmc.common.ui.utils.MyButton;
 import lcmc.common.domain.util.Tools;
-
-import javax.inject.Inject;
-import javax.inject.Named;
+import lombok.RequiredArgsConstructor;
 
 /**
  * An implementation of a dialog where user can enter either ip or hostname of
  * the host and user name.
  */
-@Named
+@RequiredArgsConstructor
 public final class NewProxyHostDialog extends NewHostDialog {
+    private final ConfigurationProxy configurationProxy;
+
     private VolumeInfo volumeInfo;
     private WizardDialog origDialog;
     private WizardDialog nextDialogObject = null;
-    @Inject
-    private ConfigurationProxy configurationProxy;
 
     public void init(final WizardDialog previousDialog,
                      final Host host,

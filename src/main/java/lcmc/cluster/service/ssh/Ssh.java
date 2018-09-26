@@ -27,6 +27,7 @@ import ch.ethz.ssh2.SCPClient;
 import java.io.IOException;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
+import java.util.function.Supplier;
 
 import lcmc.common.ui.main.MainData;
 import lcmc.common.ui.MainPanel;
@@ -42,13 +43,22 @@ import lcmc.common.domain.ExecCallback;
 import lcmc.logger.Logger;
 import lcmc.logger.LoggerFactory;
 import lcmc.common.domain.util.Tools;
+import lombok.RequiredArgsConstructor;
 
-import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Provider;
 
-@Named
+@RequiredArgsConstructor
 public class Ssh {
+
+    private final Supplier<ConnectionThread> connectionThreadProvider;
+    private final MainData mainData;
+    private final MainPanel mainPanel;
+    private final ProgressIndicator progressIndicator;
+    private final Application application;
+    private final SwingUtils swingUtils;
+    private final Provider<Authentication> authenticationProvider;
+
     private static final Logger LOG = LoggerFactory.getLogger(Ssh.class);
     public static final int DEFAULT_COMMAND_TIMEOUT = Tools.getDefaultInt("SSH.Command.Timeout");
     public static final int DEFAULT_COMMAND_TIMEOUT_LONG =
@@ -66,8 +76,6 @@ public class Ssh {
     /** Callback when connection is failed or properly closed. */
     private ConnectionCallback connectionCallback;
     private Host host;
-    @Inject
-    private Provider<ConnectionThread> connectionThreadProvider;
     private ConnectionThread connectionThread;
     private ProgressBar progressBar = null;
 
@@ -75,18 +83,6 @@ public class Ssh {
     private final Lock mConnectionLock = new ReentrantLock();
     private final Lock mConnectionThreadLock = new ReentrantLock();
     private LocalPortForwarder localPortForwarder = null;
-    @Inject
-    private MainData mainData;
-    @Inject
-    private MainPanel mainPanel;
-    @Inject
-    private ProgressIndicator progressIndicator;
-    @Inject
-    private Application application;
-    @Inject
-    private SwingUtils swingUtils;
-    @Inject
-    private Provider<Authentication> authenticationProvider;
 
     boolean reconnect() {
         swingUtils.isNotSwingThread();

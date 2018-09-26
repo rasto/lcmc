@@ -24,30 +24,21 @@ import lcmc.cluster.ui.ClusterBrowser;
 import lcmc.common.domain.Application;
 import lcmc.common.ui.Browser;
 import lcmc.crm.domain.ResourceAgent;
+import lombok.RequiredArgsConstructor;
 
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Provider;
 import java.util.Map;
+import java.util.function.Supplier;
 
-@Named
+@RequiredArgsConstructor
 public class CrmServiceFactory {
-    @Inject
-    private Provider<FilesystemRaInfo> filesystemRaInfoProvider;
-    @Inject
-    private Provider<LinbitDrbdInfo> linbitDrbdInfoProvider;
-    @Inject
-    private Provider<DrbddiskInfo> drbddiskInfoProvider;
-    @Inject
-    private Provider<IPaddrInfo> ipaddrInfoProvider;
-    @Inject
-    private Provider<VirtualDomainInfo> virtualDomainInfoProvider;
-    @Inject
-    private Provider<GroupInfo> groupInfoProvider;
-    @Inject
-    private Provider<CloneInfo> cloneInfoProvider;
-    @Inject @Named("serviceInfo")
-    private Provider<ServiceInfo> serviceInfoProvider;
+    private final Supplier<FilesystemRaInfo> filesystemRaInfoProvider;
+    private final Supplier<LinbitDrbdInfo> linbitDrbdInfoProvider;
+    private final Supplier<DrbddiskInfo> drbddiskInfoProvider;
+    private final Supplier<IPaddrInfo> ipaddrInfoProvider;
+    private final Supplier<VirtualDomainInfo> virtualDomainInfoProvider;
+    private final Supplier<GroupInfo> groupInfoProvider;
+    private final Supplier<CloneInfo> cloneInfoProvider;
+    private final Supplier<ServiceInfo> serviceInfoProvider;
 
     public ServiceInfo createFromResourceAgent(
             final ResourceAgent newResourceAgent,

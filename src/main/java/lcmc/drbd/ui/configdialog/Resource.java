@@ -28,6 +28,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.Supplier;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Provider;
@@ -37,6 +38,8 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
+import lcmc.common.ui.ProgressBar;
+import lcmc.common.ui.main.MainData;
 import lcmc.common.ui.utils.SwingUtils;
 import lcmc.configs.AppDefaults;
 import lcmc.cluster.ui.widget.WidgetFactory;
@@ -60,8 +63,14 @@ import lcmc.common.domain.util.Tools;
  * An implementation of a dialog where user can enter drbd resource
  * information.
  */
-@Named
 public final class Resource extends DrbdConfig {
+    private final HostFactory hostFactory;
+    private final Supplier<NewProxyHostDialog> newProxyHostDialogProvider;
+    private final Volume volumeDialog;
+    private final Application application;
+    private final SwingUtils swingUtils;
+    private final WidgetFactory widgetFactory;
+
     private static final Logger LOG = LoggerFactory.getLogger(Resource.class);
     private static final String WFC_TIMEOUT_PARAM = "wfc-timeout";
     private static final String DEGR_WFC_TIMEOUT_PARAM = "degr-wfc-timeout";
@@ -97,18 +106,16 @@ public final class Resource extends DrbdConfig {
                                             PROXY_PLUGIN_LZMA_PARAM};
     private static final int SECRET_STRING_LENGTH = 32;
     private boolean proxyHostNextDialog = false;
-    @Inject
-    private HostFactory hostFactory;
-    @Inject
-    private Provider<NewProxyHostDialog> newProxyHostDialogProvider;
-    @Inject
-    private Volume volumeDialog;
-    @Inject
-    private Application application;
-    @Inject
-    private SwingUtils swingUtils;
-    @Inject
-    private WidgetFactory widgetFactory;
+
+    public Resource(HostFactory hostFactory, Supplier<NewProxyHostDialog> newProxyHostDialogProvider, Volume volumeDialog, Supplier<ProgressBar> progressBarProvider, Application application, SwingUtils swingUtils, WidgetFactory widgetFactory, MainData mainData) {
+        super(progressBarProvider, application, swingUtils, widgetFactory, mainData);
+        this.hostFactory = hostFactory;
+        this.newProxyHostDialogProvider = newProxyHostDialogProvider;
+        this.volumeDialog = volumeDialog;
+        this.application = application;
+        this.swingUtils = swingUtils;
+        this.widgetFactory = widgetFactory;
+    }
 
     private String getRandomSecret() {
         return Tools.getRandomSecret(SECRET_STRING_LENGTH);

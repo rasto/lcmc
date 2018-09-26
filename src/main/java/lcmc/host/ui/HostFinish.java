@@ -25,7 +25,7 @@ package lcmc.host.ui;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import javax.inject.Inject;
+import java.util.function.Supplier;
 import javax.inject.Named;
 import javax.inject.Provider;
 import javax.swing.ImageIcon;
@@ -34,6 +34,8 @@ import javax.swing.JComponent;
 import javax.swing.JPanel;
 import lcmc.cluster.ui.wizard.AddClusterDialog;
 import lcmc.common.domain.UserConfig;
+import lcmc.common.ui.ProgressBar;
+import lcmc.common.ui.main.MainData;
 import lcmc.common.ui.main.MainPresenter;
 import lcmc.cluster.ui.widget.WidgetFactory;
 import lcmc.common.domain.Application;
@@ -48,8 +50,16 @@ import lcmc.common.domain.util.Tools;
  * Host finish dialog with buttons to configure next host or configure the
  * clsuter.
  */
-@Named
 final class HostFinish extends DialogHost {
+
+    private final HostFactory hostFactory;
+    private final AddClusterDialog addClusterDialog;
+    private final MainPresenter mainPresenter;
+    private final Provider<NewHostDialog> newHostDialogFactory;
+    private final Application application;
+    private final SwingUtils swingUtils;
+    private final WidgetFactory widgetFactory;
+    private final UserConfig userConfig;
     /** Host icon for add another host button. */
     private static final ImageIcon HOST_ICON = Tools.createImageIcon(Tools.getDefault("Dialog.Host.Finish.HostIcon"));
     private static final ImageIcon CLUSTER_ICON =
@@ -59,22 +69,18 @@ final class HostFinish extends DialogHost {
     private MyButton configureClusterButton;
     private final JCheckBox saveCheckBox = new JCheckBox(Tools.getString("Dialog.Host.Finish.Save"), true);
     private NewHostDialog newHostDialog;
-    @Inject
-    private HostFactory hostFactory;
-    @Inject
-    private AddClusterDialog addClusterDialog;
-    @Inject
-    private MainPresenter mainPresenter;
-    @Inject @Named("newHostDialog")
-    private Provider<NewHostDialog> newHostDialogFactory;
-    @Inject
-    private Application application;
-    @Inject
-    private SwingUtils swingUtils;
-    @Inject
-    private WidgetFactory widgetFactory;
-    @Inject
-    private UserConfig userConfig;
+
+    public HostFinish(Supplier<ProgressBar> progressBarProvider, Application application, SwingUtils swingUtils, WidgetFactory widgetFactory, MainData mainData, HostFactory hostFactory, AddClusterDialog addClusterDialog, MainPresenter mainPresenter, Provider<NewHostDialog> newHostDialogFactory, UserConfig userConfig) {
+        super(progressBarProvider, application, swingUtils, widgetFactory, mainData);
+        this.hostFactory = hostFactory;
+        this.addClusterDialog = addClusterDialog;
+        this.mainPresenter = mainPresenter;
+        this.newHostDialogFactory = newHostDialogFactory;
+        this.application = application;
+        this.swingUtils = swingUtils;
+        this.widgetFactory = widgetFactory;
+        this.userConfig = userConfig;
+    }
 
     @Override
     public WizardDialog nextDialog() {

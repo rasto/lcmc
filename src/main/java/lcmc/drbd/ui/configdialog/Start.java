@@ -26,6 +26,7 @@ package lcmc.drbd.ui.configdialog;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.function.Supplier;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.swing.JComponent;
@@ -36,8 +37,10 @@ import lcmc.common.domain.AccessMode;
 import lcmc.common.domain.Application;
 import lcmc.common.domain.StringValue;
 import lcmc.common.domain.Value;
+import lcmc.common.ui.ProgressBar;
 import lcmc.common.ui.SpringUtilities;
 import lcmc.common.ui.WizardDialog;
+import lcmc.common.ui.main.MainData;
 import lcmc.common.ui.utils.SwingUtils;
 import lcmc.drbd.ui.resource.BlockDevInfo;
 import lcmc.drbd.ui.resource.GlobalInfo;
@@ -53,22 +56,28 @@ import lcmc.common.domain.util.Tools;
  */
 @Named
 public final class Start extends WizardDialog {
+    private final Resource resourceDialog;
+    private final Volume volumeDialog;
+    private final Application application;
+    private final SwingUtils swingUtils;
+    private final WidgetFactory widgetFactory;
+
     private static final int COMBOBOX_WIDTH = 250;
     private Widget drbdResourceWidget;
     private BlockDevInfo blockDevInfo1;
     private BlockDevInfo blockDevInfo2;
     private ResourceInfo resourceInfo;
-    @Inject
-    private Resource resourceDialog;
-    @Inject
-    private Volume volumeDialog;
+
     private GlobalInfo globalInfo;
-    @Inject
-    private Application application;
-    @Inject
-    private SwingUtils swingUtils;
-    @Inject
-    private WidgetFactory widgetFactory;
+
+    public Start(Resource resourceDialog, Volume volumeDialog, Supplier<ProgressBar> progressBarProvider, Application application, SwingUtils swingUtils, WidgetFactory widgetFactory, MainData mainData) {
+        super(progressBarProvider, application, swingUtils, widgetFactory, mainData);
+        this.resourceDialog = resourceDialog;
+        this.volumeDialog = volumeDialog;
+        this.application = application;
+        this.swingUtils = swingUtils;
+        this.widgetFactory = widgetFactory;
+    }
 
     public void init(final WizardDialog previousDialog,
                      final BlockDevInfo blockDevInfo1,

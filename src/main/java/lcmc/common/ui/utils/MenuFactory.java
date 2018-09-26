@@ -21,20 +21,19 @@
 package lcmc.common.ui.utils;
 
 import lcmc.common.domain.AccessMode;
+import lombok.RequiredArgsConstructor;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Provider;
 import javax.inject.Singleton;
 import javax.swing.ImageIcon;
+import java.util.function.Supplier;
 
-@Named
-@Singleton
+@RequiredArgsConstructor
 public class MenuFactory {
-    @Inject
-    private Provider<MyMenuItem> menuItemProvider;
-    @Inject
-    private Provider<MyMenu> menuProvider;
+    private final Supplier<MyMenuItem> menuItemProvider;
+    private final Supplier<MyMenu> menuProvider;
 
     public MyMenu createMenu(final String text,
                              final AccessMode enableAccessMode,

@@ -40,19 +40,21 @@ import lcmc.common.domain.ExecCallback;
 import lcmc.common.domain.util.Tools;
 import lcmc.cluster.service.ssh.ExecCommandConfig;
 import lcmc.cluster.service.ssh.Ssh;
+import lombok.RequiredArgsConstructor;
+
+import java.util.function.Supplier;
 
 /**
  * An implementation of a dialog where drbd proxy is installed.
  */
-@Named
+@RequiredArgsConstructor
 final class ProxyInst extends DialogHost {
+    private final Supplier<ProxyCheckInstallation> proxyCheckInstallationProvider;
+    private final Application application;
+
     private WizardDialog nextDialogObject = null;
     private VolumeInfo volumeInfo;
     private WizardDialog origDialog;
-    @Inject
-    private Provider<ProxyCheckInstallation> proxyCheckInstallationProvider;
-    @Inject
-    private Application application;
 
     void init(final WizardDialog previousDialog,
               final Host host,

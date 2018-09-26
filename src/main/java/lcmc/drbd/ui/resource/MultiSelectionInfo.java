@@ -39,6 +39,7 @@ import lcmc.crm.domain.ClusterStatus;
 import lcmc.crm.domain.PtestData;
 import lcmc.crm.service.CRM;
 import lcmc.host.domain.Host;
+import lombok.RequiredArgsConstructor;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -52,16 +53,14 @@ import java.util.concurrent.CountDownLatch;
 /**
  * This class provides menus for block device and host multi selection.
  */
-@Named
+@RequiredArgsConstructor
 public class MultiSelectionInfo extends EditableInfo {
     /** All selected objects. */
     private List<Info> selectedInfos;
-    @Inject
-    private MultiSelectionMenu multiSelectionMenu;
-    @Inject
-    private Application application;
-    @Inject
-    private SwingUtils swingUtils;
+
+    private final MultiSelectionMenu multiSelectionMenu;
+    private final Application application;
+    private final SwingUtils swingUtils;
 
     public void init(final List<Info> selectedInfos, final Browser browser) {
         super.einit(Optional.<ResourceValue>absent(), "selection", browser);

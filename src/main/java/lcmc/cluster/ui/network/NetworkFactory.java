@@ -25,16 +25,15 @@ import lcmc.cluster.domain.Cluster;
 import lcmc.cluster.domain.Network;
 import lcmc.cluster.service.NetworkService;
 import lcmc.cluster.ui.ClusterBrowser;
+import lombok.RequiredArgsConstructor;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 
-@Named
+@RequiredArgsConstructor
 public class NetworkFactory {
-    @Inject
-    private ClusterEventBus clusterEventBus;
-    @Inject
-    private NetworkService networkService;
+    private final ClusterEventBus clusterEventBus;
+    private final NetworkService networkService;
 
     public NetworkPresenter createPresenter(final Cluster cluster, final Network network, ClusterBrowser clusterBrowser) {
         final NetworkModel model = new NetworkModel();

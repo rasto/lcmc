@@ -24,15 +24,17 @@
 package lcmc.vm.ui.configdialog;
 
 import java.awt.Dimension;
-import javax.inject.Inject;
-import javax.inject.Named;
+import java.util.function.Supplier;
 import javax.swing.BoxLayout;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
+import lcmc.cluster.ui.widget.WidgetFactory;
 import lcmc.common.domain.Application;
 import lcmc.common.domain.StringValue;
+import lcmc.common.ui.ProgressBar;
+import lcmc.common.ui.main.MainData;
 import lcmc.common.ui.utils.SwingUtils;
 import lcmc.vm.domain.VMParams;
 import lcmc.vm.domain.data.DiskData;
@@ -43,8 +45,11 @@ import lcmc.common.domain.util.Tools;
 /**
  * An implementation of a dialog where user can enter a new domain.
  */
-@Named
 final class Storage extends VMConfig {
+    private final Network networkDialog;
+    private final Application application;
+    private final SwingUtils swingUtils;
+
     private static final String[] PARAMS = {DiskData.TYPE,
                                             DiskData.TARGET_BUS_TYPE,
                                             DiskData.SOURCE_FILE,
@@ -65,12 +70,13 @@ final class Storage extends VMConfig {
     private JComponent inputPane = null;
     private DiskInfo diskInfo = null;
     private WizardDialog nextDialogObject = null;
-    @Inject
-    private Network networkDialog;
-    @Inject
-    private Application application;
-    @Inject
-    private SwingUtils swingUtils;
+
+    public Storage(Supplier<ProgressBar> progressBarProvider, Application application, SwingUtils swingUtils, WidgetFactory widgetFactory, MainData mainData, Network networkDialog) {
+        super(progressBarProvider, application, swingUtils, widgetFactory, mainData);
+        this.networkDialog = networkDialog;
+        this.application = application;
+        this.swingUtils = swingUtils;
+    }
 
     @Override
     public WizardDialog nextDialog() {

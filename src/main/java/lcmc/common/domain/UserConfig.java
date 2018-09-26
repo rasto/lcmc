@@ -61,6 +61,7 @@ import lcmc.logger.Logger;
 import lcmc.logger.LoggerFactory;
 import lcmc.cluster.ui.ClusterTabFactory;
 import lcmc.cluster.ui.ClustersPanel;
+import lombok.RequiredArgsConstructor;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -70,9 +71,18 @@ import org.w3c.dom.NodeList;
  * This class parses xml from user configs and creates data objects,
  * that describe the hosts and clusters.
  */
-@Named
-@Singleton
+@RequiredArgsConstructor
 public final class UserConfig extends XMLTools {
+
+    private final ClusterTabFactory clusterTabFactory;
+    private final HostFactory hostFactory;
+    private final ClustersPanel clustersPanel;
+    private final Provider<Cluster> clusterProvider;
+    private final Application application;
+    private final SwingUtils swingUtils;
+    private final Hosts allHosts;
+    private final Clusters allClusters;
+
     private static final Logger LOG = LoggerFactory.getLogger(XMLTools.class);
     private static final String HOST_NAME_ATTR = "name";
     private static final String HOST_SSHPORT_ATTR = "ssh";
@@ -85,23 +95,6 @@ public final class UserConfig extends XMLTools {
     private static final String DOWNLOAD_PASSWD_ATTR = "dwpasswd";
     private static final String ENCODING = "UTF-8";
     public static final boolean PROXY_HOST = true;
-
-    @Inject
-    private ClusterTabFactory clusterTabFactory;
-    @Inject
-    private HostFactory hostFactory;
-    @Inject
-    private ClustersPanel clustersPanel;
-    @Inject
-    private Provider<Cluster> clusterProvider;
-    @Inject
-    private Application application;
-    @Inject
-    private SwingUtils swingUtils;
-    @Inject
-    private Hosts allHosts;
-    @Inject
-    private Clusters allClusters;
     /**
      * @param saveAll whether to save clusters specified from the command line
      */

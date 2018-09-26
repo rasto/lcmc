@@ -27,33 +27,26 @@ import lcmc.common.domain.util.Tools;
 import lcmc.common.ui.utils.SwingUtils;
 import lcmc.logger.Logger;
 import lcmc.logger.LoggerFactory;
+import lombok.RequiredArgsConstructor;
 
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Singleton;
 import javax.swing.*;
 import java.awt.*;
 import java.util.regex.Matcher;
 
-@Named
-@Singleton
+@RequiredArgsConstructor
 public class MainPresenter {
+
+    private final SwingUtils swingUtils;
+    private final Application application;
+    private final ProgressIndicator progressIndicator;
+    private final UserConfig userConfig;
+    private final MainData mainData;
+
     private static final Logger LOG = LoggerFactory.getLogger(MainPresenter.class);
 
     private static final int DIALOG_PANEL_WIDTH = 400;
     private static final int DIALOG_PANEL_HEIGHT = 300;
     private static final Dimension DIALOG_PANEL_SIZE = new Dimension(DIALOG_PANEL_WIDTH, DIALOG_PANEL_HEIGHT);
-
-    @Inject
-    private SwingUtils swingUtils;
-    @Inject
-    private Application application;
-    @Inject
-    private ProgressIndicator progressIndicator;
-    @Inject
-    private UserConfig userConfig;
-    @Inject
-    private MainData mainData;
 
     public void renameSelectedClusterTab(final String newName) {
         swingUtils.invokeLater(new Runnable() {

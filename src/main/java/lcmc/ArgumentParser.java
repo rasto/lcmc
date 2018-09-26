@@ -34,6 +34,7 @@ import lcmc.robotest.StartTests;
 import lcmc.robotest.Test;
 import lcmc.logger.Logger;
 import lcmc.logger.LoggerFactory;
+import lombok.RequiredArgsConstructor;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.HelpFormatter;
@@ -42,10 +43,7 @@ import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.apache.commons.cli.PosixParser;
 
-import javax.inject.Inject;
-import javax.inject.Named;
 import javax.inject.Provider;
-import javax.inject.Singleton;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.PrintStream;
@@ -56,9 +54,16 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-@Named
-@Singleton
+@RequiredArgsConstructor
 public class ArgumentParser {
+    private final UserConfig userConfig;
+    private final RoboTest roboTest;
+    private final Provider<Cluster> clusterProvider;
+    private final Application application;
+    private final SwingUtils swingUtils;
+    private final Access access;
+    private final MainData mainData;
+
     private static final Logger LOG = LoggerFactory.getLogger(ArgumentParser.class);
 
     private static final String HELP_OP = "help";
@@ -108,20 +113,6 @@ public class ArgumentParser {
     /** The --cmd-log. /var/log/lcmc.log on the servers. */
     private static final String CMD_LOG_OP = "cmd-log";
     private static final String CHECK_SWING_OP = "check-swing";
-    @Inject
-    private UserConfig userConfig;
-    @Inject
-    private RoboTest roboTest;
-    @Inject
-    private Provider<Cluster> clusterProvider;
-    @Inject
-    private Application application;
-    @Inject
-    private SwingUtils swingUtils;
-    @Inject
-    private Access access;
-    @Inject
-    private MainData mainData;
 
     public void parseOptionsAndReturnAutoArguments(String[] args) {
         final Options options = new Options();

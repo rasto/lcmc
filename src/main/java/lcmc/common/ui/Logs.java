@@ -58,6 +58,8 @@ import javax.swing.text.SimpleAttributeSet;
 import javax.swing.text.StyleConstants;
 
 import lcmc.cluster.ui.widget.WidgetFactory;
+import lcmc.common.domain.Application;
+import lcmc.common.ui.main.MainData;
 import lcmc.common.ui.utils.SwingUtils;
 import lcmc.host.domain.Host;
 import lcmc.common.domain.ExecCallback;
@@ -66,21 +68,26 @@ import lcmc.logger.LoggerFactory;
 import lcmc.common.ui.utils.MyButton;
 import lcmc.common.domain.util.Tools;
 import lcmc.cluster.service.ssh.ExecCommandConfig;
+import lombok.RequiredArgsConstructor;
 
 /**
  * An implementation of an dialog with log files from many hosts.
  */
-@Named
 public class Logs extends ConfigDialog {
+    private final SwingUtils swingUtils;
+    private final WidgetFactory widgetFactory;
+
     private static final Logger LOG = LoggerFactory.getLogger(Logs.class);
     private final JTextPane logTextArea = new JTextPane();
     private final Map<String, JCheckBox> patternToCheckBoxMap = new HashMap<String, JCheckBox>();
     private final Lock mRefreshLock = new ReentrantLock();
     private final Collection<JComponent> additionalComponents = new ArrayList<JComponent>();
-    @Inject
-    private SwingUtils swingUtils;
-    @Inject
-    private WidgetFactory widgetFactory;
+
+    public Logs(Application application, SwingUtils swingUtils, WidgetFactory widgetFactory, MainData mainData) {
+        super(application, swingUtils, widgetFactory, mainData);
+        this.swingUtils = swingUtils;
+        this.widgetFactory = widgetFactory;
+    }
 
     /**
      * Command that gets the log. The command must be specified in the

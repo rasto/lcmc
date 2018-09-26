@@ -78,13 +78,24 @@ import lcmc.cluster.service.ssh.ExecCommandConfig;
 import lcmc.cluster.service.ssh.ExecCommandThread;
 import lcmc.common.domain.util.Tools;
 import lcmc.common.ui.utils.WidgetListener;
+import lombok.RequiredArgsConstructor;
 
 /**
  * An implementation of a dialog where corosync/openais is initialized on all
  * hosts.
  */
-@Named
-final class CoroConfig extends DialogCluster {
+@RequiredArgsConstructor
+public final class CoroConfig extends DialogCluster {
+    private final InitCluster initClusterDialog;
+    private final MainData mainData;
+    private final Application application;
+    private final SwingUtils swingUtils;
+    private final WidgetFactory widgetFactory;
+    private final NetworkService networkService;
+    private final Access access;
+
+    private MyButton makeConfigButton;
+
     private static final Logger LOG = LoggerFactory.getLogger(CoroConfig.class);
     private static final Value MCAST_TYPE = new StringValue("mcast");
     private static final int ADDR_COMBOBOX_WIDTH = 100;
@@ -119,22 +130,6 @@ final class CoroConfig extends DialogCluster {
     private boolean configChangedByUser = false;
     private volatile JScrollPane configScrollPane = null;
     private volatile boolean configAlreadyScrolled = false;
-
-    @Inject
-    private InitCluster initClusterDialog;
-    @Inject
-    private MainData mainData;
-    @Inject
-    private Application application;
-    @Inject
-    private SwingUtils swingUtils;
-    @Inject
-    private WidgetFactory widgetFactory;
-    private MyButton makeConfigButton;
-    @Inject
-    private NetworkService networkService;
-    @Inject
-    private Access access;
 
     public void init(final WizardDialog previousDialog, final Cluster cluster) {
         super.init(previousDialog, cluster);

@@ -34,7 +34,6 @@ import javax.inject.Named;
 /**
  * An implementation of an dialog with log files.
  */
-@Named
 public final class DrbdsLog extends HostLogs {
 
     public void init(final Host host) {

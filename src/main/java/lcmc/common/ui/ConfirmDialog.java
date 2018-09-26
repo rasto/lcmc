@@ -23,13 +23,14 @@
 
 package lcmc.common.ui;
 
-import javax.inject.Inject;
-import javax.inject.Named;
 import javax.swing.ImageIcon;
 import javax.swing.JComponent;
 import javax.swing.JOptionPane;
 
+import lcmc.cluster.ui.widget.WidgetFactory;
+import lcmc.common.domain.Application;
 import lcmc.common.domain.util.Tools;
+import lcmc.common.ui.main.MainData;
 import lcmc.common.ui.utils.SwingUtils;
 
 /**
@@ -39,14 +40,21 @@ import lcmc.common.ui.utils.SwingUtils;
  * this dialog.
  *
  */
-@Named
 public final class ConfirmDialog extends ConfigDialog {
+    private final SwingUtils swingUtils;
+
     private String description;
     private String title;
     private String yesButton;
     private String noButton;
-    @Inject
-    private SwingUtils swingUtils;
+
+    public ConfirmDialog(final Application application,
+                         final SwingUtils swingUtils,
+                         final WidgetFactory widgetFactory,
+                         final MainData mainData) {
+        super(application, swingUtils, widgetFactory, mainData);
+        this.swingUtils = swingUtils;
+    }
 
     public void init(final String title, final String description, final String yesButton, final String noButton) {
         this.title       = title;

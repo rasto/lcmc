@@ -37,28 +37,23 @@ import lcmc.drbd.ui.resource.ResourceInfo;
 import lcmc.drbd.ui.resource.VolumeInfo;
 import lcmc.logger.Logger;
 import lcmc.logger.LoggerFactory;
-
-import javax.inject.Inject;
-import javax.inject.Named;
+import lombok.RequiredArgsConstructor;
 
 /**
  * Show step by step dialogs that add and configure new host.
  */
-@Named
+@RequiredArgsConstructor
 public final class AddDrbdConfigDialog {
+    private final MainPanel mainPanel;
+    private final Start startDialog;
+    private final Resource resourceDialog;
+    private final SwingUtils swingUtils;
+
     private static final Logger LOG = LoggerFactory.getLogger(AddDrbdConfigDialog.class);
     private boolean wizardCanceled = false;
     private GlobalInfo globalInfo;
     private BlockDevInfo blockDevInfo1;
     private BlockDevInfo blockDevInfo2;
-    @Inject
-    private MainPanel mainPanel;
-    @Inject
-    private Start startDialog;
-    @Inject
-    private Resource resourceDialog;
-    @Inject
-    private SwingUtils swingUtils;
 
     public void init(final GlobalInfo globalInfo, final BlockDevInfo blockDevInfo1, final BlockDevInfo blockDevInfo2) {
         this.globalInfo = globalInfo;

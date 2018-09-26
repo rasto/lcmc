@@ -21,19 +21,14 @@
 package lcmc.cluster.ui;
 
 import lcmc.cluster.domain.Cluster;
+import lombok.RequiredArgsConstructor;
 
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Provider;
-import javax.inject.Singleton;
+import java.util.function.Supplier;
 
-@Named
-@Singleton
+@RequiredArgsConstructor
 public class ClusterTabFactory {
-    @Inject
-    private ClustersPanel clustersPanel;
-    @Inject
-    private Provider<ClusterTab> clusterTabProvider;
+    private final ClustersPanel clustersPanel;
+    private final Supplier<ClusterTab> clusterTabProvider;
 
     public ClusterTab createClusterTab(final Cluster cluster) {
         final ClusterTab clusterTab = clusterTabProvider.get();

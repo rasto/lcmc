@@ -51,32 +51,28 @@ import lcmc.host.domain.Host;
 import lcmc.host.domain.Hosts;
 import lcmc.common.ui.WizardDialog;
 import lcmc.common.domain.util.Tools;
+import lombok.RequiredArgsConstructor;
 
 /**
  * An implementation of a dialog where user can choose which hosts belong to
  * the cluster.
  */
-@Named
+@RequiredArgsConstructor
 final class ClusterHosts extends DialogCluster {
+
+    private final CommStack commStackDialog;
+    private final Connect connectDialog;
+    private final MainPresenter mainPresenter;
+    private final Application application;
+    private final SwingUtils swingUtils;
+    private final Hosts allHosts;
+
     private static final ImageIcon HOST_CHECKED_ICON = Tools.createImageIcon(
-                                               Tools.getDefault("Dialog.Cluster.ClusterHosts.HostCheckedIcon"));
+            Tools.getDefault("Dialog.Cluster.ClusterHosts.HostCheckedIcon"));
     private static final ImageIcon HOST_UNCHECKED_ICON = Tools.createImageIcon(
-                                               Tools.getDefault("Dialog.Cluster.ClusterHosts.HostUncheckedIcon"));
+            Tools.getDefault("Dialog.Cluster.ClusterHosts.HostUncheckedIcon"));
     /** Map from checkboxes to the host, which they choose. */
     private final Map<JCheckBox, Host> checkBoxToHost = new LinkedHashMap<JCheckBox, Host>();
-
-    @Inject
-    private CommStack commStackDialog;
-    @Inject
-    private Connect connectDialog;
-    @Inject
-    private MainPresenter mainPresenter;
-    @Inject
-    private Application application;
-    @Inject
-    private SwingUtils swingUtils;
-    @Inject
-    private Hosts allHosts;
 
     /** It is executed after the dialog is applied. */
     @Override

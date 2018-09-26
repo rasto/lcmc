@@ -24,6 +24,7 @@ package lcmc.host.ui;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Supplier;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -35,6 +36,8 @@ import lcmc.Exceptions;
 import lcmc.common.domain.AccessMode;
 import lcmc.common.domain.Application;
 import lcmc.common.domain.Value;
+import lcmc.common.ui.ProgressBar;
+import lcmc.common.ui.main.MainData;
 import lcmc.common.ui.utils.SwingUtils;
 import lcmc.drbd.domain.DrbdInstallation;
 import lcmc.common.ui.SpringUtilities;
@@ -54,18 +57,23 @@ import lcmc.cluster.service.ssh.SshOutput;
  */
 @Named
 final class DrbdAvailSourceFiles extends DialogHost {
+    private final DrbdCommandInst drbdCommandInst;
+    private final Application application;
+    private final SwingUtils swingUtils;
+    private final WidgetFactory widgetFactory;
+
     private static final String DRBD_VERSION_AFTER_UTIL_SPLIT = "8.4.5";
-    @Inject
-    private DrbdCommandInst drbdCommandInst = null;
     private Widget drbdTarballCombo = null;
     private boolean listenersAdded = false;
-    @Inject
-    private Application application;
-    @Inject
-    private SwingUtils swingUtils;
-    @Inject
-    private WidgetFactory widgetFactory;
     private static final Logger drbdVersions = LoggerFactory.getLogger(DrbdAvailSourceFiles.class);
+
+    public DrbdAvailSourceFiles(Supplier<ProgressBar> progressBarProvider, Application application, SwingUtils swingUtils, WidgetFactory widgetFactory, MainData mainData, DrbdCommandInst drbdCommandInst) {
+        super(progressBarProvider, application, swingUtils, widgetFactory, mainData);
+        this.drbdCommandInst = drbdCommandInst;
+        this.application = application;
+        this.swingUtils = swingUtils;
+        this.widgetFactory = widgetFactory;
+    }
 
     /**
      * Inits the dialog and starts detecting the available drbd source

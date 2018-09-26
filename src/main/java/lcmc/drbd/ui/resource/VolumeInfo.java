@@ -55,6 +55,7 @@ import lcmc.drbd.ui.AddDrbdSplitBrainDialog;
 import lcmc.host.domain.Host;
 import lcmc.logger.Logger;
 import lcmc.logger.LoggerFactory;
+import lombok.RequiredArgsConstructor;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -75,13 +76,22 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.concurrent.CountDownLatch;
+import java.util.function.Supplier;
 import java.util.regex.Matcher;
 
 /**
  * This class holds info data of a DRBD volume.
  */
-@Named
+@RequiredArgsConstructor
 public class VolumeInfo extends EditableInfo implements CommonDeviceInterface {
+    private final AddDrbdSplitBrainDialog addDrbdSplitBrainDialog;
+    private final Supplier<DrbdXml> drbdXmlProvider;
+    private final Application application;
+    private final SwingUtils swingUtils;
+    private final VolumeMenu volumeMenu;
+    private final Supplier<DrbdLogs> drbdLogsProvider;
+    private final ClusterTreeMenu clusterTreeMenu;
+
     private static final Logger LOG = LoggerFactory.getLogger(VolumeInfo.class);
     static final String DRBD_VOL_PARAM_DEV = "device";
     static final String DRBD_VOL_PARAM_NUMBER = "number";
@@ -139,20 +149,6 @@ public class VolumeInfo extends EditableInfo implements CommonDeviceInterface {
     private String createdFs = null;
     private JComponent infoPanel = null;
     private Set<Host> hosts;
-    @Inject
-    private AddDrbdSplitBrainDialog addDrbdSplitBrainDialog;
-    @Inject
-    private Provider<DrbdXml> drbdXmlProvider;
-    @Inject
-    private Application application;
-    @Inject
-    private SwingUtils swingUtils;
-    @Inject
-    private VolumeMenu volumeMenu;
-    @Inject
-    private Provider<DrbdLogs> drbdLogsProvider;
-    @Inject
-    private ClusterTreeMenu clusterTreeMenu;
 
     void init(final String name,
               final String device,

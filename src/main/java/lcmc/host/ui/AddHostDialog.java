@@ -30,28 +30,21 @@ import lcmc.host.domain.Host;
 import lcmc.drbd.domain.DrbdInstallation;
 import lcmc.logger.Logger;
 import lcmc.logger.LoggerFactory;
-
-import javax.annotation.Resource;
-import javax.inject.Inject;
-import javax.inject.Named;
+import lombok.RequiredArgsConstructor;
 
 /**
  * Show step by step dialogs that add and configure new host.
  */
-@Named
+@RequiredArgsConstructor
 public final class AddHostDialog {
+    private final NewHostDialog newHostDialog;
+    private final MainPresenter mainPresenter;
+    private final MainPanel mainPanel;
+    private final Application application;
+    private final SwingUtils swingUtils;
+
     private static final Logger LOG = LoggerFactory.getLogger(AddHostDialog.class);
     private Host host;
-    @Resource(name="newHostDialog")
-    private NewHostDialog newHostDialog;
-    @Inject
-    private MainPresenter mainPresenter;
-    @Inject
-    private MainPanel mainPanel;
-    @Inject
-    private Application application;
-    @Inject
-    private SwingUtils swingUtils;
 
     public void showDialogs(final Host host) {
         mainPresenter.enableAddHostButtons(false);

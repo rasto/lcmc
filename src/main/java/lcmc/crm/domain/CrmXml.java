@@ -41,6 +41,7 @@ import lcmc.logger.Logger;
 import lcmc.logger.LoggerFactory;
 import lcmc.robotest.StartTests;
 import lcmc.robotest.Test;
+import lombok.RequiredArgsConstructor;
 import org.apache.commons.collections15.map.MultiKeyMap;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
@@ -54,6 +55,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
+import java.util.function.Supplier;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -63,8 +65,13 @@ import java.util.regex.Pattern;
  * of services in the hashes and provides methods to get this
  * information.
  */
-@Named
+@RequiredArgsConstructor
 public class CrmXml {
+    private final ProgressIndicator progressIndicator;
+    private final Application application;
+    private final StartTests startTests;
+    private final Supplier<ResourceUpdater> resourceUpdaterProvider;
+
     private static final Logger LOG = LoggerFactory.getLogger(CrmXml.class);
     private static final Table<String, String, String> RA_NON_ADVANCED_PARAM = HashBasedTable.create();
     static final Value PCMK_TRUE_VALUE = new StringValue("true");
@@ -325,14 +332,6 @@ public class CrmXml {
     }
 
     private static final AccessMode.Type DEFAULT_ACCESS_TYPE = AccessMode.ADMIN;
-    @Inject
-    private ProgressIndicator progressIndicator;
-    @Inject
-    private Application application;
-    @Inject
-    private StartTests startTests;
-    @Inject
-    private Provider<ResourceUpdater> resourceUpdaterProvider;
 
     public static Unit getUnitMilliSec() {
         return new Unit("ms", "ms", "Millisecond", "Milliseconds");

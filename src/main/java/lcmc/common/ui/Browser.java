@@ -26,9 +26,8 @@ import lcmc.cluster.ui.ClusterBrowser;
 import lcmc.cluster.ui.network.InfoPresenter;
 import lcmc.common.domain.Application;
 import lcmc.common.domain.util.Tools;
+import lombok.RequiredArgsConstructor;
 
-import javax.inject.Inject;
-import javax.inject.Named;
 import javax.swing.*;
 import javax.swing.tree.DefaultMutableTreeNode;
 import java.awt.*;
@@ -41,16 +40,16 @@ import java.util.concurrent.locks.ReentrantLock;
  * clusters.
  * Every resource has its Info object, that accessible through the tree view.
  */
-@Named
+@RequiredArgsConstructor
 public class Browser {
+    private final Application application;
+
     public static final ImageIcon APPLY_ICON = Tools.createImageIcon(Tools.getDefault("Browser.ApplyIcon"));
     public static final ImageIcon REVERT_ICON = Tools.createImageIcon(Tools.getDefault("Browser.RevertIcon"));
     public static final ImageIcon ACTIONS_MENU_ICON = Tools.createImageIcon(Tools.getDefault("Browser.MenuIcon"));
     public static final Color PANEL_BACKGROUND = Tools.getDefaultColor("ViewPanel.Background");
     public static final Color BUTTON_PANEL_BACKGROUND = Tools.getDefaultColor("ViewPanel.ButtonPanel.Background");
     public static final Color STATUS_BACKGROUND = Tools.getDefaultColor("ViewPanel.Status.Background");
-    @Inject
-    private Application application;
 
     private JSplitPane infoPanelSplitPane;
     private final Lock mDRBDtestLock = new ReentrantLock();

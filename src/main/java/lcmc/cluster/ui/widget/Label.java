@@ -20,14 +20,13 @@
 package lcmc.cluster.ui.widget;
 
 import java.awt.Color;
-import javax.inject.Inject;
-import javax.inject.Named;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.text.Document;
 import lcmc.common.domain.AccessMode;
 import lcmc.common.domain.StringValue;
 import lcmc.common.domain.Value;
+import lcmc.common.ui.Access;
 import lcmc.common.ui.utils.MyButton;
 import lcmc.common.ui.utils.SwingUtils;
 import lcmc.common.ui.utils.WidgetListener;
@@ -37,10 +36,13 @@ import lcmc.common.ui.utils.WidgetListener;
  * field can be Textfield or combo box, depending if there are values
  * too choose from.
  */
-@Named
-public final class Label extends GenericWidget<JComponent> {
-    @Inject
-    private SwingUtils swingUtils;
+public class Label extends GenericWidget<JComponent> {
+    private final SwingUtils swingUtils;
+
+    public Label(SwingUtils swingUtils, Access access) {
+        super(swingUtils, access);
+        this.swingUtils = swingUtils;
+    }
 
     public void init(final Value selectedValue,
                      final String regexp,

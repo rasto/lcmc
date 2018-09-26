@@ -103,6 +103,7 @@ import lcmc.logger.LoggerFactory;
 import lcmc.common.ui.utils.MyMenuItem;
 import lcmc.common.domain.util.Tools;
 
+import lombok.RequiredArgsConstructor;
 import org.apache.commons.collections15.Transformer;
 import org.apache.commons.collections15.TransformerUtils;
 
@@ -110,8 +111,14 @@ import org.apache.commons.collections15.TransformerUtils;
  * This class creates graph and provides methods for scaling etc.,
  * that are used in all graphs.
  */
-@Named
+
+@RequiredArgsConstructor
 public abstract class ResourceGraph {
+    private final Application application;
+    private final SwingUtils swingUtils;
+    private final MainData mainData;
+    private final ProgressIndicator progressIndicator;
+
     private static final Logger LOG = LoggerFactory.getLogger(ResourceGraph.class);
     /** Empty shape for arrows. (to not show an arrow). */
     private static final Shape EMPTY_SHAPE = new Area();
@@ -167,18 +174,10 @@ public abstract class ResourceGraph {
     /** List of edges that are being tested during test. */
     private volatile Edge existingTestEdge = null;
     private final Lock mTestEdgeLock = new ReentrantLock();
-    @Inject
-    private Application application;
-    @Inject
-    private SwingUtils swingUtils;
     private final Map<String, TextLayout> textLayoutCache = new HashMap<String, TextLayout>();
     private double scaledSoFar = 1.0;
 
     private ClusterBrowser clusterBrowser;
-    @Inject
-    private MainData mainData;
-    @Inject
-    private ProgressIndicator progressIndicator;
 
     /** Starts the animation if vertex is being updated. */
     public final void startAnimation(final Info info) {

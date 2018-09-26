@@ -22,14 +22,13 @@
 
 package lcmc.host.ui;
 
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Provider;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.SpringLayout;
 
+import lcmc.cluster.ui.widget.WidgetFactory;
 import lcmc.common.domain.Application;
+import lcmc.common.ui.ProgressBar;
 import lcmc.common.ui.SpringUtilities;
 import lcmc.common.ui.WizardDialog;
 import lcmc.common.domain.ConvertCmdCallback;
@@ -37,17 +36,25 @@ import lcmc.common.domain.ExecCallback;
 import lcmc.common.domain.util.Tools;
 import lcmc.cluster.service.ssh.ExecCommandConfig;
 import lcmc.cluster.service.ssh.Ssh;
+import lcmc.common.ui.main.MainData;
+import lcmc.common.ui.utils.SwingUtils;
+
+import java.util.function.Supplier;
 
 /**
  * An implementation of a dialog where openais with pacemaker is installed.
  */
-@Named
 final class PacemakerInst extends DialogHost {
-    @Inject
-    private Provider<CheckInstallation> checkInstallationProvider;
+    private final Supplier<CheckInstallation> checkInstallationProvider;
+    private final Application application;
+
     private CheckInstallation checkInstallationDialog = null;
-    @Inject
-    private Application application;
+
+    public PacemakerInst(Supplier<ProgressBar> progressBarProvider, Application application, SwingUtils swingUtils, WidgetFactory widgetFactory, MainData mainData, Supplier<CheckInstallation> checkInstallationProvider) {
+        super(progressBarProvider, application, swingUtils, widgetFactory, mainData);
+        this.checkInstallationProvider = checkInstallationProvider;
+        this.application = application;
+    }
 
     /**
      * Checks the answer of the installation and enables/disables the

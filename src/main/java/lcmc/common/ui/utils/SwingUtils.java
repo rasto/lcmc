@@ -23,14 +23,14 @@ package lcmc.common.ui.utils;
 import lcmc.common.domain.util.Tools;
 import lcmc.logger.Logger;
 import lcmc.logger.LoggerFactory;
+import lombok.RequiredArgsConstructor;
 
 import javax.inject.Named;
 import javax.inject.Singleton;
 import javax.swing.*;
 import java.lang.reflect.InvocationTargetException;
 
-@Named
-@Singleton
+@RequiredArgsConstructor
 public class SwingUtils {
     private static final Logger LOG = LoggerFactory.getLogger(SwingUtils.class);
     private boolean checkSwing = false;

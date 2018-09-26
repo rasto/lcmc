@@ -25,6 +25,7 @@ import lcmc.common.domain.ResourceValue;
 import lcmc.common.ui.Browser;
 import lcmc.common.ui.Info;
 import lcmc.drbd.domain.NetInterface;
+import lombok.RequiredArgsConstructor;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -34,22 +35,18 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
+import java.util.function.Supplier;
 
-@Named
-@Singleton
+@RequiredArgsConstructor
 public class ClusterViewFactory {
-    @Inject
-    @Named("netInfo")
-    private Provider<NetInfo> netInfoProvider;
-    @Inject
-    private Provider<FSInfo> fsInfoProvider;
+    private final Supplier<NetInfo> netInfoProvider;
+    private final Supplier<FSInfo> fsInfoProvider;
+    private final Supplier<CommonBlockDevInfo> commonBlockDevInfoProvider;
 
     private final ConcurrentMap<ResourceValue, Info> viewByResource = new ConcurrentHashMap<ResourceValue, Info>();
     private final ConcurrentMap<String, Info> viewByFileSystemName = new ConcurrentHashMap<String, Info>();
 
     private final Lock viewLock = new ReentrantLock();
-    @Inject
-    private Provider<CommonBlockDevInfo> commonBlockDevInfoProvider;
 
     public FSInfo createFileSystemView(final String fileSystem, final Browser browser) {
         final FSInfo fsInfo = fsInfoProvider.get();

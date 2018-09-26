@@ -54,7 +54,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import com.google.common.base.Optional;
 
-@Named
 public class VMParser {
     private static final Logger LOG = LoggerFactory.getLogger(VMParser.class);
     private static final Pattern DISPLAY_PATTERN = Pattern.compile(".*:(\\d+)$");

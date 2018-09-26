@@ -24,13 +24,11 @@ import com.google.common.base.Optional;
 import lcmc.common.domain.Value;
 import lcmc.drbd.domain.NetInterface;
 
-import javax.inject.Named;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-@Named
 public class HostNetworks {
     private List<NetInterface> netInterfacesWithBridges = new ArrayList<NetInterface>();
     private List<Value> bridges = new ArrayList<Value>();

@@ -39,7 +39,6 @@ import javax.swing.*;
 /**
  * This class holds info data for a net interface.
  */
-@Named
 public class NetInfo extends Info {
     public static final ImageIcon NET_INTERFACE_ICON =
                                                     Tools.createImageIcon(Tools.getDefault("HostBrowser.NetIntIcon"));

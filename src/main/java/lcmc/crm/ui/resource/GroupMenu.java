@@ -24,9 +24,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Provider;
+import java.util.function.Supplier;
 import javax.swing.JCheckBox;
 import javax.swing.JDialog;
 import javax.swing.JMenuItem;
@@ -47,20 +45,16 @@ import lcmc.common.ui.utils.MyMenu;
 import lcmc.common.ui.utils.MyMenuItem;
 import lcmc.common.domain.util.Tools;
 import lcmc.common.ui.utils.UpdatableItem;
+import lombok.RequiredArgsConstructor;
 
-@Named
+@RequiredArgsConstructor
 public class GroupMenu extends ServiceMenu {
 
-    @Inject @Named("serviceMenu")
-    private Provider<ServiceMenu> serviceMenuProvider;
-    @Inject
-    private MenuFactory menuFactory;
-    @Inject
-    private Application application;
-    @Inject
-    private SwingUtils swingUtils;
-    @Inject
-    private MainData mainData;
+    private final Supplier<ServiceMenu> serviceMenuProvider;
+    private final MenuFactory menuFactory;
+    private final Application application;
+    private final SwingUtils swingUtils;
+    private final MainData mainData;
 
     @Override
     public List<UpdatableItem> getPulldownMenu(final ServiceInfo serviceInfo) {

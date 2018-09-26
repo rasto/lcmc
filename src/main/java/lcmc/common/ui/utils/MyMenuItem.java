@@ -51,14 +51,19 @@ import lcmc.logger.LoggerFactory;
 import lcmc.common.domain.Predicate;
 import lcmc.common.domain.util.Tools;
 import lcmc.common.domain.VisiblePredicate;
+import lombok.RequiredArgsConstructor;
 
 /**
  * A menu item that can have an alternate text depending on the predicate()
  * method and be enabled/disabled depending on the enablePredicate() method.
  */
-@Named
+@RequiredArgsConstructor
 public class MyMenuItem extends JMenuItem
 implements ActionListener, UpdatableItem, ComponentWithTest {
+    private final Application application;
+    private final SwingUtils swingUtils;
+    private final Access access;
+
     private static final Logger LOG = LoggerFactory.getLogger(MyMenuItem.class);
     private static final long serialVersionUID = 1L;
     private static final GraphicsDevice SCREEN_DEVICE =
@@ -80,12 +85,6 @@ implements ActionListener, UpdatableItem, ComponentWithTest {
     private AccessMode enableAccessMode;
     private AccessMode visibleAccessMode;
     private String origToolTipText = "";
-    @Inject
-    private Application application;
-    @Inject
-    private SwingUtils swingUtils;
-    @Inject
-    private Access access;
 
     private MenuAction menuAction;
 

@@ -60,6 +60,7 @@ import lcmc.host.domain.Host;
 import lcmc.logger.Logger;
 import lcmc.logger.LoggerFactory;
 import lcmc.vm.ui.resource.DomainInfo;
+import lombok.RequiredArgsConstructor;
 import lombok.val;
 
 import javax.inject.Inject;
@@ -92,8 +93,17 @@ import java.util.regex.Matcher;
  * This class holds info data for one hearteat service and allows to enter
  * its arguments and execute operations on it.
  */
-@Named
+@RequiredArgsConstructor
 public class ServiceInfo extends EditableInfo {
+    private final ProgressIndicator progressIndicator;
+    private final ServiceMenu serviceMenu;
+    private final Provider<CloneInfo> cloneInfoProvider;
+    private final Application application;
+    private final SwingUtils swingUtils;
+    private final WidgetFactory widgetFactory;
+    private final ClusterTreeMenu clusterTreeMenu;
+    private final CrmServiceFactory crmServiceFactory;
+    private final Access access;
     private static final Logger LOG = LoggerFactory.getLogger(ServiceInfo.class);
 
     private static final Value NOTHING_SELECTED_VALUE = new StringValue();
@@ -193,24 +203,6 @@ public class ServiceInfo extends EditableInfo {
     private ResourceAgent resourceAgent;
     /** Radio buttons for clone/master/slave primitive resources. */
     private Widget typeRadioGroup;
-    @Inject
-    private ProgressIndicator progressIndicator;
-    @Inject
-    private ServiceMenu serviceMenu;
-    @Inject
-    private Provider<CloneInfo> cloneInfoProvider;
-    @Inject
-    private Application application;
-    @Inject
-    private SwingUtils swingUtils;
-    @Inject
-    private WidgetFactory widgetFactory;
-    @Inject
-    private ClusterTreeMenu clusterTreeMenu;
-    @Inject
-    private CrmServiceFactory crmServiceFactory;
-    @Inject
-    private Access access;
 
     public void init(final String name, final ResourceAgent resourceAgent, final Browser browser) {
         final boolean isStonith = resourceAgent != null && resourceAgent.isStonith();

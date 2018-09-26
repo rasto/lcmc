@@ -25,14 +25,15 @@ package lcmc.lvm.ui;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Set;
-import javax.inject.Inject;
-import javax.inject.Named;
+import java.util.function.Supplier;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SpringLayout;
 import lcmc.common.domain.AccessMode;
 import lcmc.common.domain.Application;
+import lcmc.common.ui.ProgressBar;
+import lcmc.common.ui.main.MainData;
 import lcmc.common.ui.utils.SwingUtils;
 import lcmc.host.domain.Host;
 import lcmc.common.domain.StringValue;
@@ -49,19 +50,23 @@ import lcmc.common.ui.utils.WidgetListener;
 /**
  * This class implements LVM snapshot dialog.
  */
-@Named
 public final class LVSnapshot extends LV {
+    private final SwingUtils swingUtils;
+    private final WidgetFactory widgetFactory;
+
     private static final int SNAPSHOT_TIMEOUT = 5000;
     private static final String SNAPSHOT_DESCRIPTION = "Create a snapshot of the logical volume.";
     private BlockDevInfo blockDevInfo;
     private Widget lvNameWi;
     private Widget sizeWi;
     private Widget maxSizeWi;
-    @Inject
-    private SwingUtils swingUtils;
-    @Inject
-    private WidgetFactory widgetFactory;
     private MyButton snapshotButton;
+
+    public LVSnapshot(Supplier<ProgressBar> progressBarProvider, Application application, SwingUtils swingUtils, WidgetFactory widgetFactory, MainData mainData) {
+        super(progressBarProvider, application, swingUtils, widgetFactory, mainData);
+        this.swingUtils = swingUtils;
+        this.widgetFactory = widgetFactory;
+    }
 
     public void init(final BlockDevInfo blockDevInfo) {
         super.init(null);

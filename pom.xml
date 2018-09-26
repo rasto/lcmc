@@ -17,7 +17,6 @@
         <iss.file>scripts/lcmc.iss</iss.file>
         <rpm.wrapper.script>scripts/lcmc</rpm.wrapper.script>
         <junit.category.exclude>lcmc.testutils.annotation.type.GuiTest,lcmc.testutils.annotation.type.IntegrationTest</junit.category.exclude>
-        <spring.version>5.1.0.RELEASE</spring.version>
         <maven.build.timestamp.format>MMM d yyyy</maven.build.timestamp.format>
         <release>${project.version}</release>
     </properties>
@@ -128,11 +127,6 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-context</artifactId>
-            <version>${spring.version}</version>
-        </dependency>
-        <dependency>
             <groupId>log4j</groupId>
             <artifactId>log4j</artifactId>
             <version>1.2.17</version>
@@ -147,12 +141,6 @@
             <groupId>com.googlecode.catch-exception</groupId>
             <artifactId>catch-exception</artifactId>
             <version>1.2.0</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-test</artifactId>
-            <version>5.1.0.RELEASE</version>
             <scope>test</scope>
         </dependency>
         <dependency>

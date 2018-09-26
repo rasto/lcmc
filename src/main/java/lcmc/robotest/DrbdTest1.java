@@ -24,19 +24,14 @@ import java.awt.event.KeyEvent;
 import lcmc.cluster.domain.Cluster;
 import lcmc.cluster.ui.widget.MComboBox;
 import lcmc.common.domain.util.Tools;
-
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Singleton;
+import lombok.RequiredArgsConstructor;
 
 /**
  * This class is used to test the GUI.
  */
-@Named
-@Singleton
+@RequiredArgsConstructor
 final class DrbdTest1 {
-    @Inject
-    private RoboTest roboTest;
+    private final RoboTest roboTest;
 
     void start(final Cluster cluster, final int blockDevY) {
         roboTest.setSlowFactor(0.2f);

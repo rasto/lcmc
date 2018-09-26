@@ -28,7 +28,6 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import javax.inject.Named;
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpressionException;
@@ -36,7 +35,6 @@ import javax.xml.xpath.XPathFactory;
 import java.util.HashMap;
 import java.util.Map;
 
-@Named
 class VMCreator {
     private static final Logger LOG = LoggerFactory.getLogger(VMCreator.class);
     private Document doc;

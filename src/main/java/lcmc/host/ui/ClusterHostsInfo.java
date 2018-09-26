@@ -32,6 +32,7 @@ import lcmc.common.ui.Browser;
 import lcmc.cluster.ui.ClusterBrowser;
 import lcmc.crm.ui.resource.HostInfo;
 import lcmc.common.ui.utils.MyButton;
+import lombok.RequiredArgsConstructor;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -39,10 +40,9 @@ import javax.inject.Named;
 /**
  * This class holds the information hosts in this cluster.
  */
-@Named
+@RequiredArgsConstructor
 public final class ClusterHostsInfo extends CategoryInfo {
-    @Inject
-    private WidgetFactory widgetFactory;
+    private final WidgetFactory widgetFactory;
 
     @Override
     public ClusterBrowser getBrowser() {

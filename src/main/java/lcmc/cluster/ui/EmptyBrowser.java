@@ -31,6 +31,7 @@ import lcmc.host.domain.Host;
 import lcmc.host.domain.Hosts;
 import lcmc.host.ui.AllHostsInfo;
 import lcmc.host.ui.HostBrowser;
+import lombok.RequiredArgsConstructor;
 
 import javax.annotation.Resource;
 import javax.inject.Inject;
@@ -47,20 +48,16 @@ import java.util.function.BiConsumer;
  * to edit data of services etc.
  * Every resource has its Info object, that accessible through the tree view.
  */
-@Named
-@Singleton
+@RequiredArgsConstructor
 public final class EmptyBrowser extends Browser {
+    private final AllHostsInfo allHostsInfo;
+    private final Hosts allHosts;
+    private final TreeMenuController treeMenuController;
+    private final CategoryInfo resourcesCategory;
+
     /** Menu's all hosts node. */
     private DefaultMutableTreeNode allHostsNode;
     private DefaultMutableTreeNode treeTop;
-    @Inject
-    private AllHostsInfo allHostsInfo;
-    @Inject
-    private Hosts allHosts;
-    @Inject
-    private TreeMenuController treeMenuController;
-    @Resource(name="categoryInfo")
-    private CategoryInfo resourcesCategory;
 
     void init() {
         allHostsInfo.init(this);

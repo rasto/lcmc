@@ -34,6 +34,7 @@ import lcmc.cluster.ui.widget.Widget;
 import lcmc.cluster.ui.widget.WidgetFactory;
 import lcmc.common.domain.util.Tools;
 import lcmc.common.domain.Unit;
+import lombok.RequiredArgsConstructor;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -42,12 +43,12 @@ import javax.inject.Named;
  * this class holds info data, menus and configuration
  * for a drbd resource.
  */
-@Named
+@RequiredArgsConstructor
 public abstract class AbstractDrbdInfo extends EditableInfo {
+    private final WidgetFactory widgetFactory;
+
     protected static final String DRBD_RES_PARAM_AFTER = "resync-after";
     protected static final String DRBD_RES_PARAM_AFTER_8_3 = "after";
-    @Inject
-    private WidgetFactory widgetFactory;
 
     @Override
     public ClusterBrowser getBrowser() {

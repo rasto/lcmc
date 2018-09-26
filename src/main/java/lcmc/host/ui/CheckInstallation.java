@@ -28,31 +28,43 @@ import lcmc.cluster.ui.widget.WidgetFactory;
 import lcmc.common.domain.Application;
 import lcmc.common.domain.ExecCallback;
 import lcmc.common.domain.util.Tools;
+import lcmc.common.ui.ProgressBar;
 import lcmc.common.ui.SpringUtilities;
 import lcmc.common.ui.WizardDialog;
+import lcmc.common.ui.main.MainData;
 import lcmc.common.ui.utils.MyButton;
 import lcmc.common.ui.utils.SwingUtils;
 import lcmc.drbd.domain.DrbdInstallation;
 import lcmc.host.domain.Host;
 import lcmc.logger.Logger;
 import lcmc.logger.LoggerFactory;
+import lombok.RequiredArgsConstructor;
 import lombok.val;
 
-import javax.inject.Inject;
-import javax.inject.Named;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Supplier;
 
 /**
  * An implementation of a dialog where
  * drbd/heartbeat/pacemaker/openais/corosync etc. installation is checked.
  */
-@Named
+@RequiredArgsConstructor
 final class CheckInstallation extends DialogHost {
+
+    private final WidgetFactory widgetFactory;
+    private final HostFinish hostFinishDialog;
+    private final DrbdAvailSourceFiles drbdAvailSourceFilesDialog;
+    private final DrbdCommandInst drbdCommandInstDialog;
+    private final HeartbeatInst heartbeatInstDialog;
+    private final PacemakerInst pacemakerInstDialog;
+    private final Application application;
+    private final SwingUtils swingUtils;
+
     private static final Logger LOG = LoggerFactory.getLogger(CheckInstallation.class);
 
     private static final ImageIcon CHECKING_ICON = Tools.createImageIcon(
@@ -80,8 +92,6 @@ final class CheckInstallation extends DialogHost {
                                   new JLabel(": " + Tools.getString("Dialog.Host.CheckInstallation.CheckingPm"));
     private final JLabel checkingHeartbeatPacemakerLabel =
                                   new JLabel(": " + Tools.getString("Dialog.Host.CheckInstallation.CheckingHbPm"));
-    @Inject
-    private WidgetFactory widgetFactory;
     private MyButton installDrbdButton;
     private MyButton installPacemakerButton;
     private MyButton installHeartbeatPacemakerButton;
@@ -99,20 +109,18 @@ final class CheckInstallation extends DialogHost {
     private final JLabel heartbeatPacemakerLabel = new JLabel("Pcmk/Heartbeat");
 
     private final JLabel pacemakerLabel = new JLabel("Pcmk/Corosync");
-    @Inject
-    private HostFinish hostFinishDialog;
-    @Inject
-    private DrbdAvailSourceFiles drbdAvailSourceFilesDialog;
-    @Inject
-    private DrbdCommandInst drbdCommandInstDialog;
-    @Inject
-    private HeartbeatInst heartbeatInstDialog;
-    @Inject
-    private PacemakerInst pacemakerInstDialog;
-    @Inject
-    private Application application;
-    @Inject
-    private SwingUtils swingUtils;
+
+    public CheckInstallation(Supplier<ProgressBar> progressBarProvider, Application application, SwingUtils swingUtils, WidgetFactory widgetFactory, MainData mainData, HostFinish hostFinishDialog, DrbdAvailSourceFiles drbdAvailSourceFilesDialog, DrbdCommandInst drbdCommandInstDialog, HeartbeatInst heartbeatInstDialog, PacemakerInst pacemakerInstDialog) {
+        super(progressBarProvider, application, swingUtils, widgetFactory, mainData);
+        this.widgetFactory = widgetFactory;
+        this.hostFinishDialog = hostFinishDialog;
+        this.drbdAvailSourceFilesDialog = drbdAvailSourceFilesDialog;
+        this.drbdCommandInstDialog = drbdCommandInstDialog;
+        this.heartbeatInstDialog = heartbeatInstDialog;
+        this.pacemakerInstDialog = pacemakerInstDialog;
+        this.application = application;
+        this.swingUtils = swingUtils;
+    }
 
     @Override
     public void init(final WizardDialog previousDialog, final Host host, final DrbdInstallation drbdInstallation) {

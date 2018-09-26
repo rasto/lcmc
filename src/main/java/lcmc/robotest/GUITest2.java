@@ -22,19 +22,14 @@ package lcmc.robotest;
 
 import java.awt.Color;
 import lcmc.common.domain.util.Tools;
-
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Singleton;
+import lombok.RequiredArgsConstructor;
 
 /**
  * This class is used to test the GUI.
  */
-@Named
-@Singleton
+@RequiredArgsConstructor
 final class GUITest2 {
-    @Inject
-    private RoboTest roboTest;
+    private final RoboTest roboTest;
 
     /** Cluster wizard locked until focus is lost. */
     void start(final int count) {

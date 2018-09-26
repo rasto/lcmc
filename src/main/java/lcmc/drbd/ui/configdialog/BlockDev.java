@@ -48,26 +48,24 @@ import lcmc.drbd.service.DRBD;
 import lcmc.logger.Logger;
 import lcmc.logger.LoggerFactory;
 import lcmc.common.domain.util.Tools;
+import lombok.RequiredArgsConstructor;
 
 /**
  * An implementation of a dialog where user can enter drbd block device
  * information.
  */
-@Named
+@RequiredArgsConstructor
 final class BlockDev extends DrbdConfig {
+    private final MainData mainData;
+    private final MainPanel mainPanel;
+    private final CreateMD createMDDialog;
+    private final Application application;
+    private final SwingUtils swingUtils;
+
     private static final Logger LOG = LoggerFactory.getLogger(BlockDev.class);
     private BlockDevInfo blockDevInfo;
-    @Inject
-    private MainData mainData;
-    @Inject
-    private MainPanel mainPanel;
-    @Inject
-    private CreateMD createMDDialog;
+
     private GlobalInfo globalInfo;
-    @Inject
-    private Application application;
-    @Inject
-    private SwingUtils swingUtils;
 
     void init(final WizardDialog previousDialog, final VolumeInfo dli, final BlockDevInfo blockDevInfo) {
         init(previousDialog, dli);

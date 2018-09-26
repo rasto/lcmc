@@ -38,7 +38,6 @@ import javax.swing.*;
  * in all hosts in the cluster and can be chosen in the scrolling list in
  * the filesystem service.
  */
-@Named
 public class CommonBlockDevInfo extends HbCategoryInfo implements CommonDeviceInterface {
     /** block devices of this common block device on all nodes. */
     private BlockDevice[] blockDevices;

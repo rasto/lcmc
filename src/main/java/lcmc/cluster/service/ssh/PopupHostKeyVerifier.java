@@ -28,21 +28,19 @@ import lcmc.common.domain.Application;
 import lcmc.logger.Logger;
 import lcmc.logger.LoggerFactory;
 import lcmc.common.domain.util.Tools;
-
-import javax.inject.Inject;
-import javax.inject.Named;
+import lombok.RequiredArgsConstructor;
 
 /**
  * This ServerHostKeyVerifier asks the user on how to proceed if a key
  * cannot be found in the in-memory database.
  */
-@Named
+@RequiredArgsConstructor
 public class PopupHostKeyVerifier implements ServerHostKeyVerifier {
+    private final Application application;
+
     private static final Logger LOG = LoggerFactory.getLogger(PopupHostKeyVerifier.class);
 
     private SSHGui sshGui;
-    @Inject
-    private Application application;
 
     public void init(final SSHGui sshGui) {
         this.sshGui = sshGui;

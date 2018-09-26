@@ -28,8 +28,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.List;
 
-import javax.inject.Inject;
-import javax.inject.Named;
 import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
 import javax.swing.JComponent;
@@ -40,6 +38,9 @@ import javax.swing.SpringLayout;
 
 import lcmc.cluster.ui.widget.WidgetFactory;
 import lcmc.common.domain.Application;
+import lcmc.common.ui.Access;
+import lcmc.common.ui.main.MainData;
+import lcmc.common.ui.utils.SwingUtils;
 import lcmc.host.domain.Host;
 import lcmc.common.ui.Browser;
 import lcmc.drbd.ui.DrbdGraph;
@@ -57,17 +58,21 @@ import lcmc.cluster.service.ssh.ExecCommandConfig;
 /**
  * This class holds info data for a host.
  */
-@Named
 public class ProxyHostInfo extends Info {
+    private final Application application;
+    private final WidgetFactory widgetFactory;
+    private final ProxyHostMenu proxyHostMenu;
+
     private static final Logger LOG = LoggerFactory.getLogger(ProxyHostInfo.class);
     private static final String NAME_PREFIX = Tools.getString("ProxyHostInfo.NameInfo");
     private Host host;
-    @Inject
-    private Application application;
-    @Inject
-    private WidgetFactory widgetFactory;
-    @Inject
-    private ProxyHostMenu proxyHostMenu;
+
+    public ProxyHostInfo(Application application, SwingUtils swingUtils, Access access, MainData mainData, Application application1, WidgetFactory widgetFactory, ProxyHostMenu proxyHostMenu) {
+        super(application, swingUtils, access, mainData);
+        this.application = application1;
+        this.widgetFactory = widgetFactory;
+        this.proxyHostMenu = proxyHostMenu;
+    }
 
     public void init(final Host host, final Browser browser) {
         super.init(host.getName(), browser);

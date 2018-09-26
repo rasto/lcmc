@@ -27,9 +27,6 @@ import java.awt.Graphics;
 import java.awt.GridLayout;
 import java.awt.Insets;
 
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Singleton;
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
@@ -48,32 +45,28 @@ import lcmc.common.ui.main.MainData;
 import lcmc.logger.Logger;
 import lcmc.logger.LoggerFactory;
 import lcmc.common.domain.util.Tools;
+import lombok.RequiredArgsConstructor;
 
 /**
  * An implementation of a panel that holds cluster tabs. Clicking on the tab,
  * changes also host that is shown in the terminal panel, to the host, that
  * is active in the cluster.
  */
-@Named
-@Singleton
+@RequiredArgsConstructor
 public final class ClustersPanel extends JPanel {
+    private final ClusterTabFactory clusterTabFactory;
+    private final UserConfig userConfig;
+    private final MainData mainData;
+    private final MainPresenter mainPresenter;
+    private final Application application;
+
     private static final Logger LOG = LoggerFactory.getLogger(ClustersPanel.class);
     private static final ImageIcon ALL_CLUSTERS_ICON = Tools.createImageIcon(
                                                             Tools.getDefault("ClustersPanel.ClustersIcon"));
     private static final String ALL_CLUSTERS_LABEL = Tools.getString("ClustersPanel.ClustersTab");
     private static final int TAB_BORDER_WIDTH = 3;
     private JTabbedPane tabbedPane;
-    @Inject
-    private ClusterTabFactory clusterTabFactory;
     private ClusterTab previouslySelectedTab = null;
-    @Inject
-    private UserConfig userConfig;
-    @Inject
-    private MainData mainData;
-    @Inject
-    private MainPresenter mainPresenter;
-    @Inject
-    private Application application;
 
     /** Shows the tabbed pane. */
     public void init() {

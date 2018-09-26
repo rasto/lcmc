@@ -26,6 +26,7 @@ import lcmc.cluster.domain.Cluster;
 import lcmc.cluster.domain.Clusters;
 import lcmc.cluster.ui.ClusterBrowser;
 import lcmc.common.domain.AccessMode;
+import lombok.RequiredArgsConstructor;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -34,11 +35,9 @@ import javax.swing.*;
 import java.util.List;
 import java.util.Map;
 
-@Named
-@Singleton
+@RequiredArgsConstructor
 public class Access {
-    @Inject
-    private Clusters allClusters;
+    private final Clusters allClusters;
 
     private boolean advancedMode = false;
     private AccessMode.Type accessType = AccessMode.ADMIN;

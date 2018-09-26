@@ -25,6 +25,7 @@ import lcmc.cluster.domain.Cluster;
 import lcmc.common.domain.AllHostsUpdatable;
 import lcmc.common.ui.ViewPanel;
 import lcmc.common.ui.main.MainData;
+import lombok.RequiredArgsConstructor;
 import lombok.val;
 
 import javax.inject.Inject;
@@ -35,14 +36,13 @@ import java.awt.*;
 /**
  * An implementation of a custer view with tree of services.
  */
-@Named
+@RequiredArgsConstructor
 public class ClusterViewPanel extends ViewPanel implements AllHostsUpdatable {
-    private Cluster cluster;
 
-    @Inject
-    private ClusterBrowser clusterBrowser;
-    @Inject
-    private MainData mainData;
+    private final ClusterBrowser clusterBrowser;
+    private final MainData mainData;
+
+    private Cluster cluster;
 
     public void init(final Cluster cluster) {
         this.cluster = cluster;

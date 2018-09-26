@@ -45,14 +45,13 @@ import lcmc.host.domain.Host;
 import lcmc.logger.Logger;
 import lcmc.logger.LoggerFactory;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.val;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import javax.inject.Inject;
-import javax.inject.Named;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -73,8 +72,11 @@ import static java.util.Arrays.asList;
  * information.
  * The xml is obtained with drbdsetp xml command and drbdadm dump-xml.
  */
-@Named
+@RequiredArgsConstructor
 public class DrbdXml {
+    private final Access access;
+    private final ProgressIndicator progressIndicator;
+
     private static final Logger LOG = LoggerFactory.getLogger(DrbdXml.class);
     private static final String[] EMPTY_STRING = new String[0];
 
@@ -120,8 +122,6 @@ public class DrbdXml {
         it from the drbdsetup. */
     static final Map<String, Value> HARDCODED_DEFAULTS = new HashMap<String, Value>();
 
-    @Inject
-    private Access access;
     static {
         PARAM_ACCESS_TYPE.put("rate", AccessMode.OP);
     }
@@ -348,8 +348,6 @@ public class DrbdXml {
     private final Map<String, Boolean> hostDrbdLoadedMap = new HashMap<String, Boolean>();
     private boolean unknownSections = false;
     private String oldConfig = null;
-    @Inject
-    private ProgressIndicator progressIndicator;
 
     public void init(final Host[] hosts, final Map<Host, String> drbdParameters) {
         addSpecialParameter("resource", "name", true);

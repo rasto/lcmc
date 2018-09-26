@@ -23,21 +23,15 @@ package lcmc.robotest;
 import lcmc.cluster.domain.Cluster;
 import lcmc.logger.Logger;
 import lcmc.logger.LoggerFactory;
-
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Singleton;
+import lombok.RequiredArgsConstructor;
 
 /**
  * This class is used to test the GUI.
  */
-@Named
-@Singleton
+@RequiredArgsConstructor
 final class DrbdTest5 {
-    @Inject
-    private RoboTest roboTest;
-    @Inject
-    private DrbdTest1 drbdTest1;
+    private final RoboTest roboTest;
+    private final DrbdTest1 drbdTest1;
 
     private static final Logger LOG = LoggerFactory.getLogger(DrbdTest5.class);
 

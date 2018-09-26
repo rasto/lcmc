@@ -23,29 +23,32 @@ package lcmc.vm.ui.resource;
 
 import lcmc.cluster.service.NetworkService;
 import lcmc.cluster.ui.widget.Widget;
+import lcmc.cluster.ui.widget.WidgetFactory;
 import lcmc.common.domain.AccessMode;
 import lcmc.common.domain.Application;
 import lcmc.common.domain.StringValue;
 import lcmc.common.domain.Value;
 import lcmc.common.domain.util.Tools;
 import lcmc.common.ui.Browser;
+import lcmc.common.ui.main.MainData;
 import lcmc.common.ui.treemenu.ClusterTreeMenu;
+import lcmc.common.ui.utils.MenuFactory;
 import lcmc.common.ui.utils.SwingUtils;
 import lcmc.host.domain.Host;
 import lcmc.vm.domain.VmsXml;
 import lcmc.vm.domain.data.GraphicsData;
 import org.w3c.dom.Node;
 
-import javax.inject.Inject;
-import javax.inject.Named;
 import javax.swing.*;
 import java.util.*;
 
 /**
  * This class holds info about virtual graphics displays.
  */
-@Named
 public final class GraphicsInfo extends HardwareInfo {
+    private final SwingUtils swingUtils;
+    private final ClusterTreeMenu clusterTreeMenu;
+    private final NetworkService networkService;
 
     /** Parameters. AUTOPORT is generated */
     private static final String[] PARAMETERS = {GraphicsData.TYPE,
@@ -120,8 +123,6 @@ public final class GraphicsInfo extends HardwareInfo {
                                         new StringValue("5901", "5901")});
     }
 
-    @Inject
-    private SwingUtils swingUtils;
 
     /** Combo box that can be made invisible. */
     private final Map<String, Widget> portWi = new HashMap<String, Widget>();
@@ -137,10 +138,13 @@ public final class GraphicsInfo extends HardwareInfo {
     private final Map<String, Widget> xauthWi = new HashMap<String, Widget>();
     /** Table panel. */
     private JComponent tablePanel = null;
-    @Inject
-    private ClusterTreeMenu clusterTreeMenu;
-    @Inject
-    private NetworkService networkService;
+
+    public GraphicsInfo(Application application, SwingUtils swingUtils, MenuFactory menuFactory, WidgetFactory widgetFactory, MainData mainData, ClusterTreeMenu clusterTreeMenu, NetworkService networkService) {
+        super(application, swingUtils, menuFactory, widgetFactory, mainData, clusterTreeMenu);
+        this.swingUtils = swingUtils;
+        this.clusterTreeMenu = clusterTreeMenu;
+        this.networkService = networkService;
+    }
 
     void init(final String name, final Browser browser, final DomainInfo vmsVirtualDomainInfo) {
         super.init(name, browser, vmsVirtualDomainInfo);

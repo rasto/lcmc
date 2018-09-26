@@ -24,6 +24,7 @@ import java.awt.event.KeyEvent;
 import lcmc.cluster.ui.widget.GenericWidget.MTextField;
 import lcmc.cluster.ui.widget.MComboBox;
 import lcmc.common.domain.util.Tools;
+import lombok.RequiredArgsConstructor;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -32,11 +33,9 @@ import javax.inject.Singleton;
 /**
  * This class is used to test the GUI.
  */
-@Named
-@Singleton
+@RequiredArgsConstructor
 final class PcmkTest3 {
-    @Inject
-    private RoboTest roboTest;
+    private final RoboTest roboTest;
 
     void start(final int count) {
         roboTest.setSlowFactor(0.3f);

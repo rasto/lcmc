@@ -59,15 +59,18 @@ import lcmc.cluster.ui.widget.MComboBox;
 import lcmc.logger.Logger;
 import lcmc.logger.LoggerFactory;
 import lcmc.common.domain.util.Tools;
+import lombok.RequiredArgsConstructor;
+
 import javax.inject.Inject;
 import javax.inject.Named;
 
 /**
  * This class is used to test the GUI.
  */
-@Named
-@Singleton
+@RequiredArgsConstructor
 public class RoboTest {
+    private final MainData mainData;
+
     private static final Logger LOG = LoggerFactory.getLogger(RoboTest.class);
     private static final GraphicsDevice SCREEN_DEVICE =
                                         GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice();
@@ -90,8 +93,6 @@ public class RoboTest {
     private Cluster cluster;
 
     static final boolean PROXY = true;
-    @Inject
-    private MainData mainData;
 
     public void initRobot(final Cluster cluster) {
         this.cluster = cluster;

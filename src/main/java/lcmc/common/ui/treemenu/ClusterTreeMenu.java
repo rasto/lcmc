@@ -22,6 +22,7 @@ package lcmc.common.ui.treemenu;
 
 import lcmc.cluster.ui.network.InfoPresenter;
 import lcmc.common.ui.Info;
+import lombok.RequiredArgsConstructor;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -35,11 +36,9 @@ import java.util.Enumeration;
 import java.util.List;
 import java.util.function.BiConsumer;
 
-@Named
-@Singleton
+@RequiredArgsConstructor
 public class ClusterTreeMenu {
-    @Inject
-    private TreeMenuController treeMenuController;
+    private final TreeMenuController treeMenuController;
 
     public void addChild(final DefaultMutableTreeNode parent, final MutableTreeNode child) {
         treeMenuController.addChild(parent, child);

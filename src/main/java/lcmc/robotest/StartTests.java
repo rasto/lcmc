@@ -28,79 +28,46 @@ import lcmc.host.domain.Host;
 import lcmc.logger.Logger;
 import lcmc.logger.LoggerFactory;
 import lcmc.common.domain.util.Tools;
+import lombok.RequiredArgsConstructor;
 
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Singleton;
 import java.io.IOException;
 
-@Named
-@Singleton
+@RequiredArgsConstructor
 public class StartTests {
-    private static final Logger LOG = LoggerFactory.getLogger(RoboTest.class);
 
-    @Inject
-    private PcmkTest1 pcmkTest1;
-    @Inject
-    private PcmkTest2 pcmkTest2;
-    @Inject
-    private PcmkTest3 pcmkTest3;
-    @Inject
-    private PcmkTest4 pcmkTest4;
-    @Inject
-    private PcmkTest5 pcmkTest5;
-    @Inject
-    private PcmkTest6 pcmkTest6;
-    @Inject
-    private PcmkTest7 pcmkTest7;
-    @Inject
-    private PcmkTest8 pcmkTest8;
-    @Inject
-    private PcmkTestA pcmkTestA;
-    @Inject
-    private PcmkTestB pcmkTestB;
-    @Inject
-    private PcmkTestC pcmkTestC;
-    @Inject
-    private PcmkTestD pcmkTestD;
-    @Inject
-    private PcmkTestE pcmkTestE;
-    @Inject
-    private PcmkTestF pcmkTestF;
-    @Inject
-    private PcmkTestG pcmkTestG;
-    @Inject
-    private PcmkTestH pcmkTestH;
-    @Inject
-    private RoboTest roboTest;
-    @Inject
-    private DrbdTest1 drbdTest1;
-    @Inject
-    private DrbdTest2 drbdTest2;
-    @Inject
-    private DrbdTest3 drbdTest3;
-    @Inject
-    private DrbdTest4 drbdTest4;
-    @Inject
-    private DrbdTest5 drbdTest5;
-    @Inject
-    private DrbdTest8 drbdTest8;
-    @Inject
-    private GUITest1 guiTest1;
-    @Inject
-    private GUITest2 guiTest2;
-    @Inject
-    private VMTest1 vmTest1;
-    @Inject
-    private VMTest4 vmTest4;
-    @Inject
-    private VMTest5 vmTest5;
-    @Inject
-    private MainData mainData;
-    @Inject
-    private MainPanel mainPanel;
-    @Inject
-    private Application application;
+    private final RoboTest roboTest;
+    private final MainData mainData;
+    private final MainPanel mainPanel;
+    private final Application application;
+    private final PcmkTest1 pcmkTest1;
+    private final PcmkTest2 pcmkTest2;
+    private final PcmkTest3 pcmkTest3;
+    private final PcmkTest4 pcmkTest4;
+    private final PcmkTest5 pcmkTest5;
+    private final PcmkTest6 pcmkTest6;
+    private final PcmkTest7 pcmkTest7;
+    private final PcmkTest8 pcmkTest8;
+    private final PcmkTestA pcmkTestA;
+    private final PcmkTestB pcmkTestB;
+    private final PcmkTestC pcmkTestC;
+    private final PcmkTestD pcmkTestD;
+    private final PcmkTestE pcmkTestE;
+    private final PcmkTestF pcmkTestF;
+    private final PcmkTestG pcmkTestG;
+    private final PcmkTestH pcmkTestH;
+    private final DrbdTest1 drbdTest1;
+    private final DrbdTest2 drbdTest2;
+    private final DrbdTest3 drbdTest3;
+    private final DrbdTest4 drbdTest4;
+    private final DrbdTest5 drbdTest5;
+    private final DrbdTest8 drbdTest8;
+    private final GUITest1 guiTest1;
+    private final GUITest2 guiTest2;
+    private final VMTest1 vmTest1;
+    private final VMTest4 vmTest4;
+    private final VMTest5 vmTest5;
+
+    private static final Logger LOG = LoggerFactory.getLogger(RoboTest.class);
 
     private Cluster cluster;
 

@@ -53,12 +53,16 @@ import lcmc.common.domain.Http;
 import lcmc.logger.Logger;
 import lcmc.logger.LoggerFactory;
 import lcmc.common.domain.util.Tools;
+import lombok.RequiredArgsConstructor;
 
 /**
  * An implementation of a bug report dialog.
  */
-@Named
+@RequiredArgsConstructor
 public final class BugReport extends ConfigDialog {
+    private final SwingUtils swingUtils;
+    private final Clusters allClusters;
+
     private static final Logger LOG = LoggerFactory.getLogger(BugReport.class);
 
     private static final String CONFIG_CIB = "pcmk configs";
@@ -76,10 +80,6 @@ public final class BugReport extends ConfigDialog {
     private final Map<String, JCheckBox> configCheckBoxMap = new HashMap<String, JCheckBox>();
     private final Map<Cluster, JCheckBox> clusterCheckBoxMap = new HashMap<Cluster, JCheckBox>();
     private String logBuffer;
-    @Inject
-    private SwingUtils swingUtils;
-    @Inject
-    private Clusters allClusters;
 
     public void init(final Cluster selectedCluster, final String errorText) {
         this.selectedCluster = selectedCluster;

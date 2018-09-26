@@ -34,6 +34,7 @@ import lcmc.cluster.ui.widget.Widget;
 import lcmc.cluster.ui.widget.WidgetFactory;
 import lcmc.common.domain.util.Tools;
 import lcmc.cluster.service.NetworkService;
+import lombok.RequiredArgsConstructor;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -42,12 +43,10 @@ import javax.inject.Named;
  * This class holds info about IPaddr/IPaddr2 heartbeat service. It adds a
  * better ip entering capabilities.
  */
-@Named
+@RequiredArgsConstructor
 final class IPaddrInfo extends ServiceInfo {
-    @Inject
-    private WidgetFactory widgetFactory;
-    @Inject
-    private NetworkService networkService;
+    private final WidgetFactory widgetFactory;
+    private final NetworkService networkService;
 
     /**
      * Returns whether all the parameters are correct. If param is null,

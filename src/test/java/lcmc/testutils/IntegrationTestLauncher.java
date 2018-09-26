@@ -27,6 +27,7 @@ import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.function.Supplier;
 
 import lcmc.LCMC;
 import lcmc.cluster.service.storage.FileSystemService;
@@ -42,18 +43,25 @@ import lcmc.host.domain.HostFactory;
 import lcmc.logger.LoggerFactory;
 import lcmc.common.domain.util.Tools;
 import lcmc.cluster.ui.ClusterTabFactory;
-
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Provider;
-import javax.inject.Singleton;
+import lombok.RequiredArgsConstructor;
 
 /**
  * This class provides tools for testing.
  */
-@Named
-@Singleton
+@RequiredArgsConstructor
 public class IntegrationTestLauncher {
+    private final MainPresenter mainPresenter;
+    private final MainPanel mainPanel;
+    private final Application application;
+    private final SwingUtils swingUtils;
+    private final HostFactory hostFactory;
+    private final Supplier<Cluster> clusterProvider;
+    private final LCMC lcmc;
+    private final ClusterTabFactory clusterTabFactory;
+    private final NetworkService networkService;
+    private final FileSystemService fileSystemService;
+    private final UserConfig userConfig;
+
     private static final String PASSWORD = "rastislav";
     private static final String ID_DSA_KEY = "rastislav";
     private static final String ID_RSA_KEY = "rastislav";
@@ -63,29 +71,6 @@ public class IntegrationTestLauncher {
 
     private final List<Host> hosts = new ArrayList<Host>();
     private volatile boolean clusterLoaded = false;
-
-    @Inject
-    private MainPresenter mainPresenter;
-    @Inject
-    private MainPanel mainPanel;
-    @Inject
-    private Application application;
-    @Inject
-    private SwingUtils swingUtils;
-    @Inject
-    private HostFactory hostFactory;
-    @Inject
-    private Provider<Cluster> clusterProvider;
-    @Inject
-    private LCMC lcmc;
-    @Inject
-    private ClusterTabFactory clusterTabFactory;
-    @Inject
-    private NetworkService networkService;
-    @Inject
-    private FileSystemService fileSystemService;
-    @Inject
-    private UserConfig userConfig;
 
     public void initTestCluster() {
         initCluster();

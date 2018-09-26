@@ -31,6 +31,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
+import java.util.function.Supplier;
 
 import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.Table;
@@ -43,6 +44,7 @@ import lcmc.robotest.Test;
 import lcmc.logger.Logger;
 import lcmc.logger.LoggerFactory;
 import lcmc.common.domain.util.Tools;
+import lombok.RequiredArgsConstructor;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -58,9 +60,13 @@ import javax.swing.plaf.FontUIResource;
  * Holds data, that are used globaly in the application and provides some
  * functions for this data.
  */
-@Named
-@Singleton
+@RequiredArgsConstructor
 public class Application {
+
+    private final Hosts allHosts;
+    private final Clusters allClusters;
+    private final Supplier<ConfirmDialog> confirmDialogProvider;
+
     private static final Logger LOG = LoggerFactory.getLogger(Application.class);
     public static final String HEARTBEAT_NAME = "Heartbeat";
     public static final String COROSYNC_NAME = "Corosync/OpenAIS";
@@ -112,13 +118,6 @@ public class Application {
     private boolean embedApplet = Tools.isLinux();
     private boolean cmdLog = false;
     private Test autoTest = null;
-
-    @Inject
-    private Hosts allHosts;
-    @Inject
-    private Clusters allClusters;
-    @Inject
-    private Provider<ConfirmDialog> confirmDialogProvider;
 
     public int danglingHostsCount() {
         int c = 0;

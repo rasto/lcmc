@@ -56,10 +56,14 @@ import lcmc.common.ui.utils.WidgetListener;
  */
 @Named
 public final class TextfieldWithUnit extends GenericWidget<JComponent> {
-    @Inject
-    private SwingUtils swingUtils;
-    @Inject
-    private Access access;
+    private final SwingUtils swingUtils;
+    private final Access access;
+
+    public TextfieldWithUnit(SwingUtils swingUtils, Access access) {
+        super(swingUtils, access);
+        this.swingUtils = swingUtils;
+        this.access = access;
+    }
     /** Text field in widget with units. */
     private JTextField textFieldPart;
     private MComboBox<Unit> unitComboBox;

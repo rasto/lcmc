@@ -58,47 +58,35 @@ import lcmc.logger.Logger;
 import lcmc.logger.LoggerFactory;
 import lcmc.common.domain.util.Tools;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+import lombok.val;
 
 /**
  * This is the central class with main function. It starts the LCMC GUI.
  */
-@Named
-@Singleton
+@RequiredArgsConstructor
 public final class LCMC extends JPanel {
+
+    private final Application application;
+    private final ArgumentParser argumentParser;
+    private final MainPanel mainPanel;
+    private final MainMenu menu;
+    private final ProgressIndicator progressIndicator;
+    private final MainData mainData;
+    private final MainPresenter mainPresenter;
+    private final BlockDeviceService blockDeviceService;
+    private final MountPointService mountPointService;
+    private final FileSystemService fileSystemService;
+    private final NetworkService networkService;
+    private final SwingUtils swingUtils;
+    @Getter
+    private final JComponent mainGlassPane;
+    private final ProgressIndicator progressInidicator;
     private static final Logger LOG = LoggerFactory.getLogger(LCMC.class);
     private static volatile boolean uncaughtExceptionFlag = false;
 
     private static final int TOOLTIP_INITIAL_DELAY_MILLIS = 200;
     private static final int TOOLTIP_DISMISS_DELAY_MILLIS = 100000;
-
-    @Inject
-    private Application application;
-    @Inject
-    private ArgumentParser argumentParser;
-    @Inject
-    private MainPanel mainPanel;
-    @Inject
-    private MainMenu menu;
-    @Inject
-    private ProgressIndicator progressIndicator;
-    @Inject
-    private MainData mainData;
-    @Inject
-    private MainPresenter mainPresenter;
-    @Inject
-    private BlockDeviceService blockDeviceService;
-    @Inject
-    private MountPointService mountPointService;
-    @Inject
-    private FileSystemService fileSystemService;
-    @Inject
-    private NetworkService networkService;
-    @Inject
-    private SwingUtils swingUtils;
-    @Getter
-    private JComponent mainGlassPane;
-    @Inject
-    private ProgressIndicator progressInidicator;
 
     protected void createAndShowGUI(final Container mainFrame) {
         setupUiManager();
@@ -159,7 +147,7 @@ public final class LCMC extends JPanel {
 
     void createMainFrame(final JFrame mainFrame) {
         progressIndicator.init();
-        mainGlassPane = progressInidicator.getPane();
+        val mainGlassPane = progressInidicator.getPane();
         mainFrame.setGlassPane(mainGlassPane);
         mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         mainFrame.addWindowListener(new ExitListener());

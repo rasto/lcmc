@@ -35,10 +35,8 @@ import lcmc.event.NetInterfacesChangedEvent;
 import lcmc.event.NetworkChangedEvent;
 import lcmc.host.domain.Host;
 import lcmc.host.domain.HostNetworks;
+import lombok.RequiredArgsConstructor;
 
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Singleton;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -48,13 +46,11 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
-@Named
-@Singleton
+@RequiredArgsConstructor
 public class NetworkService {
-    @Inject
-    private HwEventBus hwEventBus;
-    @Inject
-    private ClusterEventBus clusterEventBus;
+    private final HwEventBus hwEventBus;
+    private final ClusterEventBus clusterEventBus;
+
     private Map<Host, HostNetworks> hostNetInterfacesByHost = new ConcurrentHashMap<Host, HostNetworks>();
     private Map<Cluster, List<Network>> networksByCluster = new ConcurrentHashMap<Cluster, List<Network>>();
 

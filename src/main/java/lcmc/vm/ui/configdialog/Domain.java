@@ -24,14 +24,16 @@
 package lcmc.vm.ui.configdialog;
 
 import java.awt.Dimension;
-import javax.inject.Inject;
-import javax.inject.Named;
+import java.util.function.Supplier;
 import javax.swing.BoxLayout;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
+import lcmc.cluster.ui.widget.WidgetFactory;
 import lcmc.common.domain.Application;
+import lcmc.common.ui.ProgressBar;
+import lcmc.common.ui.main.MainData;
 import lcmc.common.ui.utils.SwingUtils;
 import lcmc.vm.domain.VMParams;
 import lcmc.common.ui.WizardDialog;
@@ -42,8 +44,12 @@ import lcmc.common.domain.util.Tools;
 /**
  * An implementation of a dialog where user can enter a new domain.
  */
-@Named
 public final class Domain extends VMConfig {
+    private final InstallationDisk installationDiskDialog;
+    private final Filesystem filesystemDialog;
+    private final Application application;
+    private final SwingUtils swingUtils;
+
     private static final String[] PARAMS = {VMParams.VM_PARAM_DOMAIN_TYPE,
                                             VMParams.VM_PARAM_NAME,
                                             VMParams.VM_PARAM_VIRSH_OPTIONS,
@@ -60,14 +66,14 @@ public final class Domain extends VMConfig {
     private JComponent inputPane = null;
     private Widget domainNameWidget;
     private VMConfig nextDialogObject = null;
-    @Inject
-    private InstallationDisk installationDiskDialog;
-    @Inject
-    private Filesystem filesystemDialog;
-    @Inject
-    private Application application;
-    @Inject
-    private SwingUtils swingUtils;
+
+    public Domain(Supplier<ProgressBar> progressBarProvider, Application application, SwingUtils swingUtils, WidgetFactory widgetFactory, MainData mainData, InstallationDisk installationDiskDialog, Filesystem filesystemDialog) {
+        super(progressBarProvider, application, swingUtils, widgetFactory, mainData);
+        this.installationDiskDialog = installationDiskDialog;
+        this.filesystemDialog = filesystemDialog;
+        this.application = application;
+        this.swingUtils = swingUtils;
+    }
 
     @Override
     public WizardDialog nextDialog() {

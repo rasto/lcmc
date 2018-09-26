@@ -46,7 +46,6 @@ import java.util.Map;
 /**
  * This class is for resource defaults or rsc_defaults.
  */
-@Named
 public final class RscDefaultsInfo extends EditableInfo {
     private static final Logger LOG = LoggerFactory.getLogger(RscDefaultsInfo.class);
     public void einit(final String name, final Browser browser) {

@@ -24,25 +24,31 @@
 package lcmc.vm.ui.configdialog;
 
 import java.awt.Dimension;
-import javax.inject.Inject;
-import javax.inject.Named;
+import java.util.function.Supplier;
 import javax.swing.BoxLayout;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
+import lcmc.cluster.ui.widget.WidgetFactory;
 import lcmc.common.domain.Application;
+import lcmc.common.ui.ProgressBar;
+import lcmc.common.ui.main.MainData;
 import lcmc.common.ui.utils.SwingUtils;
 import lcmc.vm.domain.data.GraphicsData;
 import lcmc.common.ui.WizardDialog;
 import lcmc.vm.ui.resource.GraphicsInfo;
 import lcmc.common.domain.util.Tools;
+import lombok.RequiredArgsConstructor;
 
 /**
  * An implementation of a dialog where user can enter a new domain.
  */
-@Named
 final class Display extends VMConfig {
+    private final VMFinish vmFinishDialog;
+    private final Application application;
+    private final SwingUtils swingUtils;
+
     private static final String[] PARAMS = {GraphicsData.TYPE,
                                             GraphicsData.PORT,
                                             GraphicsData.LISTEN,
@@ -53,12 +59,13 @@ final class Display extends VMConfig {
     private JComponent inputPane = null;
     private GraphicsInfo graphicsInfo = null;
     private WizardDialog nextDialogObject = null;
-    @Inject
-    private VMFinish vmFinishDialog;
-    @Inject
-    private Application application;
-    @Inject
-    private SwingUtils swingUtils;
+
+    public Display(Supplier<ProgressBar> progressBarProvider, Application application, SwingUtils swingUtils, WidgetFactory widgetFactory, MainData mainData, VMFinish vmFinishDialog) {
+        super(progressBarProvider, application, swingUtils, widgetFactory, mainData);
+        this.vmFinishDialog = vmFinishDialog;
+        this.application = application;
+        this.swingUtils = swingUtils;
+    }
 
     @Override
     public WizardDialog nextDialog() {

@@ -27,6 +27,7 @@ import lcmc.common.ui.Info;
 import lcmc.common.ui.utils.SwingUtils;
 import lcmc.logger.Logger;
 import lcmc.logger.LoggerFactory;
+import lombok.RequiredArgsConstructor;
 import lombok.val;
 
 import javax.inject.Inject;
@@ -41,22 +42,16 @@ import java.awt.event.MouseListener;
 import java.util.*;
 import java.util.function.BiConsumer;
 
-@Named
-@Singleton
+@RequiredArgsConstructor
 public class TreeMenuController {
+    private final SwingUtils swingUtils;
 
     private static final Logger LOG = LoggerFactory.getLogger(TreeMenuController.class);
     private DefaultTreeModel treeModel;
     private JTree tree;
-    private final SwingUtils swingUtils;
 
     private volatile boolean disableListeners = true;
     private BiConsumer<InfoPresenter, Boolean> onSelect;
-
-    @Inject
-    public TreeMenuController(final SwingUtils swingUtils) {
-        this.swingUtils = swingUtils;
-    }
 
     public final DefaultMutableTreeNode createMenuTreeTop(final InfoPresenter infoPresenter) {
         final DefaultMutableTreeNode treeTop = new DefaultMutableTreeNode(infoPresenter);

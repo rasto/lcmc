@@ -33,7 +33,6 @@ import javax.inject.Named;
  * linbit::drbd info class is used for drbd pacemaker service that is
  * treated in special way.
  */
-@Named
 public class LinbitDrbdInfo extends ServiceInfo {
     /** Returns string representation of the linbit::drbd service. */
     @Override

@@ -30,8 +30,7 @@ import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.util.Map;
 import java.util.Set;
-import javax.inject.Inject;
-import javax.inject.Named;
+import java.util.function.Supplier;
 import javax.swing.JCheckBox;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
@@ -43,6 +42,8 @@ import lcmc.cluster.ui.widget.WidgetFactory;
 import lcmc.common.domain.AccessMode;
 import lcmc.common.domain.Application;
 import lcmc.cluster.domain.Cluster;
+import lcmc.common.ui.ProgressBar;
+import lcmc.common.ui.main.MainData;
 import lcmc.common.ui.utils.SwingUtils;
 import lcmc.host.domain.Host;
 import lcmc.common.domain.StringValue;
@@ -64,8 +65,10 @@ import lcmc.common.ui.utils.WidgetListener;
 /**
  * This class implements LVM resize dialog.
  */
-@Named
 public final class LVResize extends LV {
+    private final SwingUtils swingUtils;
+    private final WidgetFactory widgetFactory;
+
     private static final Logger LOG = LoggerFactory.getLogger(LVResize.class);
     private static final String DESCRIPTION =
                    "Resize the LVM volume. You can make it bigger, but not"
@@ -80,11 +83,13 @@ public final class LVResize extends LV {
     private Widget oldSizeWidget;
     private Widget maxSizeWidget;
     private Map<Host, JCheckBox> hostCheckBoxes = null;
-    @Inject
-    private SwingUtils swingUtils;
-    @Inject
-    private WidgetFactory widgetFactory;
     private MyButton resizeButton;
+
+    public LVResize(Supplier<ProgressBar> progressBarProvider, Application application, SwingUtils swingUtils, WidgetFactory widgetFactory, MainData mainData) {
+        super(progressBarProvider, application, swingUtils, widgetFactory, mainData);
+        this.swingUtils = swingUtils;
+        this.widgetFactory = widgetFactory;
+    }
 
     public void init(final BlockDevInfo blockDevInfo) {
         super.init(null);

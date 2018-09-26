@@ -28,6 +28,7 @@ import lcmc.drbd.ui.configdialog.NewProxyHostDialog;
 import lcmc.drbd.ui.resource.VolumeInfo;
 import lcmc.logger.Logger;
 import lcmc.logger.LoggerFactory;
+import lombok.RequiredArgsConstructor;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -35,15 +36,14 @@ import javax.inject.Named;
 /**
  * Show step by step dialogs that add and configure new proxy host.
  */
-@Named
+@RequiredArgsConstructor
 public final class ProxyHostWizard {
+    private final MainPanel mainPanel;
+    private final NewProxyHostDialog newProxyHostDialog;
+
     private static final Logger LOG = LoggerFactory.getLogger(ProxyHostWizard.class);
     private VolumeInfo volumeInfo;
     private Host host;
-    @Inject
-    private MainPanel mainPanel;
-    @Inject
-    private NewProxyHostDialog newProxyHostDialog;
 
     public void init(final Host host, final VolumeInfo volumeInfo) {
         this.host = host;

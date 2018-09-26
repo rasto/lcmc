@@ -32,14 +32,9 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import lcmc.common.domain.util.Tools;
 
-import javax.inject.Named;
-import javax.inject.Singleton;
-
 /**
  * This class holds a set of all clusters.
  */
-@Named
-@Singleton
 public final class Clusters {
     private final Set<Cluster> clusters = new TreeSet<Cluster>();
     private final ReadWriteLock mClustersLock = new ReentrantReadWriteLock();

@@ -35,7 +35,6 @@ import lcmc.common.ui.utils.PatternDocument;
  * field can be Textfield or combo box, depending if there are values
  * too choose from.
  */
-@Named
 public final class Passwdfield extends Textfield {
     public void init(final Value selectedValue,
                      final String regexp,

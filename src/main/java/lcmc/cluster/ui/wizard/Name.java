@@ -43,29 +43,24 @@ import lcmc.common.domain.StringValue;
 import lcmc.common.domain.util.Tools;
 import lcmc.cluster.ui.ClusterTabFactory;
 import lcmc.common.ui.utils.SwingUtils;
+import lombok.RequiredArgsConstructor;
 
 /**
  * An implementation of a dialog where user can enter the name of the cluster.
  */
-@Named
+@RequiredArgsConstructor
 public final class Name extends DialogCluster {
+
+    private final ClusterHosts clusterHostsDialog;
+    private final ClusterTabFactory clusterTabFactory;
+    private final MainPresenter mainPresenter;
+    private final Application application;
+    private final SwingUtils swingUtils;
+    private final Clusters allClusters;
+    private final WidgetFactory widgetFactory;
+
     private static final int NAME_FIELD_WIDTH = 120;
     private Widget nameField;
-
-    @Inject
-    private ClusterHosts clusterHostsDialog;
-    @Inject
-    private ClusterTabFactory clusterTabFactory;
-    @Inject
-    private MainPresenter mainPresenter;
-    @Inject
-    private Application application;
-    @Inject
-    private SwingUtils swingUtils;
-    @Inject
-    private Clusters allClusters;
-    @Inject
-    private WidgetFactory widgetFactory;
 
     @Override
     protected void finishDialog() {

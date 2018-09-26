@@ -31,8 +31,6 @@ import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.inject.Inject;
-import javax.inject.Named;
 import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
 import javax.swing.JComponent;
@@ -44,6 +42,9 @@ import javax.swing.SpringLayout;
 import lcmc.cluster.ui.widget.WidgetFactory;
 import lcmc.common.domain.Application;
 import lcmc.common.domain.ColorText;
+import lcmc.common.ui.Access;
+import lcmc.common.ui.main.MainData;
+import lcmc.common.ui.utils.SwingUtils;
 import lcmc.host.domain.Host;
 import lcmc.common.ui.Browser;
 import lcmc.host.ui.HostBrowser;
@@ -61,17 +62,22 @@ import lcmc.cluster.service.ssh.ExecCommandConfig;
  * This class holds info data for a host.
  * It shows host view, just like in the host tab.
  */
-@Named
 public class HostDrbdInfo extends Info {
+
+    private final HostDrbdMenu hostDrbdMenu;
+    private final Application application;
+    private final WidgetFactory widgetFactory;
+
     private static final Logger LOG = LoggerFactory.getLogger(HostDrbdInfo.class);
     static final String NO_DRBD_STATUS_TOOLTIP = "drbd status is not available";
-    @Inject
-    private HostDrbdMenu hostDrbdMenu;
     private Host host;
-    @Inject
-    private Application application;
-    @Inject
-    private WidgetFactory widgetFactory;
+
+    public HostDrbdInfo(Application application, SwingUtils swingUtils, Access access, MainData mainData, HostDrbdMenu hostDrbdMenu, WidgetFactory widgetFactory) {
+        super(application, swingUtils, access, mainData);
+        this.application = application;
+        this.hostDrbdMenu = hostDrbdMenu;
+        this.widgetFactory = widgetFactory;
+    }
 
     public void init(final Host host, final Browser browser) {
         super.init(host.getName(), browser);

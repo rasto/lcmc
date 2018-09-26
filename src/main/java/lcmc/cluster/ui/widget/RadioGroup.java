@@ -32,8 +32,6 @@ import java.util.Map;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
-import javax.inject.Inject;
-import javax.inject.Named;
 import javax.swing.AbstractButton;
 import javax.swing.ButtonGroup;
 import javax.swing.JComponent;
@@ -54,8 +52,10 @@ import lcmc.common.ui.utils.WidgetListener;
  * field can be Textfield or combo box, depending if there are values
  * too choose from.
  */
-@Named
 public final class RadioGroup extends GenericWidget<JComponent> {
+    private final SwingUtils swingUtils;
+    private final Access access;
+
     private Value radioGroupValue;
     /** Radio group hash, from string that is displayed to the object. */
     private final Map<String, Value> radioGroupHash = new HashMap<String, Value>();
@@ -64,10 +64,12 @@ public final class RadioGroup extends GenericWidget<JComponent> {
     private final ReadWriteLock mComponentsLock = new ReentrantReadWriteLock();
     private final Lock mComponentsReadLock = mComponentsLock.readLock();
     private final Lock mComponentsWriteLock = mComponentsLock.writeLock();
-    @Inject
-    private SwingUtils swingUtils;
-    @Inject
-    private Access access;
+
+    public RadioGroup(SwingUtils swingUtils, Access access) {
+        super(swingUtils, access);
+        this.swingUtils = swingUtils;
+        this.access = access;
+    }
 
     public void init(final Value selectedValue,
                      final Value[] items,

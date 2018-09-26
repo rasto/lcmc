@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
+import java.util.function.Supplier;
 
 import lcmc.common.ui.Access;
 import lcmc.common.ui.CallbackAction;
@@ -54,13 +55,21 @@ import lcmc.common.domain.Predicate;
 import lcmc.common.domain.util.Tools;
 import lcmc.common.ui.utils.UpdatableItem;
 import lcmc.common.domain.VisiblePredicate;
+import lombok.RequiredArgsConstructor;
 
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Provider;
-
-@Named
+@RequiredArgsConstructor
 public class BlockDevMenu {
+
+    private final ProgressIndicator progressIndicator;
+    private final MenuFactory menuFactory;
+    private final Application application;
+    private final Supplier<VGCreate> vgCreateProvide;
+    private final Supplier<VGRemove> vgRemoveProvider;
+    private final Supplier<LVCreate> lvCreateProvider;
+    private final Supplier<LVResize> lvResizeProvder;
+    private final Supplier<LVSnapshot> lvSnapshotProvider;
+    private final Supplier<DrbdLog> drbdLogProvider;
+    private final Access access;
     private static final Logger LOG = LoggerFactory.getLogger(BlockDevMenu.class);
 
     private static final String PV_CREATE_MENU_ITEM = "Create PV";
@@ -81,26 +90,6 @@ public class BlockDevMenu {
     private static final String LV_SNAPSHOT_MENU_DESCRIPTION = "Create a snapshot of the logical volume.";
 
     private BlockDevInfo blockDevInfo;
-    @Inject
-    private ProgressIndicator progressIndicator;
-    @Inject
-    private MenuFactory menuFactory;
-    @Inject
-    private Application application;
-    @Inject
-    private Provider<VGCreate> vgCreateProvide;
-    @Inject
-    private Provider<VGRemove> vgRemoveProvider;
-    @Inject
-    private Provider<LVCreate> lvCreateProvider;
-    @Inject
-    private Provider<LVResize> lvResizeProvder;
-    @Inject
-    private Provider<LVSnapshot> lvSnapshotProvider;
-    @Inject
-    private Provider<DrbdLog> drbdLogProvider;
-    @Inject
-    private Access access;
 
     public List<UpdatableItem> getPulldownMenu(final BlockDevInfo blockDevInfo) {
         this.blockDevInfo = blockDevInfo;

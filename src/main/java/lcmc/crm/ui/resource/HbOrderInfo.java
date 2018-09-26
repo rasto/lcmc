@@ -52,7 +52,6 @@ import java.util.regex.Matcher;
 /**
  * Object that holds an order constraint information.
  */
-@Named
 final class HbOrderInfo extends EditableInfo implements HbConstraintInterface {
     private static final Logger LOG = LoggerFactory.getLogger(HbOrderInfo.class);
     public static final String NOT_AVAIL_FOR_PCMK_VERSION = Tools.getString("HbOrderInfo.NotAvailableForThisVersion");

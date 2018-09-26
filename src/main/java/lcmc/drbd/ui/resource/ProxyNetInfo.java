@@ -31,7 +31,6 @@ import javax.inject.Named;
 /**
  * This class holds info data for a net interface on a drbd proxy host.
  */
-@Named
 public final class ProxyNetInfo extends NetInfo {
     /** Prefix in the host address field indicating a proxy address. */
     public static final String PROXY_PREFIX = "proxy: ";

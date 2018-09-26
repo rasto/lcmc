@@ -42,6 +42,7 @@ import lcmc.crm.domain.ClusterStatus;
 import lcmc.crm.domain.PtestData;
 import lcmc.crm.service.CRM;
 import lcmc.host.domain.Host;
+import lombok.RequiredArgsConstructor;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -57,13 +58,21 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
+import java.util.function.Supplier;
 
 /**
  * This class describes a connection between two heartbeat services.
  * It can be order, colocation or both.
  */
-@Named("hbConnectionInfo")
+@RequiredArgsConstructor
 public class HbConnectionInfo extends EditableInfo {
+    private final Supplier<HbColocationInfo> colocationInfoProvider;
+    private final Supplier<HbOrderInfo> orderInfoProvider;
+    private final Application application;
+    private final SwingUtils swingUtils;
+    private final HbConnectionMenu hbConnectionMenu;
+    private final ClusterTreeMenu clusterTreeMenu;
+
     private JComponent infoPanel = null;
     /** Constraints. */
     private final Collection<HbConstraintInterface> constraints = new ArrayList<HbConstraintInterface>();
@@ -76,18 +85,6 @@ public class HbConnectionInfo extends EditableInfo {
     private ServiceInfo lastServiceInfoChild = null;
     private final Map<String, HbColocationInfo> colocationIds = new LinkedHashMap<String, HbColocationInfo>();
     private final Map<String, HbOrderInfo> orderIds = new LinkedHashMap<String, HbOrderInfo>();
-    @Inject
-    private Provider<HbColocationInfo> colocationInfoProvider;
-    @Inject
-    private Provider<HbOrderInfo> orderInfoProvider;
-    @Inject
-    private Application application;
-    @Inject
-    private SwingUtils swingUtils;
-    @Inject
-    private HbConnectionMenu hbConnectionMenu;
-    @Inject
-    private ClusterTreeMenu clusterTreeMenu;
 
     public void init(final Browser browser) {
         super.einit(Optional.<ResourceValue>absent(), "HbConnectionInfo", browser);

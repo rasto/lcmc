@@ -70,14 +70,20 @@ import lcmc.common.ui.main.MainData;
 import lcmc.common.ui.utils.MyButton;
 import lcmc.common.domain.util.Tools;
 import lcmc.common.ui.utils.SwingUtils;
+import lombok.RequiredArgsConstructor;
 
 /**
  * An implementation of a dialog with buttons. Ok button is predefined.
  * The dialogs should extend this class and overwrite at least
  * getDialogTitle(), getDescription(), getInputPane() and nextDialog() methods.
  */
-@Named
+@RequiredArgsConstructor
 public abstract class ConfigDialog {
+    private final Application application;
+    private final SwingUtils swingUtils;
+    private final WidgetFactory widgetFactory;
+    private final MainData mainData;
+
     private static final int INPUT_PANE_HEIGHT = 200;
     private volatile JOptionPane optionPane;
     private JDialog dialogPanel;
@@ -91,15 +97,8 @@ public abstract class ConfigDialog {
     private volatile Object optionPaneAnswer;
     private boolean skipButtonShouldBeEnabled = true;
     private final List<JComponent> additionalOptions = new ArrayList<JComponent>();
-    @Inject
-    private Application application;
-    @Inject
-    private SwingUtils swingUtils;
-    @Inject
-    private WidgetFactory widgetFactory;
+
     private final MyButton[] options = new MyButton[buttons().length];
-    @Inject
-    private MainData mainData;
 
     protected final JDialog getDialogPanel() {
         return dialogPanel;

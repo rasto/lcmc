@@ -30,23 +30,19 @@ import lcmc.event.CommonFileSystemsChangedEvent;
 import lcmc.event.FileSystemsChangedEvent;
 import lcmc.event.HwFileSystemsChangedEvent;
 import lcmc.host.domain.Host;
+import lombok.RequiredArgsConstructor;
 
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Singleton;
 import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.concurrent.ConcurrentHashMap;
 
-@Named
-@Singleton
+@RequiredArgsConstructor
 public class FileSystemService {
-    @Inject
-    private HwEventBus hwEventBus;
-    @Inject
-    private ClusterEventBus clusterEventBus;
+    private final HwEventBus hwEventBus;
+    private final ClusterEventBus clusterEventBus;
+
     private Map<Host, Set<String>> fileSystemsByHost = new ConcurrentHashMap<Host, Set<String>>();
     private Map<Cluster, Set<String>> commonFileSystemsByCluster = new ConcurrentHashMap<Cluster, Set<String>>();
 

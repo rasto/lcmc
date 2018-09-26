@@ -36,10 +36,9 @@ import lcmc.crm.domain.CrmXml;
 import lcmc.crm.domain.ResourceAgent;
 import lcmc.crm.ui.ServiceLogs;
 import lcmc.host.domain.Host;
+import lombok.RequiredArgsConstructor;
 import lombok.val;
 
-import javax.inject.Inject;
-import javax.inject.Named;
 import javax.inject.Provider;
 import javax.swing.*;
 import javax.swing.tree.DefaultMutableTreeNode;
@@ -48,24 +47,16 @@ import java.awt.geom.Point2D;
 import java.util.*;
 import java.util.List;
 
-@Named
+@RequiredArgsConstructor
 public class ServiceMenu {
-    @Inject
-    private MainData drbdGui;
-    @Inject
-    private EditConfig editDialog;
-    @Inject
-    private MenuFactory menuFactory;
-    @Inject
-    private Application application;
-    @Inject
-    private SwingUtils swingUtils;
-    @Inject
-    private Provider<ServiceLogs> serviceLogsProvider;
-    @Inject
-    private ClusterTreeMenu clusterTreeMenu;
-    @Inject
-    private Access access;
+    private final MainData drbdGui;
+    private final EditConfig editDialog;
+    private final MenuFactory menuFactory;
+    private final Application application;
+    private final SwingUtils swingUtils;
+    private final Provider<ServiceLogs> serviceLogsProvider;
+    private final ClusterTreeMenu clusterTreeMenu;
+    private final Access access;
 
     public List<UpdatableItem> getPulldownMenu(final ServiceInfo serviceInfo) {
         final List<UpdatableItem> items = new ArrayList<UpdatableItem>();

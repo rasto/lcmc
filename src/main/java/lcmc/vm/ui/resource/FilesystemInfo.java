@@ -27,7 +27,9 @@ import lcmc.common.domain.StringValue;
 import lcmc.common.domain.Value;
 import lcmc.common.domain.util.Tools;
 import lcmc.common.ui.Browser;
+import lcmc.common.ui.main.MainData;
 import lcmc.common.ui.treemenu.ClusterTreeMenu;
+import lcmc.common.ui.utils.MenuFactory;
 import lcmc.common.ui.utils.MyButton;
 import lcmc.common.ui.utils.SwingUtils;
 import lcmc.drbd.ui.resource.BlockDevInfo;
@@ -36,8 +38,6 @@ import lcmc.vm.domain.VmsXml;
 import lcmc.vm.domain.data.FilesystemData;
 import org.w3c.dom.Node;
 
-import javax.inject.Inject;
-import javax.inject.Named;
 import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -46,8 +46,12 @@ import java.util.*;
 /**
  * This class holds info about Virtual filesystem.
  */
-@Named
 public final class FilesystemInfo extends HardwareInfo {
+
+    private final Application application;
+    private final SwingUtils swingUtils;
+    private final WidgetFactory widgetFactory;
+    private final ClusterTreeMenu clusterTreeMenu;
     /** Parameters. */
     private static final String[] PARAMETERS = {FilesystemData.TYPE,
                                                 FilesystemData.SOURCE_DIR,
@@ -103,13 +107,6 @@ public final class FilesystemInfo extends HardwareInfo {
         PREFERRED_MAP.put(FilesystemData.TARGET_DIR, new StringValue("/"));
     }
 
-    @Inject
-    private Application application;
-    @Inject
-    private SwingUtils swingUtils;
-    @Inject
-    private WidgetFactory widgetFactory;
-
     /** Source file combo box, so that it can be disabled, depending on type. */
     private final Map<String, Widget> sourceDirWi =
                                             new HashMap<String, Widget>();
@@ -120,8 +117,14 @@ public final class FilesystemInfo extends HardwareInfo {
     private Value[] sourceDirs;
     /** Table panel. */
     private JComponent tablePanel = null;
-    @Inject
-    private ClusterTreeMenu clusterTreeMenu;
+
+    public FilesystemInfo(Application application, SwingUtils swingUtils, MenuFactory menuFactory, WidgetFactory widgetFactory, MainData mainData, ClusterTreeMenu clusterTreeMenu) {
+        super(application, swingUtils, menuFactory, widgetFactory, mainData, clusterTreeMenu);
+        this.application = application;
+        this.swingUtils = swingUtils;
+        this.widgetFactory = widgetFactory;
+        this.clusterTreeMenu = clusterTreeMenu;
+    }
 
     void init(final String name, final Browser browser, final DomainInfo domainInfo) {
         super.init(name, browser, domainInfo);

@@ -27,6 +27,7 @@ import lcmc.host.domain.Host;
 import lcmc.drbd.domain.DrbdInstallation;
 import lcmc.logger.Logger;
 import lcmc.logger.LoggerFactory;
+import lombok.RequiredArgsConstructor;
 
 import javax.annotation.Resource;
 import javax.inject.Inject;
@@ -35,14 +36,13 @@ import javax.inject.Named;
 /**
  * Show step by step dialogs that configure a host.
  */
-@Named
+@RequiredArgsConstructor
 public final class EditHostDialog {
+    private final SSH sshDialog;
+    private final MainPanel mainPanel;
+
     private static final Logger LOG = LoggerFactory.getLogger(EditHostDialog.class);
     private Host host;
-    @Resource(name="SSH")
-    private SSH sshDialog;
-    @Inject
-    private MainPanel mainPanel;
 
     public void showDialogs(final Host host) {
         DialogHost dialog = sshDialog;

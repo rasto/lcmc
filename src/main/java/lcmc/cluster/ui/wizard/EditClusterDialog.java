@@ -27,6 +27,7 @@ import lcmc.common.ui.MainPanel;
 import lcmc.logger.Logger;
 import lcmc.logger.LoggerFactory;
 import lcmc.common.domain.util.Tools;
+import lombok.RequiredArgsConstructor;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -34,15 +35,14 @@ import javax.inject.Named;
 /**
  * Show step by step dialogs that configure a cluster.
  */
-@Named
+@RequiredArgsConstructor
 public final class EditClusterDialog {
+    private final Name nameDialog;
+    private final MainPanel mainPanel;
+
     private static final Logger LOG = LoggerFactory.getLogger(EditClusterDialog.class);
     private static final String CANCEL_BTN = Tools.getString("Dialog.Dialog.Cancel");
     private static final String FINISH_BTN = Tools.getString("Dialog.Dialog.Finish");
-    @Inject
-    private Name nameDialog;
-    @Inject
-    private MainPanel mainPanel;
 
     public void showDialogs(final Cluster cluster) {
         cluster.setClusterTabClosable(false);

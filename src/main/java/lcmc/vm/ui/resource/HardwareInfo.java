@@ -41,6 +41,7 @@ import lcmc.logger.Logger;
 import lcmc.logger.LoggerFactory;
 import lcmc.vm.domain.LinuxFile;
 import lcmc.vm.domain.VmsXml;
+import lombok.RequiredArgsConstructor;
 import org.w3c.dom.Node;
 
 import javax.inject.Inject;
@@ -61,8 +62,15 @@ import java.util.regex.Pattern;
 /**
  * This class holds info about Virtual Hardware.
  */
-@Named
+@RequiredArgsConstructor
 public abstract class HardwareInfo extends EditableInfo {
+    private final Application application;
+    private final SwingUtils swingUtils;
+    private final MenuFactory menuFactory;
+    private final WidgetFactory widgetFactory;
+    private final MainData mainData;
+    private final ClusterTreeMenu clusterTreeMenu;
+
     private static final Logger LOG = LoggerFactory.getLogger(HardwareInfo.class);
     /**
      * Back to overview icon.
@@ -80,18 +88,6 @@ public abstract class HardwareInfo extends EditableInfo {
     private JComponent infoPanel = null;
     private DomainInfo vmsVirtualDomainInfo;
     private final Map<String, LinuxFile> linuxFileCache = new HashMap<String, LinuxFile>();
-    @Inject
-    private Application application;
-    @Inject
-    private SwingUtils swingUtils;
-    @Inject
-    private MenuFactory menuFactory;
-    @Inject
-    private WidgetFactory widgetFactory;
-    @Inject
-    private MainData mainData;
-    @Inject
-    private ClusterTreeMenu clusterTreeMenu;
 
     void init(final String name, final Browser browser, final DomainInfo vmsVirtualDomainInfo) {
         super.einit(Optional.of(new ResourceValue(name)), name, browser);

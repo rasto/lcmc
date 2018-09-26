@@ -36,20 +36,26 @@ import lcmc.host.domain.Host;
 import lcmc.host.ui.HostBrowser;
 import lcmc.vm.domain.VmsXml;
 import lcmc.vm.ui.AddVMConfigDialog;
+import lombok.RequiredArgsConstructor;
 
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Provider;
 import javax.swing.*;
 import java.awt.*;
 import java.util.*;
 import java.util.List;
+import java.util.function.Supplier;
 
 /**
  * This class shows a list of virtual machines.
  */
-@Named
+@RequiredArgsConstructor
 public final class VMListInfo extends CategoryInfo {
+    private final Supplier<AddVMConfigDialog> addVMConfigDialogProvider;
+    private final Supplier<DomainInfo> domainInfoProvider;
+    private final MenuFactory menuFactory;
+    private final Application application;
+    private final SwingUtils swingUtils;
+    private final WidgetFactory widgetFactory;
+    private final ClusterTreeMenu clusterTreeMenu;
     /**
      * Default widths for columns.
      */
@@ -71,20 +77,6 @@ public final class VMListInfo extends CategoryInfo {
      */
     private volatile Map<String, Color> domainToColor =
             new HashMap<String, Color>();
-    @Inject
-    private Provider<AddVMConfigDialog> addVMConfigDialogProvider;
-    @Inject
-    private Provider<DomainInfo> domainInfoProvider;
-    @Inject
-    private MenuFactory menuFactory;
-    @Inject
-    private Application application;
-    @Inject
-    private SwingUtils swingUtils;
-    @Inject
-    private WidgetFactory widgetFactory;
-    @Inject
-    private ClusterTreeMenu clusterTreeMenu;
 
     /**
      * Returns browser object of this info.

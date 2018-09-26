@@ -29,24 +29,18 @@ import lcmc.common.ui.MainPanel;
 import lcmc.logger.Logger;
 import lcmc.logger.LoggerFactory;
 import lcmc.common.domain.util.Tools;
-
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Singleton;
+import lombok.RequiredArgsConstructor;
 
 /**
  * This class is used to test the GUI.
  */
-@Named
-@Singleton
+@RequiredArgsConstructor
 final class DrbdTest8 {
-    @Inject
-    private RoboTest roboTest;
-    @Inject
-    private DrbdTest1 drbdTest1;
+    private final RoboTest roboTest;
+    private final DrbdTest1 drbdTest1;
+    private final MainPanel mainPanel;
+
     private static final Logger LOG = LoggerFactory.getLogger(DrbdTest8.class);
-    @Inject
-    private MainPanel mainPanel;
 
     /** DRBD Test 8 / proxy. */
     void start(final Cluster cluster, final int blockDevY) {

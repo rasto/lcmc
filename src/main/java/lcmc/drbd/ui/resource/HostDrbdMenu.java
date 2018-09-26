@@ -23,6 +23,7 @@ package lcmc.drbd.ui.resource;
 import java.awt.Color;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Supplier;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Provider;
@@ -54,32 +55,25 @@ import lcmc.common.domain.Predicate;
 import lcmc.common.domain.util.Tools;
 import lcmc.common.ui.utils.UpdatableItem;
 import lcmc.common.domain.VisiblePredicate;
+import lombok.RequiredArgsConstructor;
 
-@Named
+@RequiredArgsConstructor
 public class HostDrbdMenu {
+    private final EditHostDialog editHostDialog;
+    private final MainData mainData;
+    private final MainPresenter mainPresenter;
+    private final ProxyHostWizard proxyHostWizard;
+    private final MenuFactory menuFactory;
+    private final Application application;
+    private final Supplier<VGCreate> vgCreateProvider;
+    private final Supplier<LVCreate> lvCreateProvider;
+    private final Supplier<DrbdsLog> drbdsLogProvider;
+
     private static final String LVM_MENU = "LVM";
     private static final String VG_CREATE_MENU_ITEM = "Create VG";
     private static final String VG_CREATE_MENU_DESCRIPTION = "Create a volume group.";
     private static final String LV_CREATE_MENU_ITEM = "Create LV in VG ";
     private static final String LV_CREATE_MENU_DESCRIPTION = "Create a logical volume.";
-    @Inject
-    private EditHostDialog editHostDialog;
-    @Inject
-    private MainData mainData;
-    @Inject
-    private MainPresenter mainPresenter;
-    @Inject
-    private ProxyHostWizard proxyHostWizard;
-    @Inject
-    private MenuFactory menuFactory;
-    @Inject
-    private Application application;
-    @Inject
-    private Provider<VGCreate> vgCreateProvider;
-    @Inject
-    private Provider<LVCreate> lvCreateProvider;
-    @Inject
-    private Provider<DrbdsLog> drbdsLogProvider;
 
     public List<UpdatableItem> getPulldownMenu(final Host host, final HostDrbdInfo hostDrbdInfo) {
         final List<UpdatableItem> items = new ArrayList<UpdatableItem>();

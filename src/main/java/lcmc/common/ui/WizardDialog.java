@@ -30,6 +30,7 @@ import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Supplier;
 import javax.inject.Inject;
 import javax.inject.Provider;
 import javax.swing.ImageIcon;
@@ -38,7 +39,10 @@ import javax.swing.JComponent;
 import javax.swing.JPanel;
 
 import lcmc.cluster.ui.widget.Check;
+import lcmc.cluster.ui.widget.WidgetFactory;
+import lcmc.common.domain.Application;
 import lcmc.common.domain.CancelCallback;
+import lcmc.common.ui.main.MainData;
 import lcmc.common.ui.utils.MyButton;
 import lcmc.common.domain.util.Tools;
 import lcmc.common.ui.utils.SwingUtils;
@@ -50,6 +54,10 @@ import lcmc.common.ui.utils.SwingUtils;
  * and overwrite at least * body() and nextDialog() methods.
  */
 public abstract class WizardDialog extends ConfigDialog {
+
+    private final SwingUtils swingUtils;
+    private final Supplier<ProgressBar> progressBarProvider;
+
     static final ImageIcon CANCEL_ICON = Tools.createImageIcon(Tools.getDefault("Dialog.Dialog.CancelIcon"));
     static final ImageIcon FINISH_ICON = Tools.createImageIcon(Tools.getDefault("Dialog.Dialog.FinishIcon"));
     private static final ImageIcon NEXT_ICON = Tools.createImageIcon(Tools.getDefault("Dialog.Dialog.NextIcon"));
@@ -57,10 +65,12 @@ public abstract class WizardDialog extends ConfigDialog {
     /** Previous dialog object. A dialog that will be displayed after clicking on the back button */
     private WizardDialog previousDialog;
     private ProgressBar progressBar = null;
-    @Inject
-    private SwingUtils swingUtils;
-    @Inject
-    private Provider<ProgressBar> progressBarProvider;
+
+    public WizardDialog(Supplier<ProgressBar> progressBarProvider, Application application, SwingUtils swingUtils, WidgetFactory widgetFactory, MainData mainData) {
+        super(application, swingUtils, widgetFactory, mainData);
+        this.swingUtils = swingUtils;
+        this.progressBarProvider = progressBarProvider;
+    }
 
     /**
      * Returns previous dialog. It is used to get with the back button to

@@ -36,19 +36,19 @@ import lcmc.common.ui.WizardDialog;
 import lcmc.logger.Logger;
 import lcmc.logger.LoggerFactory;
 import lcmc.common.domain.util.Tools;
+import lombok.RequiredArgsConstructor;
 
 /**
  * An implementation of a dialog where connection to every host will be checked
  * and established if there isn't one.
  */
-@Named
+@RequiredArgsConstructor
 final class Connect extends DialogCluster {
-    private static final Logger LOG = LoggerFactory.getLogger(Connect.class);
 
-    @Inject
-    private CommStack commStackDialog;
-    @Inject
-    private SwingUtils swingUtils;
+    private final CommStack commStackDialog;
+    private final SwingUtils swingUtils;
+
+    private static final Logger LOG = LoggerFactory.getLogger(Connect.class);
 
     @Override
     public WizardDialog nextDialog() {

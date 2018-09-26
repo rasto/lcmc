@@ -45,19 +45,20 @@ import lcmc.logger.Logger;
 import lcmc.logger.LoggerFactory;
 import lcmc.common.ui.utils.MyButton;
 import lcmc.common.domain.util.Tools;
+import lombok.RequiredArgsConstructor;
 
 /**
  * An implementation of a dialog where drbd block devices are initialized.
  * information.
  */
-@Named
+@RequiredArgsConstructor
 public final class SplitBrain extends DrbdConfig {
+    private final WidgetFactory widgetFactory;
+
     private static final Logger LOG = LoggerFactory.getLogger(SplitBrain.class);
     private static final int COMBOBOX_WIDTH = 160;
     /** Combo box with host that has more recent data. */
     private Widget hostWithBetterDataWidget;
-    @Inject
-    private WidgetFactory widgetFactory;
     private MyButton resolveButton;
 
     protected void resolve() {

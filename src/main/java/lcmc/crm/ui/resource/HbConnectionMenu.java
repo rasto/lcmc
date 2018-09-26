@@ -36,16 +36,16 @@ import lcmc.common.ui.utils.MyMenuItem;
 import lcmc.common.domain.Predicate;
 import lcmc.common.domain.util.Tools;
 import lcmc.common.ui.utils.UpdatableItem;
+import lombok.RequiredArgsConstructor;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 
-@Named
+@RequiredArgsConstructor
 public class HbConnectionMenu {
+    private final MenuFactory menuFactory;
 
     private HbConnectionInfo hbConnectionInfo;
-    @Inject
-    private MenuFactory menuFactory;
 
     public List<UpdatableItem> getPulldownMenu(final HbConnectionInfo hbConnectionInfo) {
         this.hbConnectionInfo = hbConnectionInfo;

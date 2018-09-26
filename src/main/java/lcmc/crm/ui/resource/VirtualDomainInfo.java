@@ -27,7 +27,13 @@ import java.util.Set;
 import java.util.TreeSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import lcmc.cluster.ui.widget.WidgetFactory;
 import lcmc.common.domain.Application;
+import lcmc.common.ui.Access;
+import lcmc.common.ui.main.ProgressIndicator;
+import lcmc.common.ui.treemenu.ClusterTreeMenu;
+import lcmc.common.ui.utils.SwingUtils;
 import lcmc.host.domain.Host;
 import lcmc.common.domain.StringValue;
 import lcmc.vm.domain.VmsXml;
@@ -35,14 +41,14 @@ import lcmc.common.domain.Value;
 import lcmc.vm.ui.resource.DomainInfo;
 import lcmc.common.ui.utils.UpdatableItem;
 
-import javax.inject.Inject;
-import javax.inject.Named;
+import javax.inject.Provider;
 
 /**
  * This class holds info about VirtualDomain service in the cluster menu.
  */
-@Named
 public class VirtualDomainInfo extends ServiceInfo {
+    private final VirtualDomainMenu virtualDomainMenu;
+
     /** Pattern that captures a name from xml file name. */
     static final Pattern LIBVIRT_CONF_PATTERN = Pattern.compile(".*?([^/]+).xml$");
     private static final String CONFIG_PARAM = "config";
@@ -56,8 +62,11 @@ public class VirtualDomainInfo extends ServiceInfo {
     private static final String PARAM_ALLOW_MIGRATE = "allow-migrate";
     /** VirtualDomain in the VMs menu. */
     private DomainInfo domainInfo = null;
-    @Inject
-    private VirtualDomainMenu virtualDomainMenu;
+
+    public VirtualDomainInfo(VirtualDomainMenu virtualDomainMenu, ProgressIndicator progressIndicator, ServiceMenu serviceMenu, Provider<CloneInfo> cloneInfoProvider, Application application, SwingUtils swingUtils, WidgetFactory widgetFactory, ClusterTreeMenu clusterTreeMenu, CrmServiceFactory crmServiceFactory, Access access) {
+        super(progressIndicator, serviceMenu, cloneInfoProvider, application, swingUtils, widgetFactory, clusterTreeMenu, crmServiceFactory, access);
+        this.virtualDomainMenu = virtualDomainMenu;
+    }
 
     VmsXml getVMSXML(final Host host) {
         return getBrowser().getVmsXml(host);

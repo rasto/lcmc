@@ -46,9 +46,11 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.text.Document;
 
+import lcmc.common.ui.Access;
 import lcmc.common.ui.SpringUtilities;
 import lcmc.common.ui.Browser;
 import lcmc.cluster.ui.ClusterBrowser;
+import lcmc.common.ui.main.MainData;
 import lcmc.common.ui.utils.SwingUtils;
 import lcmc.crm.ui.CrmGraph;
 import lcmc.host.ui.HostBrowser;
@@ -77,8 +79,12 @@ import lcmc.cluster.service.ssh.Ssh;
  * This class holds info data for a host.
  * It shows host view, just like in the host tab.
  */
-@Named
 public class HostInfo extends Info {
+    private final HostMenu hostMenu;
+    private final Application application;
+    private final SwingUtils swingUtils;
+    private final WidgetFactory widgetFactory;
+
     private static final Logger LOG = LoggerFactory.getLogger(HostInfo.class);
     static final ImageIcon HOST_STANDBY_ICON = Tools.createImageIcon(Tools.getDefault("CRMGraph.HostStandbyIcon"));
     static final ImageIcon HOST_STANDBY_OFF_ICON =
@@ -102,14 +108,14 @@ public class HostInfo extends Info {
     private Host host;
     private volatile boolean crmInfoShowing = false;
     private volatile boolean crmShowInProgress = true;
-    @Inject
-    private HostMenu hostMenu;
-    @Inject
-    private Application application;
-    @Inject
-    private SwingUtils swingUtils;
-    @Inject
-    private WidgetFactory widgetFactory;
+
+    public HostInfo(HostMenu hostMenu, WidgetFactory widgetFactory, Application application, SwingUtils swingUtils, Access access, MainData mainData) {
+        super(application, swingUtils, access, mainData);
+        this.application = application;
+        this.swingUtils = swingUtils;
+        this.hostMenu = hostMenu;
+        this.widgetFactory = widgetFactory;
+    }
 
     public void init(final Host host, final Browser browser) {
         super.init(host.getName(), browser);

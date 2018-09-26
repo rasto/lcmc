@@ -50,10 +50,9 @@ import lcmc.vm.domain.VMParams;
 import lcmc.vm.domain.VmsXml;
 import lcmc.vm.domain.data.*;
 import lcmc.vm.service.VIRSH;
+import lombok.RequiredArgsConstructor;
 import org.w3c.dom.Node;
 
-import javax.inject.Inject;
-import javax.inject.Named;
 import javax.inject.Provider;
 import javax.swing.*;
 import javax.swing.tree.DefaultMutableTreeNode;
@@ -72,8 +71,25 @@ import java.util.regex.Matcher;
  * This class holds info about VirtualDomain service in the VMs category,
  * but not in the cluster view.
  */
-@Named
+@RequiredArgsConstructor
 public class DomainInfo extends EditableInfo {
+    private final ProgressIndicator progressIndicator;
+    private final Application application;
+    private final SwingUtils swingUtils;
+    private final DomainMenu domainMenu;
+    private final Provider<DiskInfo> diskInfoProvider;
+    private final Provider<FilesystemInfo> filesystemInfoProvider;
+    private final Provider<InterfaceInfo> interfaceInfoProvider;
+    private final Provider<InputDevInfo> inputDevInfoProvider;
+    private final Provider<GraphicsInfo> graphicsInfoProvider;
+    private final Provider<SoundInfo> soundInfoProvider;
+    private final Provider<SerialInfo> serialInfoProvider;
+    private final Provider<ParallelInfo> parallelInfoProvider;
+    private final Provider<VideoInfo> videoInfoProvider;
+    private final Provider<VmsXml> vmsXmlProvider;
+    private final WidgetFactory widgetFactory;
+    private final ClusterTreeMenu clusterTreeMenu;
+
     private static final Logger LOG = LoggerFactory.getLogger(DomainInfo.class);
     /** Timeout of starting, shutting down, etc. actions in seconds. */
     private static final int ACTION_TIMEOUT = 20;
@@ -566,38 +582,6 @@ public class DomainInfo extends EditableInfo {
     private Value[] autostartPossibleValues;
     /** This is a map from host to the check box. */
     private final Map<String, Widget> definedOnHostComboBoxHash = new HashMap<String, Widget>();
-    @Inject
-    private ProgressIndicator progressIndicator;
-    @Inject
-    private Application application;
-    @Inject
-    private SwingUtils swingUtils;
-    @Inject
-    private DomainMenu domainMenu;
-    @Inject
-    private Provider<DiskInfo> diskInfoProvider;
-    @Inject
-    private Provider<FilesystemInfo> filesystemInfoProvider;
-    @Inject
-    private Provider<InterfaceInfo> interfaceInfoProvider;
-    @Inject
-    private Provider<InputDevInfo> inputDevInfoProvider;
-    @Inject
-    private Provider<GraphicsInfo> graphicsInfoProvider;
-    @Inject
-    private Provider<SoundInfo> soundInfoProvider;
-    @Inject
-    private Provider<SerialInfo> serialInfoProvider;
-    @Inject
-    private Provider<ParallelInfo> parallelInfoProvider;
-    @Inject
-    private Provider<VideoInfo> videoInfoProvider;
-    @Inject
-    private Provider<VmsXml> vmsXmlProvider;
-    @Inject
-    private WidgetFactory widgetFactory;
-    @Inject
-    private ClusterTreeMenu clusterTreeMenu;
 
     public void einit(final String name, final Browser browser) {
         super.einit(Optional.of(new ResourceValue(name)), name, browser);

@@ -53,19 +53,17 @@ import lcmc.common.domain.util.Tools;
 import lcmc.common.ui.utils.UpdatableItem;
 import lcmc.common.domain.VisiblePredicate;
 import lcmc.host.domain.parser.HostParser;
+import lombok.RequiredArgsConstructor;
 import lombok.val;
 
-@Named
+@RequiredArgsConstructor
 public class PcmkMultiSelectionMenu {
+    private final MenuFactory menuFactory;
+    private final Application application;
+    private final MainData mainData;
+    private final Access access;
+
     private PcmkMultiSelectionInfo pcmkMultiSelectionInfo;
-    @Inject
-    private MenuFactory menuFactory;
-    @Inject
-    private Application application;
-    @Inject
-    private MainData mainData;
-    @Inject
-    private Access access;
 
     public List<UpdatableItem> getPulldownMenu(final PcmkMultiSelectionInfo pcmkMultiSelectionInfo) {
         this.pcmkMultiSelectionInfo = pcmkMultiSelectionInfo;

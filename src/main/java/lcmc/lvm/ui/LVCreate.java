@@ -33,7 +33,7 @@ import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
-import javax.inject.Inject;
+import java.util.function.Supplier;
 import javax.inject.Named;
 import javax.swing.JCheckBox;
 import javax.swing.JComponent;
@@ -44,6 +44,8 @@ import javax.swing.SpringLayout;
 import lcmc.common.domain.AccessMode;
 import lcmc.common.domain.Application;
 import lcmc.cluster.domain.Cluster;
+import lcmc.common.ui.ProgressBar;
+import lcmc.common.ui.main.MainData;
 import lcmc.common.ui.utils.SwingUtils;
 import lcmc.host.domain.Host;
 import lcmc.common.domain.StringValue;
@@ -63,6 +65,8 @@ import lcmc.common.ui.utils.WidgetListener;
 /** Create LV dialog. */
 @Named
 public final class LVCreate extends LV {
+    private final SwingUtils swingUtils;
+    private final WidgetFactory widgetFactory;
     private static final String LV_CREATE_DESCRIPTION = "Create a logical volume in an existing volume group.";
     private static final int LV_CREATE_TIMEOUT = 5000;
     private final Collection<Host> selectedHosts = new LinkedHashSet<Host>();
@@ -72,11 +76,13 @@ public final class LVCreate extends LV {
     private String volumeGroup;
     private Map<Host, JCheckBox> hostCheckBoxes = null;
     private final Collection<BlockDevice> selectedBlockDevices = new LinkedHashSet<BlockDevice>();
-    @Inject
-    private SwingUtils swingUtils;
-    @Inject
-    private WidgetFactory widgetFactory;
     private MyButton createButton;
+
+    public LVCreate(Supplier<ProgressBar> progressBarProvider, Application application, SwingUtils swingUtils, WidgetFactory widgetFactory, MainData mainData) {
+        super(progressBarProvider, application, swingUtils, widgetFactory, mainData);
+        this.swingUtils = swingUtils;
+        this.widgetFactory = widgetFactory;
+    }
 
     public void init(final Host host, final String volumeGroup, final BlockDevice selectedBlockDevice) {
         super.init(null);

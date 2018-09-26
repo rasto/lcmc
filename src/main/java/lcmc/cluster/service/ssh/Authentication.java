@@ -29,13 +29,15 @@ import lcmc.cluster.ui.SSHGui;
 import lcmc.logger.Logger;
 import lcmc.logger.LoggerFactory;
 import lcmc.common.domain.util.Tools;
+import lombok.RequiredArgsConstructor;
 
-import javax.inject.Inject;
-import javax.inject.Named;
 import javax.inject.Provider;
 
-@Named
+@RequiredArgsConstructor
 public class Authentication {
+    private final Application application;
+    private final Provider<PopupHostKeyVerifier> popupHostKeyVerifierProvider;
+
     private static final Logger LOG = LoggerFactory.getLogger(Authentication.class);
 
     private LastSuccessfulPassword lastSuccessfulPassword;
@@ -50,10 +52,6 @@ public class Authentication {
     private boolean authenticated = false;
     private int passwdTry = 3;
     private boolean enableKeyboardInteractive = true;
-    @Inject
-    private Application application;
-    @Inject
-    private Provider<PopupHostKeyVerifier> popupHostKeyVerifierProvider;
 
     public void init(final LastSuccessfulPassword lastSuccessfulPassword, final Host host, final SSHGui sshGui) {
         this.lastSuccessfulPassword = lastSuccessfulPassword;

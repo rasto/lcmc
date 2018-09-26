@@ -45,9 +45,15 @@ import lcmc.common.domain.ExecCallback;
 import lcmc.common.ui.utils.MyButton;
 import lcmc.common.domain.util.Tools;
 import lcmc.cluster.service.ssh.ExecCommandConfig;
+import lombok.RequiredArgsConstructor;
 
-@Named
+@RequiredArgsConstructor
 final class ProxyCheckInstallation extends DialogHost {
+    private final WidgetFactory widgetFactory;
+    private final ProxyInst proxyInstDialog;
+    private final Application application;
+    private final SwingUtils swingUtils;
+
     private static final ImageIcon CHECKING_ICON =
                                Tools.createImageIcon(Tools.getDefault("Dialog.Host.CheckInstallation.CheckingIcon"));
     private static final ImageIcon NOT_INSTALLED_ICON =
@@ -63,8 +69,6 @@ final class ProxyCheckInstallation extends DialogHost {
     private final JLabel checkingProxyLabel = new JLabel(": "
                                                          + Tools.getString("ProxyCheckInstallation.CheckingProxy"));
 
-    @Inject
-    private WidgetFactory widgetFactory;
     private MyButton installProxyButton;
     private Widget proxyInstallationMethodWidget;
 
@@ -72,12 +76,6 @@ final class ProxyCheckInstallation extends DialogHost {
     private Host proxyHost;
     private VolumeInfo volumeInfo;
     private WizardDialog origDialog;
-    @Inject
-    private ProxyInst proxyInstDialog;
-    @Inject
-    private Application application;
-    @Inject
-    private SwingUtils swingUtils;
 
     void init(final WizardDialog previousDialog,
               final Host proxyHost,

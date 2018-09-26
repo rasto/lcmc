@@ -48,20 +48,19 @@ import lcmc.common.domain.Predicate;
 import lcmc.common.domain.util.Tools;
 import lcmc.common.ui.utils.UpdatableItem;
 import lcmc.common.domain.VisiblePredicate;
+import lombok.RequiredArgsConstructor;
 
-@Named
+@RequiredArgsConstructor
 public class DomainMenu {
+    private final MenuFactory menuFactory;
+    private final Application application;
+    private final Access access;
+
     private static final ImageIcon RESUME_ICON = Tools.createImageIcon(Tools.getDefault("VMS.Resume.IconLarge"));
     private static final ImageIcon SHUTDOWN_ICON = Tools.createImageIcon(Tools.getDefault("VMS.Shutdown.IconLarge"));
     private static final ImageIcon REBOOT_ICON = Tools.createImageIcon(Tools.getDefault("VMS.Reboot.IconLarge"));
     private static final ImageIcon DESTROY_ICON = Tools.createImageIcon(Tools.getDefault("VMS.Destroy.IconLarge"));
     private DomainInfo domainInfo;
-    @Inject
-    private MenuFactory menuFactory;
-    @Inject
-    private Application application;
-    @Inject
-    private Access access;
 
     public List<UpdatableItem> getPulldownMenu(final DomainInfo domainInfo) {
         this.domainInfo = domainInfo;

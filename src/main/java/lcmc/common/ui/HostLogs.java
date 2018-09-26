@@ -30,7 +30,6 @@ import javax.inject.Named;
 /**
  * An implementation of an dialog, with log files.
  */
-@Named
 public class HostLogs extends Logs {
     private Host host;
 

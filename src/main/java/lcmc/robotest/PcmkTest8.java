@@ -20,18 +20,14 @@
 
 package lcmc.robotest;
 
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Singleton;
+import lombok.RequiredArgsConstructor;
 
 /**
  * This class is used to test the GUI.
  */
-@Named
-@Singleton
+@RequiredArgsConstructor
 final class PcmkTest8 {
-    @Inject
-    private RoboTest roboTest;
+    private final RoboTest roboTest;
 
     void start(final int count) {
         roboTest.setSlowFactor(0.2f);

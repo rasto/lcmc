@@ -34,6 +34,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Supplier;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Provider;
@@ -42,6 +43,8 @@ import javax.swing.JPopupMenu;
 
 import lcmc.common.ui.MainPanel;
 import lcmc.common.ui.ResourceGraph;
+import lcmc.common.ui.main.MainData;
+import lcmc.common.ui.main.ProgressIndicator;
 import lcmc.common.ui.utils.SwingUtils;
 import lcmc.drbd.ui.resource.BlockDevInfo;
 import lcmc.drbd.ui.resource.HostDrbdInfo;
@@ -60,8 +63,11 @@ import lcmc.common.domain.util.Tools;
  * This class creates graph and provides methods to add new block device
  * vertices and drbd volume edges, remove or modify them.
  */
-@Named
 public class DrbdGraph extends ResourceGraph {
+    private final MainPanel mainPanel;
+    private final SwingUtils swingUtils;
+    private final Supplier<MultiSelectionInfo> multiSelectionInfoProvider;
+
     /** Horizontal step in pixels by which the block devices are drawn in the graph. */
     private static final int BD_STEP_Y = 60;
     /** Y position of the host. */
@@ -99,16 +105,17 @@ public class DrbdGraph extends ResourceGraph {
     /** Map from drbd volume info object to the graph edge. */
     private final Map<VolumeInfo, Edge> drbdVolumeToEdgeMap = new LinkedHashMap<VolumeInfo, Edge>();
 
-    @Inject
-    private Provider<MultiSelectionInfo> multiSelectionInfoProvider;
     private MultiSelectionInfo multiSelectionInfo;
 
     /** The first X position of the host. */
     private int hostDefaultXPos = 10;
-    @Inject
-    private MainPanel mainPanel;
-    @Inject
-    private SwingUtils swingUtils;
+
+    public DrbdGraph(Supplier<MultiSelectionInfo> multiSelectionInfoProvider, MainPanel mainPanel, Application application, SwingUtils swingUtils, MainData mainData, ProgressIndicator progressIndicator) {
+        super(application, swingUtils, mainData, progressIndicator);
+        this.mainPanel = mainPanel;
+        this.swingUtils = swingUtils;
+        this.multiSelectionInfoProvider = multiSelectionInfoProvider;
+    }
 
     @Override
     public void initGraph(final ClusterBrowser clusterBrowser) {

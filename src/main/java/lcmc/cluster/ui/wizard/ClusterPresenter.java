@@ -22,14 +22,11 @@ package lcmc.cluster.ui.wizard;
 
 import lcmc.cluster.ui.EmptyBrowser;
 import lcmc.cluster.domain.Cluster;
+import lombok.RequiredArgsConstructor;
 
-import javax.inject.Inject;
-import javax.inject.Named;
-
-@Named
+@RequiredArgsConstructor
 public class ClusterPresenter {
-    @Inject
-    private EmptyBrowser emptyBrowser;
+    private final EmptyBrowser emptyBrowser;
 
     public void onCloseCluster(final Cluster cluster) {
         disconnectCluster(cluster);

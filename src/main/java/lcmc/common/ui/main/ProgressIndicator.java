@@ -21,20 +21,15 @@
 package lcmc.common.ui.main;
 
 import lcmc.common.ui.MainMenu;
+import lombok.RequiredArgsConstructor;
 
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Singleton;
 import javax.swing.*;
 
-@Named
-@Singleton
+@RequiredArgsConstructor
 public class ProgressIndicator {
 
-    @Inject
-    private ProgressIndicatorPanel progressIndicatorPanel;
-    @Inject
-    private MainMenu mainMenu;
+    private final ProgressIndicatorPanel progressIndicatorPanel;
+    private final MainMenu mainMenu;
 
     public void init() {
         progressIndicatorPanel.init();

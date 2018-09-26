@@ -24,16 +24,19 @@ package lcmc.host.ui;
 
 import java.util.ArrayList;
 import java.util.List;
-import javax.inject.Inject;
-import javax.inject.Named;
+import java.util.function.Supplier;
 import javax.swing.BoxLayout;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 
 import lcmc.cluster.ui.SSHGui;
+import lcmc.cluster.ui.widget.WidgetFactory;
+import lcmc.common.domain.Application;
+import lcmc.common.ui.ProgressBar;
 import lcmc.common.ui.WizardDialog;
 import lcmc.common.domain.CancelCallback;
 import lcmc.common.domain.ConnectionCallback;
+import lcmc.common.ui.main.MainData;
 import lcmc.common.ui.utils.SwingUtils;
 import lcmc.logger.Logger;
 import lcmc.logger.LoggerFactory;
@@ -42,13 +45,16 @@ import lcmc.common.domain.util.Tools;
 /**
  * An implementation of a dialog where ssh connection will be established.
  */
-@Named
 public class SSH extends DialogHost {
+    private final Devices devices;
+    private final SwingUtils swingUtils;
     private static final Logger LOG = LoggerFactory.getLogger(SSH.class);
-    @Inject
-    private Devices devices;
-    @Inject
-    private SwingUtils swingUtils;
+
+    public SSH(Supplier<ProgressBar> progressBarProvider, Application application, SwingUtils swingUtils, WidgetFactory widgetFactory, MainData mainData, Devices devices) {
+        super(progressBarProvider, application, swingUtils, widgetFactory, mainData);
+        this.devices = devices;
+        this.swingUtils = swingUtils;
+    }
 
     private String connectHost() {
         final SSHGui sshGui = new SSHGui(getDialogPanel(), getHost(), getProgressBar());

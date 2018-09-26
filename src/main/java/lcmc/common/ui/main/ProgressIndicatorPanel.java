@@ -62,6 +62,7 @@ import lcmc.logger.Logger;
 import lcmc.logger.LoggerFactory;
 import lcmc.common.ui.utils.MyButton;
 import lcmc.common.domain.util.Tools;
+import lombok.RequiredArgsConstructor;
 
 /**
  * An infinite progress panel displays a rotating figure and
@@ -93,9 +94,12 @@ import lcmc.common.domain.util.Tools;
  * {@code setForeground()}.
  */
 
-@Named
-@Singleton
+@RequiredArgsConstructor
 class ProgressIndicatorPanel extends JComponent implements MouseListener, KeyListener {
+    private final WidgetFactory widgetFactory;
+    private final MainPanel mainPanel;
+    private final MainData mainData;
+
     private static final Logger LOG = LoggerFactory.getLogger(ProgressIndicatorPanel.class);
     private static final int RAMP_DELAY_STOP  = 1000;
     private static final ImageIcon CANCEL_ICON = Tools.createImageIcon(
@@ -124,8 +128,6 @@ class ProgressIndicatorPanel extends JComponent implements MouseListener, KeyLis
     private RenderingHints hints = null;
     private final Lock mAnimatorLock = new ReentrantLock();
     private final Lock mTextsLock = new ReentrantLock();
-    @Inject
-    private WidgetFactory widgetFactory;
     /** Cancel button. TODO: not used. */
     private MyButton cancelButton;
     /** Animator thread. */
@@ -137,10 +139,6 @@ class ProgressIndicatorPanel extends JComponent implements MouseListener, KeyLis
     private int oldHeight = getHeight();
     /** Beginning position of the bar. */
     private double barPos = -1;
-    @Inject
-    private MainPanel mainPanel;
-    @Inject
-    private MainData mainData;
 
     public void init() {
         this.rampDelay = 300;

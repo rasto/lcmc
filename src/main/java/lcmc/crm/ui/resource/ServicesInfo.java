@@ -44,9 +44,8 @@ import lcmc.crm.ui.CrmGraph;
 import lcmc.host.domain.Host;
 import lcmc.logger.Logger;
 import lcmc.logger.LoggerFactory;
+import lombok.RequiredArgsConstructor;
 
-import javax.inject.Inject;
-import javax.inject.Named;
 import javax.swing.*;
 import javax.swing.tree.DefaultMutableTreeNode;
 import java.awt.*;
@@ -62,27 +61,21 @@ import java.util.concurrent.CountDownLatch;
  * This class holds info data for services view and global heartbeat
  * config.
  */
-@Named
+@RequiredArgsConstructor
 public class ServicesInfo extends EditableInfo {
+
+    private final ServicesMenu servicesMenu;
+    private final ProgressIndicator progressIndicator;
+    private final Application application;
+    private final SwingUtils swingUtils;
+    private final ClusterTreeMenu clusterTreeMenu;
+    private final CrmServiceFactory crmServiceFactory;
+    private final Dialogs dialogs;
+
     private static final Logger LOG = LoggerFactory.getLogger(ServicesInfo.class);
     static final ImageIcon CLUSTER_ICON = Tools.createImageIcon(Tools.getDefault("ClustersPanel.ClusterIcon"));
     /** Cache for the info panel. */
     private JComponent infoPanel = null;
-
-    @Inject
-    private ServicesMenu servicesMenu;
-    @Inject
-    private ProgressIndicator progressIndicator;
-    @Inject
-    private Application application;
-    @Inject
-    private SwingUtils swingUtils;
-    @Inject
-    private ClusterTreeMenu clusterTreeMenu;
-    @Inject
-    private CrmServiceFactory crmServiceFactory;
-    @Inject
-    private Dialogs dialogs;
 
     public void einit(final String name, final Browser browser) {
         super.einit(Optional.of(new ResourceValue(name)), name, browser);

@@ -40,25 +40,22 @@ import lcmc.common.ui.Browser;
 import lcmc.cluster.ui.wizard.ClusterPresenter;
 import lcmc.common.ui.utils.MyButton;
 import lcmc.common.domain.util.Tools;
+import lombok.RequiredArgsConstructor;
 
 /**
  * An implementation of a cluster tab, that contains host views of the hosts,
  * that are in the cluster.
  */
-@Named
+@RequiredArgsConstructor
 public final class ClusterTab extends JPanel {
+    private final EmptyViewPanel emptyViewPanel;
+    private final ClusterPresenter clusterPresenter;
+    private final ClusterViewPanel clusterViewPanel;
+    private final WidgetFactory widgetFactory;
+
     private Cluster cluster;
     private JLabel labelTitle;
-    @Inject
-    private EmptyViewPanel emptyViewPanel;
-    @Inject
-    private ClusterPresenter clusterPresenter;
-    @Inject
-    private ClusterViewPanel clusterViewPanel;
-
     public static final ImageIcon CLUSTER_ICON = Tools.createImageIcon(Tools.getDefault("ClustersPanel.ClusterIcon"));
-    @Inject
-    private WidgetFactory widgetFactory;
 
     public void initWithCluster(final Cluster cluster0) {
         this.cluster = cluster0;

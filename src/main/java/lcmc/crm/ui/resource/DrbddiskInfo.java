@@ -26,13 +26,10 @@ import lcmc.common.domain.Application;
 import lcmc.host.domain.Host;
 import lcmc.drbd.ui.resource.ResourceInfo;
 
-import javax.inject.Named;
-
 /**
  * DrbddiskInfo class is used for drbddisk heartbeat service that is
  * treated in special way.
  */
-@Named
 public class DrbddiskInfo extends ServiceInfo {
     /** Returns string representation of the drbddisk service. */
     @Override

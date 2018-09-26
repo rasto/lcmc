@@ -21,6 +21,7 @@
 package lcmc.cluster.service.ssh;
 
 import java.io.IOException;
+import java.util.function.Supplier;
 
 import lcmc.common.domain.Application;
 import lcmc.common.ui.utils.SwingUtils;
@@ -31,13 +32,15 @@ import lcmc.common.domain.ConnectionCallback;
 import lcmc.logger.Logger;
 import lcmc.logger.LoggerFactory;
 import lcmc.common.domain.util.Tools;
+import lombok.RequiredArgsConstructor;
 
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Provider;
-
-@Named
+@RequiredArgsConstructor
 public class ConnectionThread extends Thread {
+
+    private final Application application;
+    private final SwingUtils swingUtils;
+    private final Supplier<PopupHostKeyVerifier> popupHostKeyVerifierProvider;
+
     private static final Logger LOG = LoggerFactory.getLogger(ConnectionThread.class);
     private String hostname;
     private SSHGui sshGui;
@@ -51,12 +54,6 @@ public class ConnectionThread extends Thread {
 
     private volatile boolean connectionFailed;
     private volatile boolean connectionEstablished = false;
-    @Inject
-    private Application application;
-    @Inject
-    private SwingUtils swingUtils;
-    @Inject
-    private Provider<PopupHostKeyVerifier> popupHostKeyVerifierProvider;
 
     void init(final Host host,
               final SSHGui sshGui,

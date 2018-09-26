@@ -28,23 +28,19 @@ import lcmc.drbd.ui.configdialog.DrbdConfig;
 import lcmc.drbd.ui.resource.VolumeInfo;
 import lcmc.logger.Logger;
 import lcmc.logger.LoggerFactory;
-
-import javax.inject.Inject;
-import javax.inject.Named;
+import lombok.RequiredArgsConstructor;
 
 /**
  * Show step by step dialogs that resolve a drbd split-brain.
  */
-@Named
+@RequiredArgsConstructor
 public final class AddDrbdSplitBrainDialog {
+    private final MainData mainData;
+    private final MainPanel mainPanel;
+    private final SplitBrain splitBrainDialog;
+
     private static final Logger LOG = LoggerFactory.getLogger(AddDrbdSplitBrainDialog.class);
     private VolumeInfo volumeInfo;
-    @Inject
-    private MainData mainData;
-    @Inject
-    private MainPanel mainPanel;
-    @Inject
-    private SplitBrain splitBrainDialog;
 
     public void init(final VolumeInfo volumeInfo) {
         this.volumeInfo = volumeInfo;

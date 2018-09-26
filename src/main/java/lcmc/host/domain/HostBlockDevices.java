@@ -23,7 +23,6 @@ package lcmc.host.domain;
 import com.google.common.base.Optional;
 import lcmc.drbd.domain.BlockDevice;
 
-import javax.inject.Named;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
@@ -34,7 +33,6 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
-@Named
 public class HostBlockDevices {
     private Set<BlockDevice> blockDevices = new LinkedHashSet<BlockDevice>();
     private ConcurrentMap<String, BlockDevice> byName = new ConcurrentHashMap<String, BlockDevice>();

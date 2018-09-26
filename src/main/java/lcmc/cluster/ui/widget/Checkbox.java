@@ -35,22 +35,23 @@ import lcmc.common.domain.Value;
 import lcmc.common.ui.utils.MyButton;
 import lcmc.common.ui.utils.SwingUtils;
 import lcmc.common.ui.utils.WidgetListener;
+import lombok.RequiredArgsConstructor;
 
 /**
  * An implementation of a field where user can enter new value. The
  * field can be Textfield or combo box, depending if there are values
  * too choose from.
  */
-@Named
+@RequiredArgsConstructor
 public class Checkbox extends GenericWidget<JComponent> {
+    private final SwingUtils swingUtils;
+
     static final String CHECKBOX_TRUE = "True";
     static final String CHECKBOX_FALSE = "False";
     /** Name for the 'true' value. */
     private Value checkBoxTrue = new StringValue(CHECKBOX_TRUE);
     /** Name for the 'false' value. */
     private Value checkBoxFalse = new StringValue(CHECKBOX_FALSE);
-    @Inject
-    private SwingUtils swingUtils;
 
     public void init(final Value selectedValue,
                     final Value[] items,

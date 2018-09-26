@@ -33,6 +33,8 @@ import lcmc.common.domain.util.Tools;
 import lcmc.common.ui.Info;
 import lcmc.common.ui.MainPanel;
 import lcmc.common.ui.ResourceGraph;
+import lcmc.common.ui.main.MainData;
+import lcmc.common.ui.main.ProgressIndicator;
 import lcmc.common.ui.utils.MenuAction;
 import lcmc.common.ui.utils.MenuFactory;
 import lcmc.common.ui.utils.MyMenuItem;
@@ -66,13 +68,17 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
+import java.util.function.Supplier;
 
 /**
  * This class creates graph and provides methods to add new nodes, edges,
  * remove or modify them.
  */
-@Named
 public class CrmGraph extends ResourceGraph {
+    private final MainPanel mainPanel;
+    private final Supplier<PcmkMultiSelectionInfo> pcmkMultiSelectionInfoProvider;
+    private final SwingUtils swingUtils;
+    private final MenuFactory menuFactory;
     /** X position of a new block device. */
 
     private static final int BD_X_POS = 15;
@@ -142,14 +148,14 @@ public class CrmGraph extends ResourceGraph {
 
     private int hostDefaultXPos = 10;
     private PcmkMultiSelectionInfo multiSelectionInfo = null;
-    @Inject
-    private MainPanel mainPanel;
-    @Inject
-    private Provider<PcmkMultiSelectionInfo> pcmkMultiSelectionInfoProvider;
-    @Inject
-    private SwingUtils swingUtils;
-    @Inject
-    private MenuFactory menuFactory;
+
+    public CrmGraph(MainPanel mainPanel, Supplier<PcmkMultiSelectionInfo> pcmkMultiSelectionInfoProvider, Application application, SwingUtils swingUtils, MainData mainData, ProgressIndicator progressIndicator, MenuFactory menuFactory) {
+        super(application, swingUtils, mainData, progressIndicator);
+        this.swingUtils = swingUtils;
+        this.mainPanel = mainPanel;
+        this.pcmkMultiSelectionInfoProvider = pcmkMultiSelectionInfoProvider;
+        this.menuFactory = menuFactory;
+    }
 
     @Override
     public void initGraph(final ClusterBrowser clusterBrowser) {

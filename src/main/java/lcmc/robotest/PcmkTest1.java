@@ -30,19 +30,14 @@ import static lcmc.robotest.RoboTest.CONFIRM_REMOVE;
 import lcmc.logger.Logger;
 import lcmc.logger.LoggerFactory;
 import lcmc.common.domain.util.Tools;
-
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Singleton;
+import lombok.RequiredArgsConstructor;
 
 /**
  * This class is used to test the GUI.
  */
-@Named
-@Singleton
+@RequiredArgsConstructor
 final class PcmkTest1 {
-    @Inject
-    private RoboTest roboTest;
+    private final RoboTest roboTest;
     private static final Logger LOG = LoggerFactory.getLogger(PcmkTest1.class);
 
     void start(final Cluster cluster) {

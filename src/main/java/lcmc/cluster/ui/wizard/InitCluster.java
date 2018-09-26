@@ -66,13 +66,21 @@ import lcmc.crm.service.Openais;
 import lcmc.cluster.service.ssh.ExecCommandConfig;
 import lcmc.cluster.service.ssh.ExecCommandThread;
 import lcmc.common.domain.util.Tools;
+import lombok.RequiredArgsConstructor;
 import lombok.val;
 
 /**
  * An implementation of a dialog where cluster is initialized on all hosts.
  */
-@Named
+@RequiredArgsConstructor
 public class InitCluster extends DialogCluster {
+    private final WidgetFactory widgetFactory;
+    private final Finish finishDialog;
+    private final MainData mainData;
+    private final Application application;
+    private final SwingUtils swingUtils;
+    private final Access access;
+
     private static final Logger LOG = LoggerFactory.getLogger(InitCluster.class);
     private static final int CHECK_INTERVAL = 1000;
     private static final String HEARTBEAT_BUTTON_SWITCH_TEXT = Tools.getString("Dialog.Cluster.Init.HbButtonSwitch");
@@ -106,21 +114,10 @@ public class InitCluster extends DialogCluster {
      * override this one and use different finish/next button.
      */
     private String otherFinishButton = null;
-    @Inject
-    private WidgetFactory widgetFactory;
+
     /** Whether to use openais init script instead of corosync. It applies only
      * if both of them are present. */
     private Widget useOpenaisButton;
-    @Inject
-    private Finish finishDialog;
-    @Inject
-    private MainData mainData;
-    @Inject
-    private Application application;
-    @Inject
-    private SwingUtils swingUtils;
-    @Inject
-    private Access access;
 
     public void init(final WizardDialog previousDialog, final Cluster cluster) {
         super.init(previousDialog, cluster);

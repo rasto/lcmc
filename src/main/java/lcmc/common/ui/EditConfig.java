@@ -42,6 +42,9 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.text.Document;
 
+import lcmc.cluster.ui.widget.WidgetFactory;
+import lcmc.common.domain.Application;
+import lcmc.common.ui.main.MainData;
 import lcmc.common.ui.main.ProgressIndicator;
 import lcmc.common.ui.utils.SwingUtils;
 import lcmc.configs.DistResource;
@@ -52,12 +55,15 @@ import lcmc.logger.LoggerFactory;
 import lcmc.cluster.service.ssh.ExecCommandConfig;
 import lcmc.cluster.service.ssh.ExecCommandThread;
 import lcmc.common.domain.util.Tools;
+import lombok.RequiredArgsConstructor;
 
 /**
  * An implementation of an edit config dialog.
  */
-@Named
 public final class EditConfig extends ConfigDialog {
+    private final ProgressIndicator progressIndicator;
+    private final SwingUtils swingUtils;
+
     private static final Logger LOG = LoggerFactory.getLogger(EditConfig.class);
     private String fileToEdit;
     private Set<Host> hosts;
@@ -70,10 +76,12 @@ public final class EditConfig extends ConfigDialog {
     /** Whether config area is being filled so that save button,
         doesn't get enabled. */
     private volatile boolean configInProgress = true;
-    @Inject
-    private ProgressIndicator progressIndicator;
-    @Inject
-    private SwingUtils swingUtils;
+
+    public EditConfig(ProgressIndicator progressIndicator, Application application, SwingUtils swingUtils, WidgetFactory widgetFactory, MainData mainData) {
+        super(application, swingUtils, widgetFactory, mainData);
+        this.progressIndicator = progressIndicator;
+        this.swingUtils = swingUtils;
+    }
 
     public void init(final String fileToEdit, final Set<Host> hosts) {
         this.fileToEdit = fileToEdit;

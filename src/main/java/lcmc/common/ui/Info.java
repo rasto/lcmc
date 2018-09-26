@@ -32,6 +32,7 @@ import lcmc.common.ui.main.MainData;
 import lcmc.common.ui.utils.*;
 import lcmc.logger.Logger;
 import lcmc.logger.LoggerFactory;
+import lombok.RequiredArgsConstructor;
 import lombok.val;
 
 import javax.inject.Inject;
@@ -61,8 +62,13 @@ import java.util.concurrent.locks.ReentrantLock;
  * etc. It provides methods to show this info and graphical view if
  * available.
  */
-@Named
+@RequiredArgsConstructor
 public class Info implements Comparable<Info>, Value, InfoPresenter {
+    private final Application application;
+    private final SwingUtils swingUtils;
+    private final Access access;
+    private final MainData mainData;
+
     private static final Logger LOG = LoggerFactory.getLogger(Info.class);
     /** Amount of frames per second. */
     public static final ImageIcon LOGFILE_ICON = Tools.createImageIcon(Tools.getDefault("Info.LogIcon"));
@@ -95,14 +101,6 @@ public class Info implements Comparable<Info>, Value, InfoPresenter {
                                                                 new HashMap<JTextComponent, AccessMode>();
     /** Hash from component to the enable access mode. */
     private final Map<JComponent, AccessMode> componentToEnableAccessMode = new HashMap<JComponent, AccessMode>();
-    @Inject
-    private Application application;
-    @Inject
-    private SwingUtils swingUtils;
-    @Inject
-    private Access access;
-    @Inject
-    private MainData mainData;
 
     public void init(final String name, final Browser browser) {
         this.name = name;

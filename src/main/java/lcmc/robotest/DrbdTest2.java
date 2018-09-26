@@ -22,21 +22,15 @@ package lcmc.robotest;
 
 import lcmc.cluster.domain.Cluster;
 import lcmc.common.domain.util.Tools;
-
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Singleton;
+import lombok.RequiredArgsConstructor;
 
 /**
  * This class is used to test the GUI.
  */
-@Named
-@Singleton
+@RequiredArgsConstructor
 final class DrbdTest2 {
-    @Inject
-    private RoboTest roboTest;
-    @Inject
-    private DrbdTest1 drbdTest1;
+    private final RoboTest roboTest;
+    private final DrbdTest1 drbdTest1;
 
     void start(final Cluster cluster, final int blockDevY) {
         roboTest.setSlowFactor(0.2f);

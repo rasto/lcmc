@@ -30,6 +30,7 @@ import lcmc.common.domain.AccessMode;
 import lcmc.common.domain.Application;
 import lcmc.common.domain.UserConfig;
 import lcmc.common.domain.util.Tools;
+import lcmc.common.ui.Access;
 import lcmc.common.ui.Browser;
 import lcmc.common.ui.Info;
 import lcmc.common.ui.main.MainData;
@@ -41,9 +42,6 @@ import lcmc.logger.Logger;
 import lcmc.logger.LoggerFactory;
 
 import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Provider;
-import javax.inject.Singleton;
 import javax.swing.*;
 import javax.swing.border.LineBorder;
 import javax.swing.border.TitledBorder;
@@ -56,15 +54,26 @@ import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.util.*;
 import java.util.List;
+import java.util.function.Supplier;
 import java.util.regex.Matcher;
 
 /**
  * This class holds all hosts that are added to the GUI as opposite to all
  * hosts in a cluster.
  */
-@Named
-@Singleton
 public final class AllHostsInfo extends Info {
+
+    private final WidgetFactory widgetFactory;
+    private final UserConfig userConfig;
+    private final Supplier<AddHostDialog> addHostDialogProvider;
+    private final HostFactory hostFactory;
+    private final MainData mainData;
+    private final MainPresenter mainPresenter;
+    private final Supplier<Cluster> clusterProvider;
+    private final Clusters allClusters;
+    private final Application application;
+    private final SwingUtils swingUtils;
+    private final MenuFactory menuFactory;
     private static final Logger LOG = LoggerFactory.getLogger(AllHostsInfo.class);
     private static final ImageIcon CLUSTER_ICON = Tools.createImageIcon(Tools.getDefault("ClusterTab.ClusterIcon"));
     private static final String QUICK_CLUSTER_BOX_TITLE = Tools.getString("AllHostsInfo.QuickCluster");
@@ -77,34 +86,27 @@ public final class AllHostsInfo extends Info {
     private final Map<Cluster, JPanel> clusterBoxBackgrounds = new HashMap<Cluster, JPanel>();
     private final JPanel mainPanel = new JPanel(new GridBagLayout());
     private final GridBagConstraints gridBagConstraints = new GridBagConstraints();
-    @Inject
-    private WidgetFactory widgetFactory;
     private MyButton loadMarkedClustersButton;
     /** Stop marked clusters button. */
     private MyButton unloadMarkedClustersButton;
     /** Remove marked clusters button. */
     private MyButton removeMarkedClustersButton;
-    @Inject
-    private UserConfig userConfig;
-    @Inject
-    private Provider<AddHostDialog> addHostDialogProvider;
-    @Inject
-    private HostFactory hostFactory;
-    @Inject
-    private MainData mainData;
-    @Inject
-    private MainPresenter mainPresenter;
-    @Inject
-    private Provider<Cluster> clusterProvider;
-    @Inject
-    private Clusters allClusters;
-    @Inject
-    private Application application;
-    @Inject
-    private SwingUtils swingUtils;
-    @Inject
-    private MenuFactory menuFactory;
     private EmptyBrowser emptyBrowser;
+
+    public AllHostsInfo(Application application, SwingUtils swingUtils, Access access, MainData mainData, WidgetFactory widgetFactory, UserConfig userConfig, Supplier<AddHostDialog> addHostDialogProvider, HostFactory hostFactory, MainData mainData1, MainPresenter mainPresenter, Supplier<Cluster> clusterProvider, Clusters allClusters, MenuFactory menuFactory) {
+        super(application, swingUtils, access, mainData);
+        this.widgetFactory = widgetFactory;
+        this.userConfig = userConfig;
+        this.addHostDialogProvider = addHostDialogProvider;
+        this.hostFactory = hostFactory;
+        this.mainData = mainData1;
+        this.mainPresenter = mainPresenter;
+        this.clusterProvider = clusterProvider;
+        this.allClusters = allClusters;
+        this.application = application;
+        this.swingUtils = swingUtils;
+        this.menuFactory = menuFactory;
+    }
 
     public void init(final EmptyBrowser emptyBrowser) {
         this.emptyBrowser = emptyBrowser;

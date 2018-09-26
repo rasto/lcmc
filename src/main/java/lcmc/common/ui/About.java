@@ -34,8 +34,6 @@ import lcmc.common.domain.util.Tools;
 /**
  * An implementation of an About dialog.
  */
-@Named
-@Singleton
 public final class About extends ConfigDialog {
     @Override
     protected void initDialogBeforeVisible() {

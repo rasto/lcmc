@@ -23,6 +23,7 @@ package lcmc.crm.ui.resource;
 import java.awt.Color;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Supplier;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Provider;
@@ -53,24 +54,20 @@ import lcmc.common.domain.Predicate;
 import lcmc.common.domain.util.Tools;
 import lcmc.common.ui.utils.UpdatableItem;
 import lcmc.common.domain.VisiblePredicate;
+import lombok.RequiredArgsConstructor;
 import lombok.val;
 
-@Named
+@RequiredArgsConstructor
 public class HostMenu {
-    private static final String NOT_IN_CLUSTER = "not in cluster";
 
-    @Inject
-    private EditHostDialog editHostDialog;
-    @Inject
-    private MainData mainData;
-    @Inject
-    private MainPresenter mainPresenter;
-    @Inject
-    private MenuFactory menuFactory;
-    @Inject
-    private Application application;
-    @Inject @Named("hostLogs")
-    private Provider<HostLogs> hostLogsProvider;
+    private final EditHostDialog editHostDialog;
+    private final MainData mainData;
+    private final MainPresenter mainPresenter;
+    private final MenuFactory menuFactory;
+    private final Application application;
+    private final Supplier<HostLogs> hostLogsProvider;
+
+    private static final String NOT_IN_CLUSTER = "not in cluster";
 
     public List<UpdatableItem> getPulldownMenu(final HostInfo hostInfo) {
         final List<UpdatableItem> items = new ArrayList<UpdatableItem>();

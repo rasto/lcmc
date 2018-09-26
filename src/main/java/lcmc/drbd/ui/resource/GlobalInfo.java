@@ -27,6 +27,7 @@ import lcmc.cluster.domain.Cluster;
 import lcmc.cluster.ui.ClusterBrowser;
 import lcmc.cluster.ui.widget.Check;
 import lcmc.cluster.ui.widget.Widget;
+import lcmc.cluster.ui.widget.WidgetFactory;
 import lcmc.common.domain.Application;
 import lcmc.common.domain.Application.RunMode;
 import lcmc.common.domain.ResourceValue;
@@ -46,9 +47,6 @@ import lcmc.host.domain.HostFactory;
 import lcmc.logger.Logger;
 import lcmc.logger.LoggerFactory;
 
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Provider;
 import javax.swing.*;
 import javax.swing.tree.DefaultMutableTreeNode;
 import java.awt.*;
@@ -59,6 +57,7 @@ import java.net.UnknownHostException;
 import java.util.*;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
+import java.util.function.Supplier;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -67,8 +66,19 @@ import java.util.regex.Pattern;
  * drbd config, but if a drbd block device is selected it forwards to the
  * block device info, which is defined in HostBrowser.java.
  */
-@Named
 public class GlobalInfo extends AbstractDrbdInfo {
+
+    private final GlobalMenu globalMenu;
+    private final HostFactory hostFactory;
+    private final Supplier<VolumeInfo> volumeInfoProvider;
+    private final Supplier<AddDrbdConfigDialog> addDrbdConfigDialogProvider;
+    private final Supplier<ProxyHostInfo> proxyHostInfoProvider;
+    private final Supplier<ResourceInfo> resourceInfoProvider;
+    private final Supplier<DrbdXml> drbdXmlProvider;
+    private final Application application;
+    private final SwingUtils swingUtils;
+    private final ClusterTreeMenu clusterTreeMenu;
+    private final Dialogs dialogs;
     private static final Logger LOG = LoggerFactory.getLogger(GlobalInfo.class);
     private static final String SECTION_COMMON_PROXY = "proxy";
 
@@ -77,29 +87,23 @@ public class GlobalInfo extends AbstractDrbdInfo {
     static final ImageIcon CLUSTER_ICON = Tools.createImageIcon(Tools.getDefault("ClustersPanel.ClusterIcon"));
     private BlockDevInfo selectedBlockDevice = null;
     private JComponent infoPanel = null;
-    @Inject
-    private GlobalMenu globalMenu;
-    @Inject
-    private HostFactory hostFactory;
-    @Inject
-    private Provider<VolumeInfo> volumeInfoProvider;
-    @Inject
-    private Provider<AddDrbdConfigDialog> addDrbdConfigDialogProvider;
     private ProxyHostInfo proxyHostInfo = null;
-    @Inject
-    private Provider<ProxyHostInfo> proxyHostInfoProvider;
-    @Inject
-    private Provider<ResourceInfo> resourceInfoProvider;
-    @Inject
-    private Provider<DrbdXml> drbdXmlProvider;
-    @Inject
-    private Application application;
-    @Inject
-    private SwingUtils swingUtils;
-    @Inject
-    private ClusterTreeMenu clusterTreeMenu;
-    @Inject
-    private Dialogs dialogs;
+
+    public GlobalInfo(WidgetFactory widgetFactory, GlobalMenu globalMenu, HostFactory hostFactory, Supplier<VolumeInfo> volumeInfoProvider, Supplier<AddDrbdConfigDialog> addDrbdConfigDialogProvider, Supplier<ProxyHostInfo> proxyHostInfoProvider, Supplier<ResourceInfo> resourceInfoProvider, Supplier<DrbdXml> drbdXmlProvider, Application application, SwingUtils swingUtils, ClusterTreeMenu clusterTreeMenu, Dialogs dialogs) {
+        super(widgetFactory);
+        this.globalMenu = globalMenu;
+        this.hostFactory = hostFactory;
+        this.volumeInfoProvider = volumeInfoProvider;
+        this.addDrbdConfigDialogProvider = addDrbdConfigDialogProvider;
+        this.proxyHostInfoProvider = proxyHostInfoProvider;
+        this.resourceInfoProvider = resourceInfoProvider;
+        this.drbdXmlProvider = drbdXmlProvider;
+        this.application = application;
+        this.swingUtils = swingUtils;
+        this.clusterTreeMenu = clusterTreeMenu;
+        this.dialogs = dialogs;
+    }
+
 
     public void einit(final String name, final Browser browser) {
         super.einit(Optional.of(new ResourceValue(name)), name, browser);

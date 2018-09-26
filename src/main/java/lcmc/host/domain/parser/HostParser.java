@@ -35,6 +35,7 @@ import java.util.TreeSet;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
+import java.util.function.Supplier;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -85,8 +86,8 @@ public class HostParser {
     private final Host              host;
     private final DrbdHost          drbdHost;
     private final HwEventBus        hwEventBus;
-    private final Provider<VmsXml>  vmsXmlProvider;
-    private final Provider<DrbdXml> drbdXmlProvider;
+    private final Supplier<VmsXml>  vmsXmlProvider;
+    private final Supplier<DrbdXml> drbdXmlProvider;
     private final SwingUtils        swingUtils;
     private final Application       application;
     private final DistributionDetector distributionDetector;

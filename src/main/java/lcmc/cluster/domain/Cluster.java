@@ -43,16 +43,18 @@ import lcmc.cluster.service.storage.BlockDeviceService;
 import lcmc.logger.Logger;
 import lcmc.logger.LoggerFactory;
 import lcmc.common.domain.util.Tools;
-
-import javax.inject.Inject;
-import javax.inject.Named;
+import lombok.RequiredArgsConstructor;
 
 /**
  * This class holds cluster data and implementation of cluster related
  * methods.
  */
-@Named
+@RequiredArgsConstructor
 public class Cluster implements Comparable<Cluster> {
+    private final MainData mainData;
+    private final SwingUtils swingUtils;
+    private final BlockDeviceService blockDeviceService;
+
     private static final Logger LOG = LoggerFactory.getLogger(Cluster.class);
     private String name = null;
     private final Set<Host> hosts = new LinkedHashSet<Host>();
@@ -68,16 +70,10 @@ public class Cluster implements Comparable<Cluster> {
     private boolean clusterTabClosable = true;
 
     private ClusterBrowser clusterBrowser;
-    @Inject
-    private MainData mainData;
-    @Inject
-    private SwingUtils swingUtils;
     /**
      * Proxy hosts. More can be added in the DRBD config
      * wizard. */
     private final Set<Host> proxyHosts = new LinkedHashSet<Host>();
-    @Inject
-    private BlockDeviceService blockDeviceService;
 
     public void setName(final String name) {
         this.name = name;

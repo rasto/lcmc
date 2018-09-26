@@ -45,17 +45,18 @@ import lcmc.common.ui.utils.PatternDocument;
 import lcmc.common.domain.util.Tools;
 import lcmc.common.ui.utils.SwingUtils;
 import lcmc.common.ui.utils.WidgetListener;
+import lombok.RequiredArgsConstructor;
 
 /**
  * An implementation of a field where user can enter new value. The
  * field can be Textfield or combo box, depending if there are values
  * too choose from.
  */
-@Named
+@RequiredArgsConstructor
 public final class ComboBox extends GenericWidget<MComboBox<Value>> {
+    private final SwingUtils swingUtils;
+
     private static final int CB_SCROLLBAR_MAX_ROWS = 10;
-    @Inject
-    private SwingUtils swingUtils;
 
     protected static Value addItems(final Collection<Value> comboList, final Value selectedValue, final Value[] items) {
         Value selectedValueInfo = null;

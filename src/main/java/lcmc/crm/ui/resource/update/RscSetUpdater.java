@@ -33,16 +33,16 @@ import lcmc.crm.ui.resource.PcmkRscSetsInfo;
 import lcmc.crm.ui.resource.ServiceInfo;
 import lombok.Getter;
 
-import javax.inject.Provider;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Supplier;
 
 public class RscSetUpdater {
     private final Application.RunMode runMode;
     private final ClusterBrowser browser;
-    private final Provider<ConstraintPHInfo> constraintPHInfoProvider;
-    private final Provider<PcmkRscSetsInfo> pcmkRscSetsInfoProvider;
+    private final Supplier<ConstraintPHInfo> constraintPHInfoProvider;
+    private final Supplier<PcmkRscSetsInfo> pcmkRscSetsInfoProvider;
     private final CrmGraph crmGraph;
     @Getter
     private List<ServiceInfo> serviceIsPresent = Lists.newArrayList();
@@ -52,8 +52,8 @@ public class RscSetUpdater {
 
     public RscSetUpdater(final Application.RunMode runMode,
                          final ClusterBrowser browser,
-                         final Provider<ConstraintPHInfo> constraintPHInfoProvider,
-                         final Provider<PcmkRscSetsInfo> pcmkRscSetsInfoProvider) {
+                         final Supplier<ConstraintPHInfo> constraintPHInfoProvider,
+                         final Supplier<PcmkRscSetsInfo> pcmkRscSetsInfoProvider) {
         this.runMode = runMode;
         this.browser = browser;
         this.constraintPHInfoProvider = constraintPHInfoProvider;

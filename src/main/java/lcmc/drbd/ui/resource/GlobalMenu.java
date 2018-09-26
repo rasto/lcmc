@@ -22,6 +22,7 @@ package lcmc.drbd.ui.resource;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Supplier;
 
 import lcmc.cluster.ui.wizard.EditClusterDialog;
 import lcmc.drbd.ui.ProxyHostWizard;
@@ -33,23 +34,15 @@ import lcmc.common.ui.utils.MenuAction;
 import lcmc.common.ui.utils.MenuFactory;
 import lcmc.common.domain.util.Tools;
 import lcmc.common.ui.utils.UpdatableItem;
+import lombok.RequiredArgsConstructor;
 
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Provider;
-
-@Named
+@RequiredArgsConstructor
 public class GlobalMenu {
-    @Inject
-    private Provider<EditClusterDialog> editClusterDialogProvider;
-    @Inject
-    private HostFactory hostFactory;
-    @Inject
-    private Provider<ProxyHostWizard> proxyHostWizardProvider;
-    @Inject
-    private MenuFactory menuFactory;
-    @Inject
-    private Provider<DrbdLogs> drbdLogsProvider;
+    private final Supplier<EditClusterDialog> editClusterDialogProvider;
+    private final HostFactory hostFactory;
+    private final Supplier<ProxyHostWizard> proxyHostWizardProvider;
+    private final MenuFactory menuFactory;
+    private final Supplier<DrbdLogs> drbdLogsProvider;
 
     public List<UpdatableItem> getPulldownMenu(final GlobalInfo globalInfo) {
         final List<UpdatableItem> items = new ArrayList<UpdatableItem>();

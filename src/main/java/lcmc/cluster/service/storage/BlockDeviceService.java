@@ -37,6 +37,7 @@ import lcmc.event.HwBlockDevicesDiskSpaceEvent;
 import lcmc.event.HwDrbdStatusChangedEvent;
 import lcmc.host.domain.Host;
 import lcmc.host.domain.HostBlockDevices;
+import lombok.RequiredArgsConstructor;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -49,17 +50,14 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
-@Named
-@Singleton
+@RequiredArgsConstructor
 public class BlockDeviceService {
-    @Inject
-    private HwEventBus hwEventBus;
-    @Inject
-    private ClusterEventBus clusterEventBus;
+    private final HwEventBus hwEventBus;
+    private final ClusterEventBus clusterEventBus;
+    private final ClusterViewFactory clusterViewFactory;
+
     private Map<Host, HostBlockDevices> hostBlockDevicesByHost = new ConcurrentHashMap<Host, HostBlockDevices>();
     private Map<Cluster, List<String>> commonBlockDevicesByCluster = new ConcurrentHashMap<Cluster, List<String>>();
-    @Inject
-    private ClusterViewFactory clusterViewFactory;
 
     private Collection<CommonBlockDevInfo> commonBlockDevViews;
 

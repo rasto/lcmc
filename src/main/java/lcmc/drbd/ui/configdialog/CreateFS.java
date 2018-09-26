@@ -26,8 +26,6 @@ package lcmc.drbd.ui.configdialog;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Set;
-import javax.inject.Inject;
-import javax.inject.Named;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -50,13 +48,19 @@ import lcmc.logger.LoggerFactory;
 import lcmc.common.ui.utils.MyButton;
 import lcmc.common.domain.util.Tools;
 import lcmc.common.ui.utils.WidgetListener;
+import lombok.RequiredArgsConstructor;
 
 /**
  * An implementation of a dialog where drbd block devices are initialized.
  * information.
  */
-@Named
+@RequiredArgsConstructor
 final class CreateFS extends DrbdConfig {
+    private final Application application;
+    private final SwingUtils swingUtils;
+    private final WidgetFactory widgetFactory;
+    private final FileSystemService fileSystemService;
+
     private static final Logger LOG = LoggerFactory.getLogger(CreateFS.class);
     /** No host string. (none) */
     private static final Value NO_HOST_STRING =
@@ -73,14 +77,6 @@ final class CreateFS extends DrbdConfig {
     private Widget filesystemWidget;
     private Widget skipInitialSyncWidget;
     private JLabel skipInitialSyncLabel;
-    @Inject
-    private Application application;
-    @Inject
-    private SwingUtils swingUtils;
-    @Inject
-    private WidgetFactory widgetFactory;
-    @Inject
-    private FileSystemService fileSystemService;
     private MyButton makeFileSystemButton;
 
     /**

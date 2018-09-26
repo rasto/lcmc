@@ -37,7 +37,6 @@ import lcmc.cluster.service.ssh.SshOutput;
 /**
  * This class holds info data for a filesystem.
  */
-@Named
 public final class FSInfo extends Info {
     private static final ImageIcon FS_ICON = Tools.createImageIcon(Tools.getDefault("HostBrowser.FileSystemIcon"));
     private String cachedModinfoOutput = null;

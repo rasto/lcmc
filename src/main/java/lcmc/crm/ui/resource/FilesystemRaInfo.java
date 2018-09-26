@@ -50,9 +50,8 @@ import lcmc.drbd.ui.resource.VolumeInfo;
 import lcmc.event.CommonBlockDevicesChangedEvent;
 import lcmc.event.CommonMountPointsEvent;
 import lcmc.host.domain.Host;
+import lombok.RequiredArgsConstructor;
 
-import javax.inject.Inject;
-import javax.inject.Named;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreeNode;
 import java.util.*;
@@ -62,8 +61,17 @@ import java.util.*;
  * way, so that it can use block device information and drbd devices. If
  * drbd device is selected, the drbddisk service will be added too.
  */
-@Named
+@RequiredArgsConstructor
 public class FilesystemRaInfo extends ServiceInfo {
+    private final Application application;
+    private final SwingUtils swingUtils;
+    private final WidgetFactory widgetFactory;
+    private final BlockDeviceService blockDeviceService;
+    private final MountPointService mountPointService;
+    private final ClusterEventBus clusterEventBus;
+    private final ClusterTreeMenu clusterTreeMenu;
+    private final FileSystemService fileSystemService;
+
     /** Name of the device parameter in the file system. */
     private static final String FS_RES_PARAM_DEV = "device";
     private static final String FS_RES_PARAM_DIRECTORY = "directory";
@@ -74,22 +82,7 @@ public class FilesystemRaInfo extends ServiceInfo {
     private Widget fstypeParamWidget = null;
     private Optional<Widget> directoryParamWidget = Optional.absent();
     private boolean drbddiskIsPreferred = false;
-    @Inject
-    private Application application;
-    @Inject
-    private SwingUtils swingUtils;
-    @Inject
-    private WidgetFactory widgetFactory;
-    @Inject
-    private BlockDeviceService blockDeviceService;
-    @Inject
-    private MountPointService mountPointService;
-    @Inject
-    private ClusterEventBus clusterEventBus;
-    @Inject
-    private ClusterTreeMenu clusterTreeMenu;
-    @Inject
-    private FileSystemService fileSystemService;
+
 
     @Override
     public void init(final String name, final ResourceAgent resourceAgent, final Browser browser) {

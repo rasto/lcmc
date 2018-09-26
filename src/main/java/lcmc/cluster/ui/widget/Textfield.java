@@ -31,20 +31,25 @@ import javax.swing.text.JTextComponent;
 import lcmc.common.domain.AccessMode;
 import lcmc.common.domain.StringValue;
 import lcmc.common.domain.Value;
+import lcmc.common.ui.Access;
 import lcmc.common.ui.utils.MyButton;
 import lcmc.common.ui.utils.PatternDocument;
 import lcmc.common.ui.utils.SwingUtils;
 import lcmc.common.ui.utils.WidgetListener;
+import lombok.RequiredArgsConstructor;
 
 /**
  * An implementation of a field where user can enter new value. The
  * field can be Textfield or combo box, depending if there are values
  * too choose from.
  */
-@Named
 public class Textfield extends GenericWidget<JComponent> {
-    @Inject
-    private SwingUtils swingUtils;
+    private final SwingUtils swingUtils;
+
+    public Textfield(SwingUtils swingUtils, Access access) {
+        super(swingUtils, access);
+        this.swingUtils = swingUtils;
+    }
 
     public void init(final Value selectedValue,
                      final String regexp,

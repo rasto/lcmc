@@ -39,13 +39,17 @@ import lcmc.logger.Logger;
 import lcmc.logger.LoggerFactory;
 import lcmc.common.ui.utils.MyButton;
 import lcmc.common.domain.util.Tools;
+import lombok.RequiredArgsConstructor;
 
 /**
  * This class creates titled pane with progress bar and functions that update
  * the progress bar.
  */
-@Named
+@RequiredArgsConstructor
 public final class ProgressBar implements ActionListener {
+    private final SwingUtils swingUtils;
+    private final WidgetFactory widgetFactory;
+
     private static final Logger LOG = LoggerFactory.getLogger(ProgressBar.class);
     private static final int DEFAULT_TIMEOUT = 50 * 1000;
     /** This is threshold to catch threads that are out of the line.
@@ -57,8 +61,6 @@ public final class ProgressBar implements ActionListener {
     private JProgressBar progressBar;
     /** Progress bar panel. */
     private JPanel pbPanel;
-    @Inject
-    private SwingUtils swingUtils;
     private volatile boolean stopNow = false;
     /** Whether to hold the progress bar. */
     private boolean holdIt = false;
@@ -73,8 +75,6 @@ public final class ProgressBar implements ActionListener {
     private MyButton cancelButton = null;
     /** Cancel callback function that will be called, when cancel was pressed.  */
     private CancelCallback cancelCallback;
-    @Inject
-    private WidgetFactory widgetFactory;
 
     void init(final String title, final CancelCallback cancelCallback, final int width, final int height) {
         this.cancelCallback = cancelCallback;

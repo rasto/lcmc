@@ -38,19 +38,16 @@ import lcmc.common.ui.utils.MyMenuItem;
 import lcmc.common.domain.Predicate;
 import lcmc.common.domain.util.Tools;
 import lcmc.common.ui.utils.UpdatableItem;
+import lombok.RequiredArgsConstructor;
 
-import javax.inject.Inject;
-import javax.inject.Named;
-
-@Named
+@RequiredArgsConstructor
 public class VolumeMenu {
+
+    private final MenuFactory menuFactory;
+    private final Application application;
+    private final Access access;
+
     private VolumeInfo volumeInfo;
-    @Inject
-    private MenuFactory menuFactory;
-    @Inject
-    private Application application;
-    @Inject
-    private Access access;
 
     public List<UpdatableItem> getPulldownMenu(final VolumeInfo volumeInfo) {
         this.volumeInfo = volumeInfo;

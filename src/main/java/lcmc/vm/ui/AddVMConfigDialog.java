@@ -30,6 +30,7 @@ import lcmc.vm.ui.configdialog.VMConfig;
 import lcmc.vm.ui.resource.DomainInfo;
 import lcmc.logger.Logger;
 import lcmc.logger.LoggerFactory;
+import lombok.RequiredArgsConstructor;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -37,16 +38,14 @@ import javax.inject.Named;
 /**
  * Show step by step dialogs that add and configure new virtual domain.
  */
-@Named
+@RequiredArgsConstructor
 public final class AddVMConfigDialog {
+    private final MainData mainData;
+    private final MainPanel mainPanel;
+    private final Domain domainDialog;
+
     private static final Logger LOG = LoggerFactory.getLogger(AddVMConfigDialog.class);
     private DomainInfo vmsVirtualDomainInfo;
-    @Inject
-    private MainData mainData;
-    @Inject
-    private MainPanel mainPanel;
-    @Inject
-    private Domain domainDialog;
 
     public void init(final DomainInfo vmsVirtualDomainInfo) {
         this.vmsVirtualDomainInfo = vmsVirtualDomainInfo;

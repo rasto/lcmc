@@ -81,12 +81,22 @@ import lcmc.cluster.service.ssh.ExecCommandConfig;
 import lcmc.cluster.service.ssh.ExecCommandThread;
 import lcmc.common.domain.util.Tools;
 import lcmc.common.ui.utils.WidgetListener;
+import lombok.RequiredArgsConstructor;
 
 /**
  * An implementation of a dialog where heartbeat is initialized on all hosts.
  */
-@Named
+@RequiredArgsConstructor
 final class HbConfig extends DialogCluster {
+
+    private final MainData mainData;
+    private final Application application;
+    private final SwingUtils swingUtils;
+    private final WidgetFactory widgetFactory;
+    private final InitCluster initCluster;
+    private final NetworkService networkService;
+    private final Access access;
+
     private static final Logger LOG = LoggerFactory.getLogger(HbConfig.class);
     private static final String KEEPALIVE_OPTION = "keepalive";
     private static final String WARNTIME_OPTION = "warntime";
@@ -190,21 +200,8 @@ final class HbConfig extends DialogCluster {
     private volatile JScrollPane configScrollPane = null;
     private volatile boolean configAlreadyScrolled = false;
     private CountDownLatch fieldCheckLatch = new CountDownLatch(1);
-    @Inject
-    private MainData mainData;
-    @Inject
-    private Application application;
-    @Inject
-    private SwingUtils swingUtils;
-    @Inject
-    private WidgetFactory widgetFactory;
+
     private MyButton makeConfigButton;
-    @Inject
-    private InitCluster initCluster;
-    @Inject
-    private NetworkService networkService;
-    @Inject
-    private Access access;
 
     @Override
     public void init(final WizardDialog previousDialog, final Cluster cluster) {

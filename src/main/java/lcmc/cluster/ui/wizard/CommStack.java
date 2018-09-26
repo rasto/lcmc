@@ -48,27 +48,24 @@ import lcmc.logger.LoggerFactory;
 import lcmc.cluster.service.ssh.ExecCommandConfig;
 import lcmc.cluster.service.ssh.ExecCommandThread;
 import lcmc.common.domain.util.Tools;
+import lombok.RequiredArgsConstructor;
 import lombok.val;
 
 /**
  * An implementation of a dialog where user can choose cluster stack, that can
  * be Corosync or Heartbeat.
  */
-@Named
+@RequiredArgsConstructor
 final class CommStack extends DialogCluster {
+
+    private final HbConfig hbConfigDialog;
+    private final CoroConfig coroConfigDialog;
+    private final Application application;
+    private final SwingUtils swingUtils;
+    private final WidgetFactory widgetFactory;
+
     private static final Logger LOG = LoggerFactory.getLogger(CommStack.class);
     private Widget chooseStackCombo;
-
-    @Inject
-    private HbConfig hbConfigDialog;
-    @Inject
-    private CoroConfig coroConfigDialog;
-    @Inject
-    private Application application;
-    @Inject
-    private SwingUtils swingUtils;
-    @Inject
-    private WidgetFactory widgetFactory;
 
     @Override
     public WizardDialog nextDialog() {

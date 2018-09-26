@@ -60,9 +60,7 @@ import lcmc.host.ui.HostBrowser;
 import lcmc.logger.Logger;
 import lcmc.logger.LoggerFactory;
 
-import javax.inject.Inject;
 import javax.inject.Named;
-import javax.inject.Provider;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -78,6 +76,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.CountDownLatch;
+import java.util.function.Supplier;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -87,6 +86,15 @@ import java.util.regex.Pattern;
  */
 @Named
 public class ResourceInfo extends AbstractDrbdInfo {
+    private final Application application;
+    private final SwingUtils swingUtils;
+    private final ResourceMenu resourceMenu;
+    private final WidgetFactory widgetFactory;
+    private final Supplier<ProxyNetInfo> proxyNetInfoProvider;
+    private final ClusterTreeMenu clusterTreeMenu;
+    private final NetworkService networkService;
+    private final ClusterViewFactory clusterViewFactory;
+
     private static final Logger LOG = LoggerFactory.getLogger(ResourceInfo.class);
     static final String DRBD_RES_PARAM_NAME = "name";
     private static final String SECTION_PROXY = "proxy";
@@ -138,22 +146,18 @@ public class ResourceInfo extends AbstractDrbdInfo {
     private Set<Host> hosts;
     private final Collection<Host> selectedProxyHosts = new HashSet<Host>();
     private GlobalInfo globalInfo;
-    @Inject
-    private Application application;
-    @Inject
-    private SwingUtils swingUtils;
-    @Inject
-    private ResourceMenu resourceMenu;
-    @Inject
-    private WidgetFactory widgetFactory;
-    @Inject
-    private Provider<ProxyNetInfo> proxyNetInfoProvider;
-    @Inject
-    private ClusterTreeMenu clusterTreeMenu;
-    @Inject
-    private NetworkService networkService;
-    @Inject
-    private ClusterViewFactory clusterViewFactory;
+
+    public ResourceInfo(WidgetFactory widgetFactory, Application application, SwingUtils swingUtils, ResourceMenu resourceMenu, WidgetFactory widgetFactory1, Supplier<ProxyNetInfo> proxyNetInfoProvider, ClusterTreeMenu clusterTreeMenu, NetworkService networkService, ClusterViewFactory clusterViewFactory) {
+        super(widgetFactory);
+        this.application = application;
+        this.swingUtils = swingUtils;
+        this.resourceMenu = resourceMenu;
+        this.widgetFactory = widgetFactory1;
+        this.proxyNetInfoProvider = proxyNetInfoProvider;
+        this.clusterTreeMenu = clusterTreeMenu;
+        this.networkService = networkService;
+        this.clusterViewFactory = clusterViewFactory;
+    }
 
     public void init(final String name, final Set<Host> hosts, final Browser browser) {
         super.einit(Optional.<ResourceValue>of(new DrbdResource(name)), name, browser);

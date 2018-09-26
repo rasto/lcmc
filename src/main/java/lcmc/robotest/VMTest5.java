@@ -21,19 +21,14 @@
 package lcmc.robotest;
 
 import lcmc.cluster.domain.Cluster;
-
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Singleton;
+import lombok.RequiredArgsConstructor;
 
 /**
  * This class is used to test the GUI.
  */
-@Named
-@Singleton
+@RequiredArgsConstructor
 final class VMTest5 {
-    @Inject
-    private VMTest1 vmTest1;
+    private final VMTest1 vmTest1;
 
     void start(final Cluster cluster, final String vmTest, final int count) {
         vmTest1.startVMTest(cluster, vmTest, "lxc", count);

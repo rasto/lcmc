@@ -41,6 +41,7 @@ import lcmc.crm.service.CRM;
 import lcmc.host.domain.Host;
 import lcmc.logger.Logger;
 import lcmc.logger.LoggerFactory;
+import lombok.RequiredArgsConstructor;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -54,16 +55,14 @@ import java.util.concurrent.CountDownLatch;
 /**
  * This class provides menus for service and host multi selection.
  */
-@Named
+@RequiredArgsConstructor
 public class PcmkMultiSelectionInfo extends EditableInfo {
+    private final PcmkMultiSelectionMenu pcmkMultiSelectionMenu;
+    private final Application application;
+    private final SwingUtils swingUtils;
+
     private static final Logger LOG = LoggerFactory.getLogger(PcmkMultiSelectionInfo.class);
     private List<Info> selectedInfos;
-    @Inject
-    private PcmkMultiSelectionMenu pcmkMultiSelectionMenu;
-    @Inject
-    private Application application;
-    @Inject
-    private SwingUtils swingUtils;
 
     public void init(final List<Info> selectedInfos, final Browser browser) {
         super.einit(Optional.<ResourceValue>absent(), "selection", browser);

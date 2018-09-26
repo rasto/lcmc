@@ -24,13 +24,14 @@ package lcmc.host.ui;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Supplier;
 
-import javax.inject.Inject;
-import javax.inject.Named;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.SpringLayout;
 
+import lcmc.cluster.ui.widget.WidgetFactory;
+import lcmc.common.ui.ProgressBar;
 import lcmc.common.ui.SpringUtilities;
 import lcmc.common.ui.WizardDialog;
 import lcmc.common.domain.Application;
@@ -38,16 +39,23 @@ import lcmc.common.domain.ExecCallback;
 import lcmc.cluster.service.ssh.ExecCommandConfig;
 import lcmc.cluster.service.ssh.ExecCommandThread;
 import lcmc.common.domain.util.Tools;
+import lcmc.common.ui.main.MainData;
+import lcmc.common.ui.utils.SwingUtils;
+import lombok.RequiredArgsConstructor;
 
 /**
  * An implementation of a dialog where hardware information is collected.
  */
-@Named
 public class Devices extends DialogHost {
-    @Inject
-    private DistDetection distDetection;
-    @Inject
-    private Application application;
+    private final DistDetection distDetection;
+    private final Application application;
+
+    public Devices(Supplier<ProgressBar> progressBarProvider, Application application, SwingUtils swingUtils, WidgetFactory widgetFactory, MainData mainData, DistDetection distDetection) {
+        super(progressBarProvider, application, swingUtils, widgetFactory, mainData);
+        this.distDetection = distDetection;
+        this.application = application;
+    }
+
 
     /** Checks the answer and makes it visible to the user. */
     final void checkAnswer(final String ans) {

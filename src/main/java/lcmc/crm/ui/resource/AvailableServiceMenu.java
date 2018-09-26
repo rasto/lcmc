@@ -30,14 +30,11 @@ import lcmc.common.ui.utils.MenuAction;
 import lcmc.common.ui.utils.MenuFactory;
 import lcmc.common.domain.util.Tools;
 import lcmc.common.ui.utils.UpdatableItem;
+import lombok.RequiredArgsConstructor;
 
-import javax.inject.Inject;
-import javax.inject.Named;
-
-@Named
+@RequiredArgsConstructor
 public class AvailableServiceMenu {
-    @Inject
-    private MenuFactory menuFactory;
+    private final MenuFactory menuFactory;
 
     public List<UpdatableItem> getPulldownMenu(final AvailableServiceInfo availableServiceInfo) {
         final List<UpdatableItem> items = new ArrayList<UpdatableItem>();

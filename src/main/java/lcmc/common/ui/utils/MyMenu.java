@@ -34,19 +34,19 @@ import lcmc.common.domain.AccessMode;
 import lcmc.common.domain.Application;
 import lcmc.common.domain.EnablePredicate;
 import lcmc.common.ui.Access;
+import lombok.RequiredArgsConstructor;
 
 /**
  * This is a menu object that holds MyMenuItems.
  */
-@Named
+@RequiredArgsConstructor
 public class MyMenu extends JMenu implements UpdatableItem {
+    private final Application application;
+    private final Access access;
+
     /** Position of the menu that can be stored and retrieved. */
     private Point2D pos = null;
     private AccessMode enableAccessMode;
-    @Inject
-    private Application application;
-    @Inject
-    private Access access;
 
     private EnablePredicate enablePredicate = new EnablePredicate() {
         @Override

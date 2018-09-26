@@ -32,6 +32,7 @@ import java.awt.event.KeyEvent;
 import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.Supplier;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Provider;
@@ -75,13 +76,26 @@ import lcmc.common.domain.UserConfig;
 import lcmc.logger.Logger;
 import lcmc.logger.LoggerFactory;
 import lcmc.common.domain.util.Tools;
+import lombok.RequiredArgsConstructor;
 
 /**
  * An implementation of a menu panel.
  */
-@Named
-@Singleton
+@RequiredArgsConstructor
 public final class MainMenu extends JPanel implements ActionListener {
+    private final Supplier<AddClusterDialog> addClusterDialogProvider;
+    private final UserConfig userConfig;
+    private final Supplier<AddHostDialog> addHostDialogProvider;
+    private final HostFactory hostFactory;
+    private final MainData mainData;
+    private final MainPresenter mainPresenter;
+    private final Application application;
+    private final SwingUtils swingUtils;
+    private final BugReport bugReport;
+    private final About aboutDialog;
+    private final Dialogs dialogs;
+    private final Access access;
+
     private static final Logger LOG = LoggerFactory.getLogger(MainMenu.class);
     /** Look and feel map. */
     private static final Map<String, String> LOOK_AND_FEEL_MAP = new HashMap<String, String>();
@@ -102,30 +116,6 @@ public final class MainMenu extends JPanel implements ActionListener {
     private String upgradeCheck = "";
     private String infoText = null;
     private final JPanel infoTextPanel = new JPanel();
-    @Inject
-    private Provider<AddClusterDialog> addClusterDialogProvider;
-    @Inject
-    private UserConfig userConfig;
-    @Inject
-    private Provider<AddHostDialog> addHostDialogProvider;
-    @Inject
-    private HostFactory hostFactory;
-    @Inject
-    private MainData mainData;
-    @Inject
-    private MainPresenter mainPresenter;
-    @Inject
-    private Application application;
-    @Inject
-    private SwingUtils swingUtils;
-    @Inject
-    private BugReport bugReport;
-    @Inject
-    private About aboutDialog;
-    @Inject
-    private Dialogs dialogs;
-    @Inject
-    private Access access;
 
     public void init() {
         if (application.isUpgradeCheckEnabled()) {

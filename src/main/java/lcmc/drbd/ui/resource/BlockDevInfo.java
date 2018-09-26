@@ -53,6 +53,7 @@ import lcmc.host.ui.HostBrowser;
 import lcmc.logger.Logger;
 import lcmc.logger.LoggerFactory;
 import lcmc.lvm.service.LVM;
+import lombok.RequiredArgsConstructor;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -74,8 +75,14 @@ import java.util.regex.Pattern;
 /**
  * This class holds info data for a block device.
  */
-@Named
+@RequiredArgsConstructor
 public class BlockDevInfo extends EditableInfo {
+    private final MainPanel mainPanel;
+    private final BlockDevMenu blockDevMenu;
+    private final Application application;
+    private final SwingUtils swingUtils;
+    private final ClusterTreeMenu clusterTreeMenu;
+
     private static final Logger LOG = LoggerFactory.getLogger(BlockDevInfo.class);
     private static final Value DRBD_MD_TYPE_FLEXIBLE = new StringValue("Flexible");
     private static final String DRBD_MD_PARAM = "DrbdMetaDisk";
@@ -99,16 +106,6 @@ public class BlockDevInfo extends EditableInfo {
     private static final String PROXY_DOWN = "Proxy Down";
 
     private static final String BY_UUID_PATH = "/dev/disk/by-uuid/";
-    @Inject
-    private MainPanel mainPanel;
-    @Inject
-    private BlockDevMenu blockDevMenu;
-    @Inject
-    private Application application;
-    @Inject
-    private SwingUtils swingUtils;
-    @Inject
-    private ClusterTreeMenu clusterTreeMenu;
 
     public void init(final String name, final BlockDevice blockDevice, final Browser browser) {
         super.einit(Optional.<ResourceValue>of(blockDevice), name, browser);

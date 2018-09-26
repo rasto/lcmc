@@ -26,6 +26,7 @@ import lcmc.common.ui.WizardDialog;
 import lcmc.host.ui.SSH;
 import lcmc.drbd.ui.resource.VolumeInfo;
 import lcmc.common.ui.utils.MyButton;
+import lombok.RequiredArgsConstructor;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -33,13 +34,13 @@ import javax.inject.Named;
 /**
  * An implementation of a dialog where ssh connection will be established.
  */
-@Named
+@RequiredArgsConstructor
 public final class SSHProxy extends SSH {
+    private final DevicesProxy devicesProxyDialog;
+
     private VolumeInfo volumeInfo;
     private WizardDialog origDialog;
     private WizardDialog nextDialogObject = null;
-    @Inject
-    private DevicesProxy devicesProxyDialog;
 
     public void init(final WizardDialog previousDialog,
                      final Host host,
