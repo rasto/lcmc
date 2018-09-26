@@ -24,15 +24,11 @@ import static lcmc.robotest.RoboTest.CONFIRM_REMOVE;
 import lcmc.common.domain.util.Tools;
 import lombok.RequiredArgsConstructor;
 
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Singleton;
-
 /**
  * This class is used to test the GUI.
  */
 @RequiredArgsConstructor
-final class PcmkTest4 {
+public class PcmkTest4 {
     private final RoboTest roboTest;
 
     void start() {

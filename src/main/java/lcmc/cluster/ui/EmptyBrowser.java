@@ -23,6 +23,7 @@ package lcmc.cluster.ui;
 
 import lcmc.cluster.domain.Cluster;
 import lcmc.cluster.ui.network.InfoPresenter;
+import lcmc.common.domain.Application;
 import lcmc.common.domain.util.Tools;
 import lcmc.common.ui.Browser;
 import lcmc.common.ui.CategoryInfo;
@@ -31,12 +32,7 @@ import lcmc.host.domain.Host;
 import lcmc.host.domain.Hosts;
 import lcmc.host.ui.AllHostsInfo;
 import lcmc.host.ui.HostBrowser;
-import lombok.RequiredArgsConstructor;
 
-import javax.annotation.Resource;
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Singleton;
 import javax.swing.*;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.MutableTreeNode;
@@ -48,7 +44,6 @@ import java.util.function.BiConsumer;
  * to edit data of services etc.
  * Every resource has its Info object, that accessible through the tree view.
  */
-@RequiredArgsConstructor
 public final class EmptyBrowser extends Browser {
     private final AllHostsInfo allHostsInfo;
     private final Hosts allHosts;
@@ -58,6 +53,14 @@ public final class EmptyBrowser extends Browser {
     /** Menu's all hosts node. */
     private DefaultMutableTreeNode allHostsNode;
     private DefaultMutableTreeNode treeTop;
+
+    public EmptyBrowser(Application application, AllHostsInfo allHostsInfo, Hosts allHosts, TreeMenuController treeMenuController, CategoryInfo resourcesCategory) {
+        super(application);
+        this.allHostsInfo = allHostsInfo;
+        this.allHosts = allHosts;
+        this.treeMenuController = treeMenuController;
+        this.resourcesCategory = resourcesCategory;
+    }
 
     void init() {
         allHostsInfo.init(this);

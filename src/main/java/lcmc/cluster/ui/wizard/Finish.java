@@ -23,30 +23,38 @@
 package lcmc.cluster.ui.wizard;
 
 import java.awt.Color;
-import javax.inject.Inject;
-import javax.inject.Named;
+import java.util.function.Supplier;
 import javax.swing.JCheckBox;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 
 import lcmc.cluster.ui.EmptyBrowser;
+import lcmc.cluster.ui.widget.WidgetFactory;
 import lcmc.common.domain.UserConfig;
+import lcmc.common.ui.ProgressBar;
 import lcmc.common.ui.WizardDialog;
 import lcmc.common.domain.Application;
 import lcmc.common.domain.util.Tools;
-import lombok.RequiredArgsConstructor;
+import lcmc.common.ui.main.MainData;
+import lcmc.common.ui.utils.SwingUtils;
 
 /**
  * Cluster finish dialog. Shows some text and let's the user press the finish
  * button.
  */
-@RequiredArgsConstructor
-final class Finish extends DialogCluster {
+public class Finish extends DialogCluster {
     private final EmptyBrowser emptyBrowser;
     private final Application application;
     private final UserConfig userConfig;
 
     private final JCheckBox saveCheckBox = new JCheckBox(Tools.getString("Dialog.Cluster.Finish.Save"), true);
+
+    public Finish(Supplier<ProgressBar> progressBarProvider, Application application, SwingUtils swingUtils, WidgetFactory widgetFactory, MainData mainData, EmptyBrowser emptyBrowser, UserConfig userConfig) {
+        super(progressBarProvider, application, swingUtils, widgetFactory, mainData);
+        this.emptyBrowser = emptyBrowser;
+        this.application = application;
+        this.userConfig = userConfig;
+    }
 
     @Override
     public WizardDialog nextDialog() {

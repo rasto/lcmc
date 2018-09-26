@@ -31,8 +31,6 @@ import java.awt.event.ItemListener;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Supplier;
-import javax.inject.Inject;
-import javax.inject.Provider;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComponent;

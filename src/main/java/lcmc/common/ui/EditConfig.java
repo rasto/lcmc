@@ -28,8 +28,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-import javax.inject.Inject;
-import javax.inject.Named;
 import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
 import javax.swing.JCheckBox;

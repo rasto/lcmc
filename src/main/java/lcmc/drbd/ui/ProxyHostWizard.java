@@ -30,9 +30,6 @@ import lcmc.logger.Logger;
 import lcmc.logger.LoggerFactory;
 import lombok.RequiredArgsConstructor;
 
-import javax.inject.Inject;
-import javax.inject.Named;
-
 /**
  * Show step by step dialogs that add and configure new proxy host.
  */

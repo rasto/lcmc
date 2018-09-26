@@ -44,7 +44,7 @@ import java.util.function.Supplier;
 /**
  * An implementation of a dialog where heartbeat is installed.
  */
-final class HeartbeatInst extends DialogHost {
+public class HeartbeatInst extends DialogHost {
     private final Supplier<CheckInstallation> checkInstallationFactory;
     private final Application application;
 

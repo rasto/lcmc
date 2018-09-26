@@ -39,7 +39,6 @@ import lcmc.common.domain.VisiblePredicate;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 
 import static org.mockito.Matchers.anyObject;
@@ -67,11 +66,11 @@ public class ConstraintPHMenuTest {
     private MyMenuItem menuItemStub;
     @Mock
     private MyMenu menuStub;
-    @InjectMocks
     private ConstraintPHMenu constraintPHMenu;
 
     @Before
     public void setUp() {
+        constraintPHMenu = new ConstraintPHMenu();
         when(constraintPHInfoStub.getBrowser()).thenReturn(clusterBrowserStub);
         when(constraintPHInfoStub.getService()).thenReturn(serviceStub);
         when(menuFactoryStub.createMenuItem(anyString(),

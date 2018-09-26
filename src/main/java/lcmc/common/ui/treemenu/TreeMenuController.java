@@ -30,9 +30,6 @@ import lcmc.logger.LoggerFactory;
 import lombok.RequiredArgsConstructor;
 import lombok.val;
 
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Singleton;
 import javax.swing.*;
 import javax.swing.event.TreeModelEvent;
 import javax.swing.event.TreeModelListener;

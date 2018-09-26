@@ -28,6 +28,8 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import lcmc.common.domain.Application;
 import lcmc.common.domain.util.Tools;
+import lcmc.common.ui.main.MainData;
+import lcmc.common.ui.utils.SwingUtils;
 
 /**
  * This class holds info data for a category.
@@ -36,6 +38,10 @@ public class CategoryInfo extends Info {
     public static final String MAIN_TABLE = "main";
     private JComponent infoPanel = null;
     public static final ImageIcon CATEGORY_ICON = Tools.createImageIcon(Tools.getDefault("Browser.CategoryIcon"));
+
+    public CategoryInfo(Application application, SwingUtils swingUtils, Access access, MainData mainData) {
+        super(application, swingUtils, access, mainData);
+    }
 
     @Override
     public String getInfo() {

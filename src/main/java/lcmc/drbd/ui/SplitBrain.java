@@ -26,14 +26,16 @@ package lcmc.drbd.ui;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Set;
-import javax.inject.Inject;
-import javax.inject.Named;
+import java.util.function.Supplier;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SpringLayout;
 import lcmc.common.domain.AccessMode;
 import lcmc.common.domain.Application;
+import lcmc.common.ui.ProgressBar;
+import lcmc.common.ui.main.MainData;
+import lcmc.common.ui.utils.SwingUtils;
 import lcmc.host.domain.Host;
 import lcmc.common.ui.SpringUtilities;
 import lcmc.common.ui.WizardDialog;
@@ -45,13 +47,11 @@ import lcmc.logger.Logger;
 import lcmc.logger.LoggerFactory;
 import lcmc.common.ui.utils.MyButton;
 import lcmc.common.domain.util.Tools;
-import lombok.RequiredArgsConstructor;
 
 /**
  * An implementation of a dialog where drbd block devices are initialized.
  * information.
  */
-@RequiredArgsConstructor
 public final class SplitBrain extends DrbdConfig {
     private final WidgetFactory widgetFactory;
 
@@ -60,6 +60,11 @@ public final class SplitBrain extends DrbdConfig {
     /** Combo box with host that has more recent data. */
     private Widget hostWithBetterDataWidget;
     private MyButton resolveButton;
+
+    public SplitBrain(Supplier<ProgressBar> progressBarProvider, Application application, SwingUtils swingUtils, WidgetFactory widgetFactory, MainData mainData) {
+        super(progressBarProvider, application, swingUtils, widgetFactory, mainData);
+        this.widgetFactory = widgetFactory;
+    }
 
     protected void resolve() {
         final Host h1 = getDrbdVolumeInfo().getFirstBlockDevInfo().getHost();

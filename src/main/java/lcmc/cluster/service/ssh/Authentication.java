@@ -22,6 +22,7 @@ package lcmc.cluster.service.ssh;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.function.Supplier;
 
 import lcmc.common.domain.Application;
 import lcmc.host.domain.Host;
@@ -31,12 +32,10 @@ import lcmc.logger.LoggerFactory;
 import lcmc.common.domain.util.Tools;
 import lombok.RequiredArgsConstructor;
 
-import javax.inject.Provider;
-
 @RequiredArgsConstructor
 public class Authentication {
     private final Application application;
-    private final Provider<PopupHostKeyVerifier> popupHostKeyVerifierProvider;
+    private final Supplier<PopupHostKeyVerifier> popupHostKeyVerifierProvider;
 
     private static final Logger LOG = LoggerFactory.getLogger(Authentication.class);
 

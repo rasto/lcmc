@@ -29,7 +29,7 @@ import static lcmc.robotest.RoboTest.CONFIRM_REMOVE;
  * This class is used to test the GUI.
  */
 @RequiredArgsConstructor
-final class PcmkTestD {
+public class PcmkTestD {
     private final RoboTest roboTest;
 
     /** Pacemaker Leak tests. */

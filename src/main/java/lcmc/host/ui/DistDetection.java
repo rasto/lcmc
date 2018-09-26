@@ -41,7 +41,7 @@ import java.util.function.Supplier;
 /**
  * An implementation of a dialog that shows which distribution was detected.
  */
-final class DistDetection extends DialogHost {
+public class DistDetection extends DialogHost {
     private final CheckInstallation checkInstallation;
     private final Application application;
 

@@ -27,9 +27,6 @@ import lcmc.cluster.service.NetworkService;
 import lcmc.cluster.ui.ClusterBrowser;
 import lombok.RequiredArgsConstructor;
 
-import javax.inject.Inject;
-import javax.inject.Named;
-
 @RequiredArgsConstructor
 public class NetworkFactory {
     private final ClusterEventBus clusterEventBus;

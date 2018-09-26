@@ -26,15 +26,11 @@ import lcmc.cluster.ui.widget.MComboBox;
 import lcmc.common.domain.util.Tools;
 import lombok.RequiredArgsConstructor;
 
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Singleton;
-
 /**
  * This class is used to test the GUI.
  */
 @RequiredArgsConstructor
-final class PcmkTest3 {
+public class PcmkTest3 {
     private final RoboTest roboTest;
 
     void start(final int count) {

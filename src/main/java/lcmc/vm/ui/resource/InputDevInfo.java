@@ -87,7 +87,7 @@ final class InputDevInfo extends HardwareInfo {
     private JComponent tablePanel = null;
 
     public InputDevInfo(Application application, SwingUtils swingUtils, MenuFactory menuFactory, WidgetFactory widgetFactory, MainData mainData, ClusterTreeMenu clusterTreeMenu) {
-        super(application, swingUtils, menuFactory, widgetFactory, mainData, clusterTreeMenu);
+        super(application, swingUtils, menuFactory, widgetFactory, mainData);
         this.swingUtils = swingUtils;
         this.clusterTreeMenu = clusterTreeMenu;
     }

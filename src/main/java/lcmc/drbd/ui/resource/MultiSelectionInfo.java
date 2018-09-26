@@ -22,11 +22,13 @@ package lcmc.drbd.ui.resource;
 
 import com.google.common.base.Optional;
 import lcmc.cluster.ui.ClusterBrowser;
+import lcmc.cluster.ui.widget.WidgetFactory;
 import lcmc.common.domain.AccessMode;
 import lcmc.common.domain.Application;
 import lcmc.common.domain.ResourceValue;
 import lcmc.common.domain.Value;
 import lcmc.common.domain.util.Tools;
+import lcmc.common.ui.Access;
 import lcmc.common.ui.Browser;
 import lcmc.common.ui.EditableInfo;
 import lcmc.common.ui.Info;
@@ -39,10 +41,7 @@ import lcmc.crm.domain.ClusterStatus;
 import lcmc.crm.domain.PtestData;
 import lcmc.crm.service.CRM;
 import lcmc.host.domain.Host;
-import lombok.RequiredArgsConstructor;
 
-import javax.inject.Inject;
-import javax.inject.Named;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -53,7 +52,6 @@ import java.util.concurrent.CountDownLatch;
 /**
  * This class provides menus for block device and host multi selection.
  */
-@RequiredArgsConstructor
 public class MultiSelectionInfo extends EditableInfo {
     /** All selected objects. */
     private List<Info> selectedInfos;
@@ -61,6 +59,13 @@ public class MultiSelectionInfo extends EditableInfo {
     private final MultiSelectionMenu multiSelectionMenu;
     private final Application application;
     private final SwingUtils swingUtils;
+
+    public MultiSelectionInfo(Application application, SwingUtils swingUtils, Access access, MainData mainData, WidgetFactory widgetFactory, MultiSelectionMenu multiSelectionMenu) {
+        super(application, swingUtils, access, mainData, widgetFactory);
+        this.multiSelectionMenu = multiSelectionMenu;
+        this.application = application;
+        this.swingUtils = swingUtils;
+    }
 
     public void init(final List<Info> selectedInfos, final Browser browser) {
         super.einit(Optional.<ResourceValue>absent(), "selection", browser);

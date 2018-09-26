@@ -22,11 +22,13 @@
 
 package lcmc.crm.ui.resource;
 
-import javax.inject.Named;
 import javax.swing.ImageIcon;
 import javax.swing.JComponent;
 import lcmc.common.domain.Application;
 import lcmc.common.domain.util.Tools;
+import lcmc.common.ui.Access;
+import lcmc.common.ui.main.MainData;
+import lcmc.common.ui.utils.SwingUtils;
 
 /**
  * This class holds data that describe the crm as whole.
@@ -35,6 +37,11 @@ public final class CRMInfo extends HbCategoryInfo {
     /** Cluster manager icon. */
     private static final ImageIcon CRM_ICON =
                                       Tools.createImageIcon(Tools.getDefault("ClusterBrowser.PacemakerIconSmall"));
+
+    public CRMInfo(Application application, SwingUtils swingUtils, Access access, MainData mainData) {
+        super(application, swingUtils, access, mainData);
+    }
+
     /** Returns icon for the heartbeat menu item. */
     @Override
     public ImageIcon getCategoryIcon(final Application.RunMode runMode) {

@@ -30,10 +30,8 @@ import lcmc.cluster.ui.widget.Widget;
 import lcmc.cluster.ui.widget.WidgetFactory;
 import lcmc.common.domain.*;
 import lcmc.common.domain.util.Tools;
-import lcmc.common.ui.Browser;
-import lcmc.common.ui.EditableInfo;
-import lcmc.common.ui.Info;
-import lcmc.common.ui.SpringUtilities;
+import lcmc.common.ui.*;
+import lcmc.common.ui.main.MainData;
 import lcmc.common.ui.main.ProgressIndicator;
 import lcmc.common.ui.treemenu.ClusterTreeMenu;
 import lcmc.common.ui.utils.MyButton;
@@ -50,10 +48,8 @@ import lcmc.vm.domain.VMParams;
 import lcmc.vm.domain.VmsXml;
 import lcmc.vm.domain.data.*;
 import lcmc.vm.service.VIRSH;
-import lombok.RequiredArgsConstructor;
 import org.w3c.dom.Node;
 
-import javax.inject.Provider;
 import javax.swing.*;
 import javax.swing.tree.DefaultMutableTreeNode;
 import java.awt.*;
@@ -65,28 +61,28 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
+import java.util.function.Supplier;
 import java.util.regex.Matcher;
 
 /**
  * This class holds info about VirtualDomain service in the VMs category,
  * but not in the cluster view.
  */
-@RequiredArgsConstructor
 public class DomainInfo extends EditableInfo {
     private final ProgressIndicator progressIndicator;
     private final Application application;
     private final SwingUtils swingUtils;
     private final DomainMenu domainMenu;
-    private final Provider<DiskInfo> diskInfoProvider;
-    private final Provider<FilesystemInfo> filesystemInfoProvider;
-    private final Provider<InterfaceInfo> interfaceInfoProvider;
-    private final Provider<InputDevInfo> inputDevInfoProvider;
-    private final Provider<GraphicsInfo> graphicsInfoProvider;
-    private final Provider<SoundInfo> soundInfoProvider;
-    private final Provider<SerialInfo> serialInfoProvider;
-    private final Provider<ParallelInfo> parallelInfoProvider;
-    private final Provider<VideoInfo> videoInfoProvider;
-    private final Provider<VmsXml> vmsXmlProvider;
+    private final Supplier<DiskInfo> diskInfoProvider;
+    private final Supplier<FilesystemInfo> filesystemInfoProvider;
+    private final Supplier<InterfaceInfo> interfaceInfoProvider;
+    private final Supplier<InputDevInfo> inputDevInfoProvider;
+    private final Supplier<GraphicsInfo> graphicsInfoProvider;
+    private final Supplier<SoundInfo> soundInfoProvider;
+    private final Supplier<SerialInfo> serialInfoProvider;
+    private final Supplier<ParallelInfo> parallelInfoProvider;
+    private final Supplier<VideoInfo> videoInfoProvider;
+    private final Supplier<VmsXml> vmsXmlProvider;
     private final WidgetFactory widgetFactory;
     private final ClusterTreeMenu clusterTreeMenu;
 
@@ -582,6 +578,26 @@ public class DomainInfo extends EditableInfo {
     private Value[] autostartPossibleValues;
     /** This is a map from host to the check box. */
     private final Map<String, Widget> definedOnHostComboBoxHash = new HashMap<String, Widget>();
+
+    public DomainInfo(Application application, SwingUtils swingUtils, Access access, MainData mainData, WidgetFactory widgetFactory, ProgressIndicator progressIndicator, DomainMenu domainMenu, Supplier<DiskInfo> diskInfoProvider, Supplier<FilesystemInfo> filesystemInfoProvider, Supplier<InterfaceInfo> interfaceInfoProvider, Supplier<InputDevInfo> inputDevInfoProvider, Supplier<GraphicsInfo> graphicsInfoProvider, Supplier<SoundInfo> soundInfoProvider, Supplier<SerialInfo> serialInfoProvider, Supplier<ParallelInfo> parallelInfoProvider, Supplier<VideoInfo> videoInfoProvider, Supplier<VmsXml> vmsXmlProvider, ClusterTreeMenu clusterTreeMenu) {
+        super(application, swingUtils, access, mainData, widgetFactory);
+        this.progressIndicator = progressIndicator;
+        this.application = application;
+        this.swingUtils = swingUtils;
+        this.domainMenu = domainMenu;
+        this.diskInfoProvider = diskInfoProvider;
+        this.filesystemInfoProvider = filesystemInfoProvider;
+        this.interfaceInfoProvider = interfaceInfoProvider;
+        this.inputDevInfoProvider = inputDevInfoProvider;
+        this.graphicsInfoProvider = graphicsInfoProvider;
+        this.soundInfoProvider = soundInfoProvider;
+        this.serialInfoProvider = serialInfoProvider;
+        this.parallelInfoProvider = parallelInfoProvider;
+        this.videoInfoProvider = videoInfoProvider;
+        this.vmsXmlProvider = vmsXmlProvider;
+        this.widgetFactory = widgetFactory;
+        this.clusterTreeMenu = clusterTreeMenu;
+    }
 
     public void einit(final String name, final Browser browser) {
         super.einit(Optional.of(new ResourceValue(name)), name, browser);

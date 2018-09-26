@@ -34,8 +34,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import javax.inject.Inject;
-import javax.inject.Named;
+import java.util.function.Supplier;
 import javax.swing.ImageIcon;
 import javax.swing.JCheckBox;
 import javax.swing.JComponent;
@@ -44,6 +43,9 @@ import javax.swing.JScrollPane;
 import javax.swing.Scrollable;
 import javax.swing.SwingConstants;
 
+import lcmc.cluster.ui.widget.WidgetFactory;
+import lcmc.common.ui.ProgressBar;
+import lcmc.common.ui.main.MainData;
 import lcmc.common.ui.main.MainPresenter;
 import lcmc.common.domain.Application;
 import lcmc.common.ui.utils.SwingUtils;
@@ -51,14 +53,12 @@ import lcmc.host.domain.Host;
 import lcmc.host.domain.Hosts;
 import lcmc.common.ui.WizardDialog;
 import lcmc.common.domain.util.Tools;
-import lombok.RequiredArgsConstructor;
 
 /**
  * An implementation of a dialog where user can choose which hosts belong to
  * the cluster.
  */
-@RequiredArgsConstructor
-final class ClusterHosts extends DialogCluster {
+public class ClusterHosts extends DialogCluster {
 
     private final CommStack commStackDialog;
     private final Connect connectDialog;
@@ -73,6 +73,16 @@ final class ClusterHosts extends DialogCluster {
             Tools.getDefault("Dialog.Cluster.ClusterHosts.HostUncheckedIcon"));
     /** Map from checkboxes to the host, which they choose. */
     private final Map<JCheckBox, Host> checkBoxToHost = new LinkedHashMap<JCheckBox, Host>();
+
+    public ClusterHosts(Supplier<ProgressBar> progressBarProvider, Application application, SwingUtils swingUtils, WidgetFactory widgetFactory, MainData mainData, CommStack commStackDialog, Connect connectDialog, MainPresenter mainPresenter, Hosts allHosts) {
+        super(progressBarProvider, application, swingUtils, widgetFactory, mainData);
+        this.commStackDialog = commStackDialog;
+        this.connectDialog = connectDialog;
+        this.mainPresenter = mainPresenter;
+        this.application = application;
+        this.swingUtils = swingUtils;
+        this.allHosts = allHosts;
+    }
 
     /** It is executed after the dialog is applied. */
     @Override

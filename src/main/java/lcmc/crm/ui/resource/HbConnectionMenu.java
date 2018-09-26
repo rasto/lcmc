@@ -38,9 +38,6 @@ import lcmc.common.domain.util.Tools;
 import lcmc.common.ui.utils.UpdatableItem;
 import lombok.RequiredArgsConstructor;
 
-import javax.inject.Inject;
-import javax.inject.Named;
-
 @RequiredArgsConstructor
 public class HbConnectionMenu {
     private final MenuFactory menuFactory;

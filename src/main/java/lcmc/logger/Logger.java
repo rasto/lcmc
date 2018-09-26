@@ -33,7 +33,6 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.SwingUtilities;
 
-import lcmc.AppContext;
 import lcmc.common.domain.AccessMode;
 import lcmc.common.ui.main.MainData;
 import lcmc.common.ui.MainMenu;
@@ -41,11 +40,18 @@ import lcmc.cluster.domain.Cluster;
 import lcmc.host.domain.Host;
 import lcmc.common.ui.BugReport;
 import lcmc.common.domain.util.Tools;
+import lombok.RequiredArgsConstructor;
 
 /**
  * This class provides tools for logging.
  */
+@RequiredArgsConstructor
 public final class Logger {
+    private final String className;
+    private final MainData mainData;
+    private final MainMenu mainMenu;
+    private final BugReport bugReport;
+
     private static final String ERROR_STRING      = "ERROR   : ";
     private static final String INFO_STRING       = "INFO    : ";
     private static final String DEBUG_STRING      = "DEBUG   : ";
@@ -58,15 +64,10 @@ public final class Logger {
     public static final List<Pattern> IGNORE_EXCEPTION_PATTERNS =
         Collections.unmodifiableList(new ArrayList<Pattern>(Arrays.asList(
             Pattern.compile(".*:1.6.0_27:.*ToolTipManager\\.java.*", Pattern.DOTALL))));
-    private final String className;
     /** Map with all warnings, so that they don't appear more than once. */
     private final Collection<String> appWarningHash = new HashSet<String>();
     /** Map with all errors, so that they don't appear more than once. */
     private final Collection<String> appErrorHash = new HashSet<String>();
-
-    public Logger(final String className) {
-        this.className = className;
-    }
 
     /** Returns seconds since start. */
     private long secondsSinceStart() {
@@ -132,7 +133,6 @@ public final class Logger {
         final String msg0 = ERROR_STRING + msg;
         System.out.println(msg0);
         LoggerFactory.LOG_BUFFER.add(msg0);
-        final MainData mainData = AppContext.getBean(MainData.class);
         SwingUtilities.invokeLater(new Runnable() {
             @Override
             public void run() {
@@ -270,12 +270,11 @@ public final class Logger {
             return;
         }
 
-        AppContext.getBean(MainMenu.class).setOperatingMode(AccessMode.OP_MODE_READONLY);
+        mainMenu.setOperatingMode(AccessMode.OP_MODE_READONLY);
 
         final Thread t = new Thread(new Runnable() {
             @Override
             public void run() {
-                final BugReport bugReport = AppContext.getBean(BugReport.class);
                 bugReport.init(BugReport.UNKNOWN_CLUSTER, errorString.toString());
                 bugReport.showDialog();
             }

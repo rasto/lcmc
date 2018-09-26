@@ -119,7 +119,7 @@ public final class FilesystemInfo extends HardwareInfo {
     private JComponent tablePanel = null;
 
     public FilesystemInfo(Application application, SwingUtils swingUtils, MenuFactory menuFactory, WidgetFactory widgetFactory, MainData mainData, ClusterTreeMenu clusterTreeMenu) {
-        super(application, swingUtils, menuFactory, widgetFactory, mainData, clusterTreeMenu);
+        super(application, swingUtils, menuFactory, widgetFactory, mainData);
         this.application = application;
         this.swingUtils = swingUtils;
         this.widgetFactory = widgetFactory;

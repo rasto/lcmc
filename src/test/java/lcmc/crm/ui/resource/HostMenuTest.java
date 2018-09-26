@@ -39,7 +39,6 @@ import lcmc.common.domain.VisiblePredicate;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 
 import static org.mockito.Matchers.anyObject;
@@ -65,11 +64,17 @@ public class HostMenuTest {
     private MyMenuItem menuItemStub;
     @Mock
     private MenuFactory menuFactoryStub;
-    @InjectMocks
     private HostMenu hostMenu;
 
     @Before
     public void setUp() {
+        hostMenu = new HostMenu(
+                null,
+                mainData,
+                null,
+                menuFactoryStub,
+                null,
+                null);
         when(hostInfoStub.getBrowser()).thenReturn(hostBrowserStub);
         when(menuFactoryStub.createMenuItem(anyString(),
                 (ImageIcon) anyObject(),

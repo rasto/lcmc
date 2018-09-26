@@ -25,24 +25,28 @@ import java.awt.Color;
 import java.util.ArrayList;
 import java.util.List;
 
+import lcmc.common.domain.Application;
+import lcmc.common.ui.Access;
 import lcmc.common.ui.CategoryInfo;
 import lcmc.cluster.ui.widget.WidgetFactory;
+import lcmc.common.ui.main.MainData;
+import lcmc.common.ui.utils.SwingUtils;
 import lcmc.host.domain.Host;
 import lcmc.common.ui.Browser;
 import lcmc.cluster.ui.ClusterBrowser;
 import lcmc.crm.ui.resource.HostInfo;
 import lcmc.common.ui.utils.MyButton;
-import lombok.RequiredArgsConstructor;
-
-import javax.inject.Inject;
-import javax.inject.Named;
 
 /**
  * This class holds the information hosts in this cluster.
  */
-@RequiredArgsConstructor
 public final class ClusterHostsInfo extends CategoryInfo {
     private final WidgetFactory widgetFactory;
+
+    public ClusterHostsInfo(Application application, SwingUtils swingUtils, Access access, MainData mainData, WidgetFactory widgetFactory) {
+        super(application, swingUtils, access, mainData);
+        this.widgetFactory = widgetFactory;
+    }
 
     @Override
     public ClusterBrowser getBrowser() {

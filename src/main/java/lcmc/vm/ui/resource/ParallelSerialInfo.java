@@ -179,7 +179,7 @@ public abstract class ParallelSerialInfo extends HardwareInfo {
     private JComponent tablePanel = null;
 
     public ParallelSerialInfo(Application application, SwingUtils swingUtils, MenuFactory menuFactory, WidgetFactory widgetFactory, MainData mainData, ClusterTreeMenu clusterTreeMenu) {
-        super(application, swingUtils, menuFactory, widgetFactory, mainData, clusterTreeMenu);
+        super(application, swingUtils, menuFactory, widgetFactory, mainData);
         this.swingUtils = swingUtils;
         this.widgetFactory = widgetFactory;
         this.clusterTreeMenu = clusterTreeMenu;

@@ -29,6 +29,7 @@ import lcmc.common.domain.ColorText;
 import lcmc.common.domain.Value;
 import lcmc.common.domain.util.Tools;
 import lcmc.common.ui.Access;
+import lcmc.common.ui.main.MainData;
 import lcmc.common.ui.main.ProgressIndicator;
 import lcmc.common.ui.treemenu.ClusterTreeMenu;
 import lcmc.common.ui.utils.SwingUtils;
@@ -41,13 +42,13 @@ import lcmc.crm.service.CRM;
 import lcmc.host.domain.Host;
 import lombok.val;
 
-import javax.inject.Provider;
 import javax.swing.*;
 import javax.swing.tree.DefaultMutableTreeNode;
 import java.awt.*;
 import java.awt.geom.Point2D;
 import java.util.*;
 import java.util.List;
+import java.util.function.Supplier;
 
 /**
  * This class holds clone service info object.
@@ -57,8 +58,8 @@ public class CloneInfo extends ServiceInfo {
     private ServiceInfo containedService = null;
     private ClusterBrowser clusterBrowser;
 
-    public CloneInfo(ProgressIndicator progressIndicator, ServiceMenu serviceMenu, Provider<CloneInfo> cloneInfoProvider, Application application, SwingUtils swingUtils, WidgetFactory widgetFactory, ClusterTreeMenu clusterTreeMenu, CrmServiceFactory crmServiceFactory, Access access, CloneMenu cloneMenu) {
-        super(progressIndicator, serviceMenu, cloneInfoProvider, application, swingUtils, widgetFactory, clusterTreeMenu, crmServiceFactory, access);
+    public CloneInfo(Application application, SwingUtils swingUtils, Access access, MainData mainData, WidgetFactory widgetFactory, ProgressIndicator progressIndicator, ServiceMenu serviceMenu, Supplier<CloneInfo> cloneInfoProvider, ClusterTreeMenu clusterTreeMenu, CrmServiceFactory crmServiceFactory, CloneMenu cloneMenu) {
+        super(application, swingUtils, access, mainData, widgetFactory, progressIndicator, serviceMenu, cloneInfoProvider, clusterTreeMenu, crmServiceFactory);
         this.cloneMenu = cloneMenu;
     }
 

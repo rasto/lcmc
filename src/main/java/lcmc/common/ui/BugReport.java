@@ -31,8 +31,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import javax.inject.Inject;
-import javax.inject.Named;
 import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
 import javax.swing.JCheckBox;
@@ -43,6 +41,9 @@ import javax.swing.JTextPane;
 
 import lcmc.cluster.domain.Cluster;
 import lcmc.cluster.domain.Clusters;
+import lcmc.cluster.ui.widget.WidgetFactory;
+import lcmc.common.domain.Application;
+import lcmc.common.ui.main.MainData;
 import lcmc.common.ui.utils.SwingUtils;
 import lcmc.crm.domain.ClusterStatus;
 import lcmc.drbd.domain.DrbdXml;
@@ -53,12 +54,10 @@ import lcmc.common.domain.Http;
 import lcmc.logger.Logger;
 import lcmc.logger.LoggerFactory;
 import lcmc.common.domain.util.Tools;
-import lombok.RequiredArgsConstructor;
 
 /**
  * An implementation of a bug report dialog.
  */
-@RequiredArgsConstructor
 public final class BugReport extends ConfigDialog {
     private final SwingUtils swingUtils;
     private final Clusters allClusters;
@@ -80,6 +79,12 @@ public final class BugReport extends ConfigDialog {
     private final Map<String, JCheckBox> configCheckBoxMap = new HashMap<String, JCheckBox>();
     private final Map<Cluster, JCheckBox> clusterCheckBoxMap = new HashMap<Cluster, JCheckBox>();
     private String logBuffer;
+
+    public BugReport(Application application, SwingUtils swingUtils, WidgetFactory widgetFactory, MainData mainData, Clusters allClusters) {
+        super(application, swingUtils, widgetFactory, mainData);
+        this.swingUtils = swingUtils;
+        this.allClusters = allClusters;
+    }
 
     public void init(final Cluster selectedCluster, final String errorText) {
         this.selectedCluster = selectedCluster;

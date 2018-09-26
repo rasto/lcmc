@@ -26,6 +26,7 @@ import lcmc.Exceptions;
 import lcmc.cluster.ui.ClusterBrowser;
 import lcmc.cluster.ui.resource.CommonDeviceInterface;
 import lcmc.cluster.ui.widget.Check;
+import lcmc.cluster.ui.widget.WidgetFactory;
 import lcmc.cluster.ui.wizard.DrbdLogs;
 import lcmc.common.domain.AccessMode;
 import lcmc.common.domain.Application;
@@ -33,8 +34,10 @@ import lcmc.common.domain.ResourceValue;
 import lcmc.common.domain.StringValue;
 import lcmc.common.domain.Value;
 import lcmc.common.domain.util.Tools;
+import lcmc.common.ui.Access;
 import lcmc.common.ui.Browser;
 import lcmc.common.ui.EditableInfo;
+import lcmc.common.ui.main.MainData;
 import lcmc.common.ui.treemenu.ClusterTreeMenu;
 import lcmc.common.ui.utils.ButtonCallback;
 import lcmc.common.ui.utils.ComponentWithTest;
@@ -55,11 +58,7 @@ import lcmc.drbd.ui.AddDrbdSplitBrainDialog;
 import lcmc.host.domain.Host;
 import lcmc.logger.Logger;
 import lcmc.logger.LoggerFactory;
-import lombok.RequiredArgsConstructor;
 
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Provider;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -82,7 +81,6 @@ import java.util.regex.Matcher;
 /**
  * This class holds info data of a DRBD volume.
  */
-@RequiredArgsConstructor
 public class VolumeInfo extends EditableInfo implements CommonDeviceInterface {
     private final AddDrbdSplitBrainDialog addDrbdSplitBrainDialog;
     private final Supplier<DrbdXml> drbdXmlProvider;
@@ -149,6 +147,17 @@ public class VolumeInfo extends EditableInfo implements CommonDeviceInterface {
     private String createdFs = null;
     private JComponent infoPanel = null;
     private Set<Host> hosts;
+
+    public VolumeInfo(Application application, SwingUtils swingUtils, Access access, MainData mainData, WidgetFactory widgetFactory, AddDrbdSplitBrainDialog addDrbdSplitBrainDialog, Supplier<DrbdXml> drbdXmlProvider, VolumeMenu volumeMenu, Supplier<DrbdLogs> drbdLogsProvider, ClusterTreeMenu clusterTreeMenu) {
+        super(application, swingUtils, access, mainData, widgetFactory);
+        this.addDrbdSplitBrainDialog = addDrbdSplitBrainDialog;
+        this.drbdXmlProvider = drbdXmlProvider;
+        this.application = application;
+        this.swingUtils = swingUtils;
+        this.volumeMenu = volumeMenu;
+        this.drbdLogsProvider = drbdLogsProvider;
+        this.clusterTreeMenu = clusterTreeMenu;
+    }
 
     void init(final String name,
               final String device,

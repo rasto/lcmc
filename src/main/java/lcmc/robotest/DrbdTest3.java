@@ -35,7 +35,7 @@ import lombok.RequiredArgsConstructor;
  * This class is used to test the GUI.
  */
 @RequiredArgsConstructor
-final class DrbdTest3 {
+public class DrbdTest3 {
     private final RoboTest roboTest;
     private final DrbdTest1 drbdTest1;
     private final MainPanel mainPanel;

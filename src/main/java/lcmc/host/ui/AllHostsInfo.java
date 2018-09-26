@@ -41,7 +41,6 @@ import lcmc.host.domain.HostFactory;
 import lcmc.logger.Logger;
 import lcmc.logger.LoggerFactory;
 
-import javax.inject.Inject;
 import javax.swing.*;
 import javax.swing.border.LineBorder;
 import javax.swing.border.TitledBorder;

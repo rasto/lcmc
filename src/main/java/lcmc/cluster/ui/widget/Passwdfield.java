@@ -19,7 +19,6 @@
  */
 package lcmc.cluster.ui.widget;
 
-import javax.inject.Named;
 import javax.swing.JComponent;
 import javax.swing.JPasswordField;
 import javax.swing.text.Document;
@@ -27,8 +26,10 @@ import javax.swing.text.JTextComponent;
 import lcmc.common.domain.AccessMode;
 import lcmc.common.domain.StringValue;
 import lcmc.common.domain.Value;
+import lcmc.common.ui.Access;
 import lcmc.common.ui.utils.MyButton;
 import lcmc.common.ui.utils.PatternDocument;
+import lcmc.common.ui.utils.SwingUtils;
 
 /**
  * An implementation of a field where user can enter new value. The
@@ -36,6 +37,10 @@ import lcmc.common.ui.utils.PatternDocument;
  * too choose from.
  */
 public final class Passwdfield extends Textfield {
+    public Passwdfield(SwingUtils swingUtils, Access access) {
+        super(swingUtils, access);
+    }
+
     public void init(final Value selectedValue,
                      final String regexp,
                      final int width,

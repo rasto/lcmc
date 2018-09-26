@@ -20,7 +20,6 @@
 
 package lcmc.crm.ui.resource;
 
-import lcmc.AppContext;
 import lcmc.cluster.ui.ClusterBrowser;
 import lcmc.cluster.ui.widget.Widget;
 import lcmc.common.domain.*;
@@ -39,13 +38,13 @@ import lcmc.host.domain.Host;
 import lombok.RequiredArgsConstructor;
 import lombok.val;
 
-import javax.inject.Provider;
 import javax.swing.*;
 import javax.swing.tree.DefaultMutableTreeNode;
 import java.awt.*;
 import java.awt.geom.Point2D;
 import java.util.*;
 import java.util.List;
+import java.util.function.Supplier;
 
 @RequiredArgsConstructor
 public class ServiceMenu {
@@ -54,9 +53,10 @@ public class ServiceMenu {
     private final MenuFactory menuFactory;
     private final Application application;
     private final SwingUtils swingUtils;
-    private final Provider<ServiceLogs> serviceLogsProvider;
+    private final Supplier<ServiceLogs> serviceLogsProvider;
     private final ClusterTreeMenu clusterTreeMenu;
     private final Access access;
+    private final GroupMenu groupMenu;
 
     public List<UpdatableItem> getPulldownMenu(final ServiceInfo serviceInfo) {
         final List<UpdatableItem> items = new ArrayList<UpdatableItem>();
@@ -1058,7 +1058,6 @@ public class ServiceMenu {
                                                popups,
                                                runMode);
                     if (otherService.getResourceAgent() != null && otherService.getResourceAgent().isGroup()) {
-                        final GroupMenu groupMenu = AppContext.getBean(GroupMenu.class);
                         groupMenu.addExistingGroupServiceMenuItems(serviceInfo,
                                                                    otherService,
                                                                    dlm,

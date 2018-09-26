@@ -20,26 +20,38 @@
 
 package lcmc.drbd.ui.configdialog;
 
+import lcmc.cluster.ui.widget.WidgetFactory;
+import lcmc.common.domain.Application;
+import lcmc.common.ui.MainPanel;
+import lcmc.common.ui.ProgressBar;
+import lcmc.common.ui.main.MainData;
+import lcmc.common.ui.utils.SwingUtils;
 import lcmc.host.domain.Host;
 import lcmc.drbd.domain.DrbdInstallation;
 import lcmc.common.ui.WizardDialog;
+import lcmc.host.ui.Configuration;
 import lcmc.host.ui.NewHostDialog;
 import lcmc.drbd.ui.resource.VolumeInfo;
 import lcmc.common.ui.utils.MyButton;
 import lcmc.common.domain.util.Tools;
-import lombok.RequiredArgsConstructor;
+
+import java.util.function.Supplier;
 
 /**
  * An implementation of a dialog where user can enter either ip or hostname of
  * the host and user name.
  */
-@RequiredArgsConstructor
 public final class NewProxyHostDialog extends NewHostDialog {
     private final ConfigurationProxy configurationProxy;
 
     private VolumeInfo volumeInfo;
     private WizardDialog origDialog;
     private WizardDialog nextDialogObject = null;
+
+    public NewProxyHostDialog(Supplier<ProgressBar> progressBarProvider, Application application, SwingUtils swingUtils, WidgetFactory widgetFactory, MainData mainData, Configuration configuration, MainPanel mainPanel, ConfigurationProxy configurationProxy) {
+        super(progressBarProvider, application, swingUtils, widgetFactory, mainData, configuration, mainPanel);
+        this.configurationProxy = configurationProxy;
+    }
 
     public void init(final WizardDialog previousDialog,
                      final Host host,

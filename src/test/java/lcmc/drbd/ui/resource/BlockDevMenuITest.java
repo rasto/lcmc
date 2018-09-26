@@ -20,7 +20,6 @@ import lcmc.common.domain.VisiblePredicate;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 
 import static org.mockito.Matchers.anyObject;
@@ -50,13 +49,31 @@ public class BlockDevMenuITest {
     private MyMenuItem menuItemStub;
     @Mock
     private MenuFactory menuFactoryStub;
-    @InjectMocks
     private BlockDevMenu blockDevMenu;
-    @InjectMocks
     private BlockDevMenu blockDevMenuNoCluster;
 
     @Before
     public void setUp() {
+        blockDevMenu = new BlockDevMenu(
+                null,
+                menuFactoryStub,
+                null, null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null);
+        blockDevMenuNoCluster = new BlockDevMenu(
+                        null,
+                        menuFactoryStub,
+                        null, null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null);
         when(blockDevInfoStub.getBrowser()).thenReturn(hostBrowserStub);
         when(blockDevInfoStub.getBlockDevice()).thenReturn(blockDeviceStub);
 

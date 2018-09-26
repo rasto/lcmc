@@ -24,6 +24,7 @@ import java.util.List;
 
 import lcmc.common.domain.AccessMode;
 import lcmc.common.domain.Application;
+import lcmc.common.ui.Access;
 import lcmc.host.domain.Host;
 import lcmc.cluster.ui.ClusterBrowser;
 
@@ -40,7 +41,6 @@ import lcmc.common.domain.VisiblePredicate;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 
 import static org.mockito.Matchers.anyObject;
@@ -69,11 +69,13 @@ public class DomainMenuTest {
     private MyMenuItem menuItemStub;
     @Mock
     private MenuFactory menuFactoryStub;
-    @InjectMocks
+    @Mock
+    private Access access;
     private DomainMenu domainMenu;
 
     @Before
     public void setUp() {
+        domainMenu = new DomainMenu(menuFactoryStub, applicationStub, access);
         when(applicationStub.isUseTightvnc()).thenReturn(true);
         when(applicationStub.isUseRealvnc()).thenReturn(true);
         when(applicationStub.isUseUltravnc()).thenReturn(true);

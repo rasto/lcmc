@@ -44,9 +44,6 @@ import lcmc.logger.LoggerFactory;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Provider;
 import javax.swing.tree.DefaultMutableTreeNode;
 import java.awt.geom.Point2D;
 import java.util.HashMap;

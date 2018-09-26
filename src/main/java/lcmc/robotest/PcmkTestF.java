@@ -31,7 +31,7 @@ import lombok.RequiredArgsConstructor;
  * This class is used to test the GUI.
  */
 @RequiredArgsConstructor
-final class PcmkTestF {
+public class PcmkTestF {
     private final RoboTest roboTest;
 
     /** Cloned group. */

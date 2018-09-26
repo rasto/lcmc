@@ -20,11 +20,6 @@
 
 package lcmc.host.domain;
 
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Provider;
-import javax.inject.Singleton;
-
 import lcmc.HwEventBus;
 import lcmc.cluster.service.ssh.Ssh;
 import lcmc.cluster.service.storage.BlockDeviceService;

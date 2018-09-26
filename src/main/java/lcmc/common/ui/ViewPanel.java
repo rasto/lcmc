@@ -25,8 +25,6 @@ import lcmc.cluster.ui.network.InfoPresenter;
 import lcmc.common.domain.util.Tools;
 import lcmc.common.ui.utils.SwingUtils;
 
-import javax.inject.Inject;
-import javax.inject.Named;
 import javax.swing.*;
 import java.awt.*;
 import java.util.concurrent.locks.Lock;

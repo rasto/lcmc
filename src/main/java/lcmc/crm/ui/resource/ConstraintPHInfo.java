@@ -22,13 +22,18 @@
 
 package lcmc.crm.ui.resource;
 
+import lcmc.cluster.ui.widget.WidgetFactory;
 import lcmc.common.domain.AccessMode;
 import lcmc.common.domain.Application;
 import lcmc.common.domain.ColorText;
 import lcmc.common.domain.StringValue;
 import lcmc.common.domain.Value;
 import lcmc.common.domain.util.Tools;
+import lcmc.common.ui.Access;
 import lcmc.common.ui.Browser;
+import lcmc.common.ui.main.MainData;
+import lcmc.common.ui.main.ProgressIndicator;
+import lcmc.common.ui.treemenu.ClusterTreeMenu;
 import lcmc.common.ui.utils.SwingUtils;
 import lcmc.common.ui.utils.UpdatableItem;
 import lcmc.crm.domain.ClusterStatus;
@@ -38,21 +43,18 @@ import lcmc.crm.service.CRM;
 import lcmc.host.domain.Host;
 import lcmc.logger.Logger;
 import lcmc.logger.LoggerFactory;
-import lombok.RequiredArgsConstructor;
 
-import javax.inject.Inject;
-import javax.inject.Named;
 import javax.swing.*;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Supplier;
 
 /**
  * Object that holds an order constraint information.
  */
-@RequiredArgsConstructor
 public class ConstraintPHInfo extends ServiceInfo {
     private final ConstraintPHMenu constraintPHMenu;
     private final Application application;
@@ -79,6 +81,13 @@ public class ConstraintPHInfo extends ServiceInfo {
     private volatile PcmkRscSetsInfo pcmkRscSetsInfo = null;
     /** Whether the all resources are required to be started. */
     private Preference preference;
+
+    public ConstraintPHInfo(Application application, SwingUtils swingUtils, Access access, MainData mainData, WidgetFactory widgetFactory, ProgressIndicator progressIndicator, ServiceMenu serviceMenu, Supplier<CloneInfo> cloneInfoProvider, ClusterTreeMenu clusterTreeMenu, CrmServiceFactory crmServiceFactory, ConstraintPHMenu constraintPHMenu) {
+        super(application, swingUtils, access, mainData, widgetFactory, progressIndicator, serviceMenu, cloneInfoProvider, clusterTreeMenu, crmServiceFactory);
+        this.constraintPHMenu = constraintPHMenu;
+        this.application = application;
+        this.swingUtils = swingUtils;
+    }
 
 
     public void init(final Browser browser,

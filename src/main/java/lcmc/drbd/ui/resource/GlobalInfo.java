@@ -34,7 +34,9 @@ import lcmc.common.domain.ResourceValue;
 import lcmc.common.domain.StringValue;
 import lcmc.common.domain.Value;
 import lcmc.common.domain.util.Tools;
+import lcmc.common.ui.Access;
 import lcmc.common.ui.Browser;
+import lcmc.common.ui.main.MainData;
 import lcmc.common.ui.treemenu.ClusterTreeMenu;
 import lcmc.common.ui.utils.*;
 import lcmc.configs.AppDefaults;
@@ -89,8 +91,8 @@ public class GlobalInfo extends AbstractDrbdInfo {
     private JComponent infoPanel = null;
     private ProxyHostInfo proxyHostInfo = null;
 
-    public GlobalInfo(WidgetFactory widgetFactory, GlobalMenu globalMenu, HostFactory hostFactory, Supplier<VolumeInfo> volumeInfoProvider, Supplier<AddDrbdConfigDialog> addDrbdConfigDialogProvider, Supplier<ProxyHostInfo> proxyHostInfoProvider, Supplier<ResourceInfo> resourceInfoProvider, Supplier<DrbdXml> drbdXmlProvider, Application application, SwingUtils swingUtils, ClusterTreeMenu clusterTreeMenu, Dialogs dialogs) {
-        super(widgetFactory);
+    public GlobalInfo(Application application, SwingUtils swingUtils, Access access, MainData mainData, WidgetFactory widgetFactory, GlobalMenu globalMenu, HostFactory hostFactory, Supplier<VolumeInfo> volumeInfoProvider, Supplier<AddDrbdConfigDialog> addDrbdConfigDialogProvider, Supplier<ProxyHostInfo> proxyHostInfoProvider, Supplier<ResourceInfo> resourceInfoProvider, Supplier<DrbdXml> drbdXmlProvider, ClusterTreeMenu clusterTreeMenu, Dialogs dialogs) {
+        super(application, swingUtils, access, mainData, widgetFactory);
         this.globalMenu = globalMenu;
         this.hostFactory = hostFactory;
         this.volumeInfoProvider = volumeInfoProvider;
@@ -103,7 +105,6 @@ public class GlobalInfo extends AbstractDrbdInfo {
         this.clusterTreeMenu = clusterTreeMenu;
         this.dialogs = dialogs;
     }
-
 
     public void einit(final String name, final Browser browser) {
         super.einit(Optional.of(new ResourceValue(name)), name, browser);

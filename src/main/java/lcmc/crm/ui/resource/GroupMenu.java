@@ -29,9 +29,12 @@ import javax.swing.JCheckBox;
 import javax.swing.JDialog;
 import javax.swing.JMenuItem;
 
+import lcmc.common.ui.Access;
+import lcmc.common.ui.EditConfig;
 import lcmc.common.ui.main.MainData;
 import lcmc.common.domain.AccessMode;
 import lcmc.common.domain.Application;
+import lcmc.common.ui.treemenu.ClusterTreeMenu;
 import lcmc.common.ui.utils.SwingUtils;
 import lcmc.crm.domain.ResourceAgent;
 import lcmc.cluster.ui.ClusterBrowser;
@@ -45,9 +48,8 @@ import lcmc.common.ui.utils.MyMenu;
 import lcmc.common.ui.utils.MyMenuItem;
 import lcmc.common.domain.util.Tools;
 import lcmc.common.ui.utils.UpdatableItem;
-import lombok.RequiredArgsConstructor;
+import lcmc.crm.ui.ServiceLogs;
 
-@RequiredArgsConstructor
 public class GroupMenu extends ServiceMenu {
 
     private final Supplier<ServiceMenu> serviceMenuProvider;
@@ -55,6 +57,15 @@ public class GroupMenu extends ServiceMenu {
     private final Application application;
     private final SwingUtils swingUtils;
     private final MainData mainData;
+
+    public GroupMenu(MainData drbdGui, EditConfig editDialog, MenuFactory menuFactory, Application application, SwingUtils swingUtils, Supplier<ServiceLogs> serviceLogsProvider, ClusterTreeMenu clusterTreeMenu, Access access, GroupMenu groupMenu, Supplier<ServiceMenu> serviceMenuProvider, MainData mainData) {
+        super(drbdGui, editDialog, menuFactory, application, swingUtils, serviceLogsProvider, clusterTreeMenu, access, groupMenu);
+        this.serviceMenuProvider = serviceMenuProvider;
+        this.menuFactory = menuFactory;
+        this.application = application;
+        this.swingUtils = swingUtils;
+        this.mainData = mainData;
+    }
 
     @Override
     public List<UpdatableItem> getPulldownMenu(final ServiceInfo serviceInfo) {

@@ -30,12 +30,14 @@ import java.util.List;
 import java.util.function.Supplier;
 
 import lcmc.LCMC;
+import lcmc.LCMCFactory;
 import lcmc.cluster.service.storage.FileSystemService;
 import lcmc.common.domain.UserConfig;
 import lcmc.common.ui.main.MainPresenter;
 import lcmc.common.ui.MainPanel;
 import lcmc.common.domain.Application;
 import lcmc.cluster.domain.Cluster;
+import lcmc.common.ui.main.ProgressIndicator;
 import lcmc.common.ui.utils.SwingUtils;
 import lcmc.host.domain.Host;
 import lcmc.cluster.service.NetworkService;
@@ -43,12 +45,15 @@ import lcmc.host.domain.HostFactory;
 import lcmc.logger.LoggerFactory;
 import lcmc.common.domain.util.Tools;
 import lcmc.cluster.ui.ClusterTabFactory;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import lombok.val;
 
 /**
  * This class provides tools for testing.
  */
 @RequiredArgsConstructor
+@Getter
 public class IntegrationTestLauncher {
     private final MainPresenter mainPresenter;
     private final MainPanel mainPanel;
@@ -61,6 +66,7 @@ public class IntegrationTestLauncher {
     private final NetworkService networkService;
     private final FileSystemService fileSystemService;
     private final UserConfig userConfig;
+    private final ProgressIndicator progressIndicator;
 
     private static final String PASSWORD = "rastislav";
     private static final String ID_DSA_KEY = "rastislav";
@@ -71,6 +77,24 @@ public class IntegrationTestLauncher {
 
     private final List<Host> hosts = new ArrayList<Host>();
     private volatile boolean clusterLoaded = false;
+
+
+    public static IntegrationTestLauncher create() {
+        final LCMCFactory lcmcFactory = new LCMCFactory();
+        val lcmc = lcmcFactory.createLCMC();
+        return new IntegrationTestLauncher(lcmc.getMainPresenter(),
+                lcmcFactory.getMainPanel(),
+                lcmc.getApplication(),
+                lcmc.getSwingUtils(),
+                lcmcFactory.getHostFactory(),
+                lcmcFactory.getClusterProvider(),
+                lcmc,
+                lcmcFactory.getClusterTabFactory(),
+                lcmc.getNetworkService(),
+                lcmc.getFileSystemService(),
+                lcmcFactory.getUserConfig(),
+                lcmc.getProgressIndicator());
+    }
 
     public void initTestCluster() {
         initCluster();

@@ -1,6 +1,5 @@
 package lcmc.cluster.ui;
 
-import lcmc.AppContext;
 import lcmc.common.domain.Application;
 import lcmc.common.domain.util.Tools;
 import lcmc.common.ui.main.MainPresenter;
@@ -31,11 +30,11 @@ public final class ClusterBrowserITest {
 
     @Before
     public void setUp() {
-        integrationTestLauncher = AppContext.getBean(IntegrationTestLauncher.class);
+        integrationTestLauncher = IntegrationTestLauncher.create();
         integrationTestLauncher.initTestCluster();
-        mainPresenter = AppContext.getBean(MainPresenter.class);
-        swingUtils = AppContext.getBean(SwingUtils.class);
-        progressIndicator = AppContext.getBean(ProgressIndicator.class);
+        mainPresenter = integrationTestLauncher.getMainPresenter();
+        swingUtils = integrationTestLauncher.getSwingUtils();
+        progressIndicator = integrationTestLauncher.getProgressIndicator();
     }
 
     @Test

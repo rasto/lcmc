@@ -27,6 +27,7 @@ import lcmc.Exceptions;
 import lcmc.cluster.ui.ClusterBrowser;
 import lcmc.cluster.ui.widget.Check;
 import lcmc.cluster.ui.widget.Widget;
+import lcmc.cluster.ui.widget.WidgetFactory;
 import lcmc.common.domain.AccessMode;
 import lcmc.common.domain.Application;
 import lcmc.common.domain.ColorText;
@@ -34,10 +35,8 @@ import lcmc.common.domain.ResourceValue;
 import lcmc.common.domain.StringValue;
 import lcmc.common.domain.Value;
 import lcmc.common.domain.util.Tools;
-import lcmc.common.ui.Browser;
-import lcmc.common.ui.EditableInfo;
-import lcmc.common.ui.Info;
-import lcmc.common.ui.MainPanel;
+import lcmc.common.ui.*;
+import lcmc.common.ui.main.MainData;
 import lcmc.common.ui.treemenu.ClusterTreeMenu;
 import lcmc.common.ui.utils.ButtonCallback;
 import lcmc.common.ui.utils.ComponentWithTest;
@@ -53,10 +52,7 @@ import lcmc.host.ui.HostBrowser;
 import lcmc.logger.Logger;
 import lcmc.logger.LoggerFactory;
 import lcmc.lvm.service.LVM;
-import lombok.RequiredArgsConstructor;
 
-import javax.inject.Inject;
-import javax.inject.Named;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -75,7 +71,6 @@ import java.util.regex.Pattern;
 /**
  * This class holds info data for a block device.
  */
-@RequiredArgsConstructor
 public class BlockDevInfo extends EditableInfo {
     private final MainPanel mainPanel;
     private final BlockDevMenu blockDevMenu;
@@ -106,6 +101,15 @@ public class BlockDevInfo extends EditableInfo {
     private static final String PROXY_DOWN = "Proxy Down";
 
     private static final String BY_UUID_PATH = "/dev/disk/by-uuid/";
+
+    public BlockDevInfo(Application application, SwingUtils swingUtils, Access access, MainData mainData, WidgetFactory widgetFactory, MainPanel mainPanel, BlockDevMenu blockDevMenu, ClusterTreeMenu clusterTreeMenu) {
+        super(application, swingUtils, access, mainData, widgetFactory);
+        this.mainPanel = mainPanel;
+        this.blockDevMenu = blockDevMenu;
+        this.application = application;
+        this.swingUtils = swingUtils;
+        this.clusterTreeMenu = clusterTreeMenu;
+    }
 
     public void init(final String name, final BlockDevice blockDevice, final Browser browser) {
         super.einit(Optional.<ResourceValue>of(blockDevice), name, browser);

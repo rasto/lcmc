@@ -37,7 +37,6 @@ import lcmc.common.domain.VisiblePredicate;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
@@ -62,11 +61,11 @@ public class VolumeMenuITest {
     private MyMenuItem menuItemStub;
     @Mock
     private MenuFactory menuFactoryStub;
-    @InjectMocks
     private VolumeMenu volumeMenu;
 
     @Before
     public void setUp() {
+        volumeMenu = new VolumeMenu(menuFactoryStub, null, null);
         when(volumeInfoStub.getDrbdResourceInfo()).thenReturn(resourceInfoStub);
         when(volumeInfoStub.getBrowser()).thenReturn(clusterBrowserStub);
         when(menuFactoryStub.createMenuItem(anyString(),

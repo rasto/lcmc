@@ -37,8 +37,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.geom.Point2D;
-import javax.inject.Inject;
-import javax.inject.Named;
 import javax.swing.ImageIcon;
 import javax.swing.JMenuItem;
 import javax.swing.JToolTip;

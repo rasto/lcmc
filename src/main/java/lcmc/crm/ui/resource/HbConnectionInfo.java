@@ -24,15 +24,14 @@ package lcmc.crm.ui.resource;
 import com.google.common.base.Optional;
 import lcmc.cluster.ui.ClusterBrowser;
 import lcmc.cluster.ui.widget.Check;
+import lcmc.cluster.ui.widget.WidgetFactory;
 import lcmc.common.domain.AccessMode;
 import lcmc.common.domain.Application;
 import lcmc.common.domain.ResourceValue;
 import lcmc.common.domain.Value;
 import lcmc.common.domain.util.Tools;
-import lcmc.common.ui.Browser;
-import lcmc.common.ui.EditableInfo;
-import lcmc.common.ui.Info;
-import lcmc.common.ui.SpringUtilities;
+import lcmc.common.ui.*;
+import lcmc.common.ui.main.MainData;
 import lcmc.common.ui.treemenu.ClusterTreeMenu;
 import lcmc.common.ui.utils.ButtonCallback;
 import lcmc.common.ui.utils.ComponentWithTest;
@@ -42,11 +41,7 @@ import lcmc.crm.domain.ClusterStatus;
 import lcmc.crm.domain.PtestData;
 import lcmc.crm.service.CRM;
 import lcmc.host.domain.Host;
-import lombok.RequiredArgsConstructor;
 
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Provider;
 import javax.swing.*;
 import javax.swing.tree.DefaultMutableTreeNode;
 import java.awt.*;
@@ -64,7 +59,6 @@ import java.util.function.Supplier;
  * This class describes a connection between two heartbeat services.
  * It can be order, colocation or both.
  */
-@RequiredArgsConstructor
 public class HbConnectionInfo extends EditableInfo {
     private final Supplier<HbColocationInfo> colocationInfoProvider;
     private final Supplier<HbOrderInfo> orderInfoProvider;
@@ -85,6 +79,16 @@ public class HbConnectionInfo extends EditableInfo {
     private ServiceInfo lastServiceInfoChild = null;
     private final Map<String, HbColocationInfo> colocationIds = new LinkedHashMap<String, HbColocationInfo>();
     private final Map<String, HbOrderInfo> orderIds = new LinkedHashMap<String, HbOrderInfo>();
+
+    public HbConnectionInfo(Application application, SwingUtils swingUtils, Access access, MainData mainData, WidgetFactory widgetFactory, Supplier<HbColocationInfo> colocationInfoProvider, Supplier<HbOrderInfo> orderInfoProvider, HbConnectionMenu hbConnectionMenu, ClusterTreeMenu clusterTreeMenu) {
+        super(application, swingUtils, access, mainData, widgetFactory);
+        this.colocationInfoProvider = colocationInfoProvider;
+        this.orderInfoProvider = orderInfoProvider;
+        this.application = application;
+        this.swingUtils = swingUtils;
+        this.hbConnectionMenu = hbConnectionMenu;
+        this.clusterTreeMenu = clusterTreeMenu;
+    }
 
     public void init(final Browser browser) {
         super.einit(Optional.<ResourceValue>absent(), "HbConnectionInfo", browser);

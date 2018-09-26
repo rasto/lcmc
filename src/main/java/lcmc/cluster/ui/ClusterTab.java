@@ -28,8 +28,7 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import javax.inject.Inject;
-import javax.inject.Named;
+import java.util.function.Supplier;
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -41,6 +40,7 @@ import lcmc.cluster.ui.wizard.ClusterPresenter;
 import lcmc.common.ui.utils.MyButton;
 import lcmc.common.domain.util.Tools;
 import lombok.RequiredArgsConstructor;
+import lombok.val;
 
 /**
  * An implementation of a cluster tab, that contains host views of the hosts,
@@ -48,7 +48,7 @@ import lombok.RequiredArgsConstructor;
  */
 @RequiredArgsConstructor
 public final class ClusterTab extends JPanel {
-    private final EmptyViewPanel emptyViewPanel;
+    private final Supplier<EmptyViewPanel> emptyViewPanelProvider;
     private final ClusterPresenter clusterPresenter;
     private final ClusterViewPanel clusterViewPanel;
     private final WidgetFactory widgetFactory;
@@ -68,6 +68,7 @@ public final class ClusterTab extends JPanel {
         setBackground(Tools.getDefaultColor("ViewPanel.Status.Background"));
         if (cluster == null) {
             clusterPresenter.setDisabledDuringLoad(false);
+            val emptyViewPanel = emptyViewPanelProvider.get();
             emptyViewPanel.init();
             add(emptyViewPanel);
         }

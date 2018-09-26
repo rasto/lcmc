@@ -39,9 +39,6 @@ import lcmc.host.domain.Host;
 import lcmc.host.domain.HostBlockDevices;
 import lombok.RequiredArgsConstructor;
 
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Singleton;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;

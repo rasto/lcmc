@@ -35,7 +35,7 @@ import javax.xml.xpath.XPathFactory;
 import java.util.HashMap;
 import java.util.Map;
 
-class VMCreator {
+public class VMCreator {
     private static final Logger LOG = LoggerFactory.getLogger(VMCreator.class);
     private Document doc;
     private Map<String, String> parametersMap;

@@ -22,19 +22,25 @@
 
 package lcmc.common.ui;
 
-import javax.inject.Named;
-import javax.inject.Singleton;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.SpringLayout;
 
+import lcmc.cluster.ui.widget.WidgetFactory;
+import lcmc.common.domain.Application;
 import lcmc.common.domain.util.Tools;
+import lcmc.common.ui.main.MainData;
+import lcmc.common.ui.utils.SwingUtils;
 
 /**
  * An implementation of an About dialog.
  */
 public final class About extends ConfigDialog {
+    public About(Application application, SwingUtils swingUtils, WidgetFactory widgetFactory, MainData mainData) {
+        super(application, swingUtils, widgetFactory, mainData);
+    }
+
     @Override
     protected void initDialogBeforeVisible() {
         super.initDialogBeforeVisible();

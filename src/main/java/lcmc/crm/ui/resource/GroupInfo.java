@@ -23,12 +23,15 @@ package lcmc.crm.ui.resource;
 
 import lcmc.cluster.ui.widget.Check;
 import lcmc.cluster.ui.widget.Widget;
+import lcmc.cluster.ui.widget.WidgetFactory;
 import lcmc.common.domain.Application;
 import lcmc.common.domain.ColorText;
 import lcmc.common.domain.Value;
 import lcmc.common.domain.util.Tools;
+import lcmc.common.ui.Access;
 import lcmc.common.ui.Browser;
 import lcmc.common.ui.main.MainData;
+import lcmc.common.ui.main.ProgressIndicator;
 import lcmc.common.ui.treemenu.ClusterTreeMenu;
 import lcmc.common.ui.utils.MyButton;
 import lcmc.common.ui.utils.SwingUtils;
@@ -40,12 +43,8 @@ import lcmc.crm.service.CRM;
 import lcmc.host.domain.Host;
 import lcmc.logger.Logger;
 import lcmc.logger.LoggerFactory;
-import lombok.RequiredArgsConstructor;
 import lombok.val;
 
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Provider;
 import javax.swing.*;
 import javax.swing.tree.DefaultMutableTreeNode;
 import java.awt.*;
@@ -62,7 +61,6 @@ import java.util.regex.Matcher;
  * GroupInfo class holds data for heartbeat group, that is in some ways
  * like normal service, but it can contain other services.
  */
-@RequiredArgsConstructor
 public class GroupInfo extends ServiceInfo {
 
     private final GroupMenu groupMenu;
@@ -83,6 +81,21 @@ public class GroupInfo extends ServiceInfo {
     private final ReadWriteLock mGroupServiceLock = new ReentrantReadWriteLock();
     private final Lock mGroupServiceReadLock = mGroupServiceLock.readLock();
     private final Lock mGroupServiceWriteLock = mGroupServiceLock.writeLock();
+
+    public GroupInfo(Application application, SwingUtils swingUtils, Access access, MainData mainData, WidgetFactory widgetFactory, ProgressIndicator progressIndicator, ServiceMenu serviceMenu, Supplier<CloneInfo> cloneInfoProvider, ClusterTreeMenu clusterTreeMenu, CrmServiceFactory crmServiceFactory, GroupMenu groupMenu, Supplier<ServiceInfo> serviceInfoProvider, Supplier<FilesystemRaInfo> filesystemInfoProvider, Supplier<LinbitDrbdInfo> linbitDrbdInfoProvider, Supplier<DrbddiskInfo> drbddiskInfoProvider, Supplier<IPaddrInfo> ipaddrInfoProvider, Supplier<VirtualDomainInfo> virtualDomainInfoProvider) {
+        super(application, swingUtils, access, mainData, widgetFactory, progressIndicator, serviceMenu, cloneInfoProvider, clusterTreeMenu, crmServiceFactory);
+        this.groupMenu = groupMenu;
+        this.serviceInfoProvider = serviceInfoProvider;
+        this.filesystemInfoProvider = filesystemInfoProvider;
+        this.linbitDrbdInfoProvider = linbitDrbdInfoProvider;
+        this.drbddiskInfoProvider = drbddiskInfoProvider;
+        this.ipaddrInfoProvider = ipaddrInfoProvider;
+        this.virtualDomainInfoProvider = virtualDomainInfoProvider;
+        this.application = application;
+        this.swingUtils = swingUtils;
+        this.clusterTreeMenu = clusterTreeMenu;
+        this.mainData = mainData;
+    }
 
     void init(final ResourceAgent ra, final Browser browser) {
         super.init(Application.PACEMAKER_GROUP_NAME, ra, browser);

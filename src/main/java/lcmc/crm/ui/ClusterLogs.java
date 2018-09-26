@@ -36,8 +36,6 @@ import lcmc.common.ui.main.MainData;
 import lcmc.common.ui.utils.SwingUtils;
 import lcmc.host.domain.Host;
 
-import javax.inject.Named;
-
 /**
  * An implementation of an dialog with log files from many hosts.
  */

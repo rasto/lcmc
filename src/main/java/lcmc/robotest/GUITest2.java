@@ -28,7 +28,7 @@ import lombok.RequiredArgsConstructor;
  * This class is used to test the GUI.
  */
 @RequiredArgsConstructor
-final class GUITest2 {
+public class GUITest2 {
     private final RoboTest roboTest;
 
     /** Cluster wizard locked until focus is lost. */

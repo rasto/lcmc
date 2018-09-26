@@ -28,8 +28,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-import javax.inject.Inject;
-import javax.inject.Named;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
@@ -54,7 +52,6 @@ import lcmc.common.ui.utils.WidgetListener;
  * field can be Textfield or combo box, depending if there are values
  * too choose from.
  */
-@Named
 public final class TextfieldWithUnit extends GenericWidget<JComponent> {
     private final SwingUtils swingUtils;
     private final Access access;

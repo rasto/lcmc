@@ -3,7 +3,7 @@ package lcmc.common.domain.util;
 import java.util.Map;
 import javax.swing.JCheckBox;
 
-import lcmc.AppContext;
+import lcmc.LCMCFactory;
 import lcmc.common.domain.UserConfig;
 import lcmc.common.ui.main.MainPresenter;
 import lcmc.common.ui.main.ProgressIndicator;
@@ -11,12 +11,10 @@ import lcmc.host.domain.Host;
 import lcmc.testutils.IntegrationTestLauncher;
 import lcmc.testutils.annotation.type.GuiTest;
 import lcmc.testutils.annotation.type.IntegrationTest;
+import lombok.val;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Jsr330ScopeMetadataResolver;
 
 import static org.junit.Assert.*;
 
@@ -29,11 +27,12 @@ public final class ToolsITest {
 
     @Before
     public void setUp() {
-        testSuite = AppContext.getBean(IntegrationTestLauncher.class);
+        testSuite = IntegrationTestLauncher.create();
+
         testSuite.initTestCluster();
-        userConfig = AppContext.getBean(UserConfig.class);
-        mainPresenter = AppContext.getBean(MainPresenter.class);
-        progressIndicator = AppContext.getBean(ProgressIndicator.class);
+        userConfig = testSuite.getUserConfig();
+        mainPresenter = testSuite.getMainPresenter();
+        progressIndicator = testSuite.getProgressIndicator();
     }
 
     @Test
@@ -161,10 +160,5 @@ public final class ToolsITest {
         if (Tools.isWindows()) {
             assertEquals("/bin/dir/file", Tools.getUnixPath("d:\\bin\\dir\\file"));
         }
-    }
-
-    @Configuration
-    @ComponentScan(basePackages = "lcmc", scopeResolver = Jsr330ScopeMetadataResolver.class)
-    static class TestConfig {
     }
 }

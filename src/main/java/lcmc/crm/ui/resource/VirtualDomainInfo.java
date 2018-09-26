@@ -25,12 +25,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.function.Supplier;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import lcmc.cluster.ui.widget.WidgetFactory;
 import lcmc.common.domain.Application;
 import lcmc.common.ui.Access;
+import lcmc.common.ui.main.MainData;
 import lcmc.common.ui.main.ProgressIndicator;
 import lcmc.common.ui.treemenu.ClusterTreeMenu;
 import lcmc.common.ui.utils.SwingUtils;
@@ -40,8 +42,6 @@ import lcmc.vm.domain.VmsXml;
 import lcmc.common.domain.Value;
 import lcmc.vm.ui.resource.DomainInfo;
 import lcmc.common.ui.utils.UpdatableItem;
-
-import javax.inject.Provider;
 
 /**
  * This class holds info about VirtualDomain service in the cluster menu.
@@ -63,8 +63,8 @@ public class VirtualDomainInfo extends ServiceInfo {
     /** VirtualDomain in the VMs menu. */
     private DomainInfo domainInfo = null;
 
-    public VirtualDomainInfo(VirtualDomainMenu virtualDomainMenu, ProgressIndicator progressIndicator, ServiceMenu serviceMenu, Provider<CloneInfo> cloneInfoProvider, Application application, SwingUtils swingUtils, WidgetFactory widgetFactory, ClusterTreeMenu clusterTreeMenu, CrmServiceFactory crmServiceFactory, Access access) {
-        super(progressIndicator, serviceMenu, cloneInfoProvider, application, swingUtils, widgetFactory, clusterTreeMenu, crmServiceFactory, access);
+    public VirtualDomainInfo(Application application, SwingUtils swingUtils, Access access, MainData mainData, WidgetFactory widgetFactory, ProgressIndicator progressIndicator, ServiceMenu serviceMenu, Supplier<CloneInfo> cloneInfoProvider, ClusterTreeMenu clusterTreeMenu, CrmServiceFactory crmServiceFactory, VirtualDomainMenu virtualDomainMenu) {
+        super(application, swingUtils, access, mainData, widgetFactory, progressIndicator, serviceMenu, cloneInfoProvider, clusterTreeMenu, crmServiceFactory);
         this.virtualDomainMenu = virtualDomainMenu;
     }
 

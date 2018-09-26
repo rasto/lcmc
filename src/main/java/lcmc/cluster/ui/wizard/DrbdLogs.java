@@ -28,9 +28,11 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
 import lcmc.cluster.domain.Cluster;
+import lcmc.cluster.ui.widget.WidgetFactory;
+import lcmc.common.domain.Application;
+import lcmc.common.ui.main.MainData;
+import lcmc.common.ui.utils.SwingUtils;
 import lcmc.crm.ui.ClusterLogs;
-
-import javax.inject.Named;
 
 /**
  * An implementation of an dialog with log files from many hosts.
@@ -38,6 +40,10 @@ import javax.inject.Named;
 public final class DrbdLogs extends ClusterLogs {
     /** Name of the drbd device. */
     private String drbdDeviceName;
+
+    public DrbdLogs(Application application, SwingUtils swingUtils, WidgetFactory widgetFactory, MainData mainData) {
+        super(application, swingUtils, widgetFactory, mainData);
+    }
 
     public void init(final Cluster cluster, final String device) {
         super.init(cluster);

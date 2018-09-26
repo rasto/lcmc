@@ -24,9 +24,11 @@ package lcmc.crm.ui.resource;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.function.Supplier;
 
 import lcmc.cluster.domain.Network;
 import lcmc.common.domain.AccessMode;
+import lcmc.common.domain.Application;
 import lcmc.common.domain.StringValue;
 import lcmc.common.domain.Value;
 import lcmc.cluster.ui.widget.Check;
@@ -34,19 +36,25 @@ import lcmc.cluster.ui.widget.Widget;
 import lcmc.cluster.ui.widget.WidgetFactory;
 import lcmc.common.domain.util.Tools;
 import lcmc.cluster.service.NetworkService;
-import lombok.RequiredArgsConstructor;
-
-import javax.inject.Inject;
-import javax.inject.Named;
+import lcmc.common.ui.Access;
+import lcmc.common.ui.main.MainData;
+import lcmc.common.ui.main.ProgressIndicator;
+import lcmc.common.ui.treemenu.ClusterTreeMenu;
+import lcmc.common.ui.utils.SwingUtils;
 
 /**
  * This class holds info about IPaddr/IPaddr2 heartbeat service. It adds a
  * better ip entering capabilities.
  */
-@RequiredArgsConstructor
 final class IPaddrInfo extends ServiceInfo {
     private final WidgetFactory widgetFactory;
     private final NetworkService networkService;
+
+    public IPaddrInfo(Application application, SwingUtils swingUtils, Access access, MainData mainData, WidgetFactory widgetFactory, ProgressIndicator progressIndicator, ServiceMenu serviceMenu, Supplier<CloneInfo> cloneInfoProvider, ClusterTreeMenu clusterTreeMenu, CrmServiceFactory crmServiceFactory, NetworkService networkService) {
+        super(application, swingUtils, access, mainData, widgetFactory, progressIndicator, serviceMenu, cloneInfoProvider, clusterTreeMenu, crmServiceFactory);
+        this.widgetFactory = widgetFactory;
+        this.networkService = networkService;
+    }
 
     /**
      * Returns whether all the parameters are correct. If param is null,

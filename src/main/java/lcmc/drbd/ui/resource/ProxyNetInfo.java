@@ -21,12 +21,14 @@
 
 package lcmc.drbd.ui.resource;
 
+import lcmc.common.domain.Application;
+import lcmc.common.ui.Access;
+import lcmc.common.ui.main.MainData;
+import lcmc.common.ui.utils.SwingUtils;
 import lcmc.host.domain.Host;
 import lcmc.drbd.domain.NetInterface;
 import lcmc.common.ui.Browser;
 import lcmc.cluster.ui.resource.NetInfo;
-
-import javax.inject.Named;
 
 /**
  * This class holds info data for a net interface on a drbd proxy host.
@@ -34,6 +36,10 @@ import javax.inject.Named;
 public final class ProxyNetInfo extends NetInfo {
     /** Prefix in the host address field indicating a proxy address. */
     public static final String PROXY_PREFIX = "proxy: ";
+
+    public ProxyNetInfo(Application application, SwingUtils swingUtils, Access access, MainData mainData) {
+        super(application, swingUtils, access, mainData);
+    }
 
     /** Reformat to the form that appears in the GUI. */
     public static String displayString(final String someIp, final String someHost, final String someProxyHost) {

@@ -35,22 +35,20 @@ import lcmc.common.ui.utils.SwingUtils;
 import lcmc.host.domain.Host;
 import lcmc.host.domain.HostFactory;
 import lcmc.host.ui.AddHostDialog;
-import lombok.RequiredArgsConstructor;
 
-import javax.inject.Provider;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.function.Supplier;
 
 /**
  * An implementation of an empty tab panel with new cluster and host button.
  */
-@RequiredArgsConstructor
 public final class EmptyViewPanel extends ViewPanel implements AllHostsUpdatable {
     private final EmptyBrowser emptyBrowser;
-    private final Provider<AddClusterDialog> addClusterDialogProvider;
-    private final Provider<AddHostDialog> addHostDialogProvider;
+    private final Supplier<AddClusterDialog> addClusterDialogProvider;
+    private final Supplier<AddHostDialog> addHostDialogProvider;
     private final HostFactory hostFactory;
     private final MainData mainData;
     private final MainPresenter mainPresenter;
@@ -64,6 +62,19 @@ public final class EmptyViewPanel extends ViewPanel implements AllHostsUpdatable
     private static final ImageIcon HOST_ICON = Tools.createImageIcon(Tools.getDefault("HostTab.HostIcon"));
     private static final Dimension BIG_BUTTON_DIMENSION = new Dimension(300, 100);
     private static final String LOGO_PANEL_STRING = "LOGO-STRING";
+
+    public EmptyViewPanel(SwingUtils swingUtils, EmptyBrowser emptyBrowser, Supplier<AddClusterDialog> addClusterDialogProvider, Supplier<AddHostDialog> addHostDialogProvider, HostFactory hostFactory, MainData mainData, MainPresenter mainPresenter, Application application, WidgetFactory widgetFactory) {
+        super(swingUtils);
+        this.emptyBrowser = emptyBrowser;
+        this.addClusterDialogProvider = addClusterDialogProvider;
+        this.addHostDialogProvider = addHostDialogProvider;
+        this.hostFactory = hostFactory;
+        this.mainData = mainData;
+        this.mainPresenter = mainPresenter;
+        this.application = application;
+        this.swingUtils = swingUtils;
+        this.widgetFactory = widgetFactory;
+    }
 
     public void init() {
         emptyBrowser.init();

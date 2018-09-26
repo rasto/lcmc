@@ -33,9 +33,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.logging.Level;
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Singleton;
 import javax.swing.*;
 import javax.swing.plaf.ColorUIResource;
 import javax.swing.plaf.metal.MetalLookAndFeel;
@@ -65,6 +62,7 @@ import lombok.val;
  * This is the central class with main function. It starts the LCMC GUI.
  */
 @RequiredArgsConstructor
+@Getter
 public final class LCMC extends JPanel {
 
     private final Application application;
@@ -78,10 +76,11 @@ public final class LCMC extends JPanel {
     private final MountPointService mountPointService;
     private final FileSystemService fileSystemService;
     private final NetworkService networkService;
-    private final SwingUtils swingUtils;
     @Getter
-    private final JComponent mainGlassPane;
-    private final ProgressIndicator progressInidicator;
+    private final SwingUtils swingUtils;
+
+    @Getter
+    private JComponent mainGlassPane;
     private static final Logger LOG = LoggerFactory.getLogger(LCMC.class);
     private static volatile boolean uncaughtExceptionFlag = false;
 
@@ -112,7 +111,9 @@ public final class LCMC extends JPanel {
         setupServices();
     }
     public static void main(final String[] args) {
-        final LCMC lcmc = AppContext.getBean(LCMC.class);
+        val lcmcFactory = new LCMCFactory();
+
+        final LCMC lcmc = lcmcFactory.createLCMC();
         lcmc.launch(args);
     }
 
@@ -147,7 +148,7 @@ public final class LCMC extends JPanel {
 
     void createMainFrame(final JFrame mainFrame) {
         progressIndicator.init();
-        val mainGlassPane = progressInidicator.getPane();
+        mainGlassPane = progressIndicator.getPane();
         mainFrame.setGlassPane(mainGlassPane);
         mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         mainFrame.addWindowListener(new ExitListener());

@@ -27,13 +27,15 @@ import lcmc.cluster.service.ssh.SshOutput;
 import lcmc.common.domain.Application;
 import lcmc.common.domain.Value;
 import lcmc.common.domain.util.Tools;
+import lcmc.common.ui.Access;
 import lcmc.common.ui.Browser;
 import lcmc.common.ui.Info;
+import lcmc.common.ui.main.MainData;
+import lcmc.common.ui.utils.SwingUtils;
 import lcmc.drbd.domain.NetInterface;
 import lcmc.host.domain.Host;
 import lcmc.host.ui.HostBrowser;
 
-import javax.inject.Named;
 import javax.swing.*;
 
 /**
@@ -46,6 +48,10 @@ public class NetInfo extends Info {
                                                Tools.createImageIcon(Tools.getDefault("HostBrowser.NetIntIconLarge"));
     public static final String IP_PLACEHOLDER = "--.--.--.--";
     private NetInterface netInterface;
+
+    public NetInfo(Application application, SwingUtils swingUtils, Access access, MainData mainData) {
+        super(application, swingUtils, access, mainData);
+    }
 
     public void init(final String name, final NetInterface netInterface, final Browser browser) {
         this.netInterface = netInterface;

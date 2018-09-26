@@ -45,9 +45,6 @@ import lcmc.logger.LoggerFactory;
 import lcmc.common.domain.util.Tools;
 import lombok.RequiredArgsConstructor;
 
-import javax.inject.Named;
-import javax.inject.Provider;
-
 @RequiredArgsConstructor
 public class Ssh {
 
@@ -57,7 +54,7 @@ public class Ssh {
     private final ProgressIndicator progressIndicator;
     private final Application application;
     private final SwingUtils swingUtils;
-    private final Provider<Authentication> authenticationProvider;
+    private final Supplier<Authentication> authenticationProvider;
 
     private static final Logger LOG = LoggerFactory.getLogger(Ssh.class);
     public static final int DEFAULT_COMMAND_TIMEOUT = Tools.getDefaultInt("SSH.Command.Timeout");

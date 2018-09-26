@@ -39,11 +39,10 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CountDownLatch;
+import java.util.function.Supplier;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import javax.inject.Inject;
-import javax.inject.Named;
 import javax.swing.BoxLayout;
 import javax.swing.JCheckBox;
 import javax.swing.JComponent;
@@ -55,6 +54,7 @@ import javax.swing.SpringLayout;
 
 import lcmc.Exceptions;
 import lcmc.common.ui.Access;
+import lcmc.common.ui.ProgressBar;
 import lcmc.common.ui.main.MainData;
 import lcmc.common.domain.AccessMode;
 import lcmc.common.domain.Application;
@@ -81,13 +81,11 @@ import lcmc.cluster.service.ssh.ExecCommandConfig;
 import lcmc.cluster.service.ssh.ExecCommandThread;
 import lcmc.common.domain.util.Tools;
 import lcmc.common.ui.utils.WidgetListener;
-import lombok.RequiredArgsConstructor;
 
 /**
  * An implementation of a dialog where heartbeat is initialized on all hosts.
  */
-@RequiredArgsConstructor
-final class HbConfig extends DialogCluster {
+public class HbConfig extends DialogCluster {
 
     private final MainData mainData;
     private final Application application;
@@ -202,6 +200,17 @@ final class HbConfig extends DialogCluster {
     private CountDownLatch fieldCheckLatch = new CountDownLatch(1);
 
     private MyButton makeConfigButton;
+
+    public HbConfig(Supplier<ProgressBar> progressBarProvider, Application application, SwingUtils swingUtils, WidgetFactory widgetFactory, MainData mainData, InitCluster initCluster, NetworkService networkService, Access access) {
+        super(progressBarProvider, application, swingUtils, widgetFactory, mainData);
+        this.mainData = mainData;
+        this.application = application;
+        this.swingUtils = swingUtils;
+        this.widgetFactory = widgetFactory;
+        this.initCluster = initCluster;
+        this.networkService = networkService;
+        this.access = access;
+    }
 
     @Override
     public void init(final WizardDialog previousDialog, final Cluster cluster) {

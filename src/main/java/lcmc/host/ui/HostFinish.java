@@ -26,8 +26,6 @@ import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.function.Supplier;
-import javax.inject.Named;
-import javax.inject.Provider;
 import javax.swing.ImageIcon;
 import javax.swing.JCheckBox;
 import javax.swing.JComponent;
@@ -50,12 +48,12 @@ import lcmc.common.domain.util.Tools;
  * Host finish dialog with buttons to configure next host or configure the
  * clsuter.
  */
-final class HostFinish extends DialogHost {
+public class HostFinish extends DialogHost {
 
     private final HostFactory hostFactory;
     private final AddClusterDialog addClusterDialog;
     private final MainPresenter mainPresenter;
-    private final Provider<NewHostDialog> newHostDialogFactory;
+    private final Supplier<NewHostDialog> newHostDialogFactory;
     private final Application application;
     private final SwingUtils swingUtils;
     private final WidgetFactory widgetFactory;
@@ -70,7 +68,7 @@ final class HostFinish extends DialogHost {
     private final JCheckBox saveCheckBox = new JCheckBox(Tools.getString("Dialog.Host.Finish.Save"), true);
     private NewHostDialog newHostDialog;
 
-    public HostFinish(Supplier<ProgressBar> progressBarProvider, Application application, SwingUtils swingUtils, WidgetFactory widgetFactory, MainData mainData, HostFactory hostFactory, AddClusterDialog addClusterDialog, MainPresenter mainPresenter, Provider<NewHostDialog> newHostDialogFactory, UserConfig userConfig) {
+    public HostFinish(Supplier<ProgressBar> progressBarProvider, Application application, SwingUtils swingUtils, WidgetFactory widgetFactory, MainData mainData, HostFactory hostFactory, AddClusterDialog addClusterDialog, MainPresenter mainPresenter, Supplier<NewHostDialog> newHostDialogFactory, UserConfig userConfig) {
         super(progressBarProvider, application, swingUtils, widgetFactory, mainData);
         this.hostFactory = hostFactory;
         this.addClusterDialog = addClusterDialog;

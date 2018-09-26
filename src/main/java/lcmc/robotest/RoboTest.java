@@ -38,7 +38,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
 
-import javax.inject.Singleton;
 import javax.swing.AbstractButton;
 import javax.swing.JCheckBox;
 import javax.swing.JDialog;
@@ -60,9 +59,6 @@ import lcmc.logger.Logger;
 import lcmc.logger.LoggerFactory;
 import lcmc.common.domain.util.Tools;
 import lombok.RequiredArgsConstructor;
-
-import javax.inject.Inject;
-import javax.inject.Named;
 
 /**
  * This class is used to test the GUI.

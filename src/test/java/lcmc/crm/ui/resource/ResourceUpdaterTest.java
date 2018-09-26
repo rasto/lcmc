@@ -36,13 +36,10 @@ import lombok.val;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.runners.MockitoJUnitRunner;
 
-import javax.inject.Named;
-import javax.inject.Provider;
 import javax.swing.tree.DefaultMutableTreeNode;
 
 import java.awt.geom.Point2D;
@@ -50,6 +47,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Supplier;
 
 import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Matchers.anyObject;
@@ -62,7 +60,6 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
-@Named
 public class ResourceUpdaterTest {
     private static final String GROUP_1 = "GROUP1";
     private static final String SERVICE_1 = "Service1";
@@ -83,21 +80,14 @@ public class ResourceUpdaterTest {
 
     private ConstraintPHInfo newConstraintPHInfo = null;
     @Spy
-    private Provider<ConstraintPHInfo> constraintPHInfoProvider = new Provider<ConstraintPHInfo>() {
-        @Override
-        public ConstraintPHInfo get() {
-            return newConstraintPHInfo;
-        }
-    };
+    private Supplier<ConstraintPHInfo> constraintPHInfoProvider = () -> newConstraintPHInfo;
     @Spy
-    private Provider<PcmkRscSetsInfo> pcmkRscSetsInfoProvider = new Provider<PcmkRscSetsInfo>() {
-        @Override
-        public PcmkRscSetsInfo get() {
-            return mock(PcmkRscSetsInfo.class);
-        }
-    };
-    @InjectMocks
-    private ResourceUpdater resourceUpdater = new ResourceUpdater();
+    private Supplier<PcmkRscSetsInfo> pcmkRscSetsInfoProvider = () -> mock(PcmkRscSetsInfo.class);
+    private ResourceUpdater resourceUpdater = new ResourceUpdater(
+            constraintPHInfoProvider,
+            pcmkRscSetsInfoProvider,
+            application,
+            crmServiceFactory);
     public static final Map<String, String> EXAMPLE_PARAMS = new HashMap<String, String>() {{
         put("param1", "value1");
     }};

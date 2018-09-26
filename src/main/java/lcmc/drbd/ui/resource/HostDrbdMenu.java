@@ -24,9 +24,6 @@ import java.awt.Color;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Supplier;
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Provider;
 import javax.swing.JColorChooser;
 
 import lcmc.common.ui.main.MainPresenter;

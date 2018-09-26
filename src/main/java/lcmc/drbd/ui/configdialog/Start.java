@@ -27,8 +27,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.function.Supplier;
-import javax.inject.Inject;
-import javax.inject.Named;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -54,7 +52,6 @@ import lcmc.common.domain.util.Tools;
  * An implementation of a dialog where user start to configure the DRBD.
  * information.
  */
-@Named
 public final class Start extends WizardDialog {
     private final Resource resourceDialog;
     private final Volume volumeDialog;

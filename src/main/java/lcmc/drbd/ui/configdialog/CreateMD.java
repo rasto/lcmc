@@ -25,9 +25,8 @@ package lcmc.drbd.ui.configdialog;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.function.Supplier;
 import java.util.regex.Matcher;
-import javax.inject.Inject;
-import javax.inject.Named;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -35,6 +34,8 @@ import javax.swing.SpringLayout;
 
 import lcmc.common.domain.AccessMode;
 import lcmc.common.domain.Application;
+import lcmc.common.ui.ProgressBar;
+import lcmc.common.ui.main.MainData;
 import lcmc.common.ui.main.ProgressIndicator;
 import lcmc.common.ui.utils.SwingUtils;
 import lcmc.host.domain.Host;
@@ -51,13 +52,11 @@ import lcmc.common.domain.ExecCallback;
 import lcmc.common.ui.utils.MyButton;
 import lcmc.common.domain.util.Tools;
 import lcmc.common.ui.utils.WidgetListener;
-import lombok.RequiredArgsConstructor;
 
 /**
  * An implementation of a dialog where drbd block devices are initialized.
  * information.
  */
-@RequiredArgsConstructor
 final class CreateMD extends DrbdConfig {
     private final ProgressIndicator progressIndicator;
     private final CreateFS createFSDialog;
@@ -69,6 +68,15 @@ final class CreateMD extends DrbdConfig {
     private static final int CREATE_MD_FS_ALREADY_THERE_RC = 40;
     private Widget metadataWidget;
     private MyButton makeMetaDataButton;
+
+    public CreateMD(Supplier<ProgressBar> progressBarProvider, Application application, SwingUtils swingUtils, WidgetFactory widgetFactory, MainData mainData, ProgressIndicator progressIndicator, CreateFS createFSDialog) {
+        super(progressBarProvider, application, swingUtils, widgetFactory, mainData);
+        this.progressIndicator = progressIndicator;
+        this.createFSDialog = createFSDialog;
+        this.application = application;
+        this.swingUtils = swingUtils;
+        this.widgetFactory = widgetFactory;
+    }
 
     private void createMetadataAndCheckResult(final boolean destroyData) {
         swingUtils.invokeLater(new Runnable() {

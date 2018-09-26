@@ -23,13 +23,14 @@
 package lcmc.cluster.ui.wizard;
 
 import java.awt.BorderLayout;
-import javax.inject.Inject;
-import javax.inject.Named;
+import java.util.function.Supplier;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SpringLayout;
 
+import lcmc.common.ui.ProgressBar;
+import lcmc.common.ui.main.MainData;
 import lcmc.common.ui.main.MainPresenter;
 import lcmc.common.ui.SpringUtilities;
 import lcmc.common.ui.WizardDialog;
@@ -43,12 +44,10 @@ import lcmc.common.domain.StringValue;
 import lcmc.common.domain.util.Tools;
 import lcmc.cluster.ui.ClusterTabFactory;
 import lcmc.common.ui.utils.SwingUtils;
-import lombok.RequiredArgsConstructor;
 
 /**
  * An implementation of a dialog where user can enter the name of the cluster.
  */
-@RequiredArgsConstructor
 public final class Name extends DialogCluster {
 
     private final ClusterHosts clusterHostsDialog;
@@ -61,6 +60,17 @@ public final class Name extends DialogCluster {
 
     private static final int NAME_FIELD_WIDTH = 120;
     private Widget nameField;
+
+    public Name(Supplier<ProgressBar> progressBarProvider, Application application, SwingUtils swingUtils, WidgetFactory widgetFactory, MainData mainData, ClusterHosts clusterHostsDialog, ClusterTabFactory clusterTabFactory, MainPresenter mainPresenter, Clusters allClusters) {
+        super(progressBarProvider, application, swingUtils, widgetFactory, mainData);
+        this.clusterHostsDialog = clusterHostsDialog;
+        this.clusterTabFactory = clusterTabFactory;
+        this.mainPresenter = mainPresenter;
+        this.application = application;
+        this.swingUtils = swingUtils;
+        this.allClusters = allClusters;
+        this.widgetFactory = widgetFactory;
+    }
 
     @Override
     protected void finishDialog() {

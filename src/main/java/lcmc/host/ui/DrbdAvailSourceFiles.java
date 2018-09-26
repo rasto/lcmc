@@ -26,8 +26,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Supplier;
 
-import javax.inject.Inject;
-import javax.inject.Named;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.SpringLayout;
@@ -55,8 +53,7 @@ import lcmc.cluster.service.ssh.SshOutput;
  * An implementation of a dialog where available versions of drbd will be
  * determined.
  */
-@Named
-final class DrbdAvailSourceFiles extends DialogHost {
+public class DrbdAvailSourceFiles extends DialogHost {
     private final DrbdCommandInst drbdCommandInst;
     private final Application application;
     private final SwingUtils swingUtils;

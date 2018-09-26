@@ -19,10 +19,10 @@ public final class MainPanelITest {
 
     @Before
     public void setUp() {
-        integrationTestLauncher = AppContext.getBean(IntegrationTestLauncher.class);
+        integrationTestLauncher = IntegrationTestLauncher.create();
         integrationTestLauncher.initTestCluster();
-        mainPanel = AppContext.getBean(MainPanel.class);
-        swingUtils = AppContext.getBean(SwingUtils.class);
+        mainPanel = integrationTestLauncher.getMainPanel();
+        swingUtils = integrationTestLauncher.getSwingUtils();
     }
 
     /** Tests, that the terminal area doesn't expand too much. */

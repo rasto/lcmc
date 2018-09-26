@@ -26,14 +26,15 @@ import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.List;
-import javax.inject.Inject;
-import javax.inject.Named;
 import javax.swing.ImageIcon;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 
 import lcmc.cluster.ui.widget.WidgetFactory;
 import lcmc.common.domain.Application;
+import lcmc.common.ui.Access;
+import lcmc.common.ui.main.MainData;
+import lcmc.common.ui.utils.SwingUtils;
 import lcmc.crm.domain.CrmXml;
 import lcmc.crm.domain.ResourceAgent;
 import lcmc.common.ui.Browser;
@@ -41,13 +42,11 @@ import lcmc.cluster.ui.ClusterBrowser;
 import lcmc.common.ui.utils.MyButton;
 import lcmc.common.domain.util.Tools;
 import lcmc.common.ui.utils.UpdatableItem;
-import lombok.RequiredArgsConstructor;
 
 /**
  * This class holds the information about heartbeat service from the ocfs,
  * to show it to the user.
  */
-@RequiredArgsConstructor
 public class AvailableServiceInfo extends HbCategoryInfo {
     private final Application application;
     private final AvailableServiceMenu availableServiceInfo;
@@ -57,6 +56,13 @@ public class AvailableServiceInfo extends HbCategoryInfo {
                                     Tools.createImageIcon(Tools.getDefault("ServiceInfo.ServiceStartedIconSmall"));
     private static final ImageIcon BACK_TO_OVERVIEW_ICON = Tools.createImageIcon(Tools.getDefault("BackIcon"));
     private ResourceAgent resourceAgent;
+
+    public AvailableServiceInfo(Application application, SwingUtils swingUtils, Access access, MainData mainData, AvailableServiceMenu availableServiceInfo, WidgetFactory widgetFactory) {
+        super(application, swingUtils, access, mainData);
+        this.application = application;
+        this.availableServiceInfo = availableServiceInfo;
+        this.widgetFactory = widgetFactory;
+    }
 
     public void init(final ResourceAgent resourceAgent, final Browser browser) {
         super.init(resourceAgent.getServiceName(), browser);

@@ -29,9 +29,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Supplier;
 
-import javax.inject.Inject;
-import javax.inject.Named;
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.JComponent;
@@ -42,6 +41,7 @@ import javax.swing.SpringLayout;
 import javax.swing.border.TitledBorder;
 
 import lcmc.common.ui.Access;
+import lcmc.common.ui.ProgressBar;
 import lcmc.common.ui.main.MainData;
 import lcmc.common.domain.AccessMode;
 import lcmc.common.domain.Application;
@@ -66,13 +66,11 @@ import lcmc.crm.service.Openais;
 import lcmc.cluster.service.ssh.ExecCommandConfig;
 import lcmc.cluster.service.ssh.ExecCommandThread;
 import lcmc.common.domain.util.Tools;
-import lombok.RequiredArgsConstructor;
 import lombok.val;
 
 /**
  * An implementation of a dialog where cluster is initialized on all hosts.
  */
-@RequiredArgsConstructor
 public class InitCluster extends DialogCluster {
     private final WidgetFactory widgetFactory;
     private final Finish finishDialog;
@@ -118,6 +116,16 @@ public class InitCluster extends DialogCluster {
     /** Whether to use openais init script instead of corosync. It applies only
      * if both of them are present. */
     private Widget useOpenaisButton;
+
+    public InitCluster(Supplier<ProgressBar> progressBarProvider, Application application, SwingUtils swingUtils, WidgetFactory widgetFactory, MainData mainData, Finish finishDialog, Access access) {
+        super(progressBarProvider, application, swingUtils, widgetFactory, mainData);
+        this.widgetFactory = widgetFactory;
+        this.finishDialog = finishDialog;
+        this.mainData = mainData;
+        this.application = application;
+        this.swingUtils = swingUtils;
+        this.access = access;
+    }
 
     public void init(final WizardDialog previousDialog, final Cluster cluster) {
         super.init(previousDialog, cluster);

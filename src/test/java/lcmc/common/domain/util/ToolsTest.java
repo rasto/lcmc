@@ -15,14 +15,13 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.TreeSet;
+import java.util.function.Supplier;
 
-import javax.inject.Provider;
 import javax.swing.JPanel;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import junitparams.JUnitParamsRunner;
@@ -47,7 +46,6 @@ import lcmc.vm.domain.VmsXml;
 
 @RunWith(JUnitParamsRunner.class)
 public final class ToolsTest {
-    @InjectMocks
     private HostFactory hostFactory;
     @Mock
     private HwEventBus hwEventBus;
@@ -67,28 +65,42 @@ public final class ToolsTest {
     private BlockDeviceService blockDeviceService;
 
     @Mock
-    private Provider<VmsXml> vmsXmlProvider;
+    private Supplier<VmsXml> vmsXmlProvider;
     @Mock
     private VmsXml vmsXml;
     @Mock
-    private Provider<DrbdXml> drbdXmlProvider;
+    private Supplier<DrbdXml> drbdXmlProvider;
     @Mock
     private DrbdXml drbdXml;
     @Mock
-    private Provider<TerminalPanel> terminalPanelProvider;
+    private Supplier<TerminalPanel> terminalPanelProvider;
     @Mock
     private TerminalPanel terminalPanel;
     @Mock
-    private Provider<Ssh> sshProvider;
+    private Supplier<Ssh> sshProvider;
     @Mock
     private Ssh ssh;
     @Mock
-    private Provider<HostBrowser> hostBrowserProvider;
+    private Supplier<HostBrowser> hostBrowserProvider;
     @Mock
     private HostBrowser hostBrowser;
 
     @Before
     public void setUp() {
+        hostFactory = new HostFactory(
+                hwEventBus,
+                swingUtils,
+                application,
+                mainData,
+                progressIndicator,
+                allHosts,
+                roboTest,
+                blockDeviceService,
+                vmsXmlProvider,
+                drbdXmlProvider,
+                terminalPanelProvider,
+                sshProvider,
+                hostBrowserProvider);
         MockitoAnnotations.initMocks(this);
         when(vmsXmlProvider.get()).thenReturn(vmsXml);
         when(drbdXmlProvider.get()).thenReturn(drbdXml);
@@ -652,7 +664,6 @@ public final class ToolsTest {
     @Test
     @Parameters(method="parametersForTestVersionBeforePacemaker")
     public void testVersionBeforePacemaker(final String pcmkVersion, final String hbVersion) {
-        final GlobalInfo globalInfo = new GlobalInfo();
         final Host host = hostFactory.createInstance();
 
         host.getHostParser().setPacemakerVersion(pcmkVersion);

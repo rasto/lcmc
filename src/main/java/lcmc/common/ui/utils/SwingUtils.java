@@ -25,8 +25,6 @@ import lcmc.logger.Logger;
 import lcmc.logger.LoggerFactory;
 import lombok.RequiredArgsConstructor;
 
-import javax.inject.Named;
-import javax.inject.Singleton;
 import javax.swing.*;
 import java.lang.reflect.InvocationTargetException;
 

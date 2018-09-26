@@ -23,10 +23,6 @@ package lcmc.common.ui.utils;
 import lcmc.common.domain.AccessMode;
 import lombok.RequiredArgsConstructor;
 
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Provider;
-import javax.inject.Singleton;
 import javax.swing.ImageIcon;
 import java.util.function.Supplier;
 

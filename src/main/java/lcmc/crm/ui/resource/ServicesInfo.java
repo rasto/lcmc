@@ -26,8 +26,10 @@ import com.google.common.base.Optional;
 import lcmc.cluster.ui.ClusterBrowser;
 import lcmc.cluster.ui.widget.Check;
 import lcmc.cluster.ui.widget.Widget;
+import lcmc.cluster.ui.widget.WidgetFactory;
 import lcmc.common.domain.*;
 import lcmc.common.domain.util.Tools;
+import lcmc.common.ui.Access;
 import lcmc.common.ui.Browser;
 import lcmc.common.ui.EditableInfo;
 import lcmc.common.ui.Info;
@@ -44,7 +46,6 @@ import lcmc.crm.ui.CrmGraph;
 import lcmc.host.domain.Host;
 import lcmc.logger.Logger;
 import lcmc.logger.LoggerFactory;
-import lombok.RequiredArgsConstructor;
 
 import javax.swing.*;
 import javax.swing.tree.DefaultMutableTreeNode;
@@ -61,7 +62,6 @@ import java.util.concurrent.CountDownLatch;
  * This class holds info data for services view and global heartbeat
  * config.
  */
-@RequiredArgsConstructor
 public class ServicesInfo extends EditableInfo {
 
     private final ServicesMenu servicesMenu;
@@ -76,6 +76,17 @@ public class ServicesInfo extends EditableInfo {
     static final ImageIcon CLUSTER_ICON = Tools.createImageIcon(Tools.getDefault("ClustersPanel.ClusterIcon"));
     /** Cache for the info panel. */
     private JComponent infoPanel = null;
+
+    public ServicesInfo(Application application, SwingUtils swingUtils, Access access, MainData mainData, WidgetFactory widgetFactory, ServicesMenu servicesMenu, ProgressIndicator progressIndicator, ClusterTreeMenu clusterTreeMenu, CrmServiceFactory crmServiceFactory, Dialogs dialogs) {
+        super(application, swingUtils, access, mainData, widgetFactory);
+        this.servicesMenu = servicesMenu;
+        this.progressIndicator = progressIndicator;
+        this.application = application;
+        this.swingUtils = swingUtils;
+        this.clusterTreeMenu = clusterTreeMenu;
+        this.crmServiceFactory = crmServiceFactory;
+        this.dialogs = dialogs;
+    }
 
     public void einit(final String name, final Browser browser) {
         super.einit(Optional.of(new ResourceValue(name)), name, browser);

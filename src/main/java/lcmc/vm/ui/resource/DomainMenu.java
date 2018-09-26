@@ -25,8 +25,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.regex.Matcher;
-import javax.inject.Inject;
-import javax.inject.Named;
 import javax.swing.ImageIcon;
 
 import lcmc.common.domain.AccessMode;

@@ -44,8 +44,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CountDownLatch;
-import javax.inject.Inject;
-import javax.inject.Named;
 import javax.swing.AbstractButton;
 import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;

@@ -23,8 +23,6 @@ import java.awt.Color;
 import java.awt.ItemSelectable;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
-import javax.inject.Inject;
-import javax.inject.Named;
 import javax.swing.AbstractButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComponent;
@@ -32,17 +30,16 @@ import javax.swing.text.Document;
 import lcmc.common.domain.AccessMode;
 import lcmc.common.domain.StringValue;
 import lcmc.common.domain.Value;
+import lcmc.common.ui.Access;
 import lcmc.common.ui.utils.MyButton;
 import lcmc.common.ui.utils.SwingUtils;
 import lcmc.common.ui.utils.WidgetListener;
-import lombok.RequiredArgsConstructor;
 
 /**
  * An implementation of a field where user can enter new value. The
  * field can be Textfield or combo box, depending if there are values
  * too choose from.
  */
-@RequiredArgsConstructor
 public class Checkbox extends GenericWidget<JComponent> {
     private final SwingUtils swingUtils;
 
@@ -52,6 +49,11 @@ public class Checkbox extends GenericWidget<JComponent> {
     private Value checkBoxTrue = new StringValue(CHECKBOX_TRUE);
     /** Name for the 'false' value. */
     private Value checkBoxFalse = new StringValue(CHECKBOX_FALSE);
+
+    public Checkbox(SwingUtils swingUtils, Access access) {
+        super(swingUtils, access);
+        this.swingUtils = swingUtils;
+    }
 
     public void init(final Value selectedValue,
                     final Value[] items,

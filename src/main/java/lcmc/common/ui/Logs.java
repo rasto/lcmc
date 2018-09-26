@@ -43,8 +43,6 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import javax.inject.Inject;
-import javax.inject.Named;
 import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
 import javax.swing.JCheckBox;

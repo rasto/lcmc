@@ -44,7 +44,7 @@ import java.util.function.Supplier;
 /**
  * An implementation of a dialog where openais with pacemaker is installed.
  */
-final class PacemakerInst extends DialogHost {
+public class PacemakerInst extends DialogHost {
     private final Supplier<CheckInstallation> checkInstallationProvider;
     private final Application application;
 

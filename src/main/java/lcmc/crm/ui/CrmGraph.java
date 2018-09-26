@@ -48,9 +48,6 @@ import lcmc.crm.ui.resource.ServiceInfo;
 import lcmc.host.domain.Host;
 import lcmc.host.ui.HostBrowser;
 
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Provider;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.geom.Point2D;

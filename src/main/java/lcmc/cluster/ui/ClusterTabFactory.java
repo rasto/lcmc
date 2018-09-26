@@ -27,14 +27,14 @@ import java.util.function.Supplier;
 
 @RequiredArgsConstructor
 public class ClusterTabFactory {
-    private final ClustersPanel clustersPanel;
+    private final Supplier<ClustersPanel> clustersPanelProvider;
     private final Supplier<ClusterTab> clusterTabProvider;
 
     public ClusterTab createClusterTab(final Cluster cluster) {
         final ClusterTab clusterTab = clusterTabProvider.get();
         clusterTab.initWithCluster(cluster);
         if (cluster != null) {
-            clustersPanel.addClusterTab(clusterTab);
+            clustersPanelProvider.get().addClusterTab(clusterTab);
         }
         return clusterTab;
     }

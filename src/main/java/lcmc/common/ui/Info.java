@@ -35,8 +35,6 @@ import lcmc.logger.LoggerFactory;
 import lombok.RequiredArgsConstructor;
 import lombok.val;
 
-import javax.inject.Inject;
-import javax.inject.Named;
 import javax.swing.*;
 import javax.swing.border.TitledBorder;
 import javax.swing.event.PopupMenuEvent;

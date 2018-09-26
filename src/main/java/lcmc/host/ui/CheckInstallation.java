@@ -53,8 +53,7 @@ import java.util.function.Supplier;
  * An implementation of a dialog where
  * drbd/heartbeat/pacemaker/openais/corosync etc. installation is checked.
  */
-@RequiredArgsConstructor
-final class CheckInstallation extends DialogHost {
+public class CheckInstallation extends DialogHost {
 
     private final WidgetFactory widgetFactory;
     private final HostFinish hostFinishDialog;

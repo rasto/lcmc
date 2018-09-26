@@ -30,7 +30,7 @@ import lombok.RequiredArgsConstructor;
  * This class is used to test the GUI.
  */
 @RequiredArgsConstructor
-final class PcmkTestH {
+public class PcmkTestH {
     private final RoboTest roboTest;
     /** Create ipmi resource. */
     private void chooseIpmi(final int x, final int y, final boolean apply) {

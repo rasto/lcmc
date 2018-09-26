@@ -24,12 +24,13 @@ import lcmc.common.ui.MainMenu;
 import lombok.RequiredArgsConstructor;
 
 import javax.swing.*;
+import java.util.function.Supplier;
 
 @RequiredArgsConstructor
 public class ProgressIndicator {
 
     private final ProgressIndicatorPanel progressIndicatorPanel;
-    private final MainMenu mainMenu;
+    private final Supplier<MainMenu> mainMenuProvider;
 
     public void init() {
         progressIndicatorPanel.init();
@@ -81,9 +82,9 @@ public class ProgressIndicator {
     }
 
     private void turnOffMainMenu() {
-        mainMenu.turnOff();
+        mainMenuProvider.get().turnOff();
     }
     private void turnOnMainMenu() {
-        mainMenu.turnOn();
+        mainMenuProvider.get().turnOn();
     }
 }

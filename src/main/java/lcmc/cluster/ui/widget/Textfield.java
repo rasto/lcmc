@@ -21,8 +21,6 @@ package lcmc.cluster.ui.widget;
 
 import java.awt.Color;
 import java.util.Map;
-import javax.inject.Inject;
-import javax.inject.Named;
 import javax.swing.JComponent;
 import javax.swing.event.DocumentListener;
 import javax.swing.text.AbstractDocument;

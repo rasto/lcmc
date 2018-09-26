@@ -23,8 +23,6 @@ package lcmc.drbd.ui.resource;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import javax.inject.Inject;
-import javax.inject.Named;
 import javax.swing.JMenuItem;
 
 import lcmc.common.domain.AccessMode;

@@ -28,7 +28,7 @@ import lombok.RequiredArgsConstructor;
  * This class is used to test the GUI.
  */
 @RequiredArgsConstructor
-final class PcmkTest5 {
+public class PcmkTest5 {
     private final RoboTest roboTest;
     @SuppressWarnings("TooBroadScope")
     void start(final int count) {

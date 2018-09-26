@@ -39,7 +39,6 @@ import lcmc.common.domain.VisiblePredicate;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 
 import static org.mockito.Matchers.anyObject;
@@ -71,11 +70,19 @@ public class MultiSelectionMenuITest {
     private MyMenuItem menuItemStub;
     @Mock
     private MenuFactory menuFactoryStub;
-    @InjectMocks
     private MultiSelectionMenu multiSelectionMenu;
 
     @Before
     public void setUp() {
+        multiSelectionMenu = new MultiSelectionMenu(
+                null,
+                null,
+                menuFactoryStub,
+                null,
+                null,
+                null,
+                null,
+                null);
         when(multiSelectionInfoStub.getBrowser()).thenReturn(browserStub);
         when(menuFactoryStub.createMenuItem(
                 anyString(),

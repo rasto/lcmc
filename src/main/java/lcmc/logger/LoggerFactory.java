@@ -22,11 +22,21 @@ package lcmc.logger;
 
 import java.util.HashMap;
 import java.util.Map;
+
+import lcmc.common.ui.BugReport;
+import lcmc.common.ui.MainMenu;
+import lcmc.common.ui.main.MainData;
+import lombok.RequiredArgsConstructor;
 import org.apache.commons.collections15.Buffer;
 import org.apache.commons.collections15.BufferUtils;
 import org.apache.commons.collections15.buffer.CircularFifoBuffer;
 
-public final class LoggerFactory {
+@RequiredArgsConstructor
+public class LoggerFactory {
+    private final MainData mainData;
+    private final MainMenu mainMenu;
+    private final BugReport bugReport;
+
     private static final Map<String, Logger> LOGGER_MAP = new HashMap<String, Logger>();
     private static int debugLevel = -1;
     private static boolean showAppWarning = false;
@@ -74,13 +84,13 @@ public final class LoggerFactory {
         return showAppError;
     }
 
-    public static Logger getLogger(final Class<?> clazz) {
+    public Logger getLogger(final Class<?> clazz) {
         Logger logger;
         final String name = clazz.getName();
         synchronized (LoggerFactory.class) {
             logger = LOGGER_MAP.get(name);
             if (logger == null) {
-                logger = new Logger(name);
+                logger = new Logger(name, mainData, mainMenu, bugReport);
                 LOGGER_MAP.put(name, logger);
             }
         }
@@ -96,8 +106,5 @@ public final class LoggerFactory {
             }
         }
         return lb.toString();
-    }
-
-    private LoggerFactory() {
     }
 }

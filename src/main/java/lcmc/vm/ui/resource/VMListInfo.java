@@ -27,16 +27,17 @@ import lcmc.common.domain.AccessMode;
 import lcmc.common.domain.Application;
 import lcmc.common.domain.Value;
 import lcmc.common.domain.util.Tools;
+import lcmc.common.ui.Access;
 import lcmc.common.ui.Browser;
 import lcmc.common.ui.CategoryInfo;
 import lcmc.common.ui.Info;
+import lcmc.common.ui.main.MainData;
 import lcmc.common.ui.treemenu.ClusterTreeMenu;
 import lcmc.common.ui.utils.*;
 import lcmc.host.domain.Host;
 import lcmc.host.ui.HostBrowser;
 import lcmc.vm.domain.VmsXml;
 import lcmc.vm.ui.AddVMConfigDialog;
-import lombok.RequiredArgsConstructor;
 
 import javax.swing.*;
 import java.awt.*;
@@ -47,7 +48,6 @@ import java.util.function.Supplier;
 /**
  * This class shows a list of virtual machines.
  */
-@RequiredArgsConstructor
 public final class VMListInfo extends CategoryInfo {
     private final Supplier<AddVMConfigDialog> addVMConfigDialogProvider;
     private final Supplier<DomainInfo> domainInfoProvider;
@@ -77,6 +77,17 @@ public final class VMListInfo extends CategoryInfo {
      */
     private volatile Map<String, Color> domainToColor =
             new HashMap<String, Color>();
+
+    public VMListInfo(Application application, SwingUtils swingUtils, Access access, MainData mainData, Supplier<AddVMConfigDialog> addVMConfigDialogProvider, Supplier<DomainInfo> domainInfoProvider, MenuFactory menuFactory, WidgetFactory widgetFactory, ClusterTreeMenu clusterTreeMenu) {
+        super(application, swingUtils, access, mainData);
+        this.addVMConfigDialogProvider = addVMConfigDialogProvider;
+        this.domainInfoProvider = domainInfoProvider;
+        this.menuFactory = menuFactory;
+        this.application = application;
+        this.swingUtils = swingUtils;
+        this.widgetFactory = widgetFactory;
+        this.clusterTreeMenu = clusterTreeMenu;
+    }
 
     /**
      * Returns browser object of this info.

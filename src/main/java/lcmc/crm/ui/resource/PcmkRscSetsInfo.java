@@ -35,7 +35,11 @@ import java.util.function.Supplier;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.SpringLayout;
+
+import lcmc.cluster.ui.widget.WidgetFactory;
 import lcmc.common.domain.Application;
+import lcmc.common.ui.Access;
+import lcmc.common.ui.main.MainData;
 import lcmc.common.ui.treemenu.ClusterTreeMenu;
 import lcmc.common.ui.utils.SwingUtils;
 import lcmc.crm.domain.CrmXml;
@@ -57,8 +61,8 @@ public class PcmkRscSetsInfo extends HbConnectionInfo {
     private final Collection<ConstraintPHInfo> constraintPHInfos = new LinkedHashSet<ConstraintPHInfo>();
     private final Lock mConstraintPHLock = new ReentrantLock();
 
-    public PcmkRscSetsInfo(Supplier<HbColocationInfo> colocationInfoProvider, Supplier<HbOrderInfo> orderInfoProvider, Application application, SwingUtils swingUtils, HbConnectionMenu hbConnectionMenu, ClusterTreeMenu clusterTreeMenu) {
-        super(colocationInfoProvider, orderInfoProvider, application, swingUtils, hbConnectionMenu, clusterTreeMenu);
+    public PcmkRscSetsInfo(Application application, SwingUtils swingUtils, Access access, MainData mainData, WidgetFactory widgetFactory, Supplier<HbColocationInfo> colocationInfoProvider, Supplier<HbOrderInfo> orderInfoProvider, HbConnectionMenu hbConnectionMenu, ClusterTreeMenu clusterTreeMenu) {
+        super(application, swingUtils, access, mainData, widgetFactory, colocationInfoProvider, orderInfoProvider, hbConnectionMenu, clusterTreeMenu);
         this.application = application;
     }
 

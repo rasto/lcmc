@@ -35,8 +35,6 @@ import java.util.concurrent.locks.ReentrantLock;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import javax.inject.Inject;
-import javax.inject.Named;
 import javax.swing.JScrollPane;
 import javax.swing.JTextPane;
 import javax.swing.event.CaretEvent;

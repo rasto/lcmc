@@ -22,16 +22,22 @@
 
 package lcmc.common.ui;
 
+import lcmc.cluster.ui.widget.WidgetFactory;
+import lcmc.common.domain.Application;
+import lcmc.common.ui.main.MainData;
+import lcmc.common.ui.utils.SwingUtils;
 import lcmc.host.domain.Host;
 import lcmc.common.domain.util.Tools;
-
-import javax.inject.Named;
 
 /**
  * An implementation of an dialog, with log files.
  */
 public class HostLogs extends Logs {
     private Host host;
+
+    public HostLogs(Application application, SwingUtils swingUtils, WidgetFactory widgetFactory, MainData mainData) {
+        super(application, swingUtils, widgetFactory, mainData);
+    }
 
     public void init(final Host host) {
         this.host = host;

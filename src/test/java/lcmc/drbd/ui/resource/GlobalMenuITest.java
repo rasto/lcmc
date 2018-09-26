@@ -42,7 +42,6 @@ import lcmc.common.domain.VisiblePredicate;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
@@ -57,11 +56,16 @@ public class GlobalMenuITest {
     private MyMenuItem menuItemStub;
     @Mock
     private MenuFactory menuFactoryStub;
-    @InjectMocks
     private GlobalMenu globalMenu;
 
     @Before
     public void setUp() {
+        globalMenu = new GlobalMenu(
+                null,
+                null,
+                null,
+                menuFactoryStub,
+                null);
         when(menuFactoryStub.createMenuItem(
                 anyString(),
                 (ImageIcon) anyObject(),

@@ -43,7 +43,6 @@ import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.apache.commons.cli.PosixParser;
 
-import javax.inject.Provider;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.PrintStream;
@@ -53,12 +52,13 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Supplier;
 
 @RequiredArgsConstructor
 public class ArgumentParser {
     private final UserConfig userConfig;
     private final RoboTest roboTest;
-    private final Provider<Cluster> clusterProvider;
+    private final Supplier<Cluster> clusterProvider;
     private final Application application;
     private final SwingUtils swingUtils;
     private final Access access;

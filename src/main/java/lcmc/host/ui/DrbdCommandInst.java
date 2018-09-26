@@ -22,7 +22,6 @@
 
 package lcmc.host.ui;
 
-import javax.inject.Inject;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.SpringLayout;
@@ -50,7 +49,7 @@ import java.util.function.Supplier;
 /**
  * An implementation of a dialog where drbd is installed.
  */
-final class DrbdCommandInst extends DialogHost {
+public class DrbdCommandInst extends DialogHost {
     private final Supplier<CheckInstallation> checkInstallationProvider;
     private final Application application;
 

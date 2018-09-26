@@ -28,9 +28,6 @@ import lcmc.cluster.ui.ClusterBrowser;
 import lcmc.common.domain.AccessMode;
 import lombok.RequiredArgsConstructor;
 
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Singleton;
 import javax.swing.*;
 import java.util.List;
 import java.util.Map;

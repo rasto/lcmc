@@ -36,11 +36,10 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.function.Supplier;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import javax.inject.Inject;
-import javax.inject.Named;
 import javax.swing.BoxLayout;
 import javax.swing.JCheckBox;
 import javax.swing.JComponent;
@@ -52,6 +51,7 @@ import javax.swing.SpringLayout;
 
 import lcmc.Exceptions.IllegalVersionException;
 import lcmc.common.ui.Access;
+import lcmc.common.ui.ProgressBar;
 import lcmc.common.ui.main.MainData;
 import lcmc.common.domain.AccessMode;
 import lcmc.common.ui.utils.SwingUtils;
@@ -78,13 +78,11 @@ import lcmc.cluster.service.ssh.ExecCommandConfig;
 import lcmc.cluster.service.ssh.ExecCommandThread;
 import lcmc.common.domain.util.Tools;
 import lcmc.common.ui.utils.WidgetListener;
-import lombok.RequiredArgsConstructor;
 
 /**
  * An implementation of a dialog where corosync/openais is initialized on all
  * hosts.
  */
-@RequiredArgsConstructor
 public final class CoroConfig extends DialogCluster {
     private final InitCluster initClusterDialog;
     private final MainData mainData;
@@ -130,6 +128,17 @@ public final class CoroConfig extends DialogCluster {
     private boolean configChangedByUser = false;
     private volatile JScrollPane configScrollPane = null;
     private volatile boolean configAlreadyScrolled = false;
+
+    public CoroConfig(Supplier<ProgressBar> progressBarProvider, Application application, SwingUtils swingUtils, WidgetFactory widgetFactory, MainData mainData, InitCluster initClusterDialog, NetworkService networkService, Access access) {
+        super(progressBarProvider, application, swingUtils, widgetFactory, mainData);
+        this.initClusterDialog = initClusterDialog;
+        this.mainData = mainData;
+        this.application = application;
+        this.swingUtils = swingUtils;
+        this.widgetFactory = widgetFactory;
+        this.networkService = networkService;
+        this.access = access;
+    }
 
     public void init(final WizardDialog previousDialog, final Cluster cluster) {
         super.init(previousDialog, cluster);

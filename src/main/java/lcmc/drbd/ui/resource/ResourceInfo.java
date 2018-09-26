@@ -36,9 +36,11 @@ import lcmc.common.domain.ResourceValue;
 import lcmc.common.domain.StringValue;
 import lcmc.common.domain.Value;
 import lcmc.common.domain.util.Tools;
+import lcmc.common.ui.Access;
 import lcmc.common.ui.Browser;
 import lcmc.common.ui.Info;
 import lcmc.common.ui.SpringUtilities;
+import lcmc.common.ui.main.MainData;
 import lcmc.common.ui.treemenu.ClusterTreeMenu;
 import lcmc.common.ui.utils.ButtonCallback;
 import lcmc.common.ui.utils.ComponentWithTest;
@@ -60,7 +62,6 @@ import lcmc.host.ui.HostBrowser;
 import lcmc.logger.Logger;
 import lcmc.logger.LoggerFactory;
 
-import javax.inject.Named;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -84,7 +85,6 @@ import java.util.regex.Pattern;
  * this class holds info data, menus and configuration
  * for a drbd resource.
  */
-@Named
 public class ResourceInfo extends AbstractDrbdInfo {
     private final Application application;
     private final SwingUtils swingUtils;
@@ -147,12 +147,12 @@ public class ResourceInfo extends AbstractDrbdInfo {
     private final Collection<Host> selectedProxyHosts = new HashSet<Host>();
     private GlobalInfo globalInfo;
 
-    public ResourceInfo(WidgetFactory widgetFactory, Application application, SwingUtils swingUtils, ResourceMenu resourceMenu, WidgetFactory widgetFactory1, Supplier<ProxyNetInfo> proxyNetInfoProvider, ClusterTreeMenu clusterTreeMenu, NetworkService networkService, ClusterViewFactory clusterViewFactory) {
-        super(widgetFactory);
+    public ResourceInfo(Application application, SwingUtils swingUtils, Access access, MainData mainData, WidgetFactory widgetFactory, ResourceMenu resourceMenu, Supplier<ProxyNetInfo> proxyNetInfoProvider, ClusterTreeMenu clusterTreeMenu, NetworkService networkService, ClusterViewFactory clusterViewFactory) {
+        super(application, swingUtils, access, mainData, widgetFactory);
         this.application = application;
         this.swingUtils = swingUtils;
         this.resourceMenu = resourceMenu;
-        this.widgetFactory = widgetFactory1;
+        this.widgetFactory = widgetFactory;
         this.proxyNetInfoProvider = proxyNetInfoProvider;
         this.clusterTreeMenu = clusterTreeMenu;
         this.networkService = networkService;

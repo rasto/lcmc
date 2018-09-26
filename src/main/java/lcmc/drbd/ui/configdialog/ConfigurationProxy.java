@@ -21,28 +21,37 @@
 
 package lcmc.drbd.ui.configdialog;
 
+import lcmc.cluster.ui.widget.WidgetFactory;
+import lcmc.common.domain.Application;
+import lcmc.common.ui.ProgressBar;
+import lcmc.common.ui.main.MainData;
+import lcmc.common.ui.utils.SwingUtils;
 import lcmc.host.domain.Host;
 import lcmc.drbd.domain.DrbdInstallation;
 import lcmc.common.ui.WizardDialog;
 import lcmc.host.ui.Configuration;
 import lcmc.drbd.ui.resource.VolumeInfo;
 import lcmc.common.ui.utils.MyButton;
-import lombok.RequiredArgsConstructor;
+import lcmc.host.ui.Devices;
+import lcmc.host.ui.SSH;
 
-import javax.inject.Inject;
-import javax.inject.Named;
+import java.util.function.Supplier;
 
 /**
  * An implementation of a dialog where entered ip or the host is looked up
  * with dns.
  */
-@RequiredArgsConstructor
-final class ConfigurationProxy extends Configuration {
+public class ConfigurationProxy extends Configuration {
     private final SSHProxy sshProxyDialog;
 
     private VolumeInfo volumeInfo;
     private WizardDialog origDialog;
     private WizardDialog nextDialogObject = null;
+
+    public ConfigurationProxy(Supplier<ProgressBar> progressBarProvider, Application application, SwingUtils swingUtils, WidgetFactory widgetFactory, MainData mainData, Devices devices, SSH sshDialog, SSHProxy sshProxyDialog) {
+        super(progressBarProvider, application, swingUtils, widgetFactory, mainData, devices, sshDialog);
+        this.sshProxyDialog = sshProxyDialog;
+    }
 
     void init(final WizardDialog previousDialog,
               final Host host,

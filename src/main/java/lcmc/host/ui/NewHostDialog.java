@@ -26,7 +26,6 @@ import java.awt.BorderLayout;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Supplier;
-import javax.inject.Named;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;

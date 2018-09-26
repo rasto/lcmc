@@ -30,6 +30,7 @@ import lcmc.cluster.ui.widget.Widget;
 import lcmc.cluster.ui.widget.WidgetFactory;
 import lcmc.common.domain.*;
 import lcmc.common.domain.util.Tools;
+import lcmc.common.ui.Access;
 import lcmc.common.ui.Browser;
 import lcmc.common.ui.EditableInfo;
 import lcmc.common.ui.Info;
@@ -41,11 +42,8 @@ import lcmc.logger.Logger;
 import lcmc.logger.LoggerFactory;
 import lcmc.vm.domain.LinuxFile;
 import lcmc.vm.domain.VmsXml;
-import lombok.RequiredArgsConstructor;
 import org.w3c.dom.Node;
 
-import javax.inject.Inject;
-import javax.inject.Named;
 import javax.swing.*;
 import javax.swing.filechooser.FileSystemView;
 import java.awt.*;
@@ -62,7 +60,6 @@ import java.util.regex.Pattern;
 /**
  * This class holds info about Virtual Hardware.
  */
-@RequiredArgsConstructor
 public abstract class HardwareInfo extends EditableInfo {
     private final Application application;
     private final SwingUtils swingUtils;
@@ -88,6 +85,16 @@ public abstract class HardwareInfo extends EditableInfo {
     private JComponent infoPanel = null;
     private DomainInfo vmsVirtualDomainInfo;
     private final Map<String, LinuxFile> linuxFileCache = new HashMap<String, LinuxFile>();
+
+    public HardwareInfo(Application application, SwingUtils swingUtils, Access access, MainData mainData, WidgetFactory widgetFactory, MenuFactory menuFactory, ClusterTreeMenu clusterTreeMenu) {
+        super(application, swingUtils, access, mainData, widgetFactory);
+        this.application = application;
+        this.swingUtils = swingUtils;
+        this.menuFactory = menuFactory;
+        this.widgetFactory = widgetFactory;
+        this.mainData = mainData;
+        this.clusterTreeMenu = clusterTreeMenu;
+    }
 
     void init(final String name, final Browser browser, final DomainInfo vmsVirtualDomainInfo) {
         super.einit(Optional.of(new ResourceValue(name)), name, browser);

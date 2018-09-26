@@ -23,9 +23,8 @@
 package lcmc.cluster.ui.wizard;
 
 import java.awt.Color;
+import java.util.function.Supplier;
 
-import javax.inject.Inject;
-import javax.inject.Named;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JComponent;
@@ -34,6 +33,8 @@ import javax.swing.SpringLayout;
 
 import lcmc.common.domain.AccessMode;
 import lcmc.common.domain.Application;
+import lcmc.common.ui.ProgressBar;
+import lcmc.common.ui.main.MainData;
 import lcmc.common.ui.utils.SwingUtils;
 import lcmc.host.domain.Host;
 import lcmc.common.domain.StringValue;
@@ -48,15 +49,13 @@ import lcmc.logger.LoggerFactory;
 import lcmc.cluster.service.ssh.ExecCommandConfig;
 import lcmc.cluster.service.ssh.ExecCommandThread;
 import lcmc.common.domain.util.Tools;
-import lombok.RequiredArgsConstructor;
 import lombok.val;
 
 /**
  * An implementation of a dialog where user can choose cluster stack, that can
  * be Corosync or Heartbeat.
  */
-@RequiredArgsConstructor
-final class CommStack extends DialogCluster {
+public class CommStack extends DialogCluster {
 
     private final HbConfig hbConfigDialog;
     private final CoroConfig coroConfigDialog;
@@ -66,6 +65,15 @@ final class CommStack extends DialogCluster {
 
     private static final Logger LOG = LoggerFactory.getLogger(CommStack.class);
     private Widget chooseStackCombo;
+
+    public CommStack(Supplier<ProgressBar> progressBarProvider, Application application, SwingUtils swingUtils, WidgetFactory widgetFactory, MainData mainData, HbConfig hbConfigDialog, CoroConfig coroConfigDialog) {
+        super(progressBarProvider, application, swingUtils, widgetFactory, mainData);
+        this.hbConfigDialog = hbConfigDialog;
+        this.coroConfigDialog = coroConfigDialog;
+        this.application = application;
+        this.swingUtils = swingUtils;
+        this.widgetFactory = widgetFactory;
+    }
 
     @Override
     public WizardDialog nextDialog() {

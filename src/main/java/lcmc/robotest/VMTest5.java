@@ -27,7 +27,7 @@ import lombok.RequiredArgsConstructor;
  * This class is used to test the GUI.
  */
 @RequiredArgsConstructor
-final class VMTest5 {
+public class VMTest5 {
     private final VMTest1 vmTest1;
 
     void start(final Cluster cluster, final String vmTest, final int count) {

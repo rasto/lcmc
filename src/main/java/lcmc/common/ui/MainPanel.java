@@ -22,9 +22,7 @@
 package lcmc.common.ui;
 
 import java.awt.BorderLayout;
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Singleton;
+import java.util.function.Supplier;
 import javax.swing.*;
 import javax.swing.plaf.basic.BasicSplitPaneDivider;
 import javax.swing.plaf.basic.BasicSplitPaneUI;
@@ -41,8 +39,8 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public final class MainPanel extends JPanel {
 
-    private final ClustersPanel clustersPanel;
-    private final HostFactory hostFactory;
+    private final Supplier<ClustersPanel> clustersPanelProvider;
+    private final Supplier<HostFactory> hostFactoryProvider;
     private final SwingUtils swingUtils;
 
     private JSplitPane terminalSplitPane;
@@ -51,9 +49,9 @@ public final class MainPanel extends JPanel {
 
     public void init() {
         setLayout(new BorderLayout());
-        clustersPanel.init();
-        final Host noHost = hostFactory.createInstance();
-        terminalSplitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT, clustersPanel, noHost.getTerminalPanel());
+        clustersPanelProvider.get().init();
+        final Host noHost = hostFactoryProvider.get().createInstance();
+        terminalSplitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT, clustersPanelProvider.get(), noHost.getTerminalPanel());
 
         terminalSplitPane.setContinuousLayout(true);
         terminalSplitPane.setResizeWeight(1.0);

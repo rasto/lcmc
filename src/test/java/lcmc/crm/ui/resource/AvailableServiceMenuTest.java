@@ -34,7 +34,6 @@ import lcmc.common.domain.VisiblePredicate;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 
 import static org.mockito.Matchers.anyObject;
@@ -56,11 +55,11 @@ public class AvailableServiceMenuTest {
     private MyMenuItem menuItemStub;
     @Mock
     private AvailableServiceInfo availableServiceInfoStub;
-    @InjectMocks
     private AvailableServiceMenu availableServiceMenu;
 
     @Before
     public void setUp() {
+        availableServiceMenu = new AvailableServiceMenu(menuFactoryStub);
         when(menuFactoryStub.createMenuItem(anyString(),
                                             (ImageIcon) anyObject(),
                                             anyString(),

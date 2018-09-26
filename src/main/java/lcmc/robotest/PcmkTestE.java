@@ -24,15 +24,11 @@ import static lcmc.robotest.RoboTest.HOST_Y;
 import lcmc.common.domain.util.Tools;
 import lombok.RequiredArgsConstructor;
 
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Singleton;
-
 /**
  * This class is used to test the GUI.
  */
 @RequiredArgsConstructor
-final class PcmkTestE {
+public class PcmkTestE {
     private final RoboTest roboTest;
 
     /** Host wizard deadlock. */

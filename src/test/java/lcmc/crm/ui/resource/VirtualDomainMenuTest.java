@@ -40,7 +40,6 @@ import lcmc.common.domain.VisiblePredicate;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 
 import static org.mockito.Matchers.anyObject;
@@ -69,11 +68,19 @@ public class VirtualDomainMenuTest {
     private MyMenuItem menuItemStub;
     @Mock
     private MenuFactory menuFactoryStub;
-    @InjectMocks
     private VirtualDomainMenu virtualDomainMenu;
 
     @Before
     public void setUp() {
+        virtualDomainMenu = new VirtualDomainMenu(
+                null,
+                null,
+                menuFactoryStub,
+                null,
+                null,
+                null,
+                null,
+                null);
         when(virtualDomainInfoStub.getBrowser()).thenReturn(clusterBrowserStub);
         when(applicationStub.isUseTightvnc()).thenReturn(true);
         when(applicationStub.isUseRealvnc()).thenReturn(true);

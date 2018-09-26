@@ -28,7 +28,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import lcmc.AppContext;
 import lcmc.cluster.domain.Cluster;
 import lcmc.cluster.service.NetworkService;
 import lcmc.cluster.service.storage.FileSystemService;
@@ -53,7 +52,7 @@ public final class HostITest {
 
     @Before
     public void setUp() {
-        integrationTestLauncher = AppContext.getBean(IntegrationTestLauncher.class);
+        integrationTestLauncher = IntegrationTestLauncher.create();
         integrationTestLauncher.initTestCluster();
         networkService = integrationTestLauncher.getNetworkService();
         fileSystemService = integrationTestLauncher.getFileSystemService();

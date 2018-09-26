@@ -46,10 +46,6 @@ import lcmc.logger.LoggerFactory;
 import lcmc.common.domain.util.Tools;
 import lombok.RequiredArgsConstructor;
 
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Provider;
-import javax.inject.Singleton;
 import javax.swing.AbstractButton;
 import javax.swing.UIManager;
 import javax.swing.plaf.FontUIResource;

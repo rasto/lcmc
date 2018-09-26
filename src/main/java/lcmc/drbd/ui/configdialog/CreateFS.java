@@ -26,6 +26,7 @@ package lcmc.drbd.ui.configdialog;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Set;
+import java.util.function.Supplier;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -34,6 +35,8 @@ import lcmc.Exceptions;
 import lcmc.cluster.service.storage.FileSystemService;
 import lcmc.common.domain.AccessMode;
 import lcmc.common.domain.Application;
+import lcmc.common.ui.ProgressBar;
+import lcmc.common.ui.main.MainData;
 import lcmc.common.ui.utils.SwingUtils;
 import lcmc.host.domain.Host;
 import lcmc.common.domain.StringValue;
@@ -48,13 +51,11 @@ import lcmc.logger.LoggerFactory;
 import lcmc.common.ui.utils.MyButton;
 import lcmc.common.domain.util.Tools;
 import lcmc.common.ui.utils.WidgetListener;
-import lombok.RequiredArgsConstructor;
 
 /**
  * An implementation of a dialog where drbd block devices are initialized.
  * information.
  */
-@RequiredArgsConstructor
 final class CreateFS extends DrbdConfig {
     private final Application application;
     private final SwingUtils swingUtils;
@@ -78,6 +79,14 @@ final class CreateFS extends DrbdConfig {
     private Widget skipInitialSyncWidget;
     private JLabel skipInitialSyncLabel;
     private MyButton makeFileSystemButton;
+
+    public CreateFS(Supplier<ProgressBar> progressBarProvider, Application application, SwingUtils swingUtils, WidgetFactory widgetFactory, MainData mainData, FileSystemService fileSystemService) {
+        super(progressBarProvider, application, swingUtils, widgetFactory, mainData);
+        this.application = application;
+        this.swingUtils = swingUtils;
+        this.widgetFactory = widgetFactory;
+        this.fileSystemService = fileSystemService;
+    }
 
     /**
      * Finishes the dialog. If primary bd was choosen it is forced to be a

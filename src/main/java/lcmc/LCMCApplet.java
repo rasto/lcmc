@@ -35,6 +35,7 @@ import lcmc.common.ui.utils.SwingUtils;
 import lcmc.logger.Logger;
 import lcmc.logger.LoggerFactory;
 import lcmc.common.domain.util.Tools;
+import lombok.val;
 
 
 /**
@@ -57,13 +58,14 @@ public final class LCMCApplet extends JApplet {
         } else {
             params = paramsLine.split("\\s+");
         }
-        final LCMC lcmc = AppContext.getBean(LCMC.class);
-        final MainData mainData = AppContext.getBean(MainData.class);
+        val lcmcFactory = new LCMCFactory();
+        final LCMC lcmc = lcmcFactory.createLCMC();
+        final MainData mainData = lcmc.getMainData();
 
         lcmc.initApp(params);
 
-        final Application application = AppContext.getBean(Application.class);
-        final SwingUtils swingUtils = AppContext.getBean(SwingUtils.class);
+        final Application application = lcmc.getApplication();
+        final SwingUtils swingUtils = lcmc.getSwingUtils();
         final LCMCApplet thisObject = this;
         swingUtils.invokeLater(new Runnable() {
             @Override

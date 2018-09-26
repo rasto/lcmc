@@ -29,9 +29,6 @@ import lcmc.logger.LoggerFactory;
 import lcmc.common.domain.util.Tools;
 import lombok.RequiredArgsConstructor;
 
-import javax.inject.Inject;
-import javax.inject.Named;
-
 /**
  * Show step by step dialogs that configure a cluster.
  */

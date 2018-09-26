@@ -29,10 +29,6 @@ import lcmc.logger.Logger;
 import lcmc.logger.LoggerFactory;
 import lombok.RequiredArgsConstructor;
 
-import javax.annotation.Resource;
-import javax.inject.Inject;
-import javax.inject.Named;
-
 /**
  * Show step by step dialogs that configure a host.
  */

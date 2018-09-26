@@ -36,7 +36,7 @@ import lombok.RequiredArgsConstructor;
  * This class is used to test the GUI.
  */
 @RequiredArgsConstructor
-final class PcmkTest1 {
+public class PcmkTest1 {
     private final RoboTest roboTest;
     private static final Logger LOG = LoggerFactory.getLogger(PcmkTest1.class);
 

@@ -27,7 +27,6 @@ import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.function.Supplier;
-import javax.inject.Named;
 import javax.swing.BoxLayout;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
@@ -47,7 +46,6 @@ import lcmc.common.domain.util.Tools;
 /**
  * An implementation of a dialog where user can enter a new domain.
  */
-@Named
 final class VMFinish extends VMConfig {
     private final SwingUtils swingUtils;
     private final WidgetFactory widgetFactory;

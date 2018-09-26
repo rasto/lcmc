@@ -28,6 +28,7 @@ import lcmc.common.domain.Application;
 import lcmc.common.domain.StringValue;
 import lcmc.common.domain.Value;
 import lcmc.common.domain.util.Tools;
+import lcmc.common.ui.Access;
 import lcmc.common.ui.Browser;
 import lcmc.common.ui.main.MainData;
 import lcmc.common.ui.treemenu.ClusterTreeMenu;
@@ -395,8 +396,8 @@ public final class DiskInfo extends HardwareInfo {
     /** Table panel. */
     private JComponent tablePanel = null;
 
-    public DiskInfo(Application application, SwingUtils swingUtils, MenuFactory menuFactory, WidgetFactory widgetFactory, MainData mainData, ClusterTreeMenu clusterTreeMenu) {
-        super(application, swingUtils, menuFactory, widgetFactory, mainData, clusterTreeMenu);
+    public DiskInfo(Application application, SwingUtils swingUtils, Access access, MainData mainData, WidgetFactory widgetFactory, MenuFactory menuFactory, ClusterTreeMenu clusterTreeMenu) {
+        super(application, swingUtils, access, mainData, widgetFactory, menuFactory, clusterTreeMenu);
         this.application = application;
         this.swingUtils = swingUtils;
         this.widgetFactory = widgetFactory;

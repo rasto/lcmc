@@ -26,21 +26,24 @@ import com.google.common.base.Optional;
 import lcmc.cluster.ui.ClusterBrowser;
 import lcmc.cluster.ui.widget.Check;
 import lcmc.cluster.ui.widget.Widget;
+import lcmc.cluster.ui.widget.WidgetFactory;
 import lcmc.common.domain.AccessMode;
 import lcmc.common.domain.Application;
 import lcmc.common.domain.ResourceValue;
 import lcmc.common.domain.StringValue;
 import lcmc.common.domain.Value;
 import lcmc.common.domain.util.Tools;
+import lcmc.common.ui.Access;
 import lcmc.common.ui.Browser;
 import lcmc.common.ui.EditableInfo;
+import lcmc.common.ui.main.MainData;
+import lcmc.common.ui.utils.SwingUtils;
 import lcmc.crm.domain.ClusterStatus;
 import lcmc.crm.domain.CrmXml;
 import lcmc.crm.domain.Service;
 import lcmc.crm.service.CRM;
 import lcmc.host.domain.Host;
 
-import javax.inject.Named;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -53,6 +56,10 @@ final class HbColocationInfo extends EditableInfo implements HbConstraintInterfa
     private ServiceInfo serviceInfoRsc;
     private ServiceInfo serviceInfoWithRsc;
     private HbConnectionInfo connectionInfo;
+
+    public HbColocationInfo(Application application, SwingUtils swingUtils, Access access, MainData mainData, WidgetFactory widgetFactory) {
+        super(application, swingUtils, access, mainData, widgetFactory);
+    }
 
     void init(final HbConnectionInfo connectionInfo,
               final ServiceInfo serviceInfoRsc,

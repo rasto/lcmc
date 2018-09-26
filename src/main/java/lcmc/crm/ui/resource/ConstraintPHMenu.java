@@ -22,29 +22,31 @@ package lcmc.crm.ui.resource;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Supplier;
 
+import lcmc.common.ui.Access;
 import lcmc.common.ui.CallbackAction;
 import lcmc.common.domain.AccessMode;
 import lcmc.common.domain.Application;
+import lcmc.common.ui.EditConfig;
+import lcmc.common.ui.main.MainData;
+import lcmc.common.ui.treemenu.ClusterTreeMenu;
+import lcmc.common.ui.utils.*;
+import lcmc.crm.ui.ServiceLogs;
 import lcmc.host.domain.Host;
 import lcmc.cluster.ui.ClusterBrowser;
-import lcmc.common.ui.utils.ButtonCallback;
 import lcmc.common.domain.EnablePredicate;
-import lcmc.common.ui.utils.MenuAction;
-import lcmc.common.ui.utils.MenuFactory;
-import lcmc.common.ui.utils.MyMenuItem;
 import lcmc.common.domain.util.Tools;
-import lcmc.common.ui.utils.UpdatableItem;
-import lombok.RequiredArgsConstructor;
 
-import javax.inject.Inject;
-import javax.inject.Named;
-
-@RequiredArgsConstructor
 public class ConstraintPHMenu extends ServiceMenu {
     private final MenuFactory menuFactory;
 
     private ConstraintPHInfo constraintPHInfo;
+
+    public ConstraintPHMenu(MainData drbdGui, EditConfig editDialog, MenuFactory menuFactory, Application application, SwingUtils swingUtils, Supplier<ServiceLogs> serviceLogsProvider, ClusterTreeMenu clusterTreeMenu, Access access, GroupMenu groupMenu) {
+        super(drbdGui, editDialog, menuFactory, application, swingUtils, serviceLogsProvider, clusterTreeMenu, access, groupMenu);
+        this.menuFactory = menuFactory;
+    }
 
     @Override
     public List<UpdatableItem> getPulldownMenu(final ServiceInfo serviceInfo) {

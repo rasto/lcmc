@@ -25,8 +25,6 @@ package lcmc.common.ui.utils;
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.Collection;
-import javax.inject.Inject;
-import javax.inject.Named;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JScrollPane;

@@ -23,14 +23,16 @@ package lcmc.cluster.ui.resource;
 
 import lcmc.common.domain.Application;
 import lcmc.common.domain.util.Tools;
+import lcmc.common.ui.Access;
 import lcmc.common.ui.Browser;
+import lcmc.common.ui.main.MainData;
+import lcmc.common.ui.utils.SwingUtils;
 import lcmc.crm.ui.resource.HbCategoryInfo;
 import lcmc.crm.ui.resource.ServiceInfo;
 import lcmc.drbd.domain.BlockDevice;
 import lcmc.drbd.domain.CommonBlockDevice;
 import lcmc.drbd.ui.resource.BlockDevInfo;
 
-import javax.inject.Named;
 import javax.swing.*;
 
 /**
@@ -42,6 +44,10 @@ public class CommonBlockDevInfo extends HbCategoryInfo implements CommonDeviceIn
     /** block devices of this common block device on all nodes. */
     private BlockDevice[] blockDevices;
     private CommonBlockDevice commonBlockDevice;
+
+    public CommonBlockDevInfo(Application application, SwingUtils swingUtils, Access access, MainData mainData) {
+        super(application, swingUtils, access, mainData);
+    }
 
     public void init(final String name, final BlockDevice[] blockDevices, final Browser browser) {
         super.init(name, browser);

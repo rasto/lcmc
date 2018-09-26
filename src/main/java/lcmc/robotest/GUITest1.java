@@ -29,7 +29,7 @@ import lombok.RequiredArgsConstructor;
  * This class is used to test the GUI.
  */
 @RequiredArgsConstructor
-final class GUITest1 {
+public class GUITest1 {
     private final RoboTest roboTest;
 
     /** Host wizard locked until focus is lost. */

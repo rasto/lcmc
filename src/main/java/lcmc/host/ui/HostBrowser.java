@@ -50,13 +50,13 @@ import lcmc.event.FileSystemsChangedEvent;
 import lcmc.event.NetInterfacesChangedEvent;
 import lcmc.host.domain.Host;
 
-import javax.inject.Provider;
 import javax.swing.*;
 import javax.swing.tree.DefaultMutableTreeNode;
 import java.util.*;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
+import java.util.function.Supplier;
 
 /**
  * This class holds host resource data in a tree. It shows panels that allow
@@ -66,10 +66,10 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 public class HostBrowser extends Browser {
 
     private final ProgressIndicator progressIndicator;
-    private final Provider<BlockDevInfo> blockDevInfoFactory;
+    private final Supplier<BlockDevInfo> blockDevInfoFactory;
     private final SwingUtils swingUtils;
     private final MenuFactory menuFactory;
-    private final Provider<CmdLog> cmdLogProvider;
+    private final Supplier<CmdLog> cmdLogProvider;
     private final CategoryInfo netInterfacesCategory;
     private final CategoryInfo blockDevicesCategory;
     private final CategoryInfo fileSystemsCategory;
@@ -111,7 +111,7 @@ public class HostBrowser extends Browser {
     private final Lock mBlockDevInfosWriteLock = mBlockDevInfosLock.writeLock();
     private DefaultMutableTreeNode treeTop;
 
-    public HostBrowser(Application application, HostInfo hostInfo, HostDrbdInfo hostDrbdInfo, ProgressIndicator progressIndicator, Provider<BlockDevInfo> blockDevInfoFactory, SwingUtils swingUtils, MenuFactory menuFactory, Provider<CmdLog> cmdLogProvider, CategoryInfo netInterfacesCategory, CategoryInfo blockDevicesCategory, CategoryInfo fileSystemsCategory, TreeMenuController treeMenuController, ClusterEventBus clusterEventBus, ClusterViewFactory clusterViewFactory) {
+    public HostBrowser(Application application, HostInfo hostInfo, HostDrbdInfo hostDrbdInfo, ProgressIndicator progressIndicator, Supplier<BlockDevInfo> blockDevInfoFactory, SwingUtils swingUtils, MenuFactory menuFactory, Supplier<CmdLog> cmdLogProvider, CategoryInfo netInterfacesCategory, CategoryInfo blockDevicesCategory, CategoryInfo fileSystemsCategory, TreeMenuController treeMenuController, ClusterEventBus clusterEventBus, ClusterViewFactory clusterViewFactory) {
         super(application);
         this.hostInfo = hostInfo;
         this.hostDrbdInfo = hostDrbdInfo;

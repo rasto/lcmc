@@ -22,11 +22,13 @@ package lcmc.crm.ui.resource;
 
 import com.google.common.base.Optional;
 import lcmc.cluster.ui.ClusterBrowser;
+import lcmc.cluster.ui.widget.WidgetFactory;
 import lcmc.common.domain.AccessMode;
 import lcmc.common.domain.Application;
 import lcmc.common.domain.ResourceValue;
 import lcmc.common.domain.Value;
 import lcmc.common.domain.util.Tools;
+import lcmc.common.ui.Access;
 import lcmc.common.ui.Browser;
 import lcmc.common.ui.EditableInfo;
 import lcmc.common.ui.Info;
@@ -41,10 +43,7 @@ import lcmc.crm.service.CRM;
 import lcmc.host.domain.Host;
 import lcmc.logger.Logger;
 import lcmc.logger.LoggerFactory;
-import lombok.RequiredArgsConstructor;
 
-import javax.inject.Inject;
-import javax.inject.Named;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -55,7 +54,6 @@ import java.util.concurrent.CountDownLatch;
 /**
  * This class provides menus for service and host multi selection.
  */
-@RequiredArgsConstructor
 public class PcmkMultiSelectionInfo extends EditableInfo {
     private final PcmkMultiSelectionMenu pcmkMultiSelectionMenu;
     private final Application application;
@@ -63,6 +61,13 @@ public class PcmkMultiSelectionInfo extends EditableInfo {
 
     private static final Logger LOG = LoggerFactory.getLogger(PcmkMultiSelectionInfo.class);
     private List<Info> selectedInfos;
+
+    public PcmkMultiSelectionInfo(Application application, SwingUtils swingUtils, Access access, MainData mainData, WidgetFactory widgetFactory, PcmkMultiSelectionMenu pcmkMultiSelectionMenu) {
+        super(application, swingUtils, access, mainData, widgetFactory);
+        this.pcmkMultiSelectionMenu = pcmkMultiSelectionMenu;
+        this.application = application;
+        this.swingUtils = swingUtils;
+    }
 
     public void init(final List<Info> selectedInfos, final Browser browser) {
         super.einit(Optional.<ResourceValue>absent(), "selection", browser);

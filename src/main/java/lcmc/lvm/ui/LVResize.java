@@ -68,8 +68,9 @@ import lcmc.common.ui.utils.WidgetListener;
 public final class LVResize extends LV {
     private final SwingUtils swingUtils;
     private final WidgetFactory widgetFactory;
+    private final LoggerFactory loggerFactory;
 
-    private static final Logger LOG = LoggerFactory.getLogger(LVResize.class);
+    private static final Logger LOG = loggerFactory.getLogger(LVResize.class);
     private static final String DESCRIPTION =
                    "Resize the LVM volume. You can make it bigger, but not"
                    + " smaller for now. If this volume is replicated by"
@@ -85,10 +86,11 @@ public final class LVResize extends LV {
     private Map<Host, JCheckBox> hostCheckBoxes = null;
     private MyButton resizeButton;
 
-    public LVResize(Supplier<ProgressBar> progressBarProvider, Application application, SwingUtils swingUtils, WidgetFactory widgetFactory, MainData mainData) {
+    public LVResize(Supplier<ProgressBar> progressBarProvider, Application application, SwingUtils swingUtils, WidgetFactory widgetFactory, MainData mainData, LoggerFactory loggerFactory) {
         super(progressBarProvider, application, swingUtils, widgetFactory, mainData);
         this.swingUtils = swingUtils;
         this.widgetFactory = widgetFactory;
+        this.loggerFactory = loggerFactory;
     }
 
     public void init(final BlockDevInfo blockDevInfo) {

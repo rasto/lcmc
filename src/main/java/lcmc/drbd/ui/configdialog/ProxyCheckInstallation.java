@@ -22,9 +22,8 @@ package lcmc.drbd.ui.configdialog;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.function.Supplier;
 
-import javax.inject.Inject;
-import javax.inject.Named;
 import javax.swing.ImageIcon;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
@@ -33,6 +32,8 @@ import javax.swing.SpringLayout;
 
 import lcmc.cluster.ui.widget.WidgetFactory;
 import lcmc.common.domain.Application;
+import lcmc.common.ui.ProgressBar;
+import lcmc.common.ui.main.MainData;
 import lcmc.common.ui.utils.SwingUtils;
 import lcmc.host.domain.Host;
 import lcmc.drbd.domain.DrbdInstallation;
@@ -45,10 +46,8 @@ import lcmc.common.domain.ExecCallback;
 import lcmc.common.ui.utils.MyButton;
 import lcmc.common.domain.util.Tools;
 import lcmc.cluster.service.ssh.ExecCommandConfig;
-import lombok.RequiredArgsConstructor;
 
-@RequiredArgsConstructor
-final class ProxyCheckInstallation extends DialogHost {
+public class ProxyCheckInstallation extends DialogHost {
     private final WidgetFactory widgetFactory;
     private final ProxyInst proxyInstDialog;
     private final Application application;
@@ -76,6 +75,14 @@ final class ProxyCheckInstallation extends DialogHost {
     private Host proxyHost;
     private VolumeInfo volumeInfo;
     private WizardDialog origDialog;
+
+    public ProxyCheckInstallation(Supplier<ProgressBar> progressBarProvider, Application application, SwingUtils swingUtils, WidgetFactory widgetFactory, MainData mainData, ProxyInst proxyInstDialog) {
+        super(progressBarProvider, application, swingUtils, widgetFactory, mainData);
+        this.widgetFactory = widgetFactory;
+        this.proxyInstDialog = proxyInstDialog;
+        this.application = application;
+        this.swingUtils = swingUtils;
+    }
 
     void init(final WizardDialog previousDialog,
               final Host proxyHost,

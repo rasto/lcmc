@@ -26,15 +26,22 @@ import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
+
+import lcmc.cluster.ui.widget.WidgetFactory;
+import lcmc.common.domain.Application;
+import lcmc.common.ui.main.MainData;
+import lcmc.common.ui.utils.SwingUtils;
 import lcmc.host.domain.Host;
 import lcmc.common.ui.HostLogs;
-
-import javax.inject.Named;
 
 /**
  * An implementation of an dialog with log files.
  */
 public final class DrbdsLog extends HostLogs {
+
+    public DrbdsLog(Application application, SwingUtils swingUtils, WidgetFactory widgetFactory, MainData mainData) {
+        super(application, swingUtils, widgetFactory, mainData);
+    }
 
     public void init(final Host host) {
         super.init(host);

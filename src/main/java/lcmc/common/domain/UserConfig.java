@@ -32,10 +32,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Provider;
-import javax.inject.Singleton;
+import java.util.function.Supplier;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -75,9 +72,9 @@ import org.w3c.dom.NodeList;
 public final class UserConfig extends XMLTools {
 
     private final ClusterTabFactory clusterTabFactory;
-    private final HostFactory hostFactory;
-    private final ClustersPanel clustersPanel;
-    private final Provider<Cluster> clusterProvider;
+    private final Supplier<HostFactory> hostFactoryProvider;
+    private final Supplier<ClustersPanel> clustersPanelProvider;
+    private final Supplier<Cluster> clusterProvider;
     private final Application application;
     private final SwingUtils swingUtils;
     private final Hosts allHosts;
@@ -226,7 +223,7 @@ public final class UserConfig extends XMLTools {
                     swingUtils.invokeLater(new Runnable() {
                         @Override
                         public void run() {
-                            clustersPanel.removeTabWithCluster(cluster);
+                            clustersPanelProvider.get().removeTabWithCluster(cluster);
                         }
                     });
                     continue;
@@ -329,7 +326,7 @@ public final class UserConfig extends XMLTools {
                         final boolean sudo,
                         final boolean savable) {
         application.setLastEnteredUser(username);
-        final Host host = hostFactory.createInstance();
+        final Host host = hostFactoryProvider.get().createInstance();
         host.setSavable(savable);
         host.setHostname(nodeName);
         if (sshPort == null) {

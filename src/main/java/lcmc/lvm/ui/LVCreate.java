@@ -34,7 +34,6 @@ import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Supplier;
-import javax.inject.Named;
 import javax.swing.JCheckBox;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
@@ -63,7 +62,6 @@ import lcmc.common.domain.util.Tools;
 import lcmc.common.ui.utils.WidgetListener;
 
 /** Create LV dialog. */
-@Named
 public final class LVCreate extends LV {
     private final SwingUtils swingUtils;
     private final WidgetFactory widgetFactory;

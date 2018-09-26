@@ -38,8 +38,11 @@ import lcmc.common.domain.Application;
 import lcmc.common.domain.StringValue;
 import lcmc.common.domain.Value;
 import lcmc.common.domain.util.Tools;
+import lcmc.common.ui.Access;
 import lcmc.common.ui.Browser;
 import lcmc.common.ui.Info;
+import lcmc.common.ui.main.MainData;
+import lcmc.common.ui.main.ProgressIndicator;
 import lcmc.common.ui.treemenu.ClusterTreeMenu;
 import lcmc.common.ui.utils.SwingUtils;
 import lcmc.common.ui.utils.WidgetListener;
@@ -55,6 +58,7 @@ import lombok.RequiredArgsConstructor;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreeNode;
 import java.util.*;
+import java.util.function.Supplier;
 
 /**
  * This class holds info about Filesystem service. It is treated in special
@@ -82,6 +86,18 @@ public class FilesystemRaInfo extends ServiceInfo {
     private Widget fstypeParamWidget = null;
     private Optional<Widget> directoryParamWidget = Optional.absent();
     private boolean drbddiskIsPreferred = false;
+
+    public FilesystemRaInfo(Application application, SwingUtils swingUtils, Access access, MainData mainData, WidgetFactory widgetFactory, ProgressIndicator progressIndicator, ServiceMenu serviceMenu, Supplier<CloneInfo> cloneInfoProvider, ClusterTreeMenu clusterTreeMenu, CrmServiceFactory crmServiceFactory, BlockDeviceService blockDeviceService, MountPointService mountPointService, ClusterEventBus clusterEventBus, FileSystemService fileSystemService) {
+        super(application, swingUtils, access, mainData, widgetFactory, progressIndicator, serviceMenu, cloneInfoProvider, clusterTreeMenu, crmServiceFactory);
+        this.application = application;
+        this.swingUtils = swingUtils;
+        this.widgetFactory = widgetFactory;
+        this.blockDeviceService = blockDeviceService;
+        this.mountPointService = mountPointService;
+        this.clusterEventBus = clusterEventBus;
+        this.clusterTreeMenu = clusterTreeMenu;
+        this.fileSystemService = fileSystemService;
+    }
 
 
     @Override

@@ -24,9 +24,6 @@ import lcmc.cluster.ui.network.InfoPresenter;
 import lcmc.common.ui.Info;
 import lombok.RequiredArgsConstructor;
 
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Singleton;
 import javax.swing.*;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.MutableTreeNode;

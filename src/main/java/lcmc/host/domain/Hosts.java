@@ -30,9 +30,6 @@ import lcmc.cluster.domain.Cluster;
 import lcmc.logger.Logger;
 import lcmc.logger.LoggerFactory;
 
-import javax.inject.Named;
-import javax.inject.Singleton;
-
 /**
  * This class holds a set of all hosts.
  */

@@ -49,9 +49,6 @@ import java.util.LinkedList;
 import java.util.Map;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Singleton;
 import javax.swing.*;
 
 import lcmc.common.ui.Browser;
@@ -95,7 +92,7 @@ import lombok.RequiredArgsConstructor;
  */
 
 @RequiredArgsConstructor
-class ProgressIndicatorPanel extends JComponent implements MouseListener, KeyListener {
+public class ProgressIndicatorPanel extends JComponent implements MouseListener, KeyListener {
     private final WidgetFactory widgetFactory;
     private final MainPanel mainPanel;
     private final MainData mainData;

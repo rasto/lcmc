@@ -22,8 +22,5 @@ package lcmc;
 
 import com.google.common.eventbus.EventBus;
 
-import javax.inject.Named;
-import javax.inject.Singleton;
-
 public class HwEventBus extends EventBus {
 }

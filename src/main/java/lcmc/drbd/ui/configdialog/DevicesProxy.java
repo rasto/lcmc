@@ -20,27 +20,35 @@
 
 package lcmc.drbd.ui.configdialog;
 
+import lcmc.cluster.ui.widget.WidgetFactory;
+import lcmc.common.domain.Application;
+import lcmc.common.ui.ProgressBar;
+import lcmc.common.ui.main.MainData;
+import lcmc.common.ui.utils.SwingUtils;
 import lcmc.host.domain.Host;
 import lcmc.drbd.domain.DrbdInstallation;
 import lcmc.common.ui.WizardDialog;
 import lcmc.host.ui.Devices;
 import lcmc.drbd.ui.resource.VolumeInfo;
 import lcmc.common.ui.utils.MyButton;
-import lombok.RequiredArgsConstructor;
+import lcmc.host.ui.DistDetection;
 
-import javax.inject.Inject;
-import javax.inject.Named;
+import java.util.function.Supplier;
 
 /**
  * An implementation of a dialog where hardware information is collected.
  */
-@RequiredArgsConstructor
-final class DevicesProxy extends Devices {
+public class DevicesProxy extends Devices {
     private final ProxyCheckInstallation proxyCheckInstallationDialog;
 
     private VolumeInfo volumeInfo;
     private WizardDialog origDialog;
     private WizardDialog nextDialogObject = null;
+
+    public DevicesProxy(Supplier<ProgressBar> progressBarProvider, Application application, SwingUtils swingUtils, WidgetFactory widgetFactory, MainData mainData, DistDetection distDetection, ProxyCheckInstallation proxyCheckInstallationDialog) {
+        super(progressBarProvider, application, swingUtils, widgetFactory, mainData, distDetection);
+        this.proxyCheckInstallationDialog = proxyCheckInstallationDialog;
+    }
 
     void init(final WizardDialog previousDialog,
               final Host host,

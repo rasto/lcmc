@@ -26,18 +26,22 @@ import java.util.List;
 import java.util.Locale;
 import lcmc.cluster.ui.ClusterBrowser;
 import lcmc.cluster.ui.widget.WidgetFactory;
+import lcmc.common.domain.Application;
+import lcmc.common.ui.Access;
+import lcmc.common.ui.main.MainData;
 import lcmc.common.ui.utils.MyButton;
-import lombok.RequiredArgsConstructor;
-
-import javax.inject.Inject;
-import javax.inject.Named;
+import lcmc.common.ui.utils.SwingUtils;
 
 /**
  * This class holds the information about available resource agent classes.
  */
-@RequiredArgsConstructor
 public final class AvailableServicesInfo extends HbCategoryInfo {
     private final WidgetFactory widgetFactory;
+
+    public AvailableServicesInfo(Application application, SwingUtils swingUtils, Access access, MainData mainData, WidgetFactory widgetFactory) {
+        super(application, swingUtils, access, mainData);
+        this.widgetFactory = widgetFactory;
+    }
 
     @Override
     protected String[] getColumnNames(final String tableName) {

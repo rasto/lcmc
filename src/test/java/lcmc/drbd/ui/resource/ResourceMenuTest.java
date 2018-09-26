@@ -34,7 +34,6 @@ import lcmc.common.ui.utils.UpdatableItem;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 
 import static org.mockito.Matchers.anyObject;
@@ -59,11 +58,11 @@ public class ResourceMenuTest {
     private MyMenu menuStub;
     @Mock
     private MenuFactory menuFactoryStub;
-    @InjectMocks
     private ResourceMenu resourceMenu;
 
     @Before
     public void setUp() {
+        resourceMenu = new ResourceMenu(menuFactoryStub, null);
         when(menuFactoryStub.createMenu(
                 anyString(),
                 (AccessMode) anyObject(),

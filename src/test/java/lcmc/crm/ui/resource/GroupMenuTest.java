@@ -42,7 +42,6 @@ import lcmc.common.domain.VisiblePredicate;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 
 import static org.mockito.Matchers.anyObject;
@@ -75,11 +74,11 @@ public class GroupMenuTest {
     private MenuFactory menuFactoryStub;
     @Mock
     private MainData mainData;
-    @InjectMocks
     private GroupMenu groupMenu;
 
     @Before
     public void setUp() {
+        groupMenu = new GroupMenu();
         when(groupInfoStub.getBrowser()).thenReturn(clusterBrowserStub);
         when(groupInfoStub.getResource()).thenReturn(resourceStub);
         when(groupInfoStub.getService()).thenReturn(serviceStub);

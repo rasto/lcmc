@@ -23,16 +23,16 @@
 package lcmc.drbd.ui.configdialog;
 
 import java.net.UnknownHostException;
-import javax.inject.Inject;
-import javax.inject.Named;
+import java.util.function.Supplier;
 import javax.swing.BoxLayout;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SpringLayout;
 
-import lcmc.AppContext;
 import lcmc.Exceptions;
+import lcmc.cluster.ui.widget.WidgetFactory;
+import lcmc.common.ui.ProgressBar;
 import lcmc.common.ui.main.MainData;
 import lcmc.common.ui.MainPanel;
 import lcmc.common.ui.utils.SwingUtils;
@@ -48,24 +48,33 @@ import lcmc.drbd.service.DRBD;
 import lcmc.logger.Logger;
 import lcmc.logger.LoggerFactory;
 import lcmc.common.domain.util.Tools;
-import lombok.RequiredArgsConstructor;
 
 /**
  * An implementation of a dialog where user can enter drbd block device
  * information.
  */
-@RequiredArgsConstructor
-final class BlockDev extends DrbdConfig {
+public class BlockDev extends DrbdConfig {
     private final MainData mainData;
     private final MainPanel mainPanel;
     private final CreateMD createMDDialog;
     private final Application application;
     private final SwingUtils swingUtils;
+    private final BlockDev blockDev;
 
     private static final Logger LOG = LoggerFactory.getLogger(BlockDev.class);
     private BlockDevInfo blockDevInfo;
 
     private GlobalInfo globalInfo;
+
+    public BlockDev(Supplier<ProgressBar> progressBarProvider, Application application, SwingUtils swingUtils, WidgetFactory widgetFactory, MainData mainData, MainPanel mainPanel, CreateMD createMDDialog, BlockDev blockDev) {
+        super(progressBarProvider, application, swingUtils, widgetFactory, mainData);
+        this.mainData = mainData;
+        this.mainPanel = mainPanel;
+        this.createMDDialog = createMDDialog;
+        this.application = application;
+        this.swingUtils = swingUtils;
+        this.blockDev = blockDev;
+    }
 
     void init(final WizardDialog previousDialog, final VolumeInfo dli, final BlockDevInfo blockDevInfo) {
         init(previousDialog, dli);
@@ -97,7 +106,7 @@ final class BlockDev extends DrbdConfig {
     public WizardDialog nextDialog() {
         if (getDrbdVolumeInfo().isFirstBlockDevInfo(blockDevInfo)) {
             final BlockDevInfo oBdi = getDrbdVolumeInfo().getOtherBlockDevInfo(blockDevInfo);
-            final BlockDev nextBlockDev = AppContext.getBean(BlockDev.class);
+            final BlockDev nextBlockDev = blockDev;
             nextBlockDev.init(this, getDrbdVolumeInfo(), oBdi);
             return nextBlockDev;
         } else {

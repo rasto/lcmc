@@ -29,7 +29,7 @@ import lombok.RequiredArgsConstructor;
  * This class is used to test the GUI.
  */
 @RequiredArgsConstructor
-final class PcmkTestG {
+public class PcmkTestG {
     private final RoboTest roboTest;
 
     void start(final int count) {

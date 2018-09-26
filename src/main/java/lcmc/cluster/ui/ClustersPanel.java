@@ -120,7 +120,7 @@ public final class ClustersPanel extends JPanel {
     }
 
     /** Adds an epmty tab, that opens new cluster dialogs. */
-    void addClustersTab(final String label) {
+    private void addClustersTab(final String label) {
         tabbedPane.addTab(label,
                           ALL_CLUSTERS_ICON,
                           clusterTabFactory.createClusterTab(null),

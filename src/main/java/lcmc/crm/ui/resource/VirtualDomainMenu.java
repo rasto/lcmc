@@ -22,6 +22,8 @@ package lcmc.crm.ui.resource;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.function.Supplier;
+
 import lcmc.common.domain.AccessMode;
 import lcmc.common.domain.Application;
 import lcmc.common.ui.Access;
@@ -38,8 +40,6 @@ import lcmc.common.ui.utils.MenuAction;
 import lcmc.common.ui.utils.MenuFactory;
 import lcmc.common.ui.utils.UpdatableItem;
 
-import javax.inject.Provider;
-
 public class VirtualDomainMenu extends ServiceMenu {
     private final Application application;
     private final MenuFactory menuFactory;
@@ -48,8 +48,8 @@ public class VirtualDomainMenu extends ServiceMenu {
 
     private DomainInfo domainInfo;
 
-    public VirtualDomainMenu(MainData drbdGui, EditConfig editDialog, MenuFactory menuFactory, Application application, SwingUtils swingUtils, Provider<ServiceLogs> serviceLogsProvider, ClusterTreeMenu clusterTreeMenu, Access access) {
-        super(drbdGui, editDialog, menuFactory, application, swingUtils, serviceLogsProvider, clusterTreeMenu, access);
+    public VirtualDomainMenu(MainData drbdGui, EditConfig editDialog, MenuFactory menuFactory, Application application, SwingUtils swingUtils, Supplier<ServiceLogs> serviceLogsProvider, ClusterTreeMenu clusterTreeMenu, Access access, GroupMenu groupMenu) {
+        super(drbdGui, editDialog, menuFactory, application, swingUtils, serviceLogsProvider, clusterTreeMenu, access, groupMenu);
         this.application = application;
         this.menuFactory = menuFactory;
     }
