@@ -3,5 +3,5 @@
 
 include /usr/share/cdbs/1/rules/debhelper.mk
 
-JAVA_HOME 		:= /usr/lib/jvm/java-8-openjdk-amd64
+JAVA_HOME 		:= /usr/lib/jvm/java-10-openjdk-amd64
 DEB_JARS 		:= vecmath j3dcore jd3utils jai_core xalan2

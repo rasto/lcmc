@@ -568,7 +568,7 @@
                             </classPath>
                             <icon>scripts/lcmc.ico</icon>
                             <jre>
-                                <minVersion>1.8.0</minVersion>
+                                <minVersion>1.10.0</minVersion>
                                 <maxVersion></maxVersion>
                                 <initialHeapSize>128</initialHeapSize>
                                 <maxHeapSize>1024</maxHeapSize>
