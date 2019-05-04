@@ -75,7 +75,7 @@ public final class DistResource_ubuntu extends ListResourceBundle {
         {"DrbdInst.install.2",
          "apt-get update && DEBIAN_FRONTEND=noninteractive /usr/bin/apt-get -y install -o "
          + "'DPkg::Options::force=--force-confnew'"
-         + "  drbd8-utils"},
+         + "  drbd8?-utils"},
 
         /* Drbd install method 3 */
         {"DrbdInst.install.text.3",
