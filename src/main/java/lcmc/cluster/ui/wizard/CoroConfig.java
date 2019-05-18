@@ -815,6 +815,18 @@ final class CoroConfig extends DialogCluster {
             config.append("expected_votes: ");
             config.append(hosts.length);
             config.append("\n}\n");
+
+
+            int nodeId = 1;
+            config.append("nodelist {\n");
+            for (final Host host : hosts){
+                config.append(tab + "node {\n");
+                config.append(tab + tab + "nodeid: " + nodeId + "\n");
+                config.append(tab + tab + "ring0_addr: " + host.getName() + "\n");
+                config.append(tab + "}\n");
+                nodeId++;
+            }
+            config.append("}\n");
         } else {
             config.append("\nservice {\n");
             config.append(tab);
