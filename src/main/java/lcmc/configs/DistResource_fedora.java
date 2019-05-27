@@ -85,6 +85,7 @@ public final class DistResource_fedora extends ListResourceBundle {
          "yum install: 1.1.x/1.4.x"},
         {"PmInst.install.1",
          "yum -y install pacemaker corosync"
+         + "&& " + DistResource.SUDO + "/bin/systemctl enable corosync.service"
          + "&& if ( rpm -qa|grep drbd ); then"
          + " yum -y install drbd-pacemaker; fi"
          + " && if [ -e /etc/corosync/corosync.conf ]; then"
