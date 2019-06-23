@@ -42,7 +42,7 @@ public final class DistResource_suse extends ListResourceBundle {
         {"version:openSUSE 11.4*",    "OPENSUSE11_4"}, // detected
         {"version:openSUSE 13.*",     "OPENSUSE13_1"}, // detected
         {"version:openSUSE 42.*",     "OPENSUSE13_1"}, // detected
-        {"version:openSUSE/20*",     "OPENSUSE13_1"}, // detected
+        {"version:openSUSE*",         "OPENSUSE15"},
         {"version:SUSE Linux Enterprise Server 11*", "SLES11"}, // detected
         {"version:sles9",  "SLES9"}, // chosen
         {"version:sles10", "SLES10"}, // chosen
