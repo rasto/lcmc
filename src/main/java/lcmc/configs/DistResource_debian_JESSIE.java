@@ -40,8 +40,7 @@ public final class DistResource_debian_JESSIE extends ListResourceBundle {
          "Backports repo: 1.1.x/2.3.x"},
 
         {"PmInst.install.1",
-         "echo 'deb http://ftp.debian.org/debian"
-         + " jessie-backports main'"
+         "echo 'deb [check-valid-until=no] http://archive.debian.org/debian jessie-backports main'"
          + " > /etc/apt/sources.list.d/ha-clustering.list "
          + " && apt-get update"
          + " && apt-get -t jessie-backports -y -q  --allow-unauthenticated install"

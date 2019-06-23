@@ -56,6 +56,7 @@ public final class DistResource_debian extends ListResourceBundle {
         {"PmInst.install.1",
          "apt-get update && /usr/bin/apt-get -y -q install -o"
          + " 'DPkg::Options::force=--force-confnew' corosync pacemaker"
+		 + " && mkdir /var/log/cluster"
          + " && sed -i 's/\\(START=\\)no/\\1yes/' /etc/default/corosync"
          + " && if [ -e /etc/corosync/corosync.conf ]; then"
          + " mv /etc/corosync/corosync.conf /etc/corosync/corosync.conf.orig;"
