@@ -125,13 +125,13 @@ public final class DistResource extends ListResourceBundle {
          SUDO + "/usr/sbin/crm_resource --meta -t primitive -r @ID@ -p is-managed -v false"},
 
         {"CRM.migrateResource",
-         SUDO + "/usr/sbin/crm_resource -r @ID@ -H @HOST@ --migrate"},
+         SUDO + "/usr/sbin/crm_resource -r @ID@ -H @HOST@ --move"},
         {"CRM.forceMigrateResource",
-         SUDO + "/usr/sbin/crm_resource -f -r @ID@ -H @HOST@ --migrate"},
+         SUDO + "/usr/sbin/crm_resource -f -r @ID@ -H @HOST@ --move"},
         {"CRM.migrateFromResource",
-         SUDO + "/usr/sbin/crm_resource -r @ID@ --migrate"},
+         SUDO + "/usr/sbin/crm_resource -r @ID@ --move"},
         {"CRM.unmigrateResource",
-         SUDO + "/usr/sbin/crm_resource -r @ID@ --un-migrate"},
+         SUDO + "/usr/sbin/crm_resource -r @ID@ --clear"},
 
         {"Heartbeat.getOCFParametersQuick",
          SUDO + "@GUI-HELPER@ get-resource-agents quick;"},
