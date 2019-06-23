@@ -51,6 +51,7 @@ import javax.swing.JTextArea;
 import javax.swing.SpringLayout;
 
 import lcmc.Exceptions.IllegalVersionException;
+import lcmc.cluster.ui.wizard.corosync.CorosyncPacemakerConfig;
 import lcmc.common.ui.Access;
 import lcmc.common.ui.main.MainData;
 import lcmc.common.domain.AccessMode;
@@ -168,7 +169,8 @@ final class CoroConfig extends DialogCluster {
                                 config.append("}\n");
                                 final String serviceVersion =
                                             hosts[0].getDistString("Pacemaker.Service.Ver");
-                                config.append(aisConfigPacemaker("\t", serviceVersion));
+                                String corosyncVersion = hosts[0].getHostParser().getCorosyncVersion();
+                                config.append(new CorosyncPacemakerConfig("\t", serviceVersion, corosyncVersion, hosts).create());
                                 if (hosts[0].getHostParser().isCorosyncInstalled()) {
                                     Corosync.createCorosyncConfig(hosts, config);
                                 } else {
@@ -603,7 +605,8 @@ final class CoroConfig extends DialogCluster {
 
                 /* service pacemaker */
                 final String serviceVersion = hosts[0].getDistString("Pacemaker.Service.Ver");
-                final String[] pacemakerLines = aisConfigPacemaker(SPACE_TAB, serviceVersion).toString().split(NEWLINE);
+                String corosyncVersion = hosts[0].getHostParser().getCorosyncVersion();
+                final String[] pacemakerLines = new CorosyncPacemakerConfig(SPACE_TAB, serviceVersion, corosyncVersion, hosts).create().split(NEWLINE);
                 for (final String line : pacemakerLines) {
                     configPanel.add(new JLabel(line));
                 }
@@ -737,7 +740,6 @@ final class CoroConfig extends DialogCluster {
             config.append("to_logfile: yes\n");
             config.append(tab);
             config.append("logfile: /var/log/cluster/corosync.log\n");
-
         }
         config.append(tab);
         config.append("to_stderr: no\n");
@@ -794,53 +796,6 @@ final class CoroConfig extends DialogCluster {
         return config;
     }
 
-
-    /**
-     * Returns the part of the config.
-     */
-    private CharSequence aisConfigPacemaker(final String tab, final String serviceVersion) {
-        final StringBuilder config = new StringBuilder(120);
-        final Host[] hosts = getCluster().getHostsArray();
-        boolean corosync2 = false;
-        try {
-           corosync2 = Tools.compareVersions(hosts[0].getHostParser().getCorosyncVersion(), "2") >= 0;
-        } catch (final IllegalVersionException e) {
-            LOG.appWarning("aisConfigPacemaker: cannot compare corosync version: " + hosts[0].getHostParser().getCorosyncVersion());
-        }
-        if (corosync2) {
-            config.append("\nquorum {\n");
-            config.append(tab);
-            config.append("provider: corosync_votequorum\n");
-            config.append(tab);
-            config.append("expected_votes: ");
-            config.append(hosts.length);
-            config.append("\n}\n");
-
-
-            int nodeId = 1;
-            config.append("nodelist {\n");
-            for (final Host host : hosts){
-                config.append(tab + "node {\n");
-                config.append(tab + tab + "nodeid: " + nodeId + "\n");
-                config.append(tab + tab + "ring0_addr: " + host.getName() + "\n");
-                config.append(tab + "}\n");
-                nodeId++;
-            }
-            config.append("}\n");
-        } else {
-            config.append("\nservice {\n");
-            config.append(tab);
-            config.append("ver: ");
-            config.append(serviceVersion);
-            config.append('\n');
-            config.append(tab);
-            config.append("name: pacemaker\n");
-            config.append(tab);
-            config.append("use_mgmtd: no\n");
-            config.append("}\n");
-        }
-        return config;
-    }
 
     /** Adds interface to the config panel. It must be called from a thread. */
     private void addInterface(final Value type) {
