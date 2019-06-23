@@ -6,7 +6,6 @@ import lcmc.host.domain.Host;
 import lcmc.logger.Logger;
 import lcmc.logger.LoggerFactory;
 import lombok.RequiredArgsConstructor;
-import lombok.var;
 
 @RequiredArgsConstructor
 public class CorosyncPacemakerConfig {
