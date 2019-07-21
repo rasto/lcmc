@@ -4,4 +4,4 @@
      res_Dummy_2	(ocf::heartbeat:Dummy):	Stopped (disabled)
      res_Dummy_3	(ocf::heartbeat:Dummy):	Stopped (disabled)
  Master/Slave Set: ms_Stateful_1 [res_Stateful_1]
-     Stopped (disabled): [ test1 test2 ]
+     Stopped (disabled): [ host host ]

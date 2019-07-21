@@ -1,5 +1,3 @@
-node host
-node host
 primitive res_Filesystem_xy Filesystem 
 	params device="/dev/drbd/by-res/r0/0" directory="/mnt/" fstype=ext3 
 	operations $id=res_Filesystem_xy-operations 
@@ -23,7 +21,3 @@ ms ms_drbd_xy res_drbd_xy
 	meta clone-max=2 notify=true interleave=true target-role=stopped
 colocation col_res_Filesystem_xy_ms_drbd_xy inf: res_Filesystem_xy ms_drbd_xy:Master
 order ord_ms_drbd_xy_res_Filesystem_xy inf: ms_drbd_xy:promote res_Filesystem_xy:start
-property cib-bootstrap-options:
-	stonith-enabled=false
-	no-quorum-policy=ignore
-rsc_defaults rsc-options:

@@ -1,4 +1,4 @@
  Master/Slave Set: ms_drbd_1 [res_drbd_1]
-     Masters: [ test1 ]
-     Slaves: [ test2 ]
+     Masters: [ host ]
+     Slaves: [ host ]
  res_Filesystem_1	(ocf::heartbeat:Filesystem):	Started

@@ -4,6 +4,6 @@
      res_Dummy_2	(ocf::heartbeat:Dummy):	Started
      res_Dummy_3	(ocf::heartbeat:Dummy):	Started
  Master/Slave Set: ms_Stateful_1 [res_Stateful_1]
-     Masters: [ test2 ]
-     Slaves: [ test1 ]
+     Masters: [ host ]
+     Slaves: [ host ]
 

@@ -1,5 +1,3 @@
-node host
-node host
 primitive res_Dummy_1 Dummy 
 	operations $id=res_Dummy_1-operations 
 	op start interval=0 timeout=200 
@@ -35,7 +33,3 @@ group grp_1 res_Dummy_1 res_Dummy_2 res_Dummy_3
 	meta
 colocation col_res_IPaddr2_1_res_Dummy_2 inf: res_Dummy_2 res_IPaddr2_1
 order ord_res_IPaddr2_1_res_Dummy_2 inf: res_IPaddr2_1 res_Dummy_2
-property cib-bootstrap-options:
-	stonith-enabled=false
-	no-quorum-policy=ignore
-rsc_defaults rsc-options:

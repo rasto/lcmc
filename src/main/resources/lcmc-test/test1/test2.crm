@@ -1,5 +1,3 @@
-node host
-node host
 primitive res_IPaddr2_1 IPaddr2 
 	params ip=192.168.133.100 cidr_netmask=24 
 	operations $id=res_IPaddr2_1-operations 
@@ -7,7 +5,3 @@ primitive res_IPaddr2_1 IPaddr2
 	op stop interval=0 timeout=192 
 	op monitor interval=121 timeout=154 start-delay=0
 	meta
-property cib-bootstrap-options:
-	stonith-enabled=false
-	no-quorum-policy=ignore
-rsc_defaults rsc-options:
