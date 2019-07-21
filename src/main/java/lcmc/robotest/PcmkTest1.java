@@ -100,7 +100,7 @@ final class PcmkTest1 {
                 if (pos1 == pos2) {
                     continue;
                 }
-                for (int i = 0; i < 70; i++) {
+                for (int i = 0; i < 10; i++) {
                     roboTest.moveTo(pos1, RoboTest.CLONE_RADIO_Y);
                     roboTest.getRobot().mousePress(InputEvent.BUTTON1_MASK);
                     Tools.sleep(20);

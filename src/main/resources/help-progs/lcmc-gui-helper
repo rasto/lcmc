@@ -184,7 +184,8 @@ if ($action eq "all") {
 } elsif ($action eq "get-vm-info") {
 	print get_vm_info();
 } elsif ($action eq "gui-test") {
-	gui_test(@$ACTION_OPTIONS);
+	gui_pcmk_config_test(@$ACTION_OPTIONS);
+	gui_pcmk_status_test(@$ACTION_OPTIONS);
 } elsif ($action eq "gui-drbd-test") {
 	gui_drbd_test(@$ACTION_OPTIONS);
 } elsif ($action eq "gui-vm-test") {
@@ -2179,14 +2180,12 @@ sub get_vm_info {
 
 sub gui_test_compare {
 	my $testfile_part = shift;
-	my $realconf = shift;
-	my $testfile;
+	my $realconf = remove_spaces(shift);
 	my $test = "";
-	my $try = 1;
-	$realconf =~ s/^\s+//mg;
-	$realconf =~ s/\s+$//mg;
 	my $diff = "";
+	my $try = 0;
 	do {
+		my $testfile;
 		if ($try > 1) {
 			$testfile = "$testfile_part-$try";
 		} else {
@@ -2203,9 +2202,7 @@ sub gui_test_compare {
 		} else {
 			{
 				local $/;
-				$test = <TEST>;
-				$test =~ s/^\s+//mg;
-				$test =~ s/\s+$//mg;
+				$test = remove_spaces(<TEST>);
 			}
 			close TEST;
 		}
@@ -2228,62 +2225,52 @@ sub gui_test_compare {
 	}
 }
 
+sub remove_spaces {
+	my $config = shift || "";
+	$config =~ s/^\s+//mg;
+	$config =~ s/\s+$//mg;
+	return $config;
+}
 
-sub gui_test {
+sub gui_pcmk_config_test {
 	my $testname = shift;
 	my $index = shift;
 	my @hosts = @_;
-	my $libpath = get_hb_lib_path();
-	my $hb_version = _exec("$libpath/heartbeat -V 2>/dev/null") || "";
-	if ($hb_version) {
-		$hb_version =~ s/\s+.*//;
-		chomp $hb_version;
+	my $crm_config = _exec_or_die("TERM=dumb PATH=\$PATH:/usr/sbin /usr/sbin/crm configure show");
+	for my $host (@hosts) {
+		$crm_config =~ s/$host\b/host/gi;
 	}
-	my $cib;
-	my $crm_show = 
-		"TERM=dumb PATH=\$PATH:/usr/sbin /usr/sbin/crm configure show"
-		."|grep -v 'expected-quorum-votes=2'"
-		."|grep -v 'unknown-expected-votes'"
-		."|grep -v 'dc-version='"
-		."|grep -v 'cluster-infrastructure='"
-		."|grep -v 'last-lrm-refresh='"
-		."|grep -v 'have-watchdog='";
-	$cib = _exec("$crm_show");
-	my $ret = $?;
-	if ($ret != 0) {
-		exit $ret;
-	}
-	for ($cib) {
-		s/\\$//mg;
-		s/^\s+//;
-		s/\s+$//;
-		my $i = 1;
-		for my $host (@hosts) {
-			s/$host\b/host/gi;
-			$i++;
-		}
-	}
-	# older crm shell had _rsc_set_
-	$cib =~ s/_rsc_set_ //g;
-	$cib =~ s/(start-delay=\d+) (timeout=\d+)/$2 $1/g;
-	$cib =~ s/(node)\s+\$id=".*?"/$1/g;
-	# sort node lines
-	$cib =~
-	   s/(^node\s+.*$)\n(^node\s+.*$)/join "\n", sort ($1, $2)/me;
-	my $crm_status = "crm_resource --list";
-	my $status = _exec($crm_status);
-	$ret = $?;
-	if ($ret != 0) {
-		exit $ret;
+	gui_test_compare("/tmp/lcmc-test/$testname/test$index.crm", strip_crm_config($crm_config));
+}
+
+sub gui_pcmk_status_test {
+	my $testname = shift;
+	my $index = shift;
+	my @hosts = @_;
+	my $status = _exec_or_die("crm_resource --list");
+	my $i = 1;
+	for my $host (@hosts) {
+		$status =~ s/$host\b/host/gi;
 	}
 
-	$cib =~ s/\s*\n\s*attributes standby=off\s*/\n/g;
-	$cib =~ s/^node \d+: host/node host/gm;
-	$cib =~ s/^(node host)\s+$/$1/gm;
-
-	gui_test_compare("/tmp/lcmc-test/$testname/test$index.crm", $cib);
 	gui_test_compare("/tmp/lcmc-test/$testname/status$index.crm", $status);
 }
+
+sub strip_crm_config {
+	my $crm_config = shift;
+	$crm_config =~ s/^property.*//ms;
+	$crm_config =~ s/^rsc_defaults .*//ms;
+	$crm_config =~ s/^node .*//mg;
+	$crm_config =~ s/^\s*attributes .*//mg;
+    $crm_config =~ s/\\$//mg;
+	$crm_config =~ s/^\s+//mg;
+	$crm_config =~ s/\s+$//mg;
+	# older crm shell had _rsc_set_
+	$crm_config =~ s/_rsc_set_ //g;
+	$crm_config =~ s/(start-delay=\d+) (timeout=\d+)/$2 $1/g;
+	return $crm_config;
+}
+
 
 sub gui_vm_test {
 	my $testname = shift;
@@ -2291,7 +2278,7 @@ sub gui_vm_test {
 	my $name = shift;
 	my $xml;
 	for (@VM_OPTIONS) {
-		$xml = _exec("$VIRSH_COMMAND_NO_RO $_ dumpxml --security-info $name 2>/dev/null");
+		$xml = _exec_or_die("$VIRSH_COMMAND_NO_RO $_ dumpxml --security-info $name 2>/dev/null");
 		if ($xml !~ /^\s*$/) {
 			last;
 		}
@@ -2494,6 +2481,13 @@ sub _system {
 	my $cmd = shift;
 	my $level = shift || 1;
 	return _execute($cmd, $level, 0);
+}
+
+sub _exec_or_die {
+	my $result = _exec(shift);
+	my $ret = $?;
+	exit $ret if $ret != 0;
+	return $result;
 }
 
 sub _exec {
