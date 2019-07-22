@@ -929,7 +929,7 @@ public class RoboTest {
         int scrollbarY = 0;
         int i = 0;
         do {
-            final List<java.awt.Component> res = new ArrayList<java.awt.Component>();
+            final List<java.awt.Component> res = new ArrayList<>();
             try {
                 findInside(mainData.getMainFrame(),
                            Class.forName("javax.swing.JScrollPane$ScrollBar"),
@@ -957,6 +957,7 @@ public class RoboTest {
                 break;
             }
             i++;
+            Tools.sleep(i * 1000);
         } while (scrollbar == null);
         if (scrollbar == null) {
             Tools.printStackTrace("can't find the scrollbar");
