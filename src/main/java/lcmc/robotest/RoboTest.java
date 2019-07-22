@@ -270,13 +270,11 @@ public class RoboTest {
                 final Point2D endP = getAppPosition();
                 final int endX = (int) endP.getX();
                 final int endY = (int) endP.getY();
-                final int destX = origX;
-                final int destY = origY;
                 info("test started");
                 final long startTime = System.currentTimeMillis();
                 int i = 1;
                 while (!aborted) {
-                    moveTo(destX, destY);
+                    moveTo(origX, origY);
                     if (abortWithMouseMovement()) {
                         break;
                     }
@@ -406,7 +404,7 @@ public class RoboTest {
         leftClick(); /* global options */
         final String stonith = cluster.getBrowser()
             .getClusterStatus().getGlobalParam("stonith-enabled");
-        if (stonith != null && "false".equals(stonith)) {
+        if ("false".equals(stonith)) {
             moveTo("Stonith Enabled", JCheckBox.class);
             leftClick(); /* enable stonith */
             moveTo(Tools.getString("Browser.CommitResources"));
@@ -919,7 +917,7 @@ public class RoboTest {
         moveScrollBar(down, 300);
     }
 
-    void moveScrollBar(final boolean down, final int delta) {
+    private void moveScrollBar(final boolean down, final int delta) {
         if (aborted) {
             return;
         }
@@ -1120,7 +1118,7 @@ public class RoboTest {
         moveToAbs(endX, endY);
     }
 
-    void moveToAbs(final int endX, final int endY) {
+    private void moveToAbs(final int endX, final int endY) {
         if (aborted) {
             return;
         }
@@ -1129,8 +1127,6 @@ public class RoboTest {
             robot.mouseMove(endX, endY);
             return;
         }
-        final int destX = endX;
-        final int destY = endY;
         while (true) {
             if (MouseInfo.getPointerInfo() == null) {
                 return;
@@ -1140,15 +1136,15 @@ public class RoboTest {
             final int x = (int) p.getX();
             final int y = (int) p.getY();
             int directionX = 0;
-            if (x < destX) {
+            if (x < endX) {
                 directionX = 1;
-            } else if (x > destX) {
+            } else if (x > endX) {
                 directionX = -1;
             }
             int directionY = 0;
-            if (y < destY) {
+            if (y < endY) {
                 directionY = 1;
-            } else if (y > destY) {
+            } else if (y > endY) {
                 directionY = -1;
             }
             if (directionY == 0 && directionX == 0) {
@@ -1177,7 +1173,6 @@ public class RoboTest {
         if (rbt == null) {
             return;
         }
-        final Robot robot0 = rbt;
         info("start register movement in 3 seconds");
         sleepNoFactor(3000);
         final Thread thread = new Thread(new Runnable() {
@@ -1207,9 +1202,9 @@ public class RoboTest {
         thread.start();
     }
 
-    boolean dialogColorTest(final String text) {
+    void dialogColorTest(final String text) {
         if (aborted) {
-            return false;
+            return;
         }
         sleepNoFactor(100);
         java.awt.Component dialog = getFocusedWindow();
@@ -1222,7 +1217,7 @@ public class RoboTest {
         }
         if (!(dialog instanceof JDialog) || aborted) {
             info(text + ": color test: no dialog");
-            return false;
+            return;
         }
         moveToAbs((int) dialog.getLocationOnScreen().getX() + 5,
                   (int) dialog.getLocationOnScreen().getY() + 40);
@@ -1232,9 +1227,6 @@ public class RoboTest {
                      AppDefaults.BACKGROUND,
                      true)) {
             info(text + ": color test: error");
-            return false;
-        } else {
-            return true;
         }
     }
 
@@ -1255,7 +1247,7 @@ public class RoboTest {
         LOG.info(text);
     }
 
-    public java.awt.Component findInside(final java.awt.Component component, final Class<?> clazz, final int position) {
+    private java.awt.Component findInside(final java.awt.Component component, final Class<?> clazz, final int position) {
         final List<java.awt.Component> res = new ArrayList<java.awt.Component>();
         findInside(component, clazz, res);
         if (res.size() > position) {
@@ -1264,7 +1256,7 @@ public class RoboTest {
         return null;
     }
 
-    public void findInside(final java.awt.Component component, final Class<?> clazz, final List<java.awt.Component> results) {
+    private void findInside(final java.awt.Component component, final Class<?> clazz, final List<java.awt.Component> results) {
         int i = 0;
         while (results.isEmpty() && i < 10) {
             if (i > 0) {
@@ -1289,7 +1281,7 @@ public class RoboTest {
 
     /** Find component that is next to the specified component and is of the
      * specified class. */
-    public java.awt.Component findNext(final java.awt.Component component, final Class<?> clazz) {
+    private java.awt.Component findNext(final java.awt.Component component, final Class<?> clazz) {
         boolean next = false;
         for (final java.awt.Component c : component.getParent().getComponents()) {
             if (next) {
@@ -1309,7 +1301,7 @@ public class RoboTest {
         return null;
     }
 
-    Container findComponent(final String text, final Container component, final Integer[] number) {
+    private Container findComponent(final String text, final Container component, final Integer[] number) {
         final String quotedText;
         if (text.contains("*") || text.contains("$") || text.contains("^")) {
             quotedText = text;
@@ -1359,7 +1351,7 @@ public class RoboTest {
         return findComponent(text, 1);
     }
 
-    public Container findComponent(final String text, final int number) {
+    private Container findComponent(final String text, final int number) {
         return findComponent(text,
                              (Container) getFocusedWindow(),
                              new Integer[]{number});
@@ -1369,24 +1361,8 @@ public class RoboTest {
         final Point2D loc =
             mainData.getMainFrameContentPane().getLocationOnScreen();
         final Point2D pos = MouseInfo.getPointerInfo().getLocation();
-        final Point2D newPos = new Point2D.Double(pos.getX() - loc.getX(),
+        return new Point2D.Double(pos.getX() - loc.getX(),
             pos.getY() - loc.getY());
-        return newPos;
-    }
-
-    void waitForMe() {
-        info("waiting...");
-        final Point2D iPos = MouseInfo.getPointerInfo().getLocation();
-        while (true) {
-            final Point2D pos = MouseInfo.getPointerInfo().getLocation();
-            if (Math.abs(iPos.getX() - pos.getX()) > 10
-                || Math.abs(iPos.getY() - pos.getY()) > 10) {
-                break;
-            }
-            Tools.sleep(100);
-        }
-        prevP = getAppPosition();
-        info("continue...");
     }
 
     void checkNumberOfVertices(final String name, final int should) {
@@ -1423,6 +1399,6 @@ public class RoboTest {
     }
 
     public List<Host> getClusterHosts() {
-        return new ArrayList<Host>(cluster.getHosts());
+        return new ArrayList<>(cluster.getHosts());
     }
 }
