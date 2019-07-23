@@ -559,7 +559,7 @@ public class StartTests {
             /* big group */
             final long startTime = System.currentTimeMillis();
             roboTest.info("test" + index);
-            pcmkTestG.start(15);
+            pcmkTestG.start(5);
             final int secs = (int) (System.currentTimeMillis() - startTime) / 1000;
             roboTest.info("test" + index + ", secs: " + secs);
         } else if (index == 'h') {

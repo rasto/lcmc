@@ -1,1 +1,4 @@
-NO resources configured
+Clone Set: cl_Dummy_1 [res_Dummy_1]
+Stopped (disabled): [ host host ]
+Clone Set: cl_Dummy_2 [res_Dummy_2]
+Started: [ host host ]

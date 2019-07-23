@@ -67,6 +67,7 @@ final class PcmkTestB {
             roboTest.leftClick();
             roboTest.checkTest("testB", 4);
 
+            roboTest.stopResource(dummy1X, dummy1Y + 90);
             roboTest.removeResource(dummy1X, dummy1Y + 90, CONFIRM_REMOVE);
             roboTest.removeResource(dummy1X, dummy1Y, CONFIRM_REMOVE);
             roboTest.resetTerminalAreas();
