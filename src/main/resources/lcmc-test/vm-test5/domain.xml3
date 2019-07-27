@@ -1,38 +1,5 @@
 <domain type='lxc'>
-  <name>@NAME@</name>
-  <uuid>UUID</uuid>
-  <memory>524288</memory>
-  <currentMemory>524288</currentMemory>
-  <vcpu>2</vcpu>
-  <os>
-    <type arch='ARCH' machine='MACHINE'>exe</type>
-    <init>/bin/sh</init>
-  </os>
-  <features>
-    <acpi/>
-    <apic/>
-    <pae/>
-  </features>
-  <clock offset='utc'>
-    <timer name='pit' tickpolicy='delay'/>
-    <timer name='rtc' tickpolicy='catchup'/>
-    <timer name='hpet' present='no'/>
-  </clock>
-  <on_poweroff>destroy</on_poweroff>
-  <on_reboot>restart</on_reboot>
-  <on_crash>restart</on_crash>
-  <devices>
-    <emulator>EMULATOR</emulator>
-    <filesystem type='mount' accessmode='passthrough'>
-      <source dir='/var/lib/lxc/@NAME@/rootfs'/>
-      <target dir='/'/>
-    </filesystem>
-    <interface type='network'>
-      <mac address='MAC'/>
-      <source network='default'/>
-    </interface>
-    <console type='pty'>
-      <target type='lxc' port='0'/>
-    </console>
-  </devices>
-</domain>
+<name>@NAME@</name>
+<source dir='/var/lib/lxc/@NAME@/rootfs'/>
+<interface type='network'>
+<source network='default'/>

@@ -2283,13 +2283,9 @@ sub gui_vm_test {
 			last;
 		}
 	}
-	$xml =~ s/^(\s*<uuid>)[^<]+/$1UUID/gm;
-	$xml =~ s/^(\s*<mac address=')[^']+/$1MAC/gm;
-	$xml =~ s/^(\s*<emulator>)[^<]+/$1EMULATOR/gm;
 	$xml =~ s/$name/\@NAME@/gm;
-	$xml =~ s/^(\s*<mac address=')[^']+/$1MAC/gm;
-	$xml =~ s/^(\s*<type arch=')[^']+('\s+machine=')[^']+/$1ARCH$2MACHINE/gm;
-	gui_test_compare("/tmp/lcmc-test/$testname/domain.xml$index", $xml);
+	my $simplified_xml = join "\n", $xml =~ /^\s*((?:<domain.*|<name.*|<disk.*|<source.*|<interface.*|<graphics type\S+))/mg;
+	gui_test_compare("/tmp/lcmc-test/$testname/domain.xml$index", $simplified_xml);
 }
 
 sub gui_drbd_test {

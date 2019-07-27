@@ -1212,6 +1212,8 @@ public class RoboTest {
             if (dialog instanceof JDialog || aborted) {
                 break;
             }
+            moveTo(200, 400);
+            leftClick();
             dialog = getFocusedWindow();
             sleepNoFactor(1000);
         }
