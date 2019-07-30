@@ -94,7 +94,6 @@ final class DrbdTest1 {
         } else {
             roboTest.press(KeyEvent.VK_E); /* select first interface */
         }
-        roboTest.press(KeyEvent.VK_ENTER);
         roboTest.dialogColorTest("chooseDrbdResourceInterface");
         roboTest.moveTo(500, 300);
         roboTest.rightClick();

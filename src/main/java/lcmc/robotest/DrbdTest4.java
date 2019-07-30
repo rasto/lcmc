@@ -59,21 +59,23 @@ final class DrbdTest4 {
                 roboTest.press(KeyEvent.VK_DOWN); /* drbd: r0 */
                 roboTest.press(KeyEvent.VK_ENTER);
 
+            	roboTest.sleep(20000);
                 drbdTest1.drbdNext();
+            	roboTest.sleep(20000);
             }
             drbdTest1.addDrbdVolume();
-
             drbdTest1.addBlockDevice();
             drbdTest1.addBlockDevice();
+            roboTest.sleep(20000);
             if (offset == 0) {
                 roboTest.checkDRBDTest(drbdTest, 1.1);
             } else {
                 roboTest.checkDRBDTest(drbdTest, 1.2);
             }
             roboTest.sleep(10000);
-
             drbdTest1.addMetaData();
             drbdTest1.addFileSystem();
+            roboTest.sleep(10000);
             roboTest.moveTo(Tools.getString("Dialog.Dialog.Finish")); /* fs */
             roboTest.leftClick();
 
