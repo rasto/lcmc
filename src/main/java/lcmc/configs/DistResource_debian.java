@@ -111,7 +111,7 @@ public final class DistResource_debian extends ListResourceBundle {
 
         {"DrbdInst.install.3",
          "apt-get update && /usr/bin/apt-get -y install -o "
-         + "'DPkg::Options::force=--force-confnew' drbd8-utils"},
+         + "'DPkg::Options::force=--force-confnew' drbd*-utils"},
 
         {"HbCheck.version",
          DistResource.SUDO + "@GUI-HELPER@ get-cluster-versions;"
