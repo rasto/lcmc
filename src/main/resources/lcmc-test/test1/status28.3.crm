@@ -3,5 +3,5 @@
      res_Dummy_1	(ocf::heartbeat:Dummy):	Stopped (disabled)
      res_Dummy_2	(ocf::heartbeat:Dummy):	Stopped (disabled)
      res_Dummy_3	(ocf::heartbeat:Dummy):	Stopped (disabled)
- Master/Slave Set: ms_Stateful_1 [res_Stateful_1]
+ Clone Set: ms_Stateful_1 [res_Stateful_1] (promotable)
      Stopped (disabled): [ host host ]

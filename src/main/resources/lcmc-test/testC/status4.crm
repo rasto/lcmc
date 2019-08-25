@@ -1,5 +1,5 @@
-Master/Slave Set: ms_Stateful_1 [res_Stateful_1]
+Clone Set: ms_Stateful_1 [res_Stateful_1] (promotable)
  Stopped (disabled): [ host host ]
-Master/Slave Set: ms_Stateful_2 [res_Stateful_2]
+Clone Set: ms_Stateful_2 [res_Stateful_2] (promotable)
  Stopped (disabled): [ host host ]
 

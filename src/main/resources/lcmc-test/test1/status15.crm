@@ -3,6 +3,6 @@
      res_Dummy_1	(ocf::heartbeat:Dummy):	Started
      res_Dummy_2	(ocf::heartbeat:Dummy):	Started
      res_Dummy_3	(ocf::heartbeat:Dummy):	Started
- Master/Slave Set: ms_Stateful_1 [res_Stateful_1] (unmanaged)
+ Clone Set: ms_Stateful_1 [res_Stateful_1] (promotable) (unmanaged)
      res_Stateful_1	(ocf::heartbeat:Stateful):	Master (unmanaged)
      Stopped: [ host ]
