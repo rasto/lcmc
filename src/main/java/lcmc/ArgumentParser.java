@@ -52,6 +52,7 @@ import java.io.PrintStream;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -108,20 +109,26 @@ public class ArgumentParser {
     /** The --cmd-log. /var/log/lcmc.log on the servers. */
     private static final String CMD_LOG_OP = "cmd-log";
     private static final String CHECK_SWING_OP = "check-swing";
+    public static final String SKIP_NET_INTERFACE_OP = "skip-net-interface";
+    private final UserConfig userConfig;
+    private final RoboTest roboTest;
+    private final Provider<Cluster> clusterProvider;
+    private final Application application;
+    private final SwingUtils swingUtils;
+    private final Access access;
+    private final MainData mainData;
+
     @Inject
-    private UserConfig userConfig;
-    @Inject
-    private RoboTest roboTest;
-    @Inject
-    private Provider<Cluster> clusterProvider;
-    @Inject
-    private Application application;
-    @Inject
-    private SwingUtils swingUtils;
-    @Inject
-    private Access access;
-    @Inject
-    private MainData mainData;
+    public ArgumentParser(UserConfig userConfig, RoboTest roboTest, Provider<Cluster> clusterProvider, Application application,
+            SwingUtils swingUtils, Access access, MainData mainData) {
+        this.userConfig = userConfig;
+        this.roboTest = roboTest;
+        this.clusterProvider = clusterProvider;
+        this.application = application;
+        this.swingUtils = swingUtils;
+        this.access = access;
+        this.mainData = mainData;
+    }
 
     public void parseOptionsAndReturnAutoArguments(String[] args) {
         final Options options = new Options();
@@ -174,6 +181,7 @@ public class ArgumentParser {
         options.addOption(null, NO_EMBED_OP, false, "don't embed applet in the browser");
         options.addOption(null, CMD_LOG_OP, false, "Log executed commands to the lcmc.log on the servers");
         options.addOption(null, CHECK_SWING_OP, false, "ADVANCED USE: for testing");
+        options.addOption(null, SKIP_NET_INTERFACE_OP, true, "Skip net interface in corosync config");
         final CommandLineParser parser = new PosixParser();
         String autoArgs = null;
         try {
@@ -195,6 +203,9 @@ public class ArgumentParser {
                 } else {
                     throw new ParseException("cannot parse debug level: " + level);
                 }
+            }
+            if (cmd.hasOption(SKIP_NET_INTERFACE_OP)) {
+                Arrays.stream(cmd.getOptionValues(SKIP_NET_INTERFACE_OP)).forEach(application::addSkipNetInterface);
             }
             boolean tightvnc = cmd.hasOption(TIGHTVNC_OP);
             boolean ultravnc = cmd.hasOption(ULTRAVNC_OP);

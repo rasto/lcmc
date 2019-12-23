@@ -31,8 +31,10 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
+import java.util.Set;
 
 import com.google.common.collect.HashBasedTable;
+import com.google.common.collect.Sets;
 import com.google.common.collect.Table;
 import lcmc.cluster.domain.Cluster;
 import lcmc.cluster.domain.Clusters;
@@ -67,6 +69,7 @@ public class Application {
     public static final String PM_CLONE_SET_NAME = "Clone Set";
     public static final String PM_MASTER_SLAVE_SET_NAME = "Master/Slave Set";
     public static final String PACEMAKER_GROUP_NAME = "Group";
+
     public static boolean isLive(final RunMode runMode) {
         return RunMode.LIVE == runMode;
     }
@@ -74,6 +77,7 @@ public class Application {
     public static boolean isTest(final RunMode runMode) {
         return RunMode.TEST == runMode;
     }
+    private Set<String> skipNetInterfaces = Sets.newHashSet();
     private String downloadUser = Tools.getDefault("DownloadLogin.User");
     private String downloadPassword = Tools.getDefault("DownloadLogin.Password");
     private String savedDownloadUser = "";
@@ -521,6 +525,14 @@ public class Application {
         return scaled(Tools.getDefaultInt(option));
     }
 
+    public void addSkipNetInterface(String skipNetInterface) {
+        this.skipNetInterfaces.add(skipNetInterface);
+    }
+
+    public boolean isSkipNetInterface(String name) {
+        return skipNetInterfaces.contains(name);
+    }
+
     /** Starts Real VNC viewer. */
     public void startRealVncViewer(final Host host, final int remotePort) {
         final int localPort = prepareVncViewer(host, remotePort);
@@ -662,6 +674,7 @@ public class Application {
         confirmDialog.showDialog();
         return confirmDialog.isPressedYesButton();
     }
+
 
     /**
      * Run mode. TEST does shows changes in the GUI, but does not change the

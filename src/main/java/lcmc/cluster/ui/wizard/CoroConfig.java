@@ -838,7 +838,7 @@ final class CoroConfig extends DialogCluster {
         NetInterface defaultNi = null;
         for (final NetInterface n : ni) {
             /* skip lo */
-            if (!n.isLocalHost()) {
+            if (!n.isLocalHost() && !skipNetInteface(n)) {
                 defaultNi = n;
                 break;
             }
@@ -988,6 +988,10 @@ final class CoroConfig extends DialogCluster {
         mcastPanel.setAlignmentX(java.awt.Component.LEFT_ALIGNMENT);
         pane.add(makeConfigButton);
         return pane;
+    }
+
+    private boolean skipNetInteface(NetInterface n) {
+        return application.isSkipNetInterface(n.getName());
     }
 
     @Override
