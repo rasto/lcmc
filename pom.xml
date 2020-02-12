@@ -164,7 +164,7 @@
     <repositories>
         <repository>
             <id>imagej</id>
-            <url>http://maven.imagej.net/content/repositories/public/</url>
+            <url>https://maven.imagej.net/content/repositories/public/</url>
         </repository>
         <repository>
             <id>thirdparty-releases</id>
