@@ -241,10 +241,10 @@ public class HostParser {
                 changedTypes.add(type);
                 continue;
             }
-            if ("net-info".equals(type)) {
+            if (NET_INFO_DELIM.equals(type)) {
                 try {
                     final NetInterface netInterface = new NetInterface(line);
-                    if (netInterface.getIp() != null && !"".equals(netInterface.getIp())) {
+                    if (netInterface.hasIp() && !application.isSkipNetInterface(netInterface.getName())) {
                         newNetInterfaces.add(netInterface);
                     }
                 } catch (final UnknownHostException e) {

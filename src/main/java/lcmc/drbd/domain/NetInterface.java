@@ -26,6 +26,9 @@ package lcmc.drbd.domain;
 import java.math.BigInteger;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+
+import com.google.common.base.Strings;
+
 import lcmc.common.domain.StringValue;
 import lcmc.common.domain.Value;
 import lcmc.common.domain.ResourceValue;
@@ -212,6 +215,10 @@ public final class NetInterface extends ResourceValue implements Value {
     @Override
     public String getNothingSelected() {
         return NOTHING_SELECTED;
+    }
+
+    public boolean hasIp() {
+        return !Strings.isNullOrEmpty(ip);
     }
 
     public enum AddressFamily {IPV4, IPV6, SSOCKS, SDP}
