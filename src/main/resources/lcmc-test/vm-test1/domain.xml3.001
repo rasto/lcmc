@@ -1,4 +1,4 @@
-<domain type='kvm'>
+<domain type='qemu'>
 <name>@NAME@</name>
 <disk type='file' device='disk'>
 <source file='/var/lib/libvirt/images/@NAME@.img'/>

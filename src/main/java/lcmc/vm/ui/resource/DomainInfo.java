@@ -78,23 +78,24 @@ public class DomainInfo extends EditableInfo {
     /** Timeout of starting, shutting down, etc. actions in seconds. */
     private static final int ACTION_TIMEOUT = 20;
 
-    private static final Value VIRSH_OPTION_KVM    = new StringValue();
+    private static final Value VIRSH_OPTION_QEMU = new StringValue();
     private static final Value VIRSH_OPTION_XEN    = new StringValue("-c 'xen:///'");
     private static final Value VIRSH_OPTION_LXC    = new StringValue("-c 'lxc:///'");
     private static final Value VIRSH_OPTION_VBOX   = new StringValue("-c 'vbox:///session'");
     private static final Value VIRSH_OPTION_OPENVZ = new StringValue("-c 'openvz:///system'");
     private static final Value VIRSH_OPTION_UML    = new StringValue("-c 'uml:///system'");
 
-    static final String DOMAIN_TYPE_KVM = "kvm";
+    static final String DOMAIN_TYPE_QEMU = "qemu";
     private static final String DOMAIN_TYPE_XEN    = "xen";
     private static final String DOMAIN_TYPE_LXC    = "lxc";
     private static final String DOMAIN_TYPE_VBOX   = "vbox";
     private static final String DOMAIN_TYPE_OPENVZ = "openvz";
     private static final String DOMAIN_TYPE_UML    = "uml";
+    private static final String DOMAIN_TYPE_KVM    = "kvm";
 
 
 
-    private static final Value[] VIRSH_OPTIONS = new Value[]{VIRSH_OPTION_KVM,
+    private static final Value[] VIRSH_OPTIONS = new Value[]{VIRSH_OPTION_QEMU,
                                                              VIRSH_OPTION_XEN,
                                                              VIRSH_OPTION_LXC,
                                                              VIRSH_OPTION_VBOX,
@@ -103,9 +104,10 @@ public class DomainInfo extends EditableInfo {
 
     /** Whether it needs "display" section. */
     private static final Set<String> NEED_DISPLAY =
-         Collections.unmodifiableSet(new HashSet<String>(Arrays.asList(DOMAIN_TYPE_KVM,
+         Collections.unmodifiableSet(new HashSet<String>(Arrays.asList(DOMAIN_TYPE_QEMU,
                                                                        DOMAIN_TYPE_XEN,
-                                                                       DOMAIN_TYPE_VBOX)));
+                                                                       DOMAIN_TYPE_VBOX,
+                                                                       DOMAIN_TYPE_KVM)));
     /** Whether it needs "console" section. */
     private static final Set<String> NEED_CONSOLE =
          Collections.unmodifiableSet(new HashSet<String>(Arrays.asList(DOMAIN_TYPE_LXC,
@@ -385,7 +387,7 @@ public class DomainInfo extends EditableInfo {
         DEFAULTS_MAP.put(VMParams.VM_PARAM_AUTOSTART, null);
         DEFAULTS_MAP.put(VMParams.VM_PARAM_VIRSH_OPTIONS, NO_SELECTION_VALUE);
         DEFAULTS_MAP.put(VMParams.VM_PARAM_BOOT, NO_SELECTION_VALUE);
-        DEFAULTS_MAP.put(VMParams.VM_PARAM_DOMAIN_TYPE, new StringValue(DOMAIN_TYPE_KVM));
+        DEFAULTS_MAP.put(VMParams.VM_PARAM_DOMAIN_TYPE, new StringValue(DOMAIN_TYPE_QEMU));
         DEFAULTS_MAP.put(VMParams.VM_PARAM_VCPU, new StringValue("1"));
         DEFAULTS_MAP.put(VMParams.VM_PARAM_ACPI, VM_FALSE);
         DEFAULTS_MAP.put(VMParams.VM_PARAM_APIC, VM_FALSE);
@@ -414,13 +416,13 @@ public class DomainInfo extends EditableInfo {
 
         POSSIBLE_VALUES.put(VMParams.VM_PARAM_LOADER, new Value[]{});
         POSSIBLE_VALUES.put(VMParams.VM_PARAM_DOMAIN_TYPE,
-                            new Value[]{new StringValue(DOMAIN_TYPE_KVM),
+                            new Value[]{new StringValue(DOMAIN_TYPE_QEMU),
                                         new StringValue(DOMAIN_TYPE_XEN),
                                         new StringValue(DOMAIN_TYPE_LXC),
                                         new StringValue(DOMAIN_TYPE_OPENVZ),
                                         new StringValue(DOMAIN_TYPE_VBOX),
                                         new StringValue(DOMAIN_TYPE_UML),
-                                        });
+                                        new StringValue(DOMAIN_TYPE_KVM)});
         POSSIBLE_VALUES.put(VMParams.VM_PARAM_BOOTLOADER,
                             new Value[]{NO_SELECTION_VALUE,
                                         new StringValue("/usr/bin/pygrub")});
@@ -2452,7 +2454,7 @@ public class DomainInfo extends EditableInfo {
                         loWi.setValue(NO_SELECTION_VALUE);
                     }
                     if (voWi != null) {
-                        voWi.setValue(VIRSH_OPTION_KVM);
+                        voWi.setValue(VIRSH_OPTION_QEMU);
                     }
                     if (typeWi != null) {
                         typeWi.setValue(TYPE_HVM);

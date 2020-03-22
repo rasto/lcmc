@@ -455,7 +455,7 @@ public final class DiskInfo extends HardwareInfo {
                         getVMSVirtualDomainInfo().getWidget(
                             VMParams.VM_PARAM_DOMAIN_TYPE, null).getStringValue();
         if (DiskData.DRIVER_NAME.equals(param)
-            && DomainInfo.DOMAIN_TYPE_KVM.equals(domainType)) {
+            && DomainInfo.DOMAIN_TYPE_QEMU.equals(domainType)) {
             return DRIVER_NAME_QEMU;
         }
         return PREFERRED_MAP.get(param);

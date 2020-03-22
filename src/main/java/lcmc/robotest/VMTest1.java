@@ -46,7 +46,7 @@ final class VMTest1 {
     private MainPanel mainPanel;
 
     void start(final Cluster cluster, final String vmTest, final int count) {
-        startVMTest(cluster, vmTest, "kvm", count);
+        startVMTest(cluster, vmTest, "qemu", count);
     }
 
     /** VM Test 1. */
