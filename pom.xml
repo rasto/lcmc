@@ -86,6 +86,11 @@
             <scope>test</scope>
         </dependency>
         <dependency>
+            <groupId>org.assertj</groupId>
+            <artifactId>assertj-core</artifactId>
+            <version>3.15.0</version>
+        </dependency>
+        <dependency>
             <groupId>java3d</groupId>
             <artifactId>j3d-core-utils</artifactId>
             <version>1.5.2</version>

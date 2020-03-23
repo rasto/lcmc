@@ -284,15 +284,7 @@ public class VmsXml {
         final String configName = getConfigName(type, domainName);
         namesToConfigs.put(domainName, configName);
         /* build xml */
-        final DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-
-        final DocumentBuilder db;
-        try {
-            db = dbf.newDocumentBuilder();
-        } catch (final ParserConfigurationException pce) {
-            throw new RuntimeException("cannot configure parser", pce);
-        }
-        final Document doc = db.newDocument();
+        final var doc = createDocument();
         val vmCreator = vmCreatorProvider.get();
         vmCreator.init(doc, parametersMap);
         return vmCreator.createDomain(uuid, domainName, needConsole, type);
@@ -990,5 +982,17 @@ public class VmsXml {
 
     public String getConfig() {
         return oldConfig;
+    }
+
+    private Document createDocument() {
+        final DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+
+        final DocumentBuilder db;
+        try {
+            db = dbf.newDocumentBuilder();
+        } catch (final ParserConfigurationException pce) {
+            throw new RuntimeException("cannot configure parser", pce);
+        }
+        return db.newDocument();
     }
 }

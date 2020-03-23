@@ -35,6 +35,7 @@ import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 @Named
 class VMCreator {
@@ -100,9 +101,11 @@ class VMCreator {
             bootNode2.setAttribute(VMParams.OS_BOOT_NODE_DEV, parametersMap.get(VMParams.VM_PARAM_BOOT_2));
         }
 
-        final Node loaderNode = osNode.appendChild(doc.createElement("loader"));
-        loaderNode.appendChild(doc.createTextNode(parametersMap.get(VMParams.VM_PARAM_LOADER)));
-
+        Optional.ofNullable(parametersMap.get(VMParams.VM_PARAM_LOADER))
+                .map(String::trim)
+                .filter(it -> !it.isEmpty())
+                .ifPresent(loader -> osNode.appendChild(doc.createElement("loader"))
+                                           .appendChild(doc.createTextNode(loader)));
         addFeatures(root);
         addClockOffset(root);
         addCPUMatchNode(root);
