@@ -49,13 +49,13 @@ public final class DistResource_debian extends ListResourceBundle {
         {"HbPmInst.install.text.1", "apt-get install"},
         {"HbPmInst.install.1",
          "apt-get update && /usr/bin/apt-get -y -q install -o"
-         + " 'DPkg::Options::force=--force-confnew' heartbeat pacemaker"},
+         + " 'DPkg::Options::force=--force-confnew' heartbeat pacemaker crmsh"},
 
         /* corosync/pacemaker */
         {"PmInst.install.text.1", "apt-get install"},
         {"PmInst.install.1",
          "apt-get update && /usr/bin/apt-get -y -q install -o"
-         + " 'DPkg::Options::force=--force-confnew' corosync pacemaker"
+         + " 'DPkg::Options::force=--force-confnew' corosync pacemaker crmsh"
 		 + " && mkdir /var/log/cluster"
          + " && sed -i 's/\\(START=\\)no/\\1yes/' /etc/default/corosync"
          + " && if [ -e /etc/corosync/corosync.conf ]; then"
