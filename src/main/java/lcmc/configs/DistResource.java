@@ -303,7 +303,7 @@ public final class DistResource extends ListResourceBundle {
         {"DRBD.up",
          "echo|" + SUDO + "/sbin/drbdadm @DRYRUN@ up @RES-VOL@"},
         {"DRBD.makeFilesystem",
-         SUDO + "/sbin/mkfs.@FILESYSTEM@ @DRBDDEV@"},
+		 SUDO + "/sbin/mkfs.@FILESYSTEM@ @DRBDDEV@ `[[ '%ext2%ext3%ext4%' =~ .*%@FILESYSTEM@%.* ]] && echo '-F'`"},
         {"DRBD.delMinor",
          SUDO + "/sbin/drbdsetup @DRYRUN@ @DRBDDEV@ del-minor"},
 
