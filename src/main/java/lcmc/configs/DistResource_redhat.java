@@ -85,10 +85,10 @@ public final class DistResource_redhat extends ListResourceBundle {
 
         /* Drbd install method 3 */
         {"DrbdInst.install.text.3",
-         "yum install: 8.3.x"},
+         "yum install: 8.4.x"},
 
         {"DrbdInst.install.3",
-         "/usr/bin/yum -y install kmod-drbd83 drbd83"},
+         "/usr/bin/yum -y install kmod-drbd84 drbd84"},
 
         {"HbCheck.version",
          DistResource.SUDO + "@GUI-HELPER@ get-cluster-versions;"

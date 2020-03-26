@@ -124,6 +124,13 @@ public final class DistResource_redhat_5 extends ListResourceBundle {
          + "/epel-release-5-4.noarch.rpm ; "
          + "yum -y -x resource-agents-3.* -x openais-1* -x openais-0.9*"
          + " -x heartbeat-2.1* install pacemaker.@ARCH@ heartbeat.@ARCH@"},
+
+        /* Drbd install method 3 */
+        {"DrbdInst.install.text.3",
+         "yum install: 8.3.x"},
+
+        {"DrbdInst.install.3",
+         "/usr/bin/yum -y install kmod-drbd83 drbd83"},
     };
 
     @Override

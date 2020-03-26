@@ -74,6 +74,13 @@ public final class DistResource_redhat_6 extends ListResourceBundle {
          DistResource.SUDO + "/sbin/chkconfig --level 2345 corosync on "
          + "&& " + DistResource.SUDO + "/sbin/chkconfig --level 016 corosync off"},
 
+        /* Drbd install method 3 */
+        {"DrbdInst.install.text.3",
+         "yum install: 8.3.x"},
+
+        {"DrbdInst.install.3",
+         "/usr/bin/yum -y install kmod-drbd83 drbd83"},
+
     };
 
     @Override
