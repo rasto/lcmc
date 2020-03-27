@@ -85,33 +85,18 @@ public final class DistResource_redhat extends ListResourceBundle {
 
         /* Drbd install method 3 */
         {"DrbdInst.install.text.3",
-         "yum install: 8.4.x"},
+         "dnf install: 9.x.x"},
 
         {"DrbdInst.install.3",
-         "/usr/bin/yum -y install kmod-drbd84 drbd84"},
+         "/bin/dnf -y install kmod-drbd* drbd*"},
 
         {"HbCheck.version",
          DistResource.SUDO + "@GUI-HELPER@ get-cluster-versions;"
          + "/bin/rpm -q -i openais|perl -lne"
          + " 'print \"ais:$1\" if /^Version\\s+:\\s+(\\S+)/'"},
 
-        {"Heartbeat.deleteFromRc",
-         DistResource.SUDO + "/sbin/chkconfig --del heartbeat"},
-
-        {"Heartbeat.addToRc",
-         DistResource.SUDO + "/sbin/chkconfig --add heartbeat"},
-
-        {"Corosync.addToRc",
-         DistResource.SUDO + "/sbin/chkconfig --add corosync"},
-
-        {"Corosync.deleteFromRc",
-         DistResource.SUDO + "/sbin/chkconfig --del corosync"},
-
-        {"Openais.addToRc",
-         DistResource.SUDO + "/sbin/chkconfig --add openais"},
-
-        {"Openais.deleteFromRc",
-         DistResource.SUDO + "/sbin/chkconfig --del openais"},
+        {"PmInst.install.text.2", "dnf install" },
+        {"PmInst.install.2", "/bin/dnf config-manager --enable HighAvailability && /bin/dnf install -y corosync pacemaker"},
 
         /* corosync/pacemaker from source */
         {"PmInst.install.text.9",
@@ -193,6 +178,24 @@ public final class DistResource_redhat extends ListResourceBundle {
 
         {"ProxyCheck.version",
          "rpm -q --queryformat='%{VERSION}' drbd-proxy-3.0"},
+
+        {"Heartbeat.addToRc", DistResource.SUDO + "/bin/systemctl enable heartbeat.service"},
+        {"Heartbeat.deleteFromRc", DistResource.SUDO + "/bin/systemctl disable heartbeat.service"},
+        {"Corosync.addToRc", DistResource.SUDO + "/bin/systemctl enable corosync.service"},
+        {"Corosync.deleteFromRc", DistResource.SUDO + "/bin/systemctl disable corosync.service"},
+        {"Openais.addToRc", DistResource.SUDO + "/bin/systemctl enable openais.service"},
+        {"Openais.deleteFromRc", DistResource.SUDO + "/bin/systemctl disable openais.service"},
+
+        {"Corosync.startCorosync", DistResource.SUDO + "/sbin/service corosync start"},
+        {"Corosync.startPcmk", DistResource.SUDO + "/sbin/service pacemaker start"},
+        {"Corosync.stopCorosync", DistResource.SUDO + "/sbin/service corosync stop"},
+        {"Corosync.stopCorosyncWithPcmk", DistResource.SUDO + "/sbin/service pacemaker stop && "
+                                          + DistResource.SUDO + "/sbin/service corosync stop"},
+        {"Corosync.startCorosyncWithPcmk", DistResource.SUDO + "/sbin/service corosync start;;;"
+                                           + DistResource.SUDO + "/sbin/service pacemaker start"},
+        {"Corosync.reloadCorosync", "if ! " + DistResource.SUDO + "/sbin/service corosync status >/dev/null 2>&1; then "
+                                    + DistResource.SUDO + "/sbin/service corosync start; fi"},
+
     };
 
     @Override

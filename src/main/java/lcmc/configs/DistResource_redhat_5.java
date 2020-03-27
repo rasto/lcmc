@@ -55,23 +55,6 @@ public final class DistResource_redhat_5 extends ListResourceBundle {
          + " mv /etc/corosync/corosync.conf /etc/corosync/corosync.conf.orig;"
          + " fi)"},
 
-        ///* Next Corosync/Openais/Pacemaker clusterlabs */
-        //{"PmInst.install.text.2",
-        // "clusterlabs test repo: 1.1.x/1.2.x" },
-
-        //{"PmInst.install.staging.2", "true"},
-
-        //{"PmInst.install.2",
-        // "wget -N -nd -P /etc/yum.repos.d/"
-        // + " http://www.clusterlabs.org/rpm-next/epel-5/clusterlabs.repo && "
-        // + " rpm -Uvh http://dl.fedoraproject.org/pub/epel/5/i386"
-        // + "/epel-release-5-4.noarch.rpm ; "
-        // + "(yum -y -x resource-agents-3.* -x openais-1* -x openais-0.9*"
-        // + " -x heartbeat-2.1* install pacemaker.@ARCH@ corosync.@ARCH@"
-        // + " && if [ -e /etc/corosync/corosync.conf ]; then"
-        // + " mv /etc/corosync/corosync.conf /etc/corosync/corosync.conf.orig;"
-        // + " fi)"},
-
         /* Corosync/Pacemaker clusterlabs next */
         {"PmInst.install.text.2",
          "clusterlabs repo: 1.1.x/1.4.x" },
@@ -131,6 +114,13 @@ public final class DistResource_redhat_5 extends ListResourceBundle {
 
         {"DrbdInst.install.3",
          "/usr/bin/yum -y install kmod-drbd83 drbd83"},
+
+        {"Heartbeat.deleteFromRc", DistResource.SUDO + "/sbin/chkconfig --del heartbeat"},
+        {"Heartbeat.addToRc", DistResource.SUDO + "/sbin/chkconfig --add heartbeat"}, 
+        {"Corosync.addToRc", DistResource.SUDO + "/sbin/chkconfig --add corosync"},
+        {"Corosync.deleteFromRc", DistResource.SUDO + "/sbin/chkconfig --del corosync"},
+        {"Openais.addToRc", DistResource.SUDO + "/sbin/chkconfig --add openais"},
+        {"Openais.deleteFromRc", DistResource.SUDO + "/sbin/chkconfig --del openais"},
     };
 
     @Override

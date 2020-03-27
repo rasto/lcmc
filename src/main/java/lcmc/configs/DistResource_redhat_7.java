@@ -66,23 +66,12 @@ public final class DistResource_redhat_7 extends ListResourceBundle {
          + " mv /etc/corosync/corosync.conf /etc/corosync/corosync.conf.orig;"
          + " fi"},
 
-        {"Heartbeat.addToRc", DistResource.SUDO + "/bin/systemctl enable heartbeat.service"},
-        {"Heartbeat.deleteFromRc", DistResource.SUDO + "/bin/systemctl disable heartbeat.service"},
-        {"Corosync.addToRc", DistResource.SUDO + "/bin/systemctl enable corosync.service"},
-        {"Corosync.deleteFromRc", DistResource.SUDO + "/bin/systemctl disable corosync.service"},
-        {"Openais.addToRc", DistResource.SUDO + "/bin/systemctl enable openais.service"},
-        {"Openais.deleteFromRc", DistResource.SUDO + "/bin/systemctl disable openais.service"},
+        /* Drbd install method 3 */
+        {"DrbdInst.install.text.3",
+         "yum install 8.x.x"},
 
-        {"Corosync.startCorosync", DistResource.SUDO + "/sbin/service corosync start"},
-        {"Corosync.startPcmk", DistResource.SUDO + "/sbin/service pacemaker start"},
-        {"Corosync.stopCorosync", DistResource.SUDO + "/sbin/service corosync stop"},
-        {"Corosync.stopCorosyncWithPcmk", DistResource.SUDO + "/sbin/service pacemaker stop && "
-                                          + DistResource.SUDO + "/sbin/service corosync stop"},
-        {"Corosync.startCorosyncWithPcmk", DistResource.SUDO + "/sbin/service corosync start;;;"
-                                           + DistResource.SUDO + "/sbin/service pacemaker start"},
-        {"Corosync.reloadCorosync", "if ! " + DistResource.SUDO + "/sbin/service corosync status >/dev/null 2>&1; then "
-                                    + DistResource.SUDO + "/sbin/service corosync start; fi"},
-
+        {"DrbdInst.install.3",
+         "/usr/bin/yum -y install kmod-drbd84 drbd84"},
     };
 
     @Override

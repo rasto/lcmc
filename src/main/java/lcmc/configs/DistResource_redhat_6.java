@@ -43,8 +43,7 @@ public final class DistResource_redhat_6 extends ListResourceBundle {
         /* pacamker / corosync / yum */
         {"PmInst.install.text.2", "yum install" },
 
-        {"PmInst.install.2",
-         "/usr/bin/yum -y install corosync pacemaker"},
+        {"PmInst.install.2", "/usr/bin/yum -y install corosync pacemaker"},
 
         /* Corosync/Pacemaker clusterlabs */
         {"PmInst.install.text.3",
@@ -79,8 +78,14 @@ public final class DistResource_redhat_6 extends ListResourceBundle {
          "yum install: 8.3.x"},
 
         {"DrbdInst.install.3",
-         "/usr/bin/yum -y install kmod-drbd83 drbd83"},
+         "/usr/bin/yum install -y https://www.elrepo.org/elrepo-release-6-9.el6.elrepo.noarch.rpm && /usr/bin/yum install -y kmod-drbd84 drbd84"},
 
+        {"Heartbeat.deleteFromRc", DistResource.SUDO + "/sbin/chkconfig --del heartbeat"},
+        {"Heartbeat.addToRc", DistResource.SUDO + "/sbin/chkconfig --add heartbeat"}, 
+        {"Corosync.addToRc", DistResource.SUDO + "/sbin/chkconfig --add corosync"},
+        {"Corosync.deleteFromRc", DistResource.SUDO + "/sbin/chkconfig --del corosync"},
+        {"Openais.addToRc", DistResource.SUDO + "/sbin/chkconfig --add openais"},
+        {"Openais.deleteFromRc", DistResource.SUDO + "/sbin/chkconfig --del openais"},
     };
 
     @Override
