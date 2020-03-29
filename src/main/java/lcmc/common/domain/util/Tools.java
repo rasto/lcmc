@@ -1213,14 +1213,13 @@ public final class Tools {
      * The defaultValue is stored as the first item in the array.
      */
     public static Value[] getCommonFileSystemsWithDefault(final Set<String> commonFileSystems, final Value defaultValue) {
-        final Value[] commonFileSystemItems =  new Value[commonFileSystems.size() + 2];
+        final Value[] commonFileSystemItems =  new Value[commonFileSystems.size() + 1];
         commonFileSystemItems[0] = defaultValue;
         int i = 1;
         for (final String commonFileSystem : commonFileSystems) {
             commonFileSystemItems[i] = new StringValue(commonFileSystem);
             i++;
         }
-        commonFileSystemItems[i] = new StringValue("none");
         return commonFileSystemItems;
     }
 
