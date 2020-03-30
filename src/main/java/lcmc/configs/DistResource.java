@@ -422,7 +422,7 @@ public final class DistResource extends ListResourceBundle {
          "true"},
 
         {"LVM.pvcreate",
-         SUDO + "pvcreate @DEVICE@"},
+         SUDO + "pvcreate -qq @DEVICE@"},
 
         {"LVM.pvremove",
          SUDO + "pvremove @DEVICE@"},
