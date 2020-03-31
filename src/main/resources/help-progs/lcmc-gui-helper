@@ -2102,7 +2102,7 @@ sub get_vm_info {
 		$autostart{$name}++;
 	}
 	my $libvirt_version = "";
-	if (_exec("$VIRSH_COMMAND version 2>/dev/null") =~ /libvir\s+([0-9\.]+)/) {
+	if (_exec("$VIRSH_COMMAND version 2>/dev/null") =~ /libvirt\s+([0-9\.]+)/) {
 		$libvirt_version = $1;
 	}
 	my $out = "<version>$libvirt_version</version>\n";
