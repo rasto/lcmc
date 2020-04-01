@@ -25,7 +25,7 @@ $| = 1;
 
 use Fcntl qw(F_GETFL F_SETFL O_NONBLOCK);
 use POSIX qw(:errno_h); # EAGAIN
-use Digest::MD5 "md5_hex";
+use Digest::MD5;
 
 use Socket;
 
@@ -70,8 +70,6 @@ our $DRBD_PROXY_SHOW = "drbd-proxy-ctl -c show";
 
 our $PROC_DRBD = "/proc/drbd";
 our @SERVICE_CLASSES = ("service", "systemd", "upstart");
-our $LSB_CLASS = "lsb";
-# "" = kvm
 our @VM_OPTIONS = ("",
 		   "-c 'xen:///'",
 		   "-c lxc:///",
@@ -84,7 +82,7 @@ our $VG_CACHE;
 our $LVM_CACHE_FILE = "/tmp/lcmc.lvm.$$";
 our $LVM_ALL_CACHE_FILES = "/tmp/lcmc.lvm.*";
 our $NO_LVM_CACHE = 0;
-our $ERRNO; # is set in _exec function
+our $COMMAND_ERRNO; # is set in _exec function
 
 our %DISABLE_VM_OPTIONS; # it'll be populated for options that give an error
 
@@ -164,7 +162,7 @@ if ($action eq "all") {
 } elsif ($action eq "get-old-style-resources") {
 	get_old_style_resources(@$ACTION_OPTIONS);
 } elsif ($action eq "get-lsb-resources") {
-	get_lsb_resources(@$ACTION_OPTIONS);
+	get_lsb_resources();
 } elsif ($action eq "get-stonith-devices") {
 	get_stonith_devices(@$ACTION_OPTIONS);
 } elsif ($action eq "get-drbd-xml") {
@@ -217,7 +215,7 @@ sub start_hw_info_daemon {
 			_exec("touch $LVM_CACHE_FILE");
 		}
 		if ($count % 5 == 0) {
-			my $hw_info = get_hw_info($use_lvm_cache);
+			my $hw_info = get_hw_info();
 			$hw_info .= "vg-info\n";
 			$hw_info .= get_vg_info($use_lvm_cache);
 			$hw_info .= "disk-info\n";
@@ -230,7 +228,7 @@ sub start_hw_info_daemon {
 			}
 			$count = 0;
 		} else {
-			my $hw_info_lazy = get_hw_info_lazy($use_lvm_cache);
+			my $hw_info_lazy = get_hw_info_lazy();
 			$hw_info_lazy .= "vg-info\n";
 			$hw_info_lazy .= get_vg_info($use_lvm_cache);
 			$hw_info_lazy .= "disk-info\n";
@@ -263,7 +261,6 @@ sub start_hw_info_daemon {
 }
 
 sub get_hw_info {
-	my $use_lvm_cache = shift;
 	my $out = "net-info\n";
 	$out .= get_net_info();
 	$out .= "filesystems-info\n";
@@ -289,7 +286,6 @@ sub get_hw_info {
 }
 
 sub get_hw_info_lazy {
-	my $use_lvm_cache = shift;
 	my $out = "net-info\n";
 	$out .= get_net_info();
 	$out .= "filesystems-info\n";
@@ -423,7 +419,6 @@ sub get_drbd_devs {
 # because in the output from /bin/mount is lvm device name always in the same
 # form.
 sub get_mount {
-	my $lvm_devs = shift;
 	my $drbd_devs = shift;
 	my %dev_to_mount;
 	for (_exec("/bin/mount")) {
@@ -452,15 +447,11 @@ sub get_mount {
 #
 # Returns hash with free disk space
 sub disk_space {
-	my $lvm_devs = shift;
-	my $drbd_devs = shift;
 	my %dev_to_used;
 	for (_exec("/bin/df -Pl 2>/dev/null")) {
 		if (m!(\S+)\s+\d+\s+\d+\s+\d+\s+(\d+)%\s+!) {
 			my ($dev, $used) = ($1, $2);
-			if ($$drbd_devs{$dev}) {
-				$dev = $$drbd_devs{$dev};
-			} elsif ($dev =~ m!^/dev/mapper/(.+)!) {
+			if ($dev =~ m!^/dev/mapper/(.+)!) {
 				# convert mapper/vg00--sepp-sources to vg00-sepp/sources
 				my ($group, $name) = map { s/--/-/g;$_ } $1 =~ /(.*[^-])-([^-].*)/;
 				if ($group && $name) { # && !$$lvm_devs{"$group/$name"}) {
@@ -514,20 +505,16 @@ sub get_lvm {
 
 	# create physical volume to volume group hash
 	my %pv_to_group;
-	my %group_to_pv;
 	for (_exec("$path/pvdisplay -C --noheadings -o pv_name,vg_name 2>/dev/null")) {
 		my ($pv_name, $vg_name) = split;
 		$pv_name =~ s!^/dev/!!;
 		print_debug("pv: $pv_name, $vg_name");
 		$pv_to_group{$pv_name} = $vg_name;
-		push @{$group_to_pv{$vg_name}}, $pv_name;
 	}
 
 	my %major_minor_to_dev;
 	my %major_minor_to_group;
 	my %major_minor_to_lv_name;
-	my %devs_with_lvm;
-	my %lvm_devs;
 
 	# create major:minor kernel number to device hash
 	for (_exec("$path/lvdisplay -C --noheadings -o lv_kernel_major,lv_kernel_minor,vg_name,lv_name 2>/dev/null")) {
@@ -536,17 +523,9 @@ sub get_lvm {
 		$major_minor_to_dev{"$major:$minor"} = "$group/$name";
 		$major_minor_to_group{"$major:$minor"} = $group;
 		$major_minor_to_lv_name{"$major:$minor"} = $name;
-		for my $dev (@{$group_to_pv{$group}}) {
-			$devs_with_lvm{$dev}++;
-		}
-		$lvm_devs{"$group/$name"}++;
-
 	}
 	$LV_CACHE = [\%pv_to_group,
-		      \%group_to_pv,
 		      \%major_minor_to_dev,
-		      \%devs_with_lvm,
-		      \%lvm_devs,
 		      \%major_minor_to_group,
 		      \%major_minor_to_lv_name];
 	return @$LV_CACHE;
@@ -603,8 +582,8 @@ sub get_device_mapper_major {
 	while (<DM>) {
 		$m = $1 if /^(\d+)\s+device-mapper/;
 	}
-	return $m;
 	close DM;
+	return $m;
 }
 
 sub get_disk_uuid_map {
@@ -646,21 +625,15 @@ sub get_disk_info {
 	my $use_lvm_cache = shift;
 	my $devs_in_raid = get_raid();
 	my ($pvs,
-	    $group_to_pv,
 	    $lvm_major_minor_to_dev,
-	    $devs_with_lvm,
-	    $lvm_devs,
 	    $lvm_major_minor_to_group,
 	    $lvm_major_minor_to_lv_name) = get_lvm($use_lvm_cache);
 	my $dm_major_minor_to_dev = get_device_mapper_hash();
 	my $drbd_devs = get_drbd_devs();
-	my $dev_to_mount = get_mount($lvm_devs, $drbd_devs);
+	my $dev_to_mount = get_mount($drbd_devs);
 	my $dev_to_swap = get_swaps();
 	# read partition table
 	open PT, "/proc/partitions" or disk_info_error("cannot open /proc/partitions");
-	my @raids;
-	my @lvms;
-	my @partitions;
 	my $info;
 	my $device_mapper_major = get_device_mapper_major();
 	my $by_uuids = get_disk_uuid_map("/dev/disk/by-uuid");
@@ -825,8 +798,6 @@ sub get_crypto_info {
 #
 # prints available qemu keymaps.
 sub get_qemu_keymaps_info {
-	my @modules;
-	my %module_exists;
 	my $out = "";
 	for (_exec("ls /usr/share/qemu*/keymaps/ 2>/dev/null")) {
 		$out .= $_;
@@ -917,7 +888,6 @@ sub get_version_info {
 
 sub get_drbd_events {
 	my $kidpid;
-	my $pid = $$;
 	die "can't fork: $!" unless defined($kidpid = fork());
 	if ($kidpid) {
 		while (1) {
@@ -937,7 +907,7 @@ sub do_drbd_events {
 	       print "--nm--\n";
 	       return;
 	}
-	my ($v1, $v2, $v3) = get_drbd_version();
+	my ($v1, $v2) = get_drbd_version();
 	my $command;
 	if ($v1 < 7 || ($v1 == 8 && $v2 < 4)) { # < 8.4.0
 		$command = "/sbin/drbdsetup /dev/drbd0 events -a -u";
@@ -1038,7 +1008,6 @@ sub get_message {
 #
 sub get_cluster_events {
 	my $kidpid;
-	my $pid = $$;
 	die "can't fork: $!" unless defined($kidpid = fork());
 	if ($kidpid) {
 		# parent
@@ -1082,13 +1051,12 @@ sub do_cluster_events {
 				} elsif (/error:/
 					 || /Diff: ---/ 
 					 || /Local-only Change:/) {
-					my $info =
-					get_cluster_info($hb_version);
-					if ($info ne $prev_info) {
+					my $cluster_info = get_cluster_info($hb_version);
+					if ($cluster_info ne $prev_info) {
 						print "---start---\n";
-						print $info;
+						print $cluster_info;
 						print "---done---\n";
-						$prev_info = $info;
+						$prev_info = $cluster_info;
 					}
 				}
 			}
@@ -1105,7 +1073,6 @@ sub do_cluster_events {
 sub get_resource_status {
 	my $hb_version = shift;
 	my %role;
-	my %running;
 	my %unmanaged;
 	my %resources;
 	my @fenced_nodes;
@@ -1328,7 +1295,7 @@ sub get_resource_agents {
 		# lsb is subset of service, but this is needed for
 		# services already configured as lsb in pcmk config.
 		print "class:lsb\n";
-		get_lsb_resources($type);
+		get_lsb_resources();
 	}
 }
 
@@ -1399,7 +1366,6 @@ sub get_service_resources {
 }
 
 sub get_lsb_resources {
-	my $type = shift || "";
 	# old style init scripts (lsb)
 	my $dir = "/etc/init.d/";
 	for (_exec("find $dir -perm -u=x -xtype f -printf \"%f\n\"")) {
@@ -1487,7 +1453,6 @@ sub get_stonith_devices_old {
 				my $path = "PATH=\$PATH:/usr/share/cluster-glue";
 				print get_ocf_like_stonith_devices(
 				     "$subtype/$_",
-				     $dir,
 				     scalar _exec("$path $dir/$_ getinfo-devid"),
 				     scalar _exec("$path $dir/$_ getinfo-devdescr")
 					   ._exec("$path $dir/$_ getinfo-devurl"),
@@ -1528,7 +1493,6 @@ sub get_stonith_devices_old {
 			my ($parameters) =
 				$content =~ /(<parameters>.*?<\/parameters>)/s;
 			print get_ocf_like_stonith_devices($name,
-							   $dir,
 							   $shortdesc,
 							   $longdesc,
 							   $parameters);
@@ -1538,13 +1502,12 @@ sub get_stonith_devices_old {
 
 sub get_ocf_like_stonith_devices {
 	my $device     = shift;
-	my $dir        = shift;
 	my $shortdesc  = shift;
 	my $longdesc   = shift;
 	my $parameters = shift;
 	my $class = "stonith";
 
-	my $xml = <<XML;
+	return <<XML;
 <?xml version="1.0"?>
 <resource-agent name="$device" class="$class">
 <version>1.0</version>
@@ -1601,18 +1564,18 @@ sub get_drbd_xml {
 		my $cols = 80;
 		$desc = join "\n",
 			map {
-			    my $a = $_;
+			    my $line = $_;
 			    $_ = "";
-			    while (length $a >= $cols) {
-				    my $r = rindex $a, " ", $cols;
-				    my $b = substr $a,
+			    while (length $line >= $cols) {
+				    my $r = rindex $line, " ", $cols;
+				    my $next_line = substr $line,
 				    	  	   $r,
-						   length($a) - $r,
+						   length($line) - $r,
 						   "\n";
-				    $_.=$a;
-				    $a = $b;
+				    $_.=$line;
+				    $line = $next_line;
 			    };
-			    $_.$a}
+			    $_.$line}
 			    split /\n/, $desc;
 		for ($desc, $command) {
 			s/\\m\[blue\]//g;
@@ -1693,7 +1656,7 @@ sub get_drbd_xml {
 		print "</command>\n";
 	}
 
-	my ($v1, $v2, $v3) = get_drbd_version();
+	my ($v1, $v2) = get_drbd_version();
 	my @sections = ("net-options", "disk-options");
 	my $help_option = "xml-help";
 	if ($v1 < 7 || ($v1 == 8 && $v2 < 4)) { # < 8.4.0
@@ -1703,8 +1666,8 @@ sub get_drbd_xml {
 	    
 	for (@sections) {
 		my $xml = _exec("/sbin/drbdsetup $help_option $_");
-		if ($ERRNO) {
-			print "ERROR: can't exec drbdsetup: $ERRNO\n";
+		if ($COMMAND_ERRNO) {
+			print "ERROR: can't exec drbdsetup: $COMMAND_ERRNO\n";
 			exit 1;
 		}
 		$xml =~ s/(option name="(.*?)".*?)(<\/option>)/$1.($descs{$2} || "not documented").$3/egs;
@@ -1809,7 +1772,7 @@ sub get_drbd_proxy_info
 
 sub get_drbd_version {
 	my (@version) = _exec("echo|/sbin/drbdadm help 2>/dev/null")
-					=~ /Version:\s+(\d+)\.(\d+)\.(\d+)/;
+					=~ /Version:\s+(\d+)\.(\d+)\.\d+/;
 	return @version;
 }
 
@@ -2171,7 +2134,7 @@ sub get_vm_info {
 	if ($networks) {
 		$out .= $networks;
 	}
-	my $md5 = md5_hex($out);
+	my $md5 = Digest::MD5::md5_hex($out);
 	my $ret = "<vms md5=\"$md5\">\n";
 	$ret .= $out;
 	$ret .= "</vms>\n";
@@ -2248,7 +2211,6 @@ sub gui_pcmk_status_test {
 	my $index = shift;
 	my @hosts = @_;
 	my $status = _exec_or_die("crm_resource --list");
-	my $i = 1;
 	for my $host (@hosts) {
 		$status =~ s/$host\b/host/gi;
 	}
@@ -2517,7 +2479,7 @@ sub _execute {
 	} else {
 		$out = system($cmd);
 	}
-	$ERRNO=$?;
+	$COMMAND_ERRNO=$?;
 	my $end_time = _log_time();
 	_log($end_time . " done  $cmd_code: $cmd_log", $level);
 	if ($wantoutput) {
@@ -2588,19 +2550,19 @@ sub processed_log {
 	my %cmd_no;
 	my @cmd_log;
 	while (<LOG>) {
-		my ($time, $action, $code, $cmd) =
+		my ($time, $log_action, $code, $cmd) =
 					/(\d+)\s+(\S+)\s+(\S+)\s+(.*)/;
-		if (!$time || !$action || !$code || !$cmd) {
+		if (!$time || !$log_action || !$code || !$cmd) {
 			print "ERROR: can't parse: $_\n";
 			next;
 		}
 		if ($time < $from_time) {
 			next;
 		}
-		if ("start" eq $action) {
+		if ("start" eq $log_action) {
 			$start{$code} = $time;
 			$cmds{$code} = $cmd;
-		} elsif ("done" eq $action) {
+		} elsif ("done" eq $log_action) {
 			next if !$start{$code}; # ignore without start
 
 			my $duration = $time - $start{$code};
@@ -2610,7 +2572,7 @@ sub processed_log {
 				push @cmd_log, "$duration $cmd\n";
 			}
 		} else {
-			print "ERROR: unknown action: $action\n";
+			print "ERROR: unknown action: $log_action\n";
 			next;
 		}
 	}
@@ -2635,8 +2597,6 @@ sub raw_log {
 		print "can't open $LOG_FILE\n";
 		return;
 	}
-	my %start;
-	my %cmds;
 	my $log_time = $$HELPER_OPTIONS{$LOG_TIME_OP} || $LOG_TIME_DEFAULT;
 	my $from_time = $now - _convert_to_sec($log_time) * 1000;
 	while (<LOG>) {
