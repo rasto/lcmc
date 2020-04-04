@@ -97,7 +97,7 @@ final class PacemakerInst extends DialogHost {
                     final String fileName = "/help-progs/" + parts[i];
                     final String to = parts[i + 1];
                     final String perm = parts[i + 2];
-                    final String file = Tools.getFile(fileName);
+                    final String file = Tools.readFile(fileName);
                     if (file != null) {
                         getHost().getSSH().scp(file, to, perm, true, null, null, null);
                     }

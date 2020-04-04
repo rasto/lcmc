@@ -43,6 +43,9 @@ import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -59,6 +62,8 @@ import java.util.TreeSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javax.imageio.ImageIO;
 import javax.swing.BorderFactory;
@@ -89,6 +94,7 @@ import lcmc.crm.ui.resource.ServiceInfo;
 import lcmc.host.domain.Host;
 import lcmc.logger.Logger;
 import lcmc.logger.LoggerFactory;
+import lombok.SneakyThrows;
 
 /**
  * This class provides tools, that are not classified.
@@ -633,7 +639,7 @@ public final class Tools {
     }
 
     /** Reads and returns a content of a text file. */
-    public static String getFile(final String fileName) {
+    public static String readFile(final String fileName) {
         if (fileName == null) {
             return null;
         }
@@ -650,9 +656,36 @@ public final class Tools {
             }
             return content.toString();
         } catch (final IOException e) {
-            LOG.appError("getFile: could not read: " + fileName, "", e);
+            LOG.appError("readFile: could not read: " + fileName, "", e);
             return null;
         }
+    }
+
+    @SneakyThrows
+    public static String inlinePerlModules(final String dir) {
+        URL url = Tools.class.getResource(dir);
+        String path = url.getPath();
+        try (var stream = Files.walk(Paths.get(path))) {
+            return stream.map(Path::toFile)
+                    .map(File::getPath)
+                    .filter(it -> it.endsWith(".pm"))
+                    .map(Tools::readPm)
+                    .map(Tools::surroundWithParenthesis)
+                    .collect(Collectors.joining("\n"));
+        }
+    }
+
+    @SneakyThrows
+    private static String readPm(String path) {
+        return Files.readAllLines(Paths.get(path))
+                    .stream()
+                    .map(line -> "    " + line)
+                    .collect(Collectors.joining("\n"));
+
+    }
+
+    private static String surroundWithParenthesis(String text) {
+        return "\n{\n" + text + "\n}\n";
     }
 
     /** Convenience sleep wrapper. */

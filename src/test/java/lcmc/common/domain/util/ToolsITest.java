@@ -71,17 +71,17 @@ public final class ToolsITest {
     @Test
     public void helperFieShouldBeLoaded() {
         final String testFile = "/help-progs/lcmc-gui-helper";
-        assertTrue(Tools.getFile(testFile).indexOf("#!") == 0);
+        assertTrue(Tools.readFile(testFile).indexOf("#!") == 0);
     }
 
     @Test
     public void nullFileShouldReturnNull() {
-        assertNull(Tools.getFile(null));
+        assertNull(Tools.readFile(null));
     }
 
     @Test
     public void nonExistingFileShouldReturnNull() {
-        assertNull(Tools.getFile("not_existing_file"));
+        assertNull(Tools.readFile("not_existing_file"));
     }
 
     @Test

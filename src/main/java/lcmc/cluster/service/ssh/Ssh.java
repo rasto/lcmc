@@ -87,6 +87,8 @@ public class Ssh {
     private SwingUtils swingUtils;
     @Inject
     private Provider<Authentication> authenticationProvider;
+    private static final String GUI_HELPER_FILENAME = "/help-progs/lcmc-gui-helper/Main.pl";
+    private static final String GUI_HELPER_DIR = "/help-progs/lcmc-gui-helper/";
 
     boolean reconnect() {
         swingUtils.isNotSwingThread();
@@ -357,11 +359,8 @@ public class Ssh {
     /** Installs gui-helper on the remote host. */
     public void installGuiHelper() {
         if (!application.getKeepHelper()) {
-            final String fileName = "/help-progs/lcmc-gui-helper";
-            final String file = Tools.getFile(fileName);
-            if (file != null) {
-                scp(file, "@GUI-HELPER-PROG@", "0700", false, null, null, null);
-            }
+            final var fileContent = Tools.readFile(GUI_HELPER_FILENAME) + Tools.inlinePerlModules(GUI_HELPER_DIR);
+            scp(fileContent, "@GUI-HELPER-PROG@", "0700", false, null, null, null);
         }
     }
 
@@ -372,7 +371,7 @@ public class Ssh {
         }
         final SCPClient scpClient = new SCPClient(connectionThread.getConnection());
         final String fileName = "lcmc-test.tar";
-        final String file = Tools.getFile('/' + fileName);
+        final String file = Tools.readFile('/' + fileName);
         try {
             scpClient.put(file.getBytes("UTF-8"), fileName, "/tmp");
         } catch (final IOException e) {
