@@ -1,6 +1,7 @@
 package lcmc.common.domain.util;
 
 import static junitparams.JUnitParamsRunner.$;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotEquals;
@@ -20,6 +21,7 @@ import javax.inject.Provider;
 import javax.swing.JPanel;
 
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -44,6 +46,7 @@ import lcmc.host.ui.HostBrowser;
 import lcmc.host.ui.TerminalPanel;
 import lcmc.robotest.RoboTest;
 import lcmc.vm.domain.VmsXml;
+import lombok.val;
 
 @RunWith(JUnitParamsRunner.class)
 public final class ToolsTest {

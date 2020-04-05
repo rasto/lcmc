@@ -43,9 +43,6 @@ import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -62,8 +59,6 @@ import java.util.TreeSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import javax.imageio.ImageIO;
 import javax.swing.BorderFactory;
@@ -638,56 +633,6 @@ public final class Tools {
         ((HTMLDocument) ep.getDocument()).getStyleSheet().addRule(bodyRule);
     }
 
-    /** Reads and returns a content of a text file. */
-    public static String readFile(final String fileName) {
-        if (fileName == null) {
-            return null;
-        }
-        final URL url = Tools.class.getResource(fileName);
-        if (url == null) {
-            return null;
-        }
-        try {
-            final BufferedReader br = new BufferedReader(new InputStreamReader(url.openStream(), "UTF-8"));
-            final StringBuilder content = new StringBuilder("");
-            while (br.ready()) {
-                content.append(br.readLine());
-                content.append('\n');
-            }
-            return content.toString();
-        } catch (final IOException e) {
-            LOG.appError("readFile: could not read: " + fileName, "", e);
-            return null;
-        }
-    }
-
-    @SneakyThrows
-    public static String inlinePerlModules(final String dir) {
-        URL url = Tools.class.getResource(dir);
-        String path = url.getPath();
-        try (var stream = Files.walk(Paths.get(path))) {
-            return stream.map(Path::toFile)
-                    .map(File::getPath)
-                    .filter(it -> it.endsWith(".pm"))
-                    .map(Tools::readPm)
-                    .map(Tools::surroundWithParenthesis)
-                    .collect(Collectors.joining("\n"));
-        }
-    }
-
-    @SneakyThrows
-    private static String readPm(String path) {
-        return Files.readAllLines(Paths.get(path))
-                    .stream()
-                    .map(line -> "    " + line)
-                    .collect(Collectors.joining("\n"));
-
-    }
-
-    private static String surroundWithParenthesis(String text) {
-        return "\n{\n" + text + "\n}\n";
-    }
-
     /** Convenience sleep wrapper. */
     public static void sleep(final int ms) {
         try {
@@ -829,7 +774,7 @@ public final class Tools {
         for (int a = '0'; a <= '9'; a++) {
             charsL.add((char) a);
         }
-        
+
         final Character[] chars = charsL.toArray(new Character[charsL.size()]);
         final StringBuilder s = new StringBuilder(len + 1);
         for (int i = 0; i < len; i++) {
@@ -855,14 +800,14 @@ public final class Tools {
         if (table == null) {
             return;
         }
-        
+
         final int margin = 3;
         for (int i = 0; i < table.getColumnCount(); i++) {
             final int vColIndex = i;
             final TableColumnModel colModel = table.getColumnModel();
             final TableColumn col = colModel.getColumn(vColIndex);
             TableCellRenderer renderer = col.getHeaderRenderer();
-            
+
             if (renderer == null) {
                 renderer = table.getTableHeader().getDefaultRenderer();
             }
@@ -1263,6 +1208,11 @@ public final class Tools {
         } catch (Exception e) {
             LOG.appError("writeImage: failed", e);
         }
+    }
+
+    @SneakyThrows
+    public static String readFile(final String fileName) {
+        return new String(Tools.class.getResourceAsStream(fileName).readAllBytes());
     }
 
     private Tools() {

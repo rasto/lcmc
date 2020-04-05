@@ -30,6 +30,7 @@ import javax.swing.JPanel;
 import javax.swing.SpringLayout;
 
 import lcmc.common.domain.Application;
+import lcmc.common.domain.util.GuiHelperFiles;
 import lcmc.common.ui.SpringUtilities;
 import lcmc.common.ui.WizardDialog;
 import lcmc.common.domain.ConvertCmdCallback;
@@ -98,9 +99,7 @@ final class PacemakerInst extends DialogHost {
                     final String to = parts[i + 1];
                     final String perm = parts[i + 2];
                     final String file = Tools.readFile(fileName);
-                    if (file != null) {
-                        getHost().getSSH().scp(file, to, perm, true, null, null, null);
-                    }
+                    getHost().getSSH().scp(file, to, perm, true, null, null, null);
                     i += 3;
                 }
             }

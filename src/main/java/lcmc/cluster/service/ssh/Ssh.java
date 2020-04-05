@@ -28,6 +28,7 @@ import java.io.IOException;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
+import lcmc.common.domain.util.GuiHelperFiles;
 import lcmc.common.ui.main.MainData;
 import lcmc.common.ui.MainPanel;
 import lcmc.common.ui.main.ProgressIndicator;
@@ -87,8 +88,7 @@ public class Ssh {
     private SwingUtils swingUtils;
     @Inject
     private Provider<Authentication> authenticationProvider;
-    private static final String GUI_HELPER_FILENAME = "/help-progs/lcmc-gui-helper/Main.pl";
-    private static final String GUI_HELPER_DIR = "/help-progs/lcmc-gui-helper/";
+    private final GuiHelperFiles guiHelperFiles = new GuiHelperFiles();
 
     boolean reconnect() {
         swingUtils.isNotSwingThread();
@@ -359,8 +359,7 @@ public class Ssh {
     /** Installs gui-helper on the remote host. */
     public void installGuiHelper() {
         if (!application.getKeepHelper()) {
-            final var fileContent = Tools.readFile(GUI_HELPER_FILENAME) + Tools.inlinePerlModules(GUI_HELPER_DIR);
-            scp(fileContent, "@GUI-HELPER-PROG@", "0700", false, null, null, null);
+            scp(guiHelperFiles.readGuiHelper(), "@GUI-HELPER-PROG@", "0700", false, null, null, null);
         }
     }
 
