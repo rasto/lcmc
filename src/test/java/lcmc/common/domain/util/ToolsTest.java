@@ -2,12 +2,9 @@ package lcmc.common.domain.util;
 
 import static junitparams.JUnitParamsRunner.$;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.when;
 
 import java.awt.Dimension;
@@ -21,12 +18,12 @@ import javax.inject.Provider;
 import javax.swing.JPanel;
 
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
 import lcmc.Exceptions;
@@ -46,7 +43,6 @@ import lcmc.host.ui.HostBrowser;
 import lcmc.host.ui.TerminalPanel;
 import lcmc.robotest.RoboTest;
 import lcmc.vm.domain.VmsXml;
-import lombok.val;
 
 @RunWith(JUnitParamsRunner.class)
 public final class ToolsTest {
@@ -119,7 +115,7 @@ public final class ToolsTest {
                  "255.255.255.255",
                  "254.255.255.255"})
     public void testIsIp(final String ip) {
-        assertTrue(ip, Tools.isIp(ip));
+        assertThat(Tools.isIp(ip)).isTrue();
     }
 
     @Test
@@ -139,12 +135,12 @@ public final class ToolsTest {
                  "127.false.0.1",
                  "false.0.0.1"})
     public void testIsNotIp(final String ip) {
-        assertFalse(ip, Tools.isIp(ip));
+        assertThat(Tools.isIp(ip)).isFalse();
     }
 
     @Test
     public void testPrintStackTrace() {
-        assertFalse("".equals(Tools.getStackTrace()));
+        assertThat("".equals(Tools.getStackTrace())).isFalse();
     }
 
     @SuppressWarnings("unused")
@@ -159,28 +155,28 @@ public final class ToolsTest {
     @Test
     @Parameters(method="parametersForDefaultShouldBeReturned")
     public void defaultShouldBeReturned(final String default0, final String key) {
-        assertEquals(default0, Tools.getDefault(key));
+        assertThat(Tools.getDefault(key)).isEqualTo(default0);
     }
 
     @Test
     public void testGetDefaultColor() {
-        assertEquals(java.awt.Color.BLACK, Tools.getDefaultColor("TerminalPanel.Background"));
+        assertThat(Tools.getDefaultColor("TerminalPanel.Background")).isEqualTo(java.awt.Color.BLACK);
     }
 
     @Test
     public void testGetDefaultInt() {
-        assertEquals(100000, Tools.getDefaultInt("Score.Infinity"));
+        assertThat(Tools.getDefaultInt("Score.Infinity")).isEqualTo(100000);
     }
 
     @Test
     public void testGetString() {
-        assertEquals("Linux Cluster Management Console", Tools.getString("DrbdMC.Title"));
+        assertThat(Tools.getString("DrbdMC.Title")).isEqualTo("Linux Cluster Management Console");
     }
 
     @Test
     public void testGetErrorString() {
         final String errorString = "the same string";
-        assertEquals(errorString, errorString);
+        assertThat(errorString).isEqualTo(errorString);
     }
 
     @SuppressWarnings("unused")
@@ -189,7 +185,7 @@ public final class ToolsTest {
             $("a,b",   ",",  new String[]{"a", "b"}),
             $("a",     ",",  new String[]{"a"}),
             $("",      ",",  new String[]{}),
-            $("",      ",",  (String[]) null),
+            $("",      ",", null),
             $("ab",    null, new String[]{"a", "b"}),
             $("a,b,c", ",",  new String[]{"a", "b" , "c"}),
             $("a",     ",",  new String[]{"a", null}),
@@ -204,7 +200,7 @@ public final class ToolsTest {
     @Test
     @Parameters(method="parametersForTestJoin")
     public void testJoin(final String expected, final String delim, final String[] values) {
-        assertEquals(expected, Tools.join(delim, values));
+        assertThat(Tools.join(delim, values)).isEqualTo(expected);
     }
 
     @SuppressWarnings("unused")
@@ -229,13 +225,13 @@ public final class ToolsTest {
                                          final String delim,
                                          final String[] values,
                                          final int length) {
-        assertEquals(expected, Tools.join(delim, values, length));
+        assertThat(Tools.join(delim, values, length)).isEqualTo(expected);
     }
 
 
     @Test
     public void joinCollectionShouldWork() {
-        assertEquals("ab", Tools.join(null, Arrays.asList("a", "b")));
+        assertThat(Tools.join(null, Arrays.asList("a", "b"))).isEqualTo("ab");
     }
 
     @Test
@@ -244,8 +240,8 @@ public final class ToolsTest {
         for (int i = 0; i < 1000; i++) {
             bigArray.add("x");
         }
-        assertTrue(Tools.join(",", bigArray).length() == 2000 - 1);
-        assertTrue(Tools.join(",", bigArray.toArray(new String[bigArray.size()]), 500).length() == 1000 - 1);
+        assertThat(Tools.join(",", bigArray)).hasSize(2000 - 1);
+        assertThat(Tools.join(",", bigArray.toArray(new String[bigArray.size()]), 500)).hasSize(1000 - 1);
     }
 
     @Test
@@ -253,7 +249,7 @@ public final class ToolsTest {
                  "Rasto, Rasto",
                  "RASTO, RASTO"})
     public void testUCFirst(final String expected, final String anyString) {
-        assertEquals(expected, Tools.ucfirst(anyString));
+        assertThat(Tools.ucfirst(anyString)).isEqualTo(expected);
     }
 
     @Test
@@ -263,7 +259,7 @@ public final class ToolsTest {
 
     @Test
     public void ucFirstEmptyStringShouldBeEmptyString() {
-        assertEquals("", Tools.ucfirst(""));
+        assertThat(Tools.ucfirst("")).isEqualTo("");
     }
 
 
@@ -279,7 +275,7 @@ public final class ToolsTest {
     @Test
     @Parameters(method="parametersForHtmlShouldBeCreated")
     public void htmlShouldBeCreated(final String html, final String text) {
-        assertEquals(html, Tools.html(text));
+        assertThat(Tools.html(text)).isEqualTo(html);
     }
 
 
@@ -295,7 +291,7 @@ public final class ToolsTest {
     @Test
     @Parameters(method="parametersForShouldBeStringClass")
     public void shouldBeStringClass(final Object object) {
-        assertTrue(Tools.isStringClass(object));
+        assertThat(Tools.isStringClass(object)).isTrue();
     }
 
     @SuppressWarnings("unused")
@@ -309,7 +305,7 @@ public final class ToolsTest {
     @Test
     @Parameters(method="parametersForShouldNotBeStringClass")
     public void shouldNotBeStringClass(final Object object) {
-        assertFalse(Tools.isStringClass(object));
+        assertThat(Tools.isStringClass(object)).isFalse();
     }
 
     @SuppressWarnings("unused")
@@ -328,16 +324,16 @@ public final class ToolsTest {
     @Test
     @Parameters(method="parametersForConfigShouldBeEscaped")
     public void configShouldBeEscaped(final String escaped, final String config) {
-        assertEquals(escaped, Tools.escapeConfig(config));
+        assertThat(Tools.escapeConfig(config)).isEqualTo(escaped);
     }
 
     @Test
     public void testSetSize() {
         final JPanel p = new JPanel();
         Tools.setSize(p, 20, 10);
-        assertEquals(new Dimension(Short.MAX_VALUE, 10), p.getMaximumSize());
-        assertEquals(new Dimension(20, 10), p.getMinimumSize());
-        assertEquals(new Dimension(20, 10), p.getPreferredSize());
+        assertThat(p.getMaximumSize()).isEqualTo(new Dimension(Short.MAX_VALUE, 10));
+        assertThat(p.getMinimumSize()).isEqualTo(new Dimension(20, 10));
+        assertThat(p.getPreferredSize()).isEqualTo(new Dimension(20, 10));
     }
 
     @SuppressWarnings("unused")
@@ -364,7 +360,7 @@ public final class ToolsTest {
     @Parameters(method="parametersForFirstVersionShouldBeSmaller")
     public void firstVersionShouldBeSmaller(final String versionOne, final String versionTwo)
     throws Exceptions.IllegalVersionException {
-        assertEquals(-1, Tools.compareVersions(versionOne, versionTwo));
+        assertThat(Tools.compareVersions(versionOne, versionTwo)).isEqualTo(-1);
     }
 
     @SuppressWarnings("unused")
@@ -389,7 +385,7 @@ public final class ToolsTest {
     @Parameters(method="parametersForFirstVersionShouldBeGreater")
     public void firstVersionShouldBeGreater(final String versionOne, final String versionTwo)
     throws Exceptions.IllegalVersionException {
-        assertEquals(1, Tools.compareVersions(versionOne, versionTwo));
+        assertThat(Tools.compareVersions(versionOne, versionTwo)).isEqualTo(1);
     }
 
     @SuppressWarnings("unused")
@@ -428,7 +424,7 @@ public final class ToolsTest {
     @Parameters(method="parametersForVersionsShouldBeEqual")
     public void versionsShouldBeEqual(final String versionOne, final String versionTwo)
     throws Exceptions.IllegalVersionException {
-        assertEquals(0, Tools.compareVersions(versionOne, versionTwo));
+        assertThat(Tools.compareVersions(versionOne, versionTwo)).isEqualTo(0);
     }
 
     @SuppressWarnings("unused")
@@ -479,29 +475,29 @@ public final class ToolsTest {
     @Test
     @Parameters(method="parametersForCharCountShouldBeReturned")
     public void charCountShouldBeReturned(final int count, final String string, final char character) {
-        assertEquals(count, Tools.charCount(string, character));
+        assertThat(Tools.charCount(string, character)).isEqualTo(count);
     }
 
     @Test
     public void charCountInNullShouldReturnZero() {
-        assertEquals(0, Tools.charCount(null, 'b'));
+        assertThat(Tools.charCount(null, 'b')).isEqualTo(0);
     }
 
     @Test
     @Parameters({"1", "-1", "0", "-0", "1235", "100000000000000000", "-100000000000000000"})
     public void shouldBeNumber(final String number) {
-        assertTrue(number, Tools.isNumber(number));
+        assertThat(Tools.isNumber(number)).isTrue();
     }
 
     @Test
     @Parameters({"0.1", "1 1", "-", "", "a", ".5", "a1344", "1344a", "13x44"})
     public void shouldNotBeNumber(final String number) {
-        assertFalse(number, Tools.isNumber(number));
+        assertThat(Tools.isNumber(number)).isFalse();
     }
 
     @Test
     public void nullShouldNotBeNumber() {
-        assertFalse("null", Tools.isNumber(null));
+        assertThat(Tools.isNumber(null)).isFalse();
     }
 
     @SuppressWarnings("unused")
@@ -518,7 +514,7 @@ public final class ToolsTest {
     @Test
     @Parameters(method="parametersForShellListShouldBeCreated")
     public void shellListShouldBeCreated(final String shellList, final String[] list) {
-        assertEquals(shellList, Tools.shellList(list));
+        assertThat(Tools.shellList(list)).isEqualTo(shellList);
     }
 
     @SuppressWarnings("unused")
@@ -533,7 +529,7 @@ public final class ToolsTest {
     @Test
     @Parameters(method="parametersForStringsShouldBeEqual")
     public void stringsShouldBeEqual(final String stringOne, final String stringTwo) {
-        assertEquals(stringOne, stringTwo);
+        assertThat(stringTwo).isEqualTo(stringOne);
     }
 
     @SuppressWarnings("unused")
@@ -569,38 +565,38 @@ public final class ToolsTest {
     public void testGetRandomSecret() {
         for (int i = 0; i < 100; i++) {
             final String s = Tools.getRandomSecret(2000);
-            assertTrue(s.length() == 2000);
+            assertThat(s).hasSize(2000);
             final int count = Tools.charCount(s, 'a');
-            assertTrue(count > 2 && count < 500);
+            assertThat(count > 2 && count < 500).isTrue();
         }
     }
 
     @Test
     @Parameters({"127.0.0.1", "127.0.1.1"})
     public void testIsLocalIp(final String ip) {
-        assertTrue(Tools.isLocalIp(ip));
+        assertThat(Tools.isLocalIp(ip)).isTrue();
     }
 
     @Test
     @Parameters({"127.0.0", "127.0.0.1.1", "127.0.0.a", "a", "a"})
     public void testIsNotLocalIp(final String ip) {
-        assertFalse(ip, Tools.isLocalIp(ip));
+        assertThat(Tools.isLocalIp(ip)).isFalse();
     }
 
     @Test
     public void textShouldBeTrimmed() {
         assertNull(Tools.trimText(null));
-        assertEquals("x", Tools.trimText("x"));
+        assertThat(Tools.trimText("x")).isEqualTo("x");
         final String x20 = " xxxxxxxxxxxxxxxxxxx";
-        assertEquals(x20 + x20 + x20 + x20, Tools.trimText(x20 + x20 + x20 + x20));
+        assertThat(Tools.trimText(x20 + x20 + x20 + x20)).isEqualTo(x20 + x20 + x20 + x20);
     }
 
     @Test
     public void textShouldNotBeTrimmed() {
         assertNull(Tools.trimText(null));
-        assertEquals("x", Tools.trimText("x"));
+        assertThat(Tools.trimText("x")).isEqualTo("x");
         final String x20 = " xxxxxxxxxxxxxxxxxxx";
-        assertEquals(x20 + x20 + x20 + x20 + "\n" + x20.trim(), Tools.trimText(x20 + x20 + x20 + x20 + x20));
+        assertThat(Tools.trimText(x20 + x20 + x20 + x20 + x20)).isEqualTo(x20 + x20 + x20 + x20 + "\n" + x20.trim());
     }
 
     @SuppressWarnings("unused")
@@ -618,7 +614,7 @@ public final class ToolsTest {
     @Test
     @Parameters(method="parametersForDirectoryPartShouldBeExtracted")
     public void directoryPartShouldBeExtracted(final String extractedDir, final String file) {
-        assertEquals(extractedDir, Tools.getDirectoryPart(file));
+        assertThat(Tools.getDirectoryPart(file)).isEqualTo(extractedDir);
     }
 
     @SuppressWarnings("unused")
@@ -641,7 +637,7 @@ public final class ToolsTest {
     @Test
     @Parameters(method="parametersForQuotesShouldBeEscaped")
     public void quotesShouldBeEscaped(final String escaped, final String string, final int level) {
-        assertEquals(escaped, Tools.escapeQuotes(string, level));
+        assertThat(Tools.escapeQuotes(string, level)).isEqualTo(escaped);
     }
 
     @SuppressWarnings("unused")
@@ -660,7 +656,7 @@ public final class ToolsTest {
 
         host.getHostParser().setPacemakerVersion(pcmkVersion);
         host.getHostParser().setHeartbeatVersion(hbVersion);
-        assertTrue(Tools.versionBeforePacemaker(host));
+        assertThat(Tools.versionBeforePacemaker(host)).isTrue();
     }
 
     @SuppressWarnings("unused")
@@ -681,7 +677,7 @@ public final class ToolsTest {
 
         host.getHostParser().setPacemakerVersion(pcmkVersion);
         host.getHostParser().setHeartbeatVersion(hbVersion);
-        assertFalse(Tools.versionBeforePacemaker(host));
+        assertThat(Tools.versionBeforePacemaker(host)).isFalse();
     }
 
     @SuppressWarnings("unused")
@@ -703,13 +699,13 @@ public final class ToolsTest {
     public void twoNewLineShouldBeOne(final String chomped, final String origString) {
         final StringBuffer sb = new StringBuffer(origString);
         Tools.chomp(sb);
-        assertEquals(chomped, sb.toString());
+        assertThat(sb.toString()).isEqualTo(chomped);
     }
 
     @Test
     public void testGenerateVMMacAddress() {
        final String mac = Tools.generateVMMacAddress();
-       assertEquals(mac.length(), 17);
+       assertThat(17).isEqualTo(mac.length());
     }
 
     @SuppressWarnings("unused")
@@ -725,7 +721,7 @@ public final class ToolsTest {
     @Test
     @Parameters(method="parametersForNamesShouldBeTheSame")
     public void namesShouldBeTheSame(final String nameOne, final String nameTwo) {
-        assertTrue(Tools.compareNames(nameOne, nameTwo) == 0);
+        assertThat(Tools.compareNames(nameOne, nameTwo) == 0).isTrue();
     }
 
     @SuppressWarnings("unused")
@@ -746,7 +742,7 @@ public final class ToolsTest {
     @Test
     @Parameters(method="parametersForNameOneShouldBeSmaller")
     public void nameOneShouldBeSmaller(final String nameOne, final String nameTwo) {
-        assertTrue(Tools.compareNames(nameOne, nameTwo) < 0);
+        assertThat(Tools.compareNames(nameOne, nameTwo) < 0).isTrue();
     }
 
     @SuppressWarnings("unused")
@@ -765,7 +761,7 @@ public final class ToolsTest {
     @Test
     @Parameters(method="parametersForNameOneShouldBeGreater")
     public void nameOneShouldBeGreater(final String nameOne, final String nameTwo) {
-        assertTrue(Tools.compareNames(nameOne, nameTwo) > 0);
+        assertThat(Tools.compareNames(nameOne, nameTwo) > 0).isTrue();
     }
 
     private Object[] equalCollections() {
@@ -780,32 +776,28 @@ public final class ToolsTest {
     @Test
     @Parameters(method="equalCollections")
     public void collectionsShouldBeEqual(final Collection<String> collection1, Collection<String> collection2) {
-        assertTrue(
-                "" + collection1 + " != " + collection2,
-                Tools.equalCollections(collection1, collection2));
+        assertThat(Tools.equalCollections(collection1, collection2)).isTrue();
     }
 
     private Object[] unequalCollections() {
         return $(
-                $(new ArrayList<String>(), new ArrayList<String>(Arrays.asList("a"))),
-                $(new ArrayList<String>(Arrays.asList("a")), new ArrayList<String>()),
-                $(new ArrayList<String>(Arrays.asList("a")), new ArrayList<String>(Arrays.asList("a", "b"))),
-                $(new ArrayList<String>(Arrays.asList("a", "b")), new ArrayList<String>(Arrays.asList("b"))),
-                $(new ArrayList<String>(Arrays.asList("a", "a")), new ArrayList<String>(Arrays.asList("a", "b"))),
-                $(new ArrayList<String>(Arrays.asList("b", "b")), new ArrayList<String>(Arrays.asList("a", "b"))),
-                $(new TreeSet<String>(), new TreeSet<String>(Arrays.asList("a"))),
-                $(new TreeSet<String>(Arrays.asList("a")), new TreeSet<String>()),
-                $(new TreeSet<String>(Arrays.asList("a")), new TreeSet<String>(Arrays.asList("a", "b"))),
-                $(new TreeSet<String>(Arrays.asList("a", "b")), new TreeSet<String>(Arrays.asList("b"))),
-                $(new TreeSet<String>(Arrays.asList("a", "a")), new TreeSet<String>(Arrays.asList("a", "b"))),
-                $(new TreeSet<String>(Arrays.asList("b", "b")), new TreeSet<String>(Arrays.asList("a", "b"))));
+                $(new ArrayList<String>(), new ArrayList<>(Arrays.asList("a"))),
+                $(new ArrayList<>(Arrays.asList("a")), new ArrayList<String>()),
+                $(new ArrayList<>(Arrays.asList("a")), new ArrayList<>(Arrays.asList("a", "b"))),
+                $(new ArrayList<>(Arrays.asList("a", "b")), new ArrayList<>(Arrays.asList("b"))),
+                $(new ArrayList<>(Arrays.asList("a", "a")), new ArrayList<>(Arrays.asList("a", "b"))),
+                $(new ArrayList<>(Arrays.asList("b", "b")), new ArrayList<>(Arrays.asList("a", "b"))),
+                $(new TreeSet<String>(), new TreeSet<>(Arrays.asList("a"))),
+                $(new TreeSet<>(Arrays.asList("a")), new TreeSet<String>()),
+                $(new TreeSet<>(Arrays.asList("a")), new TreeSet<>(Arrays.asList("a", "b"))),
+                $(new TreeSet<>(Arrays.asList("a", "b")), new TreeSet<>(Arrays.asList("b"))),
+                $(new TreeSet<>(Arrays.asList("a", "a")), new TreeSet<>(Arrays.asList("a", "b"))),
+                $(new TreeSet<>(Arrays.asList("b", "b")), new TreeSet<>(Arrays.asList("a", "b"))));
     }
 
     @Test
     @Parameters(method="unequalCollections")
     public void collectionsShouldNotBeEqual(final Collection<String> collection1, Collection<String> collection2) {
-        assertTrue(
-                "" + collection1 + " == " + collection2,
-                !Tools.equalCollections(collection1, collection2));
+        assertThat(Tools.equalCollections(collection1, collection2)).isFalse();
     }
 }

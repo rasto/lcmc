@@ -88,7 +88,8 @@ public class Ssh {
     private SwingUtils swingUtils;
     @Inject
     private Provider<Authentication> authenticationProvider;
-    private final GuiHelperFiles guiHelperFiles = new GuiHelperFiles();
+    @Inject
+    private GuiHelperFiles guiHelperFiles;
 
     boolean reconnect() {
         swingUtils.isNotSwingThread();
