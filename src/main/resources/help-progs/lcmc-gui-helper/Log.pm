@@ -8,8 +8,8 @@ our $LOG_TIME;
 our $DEBUG = 0;
 
 sub init {
-    $DO_LOG = shift || die;
-    $LOG_TIME = shift || die;
+    $DO_LOG = shift // die;
+    $LOG_TIME = shift // die;
     $LOG_FILE = "/var/log/lcmc.log";
 }
 

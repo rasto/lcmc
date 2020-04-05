@@ -80,7 +80,7 @@ for (keys %ENV) {
 	start(\@ARGV);
 
 	sub start {
-		my $argv = shift || die;
+		my $argv = shift // die;
 		my ($helper_options, $action_options) = Options::parse($argv);
 		my $do_log = $$helper_options{$CMD_LOG_OP} || $CMD_LOG_DEFAULT;
 		my $log_time = $$helper_options{$LOG_TIME_OP} || $LOG_TIME_DEFAULT;
@@ -450,7 +450,7 @@ for (keys %ENV) {
 	# minor numbers are separated with ":". And a hash that contains block devices
 	# that have lvm on top of them.
 	sub get_lvm {
-		my $use_cache = shift || 0;
+		my $use_cache = shift // 0;
 		if ($use_cache && $LV_CACHE) {
 			return @$LV_CACHE;
 		}
@@ -689,7 +689,7 @@ for (keys %ENV) {
 
 	# returns volume group info
 	sub get_vg_info {
-		my $use_cache = shift || 0;
+		my $use_cache = shift // 0;
 		if ($use_cache && defined $VG_CACHE) {
 			return $VG_CACHE;
 		}
@@ -1263,7 +1263,7 @@ for (keys %ENV) {
 	}
 
 	sub get_resource_agents {
-		my $type = shift || "";
+		my $type = shift // "";
 		my $existing_rscs_ocf;
 		my $existing_rscs_stonith;
 		if ("configured" eq $type) {
@@ -1291,7 +1291,7 @@ for (keys %ENV) {
 	}
 
 	sub get_ocf_resources {
-		my $type = shift || "";
+		my $type = shift // "";
 		my $existing_rscs = shift;
 		my $quick = 0;
 		if ("quick" eq $type) {
@@ -1336,7 +1336,7 @@ for (keys %ENV) {
 	}
 
 	sub get_old_style_resources {
-		my $type = shift || "";
+		my $type = shift // "";
 		my $quick = 0;
 		if ("quick" eq $type) {
 			$quick = 1;
@@ -1367,7 +1367,7 @@ for (keys %ENV) {
 	}
 
 	sub get_stonith_devices {
-		my $type = shift || "";
+		my $type = shift // "";
 		my $existing_rscs = shift;
 		if (!-e $STONITH_ADMIN_PROG) {
 			get_stonith_devices_old($type, $existing_rscs);
@@ -1409,7 +1409,7 @@ for (keys %ENV) {
 
 	# squeeze, natty
 	sub get_stonith_devices_old {
-		my $type = shift || "";
+		my $type = shift // "";
 		my $existing_rscs = shift;
 		my $quick = 0;
 		my $configured = 0;
@@ -2272,7 +2272,7 @@ STATUS
 
 	sub _system {
 		my $cmd = shift;
-		my $level = shift || 1;
+		my $level = shift // 1;
 		return _execute($cmd, $level, 0);
 	}
 
@@ -2285,7 +2285,7 @@ STATUS
 
 	sub _exec {
 		my $cmd = shift;
-		my $level = shift || 1;
+		my $level = shift // 1;
 		return _execute($cmd, $level, 1);
 	}
 
@@ -2447,7 +2447,7 @@ STATUS
 	}
 
 	sub remove_spaces {
-		my $config = shift || "";
+		my $config = shift // "";
 		$config =~ s/^\s+//mg;
 		$config =~ s/\s+$//mg;
 		return $config;
