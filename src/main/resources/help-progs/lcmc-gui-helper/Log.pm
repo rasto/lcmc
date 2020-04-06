@@ -79,7 +79,8 @@ sub processed_log {
         if ("start" eq $log_action) {
             $start{$code} = $time;
             $cmds{$code} = $cmd;
-        } elsif ("done" eq $log_action) {
+        }
+        elsif ("done" eq $log_action) {
             next if !$start{$code}; # ignore without start
 
             my $duration = $time - $start{$code};
@@ -88,7 +89,8 @@ sub processed_log {
             if ($duration > 1000) {
                 push @cmd_log, "$duration $cmd\n";
             }
-        } else {
+        }
+        else {
             print "ERROR: unknown action: $log_action\n";
             next;
         }
@@ -101,7 +103,7 @@ sub processed_log {
         }
     }
 
-    for my $cmd (sort { $cmd_times{$a} <=> $cmd_times{$b} } keys %cmd_times) {
+    for my $cmd (sort {$cmd_times{$a} <=> $cmd_times{$b}} keys %cmd_times) {
         print $cmd_times{$cmd} . " (" . $cmd_no{$cmd} . ") " . _cut($cmd) . "\n";
     }
 
@@ -124,7 +126,7 @@ sub raw_log {
         if ($time < $from_time) {
             next;
         }
-        print _format_time($time)." $rest\n";
+        print _format_time($time) . " $rest\n";
     }
     close $LOG_FILE;
 }
@@ -148,7 +150,8 @@ sub compute_cmd_times {
     $min_length = length $cmd if $min_length < 0;
 
     for my $o_cmd (keys %$cmd_times) {
-        INNER: for (my $l = (length $o_cmd); $l >= $min_length; $l--) {
+        INNER:
+        for (my $l = (length $o_cmd); $l >= $min_length; $l--) {
             my $s1 = substr $cmd, 0, $l;
             my $s2 = substr $o_cmd, 0, $l;
             if ($s1 eq $s2) {
@@ -166,7 +169,7 @@ sub compute_cmd_times {
 
 sub _format_time {
     my $time = substr shift, 0, 10;
-    my ($s, $min, $h, $d, $m, $y) = (localtime($time))[0..5];
+    my ($s, $min, $h, $d, $m, $y) = (localtime($time))[0 .. 5];
     $m++;
     $y += 1900;
     return sprintf "%04d-%02d-%02d %02d:%02d:%02d", $y, $m, $d, $h, $min, $s;
@@ -179,11 +182,14 @@ sub _convert_to_sec {
     return $t if !$unit;
     if ("s" eq $unit) {
         return $t;
-    } elsif ("m" eq $unit) {
+    }
+    elsif ("m" eq $unit) {
         return $t * 60;
-    } elsif ("h" eq $unit) {
+    }
+    elsif ("h" eq $unit) {
         return $t * 60 * 60;
-    } elsif ("d" eq $unit) {
+    }
+    elsif ("d" eq $unit) {
         return $t * 60 * 60 * 24;
     }
     return $LOG_TIME;

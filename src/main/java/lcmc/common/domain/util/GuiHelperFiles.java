@@ -63,7 +63,7 @@ public class GuiHelperFiles {
 
     @SneakyThrows
     private String readPerlModule(Path path) {
-        return Files.readAllLines(path).stream().map(line -> "    " + line).collect(Collectors.joining("\n"));
+        return String.join("\n", Files.readAllLines(path));
 
     }
 
