@@ -90,13 +90,13 @@ for (keys %ENV) {
             print "drbd-proxy-info\n";
             print Drbd_proxy::get_drbd_proxy_info();
             print "gui-info\n";
-            print get_gui_info();
+            print Gui_config::get_gui_info();
             print "installation-info\n";
-            print get_installation_info();
+            print Host_software::get_installation_info();
             print "gui-options-info\n";
-            print get_gui_options_info();
+            print Gui_config::get_gui_options_info();
             print "version-info\n";
-            print get_version_info();
+            print Host_software::get_version_info();
         }
         elsif ($action eq "hw-info-daemon") {
             start_hw_info_daemon();
@@ -119,7 +119,7 @@ for (keys %ENV) {
             print get_hw_info_lazy();
         }
         elsif ($action eq "installation-info") {
-            print get_installation_info();
+            print Host_software::get_installation_info();
         }
         elsif ($action eq "get-net-info") {
             print Network::get_net_info();
@@ -147,7 +147,7 @@ for (keys %ENV) {
             print Drbd_proxy::get_drbd_proxy_info();
         }
         elsif ($action eq "get-gui-info") {
-            print get_gui_info();
+            print Gui_config::get_gui_info();
         }
         elsif ($action eq "get-mount-point-info") {
             print Disk::get_mount_points_info();
@@ -298,9 +298,9 @@ for (keys %ENV) {
         $out .= "drbd-proxy-info\n";
         $out .= Drbd_proxy::get_drbd_proxy_info();
         $out .= "installation-info\n";
-        $out .= get_installation_info();
+        $out .= Host_software::get_installation_info();
         $out .= "version-info\n";
-        $out .= get_version_info();
+        $out .= Host_software::get_version_info();
         return $out;
     }
 
@@ -314,57 +314,10 @@ for (keys %ENV) {
         $out .= "mount-points-info\n";
         $out .= Disk::get_mount_points_info();
         $out .= "installation-info\n";
-        $out .= get_installation_info();
+        $out .= Host_software::get_installation_info();
         $out .= "drbd-proxy-info\n";
         $out .= Drbd_proxy::get_drbd_proxy_info();
         return $out;
-    }
-
-    sub get_gui_info {
-        my $out = "";
-        if (open FH, "/var/lib/heartbeat/drbdgui.cf") {
-            while (<FH>) {
-                $out .= "$_";
-            }
-            close FH;
-        }
-        return $out;
-    }
-
-    sub get_installation_info {
-        my $out = Host_software::get_cluster_versions();
-        my $hn = Command::_exec("hostname");
-        chomp $hn;
-        $out .= "hn:$hn\n";
-        return $out;
-    }
-
-    sub get_gui_options_info {
-        my $out = "o:vm.filesystem.source.dir.lxc\n";
-        $out .= "/var/lib/lxc\n";
-        $out .= Command::_exec("ls -1d /var/lib/lxc/*/rootfs 2>/dev/null");
-        return $out;
-    }
-
-    sub get_version_info {
-        my $cmd =
-            'uname; uname -m; uname -r; '
-                . 'for d in redhat debian gentoo SuSE SUSE distro; do '
-                . 'v=`head -1 -q /etc/"$d"_version /etc/"$d"-release /etc/"$d"-brand 2>/dev/null`; '
-                . 'if [ ! -z "$v" ]; then echo "$v"; echo "$d"; fi; '
-                . 'done |head -2'
-                . '| sed "s/distro/openfiler/";'
-                . 'lsb_release -i -r 2>/dev/null '
-                . '| sed "s/centos/redhat/I"|sed "s/SUSE LINUX/suse/" '
-                . '| sed "s/openSUSE project/suse/" '
-                . '| sed "s/openSUSE$/suse/" '
-                . '| sed "s/enterprise_linux\|ScientificSL/redhatenterpriseserver/" '
-                . '| perl -lne "print lc((split /:\s*/)[1])"'
-                . '| sed "s/oracleserver/redhat/"; '
-                . 'cut -d ":" /etc/system-release-cpe -f 4,5 2>/dev/null|sed "s/:/\n/"'
-                . '| sed "s/enterprise_linux/redhatenterpriseserver/" '
-                . '| sed "s/centos/redhat/" ';
-        return Command::_exec("$cmd");
     }
 
     # force daemon to reread the lvm information
