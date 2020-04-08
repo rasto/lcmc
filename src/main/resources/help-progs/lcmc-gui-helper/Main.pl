@@ -49,8 +49,6 @@ for (keys %ENV) {
 
     our $HW_INFO_INTERVAL = 10;
 
-    our $LVM_CACHE_FILE = "/tmp/lcmc.lvm.$$";
-    our $LVM_ALL_CACHE_FILES = "/tmp/lcmc.lvm.*";
     our $NO_LVM_CACHE = 0;
 
     start(\@ARGV);
@@ -61,6 +59,7 @@ for (keys %ENV) {
         my $do_log = $$helper_options{$CMD_LOG_OP} || $CMD_LOG_DEFAULT;
         my $log_time = $$helper_options{$LOG_TIME_OP} || $LOG_TIME_DEFAULT;
         Log::init($do_log, $log_time);
+        Disk::init();
         Drbd::init();
         Drbd_proxy::init();
         Host_software::init();
@@ -68,7 +67,7 @@ for (keys %ENV) {
         Cluster::init();
         my $action = shift @$action_options || die;
         if ($action eq "all") {
-            clear_lvm_cache();
+            Disk::clear_lvm_cache();
             my $drbd_devs = Drbd::get_drbd_devs();
             print "net-info\n";
             print Network::get_net_info();
@@ -105,7 +104,7 @@ for (keys %ENV) {
             print get_hw_info();
         }
         elsif ($action eq "hw-info-lvm") {
-            clear_lvm_cache();
+            Disk::clear_lvm_cache();
             my $drbd_devs = Drbd::get_drbd_devs();
             print get_hw_info();
             print "vg-info\n";
@@ -229,9 +228,9 @@ for (keys %ENV) {
         my $use_lvm_cache = 0;
         while (1) {
             print "\n";
-            if (!-e $LVM_CACHE_FILE) {
+            if (Disk::noLvmCache()) {
                 $use_lvm_cache = 0;
-                Command::_exec("touch $LVM_CACHE_FILE");
+                Disk::useLvmCache();
             }
             my $drbd_devs = Drbd::get_drbd_devs();
             if ($count % 5 == 0) {
@@ -318,10 +317,5 @@ for (keys %ENV) {
         $out .= "drbd-proxy-info\n";
         $out .= Drbd_proxy::get_drbd_proxy_info();
         return $out;
-    }
-
-    # force daemon to reread the lvm information
-    sub clear_lvm_cache {
-        unlink glob $LVM_ALL_CACHE_FILES;
     }
 }

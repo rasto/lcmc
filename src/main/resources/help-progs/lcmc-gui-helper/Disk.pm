@@ -2,6 +2,13 @@ package Disk;
 
 our $LV_CACHE;
 our $VG_CACHE;
+our $LVM_ALL_CACHE_FILES;
+our $LVM_CACHE_FILE;
+
+sub init() {
+    $LVM_ALL_CACHE_FILES = "/tmp/lcmc.lvm.*";
+    $LVM_CACHE_FILE = "/tmp/lcmc.lvm.$$";
+}
 
 # get_mount
 #
@@ -369,4 +376,17 @@ sub get_mount_points_info {
         closedir DIR;
     }
     return $out;
+}
+
+# force daemon to reread the lvm information
+sub clear_lvm_cache {
+    unlink glob $LVM_ALL_CACHE_FILES;
+}
+
+sub noLvmCache() {
+    return !-e $LVM_CACHE_FILE
+}
+
+sub useLvmCache() {
+    Command::_exec("touch $LVM_CACHE_FILE");
 }
