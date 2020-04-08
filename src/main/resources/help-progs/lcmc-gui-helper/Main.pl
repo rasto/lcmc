@@ -52,24 +52,14 @@ for (keys %ENV) {
     our $OCF_DIR = "/usr/lib/ocf";
     our $OCF_RESOURCE_DIR = $OCF_DIR . "/resource.d";
     our $STONITH_ADMIN_PROG = "/usr/sbin/stonith_admin";
-    our $VIRSH_COMMAND = "virsh -r";
     # --secure-info and -r don't work together
-    our $VIRSH_COMMAND_NO_RO = "virsh";
     our $PCMK_SERVICE_AGENTS = "crm_resource --list-agents ";
 
     our @SERVICE_CLASSES = ("service", "systemd", "upstart");
-    our @VM_OPTIONS = ("",
-        "-c 'xen:///'",
-        "-c lxc:///",
-        "-c openvz:///system",
-        "-c vbox:///session",
-        "-c uml:///system");
 
     our $LVM_CACHE_FILE = "/tmp/lcmc.lvm.$$";
     our $LVM_ALL_CACHE_FILES = "/tmp/lcmc.lvm.*";
     our $NO_LVM_CACHE = 0;
-
-    our %DISABLE_VM_OPTIONS; # it'll be populated for options that give an error
 
     start(\@ARGV);
 
@@ -82,6 +72,7 @@ for (keys %ENV) {
         Drbd::init();
         Drbd_proxy::init();
         Cluster_software::init();
+        VM::init();
         my $action = shift @$action_options || die;
         if ($action eq "all") {
             clear_lvm_cache();
@@ -99,8 +90,8 @@ for (keys %ENV) {
             print "crypto-info\n";
             print Drbd::available_crypto_modules();
             print "qemu-keymaps-info\n";
-            print get_qemu_keymaps_info();
-            print get_cpu_map_info();
+            print VM::get_qemu_keymaps_info();
+            print VM::get_cpu_map_info();
             print "mount-points-info\n";
             print Disk::get_mount_points_info();
             print "drbd-proxy-info\n";
@@ -154,10 +145,10 @@ for (keys %ENV) {
             print Drbd::available_crypto_modules();
         }
         elsif ($action eq "get-qemu-keymaps-info") {
-            print get_qemu_keymaps_info();
+            print VM::get_qemu_keymaps_info();
         }
         elsif ($action eq "get-cpu-map-info") {
-            print get_cpu_map_info();
+            print VM::get_cpu_map_info();
         }
         elsif ($action eq "get-drbd-proxy-info") {
             print Drbd_proxy::get_drbd_proxy_info();
@@ -206,7 +197,7 @@ for (keys %ENV) {
             print Cluster_software::get_cluster_versions();
         }
         elsif ($action eq "get-vm-info") {
-            print get_vm_info();
+            print VM::get_vm_info();
         }
         elsif ($action eq "gui-test") {
             Gui_Test::gui_pcmk_config_test(@$action_options);
@@ -278,7 +269,7 @@ for (keys %ENV) {
                 }
             }
             $use_lvm_cache = 1;
-            my $vm_info = get_vm_info();
+            my $vm_info = VM::get_vm_info();
             if ($vm_info ne $prev_vm_info) {
                 print "--vm-info-start--" . `date +%s%N`;
                 print $vm_info;
@@ -307,8 +298,8 @@ for (keys %ENV) {
         $out .= "crypto-info\n";
         $out .= Drbd::available_crypto_modules();
         $out .= "qemu-keymaps-info\n";
-        $out .= get_qemu_keymaps_info();
-        $out .= get_cpu_map_info();
+        $out .= VM::get_qemu_keymaps_info();
+        $out .= VM::get_cpu_map_info();
         $out .= "mount-points-info\n";
         $out .= Disk::get_mount_points_info();
         $out .= "drbd-proxy-info\n";
@@ -335,39 +326,6 @@ for (keys %ENV) {
         $out .= get_installation_info();
         $out .= "drbd-proxy-info\n";
         $out .= Drbd_proxy::get_drbd_proxy_info();
-        return $out;
-    }
-
-    # prints available qemu keymaps.
-    sub get_qemu_keymaps_info {
-        my $out = "";
-        for (Command::_exec("ls /usr/share/qemu*/keymaps/ 2>/dev/null")) {
-            $out .= $_;
-        }
-        return $out;
-    }
-
-    sub get_cpu_map_info {
-        my @models;
-        my %vendors;
-        if (open my $cpu_map_fh, "/usr/share/libvirt/cpu_map.xml") {
-            while (<$cpu_map_fh>) {
-                my ($model) = /<model\s+name=\'(.*)'>/;
-                push @models, $model if $model;
-                my ($vendor) = /<vendor>(.*)</
-                    || /<vendor\s+name=\'(.*?)'.*\/>/;
-                $vendors{$vendor} = 1 if $vendor;
-            }
-        }
-        my $out = "";
-        $out .= "cpu-map-model-info\n";
-        for (@models) {
-            $out .= "$_\n";
-        }
-        $out .= "cpu-map-vendor-info\n";
-        for (sort keys %vendors) {
-            $out .= "$_\n";
-        }
         return $out;
     }
 
@@ -993,124 +951,6 @@ $parameters
 </actions>
 </resource-agent>
 XML
-    }
-
-    sub get_vm_networks {
-        my %autostart;
-        for (Command::_exec("ls /etc/libvirt/qemu/networks/autostart/*.xml 2>/dev/null")) {
-            my ($name) = /([^\/]+).xml/;
-            next if !$name;
-            $autostart{$name}++;
-        }
-        my $out = "";
-        for (Command::_exec("ls /etc/libvirt/qemu/networks/*.xml 2>/dev/null")) {
-            my ($name) = /([^\/]+).xml/;
-            next if !$name;
-            chomp;
-            my $config = Command::_exec("$VIRSH_COMMAND net-dumpxml $name 2>/dev/null")
-                || "";
-            if ($config) {
-                $out .= "<net name=\"$name\" config=\"$_\"";
-                if ($autostart{$name}) {
-                    $out .= ' autostart="True"';
-                }
-                else {
-                    $out .= ' autostart="False"';
-                }
-                $out .= ">\n";
-                $out .= $config;
-                $out .= "</net>\n";
-            }
-        }
-        return $out;
-    }
-
-    sub get_vm_info {
-        my $networks = get_vm_networks();
-        my %autostart;
-        for (Command::_exec("ls /etc/libvirt/qemu/autostart/*.xml 2>/dev/null; ls /etc/xen/auto/ 2>/dev/null")) {
-            my ($name) = /([^\/]+).xml/;
-            next if !$name;
-            $autostart{$name}++;
-        }
-        my $libvirt_version = "";
-        if (Command::_exec("$VIRSH_COMMAND version 2>/dev/null") =~ /libvirt\s+([0-9\.]+)/) {
-            $libvirt_version = $1;
-        }
-        my $out = "<version>$libvirt_version</version>\n";
-        OPTIONS:
-        for my $options (@VM_OPTIONS) {
-            if ($DISABLE_VM_OPTIONS{$options}) {
-                next;
-            }
-            my $header = 1;
-            for (Command::_exec("$VIRSH_COMMAND $options list --all 2>&1")) {
-                if ($header) {
-                    if (/^-{5}/) {
-                        $header = 0;
-                    }
-                    elsif (/^error:/) {
-                        # disable the ones that give an
-                        # error
-                        $DISABLE_VM_OPTIONS{$options}++;
-                        next OPTIONS;
-                    }
-                    next;
-                }
-                my ($name) = /^\s*\S+\s+(\S+)/;
-                next if !$name;
-                chomp;
-                my $info =
-                    Command::_exec("$VIRSH_COMMAND $options dominfo $name 2>/dev/null|grep -v 'CPU time'")
-                        || "";
-                next if !$info;
-                my $vncdisplay =
-                    Command::_exec("$VIRSH_COMMAND $options vncdisplay $name 2>/dev/null") || "";
-                my $config_in_etc;
-                #if (open CONFIG, $_) {
-                #	local $/;
-                #	$config_in_etc = <CONFIG>;
-                #	close CONFIG;
-                #}
-                my $config;
-                $config =
-                    Command::_exec("$VIRSH_COMMAND_NO_RO $options dumpxml --security-info $name 2>/dev/null") || "";
-                $out .= "<vm name=\"$name\"";
-                if ($autostart{$name}) {
-                    $out .= ' autostart="True"';
-                }
-                else {
-                    $out .= ' autostart="False"';
-                }
-                if ($options) {
-                    $out .= ' virsh-options="' . $options . '"';
-                }
-                $out .= ">\n";
-                $out .= "<info>\n";
-                $out .= $info;
-                $out .= "</info>\n";
-                $out .= "<vncdisplay>$vncdisplay</vncdisplay>\n";
-                if ($config) {
-                    $out .= "<config>\n";
-                    $out .= $config;
-                    $out .= "</config>\n";
-                }
-                if ($config_in_etc) {
-                    $out .= "<config-in-etc>\n";
-                    $out .= "<![CDATA[$config_in_etc]]>";
-                    $out .= "</config-in-etc>\n";
-                }
-                $out .= "</vm>\n";
-            }
-        }
-        if ($networks) {
-            $out .= $networks;
-        }
-        my $md5 = Digest::MD5::md5_hex($out);
-        my $ret = "<vms md5=\"$md5\">\n";
-        $ret .= $out;
-        $ret .= "</vms>\n";
-        return $ret;
     }
 
     # force daemon to reread the lvm information

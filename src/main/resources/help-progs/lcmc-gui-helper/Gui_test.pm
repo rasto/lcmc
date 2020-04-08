@@ -101,8 +101,8 @@ sub gui_vm_test {
     my $index = shift;
     my $name = shift;
     my $xml;
-    for (@Main::VM_OPTIONS) {
-        $xml = Command::_exec_or_die("$Main::VIRSH_COMMAND_NO_RO $_ dumpxml --security-info $name 2>/dev/null");
+    for (@VM::VM_OPTIONS) {
+        $xml = Command::_exec_or_die("$VM::VIRSH_COMMAND_NO_RO $_ dumpxml --security-info $name 2>/dev/null");
         if ($xml !~ /^\s*$/) {
             last;
         }
