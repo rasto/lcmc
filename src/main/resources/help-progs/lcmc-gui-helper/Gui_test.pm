@@ -171,7 +171,7 @@ sub gui_drbd_test {
     $conf =~ s/^(\s+disk\s+)[^;{]+(\s*;\s*)$/$1DISK$2/mg;
     $conf =~ s/^(\s+address\s+)(?!.*127\.0\.0\.1)[^:]+/$1IP/mg;
     $conf =~ s/^(\s+outside\s+)[^:]+/$1IP/mg;
-    my $libdir = Cluster_software::get_hb_lib_path();
+    my $libdir = Host_software::get_hb_lib_path();
     $conf =~ s/$libdir/LIBDIR/g;
     gui_test_compare("/tmp/lcmc-test/$testname/drbd.conf$index", $conf);
     gui_test_compare("/tmp/lcmc-test/$testname/proc$index", $proc);

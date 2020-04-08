@@ -34,7 +34,7 @@ sub do_drbd_events {
         print "--nm--\n";
         return;
     }
-    my ($v1, $v2) = Cluster_software::get_drbd_version();
+    my ($v1, $v2) = Host_software::get_drbd_version();
     my $command;
     if ($v1 < 7 || ($v1 == 8 && $v2 < 4)) { # < 8.4.0
         $command = "/sbin/drbdsetup /dev/drbd0 events -a -u";
@@ -305,7 +305,7 @@ sub get_drbd_xml {
         print "</command>\n";
     }
 
-    my ($v1, $v2) = Cluster_software::get_drbd_version();
+    my ($v1, $v2) = Host_software::get_drbd_version();
     my @sections = ("net-options", "disk-options");
     my $help_option = "xml-help";
     if ($v1 < 7 || ($v1 == 8 && $v2 < 4)) {

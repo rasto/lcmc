@@ -1,4 +1,4 @@
-package Cluster_software;
+package Host_software;
 our $PROC_DRBD;
 
 sub init() {

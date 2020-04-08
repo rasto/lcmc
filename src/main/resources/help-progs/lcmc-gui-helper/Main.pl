@@ -71,7 +71,7 @@ for (keys %ENV) {
         Log::init($do_log, $log_time);
         Drbd::init();
         Drbd_proxy::init();
-        Cluster_software::init();
+        Host_software::init();
         VM::init();
         my $action = shift @$action_options || die;
         if ($action eq "all") {
@@ -194,7 +194,7 @@ for (keys %ENV) {
             get_cluster_metadata();
         }
         elsif ($action eq "get-cluster-versions") {
-            print Cluster_software::get_cluster_versions();
+            print Host_software::get_cluster_versions();
         }
         elsif ($action eq "get-vm-info") {
             print VM::get_vm_info();
@@ -345,7 +345,7 @@ for (keys %ENV) {
     # get_installation_info()
     #
     sub get_installation_info {
-        my $out = Cluster_software::get_cluster_versions();
+        my $out = Host_software::get_cluster_versions();
         my $hn = Command::_exec("hostname");
         chomp $hn;
         $out .= "hn:$hn\n";
@@ -430,13 +430,13 @@ for (keys %ENV) {
     }
 
     sub do_cluster_events {
-        my $libpath = Cluster_software::get_hb_lib_path();
+        my $libpath = Host_software::get_hb_lib_path();
         my $hb_version = Command::_exec("$libpath/heartbeat -V 2>/dev/null") || "";
         my $info = get_cluster_info($hb_version);
         my $pcmk_path = "/usr/libexec/pacemaker:/usr/lib/heartbeat:/usr/lib64/heartbeat:/usr/lib/pacemaker:/usr/lib64/pacemaker:/usr/lib/x86_64-linux-gnu/pacemaker";
         my $command =
             "PATH=$pcmk_path exec cibmon -udVVVV -m1 2>&1";
-        if ($hb_version && (Cluster_software::compare_versions($hb_version, "2.1.4") <= 0)) {
+        if ($hb_version && (Host_software::compare_versions($hb_version, "2.1.4") <= 0)) {
             $command =
                 " PATH=$pcmk_path exec cibmon -dV -m1 2>&1";
         }
@@ -492,7 +492,7 @@ for (keys %ENV) {
         my $ptest_prog = "/usr/sbin/ptest";
         if (!-e $crm_simulate_prog && -e $ptest_prog) {
             if ($hb_version
-                && (Cluster_software::compare_versions($hb_version, "2.1.4") <= 0)) {
+                && (Host_software::compare_versions($hb_version, "2.1.4") <= 0)) {
                 $prog = "$ptest_prog -S -VVVVV -L 2>&1";
             }
             else {
@@ -668,8 +668,8 @@ for (keys %ENV) {
 
     sub get_cluster_metadata {
         print "<metadata>\n";
-        my $libpath = Cluster_software::get_hb_lib_path();
-        my $crmd_libpath = Cluster_software::get_crmd_lib_path();
+        my $libpath = Host_software::get_hb_lib_path();
+        my $crmd_libpath = Host_software::get_crmd_lib_path();
         # pengine moved in pcmk 1.1.7
         my $pengine = Command::_exec("$crmd_libpath/pengine metadata 2>/dev/null || $libpath/pengine metadata 2>/dev/null");
         if ($pengine) {
