@@ -165,6 +165,11 @@
             <artifactId>guava</artifactId>
             <version>18.0</version>
         </dependency>
+        <dependency>
+            <groupId>org.jenkins-ci</groupId>
+            <artifactId>trilead-ssh2</artifactId>
+            <version>build-217-jenkins-19</version>
+		</dependency>
     </dependencies>
     <repositories>
         <repository>
@@ -175,7 +180,11 @@
             <id>thirdparty-releases</id>
             <name>JBoss Thirdparty Releases</name>
             <url>https://repository.jboss.org/nexus/content/repositories/thirdparty-releases</url>
-        </repository>
+		</repository>
+		<repository>
+            <id>org.jenkins-ci</id>
+		    <url>https://repo.jenkins-ci.org/releases</url>
+		</repository>
     </repositories>
 
     <build>

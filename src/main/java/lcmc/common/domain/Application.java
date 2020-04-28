@@ -22,8 +22,6 @@
 
 package lcmc.common.domain;
 
-import ch.ethz.ssh2.KnownHosts;
-
 import java.awt.Font;
 import java.awt.Insets;
 import java.io.File;
@@ -36,6 +34,8 @@ import java.util.Set;
 import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.Sets;
 import com.google.common.collect.Table;
+import com.trilead.ssh2.KnownHosts;
+
 import lcmc.cluster.domain.Cluster;
 import lcmc.cluster.domain.Clusters;
 import lcmc.common.ui.ConfirmDialog;

@@ -20,13 +20,14 @@
 
 package lcmc.cluster.service.ssh;
 
-import ch.ethz.ssh2.ChannelCondition;
-import ch.ethz.ssh2.Session;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
+
+import com.trilead.ssh2.ChannelCondition;
+import com.trilead.ssh2.Session;
 
 import lcmc.common.ui.MainPanel;
 import lcmc.common.ui.main.ProgressIndicator;
@@ -38,6 +39,7 @@ import lcmc.logger.Logger;
 import lcmc.logger.LoggerFactory;
 import lcmc.common.domain.NewOutputCallback;
 import lcmc.common.domain.util.Tools;
+import lombok.SneakyThrows;
 
 /** This class is a thread that executes commands. */
 public final class ExecCommandThread extends Thread {
@@ -245,6 +247,7 @@ public final class ExecCommandThread extends Thread {
         return connectionTimeout;
     }
 
+    @SneakyThrows
     private SshOutput execOneCommand(final String oneCommand) {
         if (sshCommandTimeout > 0 && sshCommandTimeout < 2000) {
             LOG.appWarning("execOneCommand: timeout: " + sshCommandTimeout + " to small for timeout? " + command);
@@ -303,6 +306,7 @@ public final class ExecCommandThread extends Thread {
         return new SshOutput(outputString, exitCode);
     }
 
+    @SneakyThrows
     private String execCommandAndCaptureOutput(final String oneCommand, final Session thisSession) throws IOException {
         final InputStream stdout = thisSession.getStdout();
         final OutputStream stdin = thisSession.getStdin();

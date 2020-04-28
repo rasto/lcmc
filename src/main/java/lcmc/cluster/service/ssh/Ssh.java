@@ -22,8 +22,6 @@
 
 package lcmc.cluster.service.ssh;
 
-import ch.ethz.ssh2.LocalPortForwarder;
-import ch.ethz.ssh2.SCPClient;
 import java.io.IOException;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
@@ -47,6 +45,9 @@ import lcmc.common.domain.util.Tools;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Provider;
+
+import com.trilead.ssh2.LocalPortForwarder;
+import com.trilead.ssh2.SCPClient;
 
 @Named
 public class Ssh {

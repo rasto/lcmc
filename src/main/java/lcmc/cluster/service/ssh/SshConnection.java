@@ -19,8 +19,8 @@
  */
 package lcmc.cluster.service.ssh;
 
-import ch.ethz.ssh2.Connection;
-import ch.ethz.ssh2.channel.ChannelManager;
+import com.trilead.ssh2.Connection;
+import com.trilead.ssh2.channel.ChannelManager;
 
 /** Connection class that can cancel it's connection during openSession. */
 public class SshConnection extends Connection {
@@ -36,10 +36,11 @@ public class SshConnection extends Connection {
         /* public getChannelManager() { return cm }
         has to be added to the Connection.java till
         it's sorted out. */
-        final ChannelManager cm = getChannelManager();
-        if (cm != null) {
-            cm.closeAllChannels();
-        }
+        //FIXME
+//        final ChannelManager cm = getChannelManager();
+//        if (cm != null) {
+//            cm.closeAllChannels();
+//        }
     }
 
     boolean isCanceled() {

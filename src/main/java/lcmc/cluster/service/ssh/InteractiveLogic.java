@@ -19,8 +19,10 @@
  */
 package lcmc.cluster.service.ssh;
 
-import ch.ethz.ssh2.InteractiveCallback;
 import java.io.IOException;
+
+import com.trilead.ssh2.InteractiveCallback;
+
 import lcmc.host.domain.Host;
 import lcmc.cluster.ui.SSHGui;
 

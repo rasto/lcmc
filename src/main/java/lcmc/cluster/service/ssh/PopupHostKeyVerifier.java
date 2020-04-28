@@ -19,8 +19,6 @@
  */
 package lcmc.cluster.service.ssh;
 
-import ch.ethz.ssh2.KnownHosts;
-import ch.ethz.ssh2.ServerHostKeyVerifier;
 import java.io.File;
 import java.io.IOException;
 import lcmc.cluster.ui.SSHGui;
@@ -31,6 +29,9 @@ import lcmc.common.domain.util.Tools;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+
+import com.trilead.ssh2.KnownHosts;
+import com.trilead.ssh2.ServerHostKeyVerifier;
 
 /**
  * This ServerHostKeyVerifier asks the user on how to proceed if a key
