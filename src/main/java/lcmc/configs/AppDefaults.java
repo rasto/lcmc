@@ -63,7 +63,7 @@ public final class AppDefaults extends ListResourceBundle {
         {"MainPanel.TerminalPanelHeight",        150},
 
         {"ConfigDialog.width",                   880},
-        {"ConfigDialog.height",                  400},
+        {"ConfigDialog.height",                  600},
 
         {"ConfirmDialog.width",                  400},
         {"ConfirmDialog.height",                 200},

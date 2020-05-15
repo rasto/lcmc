@@ -36,10 +36,14 @@ public class SshConnection extends Connection {
         /* public getChannelManager() { return cm }
         has to be added to the Connection.java till
         it's sorted out. */
+        //this.
+        close();
+        /*
         final ChannelManager cm = getChannelManager();
         if (cm != null) {
             cm.closeAllChannels();
         }
+        */
     }
 
     boolean isCanceled() {
