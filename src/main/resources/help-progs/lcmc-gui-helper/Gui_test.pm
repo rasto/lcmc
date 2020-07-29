@@ -52,8 +52,7 @@ sub gui_test_compare {
 
 sub remove_spaces {
     my $config = shift // "";
-    $config =~ s/^\s+//mg;
-    $config =~ s/\s+$//mg;
+    $config =~ s/\s+//mg;
     return $config;
 }
 
