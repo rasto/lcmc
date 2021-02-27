@@ -42,7 +42,7 @@ public final class DistResource_redhat_8 extends ListResourceBundle {
         /* pacamker / corosync / yum */
         {"PmInst.install.text.2", "dnf install" },
 
-        {"PmInst.install.2", " dnf --enablerepo=HighAvailability -y install pacemaker pcs"
+        {"PmInst.install.2", " dnf --enablerepo=ha -y install pacemaker pcs"
                 + " && systemctl enable --now pcsd"},
 
         /* Drbd install method 3 */
