@@ -28,13 +28,22 @@ sub get_qemu_keymaps_info {
 sub get_cpu_map_info {
     my @models;
     my %vendors;
-    if (open my $cpu_map_fh, "/usr/share/libvirt/cpu_map.xml") {
-        while (<$cpu_map_fh>) {
-            my ($model) = /<model\s+name=\'(.*)'>/;
-            push @models, $model if $model;
-            my ($vendor) = /<vendor>(.*)</
-                || /<vendor\s+name=\'(.*?)'.*\/>/;
-            $vendors{$vendor} = 1 if $vendor;
+    my @cpu_maps_files = ();
+    if (opendir my $dir, "/usr/share/libvirt/cpu_map") {
+        @cpu_maps_files = map {"/usr/share/libvirt/cpu_map/$_"} readdir $dir;
+    }
+
+    push @cpu_maps_files, "/usr/share/libvirt/cpu_map.xml";
+
+    for my $cpu_maps_file (@cpu_maps_files) {
+        if (open my $cpu_map_fh, "$cpu_maps_file") {
+            while (<$cpu_map_fh>) {
+                my ($model) = /<model\s+name=\'(.*)'>/;
+                push @models, $model if $model;
+                my ($vendor) = /<vendor>(.*)</
+                    || /<vendor\s+name=\'(.*?)'.*\/>/;
+                $vendors{$vendor} = 1 if $vendor;
+            }
         }
     }
     my $out = "";
