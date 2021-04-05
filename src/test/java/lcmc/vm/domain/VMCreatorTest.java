@@ -9,22 +9,22 @@ import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathFactory;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import lombok.SneakyThrows;
 
-public class VMCreatorTest {
+class VMCreatorTest {
 
     private final HashMap<String, String> parameters = new HashMap<>();
     private final VMCreator vmCreator = new VMCreator();
     private final Document document = createDocument();
 
-    @Before
-    public void setUp() {
+    @BeforeEach
+    void setUp() {
         parameters.put(VMParams.VM_PARAM_NAME, "NAME");
         parameters.put(VMParams.VM_PARAM_EMULATOR, "EMULATOR");
         parameters.put(VMParams.VM_PARAM_UUID, "UUID");

@@ -20,6 +20,26 @@
 
 package lcmc.common.ui.treemenu;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+
+import java.awt.event.MouseEvent;
+import java.util.Arrays;
+
+import javax.swing.JTree;
+import javax.swing.event.TreeModelEvent;
+import javax.swing.event.TreeModelListener;
+import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.TreePath;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+
 import lcmc.cluster.ui.network.InfoPresenter;
 import lcmc.common.ui.CategoryInfo;
 import lcmc.common.ui.EditableInfo;
@@ -27,28 +47,9 @@ import lcmc.common.ui.utils.SwingUtils;
 import lcmc.vm.ui.resource.ParallelInfo;
 import lcmc.vm.ui.resource.VideoInfo;
 import lombok.val;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
 
-import javax.swing.*;
-import javax.swing.event.TreeModelEvent;
-import javax.swing.event.TreeModelListener;
-import javax.swing.tree.DefaultMutableTreeNode;
-import javax.swing.tree.TreePath;
-import java.awt.event.MouseEvent;
-import java.util.Arrays;
-
-import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.assertThat;
-import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-
-@RunWith(MockitoJUnitRunner.class)
-public class TreeMenuControllerTest {
+@ExtendWith(MockitoExtension.class)
+class TreeMenuControllerTest {
     private SwingUtils swingUtils;
     @Mock
     private CategoryInfo categoryInfo;
@@ -63,8 +64,8 @@ public class TreeMenuControllerTest {
     private DefaultMutableTreeNode menuTreeTop;
     private TreePath treePath = null;
 
-    @Before
-    public void setUp() {
+    @BeforeEach
+    void setUp() {
         swingUtils = new SwingUtils() {
             @Override
             public void invokeInEdt(final Runnable runnable) {
@@ -86,24 +87,24 @@ public class TreeMenuControllerTest {
     }
 
     @Test
-    public void categoryInfoShouldBeOnTopOfTheClusterTreeMenu() {
+    void categoryInfoShouldBeOnTopOfTheClusterTreeMenu() {
 
-        assertThat(menuTreeTop.getUserObject(), is(categoryInfo));
+        assertThat(menuTreeTop.getUserObject()).isEqualTo(categoryInfo);
     }
 
     @Test
-    public void shouldAddAChild() {
+    void shouldAddAChild() {
         clusterTreeMenu.createMenuItem(menuTreeTop, infoPresenter);
 
         final JTree menuTree = clusterTreeMenu.getMenuTree();
         clusterTreeMenu.reloadNode(menuTreeTop);
 
-        assertThat(menuTree.getRowCount(), is(1));
-        assertThat(clusterTreeMenu.getChildCount(menuTreeTop), is(1));
+        assertThat(menuTree.getRowCount()).isEqualTo(1);
+        assertThat(clusterTreeMenu.getChildCount(menuTreeTop)).isEqualTo(1);
     }
 
     @Test
-    public void shouldMakePopupOnMousePress() {
+    void shouldMakePopupOnMousePress() {
         val menuItem = clusterTreeMenu.createMenuItem(menuTreeTop, infoPresenter);
 
         final JTree menuTree = clusterTreeMenu.getMenuTree();
@@ -113,123 +114,131 @@ public class TreeMenuControllerTest {
         val mousePress = new MouseEvent(menuTree, 0, 0, 0, x, y, 1, true, 2);
         treePath = new TreePath(new Object[]{menuTreeTop, menuItem});
 
-        Arrays.stream(menuTree.getMouseListeners()).forEach(listener -> {
-            listener.mousePressed(mousePress);
-        });
+        Arrays.stream(menuTree.getMouseListeners()).forEach(listener -> listener.mousePressed(mousePress));
 
         verify(infoPresenter).showPopup(menuTree, x, y);
     }
 
     @Test
-    public void shouldAddChildOnSpecificPosition() {
+    void shouldAddChildOnSpecificPosition() {
         clusterTreeMenu.createMenuItem(menuTreeTop, infoPresenter);
         val child2 = clusterTreeMenu.createMenuItem(menuTreeTop, infoPresenter2, 0);
 
         clusterTreeMenu.reloadNode(menuTreeTop);
 
-        assertThat(clusterTreeMenu.getMenuTree().getRowCount(), is(2));
-        assertThat(childAt(0), is(child2));
+        assertThat(clusterTreeMenu.getMenuTree().getRowCount()).isEqualTo(2);
+        assertThat(childAt(0)).isEqualTo(child2);
     }
 
     @Test
-    public void reloadNodeShouldSelect() {
+    void reloadNodeShouldSelect() {
         val child1 = clusterTreeMenu.createMenuItem(menuTreeTop, infoPresenter);
         val child2 = clusterTreeMenu.createMenuItem(menuTreeTop, infoPresenter2);
 
         final JTree menuTree = clusterTreeMenu.getMenuTree();
 
-        menuTree.getModel().addTreeModelListener(
-                new TreeModelListener() {
-                    @Override public void treeNodesChanged(final TreeModelEvent e) { }
-                    @Override public void treeNodesInserted(final TreeModelEvent e) { }
-                    @Override public void treeNodesRemoved(final TreeModelEvent e) { }
+        menuTree.getModel().addTreeModelListener(new TreeModelListener() {
+            @Override
+            public void treeNodesChanged(final TreeModelEvent e) {
+            }
 
-                    @Override
-                    public void treeStructureChanged(final TreeModelEvent e) {
-                        menuTree.setSelectionPath(new TreePath(e.getPath()));
-                    }
-                }
-        );
+            @Override
+            public void treeNodesInserted(final TreeModelEvent e) {
+            }
+
+            @Override
+            public void treeNodesRemoved(final TreeModelEvent e) {
+            }
+
+            @Override
+            public void treeStructureChanged(final TreeModelEvent e) {
+                menuTree.setSelectionPath(new TreePath(e.getPath()));
+            }
+        });
         clusterTreeMenu.reloadNode(child1);
         clusterTreeMenu.reloadNode(child2);
 
         val selected = (InfoPresenter) ((DefaultMutableTreeNode) menuTree.getLastSelectedPathComponent()).getUserObject();
-        assertThat(selected, is(infoPresenter2));
+        assertThat(selected).isEqualTo(infoPresenter2);
     }
 
     @Test
-    public void reloadNodeShouldSelectPreviouslySelectedNode() {
+    void reloadNodeShouldSelectPreviouslySelectedNode() {
         val child1 = clusterTreeMenu.createMenuItem(menuTreeTop, infoPresenter);
         val child2 = clusterTreeMenu.createMenuItem(menuTreeTop, infoPresenter2);
 
         final JTree menuTree = clusterTreeMenu.getMenuTree();
 
-        menuTree.getModel().addTreeModelListener(
-                new TreeModelListener() {
-                    @Override public void treeNodesChanged(final TreeModelEvent e) { }
-                    @Override public void treeNodesInserted(final TreeModelEvent e) { }
-                    @Override public void treeNodesRemoved(final TreeModelEvent e) { }
+        menuTree.getModel().addTreeModelListener(new TreeModelListener() {
+            @Override
+            public void treeNodesChanged(final TreeModelEvent e) {
+            }
 
-                    @Override
-                    public void treeStructureChanged(final TreeModelEvent e) {
-                        menuTree.setSelectionPath(new TreePath(e.getPath()));
-                    }
-                }
-        );
+            @Override
+            public void treeNodesInserted(final TreeModelEvent e) {
+            }
+
+            @Override
+            public void treeNodesRemoved(final TreeModelEvent e) {
+            }
+
+            @Override
+            public void treeStructureChanged(final TreeModelEvent e) {
+                menuTree.setSelectionPath(new TreePath(e.getPath()));
+            }
+        });
         clusterTreeMenu.reloadNode(child1);
         clusterTreeMenu.reloadNodeDontSelect(child2);
 
         val selected = (InfoPresenter) ((DefaultMutableTreeNode) menuTree.getLastSelectedPathComponent()).getUserObject();
-        assertThat(selected, is(infoPresenter));
+        assertThat(selected).isEqualTo(infoPresenter);
     }
 
     @Test
-    public void nodeChangedShouldTriggerTreeNodesChangesEvent() {
+    void nodeChangedShouldTriggerTreeNodesChangesEvent() {
         val child = clusterTreeMenu.createMenuItem(menuTreeTop, infoPresenter);
         clusterTreeMenu.setDisableListeners(false);
 
         final Boolean[] eventTriggered = new Boolean[]{false};
 
-        clusterTreeMenu.addListeners((infoPresenter, disableListeners) -> {
-            eventTriggered[0] = true;
-        });
+        clusterTreeMenu.addListeners((infoPresenter, disableListeners) -> eventTriggered[0] = true);
 
         clusterTreeMenu.nodeChanged(child);
 
-        assertThat(eventTriggered[0], is(true));
+        assertThat(eventTriggered[0]).isEqualTo(true);
     }
 
     @Test
-    public void shouldMoveNodeToSpecificPosition() {
-        val child1 = clusterTreeMenu.createMenuItem(menuTreeTop, infoPresenter);
+    void shouldMoveNodeToSpecificPosition() {
+        clusterTreeMenu.createMenuItem(menuTreeTop, infoPresenter);
         val child2 = clusterTreeMenu.createMenuItem(menuTreeTop, infoPresenter2);
 
         clusterTreeMenu.moveNodeUpToPosition(child2, 0);
 
-        assertThat(childAt(0), is(child2));
+        assertThat(childAt(0)).isEqualTo(child2);
     }
 
     @Test
-    public void removeNodeAndSelectParent() {
+    void removeNodeAndSelectParent() {
         val child1 = clusterTreeMenu.createMenuItem(menuTreeTop, infoPresenter);
         val child2 = clusterTreeMenu.createMenuItem(menuTreeTop, infoPresenter2);
 
         clusterTreeMenu.removeNode(child1);
 
-        assertThat(clusterTreeMenu.getMenuTree().getRowCount(), is(1));
-        assertThat(childAt(0), is(child2));
+        assertThat(clusterTreeMenu.getMenuTree().getRowCount()).isEqualTo(1);
+        assertThat(childAt(0)).isEqualTo(child2);
     }
 
     @Test
-    public void shouldFindIndexOfAChild() {
-        val child1 = clusterTreeMenu.createMenuItem(menuTreeTop, infoPresenter);
+    void shouldFindIndexOfAChild() {
+        clusterTreeMenu.createMenuItem(menuTreeTop, infoPresenter);
         val child2 = clusterTreeMenu.createMenuItem(menuTreeTop, infoPresenter2);
 
-        assertThat(clusterTreeMenu.getIndex(menuTreeTop, child2), is(1));
+        assertThat(clusterTreeMenu.getIndex(menuTreeTop, child2)).isEqualTo(1);
     }
 
     @Test
-    public void shouldSortNodesByName() {
+    void shouldSortNodesByName() {
         val editableInfo1 = mock(EditableInfo.class);
         val editableInfo2 = mock(EditableInfo.class);
         given(editableInfo1.isNew()).willReturn(false);
@@ -242,12 +251,12 @@ public class TreeMenuControllerTest {
 
         clusterTreeMenu.sortChildrenLeavingNewUp(menuTreeTop);
 
-        assertThat(childAt(0), is(child2));
-        assertThat(childAt(1), is(child1));
+        assertThat(childAt(0)).isEqualTo(child2);
+        assertThat(childAt(1)).isEqualTo(child1);
     }
 
     @Test
-    public void shouldSortNodesLeavingNewUp() {
+    void shouldSortNodesLeavingNewUp() {
         val editableInfo1 = mock(EditableInfo.class);
         val editableInfo2 = mock(EditableInfo.class);
 
@@ -261,12 +270,12 @@ public class TreeMenuControllerTest {
 
         clusterTreeMenu.sortChildrenLeavingNewUp(menuTreeTop);
 
-        assertThat(childAt(0), is(child1));
-        assertThat(childAt(1), is(child2));
+        assertThat(childAt(0)).isEqualTo(child1);
+        assertThat(childAt(1)).isEqualTo(child2);
     }
 
     @Test
-    public void shouldSortDifferentClassesSeparately() {
+    void shouldSortDifferentClassesSeparately() {
         val parallelInfo1 = mock(ParallelInfo.class);
         val parallelInfo2 = mock(ParallelInfo.class);
         val videoInfo1 = mock(VideoInfo.class);
@@ -289,40 +298,36 @@ public class TreeMenuControllerTest {
 
         clusterTreeMenu.sortChildrenLeavingNewUp(menuTreeTop);
 
-        assertThat(childAt(0), is(child2));
-        assertThat(childAt(1), is(child1));
-        assertThat(childAt(2), is(child4));
-        assertThat(childAt(3), is(child3));
+        assertThat(childAt(0)).isEqualTo(child2);
+        assertThat(childAt(1)).isEqualTo(child1);
+        assertThat(childAt(2)).isEqualTo(child4);
+        assertThat(childAt(3)).isEqualTo(child3);
     }
 
     @Test
-    public void shouldCallOnSelectWhenSelectionChanges() {
+    void shouldCallOnSelectWhenSelectionChanges() {
         val child1 = clusterTreeMenu.createMenuItem(menuTreeTop, infoPresenter);
         clusterTreeMenu.setDisableListeners(false);
 
         final InfoPresenter[] selected = {null};
-        clusterTreeMenu.addListeners((info, disableListeners) -> {
-            selected[0] = info;
-        });
+        clusterTreeMenu.addListeners((info, disableListeners) -> selected[0] = info);
 
         clusterTreeMenu.expandAndSelect(new Object[]{child1});
 
-        assertThat(selected[0], is(infoPresenter));
+        assertThat(selected[0]).isEqualTo(infoPresenter);
     }
 
     @Test
-    public void shouldCallOnSelectWhenNodeIsReloaded() {
+    void shouldCallOnSelectWhenNodeIsReloaded() {
         val child1 = clusterTreeMenu.createMenuItem(menuTreeTop, editableInfo);
         clusterTreeMenu.setDisableListeners(false);
 
         final InfoPresenter[] selected = {null};
-        clusterTreeMenu.addListeners((info, disableListeners) -> {
-            selected[0] = info;
-        });
+        clusterTreeMenu.addListeners((info, disableListeners) -> selected[0] = info);
 
         clusterTreeMenu.reloadNode(child1);
 
-        assertThat(selected[0], is(editableInfo));
+        assertThat(selected[0]).isEqualTo(editableInfo);
     }
 
     private DefaultMutableTreeNode childAt(int index) {

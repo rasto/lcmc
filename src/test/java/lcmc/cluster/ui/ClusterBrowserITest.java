@@ -1,5 +1,17 @@
 package lcmc.cluster.ui;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
+import java.io.File;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.concurrent.CountDownLatch;
+
+import org.junit.experimental.categories.Category;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
 import lcmc.AppContext;
 import lcmc.common.domain.Application;
 import lcmc.common.domain.util.Tools;
@@ -9,28 +21,16 @@ import lcmc.common.ui.utils.SwingUtils;
 import lcmc.host.domain.Host;
 import lcmc.testutils.IntegrationTestLauncher;
 import lcmc.testutils.annotation.type.IntegrationTest;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.experimental.categories.Category;
-
-import java.io.File;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.concurrent.CountDownLatch;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
 
 @Category(IntegrationTest.class)
-public final class ClusterBrowserITest {
+class ClusterBrowserITest {
     private IntegrationTestLauncher integrationTestLauncher;
     private MainPresenter mainPresenter;
     private SwingUtils swingUtils;
     private ProgressIndicator progressIndicator;
 
-    @Before
-    public void setUp() {
+    @BeforeEach
+    void setUp() {
         integrationTestLauncher = AppContext.getBean(IntegrationTestLauncher.class);
         integrationTestLauncher.initTestCluster();
         mainPresenter = AppContext.getBean(MainPresenter.class);
@@ -39,30 +39,30 @@ public final class ClusterBrowserITest {
     }
 
     @Test
-    public void testProcessClusterOutput() {
+    void testProcessClusterOutput() {
         final CountDownLatch nolatch = new CountDownLatch(0);
         for (final Host host : integrationTestLauncher.getHosts()) {
             final ClusterBrowser cb = host.getBrowser().getClusterBrowser();
-            assertNotNull("cb is null", cb);
+            assertThat(cb).describedAs("cb is null").isNotNull();
 
             StringBuffer buffer = new StringBuffer("cd");
             cb.parseClusterOutput("a---reset---\r\nb", buffer, host, nolatch, Application.RunMode.LIVE);
-            assertEquals("cdab", buffer.toString());
+            assertThat(buffer.toString()).isEqualTo("cdab");
 
             buffer = new StringBuffer("");
             cb.parseClusterOutput("a---reset---\r\nb", buffer, host, nolatch, Application.RunMode.LIVE);
-            assertEquals("ab", buffer.toString());
+            assertThat(buffer.toString()).isEqualTo("ab");
 
             buffer = new StringBuffer("cd");
             cb.parseClusterOutput("a---reset---\r\nb", buffer, host, nolatch, Application.RunMode.LIVE);
-            assertEquals("cdab", buffer.toString());
+            assertThat(buffer.toString()).isEqualTo("cdab");
 
             buffer = new StringBuffer("cd");
             cb.parseClusterOutput("a---reset---\r\nb---reset---\r\nc", buffer, host, nolatch, Application.RunMode.LIVE);
-            assertEquals("cdabc", buffer.toString());
+            assertThat(buffer.toString()).isEqualTo("cdabc");
         }
 
-        final List<String> files = new ArrayList<String>();
+        final List<String> files = new ArrayList<>();
         final String userHome = System.getProperty("user.home");
         files.add(userHome + "/testdir/empty.xml");
         for (final String dirName : new String[]{
@@ -152,4 +152,6 @@ public final class ClusterBrowserITest {
             }
         }
     }
+
+
 }

@@ -20,39 +20,30 @@
 
 package lcmc.crm.ui.resource;
 
-import java.util.List;
-
-import lcmc.common.domain.AccessMode;
-import lcmc.host.domain.Host;
-import lcmc.cluster.ui.ClusterBrowser;
-
-import static org.junit.Assert.assertEquals;
-
-import lcmc.common.domain.EnablePredicate;
-import lcmc.common.ui.utils.MenuAction;
-import lcmc.common.ui.utils.MenuFactory;
-import lcmc.common.ui.utils.MyMenu;
-import lcmc.common.ui.utils.MyMenuItem;
-import lcmc.common.domain.Predicate;
-import lcmc.common.ui.utils.UpdatableItem;
-import lcmc.common.domain.VisiblePredicate;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Matchers.anyObject;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import org.mockito.runners.MockitoJUnitRunner;
 
-import javax.swing.ImageIcon;
+import java.util.List;
 
-@RunWith(MockitoJUnitRunner.class)
-public class ServiceMenuTest {
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+
+import lcmc.cluster.ui.ClusterBrowser;
+import lcmc.common.ui.utils.MenuFactory;
+import lcmc.common.ui.utils.MyMenu;
+import lcmc.common.ui.utils.MyMenuItem;
+import lcmc.common.ui.utils.UpdatableItem;
+import lcmc.host.domain.Host;
+
+@ExtendWith(MockitoExtension.class)
+class ServiceMenuTest {
     @Mock
     private ServiceInfo serviceInfoStub;
     @Mock
@@ -68,49 +59,32 @@ public class ServiceMenuTest {
     @InjectMocks
     private ServiceMenu serviceMenu;
 
-    @Before
-    public void setUp() {
+    @BeforeEach
+    void setUp() {
         when(serviceInfoStub.getBrowser()).thenReturn(clusterBrowserStub);
         final Host[] hosts = new Host[]{hostStub};
         when(clusterBrowserStub.getClusterHosts()).thenReturn(hosts);
-        when(menuFactoryStub.createMenuItem(
-                any(),
-                (ImageIcon) anyObject(),
-                any(),
-                (AccessMode) anyObject(),
-                (AccessMode) anyObject())).thenReturn(menuItemStub);
-        when(menuFactoryStub.createMenuItem(any(),
-                (ImageIcon) anyObject(),
-                any(),
-
-                any(),
-                (ImageIcon) anyObject(),
-                any(),
-
-                (AccessMode) anyObject(),
-                (AccessMode) anyObject())).thenReturn(menuItemStub);
-        when(menuFactoryStub.createMenu(
-                any(),
-                (AccessMode) anyObject(),
-                (AccessMode) anyObject())).thenReturn(menuStub);
-        when(menuItemStub.predicate((Predicate) anyObject())).thenReturn(menuItemStub);
-        when(menuItemStub.enablePredicate((EnablePredicate) anyObject())).thenReturn(menuItemStub);
-        when(menuItemStub.visiblePredicate((VisiblePredicate) anyObject())).thenReturn(menuItemStub);
-        when(menuItemStub.addAction((MenuAction) anyObject())).thenReturn(menuItemStub);
-        when(menuStub.enablePredicate((EnablePredicate) anyObject())).thenReturn(menuStub);
+        when(menuFactoryStub.createMenuItem(any(), any(), any(), any(), any())).thenReturn(menuItemStub);
+        when(menuFactoryStub.createMenuItem(any(), any(), any(), any(), any(), any(), any(), any())).thenReturn(menuItemStub);
+        when(menuFactoryStub.createMenu(any(), any(), any())).thenReturn(menuStub);
+        when(menuItemStub.predicate(any())).thenReturn(menuItemStub);
+        when(menuItemStub.enablePredicate(any())).thenReturn(menuItemStub);
+        when(menuItemStub.visiblePredicate(any())).thenReturn(menuItemStub);
+        when(menuItemStub.addAction(any())).thenReturn(menuItemStub);
+        when(menuStub.enablePredicate(any())).thenReturn(menuStub);
     }
 
     @Test
-    public void menuShouldHaveItems() {
+    void menuShouldHaveItems() {
         final List<UpdatableItem> items = serviceMenu.getPulldownMenu(serviceInfoStub);
 
-        verify(menuItemStub, times(5)).predicate((Predicate) anyObject());
-        verify(menuItemStub, times(6)).visiblePredicate((VisiblePredicate) anyObject());
-        verify(menuItemStub, times(9)).enablePredicate((EnablePredicate) anyObject());
-        verify(menuItemStub, times(13)).addAction((MenuAction) anyObject());
-        verify(menuStub, times(4)).enablePredicate((EnablePredicate) anyObject());
-        verify(menuStub, times(3)).onUpdate((Runnable) anyObject());
-        assertEquals(15, items.size());
+        verify(menuItemStub, times(5)).predicate(any());
+        verify(menuItemStub, times(6)).visiblePredicate(any());
+        verify(menuItemStub, times(9)).enablePredicate(any());
+        verify(menuItemStub, times(13)).addAction(any());
+        verify(menuStub, times(4)).enablePredicate(any());
+        verify(menuStub, times(3)).onUpdate(any());
+        assertThat(items).hasSize(15);
     }
 
 }

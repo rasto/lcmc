@@ -1,24 +1,25 @@
 package lcmc.cluster.ui.widget;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
 import lcmc.AppContext;
 import lcmc.common.domain.AccessMode;
 import lcmc.common.domain.StringValue;
 import lcmc.common.domain.Value;
-import static org.junit.Assert.assertEquals;
-import org.junit.Before;
-import org.junit.Test;
 
-public final class WidgetTest {
+final class WidgetTest {
     private final WidgetFactory widgetFactory = AppContext.getBean(WidgetFactory.class);
 
     private Widget widget;
-    @Before
+
+    @BeforeEach
     public void setUp() {
         for (int i = 0; i < 10; i++) {
-            widget = widgetFactory.createInstance(Widget.GUESS_TYPE,
-                                                  Widget.NO_DEFAULT,
-                                                  new Value[]{new StringValue("a"),
-                                                              new StringValue("b"),
+            widget = widgetFactory.createInstance(Widget.GUESS_TYPE, Widget.NO_DEFAULT,
+                    new Value[]{new StringValue("a"), new StringValue("b"),
                                                               new StringValue("c")},
                                                   Widget.NO_REGEXP,
                                                   100, /* width */
@@ -29,17 +30,13 @@ public final class WidgetTest {
     }
 
     @Test
-    public void testReloadComboBox() {
+    void testReloadComboBox() {
         for (int i = 0; i < 3; i++) {
-            widget.reloadComboBox(null, new Value[]{new StringValue("a"),
-                                                    new StringValue("b")});
+            widget.reloadComboBox(null, new Value[]{new StringValue("a"), new StringValue("b")});
 
-            widget.reloadComboBox(null, new Value[]{new StringValue("a"),
-                                                    new StringValue("b"),
-                                                    new StringValue("c")});
+            widget.reloadComboBox(null, new Value[]{new StringValue("a"), new StringValue("b"), new StringValue("c")});
 
-            widget.reloadComboBox(new StringValue("as"), new Value[]{new StringValue("a"),
-                                                                     new StringValue("b"),
+            widget.reloadComboBox(new StringValue("as"), new Value[]{new StringValue("a"), new StringValue("b"),
                                                                      new StringValue("c")});
 
             widget.reloadComboBox(null, new Value[]{new StringValue("a"),
@@ -51,36 +48,34 @@ public final class WidgetTest {
     }
 
     @Test
-    public void testSetToolTipText() {
+    void testSetToolTipText() {
         widget.setToolTipText(null);
         widget.setToolTipText("");
         widget.setToolTipText("x");
     }
 
     @Test
-    public void testSetEditable() {
+    void testSetEditable() {
         widget.setEditable(false);
         widget.setEditable(true);
         widget.setEditable();
     }
 
     @Test
-    public void testGetStringValue() {
+    void testGetStringValue() {
         widget.setValueAndWait(new StringValue("a"));
-        assertEquals("a", widget.getStringValue());
+        assertThat(widget.getStringValue()).isEqualTo("a");
     }
 
     @Test
-    public void testGetValue() {
+    void testGetValue() {
         widget.setValueAndWait(new StringValue("a"));
-        assertEquals("a", widget.getValue().getValueForConfig());
+        assertThat(widget.getValue().getValueForConfig()).isEqualTo("a");
     }
 
     @Test
-    public void testClear() {
+    void testClear() {
         widget.clear();
-        widget.reloadComboBox(null, new Value[]{new StringValue("a"),
-                                                new StringValue("b"),
-                                                new StringValue("c")});
+        widget.reloadComboBox(null, new Value[]{new StringValue("a"), new StringValue("b"), new StringValue("c")});
     }
 }

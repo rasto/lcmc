@@ -20,41 +20,32 @@
 
 package lcmc.vm.ui.resource;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
 import java.util.List;
 
-import lcmc.common.domain.AccessMode;
-import lcmc.common.domain.Application;
-import lcmc.host.domain.Host;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+
 import lcmc.cluster.ui.ClusterBrowser;
-
-import static org.junit.Assert.assertEquals;
-
-import lcmc.common.domain.EnablePredicate;
-import lcmc.common.ui.utils.MenuAction;
+import lcmc.common.domain.Application;
 import lcmc.common.ui.utils.MenuFactory;
 import lcmc.common.ui.utils.MyMenu;
 import lcmc.common.ui.utils.MyMenuItem;
-import lcmc.common.domain.Predicate;
 import lcmc.common.ui.utils.UpdatableItem;
-import lcmc.common.domain.VisiblePredicate;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
+import lcmc.host.domain.Host;
 
-import static org.mockito.Matchers.anyObject;
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.when;
-import static org.mockito.Mockito.verify;
-
-import org.mockito.runners.MockitoJUnitRunner;
-
-import javax.swing.ImageIcon;
-
-@RunWith(MockitoJUnitRunner.class)
-public class DomainMenuTest {
+@ExtendWith(MockitoExtension.class)
+class DomainMenuTest {
     @Mock
     private DomainInfo domainInfoStub;
     @Mock
@@ -72,37 +63,21 @@ public class DomainMenuTest {
     @InjectMocks
     private DomainMenu domainMenu;
 
-    @Before
-    public void setUp() {
+    @BeforeEach
+    void setUp() {
         when(applicationStub.isUseTightvnc()).thenReturn(true);
         when(applicationStub.isUseRealvnc()).thenReturn(true);
         when(applicationStub.isUseUltravnc()).thenReturn(true);
         when(domainInfoStub.getBrowser()).thenReturn(clusterBrowserStub);
-        when(menuFactoryStub.createMenuItem(
-                anyString(),
-                (ImageIcon) anyObject(),
-                anyString(),
-                (AccessMode) anyObject(),
-                (AccessMode) anyObject())).thenReturn(menuItemStub);
-        when(menuFactoryStub.createMenu(
-                anyString(),
-                (AccessMode) anyObject(),
-                (AccessMode) anyObject())).thenReturn(menuStub);
-        when(menuFactoryStub.createMenuItem(anyString(),
-                (ImageIcon) anyObject(),
-                anyString(),
-
-                anyString(),
-                (ImageIcon) anyObject(),
-                anyString(),
-
-                (AccessMode) anyObject(),
-                (AccessMode) anyObject())).thenReturn(menuItemStub);
-        when(menuItemStub.enablePredicate((EnablePredicate) anyObject())).thenReturn(menuItemStub);
-        when(menuItemStub.visiblePredicate((VisiblePredicate) anyObject())).thenReturn(menuItemStub);
-        when(menuItemStub.predicate((Predicate) anyObject())).thenReturn(menuItemStub);
-        when(menuItemStub.addAction((MenuAction) anyObject())).thenReturn(menuItemStub);
-        when(menuStub.enablePredicate((EnablePredicate) anyObject())).thenReturn(menuStub);
+        when(menuFactoryStub.createMenuItem(anyString(), any(), anyString(), any(), any())).thenReturn(menuItemStub);
+        when(menuFactoryStub.createMenu(anyString(), any(), any())).thenReturn(menuStub);
+        when(menuFactoryStub.createMenuItem(anyString(), any(), anyString(), anyString(), any(), anyString(), any(),
+                any())).thenReturn(menuItemStub);
+        when(menuItemStub.enablePredicate(any())).thenReturn(menuItemStub);
+        when(menuItemStub.visiblePredicate(any())).thenReturn(menuItemStub);
+        when(menuItemStub.predicate(any())).thenReturn(menuItemStub);
+        when(menuItemStub.addAction(any())).thenReturn(menuItemStub);
+        when(menuStub.enablePredicate(any())).thenReturn(menuStub);
 
         final Host[] hosts = new Host[]{hostStub};
         when(clusterBrowserStub.getClusterHosts()).thenReturn(hosts);
@@ -112,12 +87,13 @@ public class DomainMenuTest {
     public void menuShouldHaveItems() {
         final List<UpdatableItem> items = domainMenu.getPulldownMenu(domainInfoStub);
 
-        verify(menuItemStub, times(1)).predicate((Predicate) anyObject());
-        verify(menuItemStub, times(4)).visiblePredicate((VisiblePredicate) anyObject());
-        verify(menuItemStub, times(11)).enablePredicate((EnablePredicate) anyObject());
-        verify(menuItemStub, times(11)).addAction((MenuAction) anyObject());
-        verify(menuStub, times(1)).enablePredicate((EnablePredicate) anyObject());
-        verify(menuStub, times(1)).onUpdate((Runnable) anyObject());
-        assertEquals(11, items.size());
+        verify(menuItemStub, times(1)).predicate(any());
+        verify(menuItemStub, times(4)).visiblePredicate(any());
+        verify(menuItemStub, times(11)).enablePredicate(any());
+        verify(menuItemStub, times(11)).addAction(any());
+        verify(menuStub, times(1)).enablePredicate(any());
+        verify(menuStub, times(1)).onUpdate(any());
+        assertThat(items.size()).isEqualTo(11);
     }
+
 }

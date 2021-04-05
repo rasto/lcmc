@@ -2,14 +2,15 @@ package lcmc.common.domain.util;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import lombok.val;
 
-public class GuiHelperFilesTest {
+class GuiHelperFilesTest {
     private final GuiHelperFiles guiHelperFiles = new GuiHelperFiles();
+
     @Test
-    public void shouldInlinePerlModules() {
+    void shouldInlinePerlModules() {
         val guiHelper = guiHelperFiles.readGuiHelper();
 
         assertThat(guiHelper).contains("#!/usr/bin/perl");

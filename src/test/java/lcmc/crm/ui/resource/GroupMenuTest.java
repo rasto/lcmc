@@ -20,43 +20,35 @@
 
 package lcmc.crm.ui.resource;
 
-import java.util.List;
-
-import lcmc.common.domain.AccessMode;
-import lcmc.common.ui.main.MainData;
-import lcmc.host.domain.Host;
-import lcmc.common.domain.ResourceValue;
-import lcmc.crm.domain.Service;
-import lcmc.cluster.ui.ClusterBrowser;
-
-import static org.junit.Assert.assertEquals;
-
-import lcmc.common.domain.EnablePredicate;
-import lcmc.common.ui.utils.MenuAction;
-import lcmc.common.ui.utils.MenuFactory;
-import lcmc.common.ui.utils.MyMenu;
-import lcmc.common.ui.utils.MyMenuItem;
-import lcmc.common.domain.Predicate;
-import lcmc.common.ui.utils.UpdatableItem;
-import lcmc.common.domain.VisiblePredicate;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Matchers.anyObject;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.mockito.Mockito.times;
 
-import org.mockito.runners.MockitoJUnitRunner;
+import java.util.List;
 
 import javax.swing.ImageIcon;
 
-@RunWith(MockitoJUnitRunner.class)
-public class GroupMenuTest {
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+
+import lcmc.cluster.ui.ClusterBrowser;
+import lcmc.common.domain.ResourceValue;
+import lcmc.common.ui.main.MainData;
+import lcmc.common.ui.utils.MenuFactory;
+import lcmc.common.ui.utils.MyMenu;
+import lcmc.common.ui.utils.MyMenuItem;
+import lcmc.common.ui.utils.UpdatableItem;
+import lcmc.crm.domain.Service;
+import lcmc.host.domain.Host;
+
+@ExtendWith(MockitoExtension.class)
+class GroupMenuTest {
     @Mock
     private GroupInfo groupInfoStub;
     @Mock
@@ -78,50 +70,36 @@ public class GroupMenuTest {
     @InjectMocks
     private GroupMenu groupMenu;
 
-    @Before
-    public void setUp() {
+    @BeforeEach
+    void setUp() {
         when(groupInfoStub.getBrowser()).thenReturn(clusterBrowserStub);
         final Host[] hosts = new Host[]{hostStub};
         when(clusterBrowserStub.getClusterHosts()).thenReturn(hosts);
-        when(menuFactoryStub.createMenuItem(
-                any(),
-                (ImageIcon) anyObject(),
-                any(),
-                (AccessMode) anyObject(),
-                (AccessMode) anyObject())).thenReturn(menuItemStub);
-        when(menuFactoryStub.createMenuItem(
-                any(),
-                (ImageIcon) anyObject(),
-                any(),
+        when(menuFactoryStub.createMenuItem(any(), any(), any(), any(), any())).thenReturn(menuItemStub);
+        when(menuFactoryStub.createMenuItem(any(), any(), any(),
 
-                any(),
-                (ImageIcon) anyObject(),
-                any(),
+                any(), (ImageIcon) any(), any(),
 
-                (AccessMode) anyObject(),
-                (AccessMode) anyObject())).thenReturn(menuItemStub);
-        when(menuFactoryStub.createMenu(
-                any(),
-                (AccessMode) anyObject(),
-                (AccessMode) anyObject())).thenReturn(menuStub);
-        when(menuStub.enablePredicate((EnablePredicate) anyObject())).thenReturn(menuStub);
-        when(menuItemStub.visiblePredicate((VisiblePredicate) anyObject())).thenReturn(menuItemStub);
-        when(menuItemStub.enablePredicate((EnablePredicate) anyObject())).thenReturn(menuItemStub);
-        when(menuItemStub.addAction((MenuAction) anyObject())).thenReturn(menuItemStub);
-        when(menuItemStub.predicate((Predicate) anyObject())).thenReturn(menuItemStub);
+                any(), any())).thenReturn(menuItemStub);
+        when(menuFactoryStub.createMenu(any(), any(), any())).thenReturn(menuStub);
+        when(menuStub.enablePredicate(any())).thenReturn(menuStub);
+        when(menuItemStub.visiblePredicate(any())).thenReturn(menuItemStub);
+        when(menuItemStub.enablePredicate(any())).thenReturn(menuItemStub);
+        when(menuItemStub.addAction(any())).thenReturn(menuItemStub);
+        when(menuItemStub.predicate(any())).thenReturn(menuItemStub);
     }
 
     @Test
-    public void menuShouldHaveItems() {
+    void menuShouldHaveItems() {
         final List<UpdatableItem> items = groupMenu.getPulldownMenu(groupInfoStub);
-        verify(menuItemStub, times(5)).predicate((Predicate) anyObject());
-        verify(menuItemStub, times(6)).visiblePredicate((VisiblePredicate) anyObject());
-        verify(menuItemStub, times(9)).enablePredicate((EnablePredicate) anyObject());
-        verify(menuItemStub, times(13)).addAction((MenuAction) anyObject());
-        verify(menuStub, times(5)).enablePredicate((EnablePredicate) anyObject());
-        verify(menuStub, times(4)).onUpdate((Runnable) anyObject());
+        verify(menuItemStub, times(5)).predicate(any());
+        verify(menuItemStub, times(6)).visiblePredicate(any());
+        verify(menuItemStub, times(9)).enablePredicate(any());
+        verify(menuItemStub, times(13)).addAction(any());
+        verify(menuStub, times(5)).enablePredicate(any());
+        verify(menuStub, times(4)).onUpdate(any());
 
-        assertEquals(16, items.size());
+        assertThat(items).hasSize(16);
     }
 
 }

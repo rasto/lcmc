@@ -20,29 +20,30 @@
 
 package lcmc.common.domain;
 
-import static org.junit.Assert.assertEquals;
+import static org.assertj.core.api.Assertions.assertThat;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-public final class StringValueTest {
+final class StringValueTest {
     @Test
-    public void testCompareToFunction() {
+    void testCompareToFunction() {
         final StringValue sv = new StringValue("bb");
-        assertEquals(sv.compareTo(null), 2);
-        assertEquals(sv.compareTo(new StringValue(null)), 2);
-        assertEquals(sv.compareTo(new StringValue("")), 2);
-        assertEquals(sv.compareTo(new StringValue("bb")), 0);
-        assertEquals(sv.compareTo(new StringValue("ba")), 1);
-        assertEquals(sv.compareTo(new StringValue("bc")), -1);
-        assertEquals(sv.compareTo(new StringValue("bd")), -2);
+        assertThat(2).isEqualTo(sv.compareTo(null));
+        assertThat(2).isEqualTo(sv.compareTo(new StringValue(null)));
+        assertThat(2).isEqualTo(sv.compareTo(new StringValue("")));
+        assertThat(0).isEqualTo(sv.compareTo(new StringValue("bb")));
+        assertThat(1).isEqualTo(sv.compareTo(new StringValue("ba")));
+        assertThat(-1).isEqualTo(sv.compareTo(new StringValue("bc")));
+        assertThat(-2).isEqualTo(sv.compareTo(new StringValue("bd")));
     }
 
     @Test
-    public void testCompareToFunctionWithNull() {
+    void testCompareToFunctionWithNull() {
         final StringValue sv = new StringValue(null);
-        assertEquals(sv.compareTo(null), 0);
-        assertEquals(sv.compareTo(new StringValue(null)), 0);
-        assertEquals(sv.compareTo(new StringValue("")), 0);
-        assertEquals(sv.compareTo(new StringValue("bb")), -2);
+        assertThat(0).isEqualTo(sv.compareTo(null));
+        assertThat(0).isEqualTo(sv.compareTo(new StringValue(null)));
+        assertThat(0).isEqualTo(sv.compareTo(new StringValue("")));
+        assertThat(-2).isEqualTo(sv.compareTo(new StringValue("bb")));
     }
+
 }

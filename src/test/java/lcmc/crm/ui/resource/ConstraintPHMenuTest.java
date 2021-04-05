@@ -20,41 +20,31 @@
 
 package lcmc.crm.ui.resource;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
 import java.util.List;
 
-import lcmc.common.domain.AccessMode;
-import lcmc.crm.domain.Service;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+
 import lcmc.cluster.ui.ClusterBrowser;
-
-import static org.junit.Assert.assertEquals;
-
-import lcmc.common.domain.EnablePredicate;
-import lcmc.common.ui.utils.MenuAction;
 import lcmc.common.ui.utils.MenuFactory;
 import lcmc.common.ui.utils.MyMenu;
 import lcmc.common.ui.utils.MyMenuItem;
-import lcmc.common.domain.Predicate;
 import lcmc.common.ui.utils.UpdatableItem;
-import lcmc.common.domain.VisiblePredicate;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
+import lcmc.crm.domain.Service;
 
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Matchers.anyObject;
-import static org.mockito.Mockito.when;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.never;
-
-import org.mockito.runners.MockitoJUnitRunner;
-
-import javax.swing.ImageIcon;
-
-@RunWith(MockitoJUnitRunner.class)
-public class ConstraintPHMenuTest {
+@ExtendWith(MockitoExtension.class)
+class ConstraintPHMenuTest {
     @Mock
     private ConstraintPHInfo constraintPHInfoStub;
     @Mock
@@ -70,33 +60,26 @@ public class ConstraintPHMenuTest {
     @InjectMocks
     private ConstraintPHMenu constraintPHMenu;
 
-    @Before
-    public void setUp() {
+    @BeforeEach
+    void setUp() {
         when(constraintPHInfoStub.getBrowser()).thenReturn(clusterBrowserStub);
-        when(menuFactoryStub.createMenuItem(any(),
-                (ImageIcon) anyObject(),
-                any(),
-                (AccessMode) anyObject(),
-                (AccessMode) anyObject())).thenReturn(menuItemStub);
-        when(menuFactoryStub.createMenu(
-                any(),
-                (AccessMode) anyObject(),
-                (AccessMode) anyObject())).thenReturn(menuStub);
-        when(menuStub.enablePredicate((EnablePredicate) anyObject())).thenReturn(menuStub);
-        when(menuItemStub.enablePredicate((EnablePredicate) anyObject())).thenReturn(menuItemStub);
-        when(menuItemStub.addAction((MenuAction) anyObject())).thenReturn(menuItemStub);
+        when(menuFactoryStub.createMenuItem(any(), any(), any(), any(), any())).thenReturn(menuItemStub);
+        when(menuFactoryStub.createMenu(any(), any(), any())).thenReturn(menuStub);
+        when(menuStub.enablePredicate(any())).thenReturn(menuStub);
+        when(menuItemStub.enablePredicate(any())).thenReturn(menuItemStub);
+        when(menuItemStub.addAction(any())).thenReturn(menuItemStub);
     }
 
     @Test
-    public void menuShouldHaveItems() {
+    void menuShouldHaveItems() {
         final List<UpdatableItem> items = constraintPHMenu.getPulldownMenu(constraintPHInfoStub);
-        verify(menuItemStub, never()).predicate((Predicate) anyObject());
-        verify(menuItemStub, never()).visiblePredicate((VisiblePredicate) anyObject());
-        verify(menuItemStub, times(2)).enablePredicate((EnablePredicate) anyObject());
-        verify(menuItemStub, times(2)).addAction((MenuAction) anyObject());
-        verify(menuStub, times(2)).enablePredicate((EnablePredicate) anyObject());
-        verify(menuStub, times(2)).onUpdate((Runnable) anyObject());
+        verify(menuItemStub, never()).predicate(any());
+        verify(menuItemStub, never()).visiblePredicate(any());
+        verify(menuItemStub, times(2)).enablePredicate(any());
+        verify(menuItemStub, times(2)).addAction(any());
+        verify(menuStub, times(2)).enablePredicate(any());
+        verify(menuStub, times(2)).onUpdate(any());
 
-        assertEquals(4, items.size());
+        assertThat(items).hasSize(4);
     }
 }

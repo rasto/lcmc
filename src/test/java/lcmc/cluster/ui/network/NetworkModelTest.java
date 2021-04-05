@@ -20,44 +20,44 @@
 
 package lcmc.cluster.ui.network;
 
-import org.junit.Before;
-import org.junit.Test;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import javax.swing.table.TableModel;
 
-import static org.junit.Assert.assertTrue;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
-public class NetworkModelTest {
+class NetworkModelTest {
     private static final String SOME_IPS = "1.2.3.4, 1.2.3.5";
     private static final String SOME_NETWORK = "1.2.3.0";
     private static final String SOME_CIDR = "24";
     private final NetworkModel model = new NetworkModel();
 
-    @Before
-    public void initTable() {
+    @BeforeEach
+    void initTable() {
         model.updateTable();
 
     }
 
     @Test
-    public void settingIpsShouldUpdateTable() {
+    void settingIpsShouldUpdateTable() {
         model.setIps(SOME_IPS);
 
-        assertTrue("table does not contain " + SOME_IPS, assertTableContains(SOME_IPS));
+        assertThat(assertTableContains(SOME_IPS)).describedAs("table does not contain " + SOME_IPS).isTrue();
     }
 
     @Test
-    public void settingNetworkShouldUpdateTable() {
+    void settingNetworkShouldUpdateTable() {
         model.setIps(SOME_NETWORK);
 
-        assertTrue("table does not contain " + SOME_NETWORK, assertTableContains(SOME_NETWORK));
+        assertThat(assertTableContains(SOME_NETWORK)).describedAs("table does not contain " + SOME_NETWORK).isTrue();
     }
 
     @Test
-    public void settingCidrShouldUpdateTable() {
+    void settingCidrShouldUpdateTable() {
         model.setIps(SOME_CIDR);
 
-        assertTrue("table does not contain " + SOME_CIDR, assertTableContains(SOME_CIDR));
+        assertThat(assertTableContains(SOME_CIDR)).describedAs("table does not contain " + SOME_CIDR).isTrue();
     }
 
     private boolean assertTableContains(final String string) {

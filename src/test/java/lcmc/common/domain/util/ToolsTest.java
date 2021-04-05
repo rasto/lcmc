@@ -1,10 +1,7 @@
 package lcmc.common.domain.util;
 
-import static junitparams.JUnitParamsRunner.$;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertNotEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.when;
 
 import java.awt.Dimension;
@@ -13,19 +10,23 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.TreeSet;
+import java.util.stream.Stream;
 
 import javax.inject.Provider;
 import javax.swing.JPanel;
 
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.CsvSource;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.mockito.junit.jupiter.MockitoExtension;
 
-import junitparams.JUnitParamsRunner;
-import junitparams.Parameters;
 import lcmc.Exceptions;
 import lcmc.HwEventBus;
 import lcmc.cluster.service.ssh.Ssh;
@@ -44,8 +45,8 @@ import lcmc.host.ui.TerminalPanel;
 import lcmc.robotest.RoboTest;
 import lcmc.vm.domain.VmsXml;
 
-@RunWith(JUnitParamsRunner.class)
-public final class ToolsTest {
+@ExtendWith(MockitoExtension.class)
+final class ToolsTest {
     @InjectMocks
     private HostFactory hostFactory;
     @Mock
@@ -86,157 +87,110 @@ public final class ToolsTest {
     @Mock
     private HostBrowser hostBrowser;
 
-    @Before
-    public void setUp() {
+    @BeforeEach
+    void setUp() {
         MockitoAnnotations.initMocks(this);
-        when(vmsXmlProvider.get()).thenReturn(vmsXml);
-        when(drbdXmlProvider.get()).thenReturn(drbdXml);
-        when(terminalPanelProvider.get()).thenReturn(terminalPanel);
-        when(sshProvider.get()).thenReturn(ssh);
-        when(hostBrowserProvider.get()).thenReturn(hostBrowser);
         Tools.init();
     }
 
     @Test
-    public void testCreateImageIcon() {
-        assertNull("not existing", Tools.createImageIcon("notexisting"));
-        assertNotNull("existing", Tools.createImageIcon("startpage_head.jpg"));
+    void testCreateImageIcon() {
+        assertThat(Tools.createImageIcon("notexisting")).describedAs("not existing").isNull();
+        assertThat(Tools.createImageIcon("startpage_head.jpg")).describedAs("existing").isNotNull();
     }
 
     @Test
-    public void testSetDefaults() {
+    void testSetDefaults() {
         Tools.setDefaults();
     }
 
-    @Test
-    @Parameters({"127.0.0.1",
-                 "0.0.0.0",
-                 "0.0.0.1",
-                 "255.255.255.255",
-                 "254.255.255.255"})
-    public void testIsIp(final String ip) {
+    @ParameterizedTest
+    @CsvSource({"127.0.0.1, 0.0.0.0, 0.0.0.1, 255.255.255.255, 254.255.255.255"})
+    void testIsIp(final String ip) {
         assertThat(Tools.isIp(ip)).isTrue();
     }
 
-    @Test
-    @Parameters({"localhost",
-                 "127-0-0-1",
-                 "256.255.255.255",
-                 "255.256.255.255",
-                 "255.255.256.255",
-                 "255.255.255.256",
-                 "255.255.255.1000",
-                 "255.255.255.-1",
-                 "255.255.255",
-                 "",
-                 "255.255.255.255.255",
-                 "127.0.0.false",
-                 "127.0.false.1",
-                 "127.false.0.1",
-                 "false.0.0.1"})
-    public void testIsNotIp(final String ip) {
+    @ParameterizedTest
+    @CsvSource({"localhost, 127-0-0-1, 256.255.255.255, 255.256.255.255, 255.255.256.255, 255.255.255.256, 255.255.255.1000,"
+                + " 255.255.255.-1, 255.255.255, , 255.255.255.255.255, 127.0.0.false, 127.0.false.1, 127.false.0.1, false.0.0.1"})
+    void testIsNotIp(final String ip) {
         assertThat(Tools.isIp(ip)).isFalse();
     }
 
     @Test
-    public void testPrintStackTrace() {
+    void testPrintStackTrace() {
         assertThat("".equals(Tools.getStackTrace())).isFalse();
     }
 
-    @SuppressWarnings("unused")
-    private Object[] parametersForDefaultShouldBeReturned() {
-        return $(
-            $("", "SSH.PublicKey"),
-            $("", "SSH.PublicKey"),
-            $("22", "SSH.Port")
-        );
+    private static Stream<Arguments> parametersForDefaultShouldBeReturned() {
+        return Stream.of(Arguments.of("", "SSH.PublicKey"), Arguments.of("", "SSH.PublicKey"), Arguments.of("22", "SSH.Port"));
     }
 
-    @Test
-    @Parameters(method="parametersForDefaultShouldBeReturned")
-    public void defaultShouldBeReturned(final String default0, final String key) {
+    @ParameterizedTest
+    @MethodSource("parametersForDefaultShouldBeReturned")
+    void defaultShouldBeReturned(final String default0, final String key) {
         assertThat(Tools.getDefault(key)).isEqualTo(default0);
     }
 
     @Test
-    public void testGetDefaultColor() {
+    void testGetDefaultColor() {
         assertThat(Tools.getDefaultColor("TerminalPanel.Background")).isEqualTo(java.awt.Color.BLACK);
     }
 
     @Test
-    public void testGetDefaultInt() {
+    void testGetDefaultInt() {
         assertThat(Tools.getDefaultInt("Score.Infinity")).isEqualTo(100000);
     }
 
     @Test
-    public void testGetString() {
+    void testGetString() {
         assertThat(Tools.getString("DrbdMC.Title")).isEqualTo("Linux Cluster Management Console");
     }
 
     @Test
-    public void testGetErrorString() {
+    void testGetErrorString() {
         final String errorString = "the same string";
         assertThat(errorString).isEqualTo(errorString);
     }
 
-    @SuppressWarnings("unused")
-    private Object[] parametersForTestJoin() {
-        return $(
-            $("a,b",   ",",  new String[]{"a", "b"}),
-            $("a",     ",",  new String[]{"a"}),
-            $("",      ",",  new String[]{}),
-            $("",      ",", null),
-            $("ab",    null, new String[]{"a", "b"}),
-            $("a,b,c", ",",  new String[]{"a", "b" , "c"}),
-            $("a",     ",",  new String[]{"a", null}),
-            $("",      ",",  new String[]{null, null}),
-            $("",      ",",  new String[]{null, null}),
-            $("a",     ",",  new String[]{"a", null, null}),
-            $("a",     ",",  new String[]{null, "a", null}),
-            $("a",     ",",  new String[]{null, null, "a"})
-        );
+    private static Stream<Arguments> parametersForTestJoin() {
+        return Stream.of(Arguments.of("a,b", ",", new String[]{"a", "b"}), Arguments.of("a", ",", new String[]{"a"}),
+                Arguments.of("", ",", new String[]{}), Arguments.of("", ",", null),
+                Arguments.of("ab", null, new String[]{"a", "b"}), Arguments.of("a,b,c", ",", new String[]{"a", "b", "c"}),
+                Arguments.of("a", ",", new String[]{"a", null}), Arguments.of("", ",", new String[]{null, null}),
+                Arguments.of("", ",", new String[]{null, null}), Arguments.of("a", ",", new String[]{"a", null, null}),
+                Arguments.of("a", ",", new String[]{null, "a", null}), Arguments.of("a", ",", new String[]{null, null, "a"}));
     }
 
-    @Test
-    @Parameters(method="parametersForTestJoin")
-    public void testJoin(final String expected, final String delim, final String[] values) {
+    @ParameterizedTest
+    @MethodSource("parametersForTestJoin")
+    void testJoin(final String expected, final String delim, final String[] values) {
         assertThat(Tools.join(delim, values)).isEqualTo(expected);
     }
 
-    @SuppressWarnings("unused")
-    private Object[] parametersForTestJoinWithLength() {
-        return $(
-            $("a,b",   ",", new String[]{"a", "b"},      2),
-            $("a,b",   ",", new String[]{"a", "b"},      3),
-            $("a",     ",", new String[]{"a", "b"},      1),
-            $("",      ",", new String[]{"a", "b"},      0),
-            $("",      ",", new String[]{"a", "b"},      -1),
-            $("",      ",", null,                        1),
-            $("a",     ",", new String[]{"a"},           1),
-            $("",      ",", new String[]{},              2),
-            $("",      ",", null,                        1),
-            $("a,b,c", ",", new String[]{"a", "b", "c"}, 3)
-        );
+    private static Stream<Arguments> parametersForTestJoinWithLength() {
+        return Stream.of(Arguments.of("a,b", ",", new String[]{"a", "b"}, 2), Arguments.of("a,b", ",", new String[]{"a", "b"}, 3),
+                Arguments.of("a", ",", new String[]{"a", "b"}, 1), Arguments.of("", ",", new String[]{"a", "b"}, 0),
+                Arguments.of("", ",", new String[]{"a", "b"}, -1), Arguments.of("", ",", null, 1),
+                Arguments.of("a", ",", new String[]{"a"}, 1), Arguments.of("", ",", new String[]{}, 2),
+                Arguments.of("", ",", null, 1), Arguments.of("a,b,c", ",", new String[]{"a", "b", "c"}, 3));
     }
 
-    @Test
-    @Parameters(method="parametersForTestJoinWithLength")
-    public void joinWithLengthShouldWork(final String expected,
-                                         final String delim,
-                                         final String[] values,
-                                         final int length) {
+    @ParameterizedTest
+    @MethodSource("parametersForTestJoinWithLength")
+    void joinWithLengthShouldWork(final String expected, final String delim, final String[] values, final int length) {
         assertThat(Tools.join(delim, values, length)).isEqualTo(expected);
     }
 
 
     @Test
-    public void joinCollectionShouldWork() {
+    void joinCollectionShouldWork() {
         assertThat(Tools.join(null, Arrays.asList("a", "b"))).isEqualTo("ab");
     }
 
     @Test
-    public void joinBigArrayShouldWork() {
-        final List<String> bigArray = new ArrayList<String>();
+    void joinBigArrayShouldWork() {
+        final List<String> bigArray = new ArrayList<>();
         for (int i = 0; i < 1000; i++) {
             bigArray.add("x");
         }
@@ -244,91 +198,69 @@ public final class ToolsTest {
         assertThat(Tools.join(",", bigArray.toArray(new String[bigArray.size()]), 500)).hasSize(1000 - 1);
     }
 
-    @Test
-    @Parameters({"Rasto, rasto",
-                 "Rasto, Rasto",
-                 "RASTO, RASTO"})
-    public void testUCFirst(final String expected, final String anyString) {
+    @ParameterizedTest
+    @CsvSource({"Rasto, rasto, Rasto, Rasto, RASTO, RASTO"})
+    void testUCFirst(final String expected, final String anyString) {
         assertThat(Tools.ucfirst(anyString)).isEqualTo(expected);
     }
 
     @Test
-    public void ucFirstNullShouldBeNull() {
-        assertNull(Tools.ucfirst(null));
+    void ucFirstNullShouldBeNull() {
+        assertThat(Tools.ucfirst(null)).isNull();
     }
 
     @Test
-    public void ucFirstEmptyStringShouldBeEmptyString() {
+    void ucFirstEmptyStringShouldBeEmptyString() {
         assertThat(Tools.ucfirst("")).isEqualTo("");
     }
 
 
-    @SuppressWarnings("unused")
-    private Object[] parametersForHtmlShouldBeCreated() {
-        return $( 
-            $("<html><p>test\n</html>", "test"),
-            $("<html><p>test<br>line2\n</html>", "test\nline2"),
-            $("<html>\n</html>", null)
-        );
+    private static Stream<Arguments> parametersForHtmlShouldBeCreated() {
+        return Stream.of(Arguments.of("<html><p>test\n</html>", "test"),
+                Arguments.of("<html><p>test<br>line2\n</html>", "test\nline2"), Arguments.of("<html>\n</html>", null));
     }
 
-    @Test
-    @Parameters(method="parametersForHtmlShouldBeCreated")
-    public void htmlShouldBeCreated(final String html, final String text) {
+    @ParameterizedTest
+    @MethodSource("parametersForHtmlShouldBeCreated")
+    void htmlShouldBeCreated(final String html, final String text) {
         assertThat(Tools.html(text)).isEqualTo(html);
     }
 
 
-    @SuppressWarnings("unused")
-    private Object[] parametersForShouldBeStringClass() {
-        return $( 
-            $("string"),
-            $((String) null),
-            $((Object) null)
-        );
+    private static Stream<Arguments> parametersForShouldBeStringClass() {
+        return Stream.of(Arguments.of("string"), Arguments.of((String) null), Arguments.of((Object) null));
     }
 
-    @Test
-    @Parameters(method="parametersForShouldBeStringClass")
-    public void shouldBeStringClass(final Object object) {
+    @ParameterizedTest
+    @MethodSource("parametersForShouldBeStringClass")
+    void shouldBeStringClass(final Object object) {
         assertThat(Tools.isStringClass(object)).isTrue();
     }
 
-    @SuppressWarnings("unused")
-    private Object[] parametersForShouldNotBeStringClass() {
-        return $( 
-            $(new Object()),
-            $(new StringBuilder())
-        );
+    private static Stream<Arguments> parametersForShouldNotBeStringClass() {
+        return Stream.of(Arguments.of(new Object()), Arguments.of(new StringBuilder()));
     }
 
-    @Test
-    @Parameters(method="parametersForShouldNotBeStringClass")
-    public void shouldNotBeStringClass(final Object object) {
+    @ParameterizedTest
+    @MethodSource("parametersForShouldNotBeStringClass")
+    void shouldNotBeStringClass(final Object object) {
         assertThat(Tools.isStringClass(object)).isFalse();
     }
 
-    @SuppressWarnings("unused")
-    private Object[] parametersForConfigShouldBeEscaped() {
-        return $( 
-            $(null,                  null), 
-            $("",                    ""), 
-            $("\"\\\"\"",            "\""), 
-            $("text",                "text"), 
-            $("\"text with space\"", "text with space"), 
-            $("\"text with \\\"\"",  "text with \""), 
-            $("\"just\\\"\"",        "just\"")
-        );
+    private static Stream<Arguments> parametersForConfigShouldBeEscaped() {
+        return Stream.of(Arguments.of(null, null), Arguments.of("", ""), Arguments.of("\"\\\"\"", "\""),
+                Arguments.of("text", "text"), Arguments.of("\"text with space\"", "text with space"),
+                Arguments.of("\"text with \\\"\"", "text with \""), Arguments.of("\"just\\\"\"", "just\""));
     }
 
-    @Test
-    @Parameters(method="parametersForConfigShouldBeEscaped")
-    public void configShouldBeEscaped(final String escaped, final String config) {
+    @ParameterizedTest
+    @MethodSource("parametersForConfigShouldBeEscaped")
+    void configShouldBeEscaped(final String escaped, final String config) {
         assertThat(Tools.escapeConfig(config)).isEqualTo(escaped);
     }
 
     @Test
-    public void testSetSize() {
+    void testSetSize() {
         final JPanel p = new JPanel();
         Tools.setSize(p, 20, 10);
         assertThat(p.getMaximumSize()).isEqualTo(new Dimension(Short.MAX_VALUE, 10));
@@ -336,233 +268,143 @@ public final class ToolsTest {
         assertThat(p.getPreferredSize()).isEqualTo(new Dimension(20, 10));
     }
 
-    @SuppressWarnings("unused")
-    private Object[] parametersForFirstVersionShouldBeSmaller() {
-        return $( 
-            $("2.1.3", "2.1.4"),
-            $("2.1.3", "3.1.2"),
-            $("2.1.3", "2.2.2"),
-            $("2.1.3.1", "2.1.4"),
+    private static Stream<Arguments> parametersForFirstVersionShouldBeSmaller() {
+        return Stream.of(Arguments.of("2.1.3", "2.1.4"), Arguments.of("2.1.3", "3.1.2"), Arguments.of("2.1.3", "2.2.2"),
+                Arguments.of("2.1.3.1", "2.1.4"),
 
-            $("8.3.9", "8.3.10rc1"),
-            $("8.3.10rc1", "8.3.10rc2"),
-            $("8.3.10rc2", "8.3.10"),
-            $("8.3", "8.4"),
-            $("8.3", "8.4.5"),
-            $("8.3.5", "8.4"),
-            $("8.3", "8.4rc3"),
-            $("1.1.7-2.fc16", "1.1.8"),
-            $("1.6.0_26", "1.7")
-        );
+                Arguments.of("8.3.9", "8.3.10rc1"), Arguments.of("8.3.10rc1", "8.3.10rc2"), Arguments.of("8.3.10rc2", "8.3.10"),
+                Arguments.of("8.3", "8.4"), Arguments.of("8.3", "8.4.5"), Arguments.of("8.3.5", "8.4"),
+                Arguments.of("8.3", "8.4rc3"), Arguments.of("1.1.7-2.fc16", "1.1.8"), Arguments.of("1.6.0_26", "1.7"));
     }
 
-    @Test
-    @Parameters(method="parametersForFirstVersionShouldBeSmaller")
-    public void firstVersionShouldBeSmaller(final String versionOne, final String versionTwo)
-    throws Exceptions.IllegalVersionException {
+    @ParameterizedTest
+    @MethodSource("parametersForFirstVersionShouldBeSmaller")
+    void firstVersionShouldBeSmaller(final String versionOne, final String versionTwo) throws Exceptions.IllegalVersionException {
         assertThat(Tools.compareVersions(versionOne, versionTwo)).isEqualTo(-1);
     }
 
-    @SuppressWarnings("unused")
-    private Object[] parametersForFirstVersionShouldBeGreater() {
-        return $( 
-            $("2.1.4", "2.1.3"),
-            $("3.1.2", "2.1.3"),
-            $("2.2.2", "2.1.3"),
-            $("2.1.4", "2.1.3.1"),
-            $("8.3.10rc1", "8.3.9"),
-            $("8.3.10rc2", "8.3.10rc1"),
-            $("8.3.10", "8.3.10rc2"),
-            $("8.3.10", "8.3.10rc99999999"),
-            $("8.4", "8.3"),
-            $("8.4rc3", "8.3"),
-            $("1.1.7-2.fc16", "1.1.6"),
-            $("1.7", "1.6.0_26")
-        );
+    private static Stream<Arguments> parametersForFirstVersionShouldBeGreater() {
+        return Stream.of(Arguments.of("2.1.4", "2.1.3"), Arguments.of("3.1.2", "2.1.3"), Arguments.of("2.2.2", "2.1.3"),
+                Arguments.of("2.1.4", "2.1.3.1"), Arguments.of("8.3.10rc1", "8.3.9"), Arguments.of("8.3.10rc2", "8.3.10rc1"),
+                Arguments.of("8.3.10", "8.3.10rc2"), Arguments.of("8.3.10", "8.3.10rc99999999"), Arguments.of("8.4", "8.3"),
+                Arguments.of("8.4rc3", "8.3"), Arguments.of("1.1.7-2.fc16", "1.1.6"), Arguments.of("1.7", "1.6.0_26"));
     }
 
-    @Test
-    @Parameters(method="parametersForFirstVersionShouldBeGreater")
-    public void firstVersionShouldBeGreater(final String versionOne, final String versionTwo)
-    throws Exceptions.IllegalVersionException {
+    @ParameterizedTest
+    @MethodSource("parametersForFirstVersionShouldBeGreater")
+    void firstVersionShouldBeGreater(final String versionOne, final String versionTwo) throws Exceptions.IllegalVersionException {
         assertThat(Tools.compareVersions(versionOne, versionTwo)).isEqualTo(1);
     }
 
-    @SuppressWarnings("unused")
-    private Object[] parametersForVersionsShouldBeEqual() {
-        return $( 
-            $("2.1.3", "2.1.3.1"),
-            $("2.1", "2.1.3"),
-            $("2", "2.1.3"),
-            $("2", "2.1"),
+    private static Stream<Arguments> parametersForVersionsShouldBeEqual() {
+        return Stream.of(Arguments.of("2.1.3", "2.1.3.1"), Arguments.of("2.1", "2.1.3"), Arguments.of("2", "2.1.3"),
+                Arguments.of("2", "2.1"),
 
-            $("2.1.3", "2.1.3"),
-            $("2.1", "2.1"),
-            $("2", "2"),
-            $("2.1.3.1", "2.1.3"),
-            $("2.1.3", "2.1"),
-            $("2.1.3", "2"),
-            $("2.1", "2"),
-            $("8.3", "8.3.0"),
+                Arguments.of("2.1.3", "2.1.3"), Arguments.of("2.1", "2.1"), Arguments.of("2", "2"),
+                Arguments.of("2.1.3.1", "2.1.3"), Arguments.of("2.1.3", "2.1"), Arguments.of("2.1.3", "2"),
+                Arguments.of("2.1", "2"), Arguments.of("8.3", "8.3.0"),
 
-            $("8.3.10rc1", "8.3.10rc1"),
-            $("8.3rc1", "8.3rc1"),
-            $("8rc1", "8rc1"),
-            $("8.3rc2", "8.3.0"),
-            $("8.3", "8.3.2"),
-            $("8.3.2", "8.3"),
-            $("8.4", "8.4"),
-            $("8.4", "8.4.0rc3"),
-            $("8.4.0rc3", "8.4"),
-            $("1.1.7-2.fc16", "1.1.7"),
-            $("1.7.0_03", "1.7"),
-            $("1.6.0_26", "1.6.0")
-        );
+                Arguments.of("8.3.10rc1", "8.3.10rc1"), Arguments.of("8.3rc1", "8.3rc1"), Arguments.of("8rc1", "8rc1"),
+                Arguments.of("8.3rc2", "8.3.0"), Arguments.of("8.3", "8.3.2"), Arguments.of("8.3.2", "8.3"),
+                Arguments.of("8.4", "8.4"), Arguments.of("8.4", "8.4.0rc3"), Arguments.of("8.4.0rc3", "8.4"),
+                Arguments.of("1.1.7-2.fc16", "1.1.7"), Arguments.of("1.7.0_03", "1.7"), Arguments.of("1.6.0_26", "1.6.0"));
     }
 
-    @Test
-    @Parameters(method="parametersForVersionsShouldBeEqual")
-    public void versionsShouldBeEqual(final String versionOne, final String versionTwo)
-    throws Exceptions.IllegalVersionException {
+    @ParameterizedTest
+    @MethodSource("parametersForVersionsShouldBeEqual")
+    void versionsShouldBeEqual(final String versionOne, final String versionTwo) throws Exceptions.IllegalVersionException {
         assertThat(Tools.compareVersions(versionOne, versionTwo)).isEqualTo(0);
     }
 
-    @SuppressWarnings("unused")
-    private Object[] parametersForCompareVersionsShouldThrowException() {
-        return $( 
-            $("", ""),
-            $(null, null),
-            $("", "2.1.3"),
-            $("2.1.3", ""),
-            $(null, "2.1.3"),
-            $("2.1.3", null),
-            $("2.1.3", "2.1.a"),
-            $("a.1.3", "2.1.3"),
-            $("rc1", "8rc1"),
-            $("8rc1", "8rc"),
-            $("8rc1", "8rc"),
-            $("8rc", "8rc1"),
-            $("8rc1", "rc"),
-            $("rc", "8rc1"),
-            $("8r1", "8.3.1rc1"),
-            $("8.3.1", "8.3rc1.1"),
-            $("8.3rc1.1", "8.3.1")
-        );
+    private static Stream<Arguments> parametersForCompareVersionsShouldThrowException() {
+        return Stream.of(Arguments.of("", ""), Arguments.of(null, null), Arguments.of("", "2.1.3"), Arguments.of("2.1.3", ""),
+                Arguments.of(null, "2.1.3"), Arguments.of("2.1.3", null), Arguments.of("2.1.3", "2.1.a"),
+                Arguments.of("a.1.3", "2.1.3"), Arguments.of("rc1", "8rc1"), Arguments.of("8rc1", "8rc"),
+                Arguments.of("8rc1", "8rc"), Arguments.of("8rc", "8rc1"), Arguments.of("8rc1", "rc"), Arguments.of("rc", "8rc1"),
+                Arguments.of("8r1", "8.3.1rc1"), Arguments.of("8.3.1", "8.3rc1.1"), Arguments.of("8.3rc1.1", "8.3.1"));
     }
 
-    @Test(expected=Exceptions.IllegalVersionException.class)
-    @Parameters(method="parametersForCompareVersionsShouldThrowException")
-    public void compareVersionsShouldThrowException(final String versionOne, final String versionTwo)
-    throws Exceptions.IllegalVersionException {
-        Tools.compareVersions(versionOne, versionTwo);
+    @ParameterizedTest
+    @MethodSource("parametersForCompareVersionsShouldThrowException")
+    void compareVersionsShouldThrowException(final String versionOne, final String versionTwo) {
+        assertThatThrownBy(() -> Tools.compareVersions(versionOne, versionTwo)).isInstanceOf(
+                Exceptions.IllegalVersionException.class);
     }
 
-    @SuppressWarnings("unused")
-    private Object[] parametersForCharCountShouldBeReturned() {
-        return $( 
-            $(1, "abcd", 'b'),
-            $(0, "abcd", 'e'),
-            $(1, "abcd", 'd'),
-            $(1, "abcd", 'a'),
-            $(2, "abcdb", 'b'),
-            $(5, "ccccc", 'c'),
-            $(1, "a", 'a'),
-            $(0, "a", 'b'),
-            $(0, "", 'b')
-        );
+    private static Stream<Arguments> parametersForCharCountShouldBeReturned() {
+        return Stream.of(Arguments.of(1, "abcd", 'b'), Arguments.of(0, "abcd", 'e'), Arguments.of(1, "abcd", 'd'),
+                Arguments.of(1, "abcd", 'a'), Arguments.of(2, "abcdb", 'b'), Arguments.of(5, "ccccc", 'c'),
+                Arguments.of(1, "a", 'a'), Arguments.of(0, "a", 'b'), Arguments.of(0, "", 'b'));
     }
 
-    @Test
-    @Parameters(method="parametersForCharCountShouldBeReturned")
-    public void charCountShouldBeReturned(final int count, final String string, final char character) {
+    @ParameterizedTest
+    @MethodSource("parametersForCharCountShouldBeReturned")
+    void charCountShouldBeReturned(final int count, final String string, final char character) {
         assertThat(Tools.charCount(string, character)).isEqualTo(count);
     }
 
     @Test
-    public void charCountInNullShouldReturnZero() {
+    void charCountInNullShouldReturnZero() {
         assertThat(Tools.charCount(null, 'b')).isEqualTo(0);
     }
 
-    @Test
-    @Parameters({"1", "-1", "0", "-0", "1235", "100000000000000000", "-100000000000000000"})
-    public void shouldBeNumber(final String number) {
+    @ParameterizedTest
+    @CsvSource({"1, -1, 0, -0, 1235, 100000000000000000, -100000000000000000"})
+    void shouldBeNumber(final String number) {
         assertThat(Tools.isNumber(number)).isTrue();
     }
 
-    @Test
-    @Parameters({"0.1", "1 1", "-", "", "a", ".5", "a1344", "1344a", "13x44"})
-    public void shouldNotBeNumber(final String number) {
+    @ParameterizedTest
+    @CsvSource({"0.1, 1 1, -, '', a, .5, a1344, 1344a, 13x44"})
+    void shouldNotBeNumber(final String number) {
         assertThat(Tools.isNumber(number)).isFalse();
     }
 
     @Test
-    public void nullShouldNotBeNumber() {
+    void nullShouldNotBeNumber() {
         assertThat(Tools.isNumber(null)).isFalse();
     }
 
-    @SuppressWarnings("unused")
-    private Object[] parametersForShellListShouldBeCreated() {
-        return $( 
-            $("{'a','b'}", new String[]{"a", "b"}),
-            $("{'a','b','b'}", new String[]{"a", "b", "b"}),
-            $("a", new String[]{"a"}),
-            $(null, new String[]{}),
-            $(null, null)
-        );
+    private static Stream<Arguments> parametersForShellListShouldBeCreated() {
+        return Stream.of(Arguments.of("{'a','b'}", new String[]{"a", "b"}),
+                Arguments.of("{'a','b','b'}", new String[]{"a", "b", "b"}), Arguments.of("a", new String[]{"a"}),
+                Arguments.of(null, new String[]{}), Arguments.of(null, null));
     }
 
-    @Test
-    @Parameters(method="parametersForShellListShouldBeCreated")
-    public void shellListShouldBeCreated(final String shellList, final String[] list) {
+    @ParameterizedTest
+    @MethodSource("parametersForShellListShouldBeCreated")
+    void shellListShouldBeCreated(final String shellList, final String[] list) {
         assertThat(Tools.shellList(list)).isEqualTo(shellList);
     }
 
-    @SuppressWarnings("unused")
-    private Object[] parametersForStringsShouldBeEqual() {
-        return $( 
-            $(null, null),
-            $("", ""),
-            $("x", "x")
-        );
+    private static Stream<Arguments> parametersForStringsShouldBeEqual() {
+        return Stream.of(Arguments.of(null, null), Arguments.of("", ""), Arguments.of("x", "x"));
     }
 
-    @Test
-    @Parameters(method="parametersForStringsShouldBeEqual")
-    public void stringsShouldBeEqual(final String stringOne, final String stringTwo) {
+    @ParameterizedTest
+    @MethodSource("parametersForStringsShouldBeEqual")
+    void stringsShouldBeEqual(final String stringOne, final String stringTwo) {
         assertThat(stringTwo).isEqualTo(stringOne);
     }
 
-    @SuppressWarnings("unused")
-    private Object[] parametersForStringsShouldNotBeEqual() {
-        return $(
-            $("x", "a"),
-            $("x", ""),
-            $("", "x"),
-            $(null, "x"),
-            $("x", null)
-        );
+    private static Stream<Arguments> parametersForStringsShouldNotBeEqual() {
+        return Stream.of(Arguments.of("x", "a"), Arguments.of("x", ""), Arguments.of("", "x"), Arguments.of(null, "x"),
+                Arguments.of("x", null));
+    }
+
+    @ParameterizedTest
+    @MethodSource("parametersForStringsShouldNotBeEqual")
+    void stringsShouldNotBeEqual(final String stringOne, final String stringTwo) {
+        assertThat(stringOne).isNotEqualTo(stringTwo);
+    }
+
+    private Stream<Arguments> parametersForUnitShouldBeExtracted() {
+        return Stream.of(Arguments.of("10", "min", "10min"), Arguments.of("0", "s", "0s"), Arguments.of("0", "", "0"),
+                Arguments.of("5", "", "5"), Arguments.of("", "s", "s"), Arguments.of(null, null, null));
     }
 
     @Test
-    @Parameters(method="parametersForStringsShouldNotBeEqual")
-    public void stringsShouldNotBeEqual(final String stringOne, final String stringTwo) {
-        assertNotEquals(stringOne, stringTwo);
-    }
-
-    @SuppressWarnings("unused")
-    private Object[] parametersForUnitShouldBeExtracted() {
-        return $(
-            $("10", "min", "10min"),
-            $("0",  "s",   "0s"),
-            $("0",  "",    "0"),
-            $("5",  "",    "5"),
-            $("",   "s",   "s"),
-            $(null, null,  null)
-        );
-    }
-
-    @Test
-    public void testGetRandomSecret() {
+    void testGetRandomSecret() {
         for (int i = 0; i < 100; i++) {
             final String s = Tools.getRandomSecret(2000);
             assertThat(s).hasSize(2000);
@@ -571,86 +413,68 @@ public final class ToolsTest {
         }
     }
 
-    @Test
-    @Parameters({"127.0.0.1", "127.0.1.1"})
-    public void testIsLocalIp(final String ip) {
+    @ParameterizedTest
+    @CsvSource({"127.0.0.1, 127.0.1.1"})
+    void testIsLocalIp(final String ip) {
         assertThat(Tools.isLocalIp(ip)).isTrue();
     }
 
-    @Test
-    @Parameters({"127.0.0", "127.0.0.1.1", "127.0.0.a", "a", "a"})
-    public void testIsNotLocalIp(final String ip) {
+    @ParameterizedTest
+    @CsvSource({"127.0.0, 127.0.0.1.1, 127.0.0.a, a, a"})
+    void testIsNotLocalIp(final String ip) {
         assertThat(Tools.isLocalIp(ip)).isFalse();
     }
 
     @Test
-    public void textShouldBeTrimmed() {
-        assertNull(Tools.trimText(null));
+    void textShouldBeTrimmed() {
+        assertThat(Tools.trimText(null)).isNull();
         assertThat(Tools.trimText("x")).isEqualTo("x");
         final String x20 = " xxxxxxxxxxxxxxxxxxx";
         assertThat(Tools.trimText(x20 + x20 + x20 + x20)).isEqualTo(x20 + x20 + x20 + x20);
     }
 
     @Test
-    public void textShouldNotBeTrimmed() {
-        assertNull(Tools.trimText(null));
+    void textShouldNotBeTrimmed() {
+        assertThat(Tools.trimText(null)).isNull();
         assertThat(Tools.trimText("x")).isEqualTo("x");
         final String x20 = " xxxxxxxxxxxxxxxxxxx";
         assertThat(Tools.trimText(x20 + x20 + x20 + x20 + x20)).isEqualTo(x20 + x20 + x20 + x20 + "\n" + x20.trim());
     }
 
-    @SuppressWarnings("unused")
-    private Object[] parametersForDirectoryPartShouldBeExtracted() {
-        return $(
-            $("/usr/bin/", "/usr/bin/somefile"),
-            $("/usr/bin/", "/usr/bin/"),
-            $("somefile", "somefile"),
-            $("", ""),
-            $(null, null),
-            $("/", "/")
-        );
+    private static Stream<Arguments> parametersForDirectoryPartShouldBeExtracted() {
+        return Stream.of(Arguments.of("/usr/bin/", "/usr/bin/somefile"), Arguments.of("/usr/bin/", "/usr/bin/"),
+                Arguments.of("somefile", "somefile"), Arguments.of("", ""), Arguments.of(null, null), Arguments.of("/", "/"));
     }
 
-    @Test
-    @Parameters(method="parametersForDirectoryPartShouldBeExtracted")
-    public void directoryPartShouldBeExtracted(final String extractedDir, final String file) {
+    @ParameterizedTest
+    @MethodSource("parametersForDirectoryPartShouldBeExtracted")
+    void directoryPartShouldBeExtracted(final String extractedDir, final String file) {
         assertThat(Tools.getDirectoryPart(file)).isEqualTo(extractedDir);
     }
 
-    @SuppressWarnings("unused")
-    private Object[] parametersForQuotesShouldBeEscaped() {
-        return $(
-            $("test", "test", 0),
-            $("test", "test", -1),
-            $(null, null, -1),
-            $(null, null, 1),
-
-            $("test", "test", 1),
-            $("test", "test", 2),
-            $("test", "test", 100),
-
-            $("\\\"\\$\\`test\\\\", "\"$`test\\", 1),
-            $("\\\\\\\"\\\\\\$\\\\\\`test\\\\\\\\", "\"$`test\\", 2)
-        );
+    private static Stream<Arguments> parametersForQuotesShouldBeEscaped() {
+        return Stream.of(Arguments.of("test", "test", 0), Arguments.of("test", "test", -1), Arguments.of(null, null, -1),
+                Arguments.of(null, null, 1), Arguments.of("test", "test", 1), Arguments.of("test", "test", 2),
+                Arguments.of("test", "test", 100), Arguments.of("\\\"\\$\\`test\\\\", "\"$`test\\", 1),
+                Arguments.of("\\\\\\\"\\\\\\$\\\\\\`test\\\\\\\\", "\"$`test\\", 2));
     }
 
-    @Test
-    @Parameters(method="parametersForQuotesShouldBeEscaped")
-    public void quotesShouldBeEscaped(final String escaped, final String string, final int level) {
+    @ParameterizedTest
+    @MethodSource("parametersForQuotesShouldBeEscaped")
+    void quotesShouldBeEscaped(final String escaped, final String string, final int level) {
         assertThat(Tools.escapeQuotes(string, level)).isEqualTo(escaped);
     }
 
-    @SuppressWarnings("unused")
-    private Object[] parametersForTestVersionBeforePacemaker() {
-        return $(
-            $(null, "2.1.4"),
-            $(null, "2.1.3")
-        );
+    private static Stream<Arguments> parametersForTestVersionBeforePacemaker() {
+        return Stream.of(Arguments.of(null, "2.1.4"), Arguments.of(null, "2.1.3"));
     }
 
-    @Test
-    @Parameters(method="parametersForTestVersionBeforePacemaker")
-    public void testVersionBeforePacemaker(final String pcmkVersion, final String hbVersion) {
+    @ParameterizedTest
+    @MethodSource("parametersForTestVersionBeforePacemaker")
+    void testVersionBeforePacemaker(final String pcmkVersion, final String hbVersion) {
+        when(terminalPanelProvider.get()).thenReturn(terminalPanel);
+        when(sshProvider.get()).thenReturn(ssh);
+        when(hostBrowserProvider.get()).thenReturn(hostBrowser);
         final GlobalInfo globalInfo = new GlobalInfo();
         final Host host = hostFactory.createInstance();
 
@@ -659,20 +483,18 @@ public final class ToolsTest {
         assertThat(Tools.versionBeforePacemaker(host)).isTrue();
     }
 
-    @SuppressWarnings("unused")
-    private Object[] parametersForTestVersionAfterPacemaker() {
-        return $(
-            $("1.1.5", null),
-            $(null, null),
-            $("1.0.9", "3.0.2"),
-            $("1.0.9", "2.99.0"),
-            $("1.0.9", null)
-        );
+    private static Stream<Arguments> parametersForTestVersionAfterPacemaker() {
+        return Stream.of(Arguments.of("1.1.5", null), Arguments.of(null, null), Arguments.of("1.0.9", "3.0.2"),
+                Arguments.of("1.0.9", "2.99.0"), Arguments.of("1.0.9", null));
     }
 
-    @Test
-    @Parameters(method="parametersForTestVersionAfterPacemaker")
-    public void testVersionAfterPacemaker(final String pcmkVersion, final String hbVersion) {
+    @ParameterizedTest
+    @MethodSource("parametersForTestVersionAfterPacemaker")
+    void testVersionAfterPacemaker(final String pcmkVersion, final String hbVersion) {
+        when(terminalPanelProvider.get()).thenReturn(terminalPanel);
+        when(sshProvider.get()).thenReturn(ssh);
+        when(hostBrowserProvider.get()).thenReturn(hostBrowser);
+
         final Host host = hostFactory.createInstance();
 
         host.getHostParser().setPacemakerVersion(pcmkVersion);
@@ -680,124 +502,92 @@ public final class ToolsTest {
         assertThat(Tools.versionBeforePacemaker(host)).isFalse();
     }
 
-    @SuppressWarnings("unused")
-    private Object[] parametersForTwoNewLineShouldBeOne() {
-        return $(
-            $("",      ""),
-            $("\n",    "\n\n\n"),
-            $(" ",     " "),
-            $("a",     "a"),
-            $("a\nb",  "a\nb"),
-            $(" a\n",  " a\n"),
-            $(" a\n",  " a\n\n"),
-            $(" a \n", " a \n")
-        );
+    private static Stream<Arguments> parametersForTwoNewLineShouldBeOne() {
+        return Stream.of(Arguments.of("", ""), Arguments.of("\n", "\n\n\n"), Arguments.of(" ", " "), Arguments.of("a", "a"),
+                Arguments.of("a\nb", "a\nb"), Arguments.of(" a\n", " a\n"), Arguments.of(" a\n", " a\n\n"),
+                Arguments.of(" a \n", " a \n"));
     }
 
-    @Test
-    @Parameters(method="parametersForTwoNewLineShouldBeOne")
-    public void twoNewLineShouldBeOne(final String chomped, final String origString) {
+    @ParameterizedTest
+    @MethodSource("parametersForTwoNewLineShouldBeOne")
+    void twoNewLineShouldBeOne(final String chomped, final String origString) {
         final StringBuffer sb = new StringBuffer(origString);
         Tools.chomp(sb);
         assertThat(sb.toString()).isEqualTo(chomped);
     }
 
     @Test
-    public void testGenerateVMMacAddress() {
-       final String mac = Tools.generateVMMacAddress();
-       assertThat(17).isEqualTo(mac.length());
+    void testGenerateVMMacAddress() {
+        final String mac = Tools.generateVMMacAddress();
+        assertThat(17).isEqualTo(mac.length());
     }
 
-    @SuppressWarnings("unused")
-    private Object[] parametersForNamesShouldBeTheSame() {
-        return $(
-            $("a", "a"),
-            $("2a", "2a"),
-            $("1a2b3c4", "1a2b3c4"),
-            $(null, null)
-        );
+    private static Stream<Arguments> parametersForNamesShouldBeTheSame() {
+        return Stream.of(Arguments.of("a", "a"), Arguments.of("2a", "2a"), Arguments.of("1a2b3c4", "1a2b3c4"),
+                Arguments.of(null, null));
     }
 
-    @Test
-    @Parameters(method="parametersForNamesShouldBeTheSame")
-    public void namesShouldBeTheSame(final String nameOne, final String nameTwo) {
+    @ParameterizedTest
+    @MethodSource("parametersForNamesShouldBeTheSame")
+    void namesShouldBeTheSame(final String nameOne, final String nameTwo) {
         assertThat(Tools.compareNames(nameOne, nameTwo) == 0).isTrue();
     }
 
-    @SuppressWarnings("unused")
-    private Object[] parametersForNameOneShouldBeSmaller() {
-        return $(
-            $("a", "b"),
-            $("1a", "2a"),
-            $("2a", "2a1"),
-            $("a2b", "a10b"),
-            $("a2b3", "a10b"),
-            $("a2b", "a10b3"),
-            $("", "a"),
-            $(null, "1"),
-            $("1x", "Node001")
-        );
+    private static Stream<Arguments> parametersForNameOneShouldBeSmaller() {
+        return Stream.of(Arguments.of("a", "b"), Arguments.of("1a", "2a"), Arguments.of("2a", "2a1"), Arguments.of("a2b", "a10b"),
+                Arguments.of("a2b3", "a10b"), Arguments.of("a2b", "a10b3"), Arguments.of("", "a"), Arguments.of(null, "1"),
+                Arguments.of("1x", "Node001"));
     }
 
-    @Test
-    @Parameters(method="parametersForNameOneShouldBeSmaller")
-    public void nameOneShouldBeSmaller(final String nameOne, final String nameTwo) {
+    @ParameterizedTest
+    @MethodSource("parametersForNameOneShouldBeSmaller")
+    void nameOneShouldBeSmaller(final String nameOne, final String nameTwo) {
         assertThat(Tools.compareNames(nameOne, nameTwo) < 0).isTrue();
     }
 
-    @SuppressWarnings("unused")
-    private Object[] parametersForNameOneShouldBeGreater() {
-        return $(
-            $("10a", "2a"),
-            $("2a1", "2a"),
-            $("a10", "a2"),
-            $("a10b", "a2b"),
-            $("a", ""),
-            $("1", ""),
-            $("1", null)
-        );
+    private static Stream<Arguments> parametersForNameOneShouldBeGreater() {
+        return Stream.of(Arguments.of("10a", "2a"), Arguments.of("2a1", "2a"), Arguments.of("a10", "a2"),
+                Arguments.of("a10b", "a2b"), Arguments.of("a", ""), Arguments.of("1", ""), Arguments.of("1", null));
     }
 
-    @Test
-    @Parameters(method="parametersForNameOneShouldBeGreater")
-    public void nameOneShouldBeGreater(final String nameOne, final String nameTwo) {
+    @ParameterizedTest
+    @MethodSource("parametersForNameOneShouldBeGreater")
+    void nameOneShouldBeGreater(final String nameOne, final String nameTwo) {
         assertThat(Tools.compareNames(nameOne, nameTwo) > 0).isTrue();
     }
 
-    private Object[] equalCollections() {
-        return $(
-                $(new ArrayList<String>(), new ArrayList<String>()),
-                $(new ArrayList<String>(Arrays.asList("a", "b")), new ArrayList<String>(Arrays.asList("a", "b"))),
-                $(new TreeSet<String>(), new TreeSet<String>()),
-                $(new TreeSet<String>(Arrays.asList("a", "b")), new TreeSet<String>(Arrays.asList("a", "b"))),
-                $(new TreeSet<String>(Arrays.asList("b", "a")), new TreeSet<String>(Arrays.asList("a", "b"))));
+    private static Stream<Arguments> equalCollections() {
+        return Stream.of(Arguments.of(new ArrayList<String>(), new ArrayList<String>()),
+                Arguments.of(new ArrayList<>(Arrays.asList("a", "b")), new ArrayList<>(Arrays.asList("a", "b"))),
+                Arguments.of(new TreeSet<String>(), new TreeSet<String>()),
+                Arguments.of(new TreeSet<>(Arrays.asList("a", "b")), new TreeSet<>(Arrays.asList("a", "b"))),
+                Arguments.of(new TreeSet<>(Arrays.asList("b", "a")), new TreeSet<>(Arrays.asList("a", "b"))));
     }
 
-    @Test
-    @Parameters(method="equalCollections")
-    public void collectionsShouldBeEqual(final Collection<String> collection1, Collection<String> collection2) {
+    @ParameterizedTest
+    @MethodSource("equalCollections")
+    void collectionsShouldBeEqual(final Collection<String> collection1, Collection<String> collection2) {
         assertThat(Tools.equalCollections(collection1, collection2)).isTrue();
     }
 
-    private Object[] unequalCollections() {
-        return $(
-                $(new ArrayList<String>(), new ArrayList<>(Arrays.asList("a"))),
-                $(new ArrayList<>(Arrays.asList("a")), new ArrayList<String>()),
-                $(new ArrayList<>(Arrays.asList("a")), new ArrayList<>(Arrays.asList("a", "b"))),
-                $(new ArrayList<>(Arrays.asList("a", "b")), new ArrayList<>(Arrays.asList("b"))),
-                $(new ArrayList<>(Arrays.asList("a", "a")), new ArrayList<>(Arrays.asList("a", "b"))),
-                $(new ArrayList<>(Arrays.asList("b", "b")), new ArrayList<>(Arrays.asList("a", "b"))),
-                $(new TreeSet<String>(), new TreeSet<>(Arrays.asList("a"))),
-                $(new TreeSet<>(Arrays.asList("a")), new TreeSet<String>()),
-                $(new TreeSet<>(Arrays.asList("a")), new TreeSet<>(Arrays.asList("a", "b"))),
-                $(new TreeSet<>(Arrays.asList("a", "b")), new TreeSet<>(Arrays.asList("b"))),
-                $(new TreeSet<>(Arrays.asList("a", "a")), new TreeSet<>(Arrays.asList("a", "b"))),
-                $(new TreeSet<>(Arrays.asList("b", "b")), new TreeSet<>(Arrays.asList("a", "b"))));
+    private static Stream<Arguments> unequalCollections() {
+        return Stream.of(Arguments.of(new ArrayList<String>(), new ArrayList<>(Arrays.asList("a"))),
+                Arguments.of(new ArrayList<>(Arrays.asList("a")), new ArrayList<String>()),
+                Arguments.of(new ArrayList<>(Arrays.asList("a")), new ArrayList<>(Arrays.asList("a", "b"))),
+                Arguments.of(new ArrayList<>(Arrays.asList("a", "b")), new ArrayList<>(Arrays.asList("b"))),
+                Arguments.of(new ArrayList<>(Arrays.asList("a", "a")), new ArrayList<>(Arrays.asList("a", "b"))),
+                Arguments.of(new ArrayList<>(Arrays.asList("b", "b")), new ArrayList<>(Arrays.asList("a", "b"))),
+                Arguments.of(new TreeSet<String>(), new TreeSet<>(Arrays.asList("a"))),
+                Arguments.of(new TreeSet<>(Arrays.asList("a")), new TreeSet<String>()),
+                Arguments.of(new TreeSet<>(Arrays.asList("a")), new TreeSet<>(Arrays.asList("a", "b"))),
+                Arguments.of(new TreeSet<>(Arrays.asList("a", "b")), new TreeSet<>(Arrays.asList("b"))),
+                Arguments.of(new TreeSet<>(Arrays.asList("a", "a")), new TreeSet<>(Arrays.asList("a", "b"))),
+                Arguments.of(new TreeSet<>(Arrays.asList("b", "b")), new TreeSet<>(Arrays.asList("a", "b"))));
     }
 
-    @Test
-    @Parameters(method="unequalCollections")
-    public void collectionsShouldNotBeEqual(final Collection<String> collection1, Collection<String> collection2) {
+    @ParameterizedTest
+    @MethodSource("unequalCollections")
+    void collectionsShouldNotBeEqual(final Collection<String> collection1, Collection<String> collection2) {
         assertThat(Tools.equalCollections(collection1, collection2)).isFalse();
     }
 }

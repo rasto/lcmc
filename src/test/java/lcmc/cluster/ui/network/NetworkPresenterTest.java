@@ -20,23 +20,25 @@
 
 package lcmc.cluster.ui.network;
 
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+
 import com.google.common.base.Optional;
+
 import lcmc.ClusterEventBus;
 import lcmc.cluster.domain.Cluster;
 import lcmc.cluster.domain.Network;
 import lcmc.cluster.service.NetworkService;
 import lcmc.cluster.ui.ClusterBrowser;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
 
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-
-@RunWith(MockitoJUnitRunner.class)
-public class NetworkPresenterTest {
+@ExtendWith(MockitoExtension.class)
+class NetworkPresenterTest {
     private static final String ANY_NAME = "ANY_NAME";
     private static final String[] ANY_ALL_IPS = null;
     private static final Integer ANY_CIDR = null;
@@ -55,21 +57,14 @@ public class NetworkPresenterTest {
 
     final Cluster cluster = new Cluster();
 
-    @Before
-    public void setupNetworkPresenter() {
-        presenter = new NetworkPresenter(
-                network,
-                model,
-                view,
-                clusterEventBus,
-                cluster,
-                networkService,
-                clusterBrowser);
+    @BeforeEach
+    void setupNetworkPresenter() {
+        presenter = new NetworkPresenter(network, model, view, clusterEventBus, cluster, networkService, clusterBrowser);
 
     }
 
     @Test
-    public void viewShouldBeUpdated() {
+    void viewShouldBeUpdated() {
         final Optional<Network> newNetwork = Optional.of(network);
         when(networkService.getCommonNetwork(cluster, network)).thenReturn(newNetwork);
 

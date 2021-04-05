@@ -1,25 +1,28 @@
 package lcmc.vm.ui.resource;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import java.util.HashMap;
 import java.util.Map;
-import lcmc.vm.domain.data.DiskData;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
 import lcmc.common.domain.util.Tools;
-import static org.junit.Assert.assertEquals;
+import lcmc.vm.domain.data.DiskData;
 
-import org.junit.Before;
-import org.junit.Test;
-
-public final class DiskInfoTest {
+class DiskInfoTest {
     private DiskInfo diskInfo;
-    @Before
-    public void setUp() {
+
+    @BeforeEach
+    void setUp() {
         Tools.init();
         diskInfo = new DiskInfo();
         diskInfo.init("", null, null);
     }
 
-    private String invokeFixSourceHostParams(final String names, final  String ports) {
-        final Map<String, String> params = new HashMap<String, String>();
+    private String invokeFixSourceHostParams(final String names, final String ports) {
+        final Map<String, String> params = new HashMap<>();
         params.put(DiskData.SOURCE_HOST_NAME, names);
         params.put(DiskData.SOURCE_HOST_PORT, ports);
         diskInfo.fixSourceHostParams(params);
@@ -27,18 +30,18 @@ public final class DiskInfoTest {
     }
 
     @Test
-    public void testFixSourceHostParams() {
-        assertEquals("a, b:1, 2", invokeFixSourceHostParams("a,b", "1,2"));
-        assertEquals("a, b:1, 1", invokeFixSourceHostParams("a,b", "1"));
-        assertEquals("a, b:1, 2", invokeFixSourceHostParams("a,b", "1,2,3"));
-        assertEquals(":", invokeFixSourceHostParams("", "1,2,3"));
-        assertEquals("null:null", invokeFixSourceHostParams(null, "1,2,3"));
-        assertEquals("a:6789", invokeFixSourceHostParams("a", null));
-        assertEquals("a:6789", invokeFixSourceHostParams("a", ""));
-        assertEquals("a, b, c:6789, 6789, 6789", invokeFixSourceHostParams("a,b,c", ""));
-        assertEquals("a:1", invokeFixSourceHostParams("a,", "1,2"));
-        assertEquals(", a:1, 2", invokeFixSourceHostParams(",a", "1,2"));
-        assertEquals("a, b, c:1, 2, 2", invokeFixSourceHostParams(" a , b , c", " 1 , 2 "));
-        assertEquals("a, b:1, 2", invokeFixSourceHostParams(" a , b ", " 1 , 2 , 3 "));
+    void testFixSourceHostParams() {
+        assertThat(invokeFixSourceHostParams("a,b", "1,2")).isEqualTo("a, b:1, 2");
+        assertThat(invokeFixSourceHostParams("a,b", "1")).isEqualTo("a, b:1, 1");
+        assertThat(invokeFixSourceHostParams("a,b", "1,2,3")).isEqualTo("a, b:1, 2");
+        assertThat(invokeFixSourceHostParams("", "1,2,3")).isEqualTo(":");
+        assertThat(invokeFixSourceHostParams(null, "1,2,3")).isEqualTo("null:null");
+        assertThat(invokeFixSourceHostParams("a", null)).isEqualTo("a:6789");
+        assertThat(invokeFixSourceHostParams("a", "")).isEqualTo("a:6789");
+        assertThat(invokeFixSourceHostParams("a,b,c", "")).isEqualTo("a, b, c:6789, 6789, 6789");
+        assertThat(invokeFixSourceHostParams("a,", "1,2")).isEqualTo("a:1");
+        assertThat(invokeFixSourceHostParams(",a", "1,2")).isEqualTo(", a:1, 2");
+        assertThat(invokeFixSourceHostParams(" a , b , c", " 1 , 2 ")).isEqualTo("a, b, c:1, 2, 2");
+        assertThat(invokeFixSourceHostParams(" a , b ", " 1 , 2 , 3 ")).isEqualTo("a, b:1, 2");
     }
 }

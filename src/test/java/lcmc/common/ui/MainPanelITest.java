@@ -1,33 +1,36 @@
 package lcmc.common.ui;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
+import org.junit.experimental.categories.Category;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
 import lcmc.AppContext;
 import lcmc.common.ui.utils.SwingUtils;
 import lcmc.host.domain.Host;
 import lcmc.testutils.IntegrationTestLauncher;
 import lcmc.testutils.annotation.type.IntegrationTest;
-import static org.junit.Assert.assertTrue;
-
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.experimental.categories.Category;
 
 @Category(IntegrationTest.class)
-public final class MainPanelITest {
+final class MainPanelITest {
     private IntegrationTestLauncher integrationTestLauncher;
     private MainPanel mainPanel;
     private SwingUtils swingUtils;
 
-    @Before
-    public void setUp() {
+    @BeforeEach
+    void setUp() {
         integrationTestLauncher = AppContext.getBean(IntegrationTestLauncher.class);
         integrationTestLauncher.initTestCluster();
         mainPanel = AppContext.getBean(MainPanel.class);
         swingUtils = AppContext.getBean(SwingUtils.class);
     }
 
-    /** Tests, that the terminal area doesn't expand too much. */
+    /**
+     * Tests, that the terminal area doesn't expand too much.
+     */
     @Test
-    public void testExpandTerminalSplitPane() {
+    void testExpandTerminalSplitPane() {
         float count = 200;
         float errors = 0;
         for (int i = 0; i < count; i++) {
@@ -42,7 +45,7 @@ public final class MainPanelITest {
             }
         }
         if (errors > 0) {
-            assertTrue("terminal area size error: " + (errors / count * 100) + "%", false);
+            assertThat(false).describedAs("terminal area size error: " + (errors / count * 100) + "%").isTrue();
         }
     }
 }

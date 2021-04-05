@@ -1,7 +1,17 @@
 package lcmc.common.domain.util;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import java.util.Map;
+
 import javax.swing.JCheckBox;
+
+import org.junit.experimental.categories.Category;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Jsr330ScopeMetadataResolver;
 
 import lcmc.AppContext;
 import lcmc.common.domain.UserConfig;
@@ -11,24 +21,16 @@ import lcmc.host.domain.Host;
 import lcmc.testutils.IntegrationTestLauncher;
 import lcmc.testutils.annotation.type.GuiTest;
 import lcmc.testutils.annotation.type.IntegrationTest;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.experimental.categories.Category;
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Jsr330ScopeMetadataResolver;
-
-import static org.junit.Assert.*;
 
 @Category(IntegrationTest.class)
-public final class ToolsITest {
+final class ToolsITest {
     private IntegrationTestLauncher testSuite;
     private MainPresenter mainPresenter;
     private ProgressIndicator progressIndicator;
     private UserConfig userConfig;
 
-    @Before
-    public void setUp() {
+    @BeforeEach
+    void setUp() {
         testSuite = AppContext.getBean(IntegrationTestLauncher.class);
         testSuite.initTestCluster();
         userConfig = AppContext.getBean(UserConfig.class);
@@ -37,67 +39,65 @@ public final class ToolsITest {
     }
 
     @Test
-    public void testIsIp() {
+    void testIsIp() {
         for (final Host host : testSuite.getHosts()) {
-            assertTrue(Tools.isIp(host.getIpAddress()));
-            assertFalse(Tools.isIp(host.getHostname()));
+            assertThat(Tools.isIp(host.getIpAddress())).isTrue();
+            assertThat(Tools.isIp(host.getHostname())).isFalse();
         }
     }
 
     @Test
-    public void testIsLocalIp() {
+    void testIsLocalIp() {
         for (final Host host : testSuite.getHosts()) {
-            assertFalse(Tools.isLocalIp(host.getIpAddress()));
+            assertThat(Tools.isLocalIp(host.getIpAddress())).isFalse();
         }
     }
 
     @Test
-    public void testGetHostCheckBoxes() {
+    void testGetHostCheckBoxes() {
         for (final Host host : testSuite.getHosts()) {
             final Map<Host, JCheckBox> comps = Tools.getHostCheckBoxes(host.getCluster());
-            assertNotNull(comps);
-            assertTrue(comps.size() == testSuite.getHosts().size());
-            assertTrue(comps.containsKey(host));
+            assertThat(comps).isNotNull().hasSize(testSuite.getHosts().size()).containsKey(host);
         }
     }
 
     @Test
-    public void testVersionBeforePacemaker() {
+    void testVersionBeforePacemaker() {
         for (final Host h : testSuite.getHosts()) {
             Tools.versionBeforePacemaker(h);
         }
     }
 
     @Test
-    public void helperFieShouldBeLoaded() {
+    void helperFieShouldBeLoaded() {
         final String testFile = "/help-progs/lcmc-gui-helper/Main.pl";
-        assertTrue(Tools.readFile(testFile).indexOf("#!") == 0);
+        assertThat(Tools.readFile(testFile).indexOf("#!")).isEqualTo(0);
     }
 
     @Test
-    public void nullFileShouldReturnNull() {
-        assertNull(Tools.readFile(null));
+    void nullFileShouldReturnNull() {
+        assertThat(Tools.readFile(null)).isNull();
     }
 
     @Test
-    public void nonExistingFileShouldReturnNull() {
-        assertNull(Tools.readFile("not_existing_file"));
+    void nonExistingFileShouldReturnNull() {
+        assertThat(Tools.readFile("not_existing_file")).isNull();
     }
 
     @Test
     @Category(GuiTest.class)
-    public void testLoadFile() {
-        assertNull(Tools.loadFile(mainPresenter, "JUNIT_TEST_FILE_CLICK_OK", false));
+    void testLoadFile() {
+        assertThat(Tools.loadFile(mainPresenter, "JUNIT_TEST_FILE_CLICK_OK", false)).isNull();
         final String testFile = "/tmp/lcmc-test-file";
         userConfig.saveConfig(testFile, false);
         final String file = Tools.loadFile(mainPresenter, testFile, false);
-        assertNotNull(file);
-        assertFalse("".equals(file));
+        assertThat(file).isNotNull();
+        assertThat(file).isNotEqualTo("");
     }
 
     @Test
     @Category(GuiTest.class)
-    public void testStartProgressIndicator() {
+    void testStartProgressIndicator() {
         for (int i = 0; i < 10; i++) {
             progressIndicator.startProgressIndicator(null);
             progressIndicator.startProgressIndicator("test");
@@ -122,7 +122,7 @@ public final class ToolsITest {
 
     @Test
     @Category(GuiTest.class)
-    public void testProgressIndicatorFailed() {
+    void testProgressIndicatorFailed() {
         progressIndicator.progressIndicatorFailed(null, "fail3");
         progressIndicator.progressIndicatorFailed("name", "fail2");
         progressIndicator.progressIndicatorFailed("name", null);
@@ -134,32 +134,32 @@ public final class ToolsITest {
 
     @Test
     @Category(GuiTest.class)
-    public void testIsLinux() {
+    void testIsLinux() {
         if (System.getProperty("os.name").toLowerCase().contains("windows")) {
-            assertFalse(Tools.isLinux());
+            assertThat(Tools.isLinux()).isFalse();
         }
         if (System.getProperty("os.name").toLowerCase().contains("linux")) {
-            assertTrue(Tools.isLinux());
+            assertThat(Tools.isLinux()).isTrue();
         }
     }
 
     @Test
     @Category(GuiTest.class)
-    public void testIsWindows() {
+    void testIsWindows() {
         if (System.getProperty("os.name").toLowerCase().contains("windows")) {
-            assertTrue(Tools.isWindows());
+            assertThat(Tools.isWindows()).isTrue();
         }
         if (System.getProperty("os.name").toLowerCase().contains("linux")) {
-            assertFalse(Tools.isWindows());
+            assertThat(Tools.isWindows()).isFalse();
         }
     }
 
     @Test
     @Category(GuiTest.class)
-    public void testGetUnixPath() {
-        assertEquals("/bin", Tools.getUnixPath("/bin"));
+    void testGetUnixPath() {
+        assertThat(Tools.getUnixPath("/bin")).isEqualTo("/bin");
         if (Tools.isWindows()) {
-            assertEquals("/bin/dir/file", Tools.getUnixPath("d:\\bin\\dir\\file"));
+            assertThat(Tools.getUnixPath("d:\\bin\\dir\\file")).isEqualTo("/bin/dir/file");
         }
     }
 

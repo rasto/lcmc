@@ -20,6 +20,8 @@
 
 package lcmc.host.domain;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import java.awt.Color;
 import java.util.Arrays;
 import java.util.Collection;
@@ -28,31 +30,27 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.junit.experimental.categories.Category;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
 import lcmc.AppContext;
 import lcmc.cluster.domain.Cluster;
 import lcmc.cluster.service.NetworkService;
 import lcmc.cluster.service.storage.FileSystemService;
+import lcmc.common.domain.util.Tools;
 import lcmc.testutils.IntegrationTestLauncher;
 import lcmc.testutils.annotation.type.IntegrationTest;
-import lcmc.common.domain.util.Tools;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-
 import lombok.val;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.experimental.categories.Category;
 
 @Category(IntegrationTest.class)
-public final class HostITest {
+final class HostITest {
     private IntegrationTestLauncher integrationTestLauncher;
     private NetworkService networkService;
     private FileSystemService fileSystemService;
 
-    @Before
-    public void setUp() {
+    @BeforeEach
+    void setUp() {
         integrationTestLauncher = AppContext.getBean(IntegrationTestLauncher.class);
         integrationTestLauncher.initTestCluster();
         networkService = integrationTestLauncher.getNetworkService();
@@ -60,47 +58,48 @@ public final class HostITest {
     }
 
     @Test
-    public void testGetBrowser() {
+    void testGetBrowser() {
         for (final Host host : integrationTestLauncher.getHosts()) {
-            assertNotNull(host.getBrowser());
+            assertThat(host.getBrowser()).isNotNull();
         }
     }
 
     @Test
-    public void testGetDrbdColors() {
-        final Set<Color> hostColors = new HashSet<Color>();
+    void testGetDrbdColors() {
+        final Set<Color> hostColors = new HashSet<>();
         for (final Host host : integrationTestLauncher.getHosts()) {
             final Color[] colors = host.getDrbdColors();
-            assertNotNull(colors);
-            assertTrue(colors.length > 0 && colors.length <= 2);
-            assertFalse(hostColors.contains(colors[0]));
+            assertThat(colors).isNotNull();
+            assertThat(colors.length > 0 && colors.length <= 2).isTrue();
+            assertThat(hostColors.contains(colors[0])).isFalse();
             hostColors.add(colors[0]);
         }
     }
 
     @Test
-    public void testGetPmColors() {
-        final Set<Color> hostColors = new HashSet<Color>();
+    void testGetPmColors() {
+        final Set<Color> hostColors = new HashSet<>();
         for (final Host host : integrationTestLauncher.getHosts()) {
             final Color[] colors = host.getPmColors();
-            assertNotNull(colors);
-            assertTrue(colors.length > 0 && colors.length <= 2);
-            assertFalse(hostColors.contains(colors[0]));
+            assertThat(colors).isNotNull();
+            assertThat(colors.length > 0 && colors.length <= 2).isTrue();
+            assertThat(hostColors.contains(colors[0])).isFalse();
             hostColors.add(colors[0]);
         }
     }
 
     @Test
-    public void testSetClStatus() {
+    void testSetClStatus() {
         for (final Host host : integrationTestLauncher.getHosts()) {
             host.setCrmStatusOk(false);
-            Tools.sleep(500); host.setCrmStatusOk(true);
+            Tools.sleep(500);
+            host.setCrmStatusOk(true);
             Tools.sleep(500);
         }
     }
 
     @Test
-    public void testSetDrbdStatus() {
+    void testSetDrbdStatus() {
         for (final Host host : integrationTestLauncher.getHosts()) {
             host.setDrbdStatusOk(false);
             Tools.sleep(500);
@@ -110,206 +109,191 @@ public final class HostITest {
     }
 
     @Test
-    public void testIsClStatus() {
+    void testIsClStatus() {
         for (final Host host : integrationTestLauncher.getHosts()) {
-            assertTrue(host.isCrmStatusOk());
+            assertThat(host.isCrmStatusOk()).isTrue();
         }
     }
 
     @Test
-    public void testIsDrbdStatus() {
+    void testIsDrbdStatus() {
         for (final Host host : integrationTestLauncher.getHosts()) {
-            assertTrue(host.isDrbdStatusOk());
+            assertThat(host.isDrbdStatusOk()).isTrue();
         }
     }
 
     @Test
-    public void testIsInCluster() {
+    void testIsInCluster() {
         for (final Host host : integrationTestLauncher.getHosts()) {
-            assertTrue(host.isInCluster());
-            assertTrue(host.isInCluster(null));
-            assertTrue(host.isInCluster(new Cluster()));
+            assertThat(host.isInCluster()).isTrue();
+            assertThat(host.isInCluster(null)).isTrue();
+            assertThat(host.isInCluster(new Cluster())).isTrue();
         }
     }
 
     @Test
-    public void testGetNetInterfaces() {
+    void testGetNetInterfaces() {
         for (final Host host : integrationTestLauncher.getHosts()) {
-            assertTrue(networkService.getNetInterfacesWithBridges(host).length > 0);
-            assertNotNull(networkService.getNetInterfacesWithBridges(host)[0]);
-            assertTrue(noValueIsNull(networkService.getNetInterfacesWithBridges(host)));
+            assertThat(networkService.getNetInterfacesWithBridges(host).length > 0).isTrue();
+            assertThat(networkService.getNetInterfacesWithBridges(host)[0]).isNotNull();
+            assertThat(noValueIsNull(networkService.getNetInterfacesWithBridges(host))).isTrue();
         }
     }
 
     @Test
-    public void testGetBridges() {
+    void testGetBridges() {
         for (final Host host : integrationTestLauncher.getHosts()) {
-            assertTrue(integrationTestLauncher.getNetworkService().getBridges(host).size() >= 0);
+            assertThat(integrationTestLauncher.getNetworkService().getBridges(host).size() >= 0).isTrue();
         }
     }
 
     @Test
-    public void testGetNetworksIntersection() {
-        Map<String, Integer> commonNetworks = networkService.getNetworksIntersection(
-                integrationTestLauncher.getHosts());
+    void testGetNetworksIntersection() {
+        Map<String, Integer> commonNetworks = networkService.getNetworksIntersection(integrationTestLauncher.getHosts());
         if (integrationTestLauncher.getHosts().size() > 0) {
-            assertNotNull(commonNetworks);
-            assertTrue(!commonNetworks.isEmpty());
+            assertThat(commonNetworks).isNotNull();
+            assertThat(commonNetworks).isNotEmpty();
         }
     }
 
     @Test
-    public void testGetIpsFromNetwork() {
+    void testGetIpsFromNetwork() {
         for (final Host host : integrationTestLauncher.getHosts()) {
             final Collection<String> ips = networkService.getIpsFromNetwork(host, "192.168.133.0");
-            assertTrue(!ips.isEmpty());
+            assertThat(ips.isEmpty()).isFalse();
             for (final String ip : ips) {
-                assertTrue(ip.startsWith("192.168.133."));
+                assertThat(ip).startsWith("192.168.133.");
             }
         }
     }
 
     @Test
-    public void testGetFileSystems() {
+    void testGetFileSystems() {
         for (final Host host : integrationTestLauncher.getHosts()) {
-            assertTrue(fileSystemService.getFileSystems(host).size() > 0);
-            assertTrue(noValueIsNull(fileSystemService.getFileSystems(host)));
+            assertThat(fileSystemService.getFileSystems(host).size() > 0).isTrue();
+            assertThat(noValueIsNull(fileSystemService.getFileSystems(host))).isTrue();
 
-            assertTrue(fileSystemService.getFileSystems(host).size() > 0);
-            assertTrue(noValueIsNull(fileSystemService.getFileSystems(host)));
+            assertThat(fileSystemService.getFileSystems(host).size() > 0).isTrue();
+            assertThat(noValueIsNull(fileSystemService.getFileSystems(host))).isTrue();
         }
     }
 
     @Test
-    public void testGetCryptoModules() {
+    void testGetCryptoModules() {
         for (final Host host : integrationTestLauncher.getHosts()) {
-            assertTrue(host.getHostParser().getAvailableCryptoModules().size() > 0);
-            assertTrue(noValueIsNull(host.getHostParser().getAvailableCryptoModules()));
+            assertThat(host.getHostParser().getAvailableCryptoModules().size() > 0).isTrue();
+            assertThat(noValueIsNull(host.getHostParser().getAvailableCryptoModules())).isTrue();
         }
     }
 
     @Test
-    public void testGetQemuKeymaps() {
+    void testGetQemuKeymaps() {
         for (final Host host : integrationTestLauncher.getHosts()) {
-            assertTrue(host.getHostParser().getAvailableQemuKeymaps().size() >= 0);
-            assertTrue(noValueIsNull(host.getHostParser().getAvailableQemuKeymaps()));
+            assertThat(host.getHostParser().getAvailableQemuKeymaps().size() > 0).isTrue();
+            assertThat(noValueIsNull(host.getHostParser().getAvailableQemuKeymaps())).isTrue();
         }
     }
 
     @Test
-    public void testGetCPUMapsModels() {
+    void testGetCPUMapsModels() {
         for (final Host host : integrationTestLauncher.getHosts()) {
-            assertTrue(host.getHostParser().getCPUMapModels().size() > 0);
-            assertTrue(noValueIsNull(host.getHostParser().getCPUMapModels()));
+            assertThat(host.getHostParser().getCPUMapModels().size() > 0).isTrue();
+            assertThat(noValueIsNull(host.getHostParser().getCPUMapModels())).isTrue();
         }
     }
 
     @Test
-    public void testGetCPUMapVendor() {
+    void testGetCPUMapVendor() {
         for (final Host host : integrationTestLauncher.getHosts()) {
-            assertTrue(host.getHostParser().getCPUMapVendors().size() > 0);
-            assertTrue(noValueIsNull(host.getHostParser().getCPUMapVendors()));
+            assertThat(host.getHostParser().getCPUMapVendors().size() > 0).isTrue();
+            assertThat(noValueIsNull(host.getHostParser().getCPUMapVendors())).isTrue();
         }
     }
 
     @Test
-    public void testGetDistFromDistVersion() {
+    void testGetDistFromDistVersion() {
         for (final Host host : integrationTestLauncher.getHosts()) {
             val hostParser = host.getHostParser();
-            assertEquals(hostParser.getDistFromDistVersion("ubuntu-lucid"), "ubuntu");
-            assertEquals(hostParser.getDistFromDistVersion("fc"), "fedora");
-            assertEquals(hostParser.getDistFromDistVersion("rhel"), "rhel");
-            assertEquals(hostParser.getDistFromDistVersion("centos"), "rhel");
-            assertEquals(hostParser.getDistFromDistVersion("xy"), null);
+            assertThat(hostParser.getDistFromDistVersion("ubuntu-lucid")).isEqualTo("ubuntu");
+            assertThat(hostParser.getDistFromDistVersion("fc")).isEqualTo("fedora");
+            assertThat(hostParser.getDistFromDistVersion("rhel")).isEqualTo("rhel");
+            assertThat(hostParser.getDistFromDistVersion("centos")).isEqualTo("rhel");
+            assertThat(hostParser.getDistFromDistVersion("xy")).isEqualTo(null);
+        }
+    }
+
+
+    @Test
+    void testGetKernelName() {
+        for (final Host host : integrationTestLauncher.getHosts()) {
+            assertThat("Linux").isEqualTo(host.getHostParser().getKernelName());
         }
     }
 
     @Test
-    public void testGetKernelName() {
-        for (final Host host : integrationTestLauncher.getHosts()) {
-            assertEquals(host.getHostParser().getKernelName(), "Linux");
-        }
-    }
-
-    @Test
-    public void testGetKernelVersion() {
+    void testGetKernelVersion() {
         for (final Host host : integrationTestLauncher.getHosts()) {
 
-            if ("openSUSE 12.1 (x86_64)/12.1".equals(
-                                            host.getHostParser().getDistributionVersionString())) {
-                assertTrue("kernel version"
-                           + "(" + host.getHostParser().getDistributionVersionString() + ")",
-                           host.getHostParser().getKernelVersion() == null);
+            if ("openSUSE 12.1 (x86_64)/12.1".equals(host.getHostParser().getDistributionVersionString())) {
+                assertThat(host.getHostParser().getKernelVersion() == null).describedAs(
+                        "kernel version" + "(" + host.getHostParser().getDistributionVersionString() + ")").isTrue();
             } else {
-                assertTrue("kernel version: " + host.getHostParser().getKernelVersion()
-                           + "(" + host.getHostParser().getDistributionVersionString() + ")",
-                           Character.isDigit(
-                                        host.getHostParser().getKernelVersion().charAt(0)));
+                assertThat(Character.isDigit(host.getHostParser().getKernelVersion().charAt(0))).describedAs(
+                        "kernel version: " + host.getHostParser().getKernelVersion() + "(" + host.getHostParser()
+                                .getDistributionVersionString() + ")").isTrue();
             }
         }
     }
 
     @Test
-    public void testGetDetectedKernelVersion() {
+    void testGetDetectedKernelVersion() {
         for (final Host host : integrationTestLauncher.getHosts()) {
-            assertTrue(
-                Character.isDigit(host.getHostParser().getDetectedKernelVersion().charAt(0)));
+            assertThat(Character.isDigit(host.getHostParser().getDetectedKernelVersion().charAt(0))).isTrue();
         }
     }
 
     @Test
-    public void testGetHeartbeatLibPath() {
+    void testGetHeartbeatLibPath() {
         for (final Host host : integrationTestLauncher.getHosts()) {
-            assertTrue(host.getHostParser().getHeartbeatLibPath().indexOf("/usr/") == 0);
+            assertThat(host.getHostParser().getHeartbeatLibPath().indexOf("/usr/") == 0).isTrue();
         }
     }
 
     @Test
-    public void testGetDist() {
-        final Set<String> values = new HashSet<String>(Arrays.asList("suse",
-                                                                     "redhat",
-                                                                     "redhatenterpriseserver",
-                                                                     "rhel",
-                                                                     "fedora",
-                                                                     "debian",
-                                                                     "ubuntu"));
+    void testGetDist() {
+        final Set<String> values =
+                new HashSet<>(Arrays.asList("suse", "redhat", "redhatenterpriseserver", "rhel", "fedora", "debian", "ubuntu"));
         for (final Host host : integrationTestLauncher.getHosts()) {
-            assertTrue("unknown: " + host.getHostParser().getDistributionName(), values.contains(host.getHostParser().getDistributionName()));
+            assertThat(values.contains(host.getHostParser().getDistributionName())).describedAs(
+                    "unknown: " + host.getHostParser().getDistributionName()).isTrue();
         }
     }
 
     @Test
-    public void testGetDistVersion() {
-        final Set<String> values = new HashSet<String>(Arrays.asList("debian-squeeze",
-                                                                     "debian-lenny",
-                                                                     "fedora",
-                                                                     "rhel5",
-                                                                     "rhel6",
-                                                                     "rhel7"
-                                                                     ));
+    void testGetDistVersion() {
+        final Set<String> values =
+                new HashSet<>(Arrays.asList("debian-squeeze", "debian-lenny", "fedora", "rhel5", "rhel6", "rhel7"));
         for (final Host host : integrationTestLauncher.getHosts()) {
             val hostParser = host.getHostParser();
-            assertTrue("unknown: " + hostParser.getDistributionVersion() + "(" + hostParser.getDistributionName() + ")",
-                    values.contains(hostParser.getDistributionVersion())
-                            || "fedora".equals(hostParser.getDistributionName())
-                            || "suse".equals(hostParser.getDistributionName())
-                            || "debian".equals(hostParser.getDistributionName())
-                            || "ubuntu".equals(hostParser.getDistributionName()));
+            assertThat(values.contains(hostParser.getDistributionVersion()) || "fedora".equals(hostParser.getDistributionName())
+                       || "suse".equals(hostParser.getDistributionName()) || "debian".equals(hostParser.getDistributionName())
+                       || "ubuntu".equals(hostParser.getDistributionName())).describedAs(
+                    "unknown: " + hostParser.getDistributionVersion() + "(" + hostParser.getDistributionName() + ")").isTrue();
         }
     }
 
     @Test
-    public void testGetDistVersionString() {
+    void testGetDistVersionString() {
         for (final Host host : integrationTestLauncher.getHosts()) {
-            assertNotNull("cannot be null: ", host.getHostParser().getDistributionVersionString());
+            assertThat(host.getHostParser().getDistributionVersionString()).describedAs("cannot be null: ").isNotNull();
         }
     }
 
     @Test
-    public void testDisconnect() {
+    void testDisconnect() {
         for (final Host host : integrationTestLauncher.getHosts()) {
             host.disconnect();
-            assertFalse(host.isConnected());
+            assertThat(host.isConnected()).isFalse();
             host.connect(null, null, null);
         }
         for (final Host host : integrationTestLauncher.getHosts()) {
@@ -319,7 +303,7 @@ public final class HostITest {
                 }
                 Tools.sleep(1000);
             }
-            assertTrue(host.isConnected());
+            assertThat(host.isConnected()).isTrue();
         }
     }
 
