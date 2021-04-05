@@ -19,65 +19,59 @@
  */
 package lcmc.drbd.ui.resource;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import lcmc.common.domain.AccessMode;
 
-import static org.junit.Assert.assertEquals;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 
-import lcmc.common.domain.EnablePredicate;
 import lcmc.common.ui.utils.MenuFactory;
 import lcmc.common.ui.utils.MyMenu;
 import lcmc.common.ui.utils.UpdatableItem;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
 
-import static org.mockito.Matchers.anyObject;
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.never;
+@ExtendWith(MockitoExtension.class)
+class ResourceMenuTest {
+   private Set<VolumeInfo> volumes;
+   @Mock
+   private ResourceInfo resourceInfoStub;
+   @Mock
+   private VolumeInfo drbdVolumeOneStub;
+   @Mock
+   private VolumeInfo drbdVolumeTwoStub;
+   @Mock
+   private MyMenu menuStub;
+   @Mock
+   private MenuFactory menuFactoryStub;
+   @InjectMocks
+   private ResourceMenu resourceMenu;
 
-import org.mockito.runners.MockitoJUnitRunner;
+   @BeforeEach
+   void setUp() {
+      when(menuFactoryStub.createMenu(anyString(), any(), any())).thenReturn(menuStub);
+      volumes = new HashSet<>(Arrays.asList(drbdVolumeOneStub, drbdVolumeTwoStub));
+      when(resourceInfoStub.getDrbdVolumes()).thenReturn(volumes);
+   }
 
-@RunWith(MockitoJUnitRunner.class)
-public class ResourceMenuTest {
-    private Set<VolumeInfo> volumes;
-    @Mock
-    private ResourceInfo resourceInfoStub;
-    @Mock
-    private VolumeInfo drbdVolumeOneStub;
-    @Mock
-    private VolumeInfo drbdVolumeTwoStub;
-    @Mock
-    private MyMenu menuStub;
-    @Mock
-    private MenuFactory menuFactoryStub;
-    @InjectMocks
-    private ResourceMenu resourceMenu;
+   @Test
+   void menuShouldHaveItems() {
+      final List<UpdatableItem> items = resourceMenu.getPulldownMenu(resourceInfoStub);
 
-    @Before
-    public void setUp() {
-        when(menuFactoryStub.createMenu(
-                anyString(),
-                (AccessMode) anyObject(),
-                (AccessMode) anyObject())).thenReturn(menuStub);
-        volumes = new HashSet<VolumeInfo>(Arrays.asList(drbdVolumeOneStub, drbdVolumeTwoStub));
-        when(resourceInfoStub.getDrbdVolumes()).thenReturn(volumes);
-    }
-
-    @Test
-    public void menuShouldHaveItems() {
-        final List<UpdatableItem> items = resourceMenu.getPulldownMenu(resourceInfoStub);
-
-        verify(menuStub, never()).enablePredicate((EnablePredicate) anyObject());
-        verify(menuStub, times(2)).onUpdate((Runnable) anyObject());
-        assertEquals(2, items.size());
-    }
+      verify(menuStub, never()).enablePredicate(any());
+      verify(menuStub, times(2)).onUpdate(any());
+      assertThat(items).hasSize(2);
+   }
 }

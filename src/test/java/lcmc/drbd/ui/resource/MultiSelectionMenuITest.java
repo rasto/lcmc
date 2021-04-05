@@ -20,82 +20,68 @@
 
 package lcmc.drbd.ui.resource;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
 import java.util.Arrays;
 import java.util.List;
 
-import lcmc.common.domain.AccessMode;
-import lcmc.cluster.ui.ClusterBrowser;
-import lcmc.common.ui.Info;
-
-import static org.junit.Assert.assertEquals;
-
-import lcmc.common.domain.EnablePredicate;
-import lcmc.common.ui.utils.MenuAction;
-import lcmc.common.ui.utils.MenuFactory;
-import lcmc.common.ui.utils.MyMenuItem;
-import lcmc.common.domain.Predicate;
-import lcmc.common.ui.utils.UpdatableItem;
-import lcmc.common.domain.VisiblePredicate;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 
-import static org.mockito.Matchers.anyObject;
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.never;
+import lcmc.cluster.ui.ClusterBrowser;
+import lcmc.common.ui.Info;
+import lcmc.common.ui.utils.MenuFactory;
+import lcmc.common.ui.utils.MyMenuItem;
+import lcmc.common.ui.utils.UpdatableItem;
 
-import org.mockito.runners.MockitoJUnitRunner;
+@ExtendWith(MockitoExtension.class)
+class MultiSelectionMenuITest {
+   @Mock
+   private MultiSelectionInfo multiSelectionInfoStub;
+   @Mock
+   private ClusterBrowser browserStub;
 
-import javax.swing.ImageIcon;
+   // can't use @Mock annotation, for these two, because the instanceof
+   // wouldn't work in the SUT
+   private final BlockDevInfo blockDevInfoStub = mock(BlockDevInfo.class);
+   private final HostDrbdInfo hostDrbdInfoStub = mock(HostDrbdInfo.class);
 
-@RunWith(MockitoJUnitRunner.class)
-public class MultiSelectionMenuITest {
-    @Mock
-    private MultiSelectionInfo multiSelectionInfoStub;
-    @Mock
-    private ClusterBrowser browserStub;
+   private final List<Info> selectedInfos = Arrays.asList(blockDevInfoStub, hostDrbdInfoStub);
+   @Mock
+   private MyMenuItem menuItemStub;
+   @Mock
+   private MenuFactory menuFactoryStub;
+   @InjectMocks
+   private MultiSelectionMenu multiSelectionMenu;
 
-    // can't use @Mock annotation, for these two, because the instanceof
-    // wouldn't work in the SUT
-    private final BlockDevInfo blockDevInfoStub = mock(BlockDevInfo.class);
-    private final HostDrbdInfo hostDrbdInfoStub = mock(HostDrbdInfo.class);
+   @BeforeEach
+   void setUp() {
+      when(multiSelectionInfoStub.getBrowser()).thenReturn(browserStub);
+      when(menuFactoryStub.createMenuItem(anyString(), any(), anyString(), any(), any())).thenReturn(menuItemStub);
+      when(menuItemStub.enablePredicate(any())).thenReturn(menuItemStub);
+      when(menuItemStub.visiblePredicate(any())).thenReturn(menuItemStub);
+      when(menuItemStub.addAction(any())).thenReturn(menuItemStub);
+   }
 
-    private final List<Info> selectedInfos = Arrays.asList(blockDevInfoStub, hostDrbdInfoStub);
-    @Mock
-    private MyMenuItem menuItemStub;
-    @Mock
-    private MenuFactory menuFactoryStub;
-    @InjectMocks
-    private MultiSelectionMenu multiSelectionMenu;
+   @Test
+   void menuShouldHaveItems() {
+      final List<UpdatableItem> items = multiSelectionMenu.getPulldownMenu(multiSelectionInfoStub, selectedInfos);
 
-    @Before
-    public void setUp() {
-        when(multiSelectionInfoStub.getBrowser()).thenReturn(browserStub);
-        when(menuFactoryStub.createMenuItem(
-                anyString(),
-                (ImageIcon) anyObject(),
-                anyString(),
-                (AccessMode) anyObject(),
-                (AccessMode) anyObject())).thenReturn(menuItemStub);
-        when(menuItemStub.enablePredicate((EnablePredicate) anyObject())).thenReturn(menuItemStub);
-        when(menuItemStub.visiblePredicate((VisiblePredicate) anyObject())).thenReturn(menuItemStub);
-        when(menuItemStub.addAction((MenuAction) anyObject())).thenReturn(menuItemStub);
-    }
-
-    @Test
-    public void menuShouldHaveItems() {
-        final List<UpdatableItem> items = multiSelectionMenu.getPulldownMenu(multiSelectionInfoStub, selectedInfos);
-
-        verify(menuItemStub, never()).predicate((Predicate) anyObject());
-        verify(menuItemStub, times(22)).visiblePredicate((VisiblePredicate) anyObject());
-        verify(menuItemStub, times(17)).enablePredicate((EnablePredicate) anyObject());
-        verify(menuItemStub, times(26)).addAction((MenuAction) anyObject());
-        assertEquals(26, items.size());
-    }
+      verify(menuItemStub, never()).predicate(any());
+      verify(menuItemStub, times(22)).visiblePredicate(any());
+      verify(menuItemStub, times(17)).enablePredicate(any());
+      verify(menuItemStub, times(26)).addAction(any());
+      assertThat(items).hasSize(26);
+   }
 }

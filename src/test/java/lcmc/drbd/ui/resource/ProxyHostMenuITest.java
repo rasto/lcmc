@@ -20,84 +20,64 @@
 
 package lcmc.drbd.ui.resource;
 
-import java.util.List;
-
-import lcmc.common.ui.main.MainData;
-import lcmc.common.domain.AccessMode;
-import lcmc.host.domain.Host;
-
-import static org.junit.Assert.assertEquals;
-
-import lcmc.common.domain.EnablePredicate;
-import lcmc.common.ui.utils.MenuAction;
-import lcmc.common.ui.utils.MenuFactory;
-import lcmc.common.ui.utils.MyMenuItem;
-import lcmc.common.domain.Predicate;
-import lcmc.common.ui.utils.UpdatableItem;
-import lcmc.common.domain.VisiblePredicate;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import static org.mockito.Mockito.when;
-import static org.mockito.Matchers.anyObject;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
-import org.mockito.runners.MockitoJUnitRunner;
+import static org.mockito.Mockito.when;
 
-import javax.swing.ImageIcon;
+import java.util.List;
 
-@RunWith(MockitoJUnitRunner.class)
-public class ProxyHostMenuITest {
-    @Mock
-    private ProxyHostInfo proxyHostInfoStub;
-    @Mock
-    private Host hostStub;
-    @Mock
-    private MainData mainData;
-    @Mock
-    private MyMenuItem menuItemStub;
-    @Mock
-    private MenuFactory menuFactoryStub;
-    @InjectMocks
-    private ProxyHostMenu proxyHostMenu;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+
+import lcmc.common.ui.main.MainData;
+import lcmc.common.ui.utils.MenuFactory;
+import lcmc.common.ui.utils.MyMenuItem;
+import lcmc.common.ui.utils.UpdatableItem;
+import lcmc.host.domain.Host;
+
+@ExtendWith(MockitoExtension.class)
+class ProxyHostMenuITest {
+   @Mock
+   private ProxyHostInfo proxyHostInfoStub;
+   @Mock
+   private Host hostStub;
+   @Mock
+   private MainData mainData;
+   @Mock
+   private MyMenuItem menuItemStub;
+   @Mock
+   private MenuFactory menuFactoryStub;
+   @InjectMocks
+   private ProxyHostMenu proxyHostMenu;
 
 
-    @Before
-    public void setUp() {
-        when(proxyHostInfoStub.getHost()).thenReturn(hostStub);
-        when(menuFactoryStub.createMenuItem(anyString(),
-                (ImageIcon) anyObject(),
-                anyString(),
+   @BeforeEach
+   void setUp() {
+      when(proxyHostInfoStub.getHost()).thenReturn(hostStub);
+      when(menuFactoryStub.createMenuItem(anyString(), any(), anyString(), anyString(), any(), anyString(), any(),
+              any())).thenReturn(menuItemStub);
+      when(menuFactoryStub.createMenuItem(anyString(), any(), anyString(), any(), any())).thenReturn(menuItemStub);
+      when(menuItemStub.enablePredicate(any())).thenReturn(menuItemStub);
+      when(menuItemStub.visiblePredicate(any())).thenReturn(menuItemStub);
+      when(menuItemStub.predicate(any())).thenReturn(menuItemStub);
+      when(menuItemStub.addAction(any())).thenReturn(menuItemStub);
+   }
 
-                anyString(),
-                (ImageIcon) anyObject(),
-                anyString(),
+   @Test
+   void menuShouldHaveItems() {
+      final List<UpdatableItem> items = proxyHostMenu.getPulldownMenu(proxyHostInfoStub);
 
-                (AccessMode) anyObject(),
-                (AccessMode) anyObject())).thenReturn(menuItemStub);
-        when(menuFactoryStub.createMenuItem(
-                anyString(),
-                (ImageIcon) anyObject(),
-                anyString(),
-                (AccessMode) anyObject(),
-                (AccessMode) anyObject())).thenReturn(menuItemStub);
-        when(menuItemStub.enablePredicate((EnablePredicate) anyObject())).thenReturn(menuItemStub);
-        when(menuItemStub.visiblePredicate((VisiblePredicate) anyObject())).thenReturn(menuItemStub);
-        when(menuItemStub.predicate((Predicate) anyObject())).thenReturn(menuItemStub);
-        when(menuItemStub.addAction((MenuAction) anyObject())).thenReturn(menuItemStub);
-    }
-
-    @Test
-    public void menuShouldHaveItems() {
-        final List<UpdatableItem> items = proxyHostMenu.getPulldownMenu(proxyHostInfoStub);
-
-        verify(menuItemStub, times(2)).predicate((Predicate) anyObject());
-        verify(menuItemStub, times(2)).visiblePredicate((VisiblePredicate) anyObject());
-        verify(menuItemStub, times(4)).enablePredicate((EnablePredicate) anyObject());
-        verify(menuItemStub, times(7)).addAction((MenuAction) anyObject());
-        assertEquals(7, items.size());
-    }
+      verify(menuItemStub, times(2)).predicate(any());
+      verify(menuItemStub, times(2)).visiblePredicate(any());
+      verify(menuItemStub, times(4)).enablePredicate(any());
+      verify(menuItemStub, times(7)).addAction(any());
+      assertThat(items).hasSize(7);
+   }
 }

@@ -20,84 +20,61 @@
 
 package lcmc.drbd.ui.resource;
 
-import java.util.List;
-
-import lcmc.common.domain.AccessMode;
-import lcmc.cluster.ui.ClusterBrowser;
-
-import static org.junit.Assert.assertEquals;
-
-import lcmc.common.domain.EnablePredicate;
-import lcmc.common.ui.utils.MenuAction;
-import lcmc.common.ui.utils.MenuFactory;
-import lcmc.common.ui.utils.MyMenuItem;
-import lcmc.common.domain.Predicate;
-import lcmc.common.ui.utils.UpdatableItem;
-import lcmc.common.domain.VisiblePredicate;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
-
-import javax.swing.ImageIcon;
-
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Matchers.anyObject;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.never;
 
-@RunWith(MockitoJUnitRunner.class)
-public class VolumeMenuITest {
-    @Mock
-    private VolumeInfo volumeInfoStub;
-    @Mock
-    private ResourceInfo resourceInfoStub;
-    @Mock
-    private ClusterBrowser clusterBrowserStub;
-    @Mock
-    private MyMenuItem menuItemStub;
-    @Mock
-    private MenuFactory menuFactoryStub;
-    @InjectMocks
-    private VolumeMenu volumeMenu;
+import java.util.List;
 
-    @Before
-    public void setUp() {
-        when(volumeInfoStub.getDrbdResourceInfo()).thenReturn(resourceInfoStub);
-        when(volumeInfoStub.getBrowser()).thenReturn(clusterBrowserStub);
-        when(menuFactoryStub.createMenuItem(any(),
-                (ImageIcon) anyObject(),
-                any(),
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 
-                any(),
-                (ImageIcon) anyObject(),
-                any(),
+import lcmc.cluster.ui.ClusterBrowser;
+import lcmc.common.ui.utils.MenuFactory;
+import lcmc.common.ui.utils.MyMenuItem;
+import lcmc.common.ui.utils.UpdatableItem;
 
-                (AccessMode) anyObject(),
-                (AccessMode) anyObject())).thenReturn(menuItemStub);
-        when(menuFactoryStub.createMenuItem(
-                any(),
-                (ImageIcon) anyObject(),
-                any(),
-                (AccessMode) anyObject(),
-                (AccessMode) anyObject())).thenReturn(menuItemStub);
-        when(menuItemStub.enablePredicate((EnablePredicate) anyObject())).thenReturn(menuItemStub);
-        when(menuItemStub.predicate((Predicate) anyObject())).thenReturn(menuItemStub);
-        when(menuItemStub.addAction((MenuAction) anyObject())).thenReturn(menuItemStub);
-    }
+@ExtendWith(MockitoExtension.class)
+class VolumeMenuITest {
+   @Mock
+   private VolumeInfo volumeInfoStub;
+   @Mock
+   private ResourceInfo resourceInfoStub;
+   @Mock
+   private ClusterBrowser clusterBrowserStub;
+   @Mock
+   private MyMenuItem menuItemStub;
+   @Mock
+   private MenuFactory menuFactoryStub;
+   @InjectMocks
+   private VolumeMenu volumeMenu;
 
-    @Test
-    public void menuShouldHaveItems() {
-        final List<UpdatableItem> items = volumeMenu.getPulldownMenu(volumeInfoStub);
+   @BeforeEach
+   void setUp() {
+      when(volumeInfoStub.getDrbdResourceInfo()).thenReturn(resourceInfoStub);
+      when(volumeInfoStub.getBrowser()).thenReturn(clusterBrowserStub);
+      when(menuFactoryStub.createMenuItem(any(), any(), any(), any(), any(), any(), any(), any())).thenReturn(menuItemStub);
+      when(menuFactoryStub.createMenuItem(any(), any(), any(), any(), any())).thenReturn(menuItemStub);
+      when(menuItemStub.enablePredicate(any())).thenReturn(menuItemStub);
+      when(menuItemStub.predicate(any())).thenReturn(menuItemStub);
+      when(menuItemStub.addAction(any())).thenReturn(menuItemStub);
+   }
 
-        verify(menuItemStub, times(2)).predicate((Predicate) anyObject());
-        verify(menuItemStub, never()).visiblePredicate((VisiblePredicate) anyObject());
-        verify(menuItemStub, times(5)).enablePredicate((EnablePredicate) anyObject());
-        verify(menuItemStub, times(6)).addAction((MenuAction) anyObject());
-        assertEquals(6, items.size());
-    }
+   @Test
+   void menuShouldHaveItems() {
+      final List<UpdatableItem> items = volumeMenu.getPulldownMenu(volumeInfoStub);
+
+      verify(menuItemStub, times(2)).predicate(any());
+      verify(menuItemStub, never()).visiblePredicate(any());
+      verify(menuItemStub, times(5)).enablePredicate(any());
+      verify(menuItemStub, times(6)).addAction(any());
+      assertThat(items).hasSize(6);
+   }
 }

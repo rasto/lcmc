@@ -1,113 +1,85 @@
 package lcmc.drbd.ui.resource;
 
-import java.util.List;
-
-import lcmc.common.domain.AccessMode;
-import lcmc.drbd.domain.BlockDevice;
-import lcmc.host.ui.HostBrowser;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-
-import lcmc.common.domain.EnablePredicate;
-import lcmc.common.ui.utils.MenuAction;
-import lcmc.common.ui.utils.MenuFactory;
-import lcmc.common.ui.utils.MyMenu;
-import lcmc.common.ui.utils.MyMenuItem;
-import lcmc.common.domain.Predicate;
-import lcmc.common.ui.utils.UpdatableItem;
-import lcmc.common.domain.VisiblePredicate;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Matchers.anyObject;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import org.mockito.runners.MockitoJUnitRunner;
 
-import javax.swing.ImageIcon;
+import java.util.List;
 
-@RunWith(MockitoJUnitRunner.class)
-public class BlockDevMenuITest {
-    @Mock
-    private BlockDevInfo blockDevInfoStub;
-    @Mock
-    private BlockDevice blockDeviceStub;
-    @Mock
-    private HostBrowser hostBrowserStub;
-    @Mock
-    private BlockDevInfo blockDevInfoNoClusterStub;
-    @Mock
-    private HostBrowser hostBrowserNoClusterStub;
-    @Mock
-    private MyMenu menuStub;
-    @Mock
-    private MyMenuItem menuItemStub;
-    @Mock
-    private MenuFactory menuFactoryStub;
-    @InjectMocks
-    private BlockDevMenu blockDevMenu;
-    @InjectMocks
-    private BlockDevMenu blockDevMenuNoCluster;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 
-    @Before
-    public void setUp() {
-        when(blockDevInfoStub.getBrowser()).thenReturn(hostBrowserStub);
-        when(blockDevInfoStub.getBlockDevice()).thenReturn(blockDeviceStub);
+import lcmc.common.ui.utils.MenuFactory;
+import lcmc.common.ui.utils.MyMenu;
+import lcmc.common.ui.utils.MyMenuItem;
+import lcmc.common.ui.utils.UpdatableItem;
+import lcmc.drbd.domain.BlockDevice;
+import lcmc.host.ui.HostBrowser;
 
-        when(blockDevInfoNoClusterStub.getBlockDevice()).thenReturn(blockDeviceStub);
-        when(menuFactoryStub.createMenu(
-                any(),
-                (AccessMode) anyObject(),
-                (AccessMode) anyObject())).thenReturn(menuStub);
-        when(menuFactoryStub.createMenuItem(
-                any(),
-                (ImageIcon) anyObject(),
-                any(),
-                (AccessMode) anyObject(),
-                (AccessMode) anyObject())).thenReturn(menuItemStub);
-        when(menuFactoryStub.createMenuItem(any(),
-                (ImageIcon) anyObject(),
-                any(),
+@ExtendWith(MockitoExtension.class)
+class BlockDevMenuITest {
+   @Mock
+   private BlockDevInfo blockDevInfoStub;
+   @Mock
+   private BlockDevice blockDeviceStub;
+   @Mock
+   private HostBrowser hostBrowserStub;
+   @Mock
+   private BlockDevInfo blockDevInfoNoClusterStub;
+   @Mock
+   private HostBrowser hostBrowserNoClusterStub;
+   @Mock
+   private MyMenu menuStub;
+   @Mock
+   private MyMenuItem menuItemStub;
+   @Mock
+   private MenuFactory menuFactoryStub;
+   @InjectMocks
+   private BlockDevMenu blockDevMenu;
+   @InjectMocks
+   private BlockDevMenu blockDevMenuNoCluster;
 
-                any(),
-                (ImageIcon) anyObject(),
-                any(),
+   @BeforeEach
+   void setUp() {
+      when(blockDevInfoStub.getBrowser()).thenReturn(hostBrowserStub);
+      when(blockDevInfoStub.getBlockDevice()).thenReturn(blockDeviceStub);
 
-                (AccessMode) anyObject(),
-                (AccessMode) anyObject())).thenReturn(menuItemStub);
-        when(menuStub.enablePredicate((EnablePredicate) anyObject())).thenReturn(menuStub);
-        when(menuItemStub.enablePredicate((EnablePredicate) anyObject())).thenReturn(menuItemStub);
-        when(menuItemStub.predicate((Predicate) anyObject())).thenReturn(menuItemStub);
-        when(menuItemStub.visiblePredicate((VisiblePredicate) anyObject())).thenReturn(menuItemStub);
-        when(menuItemStub.addAction((MenuAction) anyObject())).thenReturn(menuItemStub);
-    }
+      when(menuFactoryStub.createMenu(any(), any(), any())).thenReturn(menuStub);
+      when(menuFactoryStub.createMenuItem(any(), any(), any(), any(), any())).thenReturn(menuItemStub);
+      when(menuFactoryStub.createMenuItem(any(), any(), any(), any(), any(), any(), any(), any())).thenReturn(menuItemStub);
+      when(menuStub.enablePredicate(any())).thenReturn(menuStub);
+      when(menuItemStub.enablePredicate(any())).thenReturn(menuItemStub);
+      when(menuItemStub.predicate(any())).thenReturn(menuItemStub);
+      when(menuItemStub.visiblePredicate(any())).thenReturn(menuItemStub);
+      when(menuItemStub.addAction(any())).thenReturn(menuItemStub);
+   }
 
-    @Test
-    public void menuShouldHaveItems() {
-        final List<UpdatableItem> items = blockDevMenu.getPulldownMenu(blockDevInfoStub);
+   @Test
+   void menuShouldHaveItems() {
+      final List<UpdatableItem> items = blockDevMenu.getPulldownMenu(blockDevInfoStub);
 
-        verify(menuItemStub, times(6)).predicate((Predicate) anyObject());
-        verify(menuItemStub, times(19)).visiblePredicate((VisiblePredicate) anyObject());
-        verify(menuItemStub, times(19)).enablePredicate((EnablePredicate) anyObject());
-        verify(menuItemStub, times(19)).addAction((MenuAction) anyObject());
-        verify(menuStub, times(1)).enablePredicate((EnablePredicate) anyObject());
-        verify(menuStub, times(1)).onUpdate((Runnable) anyObject());
-        assertEquals(20, items.size());
-    }
+      verify(menuItemStub, times(6)).predicate(any());
+      verify(menuItemStub, times(19)).visiblePredicate(any());
+      verify(menuItemStub, times(19)).enablePredicate(any());
+      verify(menuItemStub, times(19)).addAction(any());
+      verify(menuStub).enablePredicate(any());
+      verify(menuStub).onUpdate(any());
+      assertThat((Object) items.size()).isEqualTo(20);
+   }
 
-    @Test
-    public void menuWithOrWithoutClusterShoulBeTheSameSize() {
-        final List<UpdatableItem> itemsWithCluster = blockDevMenu.getPulldownMenu(blockDevInfoStub);
-        when(blockDevInfoNoClusterStub.getBrowser()).thenReturn(hostBrowserNoClusterStub);
+   @Test
+   void menuWithOrWithoutClusterShoulBeTheSameSize() {
+      final List<UpdatableItem> itemsWithCluster = blockDevMenu.getPulldownMenu(blockDevInfoStub);
+      when(blockDevInfoNoClusterStub.getBrowser()).thenReturn(hostBrowserNoClusterStub);
 
-        final List<UpdatableItem> itemsNoCluster = blockDevMenuNoCluster.getPulldownMenu(blockDevInfoNoClusterStub);
+      final List<UpdatableItem> itemsNoCluster = blockDevMenuNoCluster.getPulldownMenu(blockDevInfoNoClusterStub);
 
-        assertTrue(itemsNoCluster.size() == itemsWithCluster.size());
-    }
+      assertThat(itemsNoCluster.size()).isEqualTo(itemsWithCluster.size());
+   }
 }

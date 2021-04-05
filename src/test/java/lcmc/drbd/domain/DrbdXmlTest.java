@@ -20,31 +20,31 @@
 
 package lcmc.drbd.domain;
 
+import static com.google.common.collect.Lists.newArrayList;
+import static java.util.Arrays.asList;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.BDDMockito.given;
+
+import java.io.IOException;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+
 import com.google.common.base.Charsets;
 import com.google.common.collect.Sets;
 import com.google.common.io.Resources;
+
 import lcmc.common.domain.AccessMode;
 import lcmc.common.domain.StringValue;
 import lcmc.common.domain.Value;
 import lcmc.host.domain.Host;
 import lombok.val;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
 
-import java.io.IOException;
-
-import static com.google.common.collect.Lists.newArrayList;
-import static java.util.Arrays.asList;
-import static org.hamcrest.CoreMatchers.nullValue;
-import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.assertThat;
-import static org.mockito.BDDMockito.given;
-
-@RunWith(MockitoJUnitRunner.class)
-public class DrbdXmlTest {
+@ExtendWith(MockitoExtension.class)
+class DrbdXmlTest {
 
     private static final String OPTION1 = "OPTION1";
     private static final String OPTION2 = "OPTION2";
@@ -53,16 +53,15 @@ public class DrbdXmlTest {
     private static final String OPTION5 = "OPTION5";
 
     private DrbdXml drbdXml;
-    private String output;
     @Mock
     private Host host1;
     @Mock
     private Host host2;
 
-    @Before
-    public void setUp() {
+    @BeforeEach
+    void setUp() {
         drbdXml = new DrbdXml();
-        output = readFile("DrbdCommands.txt");
+        val output = readFile("DrbdCommands.txt");
 
         given(host1.getName()).willReturn("HOST1");
         given(host2.getName()).willReturn("HOST2");
@@ -75,138 +74,132 @@ public class DrbdXmlTest {
     }
 
     @Test
-    public void shouldParseNumericOption() {
+    void shouldParseNumericOption() {
 
         val option = OPTION1;
 
-        assertThat(drbdXml.getParamType(option), is("numeric"));
-        assertThat(drbdXml.getParamDefault(option).getValueForConfigWithUnit(), is("16"));
-        assertThat(drbdXml.getParamDefault(option).getValueForGui(), is("16"));
-        assertThat(drbdXml.getParamDefault(option).getValueForConfig(), is("16"));
-        assertThat(drbdXml.getParamShortDesc(option), is("OPTION1 (bytes)"));
-        assertThat(drbdXml.getParamLongDesc(option), is("DESC1"));
-        assertThat(drbdXml.getDefaultUnit(option), is("K"));
-        assertThat(drbdXml.getPossibleChoices(option), nullValue());
-        assertThat(drbdXml.getSection(option), is("COMMAND"));
-        assertThat(drbdXml.checkParam(option, new StringValue("1023")), is(false));
-        assertThat(drbdXml.checkParam(option, new StringValue("1024")), is(true));
-        assertThat(drbdXml.checkParam(option, new StringValue("10240")), is(true));
-        assertThat(drbdXml.checkParam(option, new StringValue("10241")), is(false));
-        assertThat(drbdXml.getAccessType(option), is(AccessMode.ADMIN));
+        assertThat(drbdXml.getParamType(option)).isEqualTo("numeric");
+        assertThat(drbdXml.getParamDefault(option).getValueForConfigWithUnit()).isEqualTo("16");
+        assertThat(drbdXml.getParamDefault(option).getValueForGui()).isEqualTo("16");
+        assertThat(drbdXml.getParamDefault(option).getValueForConfig()).isEqualTo("16");
+        assertThat(drbdXml.getParamShortDesc(option)).isEqualTo("OPTION1 (bytes)");
+        assertThat(drbdXml.getParamLongDesc(option)).isEqualTo("DESC1");
+        assertThat(drbdXml.getDefaultUnit(option)).isEqualTo("K");
+        assertThat(drbdXml.getPossibleChoices(option)).isNull();
+        assertThat(drbdXml.getSection(option)).isEqualTo("COMMAND");
+        assertThat(drbdXml.checkParam(option, new StringValue("1023"))).isEqualTo(false);
+        assertThat(drbdXml.checkParam(option, new StringValue("1024"))).isEqualTo(true);
+        assertThat(drbdXml.checkParam(option, new StringValue("10240"))).isEqualTo(true);
+        assertThat(drbdXml.checkParam(option, new StringValue("10241"))).isEqualTo(false);
+        assertThat(drbdXml.getAccessType(option)).isEqualTo(AccessMode.ADMIN);
     }
 
     @Test
-    public void shouldParseBooleanOption() {
+    void shouldParseBooleanOption() {
         val option = OPTION2;
 
-        assertThat(drbdXml.getParamType(option), is("boolean"));
-        assertThat(drbdXml.getParamDefault(option).getValueForConfigWithUnit(), is("no"));
-        assertThat(drbdXml.getParamDefault(option).getValueForGui(), is("no"));
-        assertThat(drbdXml.getParamDefault(option).getValueForConfig(), is("no"));
-        assertThat(drbdXml.getParamShortDesc(option), is("OPTION2"));
-        assertThat(drbdXml.getParamLongDesc(option), is("DESC2"));
-        assertThat(drbdXml.getDefaultUnit(option), nullValue());
-        assertThat(drbdXml.getPossibleChoices(option), is(new Value[]{new StringValue("yes"), new StringValue("no")}));
-        assertThat(drbdXml.getSection(option), is("COMMAND"));
-        assertThat(drbdXml.getAccessType(option), is(AccessMode.ADMIN));
+        assertThat(drbdXml.getParamType(option)).isEqualTo("boolean");
+        assertThat(drbdXml.getParamDefault(option).getValueForConfigWithUnit()).isEqualTo("no");
+        assertThat(drbdXml.getParamDefault(option).getValueForGui()).isEqualTo("no");
+        assertThat(drbdXml.getParamDefault(option).getValueForConfig()).isEqualTo("no");
+        assertThat(drbdXml.getParamShortDesc(option)).isEqualTo("OPTION2");
+        assertThat(drbdXml.getParamLongDesc(option)).isEqualTo("DESC2");
+        assertThat(drbdXml.getDefaultUnit(option)).isNull();
+        assertThat(drbdXml.getPossibleChoices(option)).isEqualTo(new Value[]{new StringValue("yes"), new StringValue("no")});
+        assertThat(drbdXml.getSection(option)).isEqualTo("COMMAND");
+        assertThat(drbdXml.getAccessType(option)).isEqualTo(AccessMode.ADMIN);
     }
 
     @Test
-    public void shouldParseStringOption() {
+    void shouldParseStringOption() {
         val option = OPTION3;
 
-        assertThat(drbdXml.getParamType(option), is("string"));
-        assertThat(drbdXml.getParamDefault(option), nullValue());
-        assertThat(drbdXml.getParamShortDesc(option), is("OPTION3"));
-        assertThat(drbdXml.getParamLongDesc(option), is("DESC3"));
-        assertThat(drbdXml.getDefaultUnit(option), nullValue());
-        assertThat(drbdXml.getPossibleChoices(option), nullValue());
-        assertThat(drbdXml.getSection(option), is("COMMAND"));
-        assertThat(drbdXml.getAccessType(option), is(AccessMode.ADMIN));
+        assertThat(drbdXml.getParamType(option)).isEqualTo("string");
+        assertThat(drbdXml.getParamDefault(option)).isNull();
+        assertThat(drbdXml.getParamShortDesc(option)).isEqualTo("OPTION3");
+        assertThat(drbdXml.getParamLongDesc(option)).isEqualTo("DESC3");
+        assertThat(drbdXml.getDefaultUnit(option)).isNull();
+        assertThat(drbdXml.getPossibleChoices(option)).isNull();
+        assertThat(drbdXml.getSection(option)).isEqualTo("COMMAND");
+        assertThat(drbdXml.getAccessType(option)).isEqualTo(AccessMode.ADMIN);
     }
 
     @Test
-    public void shouldParseHandlerOption() {
+    void shouldParseHandlerOption() {
         val option = OPTION4;
 
-        assertThat(drbdXml.getParamType(option), is("handler"));
-        assertThat(drbdXml.getParamDefault(option), nullValue());
-        assertThat(drbdXml.getParamShortDesc(option), is("OPTION4"));
-        assertThat(drbdXml.getParamLongDesc(option), is("DESC4"));
-        assertThat(drbdXml.getDefaultUnit(option), nullValue());
-        assertThat(drbdXml.getPossibleChoices(option), is(new Value[]{new StringValue(), new StringValue("HANDLER1"), new StringValue("HANDLER2")}));
-        assertThat(drbdXml.getSection(option), is("COMMAND"));
-        assertThat(drbdXml.getAccessType(option), is(AccessMode.ADMIN));
+        assertThat(drbdXml.getParamType(option)).isEqualTo("handler");
+        assertThat(drbdXml.getParamDefault(option)).isNull();
+        assertThat(drbdXml.getParamShortDesc(option)).isEqualTo("OPTION4");
+        assertThat(drbdXml.getParamLongDesc(option)).isEqualTo("DESC4");
+        assertThat(drbdXml.getDefaultUnit(option)).isNull();
+        assertThat(drbdXml.getPossibleChoices(option)).isEqualTo(
+                new Value[]{new StringValue(), new StringValue("HANDLER1"), new StringValue("HANDLER2")});
+        assertThat(drbdXml.getSection(option)).isEqualTo("COMMAND");
+        assertThat(drbdXml.getAccessType(option)).isEqualTo(AccessMode.ADMIN);
     }
 
     @Test
-    public void shouldParseFencePeerOption() {
+    void shouldParseFencePeerOption() {
         val option = "fence-peer";
 
-        assertThat(drbdXml.getPossibleChoices(option), is(new Value[]{
-                new StringValue(),
-                new StringValue("hbpath/drbd-peer-outdater -t 5"),
-                new StringValue("/usr/lib/drbd/crm-fence-peer.sh")
-        }));
+        assertThat(drbdXml.getPossibleChoices(option)).isEqualTo(
+                new Value[]{new StringValue(), new StringValue("hbpath/drbd-peer-outdater -t 5"),
+                        new StringValue("/usr/lib/drbd/crm-fence-peer.sh")});
     }
 
     @Test
-    public void shouldParseAfterResyncTarget() {
+    void shouldParseAfterResyncTarget() {
         val option = "after-resync-target";
 
-        assertThat(drbdXml.getPossibleChoices(option), is(new Value[]{
-                new StringValue(),
-                new StringValue("/usr/lib/drbd/crm-unfence-peer.sh")
-        }));
+        assertThat(drbdXml.getPossibleChoices(option)).isEqualTo(
+                new Value[]{new StringValue(), new StringValue("/usr/lib/drbd/crm-unfence-peer.sh")});
     }
 
     @Test
-    public void shouldParseSplitBrain() {
+    void shouldParseSplitBrain() {
         val option = "split-brain";
 
-        assertThat(drbdXml.getPossibleChoices(option), is(new Value[]{
-                new StringValue(),
-                new StringValue("/usr/lib/drbd/notify-split-brain.sh root")
-        }));
+        assertThat(drbdXml.getPossibleChoices(option)).isEqualTo(
+                new Value[]{new StringValue(), new StringValue("/usr/lib/drbd/notify-split-brain.sh root")});
     }
 
     @Test
-    public void shouldParseBecomePrimaryOn() {
+    void shouldParseBecomePrimaryOn() {
         val option = "become-primary-on";
 
-        assertThat(drbdXml.getPossibleChoices(option), is(new Value[]{
-                new StringValue(),
-                new StringValue("both"),
-                new StringValue("HOST1"),
-                new StringValue("HOST2")
-        }));
+        assertThat(drbdXml.getPossibleChoices(option)).isEqualTo(
+                new Value[]{new StringValue(), new StringValue("both"), new StringValue("HOST1"), new StringValue("HOST2")});
     }
 
     @Test
-    public void shouldParseVerifyAlg() {
+    void shouldParseVerifyAlg() {
         val option = "verify-alg";
 
-        assertThat(drbdXml.getPossibleChoices(option), is(new Value[]{
-                new StringValue(),
-                new StringValue("CRYPTO")
-        }));
+        assertThat(drbdXml.getPossibleChoices(option)).isEqualTo(new Value[]{new StringValue(), new StringValue("CRYPTO")});
     }
 
 
     @Test
-    public void flatOptionShouldBeIgnored() {
+    void flatOptionShouldBeIgnored() {
         val option = OPTION5;
 
-        assertThat(drbdXml.getParamType(option), nullValue());
-        assertThat(drbdXml.getSection(option), nullValue());
+        assertThat(drbdXml.getParamType(option)).isNull();
+        assertThat(drbdXml.getSection(option)).isNull();
     }
 
     @Test
-    public void parameterListsShouldBePopulated() {
-        assertThat(newArrayList(drbdXml.getParameters()), is(asList(OPTION1, OPTION2, OPTION3, OPTION4, "fence-peer", "after-resync-target", "split-brain", "become-primary-on", "verify-alg",  "protocol")));
-        assertThat(newArrayList(drbdXml.getGlobalParams()), is(asList(OPTION1, OPTION2, OPTION3, OPTION4, "fence-peer", "after-resync-target", "split-brain", "become-primary-on", "verify-alg")));
-        assertThat(newArrayList(drbdXml.getSections()), is(asList("COMMAND", "resource")));
-        assertThat(newArrayList(drbdXml.getSectionParams("COMMAND")), is(asList(OPTION1, OPTION2, OPTION3, OPTION4, "fence-peer", "after-resync-target", "split-brain", "become-primary-on", "verify-alg")));
+    void parameterListsShouldBePopulated() {
+        assertThat(newArrayList(drbdXml.getParameters())).isEqualTo(
+                asList(OPTION1, OPTION2, OPTION3, OPTION4, "fence-peer", "after-resync-target", "split-brain", "become-primary-on",
+                        "verify-alg", "protocol"));
+        assertThat(newArrayList(drbdXml.getGlobalParams())).isEqualTo(
+                asList(OPTION1, OPTION2, OPTION3, OPTION4, "fence-peer", "after-resync-target", "split-brain", "become-primary-on",
+                        "verify-alg"));
+        assertThat(newArrayList(drbdXml.getSections())).isEqualTo(asList("COMMAND", "resource"));
+        assertThat(newArrayList(drbdXml.getSectionParams("COMMAND"))).isEqualTo(
+                asList(OPTION1, OPTION2, OPTION3, OPTION4, "fence-peer", "after-resync-target", "split-brain", "become-primary-on",
+                        "verify-alg"));
     }
 
     private String readFile(final String resourceName) {
