@@ -16,7 +16,7 @@
         <package.dir>packages</package.dir>
         <iss.file>scripts/lcmc.iss</iss.file>
         <rpm.wrapper.script>scripts/lcmc</rpm.wrapper.script>
-        <junit.category.exclude>lcmc.testutils.annotation.type.GuiTest,lcmc.testutils.annotation.type.IntegrationTest</junit.category.exclude>
+        <junit.category.exclude>GuiTest, IntegrationTest</junit.category.exclude>
         <spring.version>5.3.5</spring.version>
         <maven.build.timestamp.format>MMM d yyyy</maven.build.timestamp.format>
         <release>${project.version}</release>
@@ -25,13 +25,13 @@
         <profile>
             <id>GuiTests</id>
             <properties>
-                <junit.category.exclude>lcmc.testutils.annotation.type.IntegrationTest</junit.category.exclude>
+                <junit.category.exclude>IntegrationTest</junit.category.exclude>
             </properties>
         </profile>
         <profile>
             <id>IntegrationTests</id>
             <properties>
-                <junit.category.exclude>lcmc.testutils.annotation.type.GuiTest</junit.category.exclude>
+                <junit.category.exclude>GuiTest</junit.category.exclude>
             </properties>
         </profile>
     </profiles>
@@ -143,12 +143,6 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>pl.pragmatists</groupId>
-            <artifactId>JUnitParams</artifactId>
-            <version>1.1.1</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-context</artifactId>
             <version>${spring.version}</version>
@@ -241,34 +235,17 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
-                <version>2.17</version>
-                <dependencies>
-                    <dependency>
-                        <groupId>org.apache.maven.surefire</groupId>
-                        <artifactId>surefire-junit47</artifactId>
-                        <version>2.17</version>
-                    </dependency>
-                </dependencies>
-                <configuration>
-                    <includes>
-                        <include>**/*.class</include>
-                        </includes>
-                        <excludedGroups>${junit.category.exclude}</excludedGroups>
+                <version>3.0.0-M5</version>
+				<configuration>
+                    <excludedGroups>${junit.category.exclude}</excludedGroups>
                 </configuration>
             </plugin>
             <!-- failsafe -->
             <plugin>
                 <artifactId>maven-failsafe-plugin</artifactId>
-                <version>2.17</version>
-                <dependencies>
-                    <dependency>
-                        <groupId>org.apache.maven.surefire</groupId>
-                        <artifactId>surefire-junit47</artifactId>
-                        <version>2.17</version>
-                    </dependency>
-                </dependencies>
+                <version>3.0.0-M5</version>
                 <configuration>
-                    <groups>lcmc.testutils.annotation.type.IntegrationTest</groups>
+                    <groups>IntegrationTest</groups>
                 </configuration>
                 <executions>
                     <execution>

@@ -20,33 +20,35 @@
 
 package lcmc.drbd.domain;
 
-import java.net.UnknownHostException;
-import static org.junit.Assert.assertEquals;
+import static org.assertj.core.api.Assertions.assertThat;
 
-import org.junit.Test;
+import java.net.UnknownHostException;
+
+import org.junit.jupiter.api.Test;
+
 
 public final class NetInterfaceTest {
     @Test
     public void bridgeIpv6WithCidr64ShouldSetNetworkIp() throws UnknownHostException {
         final NetInterface ni = new NetInterface("eth0 ipv6 2001:db8:0:f101::1 64");
-        assertEquals("2001:db8:0:f101:0:0:0:0", ni.getNetworkIp());
+        assertThat(ni.getNetworkIp()).isEqualTo("2001:db8:0:f101:0:0:0:0");
     }
 
     @Test
     public void ipv4WithCidr23ShouldSetNetworkIp() throws UnknownHostException {
         final NetInterface ni = new NetInterface("p5p1 ipv4 192.168.1.101 23");
-        assertEquals("192.168.0.0", ni.getNetworkIp());
+        assertThat(ni.getNetworkIp()).isEqualTo("192.168.0.0");
     }
 
     @Test
     public void bridgeIpv4WithCidr24ShouldSetNetworkIp() throws UnknownHostException {
         final NetInterface ni = new NetInterface("virbr0 ipv4 192.168.133.1 24 bridge");
-        assertEquals("192.168.133.0", ni.getNetworkIp());
+        assertThat(ni.getNetworkIp()).isEqualTo("192.168.133.0");
     }
 
     @Test
     public void bridgeIpWithCidr16ShouldSetNetworkIp() throws UnknownHostException {
         final NetInterface ni = new NetInterface("virbr1 ipv4 10.10.0.1 16 bridge");
-        assertEquals("10.10.0.0", ni.getNetworkIp());
+        assertThat(ni.getNetworkIp()).isEqualTo("10.10.0.0");
     }
 }

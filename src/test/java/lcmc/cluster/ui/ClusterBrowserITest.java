@@ -8,8 +8,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 
-import org.junit.experimental.categories.Category;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 
 import lcmc.AppContext;
@@ -20,9 +20,8 @@ import lcmc.common.ui.main.ProgressIndicator;
 import lcmc.common.ui.utils.SwingUtils;
 import lcmc.host.domain.Host;
 import lcmc.testutils.IntegrationTestLauncher;
-import lcmc.testutils.annotation.type.IntegrationTest;
 
-@Category(IntegrationTest.class)
+@Tag("IntegrationTest")
 class ClusterBrowserITest {
     private IntegrationTestLauncher integrationTestLauncher;
     private MainPresenter mainPresenter;

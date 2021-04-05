@@ -75,6 +75,7 @@ class BlockDevMenuITest {
 
    @Test
    void menuWithOrWithoutClusterShoulBeTheSameSize() {
+      when(blockDevInfoNoClusterStub.getBlockDevice()).thenReturn(blockDeviceStub);
       final List<UpdatableItem> itemsWithCluster = blockDevMenu.getPulldownMenu(blockDevInfoStub);
       when(blockDevInfoNoClusterStub.getBrowser()).thenReturn(hostBrowserNoClusterStub);
 

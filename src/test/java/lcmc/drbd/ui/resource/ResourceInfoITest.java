@@ -5,17 +5,16 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.util.Arrays;
 import java.util.LinkedHashSet;
 
-import org.junit.experimental.categories.Category;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 
 import lcmc.AppContext;
 import lcmc.cluster.ui.ClusterBrowser;
 import lcmc.host.domain.HostFactory;
 import lcmc.testutils.IntegrationTestLauncher;
-import lcmc.testutils.annotation.type.IntegrationTest;
 
-@Category(IntegrationTest.class)
+@Tag("IntegrationTest")
 final class ResourceInfoITest {
     private IntegrationTestLauncher integrationTestLauncher;
 

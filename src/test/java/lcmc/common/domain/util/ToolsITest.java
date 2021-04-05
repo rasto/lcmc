@@ -6,8 +6,8 @@ import java.util.Map;
 
 import javax.swing.JCheckBox;
 
-import org.junit.experimental.categories.Category;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
@@ -19,10 +19,8 @@ import lcmc.common.ui.main.MainPresenter;
 import lcmc.common.ui.main.ProgressIndicator;
 import lcmc.host.domain.Host;
 import lcmc.testutils.IntegrationTestLauncher;
-import lcmc.testutils.annotation.type.GuiTest;
-import lcmc.testutils.annotation.type.IntegrationTest;
 
-@Category(IntegrationTest.class)
+@Tag("IntegrationTest")
 final class ToolsITest {
     private IntegrationTestLauncher testSuite;
     private MainPresenter mainPresenter;
@@ -85,7 +83,7 @@ final class ToolsITest {
     }
 
     @Test
-    @Category(GuiTest.class)
+    @Tag("GuiTest")
     void testLoadFile() {
         assertThat(Tools.loadFile(mainPresenter, "JUNIT_TEST_FILE_CLICK_OK", false)).isNull();
         final String testFile = "/tmp/lcmc-test-file";
@@ -96,7 +94,7 @@ final class ToolsITest {
     }
 
     @Test
-    @Category(GuiTest.class)
+    @Tag("GuiTest")
     void testStartProgressIndicator() {
         for (int i = 0; i < 10; i++) {
             progressIndicator.startProgressIndicator(null);
@@ -121,7 +119,7 @@ final class ToolsITest {
     }
 
     @Test
-    @Category(GuiTest.class)
+    @Tag("GuiTest")
     void testProgressIndicatorFailed() {
         progressIndicator.progressIndicatorFailed(null, "fail3");
         progressIndicator.progressIndicatorFailed("name", "fail2");
@@ -133,7 +131,7 @@ final class ToolsITest {
     }
 
     @Test
-    @Category(GuiTest.class)
+    @Tag("GuiTest")
     void testIsLinux() {
         if (System.getProperty("os.name").toLowerCase().contains("windows")) {
             assertThat(Tools.isLinux()).isFalse();
@@ -144,7 +142,7 @@ final class ToolsITest {
     }
 
     @Test
-    @Category(GuiTest.class)
+    @Tag("GuiTest")
     void testIsWindows() {
         if (System.getProperty("os.name").toLowerCase().contains("windows")) {
             assertThat(Tools.isWindows()).isTrue();
@@ -155,7 +153,7 @@ final class ToolsITest {
     }
 
     @Test
-    @Category(GuiTest.class)
+    @Tag("GuiTest")
     void testGetUnixPath() {
         assertThat(Tools.getUnixPath("/bin")).isEqualTo("/bin");
         if (Tools.isWindows()) {

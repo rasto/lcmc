@@ -30,8 +30,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.junit.experimental.categories.Category;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 
 import lcmc.AppContext;
@@ -40,10 +40,9 @@ import lcmc.cluster.service.NetworkService;
 import lcmc.cluster.service.storage.FileSystemService;
 import lcmc.common.domain.util.Tools;
 import lcmc.testutils.IntegrationTestLauncher;
-import lcmc.testutils.annotation.type.IntegrationTest;
 import lombok.val;
 
-@Category(IntegrationTest.class)
+@Tag("IntegrationTest")
 final class HostITest {
     private IntegrationTestLauncher integrationTestLauncher;
     private NetworkService networkService;
