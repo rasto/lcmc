@@ -30,10 +30,10 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 
-import static org.mockito.Mockito.stub;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
 public class NetworkPresenterTest {
@@ -71,7 +71,7 @@ public class NetworkPresenterTest {
     @Test
     public void viewShouldBeUpdated() {
         final Optional<Network> newNetwork = Optional.of(network);
-        stub(networkService.getCommonNetwork(cluster, network)).toReturn(newNetwork);
+        when(networkService.getCommonNetwork(cluster, network)).thenReturn(newNetwork);
 
         presenter.updateNetwork();
 
