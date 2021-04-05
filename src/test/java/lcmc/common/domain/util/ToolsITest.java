@@ -70,7 +70,7 @@ public final class ToolsITest {
 
     @Test
     public void helperFieShouldBeLoaded() {
-        final String testFile = "/help-progs/lcmc-gui-helper";
+        final String testFile = "/help-progs/lcmc-gui-helper/Main.pl";
         assertTrue(Tools.readFile(testFile).indexOf("#!") == 0);
     }
 

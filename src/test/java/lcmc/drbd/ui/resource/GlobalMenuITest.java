@@ -25,8 +25,8 @@ import java.util.List;
 import lcmc.common.domain.AccessMode;
 
 import static org.junit.Assert.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Matchers.anyObject;
-import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.times;
@@ -63,9 +63,9 @@ public class GlobalMenuITest {
     @Before
     public void setUp() {
         when(menuFactoryStub.createMenuItem(
-                anyString(),
+                any(),
                 (ImageIcon) anyObject(),
-                anyString(),
+                any(),
                 (AccessMode) anyObject(),
                 (AccessMode) anyObject())).thenReturn(menuItemStub);
     }

@@ -51,9 +51,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Matchers.anyObject;
-import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.mock;
@@ -108,8 +108,6 @@ public class ResourceUpdaterTest {
     @Before
     public void setUp() {
         when(clusterBrowser.getCrmGraph()).thenReturn(crmGraph);
-        when(clusterBrowser.getClusterStatus()).thenReturn(clusterStatus);
-        when(clusterBrowser.getClusterHosts()).thenReturn(new Host[]{});
     }
 
     @Test
@@ -159,7 +157,7 @@ public class ResourceUpdaterTest {
         when(servicesInfo.addServicePanel((ResourceAgent) anyObject(),
                 (Point2D) anyObject(),
                 anyBoolean(),
-                anyString(),
+                any(),
                 (CloneInfo) anyObject(),
                 (Application.RunMode) anyObject())).thenReturn(groupInfo);
 
@@ -187,7 +185,7 @@ public class ResourceUpdaterTest {
         when(servicesInfo.addServicePanel((ResourceAgent) anyObject(),
                 (Point2D) anyObject(),
                 anyBoolean(),
-                anyString(),
+                any(),
                 (CloneInfo) anyObject(),
                 (Application.RunMode) anyObject())).thenReturn(groupInfo);
 
@@ -286,14 +284,6 @@ public class ResourceUpdaterTest {
         when(clusterStatus.isOrphaned(SERVICE_1)).thenReturn(true);
         when(application.isHideLRM()).thenReturn(true);
         val cloneService = mock(ServiceInfo.class);
-        when(cloneService.getNode()).thenReturn(new DefaultMutableTreeNode());
-        when(crmServiceFactory.createServiceWithParameters(
-                eq(SERVICE_1),
-                (ResourceAgent) anyObject(),
-                eq(EXAMPLE_PARAMS),
-                eq(clusterBrowser))).thenReturn(cloneService);
-
-        when(clusterStatus.getParamValuePairs(SERVICE_1)).thenReturn(EXAMPLE_PARAMS);
 
         //when:
         resourceUpdater.updateAllResources(servicesInfo, clusterBrowser, clusterStatus, RUN_MODE);
@@ -440,8 +430,6 @@ public class ResourceUpdaterTest {
                 .thenReturn(newRscSetConnectionData);
         final ServiceInfo service1 = mock(ServiceInfo.class);
         final ServiceInfo service2 = mock(ServiceInfo.class);
-        when(clusterBrowser.getServiceInfoFromCRMId("rsc1")).thenReturn(service1);
-        when(clusterBrowser.getServiceInfoFromCRMId("rsc2")).thenReturn(service2);
 
         //when:
         resourceUpdater.updateAllResources(servicesInfo, clusterBrowser, clusterStatus, RUN_MODE);
@@ -459,8 +447,6 @@ public class ResourceUpdaterTest {
         final RscSetConnectionData rscSetConnectionData = createRscSetConnectionData(isColocation);
         when(clusterStatus.getRscSetConnections())
                 .thenReturn(Lists.newArrayList(rscSetConnectionData));
-        when(constraintPlaceHolder.getRscSetConnectionDataOrder())
-                .thenReturn(rscSetConnectionData);
         final ServiceInfo service1 = mock(ServiceInfo.class);
         final ServiceInfo service2 = mock(ServiceInfo.class);
         when(clusterBrowser.getServiceInfoFromCRMId("rsc1")).thenReturn(service1);

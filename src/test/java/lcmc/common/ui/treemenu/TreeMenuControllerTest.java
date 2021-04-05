@@ -254,7 +254,6 @@ public class TreeMenuControllerTest {
         given(editableInfo1.isNew()).willReturn(true);
         given(editableInfo1.getName()).willReturn("b");
 
-        given(editableInfo2.isNew()).willReturn(false);
         given(editableInfo2.getName()).willReturn("a");
 
         val child1 = clusterTreeMenu.createMenuItem(menuTreeTop, editableInfo1);

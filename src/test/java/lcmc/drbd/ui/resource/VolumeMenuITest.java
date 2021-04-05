@@ -43,8 +43,8 @@ import org.mockito.runners.MockitoJUnitRunner;
 
 import javax.swing.ImageIcon;
 
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Matchers.anyObject;
-import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.times;
@@ -69,24 +69,23 @@ public class VolumeMenuITest {
     public void setUp() {
         when(volumeInfoStub.getDrbdResourceInfo()).thenReturn(resourceInfoStub);
         when(volumeInfoStub.getBrowser()).thenReturn(clusterBrowserStub);
-        when(menuFactoryStub.createMenuItem(anyString(),
+        when(menuFactoryStub.createMenuItem(any(),
                 (ImageIcon) anyObject(),
-                anyString(),
+                any(),
 
-                anyString(),
+                any(),
                 (ImageIcon) anyObject(),
-                anyString(),
+                any(),
 
                 (AccessMode) anyObject(),
                 (AccessMode) anyObject())).thenReturn(menuItemStub);
         when(menuFactoryStub.createMenuItem(
-                anyString(),
+                any(),
                 (ImageIcon) anyObject(),
-                anyString(),
+                any(),
                 (AccessMode) anyObject(),
                 (AccessMode) anyObject())).thenReturn(menuItemStub);
         when(menuItemStub.enablePredicate((EnablePredicate) anyObject())).thenReturn(menuItemStub);
-        when(menuItemStub.visiblePredicate((VisiblePredicate) anyObject())).thenReturn(menuItemStub);
         when(menuItemStub.predicate((Predicate) anyObject())).thenReturn(menuItemStub);
         when(menuItemStub.addAction((MenuAction) anyObject())).thenReturn(menuItemStub);
     }

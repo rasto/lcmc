@@ -45,8 +45,8 @@ import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Matchers.anyObject;
-import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.times;
@@ -81,29 +81,27 @@ public class GroupMenuTest {
     @Before
     public void setUp() {
         when(groupInfoStub.getBrowser()).thenReturn(clusterBrowserStub);
-        when(groupInfoStub.getResource()).thenReturn(resourceStub);
-        when(groupInfoStub.getService()).thenReturn(serviceStub);
         final Host[] hosts = new Host[]{hostStub};
         when(clusterBrowserStub.getClusterHosts()).thenReturn(hosts);
         when(menuFactoryStub.createMenuItem(
-                anyString(),
+                any(),
                 (ImageIcon) anyObject(),
-                anyString(),
+                any(),
                 (AccessMode) anyObject(),
                 (AccessMode) anyObject())).thenReturn(menuItemStub);
         when(menuFactoryStub.createMenuItem(
-                anyString(),
+                any(),
                 (ImageIcon) anyObject(),
-                anyString(),
+                any(),
 
-                anyString(),
+                any(),
                 (ImageIcon) anyObject(),
-                anyString(),
+                any(),
 
                 (AccessMode) anyObject(),
                 (AccessMode) anyObject())).thenReturn(menuItemStub);
         when(menuFactoryStub.createMenu(
-                anyString(),
+                any(),
                 (AccessMode) anyObject(),
                 (AccessMode) anyObject())).thenReturn(menuStub);
         when(menuStub.enablePredicate((EnablePredicate) anyObject())).thenReturn(menuStub);

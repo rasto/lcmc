@@ -43,8 +43,8 @@ import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Matchers.anyObject;
-import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.times;
@@ -82,22 +82,22 @@ public class VirtualDomainMenuTest {
         when(clusterBrowserStub.getClusterHosts()).thenReturn(clusterHosts);
 
         when(menuFactoryStub.createMenuItem(
-                anyString(),
+                any(),
                 (ImageIcon) anyObject(),
-                anyString(),
+                any(),
                 (AccessMode) anyObject(),
                 (AccessMode) anyObject())).thenReturn(menuItemStub);
         when(menuFactoryStub.createMenu(
-                anyString(),
+                any(),
                 (AccessMode) anyObject(),
                 (AccessMode) anyObject())).thenReturn(menuStub);
-        when(menuFactoryStub.createMenuItem(anyString(),
+        when(menuFactoryStub.createMenuItem(any(),
                 (ImageIcon) anyObject(),
-                anyString(),
+                any(),
 
-                anyString(),
+                any(),
                 (ImageIcon) anyObject(),
-                anyString(),
+                any(),
 
                 (AccessMode) anyObject(),
                 (AccessMode) anyObject())).thenReturn(menuItemStub);

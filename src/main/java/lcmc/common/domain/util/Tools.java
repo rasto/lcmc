@@ -35,6 +35,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -90,6 +91,7 @@ import lcmc.host.domain.Host;
 import lcmc.logger.Logger;
 import lcmc.logger.LoggerFactory;
 import lombok.SneakyThrows;
+import lombok.val;
 
 /**
  * This class provides tools, that are not classified.
@@ -1212,7 +1214,14 @@ public final class Tools {
 
     @SneakyThrows
     public static String readFile(final String fileName) {
-        return new String(Tools.class.getResourceAsStream(fileName).readAllBytes());
+        if (fileName == null) {
+            return null;
+        }
+        val resourceAsStream = Tools.class.getResourceAsStream(fileName);
+        if (resourceAsStream == null) {
+            return null;
+        }
+        return new String(resourceAsStream.readAllBytes());
     }
 
     private Tools() {

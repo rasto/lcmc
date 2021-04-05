@@ -23,9 +23,10 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.mockito.Matchers.anyObject;
-import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import org.mockito.runners.MockitoJUnitRunner;
@@ -64,23 +65,23 @@ public class HostDrbdMenuITest {
     public void setUp() {
         when(hostDrbdInfoStub.getBrowser()).thenReturn(hostBrowserStub);
         when(menuFactoryStub.createMenuItem(
-                anyString(),
+                any(),
                 (ImageIcon) anyObject(),
-                anyString(),
+                any(),
                 (AccessMode) anyObject(),
                 (AccessMode) anyObject())).thenReturn(menuItemStub);
-        when(menuFactoryStub.createMenuItem(anyString(),
+        when(menuFactoryStub.createMenuItem(any(),
                 (ImageIcon) anyObject(),
-                anyString(),
+                any(),
 
-                anyString(),
+                any(),
                 (ImageIcon) anyObject(),
-                anyString(),
+                any(),
 
                 (AccessMode) anyObject(),
                 (AccessMode) anyObject())).thenReturn(menuItemStub);
         when(menuFactoryStub.createMenu(
-                anyString(),
+                any(),
                 (AccessMode) anyObject(),
                 (AccessMode) anyObject())).thenReturn(menuStub);
         when(menuItemStub.enablePredicate((EnablePredicate) anyObject())).thenReturn(menuItemStub);
