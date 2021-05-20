@@ -215,8 +215,8 @@ class DistributionDetectorTest {
                 Arguments.of("SLES11", "suse", "SUSE Linux Enterprise Server 11 (x86_64)"),
                 Arguments.of("OPENSUSE11_2", "suse", "openSUSE 11.2 (x86_64)"),
                 Arguments.of("OPENSUSE11_3", "suse", "openSUSE 11.3 (x86_64)"),
-                Arguments.of("OPENSUSE11_4", "suse", "openSUSE 11.4 (x86_64)"),
-                Arguments.of("2", "openfiler", "Openfiler NSA 2.3"));
+                Arguments.of("OPENSUSE11_4", "suse", "openSUSE 11.4 (x86_64)"), Arguments.of("2", "openfiler", "Openfiler NSA 2.3"),
+                Arguments.of("8", "redhat", "AlmaLinux release 8.4 (Electric Cheetah)"));
     }
 
     @ParameterizedTest

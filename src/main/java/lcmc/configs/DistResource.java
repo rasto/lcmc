@@ -46,7 +46,7 @@ public final class DistResource extends ListResourceBundle {
         {"dist:suse",                 "suse"},
         {"dist:opensuse",             "suse"},
         {"dist:centos",               "rhel"},
-        {"dist:fedora",               "redhat"},
+        {"dist:almalinux",            "redhat"},
         {"dist:rhas",                 "redhat"},
         {"dist:rhel",                 "rhel"},
         {"dist:fc",                   "fedora"},

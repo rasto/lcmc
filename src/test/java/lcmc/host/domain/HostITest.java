@@ -217,7 +217,8 @@ final class HostITest {
             assertThat(hostParser.getDistFromDistVersion("fc")).isEqualTo("fedora");
             assertThat(hostParser.getDistFromDistVersion("rhel")).isEqualTo("rhel");
             assertThat(hostParser.getDistFromDistVersion("centos")).isEqualTo("rhel");
-            assertThat(hostParser.getDistFromDistVersion("xy")).isEqualTo(null);
+            assertThat(hostParser.getDistFromDistVersion("xy")).isEqualTo("xy");
+            assertThat(hostParser.getDistFromDistVersion("almalinux")).isEqualTo("redhat");
         }
     }
 
@@ -276,7 +277,8 @@ final class HostITest {
             val hostParser = host.getHostParser();
             assertThat(values.contains(hostParser.getDistributionVersion()) || "fedora".equals(hostParser.getDistributionName())
                        || "suse".equals(hostParser.getDistributionName()) || "debian".equals(hostParser.getDistributionName())
-                       || "ubuntu".equals(hostParser.getDistributionName())).describedAs(
+                       || "redhat".equals(hostParser.getDistributionName()) || "ubuntu".equals(
+                    hostParser.getDistributionName())).describedAs(
                     "unknown: " + hostParser.getDistributionVersion() + "(" + hostParser.getDistributionName() + ")").isTrue();
         }
     }

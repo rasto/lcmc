@@ -35,6 +35,7 @@ import lcmc.host.domain.Host;
 import lcmc.logger.Logger;
 import lcmc.logger.LoggerFactory;
 import lombok.Getter;
+import lombok.val;
 
 public class DistributionDetector {
 
@@ -72,7 +73,6 @@ public class DistributionDetector {
      * and distribution.
      * @param lines
      */
-    @SuppressWarnings("fallthrough")
     public void detect(final List<String> lines) {
         if (!distInfoAlreadyLogged) {
             for (final String di : lines) {
@@ -116,7 +116,8 @@ public class DistributionDetector {
                 LOG.appError("setDistInfo: list: ", Arrays.asList(lines).toString());
                 break;
         }
-        distributionName = detectedDist;
+        distributionName = getDistFromDistVersion(detectedDist);
+        detectedDist = distributionName;
         distributionVersion = detectedDistVersion;
         initDistInfo();
         if (!distInfoAlreadyLogged) {
@@ -134,19 +135,19 @@ public class DistributionDetector {
         if (!"Linux".equals(detectedKernelName)) {
             LOG.appWarning("initDistInfo: detected kernel not linux: " + detectedKernelName);
         }
-        this.kernelName = "Linux";
+        kernelName = "Linux";
 
         if (!distributionName.equals(detectedDist)) {
             LOG.appError("initDistInfo: dist: " + distributionName + " does not match " + detectedDist);
         }
         distributionVersionString = getDistVersionString(distributionVersion);
         distributionVersion = getDistString("distributiondir");
-        this.kernelVersion = getKernelDownloadDir(detectedKernelVersion);
+        kernelVersion = getKernelDownloadDir(detectedKernelVersion);
         String arch0 = getDistString("arch:" + detectedArch);
         if (arch0 == null) {
             arch0 = detectedArch;
         }
-        this.arch = arch0;
+        arch = arch0;
     }
 
     /** Returns the detected info to show. */
@@ -160,7 +161,6 @@ public class DistributionDetector {
      * not when it is detected.
      * The conversion rules for distributions are defined in DistResource.java,
      * with 'dist:' prefix.
-     * TODO: remove it?
      */
     public String getDistFromDistVersion(final String dV) {
         /* remove numbers */
@@ -168,7 +168,8 @@ public class DistributionDetector {
             return null;
         }
         LOG.debug1("getDistFromDistVersion:" + dV.replaceFirst("\\d.*", ""));
-        return getDistString("dist:" + dV.replaceFirst("\\d.*", ""));
+        val distString = getDistString("dist:" + dV.replaceFirst("\\d.*", ""));
+        return distString == null ? dV : distString;
     }
 
     /**
@@ -183,7 +184,7 @@ public class DistributionDetector {
             return null;
         }
         final String[] texts = text.split(";;;");
-        final List<String> results =  new ArrayList<String>();
+        final List<String> results = new ArrayList<>();
         int i = 0;
         for (final String t : texts) {
             String distString = getDistString(t);
@@ -299,7 +300,6 @@ public class DistributionDetector {
     }
 
     /** Returns string that is specific to a distribution and version. */
-    @SuppressWarnings("unchecked")
     public List<String> getDistStrings(final String text) {
         if (distributionName == null) {
             distributionName = "";
