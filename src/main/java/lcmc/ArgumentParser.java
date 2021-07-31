@@ -20,32 +20,6 @@
 
 package lcmc;
 
-import lcmc.common.domain.AccessMode;
-import lcmc.common.domain.Application;
-import lcmc.cluster.domain.Cluster;
-import lcmc.common.ui.Access;
-import lcmc.common.ui.main.MainData;
-import lcmc.common.ui.utils.SwingUtils;
-import lcmc.host.domain.Host;
-import lcmc.host.domain.HostOptions;
-import lcmc.common.domain.UserConfig;
-import lcmc.robotest.RoboTest;
-import lcmc.robotest.StartTests;
-import lcmc.robotest.Test;
-import lcmc.logger.Logger;
-import lcmc.logger.LoggerFactory;
-import org.apache.commons.cli.CommandLine;
-import org.apache.commons.cli.CommandLineParser;
-import org.apache.commons.cli.HelpFormatter;
-import org.apache.commons.cli.Option;
-import org.apache.commons.cli.Options;
-import org.apache.commons.cli.ParseException;
-import org.apache.commons.cli.PosixParser;
-
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Provider;
-import javax.inject.Singleton;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.PrintStream;
@@ -56,6 +30,34 @@ import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Provider;
+import javax.inject.Singleton;
+
+import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.CommandLineParser;
+import org.apache.commons.cli.HelpFormatter;
+import org.apache.commons.cli.Option;
+import org.apache.commons.cli.Options;
+import org.apache.commons.cli.ParseException;
+import org.apache.commons.cli.PosixParser;
+
+import lcmc.cluster.domain.Cluster;
+import lcmc.common.domain.AccessMode;
+import lcmc.common.domain.Application;
+import lcmc.common.domain.UserConfig;
+import lcmc.common.ui.Access;
+import lcmc.common.ui.main.MainData;
+import lcmc.common.ui.utils.SwingUtils;
+import lcmc.host.domain.Host;
+import lcmc.host.domain.HostOptions;
+import lcmc.logger.Logger;
+import lcmc.logger.LoggerFactory;
+import lcmc.robotest.RoboTest;
+import lcmc.robotest.StartTests;
+import lcmc.robotest.Test;
 
 @Named
 @Singleton
@@ -314,7 +316,7 @@ public class ArgumentParser {
     public void parseClusterOptionsAndCreateClusterButton(final CommandLine cmd) throws ParseException {
         String clusterName = null;
         List<HostOptions> hostsOptions = null;
-        final Map<String, List<HostOptions>> clusters = new LinkedHashMap<String, List<HostOptions>>();
+        final Map<String, List<HostOptions>> clusters = new LinkedHashMap<>();
         for (final Option option : cmd.getOptions()) {
             final String op = option.getLongOpt();
             if (CLUSTER_OP.equals(op)) {
@@ -323,17 +325,17 @@ public class ArgumentParser {
                     throw new ParseException("could not parse " + CLUSTER_OP + " option");
 
                 }
-                clusters.put(clusterName, new ArrayList<HostOptions>());
+                clusters.put(clusterName, new ArrayList<>());
             } else if (HOST_OP.equals(op)) {
                 final String[] hostNames = option.getValues();
                 if (clusterName == null) {
                     clusterName = "default";
-                    clusters.put(clusterName, new ArrayList<HostOptions>());
+                    clusters.put(clusterName, new ArrayList<>());
                 }
                 if (hostNames == null) {
                     throw new ParseException("could not parse " + HOST_OP + " option");
                 }
-                hostsOptions = new ArrayList<HostOptions>();
+                hostsOptions = new ArrayList<>();
                 for (final String hostNameEntered : hostNames) {
                     final String hostName;
                     String port = null;
@@ -471,7 +473,7 @@ public class ArgumentParser {
 
     /** Sets user config from command line options returns host, for which dns lookup failed. */
     private String setUserConfigFromOptions(final Map<String, List<HostOptions>> clusters) {
-        final Map<String, List<Host>> hostMap = new LinkedHashMap<String, List<Host>>();
+        final Map<String, List<Host>> hostMap = new LinkedHashMap<>();
         for (final String clusterName : clusters.keySet()) {
             for (final HostOptions hostOptions : clusters.get(clusterName)) {
                 final String hostnameEntered = hostOptions.getHost();

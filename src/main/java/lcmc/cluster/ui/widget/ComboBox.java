@@ -28,6 +28,7 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.swing.ComboBoxEditor;
@@ -37,12 +38,13 @@ import javax.swing.event.DocumentListener;
 import javax.swing.text.AbstractDocument;
 import javax.swing.text.Document;
 import javax.swing.text.JTextComponent;
+
 import lcmc.common.domain.AccessMode;
 import lcmc.common.domain.StringValue;
 import lcmc.common.domain.Value;
+import lcmc.common.domain.util.Tools;
 import lcmc.common.ui.utils.MyButton;
 import lcmc.common.ui.utils.PatternDocument;
-import lcmc.common.domain.util.Tools;
 import lcmc.common.ui.utils.SwingUtils;
 import lcmc.common.ui.utils.WidgetListener;
 
@@ -57,7 +59,7 @@ public final class ComboBox extends GenericWidget<MComboBox<Value>> {
     @Inject
     private SwingUtils swingUtils;
 
-    protected static Value addItems(final Collection<Value> comboList, final Value selectedValue, final Value[] items) {
+    private static Value addItems(final Collection<Value> comboList, final Value selectedValue, final Value[] items) {
         Value selectedValueInfo = null;
         if (items != null) {
             for (final Value item : items) {
@@ -90,10 +92,10 @@ public final class ComboBox extends GenericWidget<MComboBox<Value>> {
                                          final Value[] items,
                                          final String regexp,
                                          final Map<String, String> abbreviations) {
-        final List<Value> comboList = new ArrayList<Value>();
+        final List<Value> comboList = new ArrayList<>();
 
         final Value selectedValueInfo = addItems(comboList, selectedValue, items);
-        final MComboBox<Value> cb = new MComboBox<Value>(comboList.toArray(new Value[comboList.size()]));
+        final MComboBox<Value> cb = new MComboBox<>(comboList.toArray(new Value[0]));
         final JTextComponent editor = (JTextComponent) cb.getEditor().getEditorComponent();
         if (regexp != null) {
             editor.setDocument(new PatternDocument(regexp, abbreviations));
@@ -103,7 +105,7 @@ public final class ComboBox extends GenericWidget<MComboBox<Value>> {
             cb.setSelectedItem(selectedValueInfo);
         }
         /* workround, so that default button works */
-        editor.addKeyListener(new ActivateDefaultButtonListener<Value>(cb));
+        editor.addKeyListener(new ActivateDefaultButtonListener<>(cb));
 
         /* removing select... keyword */
         editor.addFocusListener(new FocusListener() {
@@ -140,48 +142,45 @@ public final class ComboBox extends GenericWidget<MComboBox<Value>> {
     /** Reloads combo box with items and selects supplied value. */
     @Override
     public void reloadComboBox(final Value selectedValue, final Value[] items) {
-        swingUtils.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                final MComboBox<Value> cb = getInternalComponent();
-                final Object selectedObject = cb.getSelectedItem();
-                final Value selectedItem;
-                if (selectedObject instanceof String) {
-                    selectedItem = new StringValue((String) selectedObject);
-                } else {
-                    selectedItem = (Value) selectedObject;
-                }
-                boolean selectedChanged = false;
-                if (selectedValue == null && selectedItem != null && !selectedItem.isNothingSelected()) {
-                    selectedChanged = true;
-                } else if (selectedValue != null && !selectedValue.equals(selectedItem)) {
-                    selectedChanged = true;
-                }
-                final boolean itemsChanged = hasComboBoxChanged(items);
-                if (!selectedChanged && !itemsChanged) {
-                    return;
-                }
+        swingUtils.invokeLater(() -> {
+            final MComboBox<Value> cb = getInternalComponent();
+            final Object selectedObject = cb.getSelectedItem();
+            final Value selectedItem;
+            if (selectedObject instanceof String) {
+                selectedItem = new StringValue((String) selectedObject);
+            } else {
+                selectedItem = (Value) selectedObject;
+            }
+            boolean selectedChanged = false;
+            if (selectedValue == null && selectedItem != null && !selectedItem.isNothingSelected()) {
+                selectedChanged = true;
+            } else if (selectedValue != null && !selectedValue.equals(selectedItem)) {
+                selectedChanged = true;
+            }
+            final boolean itemsChanged = hasComboBoxChanged(items);
+            if (!selectedChanged && !itemsChanged) {
+                return;
+            }
 
-                cb.setPreferredSize(null);
-                /* removing dupicates */
+            cb.setPreferredSize(null);
+            /* removing dupicates */
 
-                final Collection<Value> comboList = new ArrayList<Value>();
-                final Value selectedValueInfo = addItems(comboList, selectedValue, items);
-                
-                if (itemsChanged) {
-                    final Collection<Value> itemCache = new HashSet<Value>();
-                    cb.setSelectedIndex(-1);
-                    cb.removeAllItems();
-                    for (final Value item : comboList) {
-                        if (!itemCache.contains(item)) {
-                            cb.addItem(item);
-                            itemCache.add(item);
-                        }
+            final Collection<Value> comboList = new ArrayList<>();
+            final Value selectedValueInfo = addItems(comboList, selectedValue, items);
+
+            if (itemsChanged) {
+                final Collection<Value> itemCache = new HashSet<>();
+                cb.setSelectedIndex(-1);
+                cb.removeAllItems();
+                for (final Value item : comboList) {
+                    if (!itemCache.contains(item)) {
+                        cb.addItem(item);
+                        itemCache.add(item);
                     }
                 }
-                if (selectedValueInfo != null) {
-                    cb.setSelectedItem(selectedValueInfo);
-                }
+            }
+            if (selectedValueInfo != null) {
+                cb.setSelectedItem(selectedValueInfo);
             }
         });
     }
@@ -191,20 +190,17 @@ public final class ComboBox extends GenericWidget<MComboBox<Value>> {
     public void setEditable(final boolean editable) {
         super.setEditable(editable);
         final JComponent comp = getInternalComponent();
-        swingUtils.invokeInEdt(new Runnable() {
-            @Override
-            public void run() {
-                final Value v = getValue();
-                if (isAlwaysEditable()) {
-                    ((JComboBox) comp).setEditable(true);
-                    final JTextComponent editor = getTextComponent();
-                    if (v == null || v.isNothingSelected()) {
-                        editor.selectAll();
-                    }
-                } else {
-                    if (v != null && !v.isNothingSelected()) {
-                        ((JComboBox) comp).setEditable(editable);
-                    }
+        swingUtils.invokeInEdt(() -> {
+            final Value v = getValue();
+            if (isAlwaysEditable()) {
+                ((JComboBox) comp).setEditable(true);
+                final JTextComponent editor = getTextComponent();
+                if (v == null || v.isNothingSelected()) {
+                    editor.selectAll();
+                }
+            } else {
+                if (v != null && !v.isNothingSelected()) {
+                    ((JComboBox) comp).setEditable(editable);
                 }
             }
         });
@@ -255,12 +251,7 @@ public final class ComboBox extends GenericWidget<MComboBox<Value>> {
     /** Clears the combo box. */
     @Override
     public void clear() {
-        swingUtils.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                getInternalComponent().removeAllItems();
-            }
-        });
+        swingUtils.invokeLater(() -> getInternalComponent().removeAllItems());
     }
 
     /** Returns whether component is editable or not. */
@@ -308,12 +299,7 @@ public final class ComboBox extends GenericWidget<MComboBox<Value>> {
         }
         final int pos = p + 3;
         if (pos >= 0 && pos < ip.length()) {
-            swingUtils.invokeLater(new Runnable() {
-                @Override
-                public void run() {
-                    tc.select(pos, ip.length());
-                }
-            });
+            swingUtils.invokeLater(() -> tc.select(pos, ip.length()));
         }
     }
 
@@ -331,12 +317,7 @@ public final class ComboBox extends GenericWidget<MComboBox<Value>> {
 
     @Override
     public void setBackgroundColor(final Color bg) {
-        swingUtils.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                setBackground(bg);
-            }
-        });
+        swingUtils.invokeLater(() -> setBackground(bg));
     }
 
     /** Cleanup whatever would cause a leak. */

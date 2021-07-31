@@ -22,7 +22,29 @@
 
 package lcmc.drbd.ui.resource;
 
-import com.google.common.base.Optional;
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.net.UnknownHostException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
+import java.util.concurrent.CountDownLatch;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.swing.BoxLayout;
+import javax.swing.ImageIcon;
+import javax.swing.JComponent;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+
 import lcmc.Exceptions;
 import lcmc.cluster.ui.ClusterBrowser;
 import lcmc.cluster.ui.widget.Check;
@@ -30,7 +52,6 @@ import lcmc.cluster.ui.widget.Widget;
 import lcmc.common.domain.AccessMode;
 import lcmc.common.domain.Application;
 import lcmc.common.domain.ColorText;
-import lcmc.common.domain.ResourceValue;
 import lcmc.common.domain.StringValue;
 import lcmc.common.domain.Value;
 import lcmc.common.domain.util.Tools;
@@ -54,23 +75,6 @@ import lcmc.logger.Logger;
 import lcmc.logger.LoggerFactory;
 import lcmc.lvm.service.LVM;
 
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.swing.*;
-import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.net.UnknownHostException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.CountDownLatch;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
 /**
  * This class holds info data for a block device.
  */
@@ -80,19 +84,20 @@ public class BlockDevInfo extends EditableInfo {
     private static final Value DRBD_MD_TYPE_FLEXIBLE = new StringValue("Flexible");
     private static final String DRBD_MD_PARAM = "DrbdMetaDisk";
     private static final String DRBD_MD_INDEX_PARAM = "DrbdMetaDiskIndex";
-    public static final ImageIcon HARDDISK_ICON_LARGE = Tools.createImageIcon(
-                           Tools.getDefault("BlockDevInfo.HarddiskIconLarge"));
+    public static final ImageIcon HARDDISK_ICON_LARGE = Tools.createImageIcon(Tools.getDefault("BlockDevInfo.HarddiskIconLarge"));
     public static final ImageIcon HARDDISK_DRBD_ICON_LARGE =
-                    Tools.createImageIcon(Tools.getDefault("BlockDevInfo.HarddiskDRBDIconLarge"));
+            Tools.createImageIcon(Tools.getDefault("BlockDevInfo.HarddiskDRBDIconLarge"));
     public static final ImageIcon NO_HARDDISK_ICON_LARGE =
-                    Tools.createImageIcon(Tools.getDefault("BlockDevInfo.NoHarddiskIconLarge"));
+            Tools.createImageIcon(Tools.getDefault("BlockDevInfo.NoHarddiskIconLarge"));
     public static final ImageIcon HARDDISK_ICON = Tools.createImageIcon(Tools.getDefault("BlockDevInfo.HarddiskIcon"));
     private static final ColorText METADISK_COLOR_TEXT = new ColorText("meta-disk", Color.BLUE, Color.BLACK);
     private static final ColorText SWAP_COLOR_TEXT = new ColorText("swap", Color.BLUE, Color.BLACK);
     private static final ColorText MOUNTED_COLOR_TEXT = new ColorText("mounted", Color.BLUE, Color.BLACK);
     private static final ColorText PHYSICAL_VOLUME_COLOR_TEXT = new ColorText("PV", Color.BLUE, Color.GREEN);
     private static final int MAX_RIGHT_CORNER_STRING_LENGTH = 28;
-    /** String that is displayed as a tool tip for disabled menu item. */
+    /**
+     * String that is displayed as a tool tip for disabled menu item.
+     */
     static final String NO_DRBD_RESOURCE_STRING = "it is not a drbd resource";
     public static final String ALLOW_TWO_PRIMARIES = "allow-two-primaries";
     public static final String PROXY_UP = "Proxy Up";
@@ -111,36 +116,33 @@ public class BlockDevInfo extends EditableInfo {
     private ClusterTreeMenu clusterTreeMenu;
 
     public void init(final String name, final BlockDevice blockDevice, final Browser browser) {
-        super.einit(Optional.<ResourceValue>of(blockDevice), name, browser);
+        super.einit(Optional.of(blockDevice), name, browser);
     }
 
     /**
-     * Return whether the block device is unimportant (for the GUI), e.g.
-     * cdrom or swap.
+     * Return whether the block device is unimportant (for the GUI), e.g. cdrom or swap.
      */
     private static boolean isUnimportant(final String name, final String type, final String mountedOn) {
-        return "swap".equals(type)
-               || "/".equals(mountedOn)
-               || "/boot".equals(mountedOn)
-               || name.startsWith("/dev/cdrom")
-               || name.startsWith("/dev/fd")
-               || name.startsWith("/dev/sr")
-               || name.endsWith("/root")
-               || name.endsWith("/lv_root")
-               || name.endsWith("/lv_swap")
-               || name.contains("/swap");
+        return "swap".equals(type) || "/".equals(mountedOn) || "/boot".equals(mountedOn) || name.startsWith("/dev/cdrom")
+               || name.startsWith("/dev/fd") || name.startsWith("/dev/sr") || name.endsWith("/root") || name.endsWith("/lv_root")
+               || name.endsWith("/lv_swap") || name.contains("/swap");
     }
-    /** DRBD resource in which this block device is member. */
+
+    /**
+     * DRBD resource in which this block device is member.
+     */
     private VolumeInfo volumeInfo;
-    /** Map from parameters to the fact if the last entered value was
-     * correct. */
-    private final Map<String, Boolean> paramCorrectValueMap = new HashMap<String, Boolean>();
-    /** Cache for the info panel. */
+    /**
+     * Map from parameters to the fact if the last entered value was correct.
+     */
+    private final Map<String, Boolean> paramCorrectValueMap = new HashMap<>();
+    /**
+     * Cache for the info panel.
+     */
     private JComponent infoPanel = null;
 
     /**
-     * Returns object of the other block device that is connected via drbd
-     * to this block device.
+     * Returns object of the other block device that is connected via drbd to this block device.
      */
     public BlockDevInfo getOtherBlockDevInfo() {
         final VolumeInfo dvi = volumeInfo;
@@ -430,12 +432,7 @@ public class BlockDevInfo extends EditableInfo {
         } else {
             final Widget gwi = super.createWidget(param, prefix, width);
             paramWi = gwi;
-            swingUtils.invokeLater(new Runnable() {
-                @Override
-                public void run() {
-                    gwi.setEditable(false);
-                }
-            });
+            swingUtils.invokeLater(() -> gwi.setEditable(false));
         }
         return paramWi;
     }
@@ -458,19 +455,9 @@ public class BlockDevInfo extends EditableInfo {
                             indW.setValue(DRBD_MD_TYPE_FLEXIBLE);
                         }
                     }
-                    swingUtils.invokeLater(new Runnable() {
-                        @Override
-                        public void run() {
-                            ind.setEnabled(!internal);
-                        }
-                    });
+                    swingUtils.invokeLater(() -> ind.setEnabled(!internal));
                     if (indW != null) {
-                        swingUtils.invokeLater(new Runnable() {
-                            @Override
-                            public void run() {
-                                indW.setEnabled(!internal);
-                            }
-                        });
+                        swingUtils.invokeLater(() -> indW.setEnabled(!internal));
                     }
                 }
             }
@@ -552,7 +539,6 @@ public class BlockDevInfo extends EditableInfo {
             /* meta disk */
             final Value internalMetaDisk =
                                     new StringValue("internal", Tools.getString("HostBrowser.MetaDisk.Internal"));
-            final Value defaultMetaDiskString = internalMetaDisk;
             getBrowser().lockBlockDevInfosRead();
             final Value[] blockDevices = getAvailableBlockDevicesForMetaDisk(
             internalMetaDisk,
@@ -560,8 +546,7 @@ public class BlockDevInfo extends EditableInfo {
             getBrowser().getSortedBlockDevInfos());
             getBrowser().unlockBlockDevInfosRead();
 
-            getBlockDevice().setDefaultValue(DRBD_MD_PARAM,
-            defaultMetaDiskString);
+            getBlockDevice().setDefaultValue(DRBD_MD_PARAM, internalMetaDisk);
             return blockDevices;
         } else if (DRBD_MD_INDEX_PARAM.equals(param)) {
             final Value dmdiValue = getBlockDevice().getValue(DRBD_MD_INDEX_PARAM);
@@ -580,7 +565,7 @@ public class BlockDevInfo extends EditableInfo {
             if (defaultMetaDiskIndex == null) {
                 defaultMetaDiskIndex = DRBD_MD_TYPE_FLEXIBLE.getValueForConfig();
             } else if (!DRBD_MD_TYPE_FLEXIBLE.getValueForConfig().equals(defaultMetaDiskIndex)) {
-                index = Integer.valueOf(defaultMetaDiskIndex) - 5;
+                index = Integer.parseInt(defaultMetaDiskIndex) - 5;
                 if (index < 0) {
                     index = 0;
                 }
@@ -616,13 +601,13 @@ public class BlockDevInfo extends EditableInfo {
         if (cv == null) {
             return false;
         }
-        return cv.booleanValue();
+        return cv;
     }
 
     protected Value[] getAvailableBlockDevicesForMetaDisk(final Value defaultValue,
                                                           final String serviceName,
                                                           final Iterable<BlockDevInfo> blockDevInfos) {
-        final List<Value> list = new ArrayList<Value>();
+        final List<Value> list = new ArrayList<>();
         final Value savedMetaDisk = getBlockDevice().getValue(DRBD_MD_PARAM);
 
         if (defaultValue != null) {
@@ -635,7 +620,7 @@ public class BlockDevInfo extends EditableInfo {
                 list.add(bdi);
             }
         }
-        return list.toArray(new Value[list.size()]);
+        return list.toArray(new Value[0]);
     }
 
     public void attach(final Application.RunMode runMode) {
@@ -775,29 +760,21 @@ public class BlockDevInfo extends EditableInfo {
 
     @Override
     public String[] getParametersFromXML() {
-        final String[] params = {
-            DRBD_MD_PARAM,
-            DRBD_MD_INDEX_PARAM,
-        };
-        return params;
+        return new String[]{DRBD_MD_PARAM, DRBD_MD_INDEX_PARAM,};
     }
 
     /** Apply all fields. */
     public void apply(final Application.RunMode runMode) {
         if (Application.isLive(runMode)) {
             final String[] params = getParametersFromXML();
-            swingUtils.invokeAndWait(new Runnable() {
-                @Override
-                public void run() {
-                    getApplyButton().setEnabled(false);
-                    getRevertButton().setEnabled(false);
-                    getInfoPanel();
-                }
+            swingUtils.invokeAndWait(() -> {
+                getApplyButton().setEnabled(false);
+                getRevertButton().setEnabled(false);
+                getInfoPanel();
             });
             waitForInfoPanel();
             if (getBlockDevice().getMetaDisk() != null) {
-                getBlockDevice().getMetaDisk().removeMetadiskOfBlockDevice(
-                getBlockDevice());
+                getBlockDevice().getMetaDisk().removeMetadiskOfBlockDevice(getBlockDevice());
             }
             getBlockDevice().setNew(false);
             storeComboBoxValues(params);
@@ -859,7 +836,7 @@ public class BlockDevInfo extends EditableInfo {
                 getBrowser().drbdtestLockAcquire();
                 thisClass.setDRBDtestData(null);
                 apply(Application.RunMode.TEST);
-                final Map<Host, String> testOutput = new LinkedHashMap<Host, String>();
+                final Map<Host, String> testOutput = new LinkedHashMap<>();
                 try {
                     getBrowser().getClusterBrowser().getGlobalInfo().createConfigDryRun(testOutput);
                     final DRBDtestData dtd = new DRBDtestData(testOutput);
@@ -893,59 +870,35 @@ public class BlockDevInfo extends EditableInfo {
         if (getBlockDevice().isDrbd()) {
             final String[] params = getParametersFromXML();
 
-            addParams(optionsPanel,
-                      params,
-                      application.getDefaultSize("HostBrowser.DrbdDevLabelWidth"),
-                      application.getDefaultSize("HostBrowser.DrbdDevFieldWidth"),
-                      null);
+            addParams(optionsPanel, params, application.getDefaultSize("HostBrowser.DrbdDevLabelWidth"),
+                    application.getDefaultSize("HostBrowser.DrbdDevFieldWidth"), null);
 
             /* apply button */
-            getApplyButton().addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(final ActionEvent e) {
-                    final Thread thread = new Thread(new Runnable() {
-                        @Override
-                        public void run() {
-                            swingUtils.invokeAndWait(new Runnable() {
-                                @Override
-                                public void run() {
-                                    getApplyButton().setEnabled(false);
-                                    getRevertButton().setEnabled(false);
-                                }
-                            });
-                            getBrowser().getClusterBrowser().drbdStatusLock();
-                            try {
-                                getBrowser().getClusterBrowser().getGlobalInfo().createDrbdConfigLive();
-                                for (final Host h : getHost().getCluster().getHostsArray()) {
-                                    DRBD.adjustApply(h, DRBD.ALL_DRBD_RESOURCES, null, Application.RunMode.LIVE);
-                                }
-                                apply(Application.RunMode.LIVE);
-                            } catch (final Exceptions.DrbdConfigException e) {
-                                LOG.appError("getInfoPanelBD: config failed", e);
-                            } catch (final UnknownHostException e) {
-                                LOG.appError("getInfoPanelBD: config failed", e);
-                            } finally {
-                                getBrowser().getClusterBrowser().drbdStatusUnlock();
-                            }
-                        }
+            getApplyButton().addActionListener(e -> {
+                final Thread thread = new Thread(() -> {
+                    swingUtils.invokeAndWait(() -> {
+                        getApplyButton().setEnabled(false);
+                        getRevertButton().setEnabled(false);
                     });
-                    thread.start();
-                }
-            });
-            getRevertButton().addActionListener(
-                new ActionListener() {
-                    @Override
-                    public void actionPerformed(final ActionEvent e) {
-                        final Thread thread = new Thread(new Runnable() {
-                            @Override
-                            public void run() {
-                                revert();
-                            }
-                        });
-                        thread.start();
+                    getBrowser().getClusterBrowser().drbdStatusLock();
+                    try {
+                        getBrowser().getClusterBrowser().getGlobalInfo().createDrbdConfigLive();
+                        for (final Host h : getHost().getCluster().getHostsArray()) {
+                            DRBD.adjustApply(h, DRBD.ALL_DRBD_RESOURCES, null, Application.RunMode.LIVE);
+                        }
+                        apply(Application.RunMode.LIVE);
+                    } catch (final Exceptions.DrbdConfigException | UnknownHostException e1) {
+                        LOG.appError("getInfoPanelBD: config failed", e1);
+                    } finally {
+                        getBrowser().getClusterBrowser().drbdStatusUnlock();
                     }
-                }
-            );
+                });
+                thread.start();
+            });
+            getRevertButton().addActionListener(e -> {
+                final Thread thread = new Thread(this::revert);
+                thread.start();
+            });
             addApplyButton(buttonPanel);
             addRevertButton(buttonPanel);
         }
@@ -1074,8 +1027,7 @@ public class BlockDevInfo extends EditableInfo {
             String s = getBlockDevice().getName();
             // TODO: cache that
             if (s.length() > MAX_RIGHT_CORNER_STRING_LENGTH) {
-                s = "..." + s.substring(s.length() - MAX_RIGHT_CORNER_STRING_LENGTH + 3,
-                s.length());
+                s = "..." + s.substring(s.length() - MAX_RIGHT_CORNER_STRING_LENGTH + 3);
             }
             if (getBlockDevice().isDrbdPhysicalVolume()) {
                 final String drbdVG = getBlockDevice().getDrbdBlockDevice().getVgOnPhysicalVolume();
@@ -1302,11 +1254,11 @@ public class BlockDevInfo extends EditableInfo {
             dvi.setApplyButtons(null, dvi.getParametersFromXML());
         }
         final DrbdXml dxml = getBrowser().getClusterBrowser().getDrbdXml();
-        final List<String> incorrect = new ArrayList<String>();
+        final List<String> incorrect = new ArrayList<>();
         if (dxml != null && dxml.isDrbdDisabled()) {
             incorrect.add("drbd is disabled");
         }
-        final Check check = new Check(incorrect, new ArrayList<String>());
+        final Check check = new Check(incorrect, new ArrayList<>());
         check.addCheck(super.checkResourceFields(param, params));
         return check;
     }

@@ -21,7 +21,35 @@
  */
 package lcmc.drbd.ui.resource;
 
-import com.google.common.base.Optional;
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.net.UnknownHostException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.Set;
+import java.util.concurrent.CountDownLatch;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Provider;
+import javax.swing.BoxLayout;
+import javax.swing.JComponent;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.SpringLayout;
+
 import lcmc.Exceptions;
 import lcmc.cluster.service.NetworkService;
 import lcmc.cluster.ui.ClusterBrowser;
@@ -32,7 +60,6 @@ import lcmc.cluster.ui.widget.Widget;
 import lcmc.cluster.ui.widget.WidgetFactory;
 import lcmc.common.domain.AccessMode;
 import lcmc.common.domain.Application;
-import lcmc.common.domain.ResourceValue;
 import lcmc.common.domain.StringValue;
 import lcmc.common.domain.Value;
 import lcmc.common.domain.util.Tools;
@@ -60,27 +87,6 @@ import lcmc.host.ui.HostBrowser;
 import lcmc.logger.Logger;
 import lcmc.logger.LoggerFactory;
 
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Provider;
-import javax.swing.*;
-import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.net.UnknownHostException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.CountDownLatch;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
 /**
  * this class holds info data, menus and configuration
  * for a drbd resource.
@@ -94,49 +100,75 @@ public class ResourceInfo extends AbstractDrbdInfo {
     private static final Value PROXY_DEFAULT_PROTOCOL = DrbdXml.PROTOCOL_A;
     private static final Value PROXY_DEFAULT_PING_TIMEOUT = new StringValue("100");
 
-    /** Parse ip and host name. */
-    public static final Pattern DRBDP_ADDRESS = Pattern.compile('^' + ProxyNetInfo.PROXY_PREFIX
-                                                                + "(\\d+\\.\\d+\\.\\d+\\.\\d+)(\\s+\\S+\\s+(\\S+))$");
+    /**
+     * Parse ip and host name.
+     */
+    public static final Pattern DRBDP_ADDRESS =
+            Pattern.compile('^' + ProxyNetInfo.PROXY_PREFIX + "(\\d+\\.\\d+\\.\\d+\\.\\d+)(\\s+\\S+\\s+(\\S+))$");
 
     public static final String FAMILY_SDP = "sdp";
     public static final String FAMILY_SSOCKS = "ssocks";
-    private final Set<VolumeInfo> drbdVolumes = new LinkedHashSet<VolumeInfo>();
-    /** Cache for getInfoPanel method. */
+    private final Set<VolumeInfo> drbdVolumes = new LinkedHashSet<>();
+    /**
+     * Cache for getInfoPanel method.
+     */
     private JComponent infoPanel = null;
-    /** Whether the meta-data has to be created or not. */
+    /**
+     * Whether the meta-data has to be created or not.
+     */
     private boolean haveToCreateMD = false;
-    private Map<Host, Widget> addressComboBoxHash = new HashMap<Host, Widget>();
-    private Map<Host, Widget> insideIpComboBoxHash = new HashMap<Host, Widget>();
-    private Map<Host, Widget> outsideIpComboBoxHash = new HashMap<Host, Widget>();
-    private Map<Host, Widget> addressComboBoxHashWizard = new HashMap<Host, Widget>();
-    private Map<Host, Widget> insideIpComboBoxHashWizard = new HashMap<Host, Widget>();
-    private Map<Host, Widget> outsideIpComboBoxHashWizard = new HashMap<Host, Widget>();
-    private final Map<Host, Value> savedHostAddresses = new HashMap<Host, Value>();
-    private final Map<Host, Value> savedInsideIps = new HashMap<Host, Value>();
-    private final Map<Host, Value> savedOutsideIps = new HashMap<Host, Value>();
-    /** Saved port, that is the same for both hosts. */
+    private Map<Host, Widget> addressComboBoxHash = new HashMap<>();
+    private Map<Host, Widget> insideIpComboBoxHash = new HashMap<>();
+    private Map<Host, Widget> outsideIpComboBoxHash = new HashMap<>();
+    private Map<Host, Widget> addressComboBoxHashWizard = new HashMap<>();
+    private Map<Host, Widget> insideIpComboBoxHashWizard = new HashMap<>();
+    private Map<Host, Widget> outsideIpComboBoxHashWizard = new HashMap<>();
+    private final Map<Host, Value> savedHostAddresses = new HashMap<>();
+    private final Map<Host, Value> savedInsideIps = new HashMap<>();
+    private final Map<Host, Value> savedOutsideIps = new HashMap<>();
+    /**
+     * Saved port, that is the same for both hosts.
+     */
     private Value savedPort = null;
-    /** Saved proxy inside port, that is the same for both hosts. */
+    /**
+     * Saved proxy inside port, that is the same for both hosts.
+     */
     private Value savedInsidePort = null;
-    /** Saved proxy outside port, that is the same for both hosts. */
+    /**
+     * Saved proxy outside port, that is the same for both hosts.
+     */
     private Value savedOutsidePort = null;
-    /** Port combo box. */
+    /**
+     * Port combo box.
+     */
     private Widget portComboBox = null;
-    /** Port combo box wizard. */
+    /**
+     * Port combo box wizard.
+     */
     private Widget portComboBoxWizard = null;
-    /** Proxy inside port combo box. */
+    /**
+     * Proxy inside port combo box.
+     */
     private Widget insidePortComboBox = null;
-    /** Proxy outside port combo box. */
+    /**
+     * Proxy outside port combo box.
+     */
     private Widget outsidePortComboBox = null;
-    /** Proxy inside port combo box for wizard. */
+    /**
+     * Proxy inside port combo box for wizard.
+     */
     private Widget insidePortComboBoxWizard = null;
-    /** Proxy outside port combo box for wizard. */
+    /**
+     * Proxy outside port combo box for wizard.
+     */
     private Widget outsidePortComboBoxWizard = null;
-    /** Resync-after combobox. */
+    /**
+     * Resync-after combobox.
+     */
     private Widget resyncAfterParamWi = null;
     private ServiceInfo isUsedByCRM;
     private Set<Host> hosts;
-    private final Collection<Host> selectedProxyHosts = new HashSet<Host>();
+    private final Collection<Host> selectedProxyHosts = new HashSet<>();
     private GlobalInfo globalInfo;
     @Inject
     private Application application;
@@ -156,7 +188,7 @@ public class ResourceInfo extends AbstractDrbdInfo {
     private ClusterViewFactory clusterViewFactory;
 
     public void init(final String name, final Set<Host> hosts, final Browser browser) {
-        super.einit(Optional.<ResourceValue>of(new DrbdResource(name)), name, browser);
+        super.einit(Optional.of(new DrbdResource(name)), name, browser);
         this.hosts = hosts;
         globalInfo = ((ClusterBrowser) browser).getGlobalInfo();
     }
@@ -229,7 +261,7 @@ public class ResourceInfo extends AbstractDrbdInfo {
         */
         final boolean volumesAvailable = configOnHost.hasVolumes();
         for (final Host host : getHosts()) {
-            final Collection<String> volumeConfigs = new ArrayList<String>();
+            final Collection<String> volumeConfigs = new ArrayList<>();
             for (final VolumeInfo dvi : drbdVolumes) {
                 final String volumeConfig = dvi.drbdVolumeConfig(host, volumesAvailable);
                 if (volumeConfig != null && !volumeConfig.isEmpty()) {
@@ -358,7 +390,7 @@ public class ResourceInfo extends AbstractDrbdInfo {
             paramWi.setEnabled(!getDrbdResource().isCommited());
             widgetAdd(param, prefix, paramWi);
         } else if (DRBD_RES_PARAM_AFTER.equals(param) || DRBD_RES_PARAM_AFTER_8_3.equals(param)) {
-            final List<Value> l = new ArrayList<Value>();
+            final List<Value> l = new ArrayList<>();
             final Value defaultItem = getParamSaved(param);
             final Value di = new StringValue("-1", Tools.getString("ClusterBrowser.None"));
             l.add(di);
@@ -385,15 +417,9 @@ public class ResourceInfo extends AbstractDrbdInfo {
                 }
             }
             getBrowser().putDrbdResHash();
-            resyncAfterParamWi = widgetFactory.createInstance(
-                                      Widget.Type.COMBOBOX,
-                                      defaultItem,
-                                      l.toArray(new Value[l.size()]),
-                                      Widget.NO_REGEXP,
-                                      width,
-                                      Widget.NO_ABBRV,
-                                      new AccessMode(getAccessType(param), isEnabledOnlyInAdvancedMode(param)),
-                                      Widget.NO_BUTTON);
+            resyncAfterParamWi = widgetFactory.createInstance(Widget.Type.COMBOBOX, defaultItem, l.toArray(new Value[0]),
+                    Widget.NO_REGEXP, width, Widget.NO_ABBRV,
+                    new AccessMode(getAccessType(param), isEnabledOnlyInAdvancedMode(param)), Widget.NO_BUTTON);
             paramWi = resyncAfterParamWi;
             widgetAdd(param, prefix, paramWi);
         } else {
@@ -479,7 +505,7 @@ public class ResourceInfo extends AbstractDrbdInfo {
                 getBrowser().getDrbdGraph().startTestAnimation((JComponent) component, startTestLatch);
                 getBrowser().drbdtestLockAcquire();
                 getBrowser().setDRBDtestData(null);
-                final Map<Host, String> testOutput = new LinkedHashMap<Host, String>();
+                final Map<Host, String> testOutput = new LinkedHashMap<>();
                 try {
                     globalInfo.createConfigDryRun(testOutput);
                     final DRBDtestData dtd = new DRBDtestData(testOutput);
@@ -516,72 +542,47 @@ public class ResourceInfo extends AbstractDrbdInfo {
         getResource().setValue(DRBD_RES_PARAM_NAME, new StringValue(getDrbdResource().getName()));
         final String[] params = getParametersFromXML();
         /* address combo boxes */
-        addHostAddresses(optionsPanel,
-                         application.getServiceLabelWidth(),
-                         application.getServiceFieldWidth(),
-                         false,
-                         getApplyButton());
+        addHostAddresses(optionsPanel, application.getServiceLabelWidth(), application.getServiceFieldWidth(), false,
+                getApplyButton());
         enableSection(SECTION_PROXY, !DrbdProxy.PROXY, !WIZARD);
-        addParams(optionsPanel,
-                  params,
-                  application.getDefaultSize("ClusterBrowser.DrbdResLabelWidth"),
-                  application.getDefaultSize("ClusterBrowser.DrbdResFieldWidth"),
-                  null);
+        addParams(optionsPanel, params, application.getDefaultSize("ClusterBrowser.DrbdResLabelWidth"),
+                application.getDefaultSize("ClusterBrowser.DrbdResFieldWidth"), null);
 
-        getApplyButton().addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(final ActionEvent e) {
-                LOG.debug1("getInfoPanel: BUTTON: apply");
-                final Thread thread = new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        swingUtils.invokeAndWait(new Runnable() {
-                            @Override
-                            public void run() {
-                                getApplyButton().setEnabled(false);
-                                getRevertButton().setEnabled(false);
-                            }
-                        });
-                        getBrowser().drbdStatusLock();
-                        try {
-                            globalInfo.createDrbdConfigLive();
-                            for (final Host h : getHosts()) {
-                                DRBD.adjustApply(h, DRBD.ALL_DRBD_RESOURCES, null, Application.RunMode.LIVE);
-                            }
-                            apply(Application.RunMode.LIVE);
-                        } catch (final Exceptions.DrbdConfigException dce) {
-                            LOG.appError("getInfoPanel: config failed", dce);
-                        } catch (final UnknownHostException uhe) {
-                            LOG.appError("getInfoPanel: config failed", uhe);
-                        } finally {
-                            getBrowser().drbdStatusUnlock();
-                        }
-                    }
+        getApplyButton().addActionListener(e -> {
+            LOG.debug1("getInfoPanel: BUTTON: apply");
+            final Thread thread = new Thread(() -> {
+                swingUtils.invokeAndWait(() -> {
+                    getApplyButton().setEnabled(false);
+                    getRevertButton().setEnabled(false);
                 });
-                thread.start();
-            }
+                getBrowser().drbdStatusLock();
+                try {
+                    globalInfo.createDrbdConfigLive();
+                    for (final Host h : getHosts()) {
+                        DRBD.adjustApply(h, DRBD.ALL_DRBD_RESOURCES, null, Application.RunMode.LIVE);
+                    }
+                    apply(Application.RunMode.LIVE);
+                } catch (final Exceptions.DrbdConfigException | UnknownHostException dce) {
+                    LOG.appError("getInfoPanel: config failed", dce);
+                } finally {
+                    getBrowser().drbdStatusUnlock();
+                }
+            });
+            thread.start();
         });
 
-        getRevertButton().addActionListener(
-            new ActionListener() {
-                @Override
-                public void actionPerformed(final ActionEvent e) {
-                    LOG.debug1("getInfoPanel: BUTTON: revert");
-                    final Thread thread = new Thread(new Runnable() {
-                        @Override
-                        public void run() {
-                            getBrowser().drbdStatusLock();
-                            try {
-                                revert();
-                            } finally {
-                                getBrowser().drbdStatusUnlock();
-                            }
-                        }
-                    });
-                    thread.start();
+        getRevertButton().addActionListener(e -> {
+            LOG.debug1("getInfoPanel: BUTTON: revert");
+            final Thread thread = new Thread(() -> {
+                getBrowser().drbdStatusLock();
+                try {
+                    revert();
+                } finally {
+                    getBrowser().drbdStatusUnlock();
                 }
-            }
-        );
+            });
+            thread.start();
+        });
 
 
         addApplyButton(buttonPanel);
@@ -873,7 +874,7 @@ public class ResourceInfo extends AbstractDrbdInfo {
     }
 
     private boolean checkAddressCorrect() {
-        final Map<Host, Widget> addressComboBoxHashClone = new HashMap<Host, Widget>(addressComboBoxHash);
+        final Map<Host, Widget> addressComboBoxHashClone = new HashMap<>(addressComboBoxHash);
         boolean correct = true;
         for (final Map.Entry<Host, Widget> hostWidgetEntry : addressComboBoxHashClone.entrySet()) {
             final Widget wi = hostWidgetEntry.getValue();
@@ -918,7 +919,7 @@ public class ResourceInfo extends AbstractDrbdInfo {
 
     /** Check proxy inside Ip. */
     private boolean checkProxyInsideIpCorrect() {
-        final Map<Host, Widget> insideIpComboBoxHashClone = new HashMap<Host, Widget>(insideIpComboBoxHash);
+        final Map<Host, Widget> insideIpComboBoxHashClone = new HashMap<>(insideIpComboBoxHash);
         boolean correct = true;
         for (final Host host : getHosts()) {
             final Host proxyHost = getProxyHost(host, !WIZARD);
@@ -951,7 +952,7 @@ public class ResourceInfo extends AbstractDrbdInfo {
 
     /** Check proxy outside ip. */
     private boolean checkProxyOutsideIpCorrect() {
-        final Map<Host, Widget> outsideIpComboBoxHashClone = new HashMap<Host, Widget>(outsideIpComboBoxHash);
+        final Map<Host, Widget> outsideIpComboBoxHashClone = new HashMap<>(outsideIpComboBoxHash);
         boolean correct = true;
         for (final Host host : getHosts()) {
             final Host proxyHost = getProxyHost(host, !WIZARD);
@@ -983,8 +984,8 @@ public class ResourceInfo extends AbstractDrbdInfo {
      * one value is changed and we don't want to check everything.
      */
     Check checkResourceFields(final String param, final String[] params, final boolean fromDrbdInfo) {
-        final List<String> incorrect = new ArrayList<String>();
-        final List<String> changed = new ArrayList<String>();
+        final List<String> incorrect = new ArrayList<>();
+        final List<String> changed = new ArrayList<>();
         final DrbdXml dxml = getBrowser().getDrbdXml();
         final Check check = new Check(incorrect, changed);
         if (dxml != null && dxml.isDrbdDisabled()) {
@@ -1044,32 +1045,24 @@ public class ResourceInfo extends AbstractDrbdInfo {
             }
         }
 
-        final Map<Host, Widget> addressComboBoxHashClone = new HashMap<Host, Widget>(addressComboBoxHash);
+        final Map<Host, Widget> addressComboBoxHashClone = new HashMap<>(addressComboBoxHash);
         for (final Map.Entry<Host, Widget> hostWidgetEntry : addressComboBoxHashClone.entrySet()) {
             final Widget wi = hostWidgetEntry.getValue();
             final Value haSaved = savedHostAddresses.get(hostWidgetEntry.getKey());
             if (!Tools.areEqual(wi.getValue(), haSaved)) {
                 final Widget wizardWi = addressComboBoxHashWizard.get(hostWidgetEntry.getKey());
-                if (wizardWi == null) {
-                    wi.setValue(haSaved);
-                } else {
-                    wizardWi.setValue(haSaved);
-                }
+                Objects.requireNonNullElse(wizardWi, wi).setValue(haSaved);
             }
         }
 
         final Widget pwi = portComboBox;
         if (!Tools.areEqual(pwi.getValue(), savedPort)) {
             final Widget wizardWi = portComboBoxWizard;
-            if (wizardWi == null) {
-                pwi.setValue(savedPort);
-            } else {
-                wizardWi.setValue(savedPort);
-            }
+            Objects.requireNonNullElse(wizardWi, pwi).setValue(savedPort);
         }
 
         /* proxy */
-        final Map<Host, Widget> insideIpComboBoxHashClone = new HashMap<Host, Widget>(insideIpComboBoxHash);
+        final Map<Host, Widget> insideIpComboBoxHashClone = new HashMap<>(insideIpComboBoxHash);
         for (final Map.Entry<Host, Widget> hostWidgetEntry : insideIpComboBoxHashClone.entrySet()) {
             final Widget wi = hostWidgetEntry.getValue();
             Value ipSaved = savedInsideIps.get(hostWidgetEntry.getKey());
@@ -1078,11 +1071,7 @@ public class ResourceInfo extends AbstractDrbdInfo {
             }
             if (!Tools.areEqual(wi.getValue(), ipSaved)) {
                 final Widget wizardWi = insideIpComboBoxHashWizard.get(hostWidgetEntry.getKey());
-                if (wizardWi == null) {
-                    wi.setValue(ipSaved);
-                } else {
-                    wizardWi.setValue(ipSaved);
-                }
+                Objects.requireNonNullElse(wizardWi, wi).setValue(ipSaved);
             }
         }
 
@@ -1096,17 +1085,13 @@ public class ResourceInfo extends AbstractDrbdInfo {
             }
         }
 
-        final Map<Host, Widget> outsideIpComboBoxHashClone = new HashMap<Host, Widget>(outsideIpComboBoxHash);
+        final Map<Host, Widget> outsideIpComboBoxHashClone = new HashMap<>(outsideIpComboBoxHash);
         for (final Map.Entry<Host, Widget> hostWidgetEntry : outsideIpComboBoxHashClone.entrySet()) {
             final Widget wi = hostWidgetEntry.getValue();
             final Value ipSaved = savedOutsideIps.get(hostWidgetEntry.getKey());
             if (!Tools.areEqual(wi.getValue(), ipSaved)) {
                 final Widget wizardWi = outsideIpComboBoxHashWizard.get(hostWidgetEntry.getKey());
-                if (wizardWi == null) {
-                    wi.setValue(ipSaved);
-                } else {
-                    wizardWi.setValue(ipSaved);
-                }
+                Objects.requireNonNullElse(wizardWi, wi).setValue(ipSaved);
             }
         }
 
@@ -1161,27 +1146,22 @@ public class ResourceInfo extends AbstractDrbdInfo {
         return Integer.toString(maxNr + 1);
     }
 
-    /** Creates host address combo boxes with labels, one per host. */
-    public void addHostAddresses(final JPanel optionsPanel,
-                                 final int leftWidth,
-                                 final int rightWidth,
-                                 final boolean wizard,
-                                 final MyButton thisApplyButton) {
-        final Map<Host, Widget> newAddressComboBoxHash = new HashMap<Host, Widget>();
-        final Map<Host, Widget> newInsideIpComboBoxHash = new HashMap<Host, Widget>();
-        final Map<Host, Widget> newOutsideIpComboBoxHash = new HashMap<Host, Widget>();
+    /**
+     * Creates host address combo boxes with labels, one per host.
+     */
+    public void addHostAddresses(final JPanel optionsPanel, final int leftWidth, final int rightWidth, final boolean wizard,
+            final MyButton thisApplyButton) {
+        final Map<Host, Widget> newAddressComboBoxHash = new HashMap<>();
+        final Map<Host, Widget> newInsideIpComboBoxHash = new HashMap<>();
+        final Map<Host, Widget> newOutsideIpComboBoxHash = new HashMap<>();
         final JPanel panel = getParamPanel(Tools.getString("ResourceInfo.HostAddresses"));
         panel.setLayout(new SpringLayout());
         for (final Host host : getHosts()) {
             final Value haSaved = savedHostAddresses.get(host);
-            final Widget wi = widgetFactory.createInstance(Widget.Type.COMBOBOX,
-                                                           haSaved,
-                                                           getNetInterfacesWithProxies(host.getBrowser()),
-                                                           Widget.NO_REGEXP,
-                                                           rightWidth,
-                                                           Widget.NO_ABBRV,
-                                                           new AccessMode(AccessMode.ADMIN, AccessMode.NORMAL),
-                                                           Widget.NO_BUTTON);
+            final Widget wi =
+                    widgetFactory.createInstance(Widget.Type.COMBOBOX, haSaved, getNetInterfacesWithProxies(host.getBrowser()),
+                            Widget.NO_REGEXP, rightWidth, Widget.NO_ABBRV, new AccessMode(AccessMode.ADMIN, AccessMode.NORMAL),
+                            Widget.NO_BUTTON);
             newAddressComboBoxHash.put(host, wi);
 
         }
@@ -1209,14 +1189,8 @@ public class ResourceInfo extends AbstractDrbdInfo {
         }
         final List<Value> drbdPorts = getPossibleDrbdPorts(defaultPortInt);
 
-        final Widget pwi = widgetFactory.createInstance(Widget.Type.COMBOBOX,
-                                                        defaultPort,
-                                                        drbdPorts.toArray(new Value[drbdPorts.size()]),
-                                                        "^\\d*$",
-                                                        leftWidth,
-                                                        Widget.NO_ABBRV,
-                                                        new AccessMode(AccessMode.ADMIN, AccessMode.NORMAL),
-                                                        Widget.NO_BUTTON);
+        final Widget pwi = widgetFactory.createInstance(Widget.Type.COMBOBOX, defaultPort, drbdPorts.toArray(new Value[0]),
+                "^\\d*$", leftWidth, Widget.NO_ABBRV, new AccessMode(AccessMode.ADMIN, AccessMode.NORMAL), Widget.NO_BUTTON);
         pwi.setAlwaysEditable(true);
         final String port = Tools.getString("ResourceInfo.NetInterfacePort");
         final JLabel label = new JLabel(port);
@@ -1275,15 +1249,9 @@ public class ResourceInfo extends AbstractDrbdInfo {
         final int insideDefaultPortInt = getDefaultInsidePort();
         final String insideDefaultPort = Integer.toString(insideDefaultPortInt);
         final List<Value> insideDrbdPorts = getPossibleDrbdPorts(insideDefaultPortInt);
-        final Widget insidePortWi = widgetFactory.createInstance(
-                                                        Widget.Type.COMBOBOX,
-                                                        new StringValue(insideDefaultPort),
-                                                        insideDrbdPorts.toArray(new Value[insideDrbdPorts.size()]),
-                                                        "^\\d*$",
-                                                        leftWidth,
-                                                        Widget.NO_ABBRV,
-                                                        new AccessMode(AccessMode.ADMIN, AccessMode.NORMAL),
-                                                        Widget.NO_BUTTON);
+        final Widget insidePortWi = widgetFactory.createInstance(Widget.Type.COMBOBOX, new StringValue(insideDefaultPort),
+                insideDrbdPorts.toArray(new Value[0]), "^\\d*$", leftWidth, Widget.NO_ABBRV,
+                new AccessMode(AccessMode.ADMIN, AccessMode.NORMAL), Widget.NO_BUTTON);
         insidePortWi.setAlwaysEditable(true);
 
         final JLabel insidePortLabel = new JLabel(Tools.getString("ResourceInfo.ProxyInsidePort"));
@@ -1310,15 +1278,9 @@ public class ResourceInfo extends AbstractDrbdInfo {
             outsideDefaultPortInt = Integer.parseInt(outsideDefaultPort.getValueForConfig());
         }
         final List<Value> outsideDrbdPorts = getPossibleDrbdPorts(outsideDefaultPortInt);
-        final Widget outsidePortWi = widgetFactory.createInstance(
-                                                        Widget.Type.COMBOBOX,
-                                                        outsideDefaultPort,
-                                                        outsideDrbdPorts.toArray(new Value[outsideDrbdPorts.size()]),
-                                                        "^\\d*$",
-                                                        leftWidth,
-                                                        Widget.NO_ABBRV,
-                                                        new AccessMode(AccessMode.ADMIN, AccessMode.NORMAL),
-                                                        Widget.NO_BUTTON);
+        final Widget outsidePortWi = widgetFactory.createInstance(Widget.Type.COMBOBOX, outsideDefaultPort,
+                outsideDrbdPorts.toArray(new Value[0]), "^\\d*$", leftWidth, Widget.NO_ABBRV,
+                new AccessMode(AccessMode.ADMIN, AccessMode.NORMAL), Widget.NO_BUTTON);
         outsidePortWi.setAlwaysEditable(true);
 
         final JLabel outsidePortLabel = new JLabel(Tools.getString("ResourceInfo.ProxyOutsidePort"));
@@ -1345,7 +1307,7 @@ public class ResourceInfo extends AbstractDrbdInfo {
                              final Map<Host, Widget> newInsideIpComboBoxHash,
                              final Map<Host, Widget> newOutsideIpComboBoxHash) {
         final DrbdXml dxml = getBrowser().getDrbdXml();
-        for (final Host pHost : new HashSet<Host>(getCluster().getProxyHosts())) {
+        for (final Host pHost : new HashSet<>(getCluster().getProxyHosts())) {
             final String section = Tools.getString("ResourceInfo.Proxy") + pHost.getName();
             final JPanel sectionPanel = getParamPanel(section);
             addSectionPanel(section, wizard, sectionPanel);
@@ -1420,17 +1382,17 @@ public class ResourceInfo extends AbstractDrbdInfo {
     }
 
     private Value[] getNetInterfaces(final HostBrowser hostBrowser) {
-        final List<Value> list = new ArrayList<Value>();
+        final List<Value> list = new ArrayList<>();
 
         list.add(null);
         for (final NetInterface netInterface : networkService.getNetInterfacesWithBridges(hostBrowser.getHost())) {
             list.add(clusterViewFactory.getNetView(netInterface, hostBrowser));
         }
-        return list.toArray(new Value[list.size()]);
+        return list.toArray(new Value[0]);
     }
 
     private Value[] getNetInterfacesWithProxies(final HostBrowser hostBrowser) {
-        final List<Value> list = new ArrayList<Value>();
+        final List<Value> list = new ArrayList<>();
 
         list.add(new StringValue());
         for (final NetInterface netInterface : networkService.getNetInterfacesWithBridges(hostBrowser.getHost())) {
@@ -1460,7 +1422,7 @@ public class ResourceInfo extends AbstractDrbdInfo {
                 list.add(proxyNetInfo);
             }
         }
-        return list.toArray(new Value[list.size()]);
+        return list.toArray(new Value[0]);
     }
 
     /** Returns true if some of the addresses have changed. */
@@ -1487,11 +1449,7 @@ public class ResourceInfo extends AbstractDrbdInfo {
 
     /** Returns true if some of proxy fields have changed. */
     private boolean checkProxyFieldsChanged() {
-        boolean changed = false;
-        /* ports */
-        if (insidePortComboBox != null && !Tools.areEqual(savedInsidePort, insidePortComboBox.getValue())) {
-            changed = true;
-        }
+        boolean changed = insidePortComboBox != null && !Tools.areEqual(savedInsidePort, insidePortComboBox.getValue());
 
         if (outsidePortComboBox != null && !Tools.areEqual(savedOutsidePort, outsidePortComboBox.getValue())) {
             changed = true;
@@ -1607,7 +1565,7 @@ public class ResourceInfo extends AbstractDrbdInfo {
 
     /** Hide/show proxy panels for selected hosts. */
     public void setProxyPanels(final boolean wizard) {
-        final Collection<Host> visible = new HashSet<Host>();
+        final Collection<Host> visible = new HashSet<>();
         final Widget insidePortCB;
         final Widget outsidePortCB;
         final Widget portCB;
@@ -1691,17 +1649,9 @@ public class ResourceInfo extends AbstractDrbdInfo {
                         final int s = ProxyNetInfo.PROXY_PREFIX.length();
                         /* select the IP part */
                         wi.setAlwaysEditable(true);
-                        swingUtils.invokeLater(new Runnable() {
-                            @Override
-                            public void run() {
-                                wi.select(s, s + NetInfo.IP_PLACEHOLDER.length());
-                            }
-                        });
-                    } else if (value instanceof StringValue) {
-                        wi.setAlwaysEditable(true);
-                    } else {
-                        wi.setAlwaysEditable(false);
-                    }
+                        swingUtils.invokeLater(() -> wi.select(s, s + NetInfo.IP_PLACEHOLDER.length()));
+                    } else
+                        wi.setAlwaysEditable(value instanceof StringValue);
                     if (value instanceof ProxyNetInfo && ((NetInfo) value).isLocalHost()) {
                         final Map<Host, Widget> cb;
                         if (wizard) {
@@ -1717,11 +1667,9 @@ public class ResourceInfo extends AbstractDrbdInfo {
         }
     }
 
-    private void addIpListeners(final boolean wizard,
-                                final MyButton thisApplyButton,
-                                final Map<Host, Widget> newIpComboBoxHash,
-                                final Map<Host, Widget> ipComboBoxHash) {
-        for (final Host pHost : new HashSet<Host>(getCluster().getProxyHosts())) {
+    private void addIpListeners(final boolean wizard, final MyButton thisApplyButton, final Map<Host, Widget> newIpComboBoxHash,
+            final Map<Host, Widget> ipComboBoxHash) {
+        for (final Host pHost : new HashSet<>(getCluster().getProxyHosts())) {
             final Widget wi;
             final Widget rwi;
             if (wizard) {
@@ -1833,7 +1781,7 @@ public class ResourceInfo extends AbstractDrbdInfo {
         if (!globalInfo.atLeastVersion("8.4")) {
             param = DRBD_RES_PARAM_AFTER_8_3;
         }
-        final List<Value> l = new ArrayList<Value>();
+        final List<Value> l = new ArrayList<>();
         final Value di = new StringValue("-1", Tools.getString("ClusterBrowser.None"));
         l.add(di);
         final Map<String, ResourceInfo> drbdResHash = getBrowser().getDrbdResourceNameHash();
@@ -1862,7 +1810,7 @@ public class ResourceInfo extends AbstractDrbdInfo {
 
         if (resyncAfterParamWi != null) {
             final Value value = resyncAfterParamWi.getValue();
-            resyncAfterParamWi.reloadComboBox(value, l.toArray(new Value[l.size()]));
+            resyncAfterParamWi.reloadComboBox(value, l.toArray(new Value[0]));
         }
     }
     /** Creates popup for the block device. */
@@ -1994,7 +1942,7 @@ public class ResourceInfo extends AbstractDrbdInfo {
 
     /** Return list of DRBD ports for combobox. */
     List<Value> getPossibleDrbdPorts(final int defaultPortInt) {
-        final List<Value> drbdPorts = new ArrayList<Value>();
+        final List<Value> drbdPorts = new ArrayList<>();
         drbdPorts.add(null);
         int defaultPortInt0 = defaultPortInt;
         int i = 0;
@@ -2004,6 +1952,7 @@ public class ResourceInfo extends AbstractDrbdInfo {
             for (final Host host : getHosts()) {
                 if (host.getBrowser().getUsedPorts().contains(port)) {
                     contains = true;
+                    break;
                 }
             }
             if (!contains || i == 0) {
@@ -2052,7 +2001,7 @@ public class ResourceInfo extends AbstractDrbdInfo {
     /**
      * Return proxy hosts that are used in this resource. */
     public Set<Host> getConfiguredProxyHosts() {
-        final Set<Host> proxyHosts = new HashSet<Host>();
+        final Set<Host> proxyHosts = new HashSet<>();
         for (final Host host : getHosts()) {
             final Host proxyHost = getProxyHost(host, !WIZARD);
             if (proxyHost != null) {
@@ -2076,9 +2025,9 @@ public class ResourceInfo extends AbstractDrbdInfo {
     @Override
     public int hashCode() {
         int hash = 5;
-        hash = 59 * hash + (this.getValueForConfig() != null ? this.getValueForConfig().hashCode() : 0);
-        hash = 59 * hash + (this.getUnit() != null ? this.getUnit().hashCode() : 0);
-        hash = 59 * hash + (this.getBrowser() != null ? this.getBrowser().hashCode() : 0);
+        hash = 59 * hash + (getValueForConfig() != null ? getValueForConfig().hashCode() : 0);
+        hash = 59 * hash + (getUnit() != null ? getUnit().hashCode() : 0);
+        hash = 59 * hash + (getBrowser() != null ? getBrowser().hashCode() : 0);
         return hash;
     }
 
@@ -2091,16 +2040,16 @@ public class ResourceInfo extends AbstractDrbdInfo {
             return false;
         }
         final Value other = (Value) obj;
-        if ((this.getValueForConfig() == null) ? (other.getValueForConfig() != null) : !this.getValueForConfig().equals(other.getValueForConfig())) {
+        if ((getValueForConfig() == null) ? (other.getValueForConfig() != null) : !getValueForConfig().equals(
+                other.getValueForConfig())) {
             return false;
         }
-        if (this.getUnit() != other.getUnit() && (this.getUnit() == null || !this.getUnit().equals(other.getUnit()))) {
+        if (getUnit() != other.getUnit() && (getUnit() == null || !getUnit().equals(other.getUnit()))) {
             return false;
         }
         if (obj instanceof Info) {
-            if (this.getBrowser() != ((Info) other).getBrowser() && (this.getBrowser() == null || !this.getBrowser().equals(((Info) other).getBrowser()))) {
-                return false;
-            }
+            return getBrowser() == ((Info) other).getBrowser() || (getBrowser() != null && getBrowser().equals(
+                    ((Info) other).getBrowser()));
         }
         return true;
     }

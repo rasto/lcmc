@@ -20,8 +20,19 @@
 
 package lcmc.cluster.service.storage;
 
-import com.google.common.base.Optional;
+import java.util.Collection;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
+import java.util.TreeSet;
+import java.util.concurrent.ConcurrentHashMap;
+
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import com.google.common.eventbus.Subscribe;
+
 import lcmc.ClusterEventBus;
 import lcmc.HwEventBus;
 import lcmc.cluster.domain.Cluster;
@@ -30,15 +41,6 @@ import lcmc.event.CommonMountPointsEvent;
 import lcmc.event.HwMountPointsChangedEvent;
 import lcmc.host.domain.Host;
 
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Singleton;
-import java.util.Collection;
-import java.util.Map;
-import java.util.Set;
-import java.util.TreeSet;
-import java.util.concurrent.ConcurrentHashMap;
-
 @Named
 @Singleton
 public class MountPointService {
@@ -46,8 +48,8 @@ public class MountPointService {
     private HwEventBus hwEventBus;
     @Inject
     private ClusterEventBus clusterEventBus;
-    private Map<Host, Set<String>> mountPointsByHost = new ConcurrentHashMap<Host, Set<String>>();
-    private Map<Cluster, Set<String>> commonMountPointsByCluster = new ConcurrentHashMap<Cluster, Set<String>>();
+    private final Map<Host, Set<String>> mountPointsByHost = new ConcurrentHashMap<>();
+    private final Map<Cluster, Set<String>> commonMountPointsByCluster = new ConcurrentHashMap<>();
 
     public void init() {
         hwEventBus.register(this);
@@ -56,31 +58,29 @@ public class MountPointService {
     @Subscribe
     public void mountPointsChanged(final HwMountPointsChangedEvent event) {
         mountPointsByHost.put(event.getHost(), event.getMountPoints());
-        updateCommonMountPoints(Optional.fromNullable(event.getHost().getCluster()));
+        updateCommonMountPoints(Optional.ofNullable(event.getHost().getCluster()));
     }
 
     public Set<String> getCommonMountPoints(final Cluster cluster) {
         final Set<String> mountPoints = commonMountPointsByCluster.get(cluster);
         if (mountPoints == null) {
-            return new TreeSet<String>();
+            return new TreeSet<>();
         }
         return mountPoints;
     }
 
     private Set<String> getCommonMountPoints(final Collection<Host> hosts) {
-        Optional<Set<String>> mountPointsIntersection = Optional.absent();
+        Optional<Set<String>> mountPointsIntersection = Optional.empty();
 
         for (final Host host : hosts) {
             final Set<String> mountPoints = mountPointsByHost.get(host);
-            mountPointsIntersection = Tools.getIntersection(
-                    Optional.fromNullable(mountPoints),
-                    mountPointsIntersection);
+            mountPointsIntersection = Tools.getIntersection(Optional.ofNullable(mountPoints), mountPointsIntersection);
         }
-        return mountPointsIntersection.or(new TreeSet<String>());
+        return mountPointsIntersection.orElse(new TreeSet<>());
     }
 
     private void updateCommonMountPoints(final Optional<Cluster> cluster) {
-        if (!cluster.isPresent()) {
+        if (cluster.isEmpty()) {
             return;
         }
         final Set<String> commonMountPoints = getCommonMountPoints(cluster.get().getHosts());

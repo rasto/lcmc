@@ -24,8 +24,7 @@
 package lcmc.vm.ui.configdialog;
 
 import java.awt.Dimension;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.swing.BoxLayout;
@@ -33,14 +32,14 @@ import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
+import lcmc.cluster.ui.widget.Widget;
 import lcmc.cluster.ui.widget.WidgetFactory;
 import lcmc.common.domain.Application;
+import lcmc.common.domain.util.Tools;
 import lcmc.common.ui.WizardDialog;
+import lcmc.common.ui.utils.MyButton;
 import lcmc.common.ui.utils.SwingUtils;
 import lcmc.vm.ui.resource.DomainInfo;
-import lcmc.cluster.ui.widget.Widget;
-import lcmc.common.ui.utils.MyButton;
-import lcmc.common.domain.util.Tools;
 
 /**
  * An implementation of a dialog where user can enter a new domain.
@@ -77,12 +76,7 @@ final class VMFinish extends VMConfig {
     @Override
     protected void initDialogAfterVisible() {
         enableComponents();
-        swingUtils.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                buttonClass(finishButton()).setEnabled(false);
-            }
-        });
+        swingUtils.invokeLater(() -> buttonClass(finishButton()).setEnabled(false));
     }
 
     @Override
@@ -96,29 +90,13 @@ final class VMFinish extends VMConfig {
         panel.setLayout(new BoxLayout(panel, BoxLayout.LINE_AXIS));
         final MyButton createConfigBtn = widgetFactory.createButton("Create Config");
         createConfigBtn.setBackgroundColor(Tools.getDefaultColor("ConfigDialog.Button"));
-        createConfigBtn.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(final ActionEvent e) {
-                final Thread thread = new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        swingUtils.invokeAndWait(new Runnable() {
-                            @Override
-                            public void run() {
-                                createConfigBtn.setEnabled(false);
-                            }
-                        });
-                        domainInfo.apply(Application.RunMode.LIVE);
-                        swingUtils.invokeLater(new Runnable() {
-                            @Override
-                            public void run() {
-                                buttonClass(finishButton()).setEnabled(true);
-                            }
-                        });
-                    }
-                });
-                thread.start();
-            }
+        createConfigBtn.addActionListener(e -> {
+            final Thread thread = new Thread(() -> {
+                swingUtils.invokeAndWait(() -> createConfigBtn.setEnabled(false));
+                domainInfo.apply(Application.RunMode.LIVE);
+                swingUtils.invokeLater(() -> buttonClass(finishButton()).setEnabled(true));
+            });
+            thread.start();
         });
         final JPanel optionsPanel = new JPanel();
         optionsPanel.setLayout(new BoxLayout(optionsPanel, BoxLayout.PAGE_AXIS));

@@ -20,12 +20,13 @@
 
 package lcmc.cluster.ui.network;
 
-import lcmc.common.domain.util.Tools;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
-import java.util.ArrayList;
-import java.util.List;
+
+import lcmc.common.domain.util.Tools;
 
 public class NetworkModel {
     String network;
@@ -40,7 +41,7 @@ public class NetworkModel {
     };
 
     public void updateTable() {
-        final List<Object[]> rows = new ArrayList<Object[]>();
+        final List<Object[]> rows = new ArrayList<>();
         rows.add(new Object[]{"Network", network});
         rows.add(new Object[]{"IPs", ips});
         rows.add(new Object[]{"CIDR", cidr});

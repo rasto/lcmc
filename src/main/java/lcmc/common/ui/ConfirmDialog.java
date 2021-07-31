@@ -56,10 +56,9 @@ public final class ConfirmDialog extends ConfigDialog {
     }
 
     /**
-     * Returns the text of the yes button. ConfirmDialog.Yes from TextResources
-     * by default.
+     * Returns the text of the yes button. ConfirmDialog.Yes from TextResources by default.
      */
-    protected String yesButton() {
+    private String yesButton() {
         if (yesButton == null) {
             return Tools.getString("ConfirmDialog.Yes");
         } else {
@@ -68,10 +67,9 @@ public final class ConfirmDialog extends ConfigDialog {
     }
 
     /**
-     * Returns the text of the no button. ConfirmDialog.No from TextResources
-     * by default.
+     * Returns the text of the no button. ConfirmDialog.No from TextResources by default.
      */
-    protected String noButton() {
+    private String noButton() {
         if (noButton == null) {
             return Tools.getString("ConfirmDialog.No");
         } else {
@@ -142,24 +140,14 @@ public final class ConfirmDialog extends ConfigDialog {
         super.initDialogBeforeVisible();
         enableComponentsLater(new JComponent[]{buttonClass(noButton())});
         enableComponents();
-        swingUtils.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                buttonClass(noButton()).setEnabled(true);
-            }
-        });
+        swingUtils.invokeLater(() -> buttonClass(noButton()).setEnabled(true));
     }
 
     /** Inits the dialog after it is visible. */
     @Override
     protected void initDialogAfterVisible() {
         super.initDialogAfterVisible();
-        swingUtils.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                buttonClass(noButton()).requestFocus();
-            }
-        });
+        swingUtils.invokeLater(() -> buttonClass(noButton()).requestFocus());
     }
 
     /**

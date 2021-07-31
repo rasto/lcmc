@@ -26,12 +26,9 @@ package lcmc.cluster.ui.wizard;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
 import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedHashSet;
@@ -51,34 +48,34 @@ import javax.swing.JTextArea;
 import javax.swing.SpringLayout;
 
 import lcmc.Exceptions.IllegalVersionException;
-import lcmc.cluster.ui.wizard.corosync.CorosyncPacemakerConfig;
-import lcmc.common.ui.Access;
-import lcmc.common.ui.main.MainData;
-import lcmc.common.domain.AccessMode;
-import lcmc.common.ui.utils.SwingUtils;
-import lcmc.crm.domain.AisCastAddress;
-import lcmc.common.domain.Application;
 import lcmc.cluster.domain.Cluster;
-import lcmc.host.domain.Host;
-import lcmc.common.domain.StringValue;
-import lcmc.common.domain.Value;
-import lcmc.drbd.domain.NetInterface;
-import lcmc.common.ui.SpringUtilities;
-import lcmc.common.ui.WizardDialog;
+import lcmc.cluster.service.NetworkService;
+import lcmc.cluster.service.ssh.ExecCommandConfig;
+import lcmc.cluster.service.ssh.ExecCommandThread;
 import lcmc.cluster.ui.widget.Check;
 import lcmc.cluster.ui.widget.Widget;
 import lcmc.cluster.ui.widget.WidgetFactory;
-import lcmc.crm.service.Corosync;
+import lcmc.cluster.ui.wizard.corosync.CorosyncPacemakerConfig;
+import lcmc.common.domain.AccessMode;
+import lcmc.common.domain.Application;
 import lcmc.common.domain.ExecCallback;
-import lcmc.cluster.service.NetworkService;
+import lcmc.common.domain.StringValue;
+import lcmc.common.domain.Value;
+import lcmc.common.domain.util.Tools;
+import lcmc.common.ui.Access;
+import lcmc.common.ui.SpringUtilities;
+import lcmc.common.ui.WizardDialog;
+import lcmc.common.ui.main.MainData;
+import lcmc.common.ui.utils.MyButton;
+import lcmc.common.ui.utils.SwingUtils;
+import lcmc.common.ui.utils.WidgetListener;
+import lcmc.crm.domain.AisCastAddress;
+import lcmc.crm.service.Corosync;
+import lcmc.crm.service.Openais;
+import lcmc.drbd.domain.NetInterface;
+import lcmc.host.domain.Host;
 import lcmc.logger.Logger;
 import lcmc.logger.LoggerFactory;
-import lcmc.common.ui.utils.MyButton;
-import lcmc.crm.service.Openais;
-import lcmc.cluster.service.ssh.ExecCommandConfig;
-import lcmc.cluster.service.ssh.ExecCommandThread;
-import lcmc.common.domain.util.Tools;
-import lcmc.common.ui.utils.WidgetListener;
 
 /**
  * An implementation of a dialog where corosync/openais is initialized on all
@@ -103,7 +100,7 @@ final class CoroConfig extends DialogCluster {
     private static final String SPACE_TAB = "        ";
     private JPanel mcastPanel;
     /** Set of mcast etc. addresses. */
-    private final Collection<AisCastAddress> aisCastAddresses = new LinkedHashSet<AisCastAddress>();
+    private final Collection<AisCastAddress> aisCastAddresses = new LinkedHashSet<>();
     private final JLabel configStatus = new JLabel("");
     /** Connection type pulldown menu: mcast ... */
     private Widget typeWidget;
@@ -137,70 +134,56 @@ final class CoroConfig extends DialogCluster {
     @Inject
     private Access access;
 
+    @Override
     public void init(final WizardDialog previousDialog, final Cluster cluster) {
         super.init(previousDialog, cluster);
         makeConfigButton = widgetFactory.createButton(Tools.getString("Dialog.Cluster.CoroConfig.CreateAisConfig"));
         final Host[] hosts = getCluster().getHostsArray();
         configs = new String[hosts.length];
         makeConfigButton.setBackgroundColor(Tools.getDefaultColor("ConfigDialog.Button"));
-        makeConfigButton.addActionListener(
-            new ActionListener() {
-                @Override
-                public void actionPerformed(final ActionEvent e) {
-                    final Thread thread = new Thread(
-                        new Runnable() {
-                            @Override
-                            public void run() {
-                                swingUtils.invokeLater(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        makeConfigButton.setEnabled(false);
-                                    }
-                                });
-                                disableComponents();
-                                final StringBuilder config = aisConfigHead(false);
-                                int ringnumber = 0;
-                                for (final AisCastAddress ca : aisCastAddresses) {
-                                    config.append('\n');
-                                    config.append(ca.getConfigString(ringnumber, "\t"));
-                                    config.append('\n');
-                                    ringnumber++;
-                                }
-                                config.append("}\n");
-                                final String serviceVersion =
-                                            hosts[0].getDistString("Pacemaker.Service.Ver");
-                                String corosyncVersion = hosts[0].getHostParser().getCorosyncVersion();
-                                config.append(new CorosyncPacemakerConfig("\t", serviceVersion, corosyncVersion, hosts).create());
-                                if (hosts[0].getHostParser().isCorosyncInstalled()) {
-                                    Corosync.createCorosyncConfig(hosts, config);
-                                } else {
-                                    Openais.createAISConfig(hosts, config);
-                                }
-                                final boolean configOk = updateOldAisConfig();
-                                if (hosts[0].getHostParser().isCorosyncInstalled() && !hosts[0].getHostParser().isOpenaisWrapper()) {
-                                    Corosync.reloadCorosyncs(hosts);
-                                } else {
-                                    Openais.reloadOpenaises(hosts);
-                                }
-                                enableComponents();
-                                final List<String> incorrect = new ArrayList<String>();
-                                final List<String> changed = new ArrayList<String>();
-                                if (configOk) {
-                                    hideRetryButton();
-                                } else {
-                                    incorrect.add("config failed");
-                                }
-                                nextButtonSetEnabled(new Check(incorrect, changed));
-                                if (configOk && !application.getAutoClusters().isEmpty()) {
-                                    Tools.sleep(1000);
-                                    pressNextButton();
-                                }
-                            }
-                        }
-                    );
-                    thread.start();
+        makeConfigButton.addActionListener(e -> {
+            final Thread thread = new Thread(() -> {
+                swingUtils.invokeLater(() -> makeConfigButton.setEnabled(false));
+                disableComponents();
+                final StringBuilder config = aisConfigHead(false);
+                int ringnumber = 0;
+                for (final AisCastAddress ca : aisCastAddresses) {
+                    config.append('\n');
+                    config.append(ca.getConfigString(ringnumber, "\t"));
+                    config.append('\n');
+                    ringnumber++;
+                }
+                config.append("}\n");
+                final String serviceVersion = hosts[0].getDistString("Pacemaker.Service.Ver");
+                String corosyncVersion = hosts[0].getHostParser().getCorosyncVersion();
+                config.append(new CorosyncPacemakerConfig("\t", serviceVersion, corosyncVersion, hosts).create());
+                if (hosts[0].getHostParser().isCorosyncInstalled()) {
+                    Corosync.createCorosyncConfig(hosts, config);
+                } else {
+                    Openais.createAISConfig(hosts, config);
+                }
+                final boolean configOk = updateOldAisConfig();
+                if (hosts[0].getHostParser().isCorosyncInstalled() && !hosts[0].getHostParser().isOpenaisWrapper()) {
+                    Corosync.reloadCorosyncs(hosts);
+                } else {
+                    Openais.reloadOpenaises(hosts);
+                }
+                enableComponents();
+                final List<String> incorrect = new ArrayList<>();
+                final List<String> changed = new ArrayList<>();
+                if (configOk) {
+                    hideRetryButton();
+                } else {
+                    incorrect.add("config failed");
+                }
+                nextButtonSetEnabled(new Check(incorrect, changed));
+                if (configOk && !application.getAutoClusters().isEmpty()) {
+                    Tools.sleep(1000);
+                    pressNextButton();
                 }
             });
+            thread.start();
+        });
     }
 
     @Override
@@ -234,30 +217,21 @@ final class CoroConfig extends DialogCluster {
 
     @Override
     protected void initDialogAfterVisible() {
-        final Thread thread = new Thread(
-            new Runnable() {
-                @Override
-                public void run() {
-                    final boolean configOk = updateOldAisConfig();
-                    swingUtils.invokeLater(new Runnable() {
-                        @Override
-                        public void run() {
-                            makeConfigButton.setEnabled(false);
-                        }
-                    });
-                    enableComponents();
-                    final List<String> incorrect = new ArrayList<String>();
-                    final List<String> changed = new ArrayList<String>();
-                    if (!configOk) {
-                        incorrect.add("config failed");
-                    }
-                    nextButtonSetEnabled(new Check(incorrect, changed));
-                    if (configOk && !application.getAutoClusters().isEmpty()) {
-                        Tools.sleep(1000);
-                        pressNextButton();
-                    }
-                }
-            });
+        final Thread thread = new Thread(() -> {
+            final boolean configOk = updateOldAisConfig();
+            swingUtils.invokeLater(() -> makeConfigButton.setEnabled(false));
+            enableComponents();
+            final List<String> incorrect = new ArrayList<>();
+            final List<String> changed = new ArrayList<>();
+            if (!configOk) {
+                incorrect.add("config failed");
+            }
+            nextButtonSetEnabled(new Check(incorrect, changed));
+            if (configOk && !application.getAutoClusters().isEmpty()) {
+                Tools.sleep(1000);
+                pressNextButton();
+            }
+        });
         thread.start();
     }
 
@@ -394,12 +368,8 @@ final class CoroConfig extends DialogCluster {
         boolean noConfigs = true;
         boolean configOk = false;
         if (configs[0].equals(OPENAIS_CONF_READ_ERROR_STRING)) {
-            swingUtils.invokeLater(new Runnable() {
-                @Override
-                public void run() {
-                    configStatus.setText(hosts[0] + Tools.getString("Dialog.Cluster.CoroConfig.NoConfigFound"));
-                }
-            });
+            swingUtils.invokeLater(
+                    () -> configStatus.setText(hosts[0] + Tools.getString("Dialog.Cluster.CoroConfig.NoConfigFound")));
             retry();
             if (!application.getAutoClusters().isEmpty()) {
                 Tools.sleep(1000);
@@ -411,23 +381,12 @@ final class CoroConfig extends DialogCluster {
             for (j = 1; j < configs.length; j++) {
                 final Host host = hosts[j];
                 if (configs[j].equals(OPENAIS_CONF_READ_ERROR_STRING)) {
-                    swingUtils.invokeLater(new Runnable() {
-                        @Override
-                        public void run() {
-                            configStatus.setText(host
-                                                 + ": "
-                                                 + configFile
-                                                 + Tools.getString("Dialog.Cluster.CoroConfig.NoConfigFound"));
-                        }
-                    });
+                    swingUtils.invokeLater(() -> configStatus.setText(
+                            host + ": " + configFile + Tools.getString("Dialog.Cluster.CoroConfig.NoConfigFound")));
                     break;
                 } else if (!configs[0].equals(configs[j])) {
-                    swingUtils.invokeLater(new Runnable() {
-                        @Override
-                        public void run() {
-                            configStatus.setText(Tools.getString("Dialog.Cluster.CoroConfig.ConfigsNotTheSame"));
-                        }
-                    });
+                    swingUtils.invokeLater(
+                            () -> configStatus.setText(Tools.getString("Dialog.Cluster.CoroConfig.ConfigsNotTheSame")));
                     break;
                 }
             }
@@ -441,18 +400,15 @@ final class CoroConfig extends DialogCluster {
                     generated = true;
                 }
                 final boolean editableConfig = generated;
-                swingUtils.invokeLater(new Runnable() {
-                    @Override
-                    public void run() {
-                        configStatus.setText(configFile + Tools.getString("Dialog.Cluster.CoroConfig.ais.conf.ok"));
-                        configCheckbox.setSelected(false);
-                        if (editableConfig) {
-                            configCheckbox.setText(CHECKBOX_SEE_EXISTING_STRING);
-                        } else {
-                            configCheckbox.setText(CHECKBOX_EDIT_CONFIG_STRING);
-                        }
-                        statusPanel.setMaximumSize(statusPanel.getPreferredSize());
+                swingUtils.invokeLater(() -> {
+                    configStatus.setText(configFile + Tools.getString("Dialog.Cluster.CoroConfig.ais.conf.ok"));
+                    configCheckbox.setSelected(false);
+                    if (editableConfig) {
+                        configCheckbox.setText(CHECKBOX_SEE_EXISTING_STRING);
+                    } else {
+                        configCheckbox.setText(CHECKBOX_EDIT_CONFIG_STRING);
                     }
+                    statusPanel.setMaximumSize(statusPanel.getPreferredSize());
                 });
                 setNewConfig(configs[0]);
                 if (editableConfig) {
@@ -466,17 +422,14 @@ final class CoroConfig extends DialogCluster {
         }
         if (!configOk) {
             final boolean noConfigsF = noConfigs;
-            swingUtils.invokeLater(new Runnable() {
-                @Override
-                public void run() {
-                    if (noConfigsF) {
-                        configCheckbox.setText(CHECKBOX_SEE_EXISTING_STRING);
-                    } else {
-                        configCheckbox.setText(CHECKBOX_EDIT_CONFIG_STRING);
-                    }
-                    configCheckbox.setSelected(false);
-                    statusPanel.setMaximumSize(statusPanel.getPreferredSize());
+            swingUtils.invokeLater(() -> {
+                if (noConfigsF) {
+                    configCheckbox.setText(CHECKBOX_SEE_EXISTING_STRING);
+                } else {
+                    configCheckbox.setText(CHECKBOX_EDIT_CONFIG_STRING);
                 }
+                configCheckbox.setSelected(false);
+                statusPanel.setMaximumSize(statusPanel.getPreferredSize());
             });
             if (noConfigs) {
                 updateConfigPanelEditable(false);
@@ -490,138 +443,130 @@ final class CoroConfig extends DialogCluster {
     /** Shows all corosync or openais.conf config files. */
     private void updateConfigPanelExisting() {
         final Host[] hosts = getCluster().getHostsArray();
-        swingUtils.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                makeConfigButton.setEnabled(false);
-                configPanel.removeAll();
-                final JPanel insideConfigPanel = new JPanel(new SpringLayout());
-                int cols = 0;
-                for (int i = 0; i < hosts.length; i++) {
-                    if (OPENAIS_CONF_READ_ERROR_STRING.equals(configs[i])) {
-                        configs[i] = Tools.getString("Dialog.Cluster.CoroConfig.NoConfigFound");
-                    }
-                    final JLabel l = new JLabel(hosts[i].getName() + ':');
-                    l.setBackground(Color.WHITE);
-                    final JPanel labelP = new JPanel();
-                    labelP.setBackground(Tools.getDefaultColor("ConfigDialog.Background"));
-                    labelP.setLayout(new BoxLayout(labelP, BoxLayout.PAGE_AXIS));
-                    labelP.setAlignmentX(java.awt.Component.TOP_ALIGNMENT);
-                    labelP.add(l);
-                    insideConfigPanel.add(labelP);
-                    final JTextArea ta = new JTextArea(configs[i]);
-                    ta.setEditable(false);
-                    insideConfigPanel.add(ta);
-                    cols += 2;
+        swingUtils.invokeLater(() -> {
+            makeConfigButton.setEnabled(false);
+            configPanel.removeAll();
+            final JPanel insideConfigPanel = new JPanel(new SpringLayout());
+            int cols = 0;
+            for (int i = 0; i < hosts.length; i++) {
+                if (OPENAIS_CONF_READ_ERROR_STRING.equals(configs[i])) {
+                    configs[i] = Tools.getString("Dialog.Cluster.CoroConfig.NoConfigFound");
                 }
-                if (cols > 0) {
-                    SpringUtilities.makeCompactGrid(insideConfigPanel,
-                                                    1, cols,
-                                                    1, 1,
-                                                    1, 1);
-                    configPanel.add(insideConfigPanel);
-                }
-                configPanel.revalidate();
-                configPanel.repaint();
+                final JLabel l = new JLabel(hosts[i].getName() + ':');
+                l.setBackground(Color.WHITE);
+                final JPanel labelP = new JPanel();
+                labelP.setBackground(Tools.getDefaultColor("ConfigDialog.Background"));
+                labelP.setLayout(new BoxLayout(labelP, BoxLayout.PAGE_AXIS));
+                labelP.setAlignmentX(java.awt.Component.TOP_ALIGNMENT);
+                labelP.add(l);
+                insideConfigPanel.add(labelP);
+                final JTextArea ta = new JTextArea(configs[i]);
+                ta.setEditable(false);
+                insideConfigPanel.add(ta);
+                cols += 2;
             }
+            if (cols > 0) {
+                SpringUtilities.makeCompactGrid(insideConfigPanel, 1, cols, 1, 1, 1, 1);
+                configPanel.add(insideConfigPanel);
+            }
+            configPanel.revalidate();
+            configPanel.repaint();
         });
     }
 
     private void updateConfigPanelEditable(final boolean configChanged) {
-        this.configChangedByUser = configChanged;
+        configChangedByUser = configChanged;
         final Host[] hosts = getCluster().getHostsArray();
-        swingUtils.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                if (!configChanged) {
-                    makeConfigButton.setEnabled(false);
-                }
-                configPanel.removeAll();
-                /* head */
-                final String[] head = aisConfigHead(true).toString().split(NEWLINE);
-                for (final String line : head) {
-                    configPanel.add(new JLabel(line));
-                }
-                /* addresses */
-                int ringnumber = 0;
-                for (final AisCastAddress c : aisCastAddresses) {
-                    configPanel.add(new JLabel(""));
-                    final String[] interfaceLines = c.getConfigString(ringnumber, SPACE_TAB).split(NEWLINE);
-                    ringnumber++;
-                    boolean firstLine = true;
-                    for (final String interfaceLine : interfaceLines) {
-                        if (firstLine) {
-                            configPanel.add(getComponentPanel(interfaceLine, getRemoveButton(c)));
-                            firstLine = false;
-                        } else {
-                            configPanel.add(new JLabel(interfaceLine));
-                        }
-                    }
-                }
-
-                if (aisCastAddresses.size() < 2) {
-                    final JLabel l;
-                    if (aisCastAddresses.isEmpty()) {
-                        l = new JLabel(Tools.getString("Dialog.Cluster.CoroConfig.WarningAtLeastTwoInt"));
-                    } else {
-                        // TODO: we need to check if there is bond interface
-                        // and one is enough
-                        l = new JLabel(Tools.getString("Dialog.Cluster.CoroConfig.WarningAtLeastTwoInt.OneMore"));
-                    }
-                    l.setForeground(Color.RED);
-                    configPanel.add(l);
-                    configPanel.add(new JLabel(""));
-                    l.addComponentListener(new ComponentListener() {
-                        @Override
-                        public void componentHidden(final ComponentEvent e) {
-                            /* do nothing */
-                        }
-
-                        @Override
-                        public void componentMoved(final ComponentEvent e) {
-                            if (configAlreadyScrolled) {
-                                return;
-                            }
-                            configAlreadyScrolled = true;
-                            configScrollPane.getViewport().setViewPosition(l.getBounds().getLocation());
-                        }
-
-                        @Override
-                        public void componentResized(final ComponentEvent e) {
-                            /* do nothing */
-                        }
-
-                        @Override
-                        public void componentShown(final ComponentEvent e) {
-                            /* do nothing */
-                        }
-                    });
-                }
-
+        swingUtils.invokeLater(() -> {
+            if (!configChanged) {
+                makeConfigButton.setEnabled(false);
+            }
+            configPanel.removeAll();
+            /* head */
+            final String[] head = aisConfigHead(true).toString().split(NEWLINE);
+            for (final String line : head) {
+                configPanel.add(new JLabel(line));
+            }
+            /* addresses */
+            int ringnumber = 0;
+            for (final AisCastAddress c : aisCastAddresses) {
                 configPanel.add(new JLabel(""));
-                /* mcast etc combo boxes */
-                configPanel.add(mcastPanel);
-                configPanel.add(new JLabel("}"));
-
-                /* service pacemaker */
-                final String serviceVersion = hosts[0].getDistString("Pacemaker.Service.Ver");
-                String corosyncVersion = hosts[0].getHostParser().getCorosyncVersion();
-                final String[] pacemakerLines = new CorosyncPacemakerConfig(SPACE_TAB, serviceVersion, corosyncVersion, hosts).create().split(NEWLINE);
-                for (final String line : pacemakerLines) {
-                    configPanel.add(new JLabel(line));
-                }
-                configPanel.revalidate();
-                configPanel.repaint();
-                if (configChanged) {
-                    if (aisCastAddresses.isEmpty()) {
-                        makeConfigButton.setEnabled(false);
+                final String[] interfaceLines = c.getConfigString(ringnumber, SPACE_TAB).split(NEWLINE);
+                ringnumber++;
+                boolean firstLine = true;
+                for (final String interfaceLine : interfaceLines) {
+                    if (firstLine) {
+                        configPanel.add(getComponentPanel(interfaceLine, getRemoveButton(c)));
+                        firstLine = false;
                     } else {
-                        access.setAccessible(makeConfigButton, AccessMode.ADMIN);
+                        configPanel.add(new JLabel(interfaceLine));
                     }
-                    if (!application.getAutoClusters().isEmpty() && !aisCastAddresses.isEmpty()) {
-                        Tools.sleep(1000);
-                        makeConfigButton.pressButton();
+                }
+            }
+
+            if (aisCastAddresses.size() < 2) {
+                final JLabel l;
+                if (aisCastAddresses.isEmpty()) {
+                    l = new JLabel(Tools.getString("Dialog.Cluster.CoroConfig.WarningAtLeastTwoInt"));
+                } else {
+                    // TODO: we need to check if there is bond interface
+                    // and one is enough
+                    l = new JLabel(Tools.getString("Dialog.Cluster.CoroConfig.WarningAtLeastTwoInt.OneMore"));
+                }
+                l.setForeground(Color.RED);
+                configPanel.add(l);
+                configPanel.add(new JLabel(""));
+                l.addComponentListener(new ComponentListener() {
+                    @Override
+                    public void componentHidden(final ComponentEvent e) {
+                        /* do nothing */
                     }
+
+                    @Override
+                    public void componentMoved(final ComponentEvent e) {
+                        if (configAlreadyScrolled) {
+                            return;
+                        }
+                        configAlreadyScrolled = true;
+                        configScrollPane.getViewport().setViewPosition(l.getBounds().getLocation());
+                    }
+
+                    @Override
+                    public void componentResized(final ComponentEvent e) {
+                        /* do nothing */
+                    }
+
+                    @Override
+                    public void componentShown(final ComponentEvent e) {
+                        /* do nothing */
+                    }
+                });
+            }
+
+            configPanel.add(new JLabel(""));
+            /* mcast etc combo boxes */
+            configPanel.add(mcastPanel);
+            configPanel.add(new JLabel("}"));
+
+            /* service pacemaker */
+            final String serviceVersion = hosts[0].getDistString("Pacemaker.Service.Ver");
+            String corosyncVersion = hosts[0].getHostParser().getCorosyncVersion();
+            final String[] pacemakerLines =
+                    new CorosyncPacemakerConfig(SPACE_TAB, serviceVersion, corosyncVersion, hosts).create().split(NEWLINE);
+            for (final String line : pacemakerLines) {
+                configPanel.add(new JLabel(line));
+            }
+            configPanel.revalidate();
+            configPanel.repaint();
+            if (configChanged) {
+                if (aisCastAddresses.isEmpty()) {
+                    makeConfigButton.setEnabled(false);
+                } else {
+                    access.setAccessible(makeConfigButton, AccessMode.ADMIN);
+                }
+                if (!application.getAutoClusters().isEmpty() && !aisCastAddresses.isEmpty()) {
+                    Tools.sleep(1000);
+                    makeConfigButton.pressButton();
                 }
             }
         });
@@ -632,21 +577,14 @@ final class CoroConfig extends DialogCluster {
         removeButton.setBackgroundColor(Tools.getDefaultColor("ConfigDialog.Button"));
         removeButton.setMaximumSize(new Dimension(REMOVE_BUTTON_WIDTH, REMOVE_BUTTON_HEIGHT));
         removeButton.setPreferredSize(new Dimension(REMOVE_BUTTON_WIDTH, REMOVE_BUTTON_HEIGHT));
-        removeButton.addActionListener(
-            new ActionListener() {
-                @Override
-                public void actionPerformed(final ActionEvent e) {
-                    final Thread t = new Thread(new Runnable() {
-                        @Override
-                        public void run() {
-                            aisCastAddresses.remove(c);
-                            updateConfigPanelEditable(true);
-                            checkInterface();
-                        }
-                    });
-                    t.start();
-                }
+        removeButton.addActionListener(e -> {
+            final Thread t = new Thread(() -> {
+                aisCastAddresses.remove(c);
+                updateConfigPanelEditable(true);
+                checkInterface();
             });
+            t.start();
+        });
         return removeButton;
     }
 
@@ -669,21 +607,11 @@ final class CoroConfig extends DialogCluster {
 
         for (final AisCastAddress c : aisCastAddresses) {
             if (c.equals("\t", type.getValueForConfig(), bindnetaddr, address, port)) {
-                swingUtils.invokeLater(new Runnable() {
-                    @Override
-                    public void run() {
-                        addAddressButton.setEnabled(false);
-                    }
-                });
+                swingUtils.invokeLater(() -> addAddressButton.setEnabled(false));
                 return;
             }
         }
-        swingUtils.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                addAddressButton.setEnabled(true);
-            }
-        });
+        swingUtils.invokeLater(() -> addAddressButton.setEnabled(true));
     }
 
     /** Plugins, not used from corosync 2.0. */
@@ -911,24 +839,14 @@ final class CoroConfig extends DialogCluster {
 
         addAddressButton = widgetFactory.createButton(Tools.getString("Dialog.Cluster.CoroConfig.AddIntButton"));
         addAddressButton.setBackgroundColor(Tools.getDefaultColor("ConfigDialog.Button"));
-        addAddressButton.addActionListener(
-                new ActionListener() {
-                    @Override
-                    public void actionPerformed(final ActionEvent e) {
-                        final Value type = typeWidget.getValue();
-                        final Thread thread = new Thread(new Runnable() {
-                            @Override
-                            public void run() {
-                                addInterface(type);
-                            }
-                        });
-                        thread.start();
-                    }
-                });
+        addAddressButton.addActionListener(e -> {
+            final Value type = typeWidget.getValue();
+            final Thread thread = new Thread(() -> addInterface(type));
+            thread.start();
+        });
 
-        configScrollPane = new JScrollPane(configPanel,
-                                           JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,
-                                           JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+        configScrollPane =
+                new JScrollPane(configPanel, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
         configScrollPane.setPreferredSize(new Dimension(Short.MAX_VALUE, 150));
         statusPanel = new JPanel();
         statusPanel.add(configStatus);
@@ -936,39 +854,27 @@ final class CoroConfig extends DialogCluster {
         configCheckbox.setBackground(Tools.getDefaultColor("ConfigDialog.Background.Light"));
 
         access.setAccessible(configCheckbox, AccessMode.ADMIN);
-        configCheckbox.addItemListener(new ItemListener() {
-            @Override
-            public void itemStateChanged(final ItemEvent e) {
-                final String text = configCheckbox.getText();
-                if (e.getStateChange() == ItemEvent.SELECTED) {
-                    final Thread thread = new Thread(new Runnable() {
-                        @Override
-                        public void run() {
-                            if (CHECKBOX_EDIT_CONFIG_STRING.equals(text)) {
-                                updateConfigPanelEditable(configChangedByUser);
-                                swingUtils.invokeLater(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        configCheckbox.setText(CHECKBOX_SEE_EXISTING_STRING);
-                                        configCheckbox.setSelected(false);
-                                        statusPanel.setMaximumSize(statusPanel.getPreferredSize());
-                                    }
-                                });
-                            } else if (CHECKBOX_SEE_EXISTING_STRING.equals(text)) {
-                                updateConfigPanelExisting();
-                                swingUtils.invokeLater(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        configCheckbox.setText(CHECKBOX_EDIT_CONFIG_STRING);
-                                        configCheckbox.setSelected(false);
-                                        statusPanel.setMaximumSize(statusPanel.getPreferredSize());
-                                    }
-                                });
-                            }
-                        }
-                    });
-                    thread.start();
-                }
+        configCheckbox.addItemListener(e -> {
+            final String text = configCheckbox.getText();
+            if (e.getStateChange() == ItemEvent.SELECTED) {
+                final Thread thread = new Thread(() -> {
+                    if (CHECKBOX_EDIT_CONFIG_STRING.equals(text)) {
+                        updateConfigPanelEditable(configChangedByUser);
+                        swingUtils.invokeLater(() -> {
+                            configCheckbox.setText(CHECKBOX_SEE_EXISTING_STRING);
+                            configCheckbox.setSelected(false);
+                            statusPanel.setMaximumSize(statusPanel.getPreferredSize());
+                        });
+                    } else if (CHECKBOX_SEE_EXISTING_STRING.equals(text)) {
+                        updateConfigPanelExisting();
+                        swingUtils.invokeLater(() -> {
+                            configCheckbox.setText(CHECKBOX_EDIT_CONFIG_STRING);
+                            configCheckbox.setSelected(false);
+                            statusPanel.setMaximumSize(statusPanel.getPreferredSize());
+                        });
+                    }
+                });
+                thread.start();
             }
         });
         statusPanel.add(configCheckbox);

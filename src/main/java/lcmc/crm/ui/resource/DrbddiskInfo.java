@@ -22,11 +22,12 @@
 package lcmc.crm.ui.resource;
 
 import java.util.Map;
-import lcmc.common.domain.Application;
-import lcmc.host.domain.Host;
-import lcmc.drbd.ui.resource.ResourceInfo;
 
 import javax.inject.Named;
+
+import lcmc.common.domain.Application;
+import lcmc.drbd.ui.resource.ResourceInfo;
+import lcmc.host.domain.Host;
 
 /**
  * DrbddiskInfo class is used for drbddisk heartbeat service that is
@@ -66,12 +67,7 @@ public class DrbddiskInfo extends ServiceInfo {
             } else {
                 dri.setUsedByCRM(null);
             }
-            final Thread thread = new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    dri.updateMenus(null);
-                }
-            });
+            final Thread thread = new Thread(() -> dri.updateMenus(null));
             thread.start();
         }
     }

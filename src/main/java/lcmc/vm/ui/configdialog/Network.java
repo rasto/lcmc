@@ -24,6 +24,7 @@
 package lcmc.vm.ui.configdialog;
 
 import java.awt.Dimension;
+
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.swing.BoxLayout;
@@ -31,14 +32,14 @@ import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
+import lcmc.cluster.ui.widget.Widget;
 import lcmc.common.domain.Application;
 import lcmc.common.domain.StringValue;
+import lcmc.common.domain.util.Tools;
+import lcmc.common.ui.WizardDialog;
 import lcmc.common.ui.utils.SwingUtils;
 import lcmc.vm.domain.data.InterfaceData;
-import lcmc.common.ui.WizardDialog;
 import lcmc.vm.ui.resource.InterfaceInfo;
-import lcmc.cluster.ui.widget.Widget;
-import lcmc.common.domain.util.Tools;
 
 /**
  * An implementation of a dialog where user can enter a new domain.
@@ -106,13 +107,9 @@ final class Network extends VMConfig {
     @Override
     protected void initDialogAfterVisible() {
         enableComponents();
-        swingUtils.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                final boolean enable = interfaceInfo.checkResourceFields(null, interfaceInfo.getRealParametersFromXML())
-                                                    .isCorrect();
-                buttonClass(nextButton()).setEnabled(enable);
-            }
+        swingUtils.invokeLater(() -> {
+            final boolean enable = interfaceInfo.checkResourceFields(null, interfaceInfo.getRealParametersFromXML()).isCorrect();
+            buttonClass(nextButton()).setEnabled(enable);
         });
     }
 

@@ -22,18 +22,18 @@
 
 package lcmc.host.ui;
 
-import lcmc.common.ui.main.MainPresenter;
-import lcmc.common.domain.Application;
-import lcmc.common.ui.MainPanel;
-import lcmc.common.ui.utils.SwingUtils;
-import lcmc.host.domain.Host;
-import lcmc.drbd.domain.DrbdInstallation;
-import lcmc.logger.Logger;
-import lcmc.logger.LoggerFactory;
-
 import javax.annotation.Resource;
 import javax.inject.Inject;
 import javax.inject.Named;
+
+import lcmc.common.domain.Application;
+import lcmc.common.ui.MainPanel;
+import lcmc.common.ui.main.MainPresenter;
+import lcmc.common.ui.utils.SwingUtils;
+import lcmc.drbd.domain.DrbdInstallation;
+import lcmc.host.domain.Host;
+import lcmc.logger.Logger;
+import lcmc.logger.LoggerFactory;
 
 /**
  * Show step by step dialogs that add and configure new host.
@@ -75,12 +75,7 @@ public final class AddHostDialog {
             } else if (dialog.isPressedFinishButton()) {
                 LOG.debug1("showDialogs: dialog: " + dialog.getClass().getName() + " finished");
                 mainPresenter.allHostsUpdate();
-                swingUtils.invokeLater(new Runnable() {
-                    @Override
-                    public void run() {
-                        mainPresenter.checkAddClusterButtons();
-                    }
-                });
+                swingUtils.invokeLater(() -> mainPresenter.checkAddClusterButtons());
                 break;
             }
             dialog = newdialog;

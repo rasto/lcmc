@@ -23,21 +23,17 @@ package lcmc.crm.ui.resource;
 import java.util.ArrayList;
 import java.util.List;
 
-import lcmc.common.ui.CallbackAction;
-import lcmc.common.domain.AccessMode;
-import lcmc.common.domain.Application;
-import lcmc.host.domain.Host;
-import lcmc.cluster.ui.ClusterBrowser;
-import lcmc.common.ui.utils.ButtonCallback;
-import lcmc.common.domain.EnablePredicate;
-import lcmc.common.ui.utils.MenuAction;
-import lcmc.common.ui.utils.MenuFactory;
-import lcmc.common.ui.utils.MyMenuItem;
-import lcmc.common.domain.util.Tools;
-import lcmc.common.ui.utils.UpdatableItem;
-
 import javax.inject.Inject;
 import javax.inject.Named;
+
+import lcmc.cluster.ui.ClusterBrowser;
+import lcmc.common.domain.AccessMode;
+import lcmc.common.domain.Application;
+import lcmc.common.domain.util.Tools;
+import lcmc.common.ui.utils.ButtonCallback;
+import lcmc.common.ui.utils.MenuFactory;
+import lcmc.common.ui.utils.MyMenuItem;
+import lcmc.common.ui.utils.UpdatableItem;
 
 @Named
 public class ConstraintPHMenu extends ServiceMenu {
@@ -48,48 +44,32 @@ public class ConstraintPHMenu extends ServiceMenu {
 
     @Override
     public List<UpdatableItem> getPulldownMenu(final ServiceInfo serviceInfo) {
-        this.constraintPHInfo = (ConstraintPHInfo) serviceInfo;
-        final List<UpdatableItem> items = new ArrayList<UpdatableItem>();
+        constraintPHInfo = (ConstraintPHInfo) serviceInfo;
+        final List<UpdatableItem> items = new ArrayList<>();
         final Application.RunMode runMode = Application.RunMode.LIVE;
         addDependencyMenuItems(constraintPHInfo, items, true, runMode);
         /* remove the placeholder and all constraints associated with it. */
-        final MyMenuItem removeMenuItem = menuFactory.createMenuItem(
-                Tools.getString("ConstraintPHInfo.Remove"),
-                ClusterBrowser.REMOVE_ICON,
-                ClusterBrowser.STARTING_PTEST_TOOLTIP,
-                new AccessMode(AccessMode.ADMIN, AccessMode.NORMAL),
-                new AccessMode(AccessMode.OP, AccessMode.NORMAL))
-                .enablePredicate(new EnablePredicate() {
-                    @Override
-                    public String check() {
-                        if (constraintPHInfo.getBrowser().crmStatusFailed()) {
-                            return ClusterBrowser.UNKNOWN_CLUSTER_STATUS_STRING;
-                        } else if (constraintPHInfo.getService().isRemoved()) {
-                            return ConstraintPHInfo.IS_BEING_REMOVED_STRING;
-                        }
-                        return null;
+        final MyMenuItem removeMenuItem =
+                menuFactory.createMenuItem(Tools.getString("ConstraintPHInfo.Remove"), ClusterBrowser.REMOVE_ICON,
+                        ClusterBrowser.STARTING_PTEST_TOOLTIP, new AccessMode(AccessMode.ADMIN, AccessMode.NORMAL),
+                        new AccessMode(AccessMode.OP, AccessMode.NORMAL)).enablePredicate(() -> {
+                    if (constraintPHInfo.getBrowser().crmStatusFailed()) {
+                        return ClusterBrowser.UNKNOWN_CLUSTER_STATUS_STRING;
+                    } else if (constraintPHInfo.getService().isRemoved()) {
+                        return ConstraintPHInfo.IS_BEING_REMOVED_STRING;
                     }
-                })
-                .addAction(new MenuAction() {
-                    @Override
-                    public void run(final String text) {
-                        constraintPHInfo.hidePopup();
-                        constraintPHInfo.removeMyself(Application.RunMode.LIVE);
-                        constraintPHInfo.getBrowser().getCrmGraph().repaint();
-                    }
+                    return null;
+                }).addAction(text -> {
+                    constraintPHInfo.hidePopup();
+                    constraintPHInfo.removeMyself(Application.RunMode.LIVE);
+                    constraintPHInfo.getBrowser().getCrmGraph().repaint();
                 });
         final ButtonCallback removeItemCallback = constraintPHInfo.getBrowser().new ClMenuItemCallback(null) {
             @Override
             public boolean isEnabled() {
                 return super.isEnabled() && !constraintPHInfo.getService().isNew();
             }
-        }
-                .addAction(new CallbackAction() {
-                    @Override
-                    public void run(final Host dcHost) {
-                        constraintPHInfo.removeMyselfNoConfirm(dcHost, Application.RunMode.TEST);
-                    }
-                });
+        }.addAction(dcHost -> constraintPHInfo.removeMyselfNoConfirm(dcHost, Application.RunMode.TEST));
         constraintPHInfo.addMouseOverListener(removeMenuItem, removeItemCallback);
         items.add(removeMenuItem);
         return items;

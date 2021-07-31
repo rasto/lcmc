@@ -37,20 +37,22 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.geom.Point2D;
+import java.util.Objects;
+
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.swing.ImageIcon;
 import javax.swing.JMenuItem;
 import javax.swing.JToolTip;
+
 import lcmc.common.domain.AccessMode;
-import lcmc.common.domain.Application;
 import lcmc.common.domain.EnablePredicate;
+import lcmc.common.domain.Predicate;
+import lcmc.common.domain.VisiblePredicate;
+import lcmc.common.domain.util.Tools;
 import lcmc.common.ui.Access;
 import lcmc.logger.Logger;
 import lcmc.logger.LoggerFactory;
-import lcmc.common.domain.Predicate;
-import lcmc.common.domain.util.Tools;
-import lcmc.common.domain.VisiblePredicate;
 
 /**
  * A menu item that can have an alternate text depending on the predicate()
@@ -81,39 +83,19 @@ implements ActionListener, UpdatableItem, ComponentWithTest {
     private AccessMode visibleAccessMode;
     private String origToolTipText = "";
     @Inject
-    private Application application;
-    @Inject
     private SwingUtils swingUtils;
     @Inject
     private Access access;
 
     private MenuAction menuAction;
 
-    private Predicate predicate = new Predicate() {
-        @Override
-        public boolean check() {
-            return true;
-        }
-    };
+    private Predicate predicate = () -> true;
 
-    private EnablePredicate enablePredicate = new EnablePredicate() {
-        @Override
-        public String check() {
-            return null;
-        }
-    };
+    private EnablePredicate enablePredicate = () -> null;
 
-    private VisiblePredicate visiblePredicate = new VisiblePredicate() {
-        @Override
-        public boolean check() {
-            return true;
-        }
-    };
+    private VisiblePredicate visiblePredicate = () -> true;
 
-    private Runnable update = new Runnable() {
-        @Override
-        public void run() {
-        }
+    private Runnable update = () -> {
     };
 
     protected void init(final String text,
@@ -129,7 +111,7 @@ implements ActionListener, UpdatableItem, ComponentWithTest {
         toolTip.setTipText(text);
         setNormalFont();
         addActionListener(this);
-        this.robot = createRobot();
+        robot = createRobot();
         processAccessMode();
         setIconAndTooltip();
         swingUtils.isSwingThread();
@@ -148,11 +130,7 @@ implements ActionListener, UpdatableItem, ComponentWithTest {
         setNormalFont();
         text1 = text;
         icon1 = icon;
-        if (shortDesc == null) {
-            shortDesc1 = "";
-        } else {
-            shortDesc1 = shortDesc;
-        }
+        shortDesc1 = Objects.requireNonNullElse(shortDesc, "");
         this.enableAccessMode = enableAccessMode;
         this.visibleAccessMode = visibleAccessMode;
         addActionListener(this);
@@ -199,11 +177,7 @@ implements ActionListener, UpdatableItem, ComponentWithTest {
         init(text1a, icon1a, shortDesc1a, enableAccessMode, visibleAccessMode);
         this.text2 = text2;
         this.icon2 = icon2;
-        if (shortDesc2 == null) {
-            this.shortDesc2 = "";
-        } else {
-            this.shortDesc2 = shortDesc2;
-        }
+        this.shortDesc2 = Objects.requireNonNullElse(shortDesc2, "");
         processAccessMode();
         setIconAndTooltip();
     }
@@ -228,12 +202,7 @@ implements ActionListener, UpdatableItem, ComponentWithTest {
         final String name = font.getFontName();
         final int style   = Font.PLAIN;
         final int size    = font.getSize();
-        swingUtils.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                setFont(new Font(name, style, size));
-            }
-        });
+        swingUtils.invokeLater(() -> setFont(new Font(name, style, size)));
     }
 
     /** Sets special font for this menu item. */
@@ -242,12 +211,7 @@ implements ActionListener, UpdatableItem, ComponentWithTest {
         final String name = font.getFontName();
         final int style   = Font.ITALIC;
         final int size    = font.getSize();
-        swingUtils.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                setFont(new Font(name, style, size));
-            }
-        });
+        swingUtils.invokeLater(() -> setFont(new Font(name, style, size)));
     }
 
     //  /**
@@ -351,14 +315,7 @@ implements ActionListener, UpdatableItem, ComponentWithTest {
     }
 
     public void actionThread() {
-        final Thread thread = new Thread(
-            new Runnable() {
-                @Override
-                public void run() {
-                    menuAction.run(getText());
-                }
-            }
-        );
+        final Thread thread = new Thread(() -> menuAction.run(getText()));
         thread.start();
     }
 
@@ -453,14 +410,11 @@ implements ActionListener, UpdatableItem, ComponentWithTest {
         toolTip.setTipText(toolTipText);
         super.setToolTipText(toolTipText);
         if (toolTip != null && robot != null && toolTip.isShowing()) {
-            final Thread t = new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    Tools.sleep(1000); /* well, doesn't work all the time */
-                    moveMouse();
-                    Tools.sleep(2000);
-                    moveMouse();
-                }
+            final Thread t = new Thread(() -> {
+                Tools.sleep(1000); /* well, doesn't work all the time */
+                moveMouse();
+                Tools.sleep(2000);
+                moveMouse();
             });
             t.start();
         }

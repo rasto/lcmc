@@ -20,8 +20,20 @@
 
 package lcmc.crm.ui.resource.update;
 
-import com.google.common.base.Optional;
+import java.awt.geom.Point2D;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
+
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Provider;
+import javax.swing.tree.DefaultMutableTreeNode;
+
 import com.google.common.collect.Lists;
+
 import lcmc.cluster.ui.ClusterBrowser;
 import lcmc.common.domain.Application;
 import lcmc.crm.domain.ClusterStatus;
@@ -44,16 +56,6 @@ import lcmc.logger.LoggerFactory;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Provider;
-import javax.swing.tree.DefaultMutableTreeNode;
-import java.awt.geom.Point2D;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
 @Named
 public class ResourceUpdater {
     private static final Logger LOG = LoggerFactory.getLogger(ResourceUpdater.class);
@@ -72,17 +74,14 @@ public class ResourceUpdater {
     private CrmServiceFactory crmServiceFactory;
     private CrmGraph crmGraph;
     private Set<String> allGroupsAndClones;
-    private List<ServiceInfo> groupServiceIsPresent = Lists.newArrayList();
-    private List<ServiceInfo> serviceIsPresent = Lists.newArrayList();
+    private final List<ServiceInfo> groupServiceIsPresent = Lists.newArrayList();
+    private final List<ServiceInfo> serviceIsPresent = Lists.newArrayList();
 
     /**
-     * This functions goes through all services, constrains etc. in
-     * clusterStatus and updates the internal structures and graph.
+     * This functions goes through all services, constrains etc. in clusterStatus and updates the internal structures and graph.
      */
-    public void updateAllResources(final ServicesInfo servicesInfo,
-                                   final ClusterBrowser browser,
-                                   final ClusterStatus clusterStatus,
-                                   final Application.RunMode runMode) {
+    public void updateAllResources(final ServicesInfo servicesInfo, final ClusterBrowser browser, final ClusterStatus clusterStatus,
+            final Application.RunMode runMode) {
         this.servicesInfo = servicesInfo;
         this.browser = browser;
         this.clusterStatus = clusterStatus;
@@ -129,8 +128,8 @@ public class ResourceUpdater {
             final List<CrmXml.ColocationData> withs = colocationEntry.getValue();
             for (final CrmXml.ColocationData colocationData : withs) {
                 final String withRscId = colocationData.getWithRsc();
-                final ServiceInfo withSi = this.browser.getServiceInfoFromCRMId(withRscId);
-                final ServiceInfo siP = this.browser.getServiceInfoFromCRMId(colocationEntry.getKey());
+                final ServiceInfo withSi = browser.getServiceInfoFromCRMId(withRscId);
+                final ServiceInfo siP = browser.getServiceInfoFromCRMId(colocationEntry.getKey());
                 crmGraph.addColocation(colocationData.getId(), siP, withSi);
             }
         }
@@ -145,7 +144,7 @@ public class ResourceUpdater {
             serviceIsPresent.add(newCi);
         } else if (!"none".equals(groupOrClone)) {
             /* group */
-            final GroupInfo gi = (GroupInfo) this.browser.getServiceInfoFromCRMId(groupOrClone);
+            final GroupInfo gi = (GroupInfo) browser.getServiceInfoFromCRMId(groupOrClone);
             if (gi != null && gi.getCloneInfo() != null) {
                 /* cloned group is already done */
                 groupServiceIsPresent.add(gi);
@@ -233,14 +232,14 @@ public class ResourceUpdater {
     }
 
     private void setGroupResources(final String grpOrCloneId, final GroupInfo newGi, final CloneInfo newCi) {
-        final Map<ServiceInfo, Map<String, String>> setParametersHash = new HashMap<ServiceInfo, Map<String, String>>();
+        final Map<ServiceInfo, Map<String, String>> setParametersHash = new HashMap<>();
         if (newCi != null) {
             setParametersHash.put(newCi, clusterStatus.getParamValuePairs(grpOrCloneId));
         } else if (newGi != null) {
             setParametersHash.put(newGi, clusterStatus.getParamValuePairs(grpOrCloneId));
         }
         final Optional<List<String>> groupResources = clusterStatus.getGroupResources(grpOrCloneId, runMode);
-        if (!groupResources.isPresent()) {
+        if (groupResources.isEmpty()) {
             return;
         }
         boolean newService = false;

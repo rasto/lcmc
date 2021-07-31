@@ -21,6 +21,23 @@
  */
 package lcmc.crm.ui.resource;
 
+import java.awt.Color;
+import java.awt.geom.Point2D;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Set;
+import java.util.TreeSet;
+
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.swing.ImageIcon;
+import javax.swing.JComponent;
+import javax.swing.JPanel;
+import javax.swing.tree.DefaultMutableTreeNode;
+
 import lcmc.cluster.ui.ClusterBrowser;
 import lcmc.cluster.ui.widget.Check;
 import lcmc.common.domain.Application;
@@ -35,15 +52,6 @@ import lcmc.crm.domain.ResourceAgent;
 import lcmc.crm.service.CRM;
 import lcmc.host.domain.Host;
 import lombok.val;
-
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.swing.*;
-import javax.swing.tree.DefaultMutableTreeNode;
-import java.awt.*;
-import java.awt.geom.Point2D;
-import java.util.*;
-import java.util.List;
 
 /**
  * This class holds clone service info object.
@@ -149,17 +157,17 @@ public class CloneInfo extends ServiceInfo {
         }
         if (cs.getResourceAgent().isGroup()) {
             val resources = clStatus.getGroupResources(cs.getHeartbeatId(runMode), runMode);
-            if (!resources.isPresent()) {
+            if (resources.isEmpty()) {
                 return null;
             }
-            final Set<String> slaves = new TreeSet<String>();
+            final Set<String> slaves = new TreeSet<>();
             for (final String hbId : resources.get()) {
                 final List<String> slNodes = clStatus.getSlaveOnNodes(hbId, runMode);
                 if (slNodes != null) {
                     slaves.addAll(slNodes);
                 }
             }
-            return new ArrayList<String>(slaves);
+            return new ArrayList<>(slaves);
         } else {
             return clStatus.getSlaveOnNodes(cs.getHeartbeatId(runMode), runMode);
         }
@@ -191,7 +199,7 @@ public class CloneInfo extends ServiceInfo {
          final List<String> slaves = getSlaveOnNodes(runMode);
          int nodesCount = 0;
          if (nodes == null) {
-             nodes = new ArrayList<String>();
+             nodes = new ArrayList<>();
          } else {
              nodesCount = nodes.size();
          }
@@ -200,7 +208,7 @@ public class CloneInfo extends ServiceInfo {
              slavesCount = slaves.size();
          }
          if (nodesCount + slavesCount < getBrowser().getClusterHosts().length) {
-             final List<Color> colors = new ArrayList<Color>();
+             final List<Color> colors = new ArrayList<>();
              colors.add(ClusterBrowser.SERVICE_STOPPED_FILL_PAINT);
              return colors;
          } else {
@@ -228,8 +236,8 @@ public class CloneInfo extends ServiceInfo {
     /** Returns text with lines as array that appears in the cluster graph. */
     @Override
     public ColorText[] getSubtextsForGraph(final Application.RunMode runMode) {
-        final List<ColorText> texts = new ArrayList<ColorText>();
-        final Map<String, String> notRunningOnNodes = new LinkedHashMap<String, String>();
+        final List<ColorText> texts = new ArrayList<>();
+        final Map<String, String> notRunningOnNodes = new LinkedHashMap<>();
         for (final Host h : getBrowser().getClusterHosts()) {
             notRunningOnNodes.put(h.getName().toLowerCase(Locale.US), h.getName());
         }
@@ -250,7 +258,7 @@ public class CloneInfo extends ServiceInfo {
             }
         }
         if (getBrowser().allHostsWithoutClusterStatus()) {
-            return texts.toArray(new ColorText[texts.size()]);
+            return texts.toArray(new ColorText[0]);
         }
         final List<String> runningOnNodes = getRunningOnNodes(runMode);
         if (runningOnNodes != null && !runningOnNodes.isEmpty()) {
@@ -325,7 +333,7 @@ public class CloneInfo extends ServiceInfo {
                 }
             }
         }
-        return texts.toArray(new ColorText[texts.size()]);
+        return texts.toArray(new ColorText[0]);
     }
 
     /** Returns fail ping string that appears in the graph. */
@@ -382,8 +390,8 @@ public class CloneInfo extends ServiceInfo {
 
     Check checkResourceFields(final String param, final String[] params, final boolean fromServicesInfo) {
         final ServiceInfo cs = containedService;
-        final List<String> incorrect = new ArrayList<String>();
-        final List<String> changed = new ArrayList<String>();
+        final List<String> incorrect = new ArrayList<>();
+        final List<String> changed = new ArrayList<>();
         final Check check = new Check(incorrect, changed);
         check.addCheck(super.checkResourceFields(param, params, fromServicesInfo, true, false));
         if (cs == null) {
@@ -451,10 +459,7 @@ public class CloneInfo extends ServiceInfo {
         if (cs != null) {
             if (Tools.versionBeforePacemaker(dcHost)) {
                 for (int i = 0; i < getBrowser().getClusterHosts().length; i++) {
-                    CRM.cleanupResource(dcHost,
-                                        cs.getHeartbeatId(runMode) + ':' + Integer.toString(i),
-                                        getBrowser().getClusterHosts(),
-                                        runMode);
+                    CRM.cleanupResource(dcHost, cs.getHeartbeatId(runMode) + ':' + i, getBrowser().getClusterHosts(), runMode);
                 }
             } else {
                 super.cleanupResource(dcHost, runMode);
@@ -591,8 +596,9 @@ public class CloneInfo extends ServiceInfo {
         this.containedService = containedService;
     }
 
+    @Override
     public List<ServiceInfo> getSubServices() {
-        final List<ServiceInfo> services = new ArrayList<ServiceInfo>();
+        final List<ServiceInfo> services = new ArrayList<>();
         final ServiceInfo cs = containedService;
         if (cs != null) {
             services.add(cs);

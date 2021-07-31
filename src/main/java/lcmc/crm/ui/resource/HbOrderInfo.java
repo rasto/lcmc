@@ -22,14 +22,20 @@
 
 package lcmc.crm.ui.resource;
 
-import com.google.common.base.Optional;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.Optional;
+import java.util.regex.Matcher;
+
+import javax.inject.Named;
+
 import lcmc.Exceptions;
 import lcmc.cluster.ui.ClusterBrowser;
 import lcmc.cluster.ui.widget.Check;
 import lcmc.cluster.ui.widget.Widget;
 import lcmc.common.domain.AccessMode;
 import lcmc.common.domain.Application;
-import lcmc.common.domain.ResourceValue;
 import lcmc.common.domain.StringValue;
 import lcmc.common.domain.Value;
 import lcmc.common.domain.util.Tools;
@@ -42,12 +48,6 @@ import lcmc.crm.service.CRM;
 import lcmc.host.domain.Host;
 import lcmc.logger.Logger;
 import lcmc.logger.LoggerFactory;
-
-import javax.inject.Named;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.regex.Matcher;
 
 /**
  * Object that holds an order constraint information.
@@ -65,7 +65,7 @@ final class HbOrderInfo extends EditableInfo implements HbConstraintInterface {
               final ServiceInfo serviceInfoParent,
               final ServiceInfo serviceInfoChild,
               final Browser browser) {
-        super.einit(Optional.<ResourceValue>of(new Service("Order")), "Order", browser);
+        super.einit(Optional.of(new Service("Order")), "Order", browser);
         this.connectionInfo = connectionInfo;
         this.serviceInfoParent = serviceInfoParent;
         this.serviceInfoChild = serviceInfoChild;
@@ -88,7 +88,7 @@ final class HbOrderInfo extends EditableInfo implements HbConstraintInterface {
     void setParameters() {
         final ClusterStatus clStatus = getBrowser().getClusterStatus();
         final String ordId = getService().getCrmId();
-        final Map<String, Value> resourceNode = new HashMap<String, Value>();
+        final Map<String, Value> resourceNode = new HashMap<>();
 
         if (serviceInfoParent == null || serviceInfoChild == null) {
             /* rsc set placeholder */
@@ -262,9 +262,9 @@ final class HbOrderInfo extends EditableInfo implements HbConstraintInterface {
         return getBrowser().getCrmXml().isOrderRequired(param);
     }
 
-    protected Map<String, String> getAttributes() {
+    public Map<String, String> getAttributes() {
         final String[] params = getParametersFromXML();
-        final Map<String, String> attrs = new LinkedHashMap<String, String>();
+        final Map<String, String> attrs = new LinkedHashMap<>();
         for (final String param : params) {
             final Value value = getComboBoxValue(param);
             if (value != null && !Tools.areEqual(value, getParamDefault(param))) {
@@ -277,7 +277,7 @@ final class HbOrderInfo extends EditableInfo implements HbConstraintInterface {
     @Override
     public void apply(final Host dcHost, final Application.RunMode runMode) {
         final String[] params = getParametersFromXML();
-        final Map<String, String> attrs = new LinkedHashMap<String, String>();
+        final Map<String, String> attrs = new LinkedHashMap<>();
         boolean changed = false;
         for (final String param : params) {
             final Value value = getComboBoxValue(param);

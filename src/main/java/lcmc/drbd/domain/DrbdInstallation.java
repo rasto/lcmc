@@ -20,15 +20,15 @@
 
 package lcmc.drbd.domain;
 
-import lcmc.Exceptions;
-import lcmc.host.ui.DrbdVersions;
-import lcmc.logger.Logger;
-import lcmc.logger.LoggerFactory;
-import lcmc.common.domain.util.Tools;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+
+import lcmc.Exceptions;
+import lcmc.common.domain.util.Tools;
+import lcmc.host.ui.DrbdVersions;
+import lcmc.logger.Logger;
+import lcmc.logger.LoggerFactory;
 
 public class DrbdInstallation {
     private static final Logger LOG = LoggerFactory.getLogger(DrbdInstallation.class);
@@ -122,14 +122,14 @@ public class DrbdInstallation {
     }
 
     public void setAvailableDrbdVersions(final String[] versions) {
-        availableDrbdVersions = new ArrayList<String>(Arrays.asList(versions));
+        availableDrbdVersions = new ArrayList<>(Arrays.asList(versions));
     }
 
     public String[] getAvailableDrbdVersions() {
         if (availableDrbdVersions == null) {
             return null;
         }
-        return availableDrbdVersions.toArray(new String[availableDrbdVersions.size()]);
+        return availableDrbdVersions.toArray(new String[0]);
     }
 
     public boolean isDrbdUpgradeAvailable(final String versionString) {

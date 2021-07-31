@@ -23,6 +23,7 @@
 package lcmc.cluster.ui.wizard;
 
 import java.awt.BorderLayout;
+
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.swing.JComponent;
@@ -30,18 +31,18 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SpringLayout;
 
-import lcmc.common.ui.main.MainPresenter;
-import lcmc.common.ui.SpringUtilities;
-import lcmc.common.ui.WizardDialog;
+import lcmc.cluster.domain.Cluster;
+import lcmc.cluster.domain.Clusters;
+import lcmc.cluster.ui.ClusterTabFactory;
 import lcmc.cluster.ui.widget.Widget;
 import lcmc.cluster.ui.widget.WidgetFactory;
 import lcmc.common.domain.AccessMode;
 import lcmc.common.domain.Application;
-import lcmc.cluster.domain.Cluster;
-import lcmc.cluster.domain.Clusters;
 import lcmc.common.domain.StringValue;
 import lcmc.common.domain.util.Tools;
-import lcmc.cluster.ui.ClusterTabFactory;
+import lcmc.common.ui.SpringUtilities;
+import lcmc.common.ui.WizardDialog;
+import lcmc.common.ui.main.MainPresenter;
 import lcmc.common.ui.utils.SwingUtils;
 
 /**
@@ -94,15 +95,12 @@ public final class Name extends DialogCluster {
             }
         }
         final boolean isValid = v;
-        swingUtils.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                buttonClass(nextButton()).setEnabled(isValid);
-                if (isValid) {
-                    nameField.setBackground(new StringValue(name), new StringValue(name), true);
-                } else {
-                    nameField.wrongValue();
-                }
+        swingUtils.invokeLater(() -> {
+            buttonClass(nextButton()).setEnabled(isValid);
+            if (isValid) {
+                nameField.setBackground(new StringValue(name), new StringValue(name), true);
+            } else {
+                nameField.wrongValue();
             }
         });
         mainPresenter.renameSelectedClusterTab(name);
@@ -126,32 +124,17 @@ public final class Name extends DialogCluster {
         enableComponents();
         if (!application.existsCluster(getCluster())) {
             application.addClusterToClusters(getCluster());
-            swingUtils.invokeLater(new Runnable() {
-                @Override
-                public void run() {
-                    clusterTabFactory.createClusterTab(getCluster());
-                }
-            });
+            swingUtils.invokeLater(() -> clusterTabFactory.createClusterTab(getCluster()));
         }
     }
 
     @Override
     protected void initDialogAfterVisible() {
-        swingUtils.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                nameField.requestFocus();
-            }
-        });
+        swingUtils.invokeLater(() -> nameField.requestFocus());
         if (!application.getAutoClusters().isEmpty()) {
             final String name = application.getAutoClusters().get(0);
             if (!".".equals(name)) {
-                swingUtils.invokeLater(new Runnable() {
-                    @Override
-                    public void run() {
-                        nameField.setValue(new StringValue(name));
-                    }
-                });
+                swingUtils.invokeLater(() -> nameField.setValue(new StringValue(name)));
             }
             pressNextButton();
         }

@@ -31,59 +31,61 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import com.google.common.collect.HashBasedTable;
-import com.google.common.collect.Table;
-import lcmc.common.domain.Value;
 import org.apache.commons.collections15.map.MultiKeyMap;
 
+import com.google.common.collect.HashBasedTable;
+import com.google.common.collect.Table;
+
+import lcmc.common.domain.Value;
+
 /**
- * This class holds data that were parsed from cib xml. This is not used in old
- * heartbeats before pacemaker.
+ * This class holds data that were parsed from cib xml. This is not used in old heartbeats before pacemaker.
  */
 final class CibQuery {
-    private Map<String, String> crmConfig = new HashMap<String, String>();
-    private Map<String, Map<String, String>> resourceParameters = new HashMap<String, Map<String, String>>();
+    private Map<String, String> crmConfig = new HashMap<>();
+    private Map<String, Map<String, String>> resourceParameters = new HashMap<>();
     private Map<String, Map<String, String>> resourceParametersNvpairsIds;
     private Map<String, ResourceAgent> resourceType;
     private Set<String> orphanedResourcesList;
     private Map<String, Set<String>> resourcesInLRMList;
     private Map<String, String> resourceInstanceAttrId;
-    private Map<String, List<CrmXml.ColocationData>> colocationRsc =
-                                                          new LinkedHashMap<String, List<CrmXml.ColocationData>>();
-    private Map<String, CrmXml.ColocationData> colocationId = new LinkedHashMap<String, CrmXml.ColocationData>();
-    private Map<String, List<CrmXml.OrderData>> orderRsc = new LinkedHashMap<String, List<CrmXml.OrderData>>();
-    private Map<String, CrmXml.OrderData> orderId = new LinkedHashMap<String, CrmXml.OrderData>();
-    private Map<String, List<CrmXml.RscSet>> orderIdRscSets = new LinkedHashMap<String, List<CrmXml.RscSet>>();
-    private Map<String, List<CrmXml.RscSet>> colocationIdRscSets = new LinkedHashMap<String, List<CrmXml.RscSet>>();
-    private List<RscSetConnectionData> rscSetConnections = new ArrayList<RscSetConnectionData>();
+    private Map<String, List<CrmXml.ColocationData>> colocationRsc = new LinkedHashMap<>();
+    private Map<String, CrmXml.ColocationData> colocationId = new LinkedHashMap<>();
+    private Map<String, List<CrmXml.OrderData>> orderRsc = new LinkedHashMap<>();
+    private Map<String, CrmXml.OrderData> orderId = new LinkedHashMap<>();
+    private Map<String, List<CrmXml.RscSet>> orderIdRscSets = new LinkedHashMap<>();
+    private Map<String, List<CrmXml.RscSet>> colocationIdRscSets = new LinkedHashMap<>();
+    private List<RscSetConnectionData> rscSetConnections = new ArrayList<>();
     private Table<String, String, String> nodeParameters;
-    private Map<String, Map<String, HostLocation>> locations = new HashMap<String, Map<String, HostLocation>>();
-    private Map<String, HostLocation> pingLocations = new HashMap<String, HostLocation>();
-    private Map<String, List<String>> locationsId = new HashMap<String, List<String>>();
-    private Map<String, HostLocation> idToLocation = new HashMap<String, HostLocation>();
+    private Map<String, Map<String, HostLocation>> locations = new HashMap<>();
+    private Map<String, HostLocation> pingLocations = new HashMap<>();
+    private Map<String, List<String>> locationsId = new HashMap<>();
+    private final Map<String, HostLocation> idToLocation = new HashMap<>();
     private Table<String, String, String> resHostToLocId = HashBasedTable.create();
-    private Map<String, String> resPingToLocId = new HashMap<String, String>();
-    private MultiKeyMap<String, Value> operations = new MultiKeyMap<String, Value>();
-    private Map<String, String> operationsRefs = new HashMap<String, String>();
-    private Map<String, String> metaAttrsId = new HashMap<String, String>();
-    private Map<String, String> metaAttrsRefs = new HashMap<String, String>();
-    private Map<String, String> operationsId = new HashMap<String, String>();
-    private Map<String, Map<String, String>> resOpIds = new HashMap<String, Map<String, String>>();
-    private Map<String, String> nodeOnline = new HashMap<String, String>();
-    private Set<String> nodePending = new HashSet<String>();
-    private Set<String> fencedNodes = new HashSet<String>();
-    private Map<String, List<String>> groupsToResources = new HashMap<String, List<String>>();
-    private Map<String, String> cloneToResource = new HashMap<String, String>();
-    private List<String> masterList = new ArrayList<String>();
+    private Map<String, String> resPingToLocId = new HashMap<>();
+    private MultiKeyMap<String, Value> operations = new MultiKeyMap<>();
+    private Map<String, String> operationsRefs = new HashMap<>();
+    private Map<String, String> metaAttrsId = new HashMap<>();
+    private Map<String, String> metaAttrsRefs = new HashMap<>();
+    private Map<String, String> operationsId = new HashMap<>();
+    private Map<String, Map<String, String>> resOpIds = new HashMap<>();
+    private Map<String, String> nodeOnline = new HashMap<>();
+    private Set<String> nodePending = new HashSet<>();
+    private Set<String> fencedNodes = new HashSet<>();
+    private Map<String, List<String>> groupsToResources = new HashMap<>();
+    private Map<String, String> cloneToResource = new HashMap<>();
+    private List<String> masterList = new ArrayList<>();
     private String designatedCoOrdinator = null;
     private Table<String, String, String> nodeFailedCount = HashBasedTable.create();
-    /** Map from rsc id to list of clone ids for failed clones. */
+    /**
+     * Map from rsc id to list of clone ids for failed clones.
+     */
     private Table<String, String, Set<String>> resourceFailedCloneIds = HashBasedTable.create();
-    private Map<String, String> nodePingCount = new HashMap<String, String>();
+    private Map<String, String> nodePingCount = new HashMap<>();
     private String rscDefaultsId = null;
-    private Map<String, String> rscDefaultsParams = new HashMap<String, String>();
-    private Map<String, String> rscDefaultsParamsNvpairIds = new HashMap<String, String>();
-    private Map<String, Value> opDefaultsParams = new HashMap<String, Value>();
+    private Map<String, String> rscDefaultsParams = new HashMap<>();
+    private Map<String, String> rscDefaultsParamsNvpairIds = new HashMap<>();
+    private Map<String, Value> opDefaultsParams = new HashMap<>();
 
     void setCrmConfig(final Map<String, String> crmConfig) {
         this.crmConfig = crmConfig;
@@ -122,11 +124,11 @@ final class CibQuery {
     }
 
     void setOrphaned(final Set<String> orphanedList) {
-        this.orphanedResourcesList = orphanedList;
+        orphanedResourcesList = orphanedList;
     }
 
     void setInLRM(final Map<String, Set<String>> inLRMList) {
-        this.resourcesInLRMList = inLRMList;
+        resourcesInLRMList = inLRMList;
     }
 
     Map<String, ResourceAgent> getResourceType() {
@@ -253,14 +255,6 @@ final class CibQuery {
         return locationsId;
     }
 
-    void setLocationMap(final Map<String, HostLocation> idToLocation) {
-        this.idToLocation = idToLocation;
-    }
-
-    Map<String, HostLocation> getLocationMap() {
-        return idToLocation;
-    }
-
     void setResHostToLocId(final Table<String, String, String> resHostToLocId) {
         this.resHostToLocId = resHostToLocId;
     }
@@ -385,16 +379,8 @@ final class CibQuery {
         this.nodeFailedCount = nodeFailedCount;
     }
 
-    Table<String, String, String> getNodeFailedCount() {
-        return nodeFailedCount;
-    }
-
     void setNodePingCount(final Map<String, String> nodePingCount) {
         this.nodePingCount = nodePingCount;
-    }
-
-    Map<String, String> getNodePingCount() {
-        return nodePingCount;
     }
 
     void setResourceFailedCloneIds(final Table<String ,String, Set<String>> resourceFailedCloneIds) {
@@ -431,10 +417,6 @@ final class CibQuery {
 
     void setRscDefaultsParamsNvpairIds(final Map<String, String> rscDefaultsParamsNvpairIds) {
         this.rscDefaultsParamsNvpairIds = rscDefaultsParamsNvpairIds;
-    }
-
-    Map<String, String> getRscDefaultsParamsNvpairIds() {
-        return rscDefaultsParamsNvpairIds;
     }
 
     void setOpDefaultsParams(final Map<String, Value> opDefaultsParams) {

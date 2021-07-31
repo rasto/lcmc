@@ -26,16 +26,21 @@ package lcmc.drbd.ui.configdialog;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SpringLayout;
+
+import lcmc.cluster.ui.widget.Widget;
+import lcmc.cluster.ui.widget.WidgetFactory;
 import lcmc.common.domain.AccessMode;
 import lcmc.common.domain.Application;
 import lcmc.common.domain.StringValue;
 import lcmc.common.domain.Value;
+import lcmc.common.domain.util.Tools;
 import lcmc.common.ui.SpringUtilities;
 import lcmc.common.ui.WizardDialog;
 import lcmc.common.ui.utils.SwingUtils;
@@ -43,9 +48,6 @@ import lcmc.drbd.ui.resource.BlockDevInfo;
 import lcmc.drbd.ui.resource.GlobalInfo;
 import lcmc.drbd.ui.resource.ResourceInfo;
 import lcmc.drbd.ui.resource.VolumeInfo;
-import lcmc.cluster.ui.widget.Widget;
-import lcmc.cluster.ui.widget.WidgetFactory;
-import lcmc.common.domain.util.Tools;
 
 /**
  * An implementation of a dialog where user start to configure the DRBD.
@@ -85,23 +87,18 @@ public final class Start extends WizardDialog {
         boolean newResource = false;
         final Value i = drbdResourceWidget.getValue();
         if (i == null || i.isNothingSelected()) {
-            final Iterable<BlockDevInfo> bdis =
-                                            new ArrayList<BlockDevInfo>(Arrays.asList(blockDevInfo1, blockDevInfo2));
+            final Iterable<BlockDevInfo> bdis = new ArrayList<>(Arrays.asList(blockDevInfo1, blockDevInfo2));
             resourceInfo = globalInfo.getNewDrbdResource(VolumeInfo.getHostsFromBlockDevices(bdis));
             globalInfo.addDrbdResource(resourceInfo);
             newResource = true;
         } else {
             resourceInfo = (ResourceInfo) i;
         }
-        final VolumeInfo dvi = globalInfo.getNewDrbdVolume(
-                                             resourceInfo,
-                                             new ArrayList<BlockDevInfo>(Arrays.asList(blockDevInfo1, blockDevInfo2)));
-        swingUtils.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                resourceInfo.addDrbdVolume(dvi);
-                globalInfo.addDrbdVolume(dvi);
-            }
+        final VolumeInfo dvi =
+                globalInfo.getNewDrbdVolume(resourceInfo, new ArrayList<>(Arrays.asList(blockDevInfo1, blockDevInfo2)));
+        swingUtils.invokeLater(() -> {
+            resourceInfo.addDrbdVolume(dvi);
+            globalInfo.addDrbdVolume(dvi);
         });
         if (newResource) {
             resourceDialog.init(this, dvi);
@@ -145,20 +142,13 @@ public final class Start extends WizardDialog {
         /* Drbd Resource */
         final JLabel drbdResourceLabel = new JLabel(Tools.getString("Dialog.DrbdConfig.Start.DrbdResource"));
         final String newDrbdResource = Tools.getString("Dialog.DrbdConfig.Start.NewDrbdResource");
-        final List<Value> choices = new ArrayList<Value>();
+        final List<Value> choices = new ArrayList<>();
         choices.add(new StringValue(null, newDrbdResource));
-        for (final ResourceInfo dri : globalInfo.getDrbdResources()) {
-            choices.add(dri);
-        }
-        drbdResourceWidget = widgetFactory.createInstance(
-                                    Widget.Type.COMBOBOX,
-                                    Widget.NO_DEFAULT,
-                                    choices.toArray(new Value[choices.size()]),
-                                    Widget.NO_REGEXP,
-                                    COMBOBOX_WIDTH,
-                                    Widget.NO_ABBRV,
-                                    new AccessMode(AccessMode.RO, AccessMode.NORMAL),
-                                    Widget.NO_BUTTON);
+        choices.addAll(globalInfo.getDrbdResources());
+        drbdResourceWidget =
+                widgetFactory.createInstance(Widget.Type.COMBOBOX, Widget.NO_DEFAULT, choices.toArray(new Value[0]),
+                        Widget.NO_REGEXP, COMBOBOX_WIDTH, Widget.NO_ABBRV, new AccessMode(AccessMode.RO, AccessMode.NORMAL),
+                        Widget.NO_BUTTON);
         inputPane.add(drbdResourceLabel);
         inputPane.add(drbdResourceWidget.getComponent());
         SpringUtilities.makeCompactGrid(inputPane, 1, 2,  // rows, cols

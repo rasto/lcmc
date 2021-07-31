@@ -31,21 +31,6 @@ import java.util.Enumeration;
 import java.util.List;
 import java.util.Set;
 
-import com.google.common.collect.HashBasedTable;
-import com.google.common.collect.Sets;
-import com.google.common.collect.Table;
-import com.trilead.ssh2.KnownHosts;
-
-import lcmc.cluster.domain.Cluster;
-import lcmc.cluster.domain.Clusters;
-import lcmc.common.ui.ConfirmDialog;
-import lcmc.host.domain.Host;
-import lcmc.host.domain.Hosts;
-import lcmc.robotest.Test;
-import lcmc.logger.Logger;
-import lcmc.logger.LoggerFactory;
-import lcmc.common.domain.util.Tools;
-
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Provider;
@@ -53,6 +38,21 @@ import javax.inject.Singleton;
 import javax.swing.AbstractButton;
 import javax.swing.UIManager;
 import javax.swing.plaf.FontUIResource;
+
+import com.google.common.collect.HashBasedTable;
+import com.google.common.collect.Sets;
+import com.google.common.collect.Table;
+import com.trilead.ssh2.KnownHosts;
+
+import lcmc.cluster.domain.Cluster;
+import lcmc.cluster.domain.Clusters;
+import lcmc.common.domain.util.Tools;
+import lcmc.common.ui.ConfirmDialog;
+import lcmc.host.domain.Host;
+import lcmc.host.domain.Hosts;
+import lcmc.logger.Logger;
+import lcmc.logger.LoggerFactory;
+import lcmc.robotest.Test;
 
 /**
  * Application
@@ -77,7 +77,8 @@ public class Application {
     public static boolean isTest(final RunMode runMode) {
         return RunMode.TEST == runMode;
     }
-    private Set<String> skipNetInterfaces = Sets.newHashSet();
+
+    private final Set<String> skipNetInterfaces = Sets.newHashSet();
     private String downloadUser = Tools.getDefault("DownloadLogin.User");
     private String downloadPassword = Tools.getDefault("DownloadLogin.Password");
     private String savedDownloadUser = "";
@@ -95,11 +96,15 @@ public class Application {
     private String lastEnteredUser = null;
     private Boolean lastEnteredUseSudo = null;
     private String lastEnteredSSHPort = null;
-    /** Whether drbd gui helper should be overwritten. */
+    /**
+     * Whether drbd gui helper should be overwritten.
+     */
     private boolean keepHelper = false;
-    private final List<String> autoHosts = new ArrayList<String>();
-    private final List<String> autoClusters = new ArrayList<String>();
-    /** Auto options, that make automatic actions in the gui. */
+    private final List<String> autoHosts = new ArrayList<>();
+    private final List<String> autoClusters = new ArrayList<>();
+    /**
+     * Auto options, that make automatic actions in the gui.
+     */
     private final Table<String, String, String> autoOptions = HashBasedTable.create();
     private int vncPortOffset = 0;
     private boolean useTightvnc = false;
@@ -526,7 +531,7 @@ public class Application {
     }
 
     public void addSkipNetInterface(String skipNetInterface) {
-        this.skipNetInterfaces.add(skipNetInterface);
+        skipNetInterfaces.add(skipNetInterface);
     }
 
     public boolean isSkipNetInterface(String name) {
@@ -539,8 +544,7 @@ public class Application {
         if (localPort < 0) {
             return;
         }
-        final vncviewer.VNCViewer v = new vncviewer.VNCViewer(new String[]{"127.0.0.1:"
-                + (Integer.toString(localPort - 5900))});
+        final vncviewer.VNCViewer v = new vncviewer.VNCViewer(new String[]{"127.0.0.1:" + ((localPort - 5900))});
 
         v.start();
         v.join();

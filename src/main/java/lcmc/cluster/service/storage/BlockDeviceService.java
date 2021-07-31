@@ -20,9 +20,22 @@
 
 package lcmc.cluster.service.storage;
 
-import com.google.common.base.Optional;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import com.google.common.collect.ImmutableList;
 import com.google.common.eventbus.Subscribe;
+
 import lcmc.ClusterEventBus;
 import lcmc.HwEventBus;
 import lcmc.cluster.domain.Cluster;
@@ -38,17 +51,6 @@ import lcmc.event.HwDrbdStatusChangedEvent;
 import lcmc.host.domain.Host;
 import lcmc.host.domain.HostBlockDevices;
 
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Singleton;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
-
 @Named
 @Singleton
 public class BlockDeviceService {
@@ -56,8 +58,8 @@ public class BlockDeviceService {
     private HwEventBus hwEventBus;
     @Inject
     private ClusterEventBus clusterEventBus;
-    private Map<Host, HostBlockDevices> hostBlockDevicesByHost = new ConcurrentHashMap<Host, HostBlockDevices>();
-    private Map<Cluster, List<String>> commonBlockDevicesByCluster = new ConcurrentHashMap<Cluster, List<String>>();
+    private final Map<Host, HostBlockDevices> hostBlockDevicesByHost = new ConcurrentHashMap<>();
+    private final Map<Cluster, List<String>> commonBlockDevicesByCluster = new ConcurrentHashMap<>();
     @Inject
     private ClusterViewFactory clusterViewFactory;
 
@@ -72,7 +74,7 @@ public class BlockDeviceService {
         final HostBlockDevices hostBlockDevices = new HostBlockDevices();
         hostBlockDevices.setBlockDevices(event.getBlockDevices());
         hostBlockDevicesByHost.put(event.getHost(), hostBlockDevices);
-        updateCommonBlockDeviceNames(Optional.fromNullable(event.getHost().getCluster()));
+        updateCommonBlockDeviceNames(Optional.ofNullable(event.getHost().getCluster()));
         clusterEventBus.post(new BlockDevicesChangedEvent(event.getHost(), hostBlockDevices.getBlockDevices()));
     }
 
@@ -108,7 +110,7 @@ public class BlockDeviceService {
         if (hostBlockDevices != null) {
             return hostBlockDevices.getBlockDeviceByName(name);
         }
-        return Optional.absent();
+        return Optional.empty();
     }
 
     public Collection<CommonBlockDevInfo> getCommonBlockDevViews() {
@@ -116,7 +118,7 @@ public class BlockDeviceService {
     }
 
     private void updateCommonBlockDeviceNames(final Optional<Cluster> cluster) {
-        if (!cluster.isPresent()) {
+        if (cluster.isEmpty()) {
             return;
         }
         final List<String> commonBlockDeviceNames = getCommonBlockDeviceNames(cluster.get().getHosts());
@@ -128,27 +130,27 @@ public class BlockDeviceService {
                 || !Tools.equalCollections(commonBlockDeviceNames, oldCommonBlockDeviceNames)) {
             final Collection<CommonBlockDevInfo> newCommonBlockDevViews =
                     createCommonBlockDevViews(cluster.get(), commonBlockDeviceNames);
-            this.commonBlockDevViews = newCommonBlockDevViews;
+            commonBlockDevViews = newCommonBlockDevViews;
             clusterEventBus.post(new CommonBlockDevicesChangedEvent(cluster.get(), newCommonBlockDevViews));
         }
     }
 
     private List<String> getCommonBlockDeviceNames(final Set<Host> hosts) {
-        Optional<List<String>> namesIntersection = Optional.absent();
+        Optional<List<String>> namesIntersection = Optional.empty();
         for (final Host host : hosts) {
             final HostBlockDevices hostBlockDevices = hostBlockDevicesByHost.get(host);
             if (hostBlockDevices != null) {
                 namesIntersection = hostBlockDevices.getBlockDevicesNamesIntersection(namesIntersection);
             }
         }
-        return namesIntersection.or(new ArrayList<String>());
+        return namesIntersection.orElse(new ArrayList<>());
     }
 
 
     private Collection<CommonBlockDevInfo> createCommonBlockDevViews(
             final Cluster cluster,
             final List<String> commonBlockDevicesNames) {
-        final List<CommonBlockDevInfo> newCommonBlockDevViews = new ArrayList<CommonBlockDevInfo>();
+        final List<CommonBlockDevInfo> newCommonBlockDevViews = new ArrayList<>();
         for (final String commonBlockDevice : commonBlockDevicesNames) {
             final CommonBlockDevInfo commonBlockDevInfo =
                     clusterViewFactory.createCommonBlockDevView(cluster, commonBlockDevice);

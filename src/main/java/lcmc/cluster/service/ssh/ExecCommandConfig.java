@@ -20,17 +20,17 @@
 
 package lcmc.cluster.service.ssh;
 
-import lcmc.common.ui.MainPanel;
-import lcmc.common.ui.main.ProgressIndicator;
-import lcmc.host.domain.Host;
-import lcmc.common.ui.ProgressBar;
 import lcmc.cluster.ui.SSHGui;
 import lcmc.common.domain.ConvertCmdCallback;
 import lcmc.common.domain.ExecCallback;
-import lcmc.logger.Logger;
-import lcmc.logger.LoggerFactory;
 import lcmc.common.domain.NewOutputCallback;
 import lcmc.common.domain.util.Tools;
+import lcmc.common.ui.MainPanel;
+import lcmc.common.ui.ProgressBar;
+import lcmc.common.ui.main.ProgressIndicator;
+import lcmc.host.domain.Host;
+import lcmc.logger.Logger;
+import lcmc.logger.LoggerFactory;
 
 public class ExecCommandConfig {
     private static final Logger LOG = LoggerFactory.getLogger(ExecCommandConfig.class);
@@ -86,12 +86,12 @@ public class ExecCommandConfig {
     }
 
     public ExecCommandConfig silentCommand() {
-        this.commandVisible = false;
+        commandVisible = false;
         return this;
     }
 
     public ExecCommandConfig silentOutput() {
-        this.outputVisible = false;
+        outputVisible = false;
         return this;
     }
 
@@ -133,7 +133,7 @@ public class ExecCommandConfig {
     }
 
     public SshOutput capture(final MainPanel mainPanel, final ProgressIndicator progressIndicator) {
-        final StringBuilder output = new StringBuilder("");
+        final StringBuilder output = new StringBuilder();
         final Integer[] exitCodeHolder = new Integer[]{0};
         if (execCallback == null) {
             final String stackTrace = Tools.getStackTrace();

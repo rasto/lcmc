@@ -21,42 +21,62 @@
  */
 package lcmc.vm.ui.resource;
 
-import com.google.common.base.Optional;
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.FlowLayout;
+import java.io.File;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.swing.BoxLayout;
+import javax.swing.ImageIcon;
+import javax.swing.JComponent;
+import javax.swing.JFileChooser;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTable;
+import javax.swing.SwingConstants;
+import javax.swing.filechooser.FileSystemView;
+
+import org.w3c.dom.Node;
+
 import lcmc.cluster.service.ssh.ExecCommandConfig;
 import lcmc.cluster.service.ssh.SshOutput;
 import lcmc.cluster.ui.ClusterBrowser;
 import lcmc.cluster.ui.widget.Check;
 import lcmc.cluster.ui.widget.Widget;
 import lcmc.cluster.ui.widget.WidgetFactory;
-import lcmc.common.domain.*;
+import lcmc.common.domain.AccessMode;
+import lcmc.common.domain.Application;
+import lcmc.common.domain.ResourceValue;
+import lcmc.common.domain.StringValue;
+import lcmc.common.domain.Unit;
+import lcmc.common.domain.Value;
 import lcmc.common.domain.util.Tools;
 import lcmc.common.ui.Browser;
 import lcmc.common.ui.EditableInfo;
 import lcmc.common.ui.Info;
 import lcmc.common.ui.main.MainData;
 import lcmc.common.ui.treemenu.ClusterTreeMenu;
-import lcmc.common.ui.utils.*;
+import lcmc.common.ui.utils.ComponentWithTest;
+import lcmc.common.ui.utils.MenuFactory;
+import lcmc.common.ui.utils.MyButton;
+import lcmc.common.ui.utils.SwingUtils;
+import lcmc.common.ui.utils.UpdatableItem;
 import lcmc.host.domain.Host;
 import lcmc.logger.Logger;
 import lcmc.logger.LoggerFactory;
 import lcmc.vm.domain.LinuxFile;
 import lcmc.vm.domain.VmsXml;
-import org.w3c.dom.Node;
-
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.swing.*;
-import javax.swing.filechooser.FileSystemView;
-import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.io.File;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 /**
  * This class holds info about Virtual Hardware.
@@ -79,7 +99,7 @@ public abstract class HardwareInfo extends EditableInfo {
     protected static final boolean FILECHOOSER_FILE_ONLY = !FILECHOOSER_DIR_ONLY;
     private JComponent infoPanel = null;
     private DomainInfo vmsVirtualDomainInfo;
-    private final Map<String, LinuxFile> linuxFileCache = new HashMap<String, LinuxFile>();
+    private final Map<String, LinuxFile> linuxFileCache = new HashMap<>();
     @Inject
     private Application application;
     @Inject
@@ -136,36 +156,22 @@ public abstract class HardwareInfo extends EditableInfo {
         initApplyButton(null);
         /* add item listeners to the apply button. */
         if (!abExisted) {
-            getApplyButton().addAction(new Runnable() {
-                @Override
-                public void run() {
-                    final Thread thread = new Thread(new Runnable() {
-                        @Override
-                        public void run() {
-                            getBrowser().clStatusLock();
-                            apply(Application.RunMode.LIVE);
-                            getBrowser().clStatusUnlock();
-                        }
-                    });
-                    thread.start();
-                }
+            getApplyButton().addAction(() -> {
+                final Thread thread = new Thread(() -> {
+                    getBrowser().clStatusLock();
+                    apply(Application.RunMode.LIVE);
+                    getBrowser().clStatusUnlock();
+                });
+                thread.start();
             });
-            getRevertButton().addActionListener(
-                    new ActionListener() {
-                        @Override
-                        public void actionPerformed(final ActionEvent e) {
-                            final Thread thread = new Thread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    getBrowser().clStatusLock();
-                                    revert();
-                                    getBrowser().clStatusUnlock();
-                                }
-                            });
-                            thread.start();
-                        }
-                    }
-            );
+            getRevertButton().addActionListener(e -> {
+                final Thread thread = new Thread(() -> {
+                    getBrowser().clStatusLock();
+                    revert();
+                    getBrowser().clStatusUnlock();
+                });
+                thread.start();
+            });
         }
         final JPanel extraButtonPanel = new JPanel(new FlowLayout(FlowLayout.TRAILING, 3, 0));
         extraButtonPanel.setBackground(Browser.BUTTON_PANEL_BACKGROUND);
@@ -175,12 +181,7 @@ public abstract class HardwareInfo extends EditableInfo {
         final MyButton overviewButton = widgetFactory.createButton("VM Host Overview", BACK_ICON);
         application.makeMiniButton(overviewButton);
         overviewButton.setPreferredSize(new Dimension(130, 50));
-        overviewButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(final ActionEvent e) {
-                vmsVirtualDomainInfo.selectMyself();
-            }
-        });
+        overviewButton.addActionListener(e -> vmsVirtualDomainInfo.selectMyself());
         extraButtonPanel.add(overviewButton);
         addParams(optionsPanel,
                   params,
@@ -195,15 +196,11 @@ public abstract class HardwareInfo extends EditableInfo {
         newPanel.setBackground(ClusterBrowser.PANEL_BACKGROUND);
         newPanel.setLayout(new BoxLayout(newPanel, BoxLayout.PAGE_AXIS));
         newPanel.add(buttonPanel);
-        newPanel.add(getMoreOptionsPanel(application.getServiceLabelWidth()
-                                         + application.getServiceFieldWidth() * 2 + 4));
+        newPanel.add(getMoreOptionsPanel(application.getServiceLabelWidth() + application.getServiceFieldWidth() * 2 + 4));
         newPanel.add(new JScrollPane(mainPanel));
-        swingUtils.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                getApplyButton().setVisible(!getVMSVirtualDomainInfo().getResource().isNew());
-                setApplyButtons(null, params);
-            }
+        swingUtils.invokeLater(() -> {
+            getApplyButton().setVisible(!getVMSVirtualDomainInfo().getResource().isNew());
+            setApplyButtons(null, params);
         });
         infoPanel = newPanel;
         infoPanelDone();
@@ -235,14 +232,11 @@ public abstract class HardwareInfo extends EditableInfo {
      */
     @Override
     protected final void rowClicked(final String tableName, final String key, final int column) {
-        final Thread thread = new Thread(new Runnable() {
-            @Override
-            public void run() {
-                if (isControlButton(tableName, column)) {
-                    vmsVirtualDomainInfo.rowClicked(tableName, key, column);
-                } else {
-                    vmsVirtualDomainInfo.selectMyself();
-                }
+        final Thread thread = new Thread(() -> {
+            if (isControlButton(tableName, column)) {
+                vmsVirtualDomainInfo.rowClicked(tableName, key, column);
+            } else {
+                vmsVirtualDomainInfo.selectMyself();
             }
         });
         thread.start();
@@ -310,39 +304,24 @@ public abstract class HardwareInfo extends EditableInfo {
      */
     @Override
     public final List<UpdatableItem> createPopup() {
-        final List<UpdatableItem> items = new ArrayList<UpdatableItem>();
+        final List<UpdatableItem> items = new ArrayList<>();
         /* remove service */
-        final ComponentWithTest removeMenuItem = menuFactory.createMenuItem(
-                Tools.getString("HardwareInfo.Menu.Remove"),
-                ClusterBrowser.REMOVE_ICON,
-                ClusterBrowser.STARTING_PTEST_TOOLTIP,
-                Tools.getString("HardwareInfo.Menu.Cancel"),
-                ClusterBrowser.REMOVE_ICON,
-                ClusterBrowser.STARTING_PTEST_TOOLTIP,
-                new AccessMode(AccessMode.ADMIN, AccessMode.NORMAL),
-                new AccessMode(AccessMode.OP, AccessMode.NORMAL))
-                .predicate(new Predicate() {
-                    @Override
-                    public boolean check() {
-                        return !getResource().isNew();
-                    }
-                })
-                .enablePredicate(new EnablePredicate() {
-                    @Override
-                    public String check() {
-                        if (getResource().isNew()) {
-                            return null;
-                        }
-                        return isRemoveable();
-                    }
-                })
-                .addAction(new MenuAction() {
-                    @Override
-                    public void run(final String text) {
-                        hidePopup();
-                        removeMyself(Application.RunMode.LIVE);
-                    }
-                });
+        final ComponentWithTest removeMenuItem =
+                menuFactory.createMenuItem(Tools.getString("HardwareInfo.Menu.Remove"), ClusterBrowser.REMOVE_ICON,
+                                ClusterBrowser.STARTING_PTEST_TOOLTIP, Tools.getString("HardwareInfo.Menu.Cancel"),
+                                ClusterBrowser.REMOVE_ICON, ClusterBrowser.STARTING_PTEST_TOOLTIP,
+                                new AccessMode(AccessMode.ADMIN, AccessMode.NORMAL), new AccessMode(AccessMode.OP, AccessMode.NORMAL))
+                        .predicate(() -> !getResource().isNew())
+                        .enablePredicate(() -> {
+                            if (getResource().isNew()) {
+                                return null;
+                            }
+                            return isRemoveable();
+                        })
+                        .addAction(text -> {
+                            hidePopup();
+                            removeMyself(Application.RunMode.LIVE);
+                        });
         addMouseOverListener(removeMenuItem, null);
         items.add((UpdatableItem) removeMenuItem);
         return items;
@@ -404,13 +383,8 @@ public abstract class HardwareInfo extends EditableInfo {
     }
 
     protected Map<String, String> getHWParameters(final boolean allParams) {
-        swingUtils.invokeAndWait(new Runnable() {
-            @Override
-            public void run() {
-                getInfoPanel();
-            }
-        });
-        final Map<String, String> parameters = new HashMap<String, String>();
+        swingUtils.invokeAndWait(this::getInfoPanel);
+        final Map<String, String> parameters = new HashMap<>();
         for (final String param : getParametersFromXML()) {
             final Value value = getComboBoxValue(param);
             if (allParams || !getParamSaved(param).equals(value)) {
@@ -502,11 +476,9 @@ public abstract class HardwareInfo extends EditableInfo {
                 } else {
                     dirSB.append("/*");
                 }
-                final SshOutput out = host.captureCommandProgressIndicator(
-                        "executing...",
-                        new ExecCommandConfig().command("stat -c \"%A %a %Y %s %n\" " + dirSB + " 2>/dev/null")
-                                .silentOutput());
-                final List<LinuxFile> files = new ArrayList<LinuxFile>();
+                final SshOutput out = host.captureCommandProgressIndicator("executing...",
+                        new ExecCommandConfig().command("stat -c \"%A %a %Y %s %n\" " + dirSB + " 2>/dev/null").silentOutput());
+                final List<LinuxFile> files = new ArrayList<>();
                 if (out.getExitCode() == 0) {
                     for (final String line : out.getOutput().split("\r\n")) {
                         if (line.trim().isEmpty()) {
@@ -531,7 +503,7 @@ public abstract class HardwareInfo extends EditableInfo {
                         }
                     }
                 }
-                return files.toArray(new LinuxFile[files.size()]);
+                return files.toArray(new LinuxFile[0]);
             }
         };
     }
@@ -624,20 +596,18 @@ public abstract class HardwareInfo extends EditableInfo {
             return false;
         }
         final HardwareInfo other = (HardwareInfo) obj;
-        if (this.getName() != other.getName() && (this.getName() == null || !this.getName().equals(other.getName()))) {
+        if (!Objects.equals(getName(), other.getName()) && (getName() == null || !getName().equals(other.getName()))) {
             return false;
         }
-        return this.vmsVirtualDomainInfo == other.vmsVirtualDomainInfo
-                || (this.vmsVirtualDomainInfo != null
-                && this.vmsVirtualDomainInfo.equals(
+        return vmsVirtualDomainInfo == other.vmsVirtualDomainInfo || (vmsVirtualDomainInfo != null && vmsVirtualDomainInfo.equals(
                 other.vmsVirtualDomainInfo));
     }
 
     @Override
     public int hashCode() {
         int hash = 5;
-        hash = 97 * hash + (this.getName() != null ? this.getName().hashCode() : 0);
-        hash = 97 * hash + (this.vmsVirtualDomainInfo != null ? this.vmsVirtualDomainInfo.hashCode() : 0);
+        hash = 97 * hash + (getName() != null ? getName().hashCode() : 0);
+        hash = 97 * hash + (vmsVirtualDomainInfo != null ? vmsVirtualDomainInfo.hashCode() : 0);
         return hash;
     }
 }

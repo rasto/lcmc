@@ -31,13 +31,13 @@ import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.SpringLayout;
 
-import lcmc.common.ui.SpringUtilities;
-import lcmc.common.ui.WizardDialog;
-import lcmc.common.domain.Application;
-import lcmc.common.domain.ExecCallback;
 import lcmc.cluster.service.ssh.ExecCommandConfig;
 import lcmc.cluster.service.ssh.ExecCommandThread;
+import lcmc.common.domain.Application;
+import lcmc.common.domain.ExecCallback;
 import lcmc.common.domain.util.Tools;
+import lcmc.common.ui.SpringUtilities;
+import lcmc.common.ui.WizardDialog;
 
 /**
  * An implementation of a dialog where hardware information is collected.
@@ -52,8 +52,8 @@ public class Devices extends DialogHost {
     /** Checks the answer and makes it visible to the user. */
     final void checkAnswer(final String ans) {
         enableComponents();
-        final List<String> incorrect = new ArrayList<String>();
-        final List<String> changed = new ArrayList<String>();
+        final List<String> incorrect = new ArrayList<>();
+        final List<String> changed = new ArrayList<>();
         if (ans != null && ans.isEmpty() || "\n".equals(ans)) {
             progressBarDoneError();
             final String error = Tools.getString("Dialog.Host.Devices.CheckError");
@@ -80,12 +80,9 @@ public class Devices extends DialogHost {
     @Override
     protected final void initDialogAfterVisible() {
         makeDefaultAndRequestFocus(buttonClass(nextButton()));
-        final Thread t = new Thread(new Runnable() {
-            @Override
-            public void run() {
-                getHost().getSSH().installGuiHelper();
-                getAllInfo();
-            }
+        final Thread t = new Thread(() -> {
+            getHost().getSSH().installGuiHelper();
+            getAllInfo();
         });
         t.start();
     }

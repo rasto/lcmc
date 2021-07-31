@@ -23,8 +23,20 @@
 
 package lcmc.crm.domain;
 
-import com.google.common.base.Optional;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.Set;
+
+import javax.inject.Inject;
+import javax.inject.Named;
+
 import com.google.common.collect.Table;
+
 import lcmc.cluster.service.ssh.ExecCommandConfig;
 import lcmc.cluster.service.ssh.SshOutput;
 import lcmc.common.domain.Application;
@@ -35,15 +47,6 @@ import lcmc.common.ui.Access;
 import lcmc.host.domain.Host;
 import lcmc.logger.Logger;
 import lcmc.logger.LoggerFactory;
-
-import javax.inject.Inject;
-import javax.inject.Named;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Set;
 
 /**
  * This class parses pacemaker/heartbeat status, stores information
@@ -62,8 +65,6 @@ public class ClusterStatus {
     private String oldCib = null;
     private boolean oldAdvancedMode = false;
     private Host host;
-    @Inject
-    private Application application;
     @Inject
     private Access access;
 
@@ -152,9 +153,9 @@ public class ClusterStatus {
 
     public Optional<List<String>> getGroupResources(final String group, final Application.RunMode runMode) {
         if (ptestResult != null && Application.isTest(runMode)) {
-            return Optional.fromNullable(shadowCibQuery.getGroupsToResources().get(group));
+            return Optional.ofNullable(shadowCibQuery.getGroupsToResources().get(group));
         } else {
-            return Optional.fromNullable(cibQuery.getGroupsToResources().get(group));
+            return Optional.ofNullable(cibQuery.getGroupsToResources().get(group));
         }
     }
 
@@ -226,11 +227,7 @@ public class ClusterStatus {
         } else {
             locs = cibQuery.getLocationsId().get(rsc);
         }
-        if (locs == null) {
-            return new ArrayList<String>();
-        } else {
-            return locs;
-        }
+        return Objects.requireNonNullElseGet(locs, ArrayList::new);
     }
 
     public HostLocation getScore(final String hbId, final String onHost, final Application.RunMode runMode) {
@@ -453,7 +450,7 @@ public class ClusterStatus {
             if ("fenced_nodes".equals(cmd)) {
 
             } else if ("res_status".equals(cmd)) {
-                final String status = Tools.join("\n", data.toArray(new String[data.size()]));
+                final String status = Tools.join("\n", data.toArray(new String[0]));
                 if (!status.equals(oldStatus)) {
                     LOG.debug1("parseCommand: status update: " + host.getName());
                     oldStatus = status;
@@ -461,7 +458,7 @@ public class ClusterStatus {
                     return true;
                 }
             } else if ("cibadmin".equals(cmd)) {
-                final String cib = Tools.join("\n", data.toArray(new String[data.size()]));
+                final String cib = Tools.join("\n", data.toArray(new String[0]));
                 final boolean advancedMode = access.isAdvancedMode();
                 if (!cib.equals(oldCib) || oldAdvancedMode != advancedMode) {
                     LOG.debug1("parseCommand: cib update: " + host.getName());
@@ -509,11 +506,11 @@ public class ClusterStatus {
 
             /* first comes 'ok' */
             if ("ok".equals(line)) {
-                data = new ArrayList<String>();
+                data = new ArrayList<>();
                 failed = false;
             } else if ("fail".equals(line) || "None".equals(line)) {
                 failed = true;
-                data = new ArrayList<String>();
+                data = new ArrayList<>();
             } else if (data != null) {
                 if (!failed) {
                     data.add(line);

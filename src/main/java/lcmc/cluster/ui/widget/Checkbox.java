@@ -21,14 +21,15 @@ package lcmc.cluster.ui.widget;
 
 import java.awt.Color;
 import java.awt.ItemSelectable;
-import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
+
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.swing.AbstractButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComponent;
 import javax.swing.text.Document;
+
 import lcmc.common.domain.AccessMode;
 import lcmc.common.domain.StringValue;
 import lcmc.common.domain.Value;
@@ -133,12 +134,9 @@ public class Checkbox extends GenericWidget<JComponent> {
 
     @Override
     public void setBackgroundColor(final Color bg) {
-        swingUtils.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                setBackground(bg);
-                getInternalComponent().setBackground(bg);
-            }
+        swingUtils.invokeLater(() -> {
+            setBackground(bg);
+            getInternalComponent().setBackground(bg);
         });
     }
 
@@ -153,24 +151,16 @@ public class Checkbox extends GenericWidget<JComponent> {
 
     @Override
     protected ItemListener getItemListener(final WidgetListener wl) {
-        return new ItemListener() {
-            @Override
-            public void itemStateChanged(final ItemEvent e) {
-                if (wl.isEnabled()) {
-                    final Value value;
-                    if (((AbstractButton) e.getItem()).isSelected()) {
-                        value = checkBoxTrue;
-                    } else {
-                        value = checkBoxFalse;
-                    }
-                    final Thread t = new Thread(new Runnable() {
-                        @Override
-                        public void run() {
-                            wl.check(value);
-                        }
-                    });
-                    t.start();
+        return e -> {
+            if (wl.isEnabled()) {
+                final Value value;
+                if (((AbstractButton) e.getItem()).isSelected()) {
+                    value = checkBoxTrue;
+                } else {
+                    value = checkBoxFalse;
                 }
+                final Thread t = new Thread(() -> wl.check(value));
+                t.start();
             }
         };
     }

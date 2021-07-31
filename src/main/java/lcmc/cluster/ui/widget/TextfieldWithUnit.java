@@ -28,6 +28,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.swing.JComponent;
@@ -38,14 +39,15 @@ import javax.swing.event.DocumentListener;
 import javax.swing.text.AbstractDocument;
 import javax.swing.text.Document;
 import javax.swing.text.JTextComponent;
+
 import lcmc.common.domain.AccessMode;
 import lcmc.common.domain.StringValue;
+import lcmc.common.domain.Unit;
 import lcmc.common.domain.Value;
 import lcmc.common.ui.Access;
 import lcmc.common.ui.SpringUtilities;
 import lcmc.common.ui.utils.MyButton;
 import lcmc.common.ui.utils.PatternDocument;
-import lcmc.common.domain.Unit;
 import lcmc.common.ui.utils.SwingUtils;
 import lcmc.common.ui.utils.WidgetListener;
 
@@ -136,10 +138,10 @@ public final class TextfieldWithUnit extends GenericWidget<JComponent> {
                                         final Unit[] items,
                                         final String regexp,
                                         final Map<String, String> abbreviations) {
-        final List<Unit> comboList = new ArrayList<Unit>();
+        final List<Unit> comboList = new ArrayList<>();
 
         final Unit selectedValueInfo = addItems(comboList, selectedValue, items);
-        final MComboBox<Unit> cb = new MComboBox<Unit>(comboList.toArray(new Unit[comboList.size()]));
+        final MComboBox<Unit> cb = new MComboBox<>(comboList.toArray(new Unit[0]));
         final JTextComponent editor = (JTextComponent) cb.getEditor().getEditorComponent();
         if (regexp != null) {
             editor.setDocument(new PatternDocument(regexp, abbreviations));
@@ -149,7 +151,7 @@ public final class TextfieldWithUnit extends GenericWidget<JComponent> {
             cb.setSelectedItem(selectedValueInfo);
         }
         /* workround, so that default button works */
-        editor.addKeyListener(new ActivateDefaultButtonListener<Unit>(cb));
+        editor.addKeyListener(new ActivateDefaultButtonListener<>(cb));
 
         /* removing select... keyword */
         editor.addFocusListener(new FocusListener() {
@@ -157,12 +159,7 @@ public final class TextfieldWithUnit extends GenericWidget<JComponent> {
             public void focusGained(final FocusEvent e) {
                 final Value v = getValue();
                 if (v.isNothingSelected()) {
-                    swingUtils.invokeLater(new Runnable() {
-                        @Override
-                        public void run() {
-                            editor.setText("");
-                        }
-                    });
+                    swingUtils.invokeLater(() -> editor.setText(""));
                 }
             }
 
@@ -207,12 +204,9 @@ public final class TextfieldWithUnit extends GenericWidget<JComponent> {
                 if (!unit.isEmpty()) {
                     unit.setEmpty(true);
                     unitEnabled = false;
-                    swingUtils.invokeLater(new Runnable() {
-                        @Override
-                        public void run() {
-                            unitComboBox.repaint();
-                            unitComboBox.setEnabled(false);
-                        }
+                    swingUtils.invokeLater(() -> {
+                        unitComboBox.repaint();
+                        unitComboBox.setEnabled(false);
                     });
                 }
             } else {
@@ -220,12 +214,9 @@ public final class TextfieldWithUnit extends GenericWidget<JComponent> {
                     unit.setEmpty(false);
                     if (textFieldPart.isEnabled()) {
                         unitEnabled = true;
-                        swingUtils.invokeLater(new Runnable() {
-                            @Override
-                            public void run() {
-                                unitComboBox.repaint();
-                                unitComboBox.setEnabled(accessible);
-                            }
+                        swingUtils.invokeLater(() -> {
+                            unitComboBox.repaint();
+                            unitComboBox.setEnabled(accessible);
                         });
                     }
                 }
@@ -241,13 +232,10 @@ public final class TextfieldWithUnit extends GenericWidget<JComponent> {
     @Override
     protected void setComponentsVisible(final boolean visible) {
         super.setComponentsEnabled(visible);
-        swingUtils.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                textFieldPart.setVisible(visible);
-                unitComboBox.setVisible(visible);
-                repaint();
-            }
+        swingUtils.invokeLater(() -> {
+            textFieldPart.setVisible(visible);
+            unitComboBox.setVisible(visible);
+            repaint();
         });
     }
 
@@ -302,12 +290,9 @@ public final class TextfieldWithUnit extends GenericWidget<JComponent> {
 
     @Override
     public void setBackgroundColor(final Color bg) {
-        swingUtils.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                setBackground(bg);
-                textFieldPart.setBackground(bg);
-            }
+        swingUtils.invokeLater(() -> {
+            setBackground(bg);
+            textFieldPart.setBackground(bg);
         });
     }
 

@@ -23,24 +23,23 @@ package lcmc.crm.ui.resource;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.util.List;
+
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.swing.ImageIcon;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 
+import lcmc.cluster.ui.ClusterBrowser;
 import lcmc.cluster.ui.widget.WidgetFactory;
 import lcmc.common.domain.Application;
+import lcmc.common.domain.util.Tools;
+import lcmc.common.ui.Browser;
+import lcmc.common.ui.utils.MyButton;
+import lcmc.common.ui.utils.UpdatableItem;
 import lcmc.crm.domain.CrmXml;
 import lcmc.crm.domain.ResourceAgent;
-import lcmc.common.ui.Browser;
-import lcmc.cluster.ui.ClusterBrowser;
-import lcmc.common.ui.utils.MyButton;
-import lcmc.common.domain.util.Tools;
-import lcmc.common.ui.utils.UpdatableItem;
 
 /**
  * This class holds the information about heartbeat service from the ocfs,
@@ -107,17 +106,13 @@ public class AvailableServiceInfo extends HbCategoryInfo {
         buttonPanel.setMinimumSize(new Dimension(0, 50));
         buttonPanel.setPreferredSize(new Dimension(0, 50));
         buttonPanel.setMaximumSize(new Dimension(Short.MAX_VALUE, 50));
-        final MyButton overviewButton = widgetFactory.createButton(Tools.getString("ClusterBrowser.RAsOverviewButton"),
-                                                                   BACK_TO_OVERVIEW_ICON);
-        overviewButton.setPreferredSize(new Dimension(application.scaled(180),
-                                                      application.scaled(50)));
-        overviewButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(final ActionEvent e) {
-                final ResourceAgentClassInfo raci = getBrowser().getClassInfoMap(resourceAgent.getResourceClass());
-                if (raci != null) {
-                    raci.selectMyself();
-                }
+        final MyButton overviewButton =
+                widgetFactory.createButton(Tools.getString("ClusterBrowser.RAsOverviewButton"), BACK_TO_OVERVIEW_ICON);
+        overviewButton.setPreferredSize(new Dimension(application.scaled(180), application.scaled(50)));
+        overviewButton.addActionListener(e -> {
+            final ResourceAgentClassInfo raci = getBrowser().getClassInfoMap(resourceAgent.getResourceClass());
+            if (raci != null) {
+                raci.selectMyself();
             }
         });
         buttonPanel.add(overviewButton, BorderLayout.LINE_START);

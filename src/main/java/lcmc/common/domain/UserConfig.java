@@ -32,6 +32,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Provider;
@@ -49,22 +50,23 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
 import lcmc.cluster.domain.Cluster;
 import lcmc.cluster.domain.Clusters;
 import lcmc.cluster.ui.ClusterBrowser;
 import lcmc.cluster.ui.ClusterTab;
+import lcmc.cluster.ui.ClusterTabFactory;
+import lcmc.cluster.ui.ClustersPanel;
 import lcmc.common.ui.utils.SwingUtils;
 import lcmc.host.domain.Host;
 import lcmc.host.domain.HostFactory;
 import lcmc.host.domain.Hosts;
 import lcmc.logger.Logger;
 import lcmc.logger.LoggerFactory;
-import lcmc.cluster.ui.ClusterTabFactory;
-import lcmc.cluster.ui.ClustersPanel;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 
 /**
  * This class parses xml from user configs and creates data objects,
@@ -213,52 +215,34 @@ public final class UserConfig extends XMLTools {
      */
     public void startClusters(final Collection<Cluster> selectedClusters) {
         final Set<Cluster> clusters = allClusters.getClusterSet();
-        if (clusters != null) {
-            /* clusters */
-            for (final Cluster cluster : clusters) {
-                if (selectedClusters != null && !selectedClusters.contains(cluster)) {
-                    continue;
+        /* clusters */
+        for (final Cluster cluster : clusters) {
+            if (selectedClusters != null && !selectedClusters.contains(cluster)) {
+                continue;
+            }
+            swingUtils.invokeLater(() -> clusterTabFactory.createClusterTab(cluster));
+            if (cluster.getHosts().isEmpty()) {
+                continue;
+            }
+            final boolean ok = cluster.connect(null, true, 1);
+            if (!ok) {
+                swingUtils.invokeLater(() -> clustersPanel.removeTabWithCluster(cluster));
+                continue;
+            }
+            final Runnable runnable = () -> {
+                for (final Host host : cluster.getHosts()) {
+                    host.waitOnLoading();
                 }
-                swingUtils.invokeLater(new Runnable() {
-                    @Override
-                    public void run() {
-                        clusterTabFactory.createClusterTab(cluster);
+                swingUtils.invokeLater(() -> {
+                    final ClusterTab clusterTab = cluster.getClusterTab();
+                    if (clusterTab != null) {
+                        clusterTab.addClusterView();
+                        clusterTab.requestFocus();
                     }
                 });
-                if (cluster.getHosts().isEmpty()) {
-                    continue;
-                }
-                final boolean ok = cluster.connect(null, true, 1);
-                if (!ok) {
-                    swingUtils.invokeLater(new Runnable() {
-                        @Override
-                        public void run() {
-                            clustersPanel.removeTabWithCluster(cluster);
-                        }
-                    });
-                    continue;
-                }
-                final Runnable runnable = new Runnable() {
-                    @Override
-                    public void run() {
-                        for (final Host host : cluster.getHosts()) {
-                            host.waitOnLoading();
-                        }
-                        swingUtils.invokeLater(new Runnable() {
-                            @Override
-                            public void run() {
-                                final ClusterTab clusterTab = cluster.getClusterTab();
-                                if (clusterTab != null) {
-                                    clusterTab.addClusterView();
-                                    clusterTab.requestFocus();
-                                }
-                            }
-                        });
-                    }
-                };
-                final Thread thread = new Thread(runnable);
-                thread.start();
-            }
+            };
+            final Thread thread = new Thread(runnable);
+            thread.start();
         }
     }
 
@@ -273,7 +257,7 @@ public final class UserConfig extends XMLTools {
         }
         /* get root <drbdgui> */
         final Node rootNode = getChildNode(document, "drbdgui");
-        final Map<String, List<Host>> hostMap = new LinkedHashMap<String, List<Host>>();
+        final Map<String, List<Host>> hostMap = new LinkedHashMap<>();
         if (rootNode != null) {
             /* download area */
             final String downloadUser = getAttribute(rootNode, DOWNLOAD_USER_ATTR);
@@ -359,11 +343,7 @@ public final class UserConfig extends XMLTools {
             username = Host.ROOT_USER;
         }
         host.setUsername(username);
-        List<Host> hostList = hostMap.get(nodeName);
-        if (hostList == null) {
-            hostList = new ArrayList<Host>();
-            hostMap.put(nodeName, hostList);
-        }
+        List<Host> hostList = hostMap.computeIfAbsent(nodeName, k -> new ArrayList<>());
         hostList.add(host);
     }
 

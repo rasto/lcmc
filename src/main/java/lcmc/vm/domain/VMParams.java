@@ -20,6 +20,9 @@
 
 package lcmc.vm.domain;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import lcmc.vm.domain.data.DiskData;
 import lcmc.vm.domain.data.FilesystemData;
 import lcmc.vm.domain.data.GraphicsData;
@@ -29,9 +32,6 @@ import lcmc.vm.domain.data.ParallelData;
 import lcmc.vm.domain.data.SerialData;
 import lcmc.vm.domain.data.SoundData;
 import lcmc.vm.domain.data.VideoData;
-
-import java.util.HashMap;
-import java.util.Map;
 
 public class VMParams {
     public static final String VM_PARAM_NAME = "name";
@@ -70,24 +70,24 @@ public class VMParams {
     public static final String VM_PARAM_ON_CRASH = "on_crash";
     public static final String VM_PARAM_DOMAIN_TYPE = "domain-type";
     public static final String HW_ADDRESS = "address";
-    public static final Map<String, String> PARAM_INTERFACE_TAG = new HashMap<String, String>();
-    public static final Map<String, String> PARAM_INTERFACE_ATTRIBUTE = new HashMap<String, String>();
-    public static final Map<String, String> PARAM_DISK_TAG = new HashMap<String, String>();
-    public static final Map<String, String> PARAM_DISK_ATTRIBUTE = new HashMap<String, String>();
-    public static final Map<String, String> PARAM_FILESYSTEM_TAG = new HashMap<String, String>();
-    public static final Map<String, String> PARAM_FILESYSTEM_ATTRIBUTE = new HashMap<String, String>();
-    public static final Map<String, String> PARAM_INPUTDEV_TAG = new HashMap<String, String>();
-    public static final Map<String, String> PARAM_INPUTDEV_ATTRIBUTE = new HashMap<String, String>();
-    public static final Map<String, String> PARAM_GRAPHICS_TAG = new HashMap<String, String>();
-    public static final Map<String, String> PARAM_GRAPHICS_ATTRIBUTE = new HashMap<String, String>();
-    public static final Map<String, String> PARAM_SOUND_TAG = new HashMap<String, String>();
-    public static final Map<String, String> PARAM_SOUND_ATTRIBUTE = new HashMap<String, String>();
-    public static final Map<String, String> PARAM_SERIAL_TAG = new HashMap<String, String>();
-    public static final Map<String, String> PARAM_SERIAL_ATTRIBUTE = new HashMap<String, String>();
-    public static final Map<String, String> PARAM_PARALLEL_TAG = new HashMap<String, String>();
-    public static final Map<String, String> PARAM_PARALLEL_ATTRIBUTE = new HashMap<String, String>();
-    public static final Map<String, String> PARAM_VIDEO_TAG = new HashMap<String, String>();
-    public static final Map<String, String> PARAM_VIDEO_ATTRIBUTE = new HashMap<String, String>();
+    public static final Map<String, String> PARAM_INTERFACE_TAG = new HashMap<>();
+    public static final Map<String, String> PARAM_INTERFACE_ATTRIBUTE = new HashMap<>();
+    public static final Map<String, String> PARAM_DISK_TAG = new HashMap<>();
+    public static final Map<String, String> PARAM_DISK_ATTRIBUTE = new HashMap<>();
+    public static final Map<String, String> PARAM_FILESYSTEM_TAG = new HashMap<>();
+    public static final Map<String, String> PARAM_FILESYSTEM_ATTRIBUTE = new HashMap<>();
+    public static final Map<String, String> PARAM_INPUTDEV_TAG = new HashMap<>();
+    public static final Map<String, String> PARAM_INPUTDEV_ATTRIBUTE = new HashMap<>();
+    public static final Map<String, String> PARAM_GRAPHICS_TAG = new HashMap<>();
+    public static final Map<String, String> PARAM_GRAPHICS_ATTRIBUTE = new HashMap<>();
+    public static final Map<String, String> PARAM_SOUND_TAG = new HashMap<>();
+    public static final Map<String, String> PARAM_SOUND_ATTRIBUTE = new HashMap<>();
+    public static final Map<String, String> PARAM_SERIAL_TAG = new HashMap<>();
+    public static final Map<String, String> PARAM_SERIAL_ATTRIBUTE = new HashMap<>();
+    public static final Map<String, String> PARAM_PARALLEL_TAG = new HashMap<>();
+    public static final Map<String, String> PARAM_PARALLEL_ATTRIBUTE = new HashMap<>();
+    public static final Map<String, String> PARAM_VIDEO_TAG = new HashMap<>();
+    public static final Map<String, String> PARAM_VIDEO_ATTRIBUTE = new HashMap<>();
 
     static {
         VMParams.PARAM_INTERFACE_ATTRIBUTE.put(InterfaceData.TYPE, "type");

@@ -35,7 +35,6 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -44,6 +43,7 @@ import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -52,6 +52,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Properties;
 import java.util.Random;
 import java.util.ResourceBundle;
@@ -79,8 +80,6 @@ import javax.swing.table.TableColumn;
 import javax.swing.table.TableColumnModel;
 import javax.swing.text.html.HTMLDocument;
 
-import com.google.common.base.Optional;
-
 import lcmc.Exceptions;
 import lcmc.cluster.domain.Cluster;
 import lcmc.common.domain.StringValue;
@@ -99,13 +98,12 @@ import lombok.val;
 public final class Tools {
     private static final Logger LOG = LoggerFactory.getLogger(Tools.class);
     private static String release = null;
-    private static final Map<String, ImageIcon> imageIcons = new HashMap<String, ImageIcon>();
-    /** Resource bundle. */
+    private static final Map<String, ImageIcon> imageIcons = new HashMap<>();
+    /**
+     * Resource bundle.
+     */
     private static ResourceBundle resource = null;
     private static ResourceBundle resourceAppDefaults = null;
-
-    /** Config data object. */
-    private static final Pattern UNIT_PATTERN = Pattern.compile("(\\d*)(\\D*)");
 
     public static void init() {
         setDefaults();
@@ -157,7 +155,7 @@ public final class Tools {
     }
 
     public static String getStackTrace(final Throwable e) {
-        final StringBuilder strace = new StringBuilder("");
+        final StringBuilder strace = new StringBuilder();
         if (e != null) {
             strace.append('\n');
             strace.append(e.getMessage());
@@ -180,7 +178,7 @@ public final class Tools {
     public static boolean isIp(final CharSequence ipString) {
         boolean wasValid = true;
         // Inet4Address ip;
-        if (ipString == null || "".equals(ipString)) {
+        if (ipString == null || "".equals(ipString.toString())) {
             wasValid = false;
         } else {
             final Pattern pattern;
@@ -229,9 +227,9 @@ public final class Tools {
      */
     public static String loadFile(MainPresenter mainPresenter, final String filename, final boolean showError) {
         BufferedReader in = null;
-        final StringBuilder content = new StringBuilder("");
+        final StringBuilder content = new StringBuilder();
         try {
-            in = new BufferedReader(new InputStreamReader(new FileInputStream(new File(filename)), "UTF-8"));
+            in = new BufferedReader(new InputStreamReader(new FileInputStream(filename), StandardCharsets.UTF_8));
             String line;
             while ((line = in.readLine()) != null) {
                 content.append(line);
@@ -320,7 +318,7 @@ public final class Tools {
         String s = getString(text);
         if (s != null) {
             for (final String r : replace) {
-                s = s.replaceFirst("\\{\\}", r);
+                s = s.replaceFirst("\\{}", r);
             }
         }
         return s;
@@ -333,7 +331,7 @@ public final class Tools {
     public static String getString(final String text, final String replace) {
         final String s = getString(text);
         if (s != null) {
-            return s.replaceFirst("\\{\\}", replace);
+            return s.replaceFirst("\\{}", replace);
         }
         return s;
     }
@@ -381,7 +379,7 @@ public final class Tools {
         if (strings.length == 1 && strings[0] == null) {
             return "";
         }
-        final StringBuilder ret = new StringBuilder("");
+        final StringBuilder ret = new StringBuilder();
         for (int i = 0; i < strings.length - 1; i++) {
             if (strings[i] != null) {
                 ret.append(strings[i]);
@@ -400,7 +398,7 @@ public final class Tools {
         if (strings == null) {
             return "";
         }
-        return join(delim, strings.toArray(new String[strings.size()]));
+        return join(delim, strings.toArray(new String[0]));
     }
 
     /**
@@ -410,7 +408,7 @@ public final class Tools {
         if (strings == null || strings.length == 0 || length <= 0) {
             return "";
         }
-        final StringBuilder ret = new StringBuilder("");
+        final StringBuilder ret = new StringBuilder();
         int i;
         for (i = 0; i < length - 1 && i < strings.length - 1; i++) {
             ret.append(strings[i]);
@@ -438,11 +436,11 @@ public final class Tools {
     public static Optional<Set<String>> getIntersection(
             final Optional<Set<String>> setA,
             final Optional<Set<String>> setB) {
-        final Set<String> resultSet = new TreeSet<String>();
-        if (!setB.isPresent()) {
+        final Set<String> resultSet = new TreeSet<>();
+        if (setB.isEmpty()) {
             return setA;
         }
-        if (!setA.isPresent()) {
+        if (setA.isEmpty()) {
             return setB;
         }
         for (final String item : setA.get()) {
@@ -658,7 +656,8 @@ public final class Tools {
         String info = null;
         try {
             final String url = "http://lcmc.sourceforge.net/version.html?lcmc-check-" + getRelease();
-            final BufferedReader reader = new BufferedReader(new InputStreamReader(new URL(url).openStream(), "UTF-8"));
+            final BufferedReader reader =
+                    new BufferedReader(new InputStreamReader(new URL(url).openStream(), StandardCharsets.UTF_8));
             int rate = 0;
             do {
                 final String line = reader.readLine();
@@ -702,9 +701,7 @@ public final class Tools {
                     Desktop.getDesktop().browse(new URI(url));
                 }
             }
-        } catch (final IOException e) {
-            LOG.error("openBrowser: can't open: " + url + "; " + e.getMessage());
-        } catch (final URISyntaxException e) {
+        } catch (final IOException | URISyntaxException e) {
             LOG.error("openBrowser: can't open: " + url + "; " + e.getMessage());
         }
     }
@@ -721,7 +718,7 @@ public final class Tools {
 
     /** Returns list that is expandable by shell. {'a','b'...} */
     public static String shellList(final String[] items) {
-        final StringBuilder list = new StringBuilder("");
+        final StringBuilder list = new StringBuilder();
         if (items == null || items.length == 0) {
             return null;
         } else if (items.length == 1) {
@@ -733,11 +730,9 @@ public final class Tools {
                 list.append(items[i]);
                 list.append("',");
             }
-            if (items.length != 0) {
-                list.append('\'');
-                list.append(items[items.length - 1]);
-                list.append('\'');
-            }
+            list.append('\'');
+            list.append(items[items.length - 1]);
+            list.append('\'');
             list.append('}');
         }
         return list.toString();
@@ -768,7 +763,7 @@ public final class Tools {
     /** Returns random secret of the specified lenght. */
     public static String getRandomSecret(final int len) {
         final Random rand = new Random();
-        final ArrayList<Character> charsL = new ArrayList<Character>();
+        final ArrayList<Character> charsL = new ArrayList<>();
         for (int a = 'a'; a <= 'z'; a++) {
             charsL.add((char) a);
             charsL.add(Character.toUpperCase((char) a));
@@ -777,7 +772,7 @@ public final class Tools {
             charsL.add((char) a);
         }
 
-        final Character[] chars = charsL.toArray(new Character[charsL.size()]);
+        final Character[] chars = charsL.toArray(new Character[0]);
         final StringBuilder s = new StringBuilder(len + 1);
         for (int i = 0; i < len; i++) {
             s.append(chars[rand.nextInt(chars.length)]);
@@ -804,8 +799,7 @@ public final class Tools {
         }
 
         final int margin = 3;
-        for (int i = 0; i < table.getColumnCount(); i++) {
-            final int vColIndex = i;
+        for (int vColIndex = 0; vColIndex < table.getColumnCount(); vColIndex++) {
             final TableColumnModel colModel = table.getColumnModel();
             final TableColumn col = colModel.getColumn(vColIndex);
             TableCellRenderer renderer = col.getHeaderRenderer();
@@ -824,7 +818,7 @@ public final class Tools {
                                                                     0);
             Integer dw = null;
             if (defaultWidths != null) {
-                dw = defaultWidths.get(i);
+                dw = defaultWidths.get(vColIndex);
             }
             int width;
             if (dw == null) {
@@ -996,7 +990,7 @@ public final class Tools {
         while (true) {
             final int pos = t.indexOf(' ', width);
             if (pos > 0) {
-                out.append(t.substring(0, pos));
+                out.append(t, 0, pos);
                 out.append('\n');
                 t = t.substring(pos + 1);
             } else {
@@ -1027,7 +1021,7 @@ public final class Tools {
         if (count <= 0) {
             return s;
         }
-        final StringBuilder sb = new StringBuilder("");
+        final StringBuilder sb = new StringBuilder();
         for (int i = 0; i < s.length(); i++) {
             final char c = s.charAt(i);
             if (c == '\\') {
@@ -1035,8 +1029,6 @@ public final class Tools {
             } else if (c == '"' || c == '$' || c == '`') {
                 sb.append('\\');
                 sb.append(c);
-            } else if (c == '\n') {
-                sb.append('\n');
             } else {
                 sb.append(c);
             }
@@ -1052,7 +1044,7 @@ public final class Tools {
         if (count <= 0) {
             return s;
         }
-        final StringBuilder sb = new StringBuilder("");
+        final StringBuilder sb = new StringBuilder();
         for (int i = 0; i < s.length(); i++) {
             final char c = s.charAt(i);
             if (c == '\n') {
@@ -1068,7 +1060,7 @@ public final class Tools {
 
     /** Returns array of host checkboxes in the specified cluster. */
     public static Map<Host, JCheckBox> getHostCheckBoxes(final Cluster cluster) {
-        final Map<Host, JCheckBox> components = new LinkedHashMap<Host, JCheckBox>();
+        final Map<Host, JCheckBox> components = new LinkedHashMap<>();
         for (final Host host : cluster.getHosts()) {
             final JCheckBox button = new JCheckBox(host.getName());
             button.setBackground(Tools.getDefaultColor("ConfigDialog.Background.Light"));
@@ -1132,7 +1124,7 @@ public final class Tools {
     }
 
     private static List<String> getNameParts(final CharSequence name) {
-        final List<String> parts = new ArrayList<String>();
+        final List<String> parts = new ArrayList<>();
         if (name == null) {
             return parts;
         }

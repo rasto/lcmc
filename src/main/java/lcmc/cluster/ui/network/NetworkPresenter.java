@@ -20,21 +20,23 @@
 
 package lcmc.cluster.ui.network;
 
-import com.google.common.base.Optional;
+import java.util.Optional;
+
+import javax.swing.ImageIcon;
+import javax.swing.JComponent;
+import javax.swing.JPanel;
+
 import com.google.common.eventbus.Subscribe;
+
 import lcmc.ClusterEventBus;
 import lcmc.cluster.domain.Cluster;
 import lcmc.cluster.domain.Network;
+import lcmc.cluster.service.NetworkService;
 import lcmc.cluster.ui.ClusterBrowser;
 import lcmc.common.domain.Application;
 import lcmc.common.domain.util.Tools;
 import lcmc.common.ui.Browser;
 import lcmc.event.NetInterfacesChangedEvent;
-import lcmc.cluster.service.NetworkService;
-
-import javax.swing.ImageIcon;
-import javax.swing.JComponent;
-import javax.swing.JPanel;
 
 public class NetworkPresenter implements InfoPresenter {
 
@@ -42,18 +44,14 @@ public class NetworkPresenter implements InfoPresenter {
     private final NetworkModel model;
     private final NetworkView view;
     private final Cluster cluster;
-    private ClusterEventBus clusterEventBus;
-    private NetworkService networkService;
+    private final ClusterEventBus clusterEventBus;
+    private final NetworkService networkService;
     private final ClusterBrowser clusterBrowser;
 
     private static final ImageIcon NETWORK_ICON = Tools.createImageIcon(Tools.getDefault("ClusterBrowser.NetworkIcon"));
 
-    public NetworkPresenter(
-            final Network network,
-            final NetworkModel model,
-            final NetworkView view,
-            final ClusterEventBus clusterEventBus,
-            final Cluster cluster,
+    public NetworkPresenter(final Network network, final NetworkModel model, final NetworkView view,
+            final ClusterEventBus clusterEventBus, final Cluster cluster,
             final NetworkService networkService, ClusterBrowser clusterBrowser) {
         this.network = network;
         this.model = model;
@@ -73,7 +71,7 @@ public class NetworkPresenter implements InfoPresenter {
 
     public void updateNetwork() {
         final Optional<Network> newNetwork = networkService.getCommonNetwork(cluster, network);
-        if (!newNetwork.isPresent()) {
+        if (newNetwork.isEmpty()) {
             return;
         }
         model.setNetwork(newNetwork.get().getName());

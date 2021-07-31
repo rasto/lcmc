@@ -21,22 +21,21 @@
  */
 package lcmc.drbd.ui.resource;
 
-import lcmc.Exceptions;
-import lcmc.common.domain.AccessMode;
+import javax.inject.Inject;
+import javax.inject.Named;
+
 import lcmc.cluster.domain.Cluster;
+import lcmc.cluster.ui.ClusterBrowser;
+import lcmc.cluster.ui.widget.Widget;
+import lcmc.cluster.ui.widget.WidgetFactory;
+import lcmc.common.domain.AccessMode;
+import lcmc.common.domain.Unit;
+import lcmc.common.domain.Value;
+import lcmc.common.domain.util.Tools;
+import lcmc.common.ui.EditableInfo;
 import lcmc.drbd.domain.DrbdProxy;
 import lcmc.drbd.domain.DrbdXml;
 import lcmc.host.domain.Host;
-import lcmc.common.domain.Value;
-import lcmc.cluster.ui.ClusterBrowser;
-import lcmc.common.ui.EditableInfo;
-import lcmc.cluster.ui.widget.Widget;
-import lcmc.cluster.ui.widget.WidgetFactory;
-import lcmc.common.domain.util.Tools;
-import lcmc.common.domain.Unit;
-
-import javax.inject.Inject;
-import javax.inject.Named;
 
 /**
  * this class holds info data, menus and configuration
@@ -158,7 +157,7 @@ public abstract class AbstractDrbdInfo extends EditableInfo {
     @Override
     protected final boolean isCheckBox(final String param) {
         final String type = getBrowser().getDrbdXml().getParamType(param);
-        return type != null && ClusterBrowser.DRBD_RESOURCE_BOOL_TYPE_NAME.equals(type);
+        return ClusterBrowser.DRBD_RESOURCE_BOOL_TYPE_NAME.equals(type);
     }
 
     @Override
@@ -206,11 +205,10 @@ public abstract class AbstractDrbdInfo extends EditableInfo {
     }
 
     /**
-     * Creates drbd config for sections and returns it. Removes 'drbd: '
-     * from the 'after' parameter.
+     * Creates drbd config for sections and returns it. Removes 'drbd: ' from the 'after' parameter.
      */
-    protected String drbdSectionsConfig(final Host host) throws Exceptions.DrbdConfigException {
-        final StringBuilder config = new StringBuilder("");
+    protected String drbdSectionsConfig(final Host host) {
+        final StringBuilder config = new StringBuilder();
         final DrbdXml dxml = getBrowser().getDrbdXml();
         final String[] sections = dxml.getSections();
         final boolean volumesAvailable = host.hasVolumes();
@@ -226,7 +224,7 @@ public abstract class AbstractDrbdInfo extends EditableInfo {
             final String[] params = dxml.getSectionParams(sectionString);
 
             if (params.length != 0) {
-                final StringBuilder sectionConfig = new StringBuilder("");
+                final StringBuilder sectionConfig = new StringBuilder();
                 boolean inPlugin = false;
                 for (final String param : params) {
                     final Value value = getComboBoxValue(param);
@@ -240,8 +238,7 @@ public abstract class AbstractDrbdInfo extends EditableInfo {
                                 inPlugin = true;
                             }
                             sectionConfig.append("\t\t\t");
-                            sectionConfig.append(param.substring(DrbdProxy.PLUGIN_PARAM_PREFIX.length(),
-                                                                 param.length()));
+                            sectionConfig.append(param.substring(DrbdProxy.PLUGIN_PARAM_PREFIX.length()));
                             if (value.equals(DrbdXml.CONFIG_YES)) {
                                 /* boolean parameter */
                                 /* also >= DRBD 8.4 */

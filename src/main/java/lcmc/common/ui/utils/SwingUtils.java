@@ -20,14 +20,15 @@
 
 package lcmc.common.ui.utils;
 
-import lcmc.common.domain.util.Tools;
-import lcmc.logger.Logger;
-import lcmc.logger.LoggerFactory;
+import java.lang.reflect.InvocationTargetException;
 
 import javax.inject.Named;
 import javax.inject.Singleton;
-import javax.swing.*;
-import java.lang.reflect.InvocationTargetException;
+import javax.swing.SwingUtilities;
+
+import lcmc.common.domain.util.Tools;
+import lcmc.logger.Logger;
+import lcmc.logger.LoggerFactory;
 
 @Named
 @Singleton
@@ -69,11 +70,8 @@ public class SwingUtils {
 
     /** Wait for next swing threads to finish. It's used for synchronization */
     public void waitForSwing() {
-        invokeAndWait(new Runnable() {
-            @Override
-            public void run() {
-                /* just wait */
-            }
+        invokeAndWait(() -> {
+            /* just wait */
         });
     }
 

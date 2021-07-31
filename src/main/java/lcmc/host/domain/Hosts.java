@@ -26,12 +26,12 @@ package lcmc.host.domain;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import lcmc.cluster.domain.Cluster;
 import lcmc.logger.Logger;
 import lcmc.logger.LoggerFactory;
-
-import javax.inject.Named;
-import javax.inject.Singleton;
 
 /**
  * This class holds a set of all hosts.
@@ -40,7 +40,7 @@ import javax.inject.Singleton;
 @Singleton
 public class Hosts {
     private static final Logger LOG = LoggerFactory.getLogger(Hosts.class);
-    private final Set<Host> hosts = new LinkedHashSet<Host>();
+    private final Set<Host> hosts = new LinkedHashSet<>();
 
     public void addHost(final Host host) {
         hosts.add(host);
@@ -63,7 +63,7 @@ public class Hosts {
     }
 
     public Host[] getHostsArray() {
-        return hosts.toArray(new Host [hosts.size()]);
+        return hosts.toArray(new Host[0]);
     }
 
     public void disconnectAllHosts() {

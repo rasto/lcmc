@@ -21,6 +21,20 @@
  */
 package lcmc.vm.ui.resource;
 
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.swing.JComponent;
+import javax.swing.JPanel;
+
+import org.w3c.dom.Node;
+
 import lcmc.cluster.ui.widget.Widget;
 import lcmc.common.domain.AccessMode;
 import lcmc.common.domain.Application;
@@ -33,51 +47,47 @@ import lcmc.common.ui.utils.SwingUtils;
 import lcmc.host.domain.Host;
 import lcmc.vm.domain.VmsXml;
 import lcmc.vm.domain.data.VideoData;
-import org.w3c.dom.Node;
-
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.swing.*;
-import java.util.*;
 
 /**
  * This class holds info about virtual video device.
  */
 @Named
 public class VideoInfo extends HardwareInfo {
-    /** Parameters. */
-    private static final String[] PARAMETERS = {VideoData.MODEL_TYPE,
-                                                VideoData.MODEL_VRAM,
-                                                VideoData.MODEL_HEADS};
+    /**
+     * Parameters.
+     */
+    private static final String[] PARAMETERS = {VideoData.MODEL_TYPE, VideoData.MODEL_VRAM, VideoData.MODEL_HEADS};
 
-    /** Whether the parameter is editable only in advanced mode. */
+    /**
+     * Whether the parameter is editable only in advanced mode.
+     */
     private static final Collection<String> IS_ENABLED_ONLY_IN_ADVANCED =
-        new HashSet<String>(Arrays.asList(new String[]{
-                                                VideoData.MODEL_VRAM,
-                                                VideoData.MODEL_HEADS}));
+            new HashSet<>(Arrays.asList(VideoData.MODEL_VRAM, VideoData.MODEL_HEADS));
 
-    /** Short name. */
-    private static final Map<String, String> SHORTNAME_MAP =
-                                                 new HashMap<String, String>();
+    /**
+     * Short name.
+     */
+    private static final Map<String, String> SHORTNAME_MAP = new HashMap<>();
 
-    /** Long name. */
-    private static final Map<String, String> LONGNAME_MAP =
-                                                 new HashMap<String, String>();
+    /**
+     * Long name.
+     */
+    private static final Map<String, String> LONGNAME_MAP = new HashMap<>();
 
-    /** Whether the parameter is required. */
-    private static final Collection<String> IS_REQUIRED =
-        new HashSet<String>(Arrays.asList(new String[]{VideoData.MODEL_TYPE}));
+    /**
+     * Whether the parameter is required.
+     */
+    private static final Collection<String> IS_REQUIRED = new HashSet<>(List.of(VideoData.MODEL_TYPE));
 
-    /** Possible values. */
-    private static final Map<String, Value[]> POSSIBLE_VALUES =
-                                               new HashMap<String, Value[]>();
+    /**
+     * Possible values.
+     */
+    private static final Map<String, Value[]> POSSIBLE_VALUES = new HashMap<>();
+
     static {
-        SHORTNAME_MAP.put(VideoData.MODEL_TYPE,
-                          Tools.getString("VideoInfo.ModelType"));
-        SHORTNAME_MAP.put(VideoData.MODEL_VRAM,
-                          Tools.getString("VideoInfo.ModelVRAM"));
-        SHORTNAME_MAP.put(VideoData.MODEL_HEADS,
-                          Tools.getString("VideoInfo.ModelHeads"));
+        SHORTNAME_MAP.put(VideoData.MODEL_TYPE, Tools.getString("VideoInfo.ModelType"));
+        SHORTNAME_MAP.put(VideoData.MODEL_VRAM, Tools.getString("VideoInfo.ModelVRAM"));
+        SHORTNAME_MAP.put(VideoData.MODEL_HEADS, Tools.getString("VideoInfo.ModelHeads"));
     }
     static {
         LONGNAME_MAP.put(VideoData.MODEL_VRAM,
@@ -100,6 +110,7 @@ public class VideoInfo extends HardwareInfo {
     @Inject
     private ClusterTreeMenu clusterTreeMenu;
 
+    @Override
     void init(final String name, final Browser browser, final DomainInfo vmsVirtualDomainInfo) {
         super.init(name, browser, vmsVirtualDomainInfo);
     }
@@ -111,12 +122,7 @@ public class VideoInfo extends HardwareInfo {
                                    DomainInfo.VIDEO_TABLE,
                                    getVMSVirtualDomainInfo().getNewVideoBtn());
         if (getResource().isNew()) {
-            swingUtils.invokeLater(new Runnable() {
-                @Override
-                public void run() {
-                    tablePanel.setVisible(false);
-                }
-            });
+            swingUtils.invokeLater(() -> tablePanel.setVisible(false));
         }
         mainPanel.add(tablePanel);
     }
@@ -219,22 +225,17 @@ public class VideoInfo extends HardwareInfo {
         if (Application.isTest(runMode)) {
             return;
         }
-        swingUtils.invokeAndWait(new Runnable() {
-            @Override
-            public void run() {
-                getApplyButton().setEnabled(false);
-                getRevertButton().setEnabled(false);
-                getInfoPanel();
-            }
+        swingUtils.invokeAndWait(() -> {
+            getApplyButton().setEnabled(false);
+            getRevertButton().setEnabled(false);
+            getInfoPanel();
         });
         waitForInfoPanel();
-        final Map<String, String> parameters =
-                                    getHWParameters(getResource().isNew());
+        final Map<String, String> parameters = getHWParameters(getResource().isNew());
         for (final Host h : getVMSVirtualDomainInfo().getDefinedOnHosts()) {
             final VmsXml vmsXml = getBrowser().getVmsXml(h);
             if (vmsXml != null) {
-                parameters.put(VideoData.SAVED_MODEL_TYPE,
-                               getParamSaved(VideoData.MODEL_TYPE).getValueForConfig());
+                parameters.put(VideoData.SAVED_MODEL_TYPE, getParamSaved(VideoData.MODEL_TYPE).getValueForConfig());
                 final String domainName =
                                 getVMSVirtualDomainInfo().getDomainName();
                 final Node domainNode = vmsXml.getDomainNode(domainName);
@@ -246,14 +247,8 @@ public class VideoInfo extends HardwareInfo {
             getResource().setNew(false);
         }
         clusterTreeMenu.reloadNodeDontSelect(getNode());
-        getBrowser().periodicalVmsUpdate(
-                getVMSVirtualDomainInfo().getDefinedOnHosts());
-        swingUtils.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                tablePanel.setVisible(true);
-            }
-        });
+        getBrowser().periodicalVmsUpdate(getVMSVirtualDomainInfo().getDefinedOnHosts());
+        swingUtils.invokeLater(() -> tablePanel.setVisible(true));
         final String[] params = getParametersFromXML();
         if (Application.isLive(runMode)) {
             storeComboBoxValues(params);
@@ -383,8 +378,7 @@ public class VideoInfo extends HardwareInfo {
         for (final Host h : getVMSVirtualDomainInfo().getDefinedOnHosts()) {
             final VmsXml vmsXml = getBrowser().getVmsXml(h);
             if (vmsXml != null) {
-                final Map<String, String> parameters =
-                                                new HashMap<String, String>();
+                final Map<String, String> parameters = new HashMap<>();
                 parameters.put(VideoData.SAVED_MODEL_TYPE,
                                getParamSaved(VideoData.MODEL_TYPE).getValueForConfig());
                 vmsXml.removeVideoXML(getVMSVirtualDomainInfo().getDomainName(),

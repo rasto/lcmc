@@ -27,6 +27,7 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
+
 import javax.annotation.Resource;
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -34,18 +35,19 @@ import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SpringLayout;
+
+import lcmc.cluster.ui.widget.Widget;
+import lcmc.cluster.ui.widget.WidgetFactory;
 import lcmc.common.domain.AccessMode;
 import lcmc.common.domain.Application;
 import lcmc.common.domain.StringValue;
 import lcmc.common.domain.Value;
+import lcmc.common.domain.util.Tools;
 import lcmc.common.ui.SpringUtilities;
 import lcmc.common.ui.WizardDialog;
-import lcmc.cluster.ui.widget.Widget;
-import lcmc.cluster.ui.widget.WidgetFactory;
 import lcmc.common.ui.utils.SwingUtils;
 import lcmc.logger.Logger;
 import lcmc.logger.LoggerFactory;
-import lcmc.common.domain.util.Tools;
 
 /**
  * An implementation of a dialog where entered ip or the host is looked up
@@ -108,8 +110,8 @@ public class Configuration extends DialogHost {
      */
     @Override
     protected final void checkFields(final Widget field) {
-        final List<String> incorrect = new ArrayList<String>();
-        final List<String> changed = new ArrayList<String>();
+        final List<String> incorrect = new ArrayList<>();
+        final List<String> changed = new ArrayList<>();
         if (!hostnameOk) {
             incorrect.add(Tools.getString("Dialog.Host.Configuration.DNSLookupError"));
         }
@@ -222,52 +224,42 @@ public class Configuration extends DialogHost {
             }
 
 
-            final Thread thread = new Thread(
-                new Runnable() {
-                    @Override
-                    public void run() {
-                        for (int i = 0; i < getHops(); i++) {
-                            if (checkDNSThread[i] != null) {
-                                try {
-                                    checkDNSThread[i].join();
-                                } catch (final InterruptedException e) {
-                                    Thread.currentThread().interrupt();
-                                }
-                            }
-                        }
-                        progressBarDone();
-                        getHost().setHostname(Tools.join(",", hostnames, getHops()));
-                        enableComponents();
-                        makeDefaultAndRequestFocus(buttonClass(nextButton()));
-                        checkFields(null);
-                        if (!application.getAutoHosts().isEmpty()) {
-                            Tools.sleep(1000);
-                            pressNextButton();
+            final Thread thread = new Thread(() -> {
+                for (int i = 0; i < getHops(); i++) {
+                    if (checkDNSThread[i] != null) {
+                        try {
+                            checkDNSThread[i].join();
+                        } catch (final InterruptedException e) {
+                            Thread.currentThread().interrupt();
                         }
                     }
-                });
+                }
+                progressBarDone();
+                getHost().setHostname(Tools.join(",", hostnames, getHops()));
+                enableComponents();
+                makeDefaultAndRequestFocus(buttonClass(nextButton()));
+                checkFields(null);
+                if (!application.getAutoHosts().isEmpty()) {
+                    Tools.sleep(1000);
+                    pressNextButton();
+                }
+            });
             thread.start();
         } else {
-            final Thread thread = new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    getHost().setHostname(Tools.join(",", hostnames, getHops()));
-                    swingUtils.invokeLater(new Runnable() {
-                        @Override
-                        public void run() {
-                            for (int i = 0; i < getHops(); i++) {
-                                hostnameField[i].setEnabled(false);
-                            }
-                        }
-                    });
-                    enableComponents();
-                    makeDefaultAndRequestFocus(buttonClass(nextButton()));
-                    checkFields(null);
-                    hostnameOk = true;
-                    if (!application.getAutoHosts().isEmpty()) {
-                        Tools.sleep(1000);
-                        pressNextButton();
+            final Thread thread = new Thread(() -> {
+                getHost().setHostname(Tools.join(",", hostnames, getHops()));
+                swingUtils.invokeLater(() -> {
+                    for (int i = 0; i < getHops(); i++) {
+                        hostnameField[i].setEnabled(false);
                     }
+                });
+                enableComponents();
+                makeDefaultAndRequestFocus(buttonClass(nextButton()));
+                checkFields(null);
+                hostnameOk = true;
+                if (!application.getAutoHosts().isEmpty()) {
+                    Tools.sleep(1000);
+                    pressNextButton();
                 }
             });
             thread.start();
@@ -366,21 +358,18 @@ public class Configuration extends DialogHost {
             }
             final Value[] items = StringValue.getValues(getHost().getIps(numberOfHops));
             if (items != null) {
-                swingUtils.invokeLater(new Runnable() {
-                    @Override
-                    public void run() {
-                        final String savedIp = getHost().getIp(numberOfHops);
-                        final Value defaultIp;
-                        if (savedIp == null && items.length > 0) {
-                            defaultIp = items[0];
-                        } else {
-                            defaultIp = new StringValue(savedIp);
-                        }
-                        ipCombo[numberOfHops].reloadComboBox(defaultIp, items);
+                swingUtils.invokeLater(() -> {
+                    final String savedIp = getHost().getIp(numberOfHops);
+                    final Value defaultIp;
+                    if (savedIp == null && items.length > 0) {
+                        defaultIp = items[0];
+                    } else {
+                        defaultIp = new StringValue(savedIp);
+                    }
+                    ipCombo[numberOfHops].reloadComboBox(defaultIp, items);
 
-                        if (items.length > 1) {
-                            ipCombo[numberOfHops].setEnabled(true);
-                        }
+                    if (items.length > 1) {
+                        ipCombo[numberOfHops].setEnabled(true);
                     }
                 });
             }

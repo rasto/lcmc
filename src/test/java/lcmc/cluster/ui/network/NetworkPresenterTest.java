@@ -23,13 +23,13 @@ package lcmc.cluster.ui.network;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.util.Optional;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-
-import com.google.common.base.Optional;
 
 import lcmc.ClusterEventBus;
 import lcmc.cluster.domain.Cluster;
@@ -43,7 +43,7 @@ class NetworkPresenterTest {
     private static final String[] ANY_ALL_IPS = null;
     private static final Integer ANY_CIDR = null;
     private NetworkPresenter presenter;
-    private Network network = new Network(ANY_NAME, ANY_ALL_IPS, ANY_CIDR);
+    private final Network network = new Network(ANY_NAME, ANY_ALL_IPS, ANY_CIDR);
     @Mock
     private NetworkModel model;
     @Mock

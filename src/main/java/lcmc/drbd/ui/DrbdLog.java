@@ -26,10 +26,11 @@ import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
-import lcmc.host.domain.Host;
-import lcmc.common.ui.HostLogs;
 
 import javax.inject.Named;
+
+import lcmc.common.ui.HostLogs;
+import lcmc.host.domain.Host;
 
 /**
  * An implementation of an dialog with log files.
@@ -55,14 +56,14 @@ public final class DrbdLog extends HostLogs {
     /** Returns which pattern names are selected by default. */
     @Override
     protected Set<String> getSelectedSet() {
-        final Set<String> selected = new HashSet<String>();
+        final Set<String> selected = new HashSet<>();
         selected.add(drbdDeviceName);
         return selected;
     }
 
     @Override
     protected Map<String, String> getPatternMap() {
-        final Map<String, String> patternMap = new LinkedHashMap<String, String>();
+        final Map<String, String> patternMap = new LinkedHashMap<>();
         patternMap.put(drbdDeviceName, wordBoundary(drbdDeviceName));
         return patternMap;
     }

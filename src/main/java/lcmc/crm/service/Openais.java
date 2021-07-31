@@ -22,10 +22,10 @@
 
 package lcmc.crm.service;
 
-import lcmc.host.domain.Host;
+import lcmc.cluster.service.ssh.ExecCommandConfig;
 import lcmc.common.domain.ConvertCmdCallback;
 import lcmc.common.domain.util.Tools;
-import lcmc.cluster.service.ssh.ExecCommandConfig;
+import lcmc.host.domain.Host;
 
 /**
  * This class provides openais commands. There are commands that
@@ -105,13 +105,7 @@ public final class Openais {
     public static void createAISConfig(final Host[] hosts, final StringBuilder config) {
         /* write heartbeat config on all hosts */
         Tools.createConfigOnAllHosts(hosts, config.toString(), AIS_CONF_NAME, AIS_CONF_DIR, AIS_CONF_PERMS, true);
-        final StringBuilder authkeys = new StringBuilder(Tools.getRandomSecret(128));
-        Tools.createConfigOnAllHosts(hosts,
-                                     authkeys.toString(),
-                                     AUTHKEYS_CONF_NAME,
-                                     AIS_CONF_DIR,
-                                     AUTHKEYS_CONF_PERMS,
-                                     true);
+        Tools.createConfigOnAllHosts(hosts, Tools.getRandomSecret(128), AUTHKEYS_CONF_NAME, AIS_CONF_DIR, AUTHKEYS_CONF_PERMS, true);
 
     }
 

@@ -20,6 +20,29 @@
 
 package lcmc.common.ui.treemenu;
 
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Enumeration;
+import java.util.List;
+import java.util.Optional;
+import java.util.function.BiConsumer;
+
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+import javax.swing.JTree;
+import javax.swing.event.TreeModelEvent;
+import javax.swing.event.TreeModelListener;
+import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.DefaultTreeModel;
+import javax.swing.tree.MutableTreeNode;
+import javax.swing.tree.TreeCellRenderer;
+import javax.swing.tree.TreeNode;
+import javax.swing.tree.TreePath;
+import javax.swing.tree.TreeSelectionModel;
+
 import lcmc.cluster.ui.network.InfoPresenter;
 import lcmc.common.domain.util.Tools;
 import lcmc.common.ui.EditableInfo;
@@ -28,18 +51,6 @@ import lcmc.common.ui.utils.SwingUtils;
 import lcmc.logger.Logger;
 import lcmc.logger.LoggerFactory;
 import lombok.val;
-
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Singleton;
-import javax.swing.*;
-import javax.swing.event.TreeModelEvent;
-import javax.swing.event.TreeModelListener;
-import javax.swing.tree.*;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
-import java.util.*;
-import java.util.function.BiConsumer;
 
 @Named
 @Singleton
@@ -316,23 +327,20 @@ public class TreeMenuController {
     public void addListeners(final BiConsumer<InfoPresenter, Boolean> onSelect) {
         this.onSelect = onSelect;
         // Listen for when the selection changes.
-        tree.addTreeSelectionListener(e -> {
-            getUserObject(tree.getLastSelectedPathComponent()).ifPresent(nodeInfo -> {
-                if (!disableListeners) {
-                    onSelect.accept(nodeInfo, disableListeners);
-                }
-            });
-        });
+        tree.addTreeSelectionListener(e -> getUserObject(tree.getLastSelectedPathComponent()).ifPresent(nodeInfo -> {
+            if (!disableListeners) {
+                onSelect.accept(nodeInfo, disableListeners);
+            }
+        }));
 
-        tree.getModel().addTreeModelListener(
-                new TreeModelListener() {
-                    @Override
-                    public void treeNodesChanged(final TreeModelEvent e) {
-                        val selected = e.getChildren();
-                        if (selected != null && selected.length > 0) {
-                            getUserObject(selected[0]).ifPresent(info -> {
-                                if (!disableListeners) {
-                                    onSelect.accept(info, disableListeners);
+        tree.getModel().addTreeModelListener(new TreeModelListener() {
+            @Override
+            public void treeNodesChanged(final TreeModelEvent e) {
+                val selected = e.getChildren();
+                if (selected != null && selected.length > 0) {
+                    getUserObject(selected[0]).ifPresent(info -> {
+                        if (!disableListeners) {
+                            onSelect.accept(info, disableListeners);
                                 }
                             });
                         }

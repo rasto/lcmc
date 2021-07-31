@@ -20,11 +20,13 @@
 package lcmc.cluster.ui.widget;
 
 import java.awt.Color;
+
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.text.Document;
+
 import lcmc.common.domain.AccessMode;
 import lcmc.common.domain.StringValue;
 import lcmc.common.domain.Value;
@@ -103,12 +105,9 @@ public final class Label extends GenericWidget<JComponent> {
 
     @Override
     public void setBackgroundColor(final Color bg) {
-        swingUtils.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                setBackground(bg);
-                getInternalComponent().setBackground(bg);
-            }
+        swingUtils.invokeLater(() -> {
+            setBackground(bg);
+            getInternalComponent().setBackground(bg);
         });
     }
 

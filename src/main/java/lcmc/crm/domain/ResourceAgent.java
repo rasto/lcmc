@@ -33,33 +33,38 @@ import java.util.Map;
 
 import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.Table;
+
+import lcmc.cluster.ui.ClusterBrowser;
+import lcmc.cluster.ui.widget.Widget;
 import lcmc.common.domain.Application;
 import lcmc.common.domain.Value;
-import lcmc.cluster.ui.ClusterBrowser;
 import lcmc.crm.ui.resource.ServiceInfo;
-import lcmc.cluster.ui.widget.Widget;
 import lcmc.logger.Logger;
 import lcmc.logger.LoggerFactory;
 
 /**
- * This class describes a resource agent with its name and class.
- * This is important in otder to distinguish services that have the same name
- * int the heartbeat, ocf, service or lsb classes.
+ * This class describes a resource agent with its name and class. This is important in otder to distinguish services that have the
+ * same name int the heartbeat, ocf, service or lsb classes.
  */
 public class ResourceAgent {
     private static final Logger LOG = LoggerFactory.getLogger(ResourceAgent.class);
     public static final String SERVICE_CLASS_NAME = "service";
     public static final String UPSTART_CLASS_NAME = "upstart";
     public static final String SYSTEMD_CLASS_NAME = "systemd";
-    /** Name of lsb style resource (/etc/init.d/*). */
+    /**
+     * Name of lsb style resource (/etc/init.d/*).
+     */
     public static final String LSB_CLASS_NAME = "lsb";
-    public static final Collection<String> SERVICE_CLASSES = new ArrayList<String>();
-    /** Name of heartbeat style resource (heartbeat 1). */
+    public static final Collection<String> SERVICE_CLASSES = new ArrayList<>();
+    /**
+     * Name of heartbeat style resource (heartbeat 1).
+     */
     public static final String HEARTBEAT_CLASS_NAME = "heartbeat";
     /** Name of ocf style resource (heartbeat 2). */
     public static final String OCF_CLASS_NAME = "ocf";
     public static final String STONITH_CLASS_NAME = "stonith";
     public static final String HEARTBEAT_PROVIDER = "heartbeat";
+
     static {
         SERVICE_CLASSES.add(SERVICE_CLASS_NAME); /* contains upstart and systemd */
         SERVICE_CLASSES.add(UPSTART_CLASS_NAME);
@@ -67,37 +72,49 @@ public class ResourceAgent {
         SERVICE_CLASSES.add(LSB_CLASS_NAME); /* deprecated */
     }
     private final String serviceName;
-    /** Name of the provider like "linbit". */
+    /**
+     * Name of the provider like "linbit".
+     */
     private final String provider;
-    /** Class of the service, like ocf. */
+    /**
+     * Class of the service, like ocf.
+     */
     private final String resourceClass;
     private String serviceVersion;
-    /** Long description of the hb service. */
+    /**
+     * Long description of the hb service.
+     */
     private String serviceLongDesc;
     private String serviceShortDesc;
-    /** Hash code. */
+    /**
+     * Hash code.
+     */
     private final int hash;
-    private final List<String> masterSlaveParameters = new ArrayList<String>();
-    private final List<String> parameters = new ArrayList<String>();
-    private final Collection<String> requiredParams = new HashSet<String>();
-    private final Collection<String> metaAttrParams = new HashSet<String>();
-    private final Map<String, String> paramLongDescriptions = new HashMap<String, String>();
-    private final Map<String, String> paramShortDescriptions = new HashMap<String, String>();
-    private final Map<String, String> paramTypes = new HashMap<String, String>();
-    private final Map<String, String> paramDefaults = new HashMap<String, String>();
-    private final Map<String, String> paramPreferredValues = new HashMap<String, String>();
-    private final Map<String, Value[]> paramPossibleChoices = new HashMap<String, Value[]>();
-    private final Map<String, Value[]> paramPossibleChoicesMS = new HashMap<String, Value[]>();
+    private final List<String> masterSlaveParameters = new ArrayList<>();
+    private final List<String> parameters = new ArrayList<>();
+    private final Collection<String> requiredParams = new HashSet<>();
+    private final Collection<String> metaAttrParams = new HashSet<>();
+    private final Map<String, String> paramLongDescriptions = new HashMap<>();
+    private final Map<String, String> paramShortDescriptions = new HashMap<>();
+    private final Map<String, String> paramTypes = new HashMap<>();
+    private final Map<String, String> paramDefaults = new HashMap<>();
+    private final Map<String, String> paramPreferredValues = new HashMap<>();
+    private final Map<String, Value[]> paramPossibleChoices = new HashMap<>();
+    private final Map<String, Value[]> paramPossibleChoicesMS = new HashMap<>();
     private final String pullDownMenuName;
-    private final Table<String ,String, Value> nameParameterToDefaultOperations = HashBasedTable.create();
-    private final Collection<String> operationNames = new LinkedHashSet<String>();
+    private final Table<String, String, Value> nameParameterToDefaultOperations = HashBasedTable.create();
+    private final Collection<String> operationNames = new LinkedHashSet<>();
     private boolean probablyMasterSlave = false;
     private boolean probablyClone = false;
-    /** Sections for some parameters. */
-    private final Map<String, String> paramSections = new HashMap<String, String>();
-    private final Map<String, Widget.Type> fieldTypes = new HashMap<String, Widget.Type>();
+    /**
+     * Sections for some parameters.
+     */
+    private final Map<String, String> paramSections = new HashMap<>();
+    private final Map<String, Widget.Type> fieldTypes = new HashMap<>();
     private final boolean pingService;
-    /** Whether to ignore defaults, show them, but don't assume they are defaults. */
+    /**
+     * Whether to ignore defaults, show them, but don't assume they are defaults.
+     */
     private boolean ignoreDefaults = false;
     private boolean metaDataLoaded = false;
 
@@ -184,7 +201,7 @@ public class ResourceAgent {
         if (this == obj) {
             return true;
         }
-        if (obj == null || !getClass().isInstance(obj)) {
+        if (!getClass().isInstance(obj)) {
             return false;
         }
         final ResourceAgent other = getClass().cast(obj);

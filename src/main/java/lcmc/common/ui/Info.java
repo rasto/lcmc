@@ -21,22 +21,42 @@
  */
 package lcmc.common.ui;
 
-import lcmc.cluster.ui.network.InfoPresenter;
-import lcmc.cluster.ui.widget.Widget;
-import lcmc.common.domain.AccessMode;
-import lcmc.common.domain.Application;
-import lcmc.common.domain.Unit;
-import lcmc.common.domain.Value;
-import lcmc.common.domain.util.Tools;
-import lcmc.common.ui.main.MainData;
-import lcmc.common.ui.utils.*;
-import lcmc.logger.Logger;
-import lcmc.logger.LoggerFactory;
-import lombok.val;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.FlowLayout;
+import java.awt.Font;
+import java.awt.Point;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import java.awt.event.MouseMotionListener;
+import java.awt.geom.Point2D;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 import javax.inject.Inject;
 import javax.inject.Named;
-import javax.swing.*;
+import javax.swing.AbstractButton;
+import javax.swing.BoxLayout;
+import javax.swing.ImageIcon;
+import javax.swing.JComponent;
+import javax.swing.JEditorPane;
+import javax.swing.JMenu;
+import javax.swing.JMenuItem;
+import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
+import javax.swing.JScrollPane;
+import javax.swing.JTable;
+import javax.swing.JToggleButton;
+import javax.swing.SwingConstants;
+import javax.swing.SwingUtilities;
 import javax.swing.border.TitledBorder;
 import javax.swing.event.PopupMenuEvent;
 import javax.swing.event.PopupMenuListener;
@@ -45,56 +65,82 @@ import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableRowSorter;
 import javax.swing.text.JTextComponent;
 import javax.swing.tree.DefaultMutableTreeNode;
-import java.awt.*;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
-import java.awt.event.MouseMotionListener;
-import java.awt.geom.Point2D;
-import java.util.*;
-import java.util.List;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
+
+import lcmc.cluster.ui.network.InfoPresenter;
+import lcmc.cluster.ui.widget.Widget;
+import lcmc.common.domain.AccessMode;
+import lcmc.common.domain.Application;
+import lcmc.common.domain.Unit;
+import lcmc.common.domain.Value;
+import lcmc.common.domain.util.Tools;
+import lcmc.common.ui.main.MainData;
+import lcmc.common.ui.utils.ButtonCallback;
+import lcmc.common.ui.utils.ComponentWithTest;
+import lcmc.common.ui.utils.MyButton;
+import lcmc.common.ui.utils.MyButtonCellRenderer;
+import lcmc.common.ui.utils.MyCellRenderer;
+import lcmc.common.ui.utils.MyMenu;
+import lcmc.common.ui.utils.SwingUtils;
+import lcmc.common.ui.utils.UpdatableItem;
+import lcmc.logger.Logger;
+import lcmc.logger.LoggerFactory;
+import lombok.val;
 
 /**
- * This class holds info data for resources, services, hosts, clusters
- * etc. It provides methods to show this info and graphical view if
- * available.
+ * This class holds info data for resources, services, hosts, clusters etc. It provides methods to show this info and graphical view
+ * if available.
  */
 @Named
 public class Info implements Comparable<Info>, Value, InfoPresenter {
     private static final Logger LOG = LoggerFactory.getLogger(Info.class);
     /** Amount of frames per second. */
     public static final ImageIcon LOGFILE_ICON = Tools.createImageIcon(Tools.getDefault("Info.LogIcon"));
-    /** Menu node of this object. */
+    /**
+     * Menu node of this object.
+     */
     private DefaultMutableTreeNode node = null;
-    /** Name of the object. */
+    /**
+     * Name of the object.
+     */
     private String name;
-    /** TODL: Checking for leak. */
+    /**
+     * TODL: Checking for leak.
+     */
     private int maxMenuList = 0;
 
-    /** Area with text info.  */
+    /**
+     * Area with text info.
+     */
     private JEditorPane resourceInfoArea;
 
-    /** Map from parameter to its user-editable widget. */
-    private final Map<String, Widget> widgetHash = Collections.synchronizedMap(new HashMap<String, Widget>());
-    /** popup menu for this object. */
+    /**
+     * Map from parameter to its user-editable widget.
+     */
+    private final Map<String, Widget> widgetHash = Collections.synchronizedMap(new HashMap<>());
+    /**
+     * popup menu for this object.
+     */
     private JPopupMenu popup;
     private final Lock mPopupLock = new ReentrantLock();
     private final Lock mMenuListLock = new ReentrantLock();
-    private List<UpdatableItem> menuList = new ArrayList<UpdatableItem>();
-    /** Whether the info object is being updated. */
+    private List<UpdatableItem> menuList = new ArrayList<>();
+    /**
+     * Whether the info object is being updated.
+     */
     private boolean updated = false;
     private double animationIndex = 0;
     private String infoCache = "";
     private Browser browser;
-    private final Map<String, JTable> tables = new HashMap<String, JTable>();
-    private final Map<String, DefaultTableModel> tableModels = new HashMap<String, DefaultTableModel>();
-    /** Hash from component to the edit access mode. */
-    private final Map<JTextComponent, AccessMode> componentToEditAccessMode =
-                                                                new HashMap<JTextComponent, AccessMode>();
-    /** Hash from component to the enable access mode. */
-    private final Map<JComponent, AccessMode> componentToEnableAccessMode = new HashMap<JComponent, AccessMode>();
+    private final Map<String, JTable> tables = new HashMap<>();
+    private final Map<String, DefaultTableModel> tableModels = new HashMap<>();
+    /**
+     * Hash from component to the edit access mode.
+     */
+    private final Map<JTextComponent, AccessMode> componentToEditAccessMode = new HashMap<>();
+    /**
+     * Hash from component to the enable access mode.
+     */
+    private final Map<JComponent, AccessMode> componentToEnableAccessMode = new HashMap<>();
     @Inject
     private Application application;
     @Inject
@@ -122,6 +168,7 @@ public class Info implements Comparable<Info>, Value, InfoPresenter {
         return name;
     }
 
+    @Override
     public Browser getBrowser() {
         return browser;
     }
@@ -210,10 +257,12 @@ public class Info implements Comparable<Info>, Value, InfoPresenter {
         LOG.appError("unimplemented");
     }
 
+    @Override
     public ImageIcon getMenuIcon(final Application.RunMode runMode) {
         return null;
     }
 
+    @Override
     public ImageIcon getCategoryIcon(final Application.RunMode runMode) {
         return null;
     }
@@ -225,12 +274,7 @@ public class Info implements Comparable<Info>, Value, InfoPresenter {
             final String newInfo = getInfo();
             if (newInfo != null && !newInfo.equals(infoCache)) {
                 infoCache = newInfo;
-                swingUtils.invokeLater(new Runnable() {
-                    @Override
-                    public void run() {
-                        ria.setText(newInfo);
-                    }
-                });
+                swingUtils.invokeLater(() -> ria.setText(newInfo));
             }
         }
     }
@@ -292,6 +336,7 @@ public class Info implements Comparable<Info>, Value, InfoPresenter {
         return false;
     }
 
+    @Override
     public JPanel getGraphicalView() {
         return null;
     }
@@ -332,7 +377,7 @@ public class Info implements Comparable<Info>, Value, InfoPresenter {
         if (menuList == null) {
             mMenuListLock.unlock();
         } else {
-            final Iterable<UpdatableItem> menuListCopy = new ArrayList<UpdatableItem>(menuList);
+            final Iterable<UpdatableItem> menuListCopy = new ArrayList<>(menuList);
             mMenuListLock.unlock();
             for (final UpdatableItem i : menuListCopy) {
                 i.cleanup();
@@ -403,12 +448,7 @@ public class Info implements Comparable<Info>, Value, InfoPresenter {
             mPopupLock.unlock();
         }
         if (popup0 != null) {
-            swingUtils.invokeLater(new Runnable() {
-                @Override
-                public void run() {
-                    popup0.setVisible(false);
-                }
-            });
+            swingUtils.invokeLater(() -> popup0.setVisible(false));
         }
     }
 
@@ -443,21 +483,11 @@ public class Info implements Comparable<Info>, Value, InfoPresenter {
         pm.addPopupMenuListener(new PopupMenuListener() {
             @Override
             public void popupMenuCanceled(final PopupMenuEvent e) {
-                swingUtils.invokeLater(new Runnable() {
-                    @Override
-                    public void run() {
-                        b.setSelected(false);
-                    }
-                });
+                swingUtils.invokeLater(() -> b.setSelected(false));
             }
             @Override
             public void popupMenuWillBecomeInvisible(final PopupMenuEvent e) {
-                swingUtils.invokeLater(new Runnable() {
-                    @Override
-                    public void run() {
-                        b.setSelected(false);
-                    }
-                });
+                swingUtils.invokeLater(() -> b.setSelected(false));
             }
             @Override
             public void popupMenuWillBecomeVisible(final PopupMenuEvent e) {
@@ -490,26 +520,13 @@ public class Info implements Comparable<Info>, Value, InfoPresenter {
                 public void mousePressed(final MouseEvent e) {
                     final JToggleButton source = (JToggleButton) (e.getSource());
                     if (source.isSelected()) {
-                        swingUtils.invokeLater(new Runnable() {
-                        @Override
-                            public void run() {
-                                b.setSelected(true);
-                            }
-                        });
+                        swingUtils.invokeLater(() -> b.setSelected(true));
                     } else {
-                        final Thread thread = new Thread(new Runnable() {
-                            @Override
-                            public void run() {
-                                final JPopupMenu pm = getPopup();
-                                if (pm != null) {
-                                    updateMenus(null);
-                                    swingUtils.invokeLater(new Runnable() {
-                                    @Override
-                                        public void run() {
-                                            showPopup(pm, b);
-                                        }
-                                    });
-                                }
+                        final Thread thread = new Thread(() -> {
+                            final JPopupMenu pm = getPopup();
+                            if (pm != null) {
+                                updateMenus(null);
+                                swingUtils.invokeLater(() -> showPopup(pm, b));
                             }
                         });
                         thread.start();
@@ -540,29 +557,21 @@ public class Info implements Comparable<Info>, Value, InfoPresenter {
         if (menuList == null) {
             mMenuListLock.unlock();
         } else {
-            final Collection<UpdatableItem> menuListCopy = new ArrayList<UpdatableItem>(menuList);
+            final Collection<UpdatableItem> menuListCopy = new ArrayList<>(menuList);
             mMenuListLock.unlock();
-            swingUtils.invokeAndWait(new Runnable() {
-                @Override
-                public void run() {
-                    for (final UpdatableItem i : menuListCopy) {
-                        i.setPos(pos);
-                        if (i instanceof MyMenu) {
-                            i.setEnabled(false);
-                        } else {
-                            i.updateAndWait();
-                        }
+            swingUtils.invokeAndWait(() -> {
+                for (final UpdatableItem i : menuListCopy) {
+                    i.setPos(pos);
+                    if (i instanceof MyMenu) {
+                        i.setEnabled(false);
+                    } else {
+                        i.updateAndWait();
                     }
                 }
             });
             for (final UpdatableItem i : menuListCopy) {
                 if (i instanceof MyMenu) {
-                    swingUtils.invokeAndWait(new Runnable() {
-                        @Override
-                        public void run() {
-                            i.updateAndWait();
-                        }
-                    });
+                    swingUtils.invokeAndWait(() -> i.updateAndWait());
                 }
             }
             final int size = menuListCopy.size();
@@ -615,24 +624,14 @@ public class Info implements Comparable<Info>, Value, InfoPresenter {
             @Override
             public void mouseEntered(final MouseEvent e) {
                 if (((java.awt.Component) c).isShowing() && ((java.awt.Component) c).isEnabled()) {
-                    final Thread thread = new Thread(new Runnable() {
-                        @Override
-                        public void run() {
-                            bc.mouseOver(c);
-                        }
-                    });
+                    final Thread thread = new Thread(() -> bc.mouseOver(c));
                     thread.start();
                 }
             }
 
             @Override
             public void mouseExited(final MouseEvent e) {
-                final Thread t = new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        bc.mouseOut(c);
-                    }
-                });
+                final Thread t = new Thread(() -> bc.mouseOut(c));
                 t.start();
             }
 
@@ -738,7 +737,7 @@ public class Info implements Comparable<Info>, Value, InfoPresenter {
 
             };
             tables.put(tableName, table);
-            final TableRowSorter<DefaultTableModel> sorter = new TableRowSorter<DefaultTableModel>(tableModel);
+            final TableRowSorter<DefaultTableModel> sorter = new TableRowSorter<>(tableModel);
             for (int i = 0; i < colNames.length; i++) {
                 final Comparator<Object> c = getColComparator(tableName, i);
                 if (c != null) {

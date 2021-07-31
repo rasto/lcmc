@@ -19,20 +19,20 @@
  */
 package lcmc.cluster.ui.widget;
 
-import java.awt.Color;
 import java.util.Map;
-import lcmc.common.domain.AccessMode;
-import lcmc.common.domain.Value;
-import lcmc.logger.Logger;
-import lcmc.logger.LoggerFactory;
-import lcmc.common.ui.utils.MyButton;
-import lcmc.common.domain.Unit;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Provider;
 import javax.inject.Singleton;
 import javax.swing.Icon;
+
+import lcmc.common.domain.AccessMode;
+import lcmc.common.domain.Unit;
+import lcmc.common.domain.Value;
+import lcmc.common.ui.utils.MyButton;
+import lcmc.logger.Logger;
+import lcmc.logger.LoggerFactory;
 
 @Named
 @Singleton
@@ -85,16 +85,14 @@ public final class WidgetFactory {
         if (type != null && type != Widget.Type.TEXTFIELDWITHUNIT && units != null) {
             LOG.appError("createInstance: wrong type with units: " + type);
         }
-        if (type == null || type == Widget.GUESS_TYPE) {
+        if (type == Widget.GUESS_TYPE) {
             /* type detection */
             if (units != null) {
                 type = Widget.Type.TEXTFIELDWITHUNIT;
             } else if (items == null || items.length == 0) {
                 type = Widget.Type.TEXTFIELD;
             } else if (items.length == 2) {
-                if (items[0] != null
-                    && items[0].toString().equalsIgnoreCase(Checkbox.CHECKBOX_TRUE)
-                    && items[1] != null
+                if (items[0] != null && items[0].toString().equalsIgnoreCase(Checkbox.CHECKBOX_TRUE) && items[1] != null
                     && items[1].toString().equalsIgnoreCase(Checkbox.CHECKBOX_FALSE)) {
                     type = Widget.Type.CHECKBOX;
                 } else {
@@ -159,9 +157,5 @@ public final class WidgetFactory {
 
     public MyButton createButton(final String text, final Icon icon, final String toolTipText) {
         return new MyButton(text, icon, toolTipText);
-    }
-
-    public MyButton createButton(final Color c1, final Color c2) {
-        return new MyButton(c1, c2);
     }
 }

@@ -23,7 +23,6 @@ package lcmc.common.ui;
 import java.awt.Color;
 import java.awt.FlowLayout;
 import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -42,16 +41,16 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.text.Document;
 
+import lcmc.cluster.service.ssh.ExecCommandConfig;
+import lcmc.cluster.service.ssh.ExecCommandThread;
+import lcmc.common.domain.ExecCallback;
+import lcmc.common.domain.util.Tools;
 import lcmc.common.ui.main.ProgressIndicator;
 import lcmc.common.ui.utils.SwingUtils;
 import lcmc.configs.DistResource;
 import lcmc.host.domain.Host;
-import lcmc.common.domain.ExecCallback;
 import lcmc.logger.Logger;
 import lcmc.logger.LoggerFactory;
-import lcmc.cluster.service.ssh.ExecCommandConfig;
-import lcmc.cluster.service.ssh.ExecCommandThread;
-import lcmc.common.domain.util.Tools;
 
 /**
  * An implementation of an edit config dialog.
@@ -61,7 +60,7 @@ public final class EditConfig extends ConfigDialog {
     private static final Logger LOG = LoggerFactory.getLogger(EditConfig.class);
     private String fileToEdit;
     private Set<Host> hosts;
-    private final Map<Host, JCheckBox> hostCheckBoxes = new HashMap<Host, JCheckBox>();
+    private final Map<Host, JCheckBox> hostCheckBoxes = new HashMap<>();
     private final JCheckBox backupCheckBoxes = new JCheckBox(Tools.getString("Dialog.EditConfig.Backup.Button"));
 
     private final JTextArea configArea = new JTextArea(Tools.getString("Dialog.EditConfig.Loading"));
@@ -189,34 +188,21 @@ public final class EditConfig extends ConfigDialog {
         for (final Host host : hosts) {
             final int index = i;
             final JCheckBox hcb = hostCheckBoxes.get(host);
-            hcb.addItemListener(new ItemListener() {
-                @Override
-                public void itemStateChanged(final ItemEvent e) {
-                    swingUtils.invokeLater(new Runnable() {
-                        @Override
-                        public void run() {
-                            setConfigArea(results[index], errors[index], e.getStateChange() == ItemEvent.SELECTED);
-                            if (e.getStateChange() == ItemEvent.SELECTED) {
-                                for (final Host h : hosts) {
-                                    final JCheckBox thiscb = hostCheckBoxes.get(h);
-                                    if (h == host) {
-                                        thiscb.setBackground(Tools.getDefaultColor("ConfigDialog.Background.Darker"));
-                                    } else {
-                                        thiscb.setBackground(Tools.getDefaultColor("ConfigDialog.Background.Light"));
-                                    }
-                                }
-                            }
+            hcb.addItemListener(e -> swingUtils.invokeLater(() -> {
+                setConfigArea(results[index], errors[index], e.getStateChange() == ItemEvent.SELECTED);
+                if (e.getStateChange() == ItemEvent.SELECTED) {
+                    for (final Host h : hosts) {
+                        final JCheckBox thiscb = hostCheckBoxes.get(h);
+                        if (h == host) {
+                            thiscb.setBackground(Tools.getDefaultColor("ConfigDialog.Background.Darker"));
+                        } else {
+                            thiscb.setBackground(Tools.getDefaultColor("ConfigDialog.Background.Light"));
                         }
-                    });
+                    }
                 }
-            });
+            }));
         }
-        swingUtils.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                setConfigArea(results[0], errors[0], true);
-            }
-        });
+        swingUtils.invokeLater(() -> setConfigArea(results[0], errors[0], true));
         final Document caDocument = configArea.getDocument();
         caDocument.addDocumentListener(new DocumentListener() {
             private void update() {

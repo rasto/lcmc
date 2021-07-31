@@ -25,12 +25,12 @@ package lcmc.vm.domain;
 import java.io.File;
 import java.io.IOException;
 
-import lcmc.configs.DistResource;
-import lcmc.vm.ui.resource.HardwareInfo;
-import lcmc.host.domain.Host;
-import lcmc.common.domain.util.Tools;
 import lcmc.cluster.service.ssh.ExecCommandConfig;
 import lcmc.cluster.service.ssh.SshOutput;
+import lcmc.common.domain.util.Tools;
+import lcmc.configs.DistResource;
+import lcmc.host.domain.Host;
+import lcmc.vm.ui.resource.HardwareInfo;
 
 /**
  * This class holds info about file in a linux file system. It should overwrite
@@ -38,15 +38,15 @@ import lcmc.cluster.service.ssh.SshOutput;
  */
 public final class LinuxFile extends File {
     static final char separatorChar = '/';
-    static final String separator = "" + separatorChar;
     static final char pathSeparatorChar = '/';
-    static final String pathSeparator = "" + pathSeparatorChar;
     private final Host host;
     private boolean directory = false;
     private long lastModified;
     private long fileLength;
-    /** Is true if this file exists, false it doesn't, null - it is not known.*/
-    private Boolean existCache = null;
+    /**
+     * Is true if this file exists, false it doesn't, null - it is not known.
+     */
+    private final Boolean existCache = null;
     private final HardwareInfo vmsHardwareInfo;
 
     public LinuxFile(final HardwareInfo vmsHardwareInfo,

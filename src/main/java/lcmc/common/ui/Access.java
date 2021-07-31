@@ -20,19 +20,21 @@
 
 package lcmc.common.ui;
 
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
-import lcmc.cluster.domain.Cluster;
-import lcmc.cluster.domain.Clusters;
-import lcmc.cluster.ui.ClusterBrowser;
-import lcmc.common.domain.AccessMode;
+import java.util.List;
+import java.util.Map;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
-import javax.swing.*;
-import java.util.List;
-import java.util.Map;
+import javax.swing.JComponent;
+
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+
+import lcmc.cluster.domain.Cluster;
+import lcmc.cluster.domain.Clusters;
+import lcmc.cluster.ui.ClusterBrowser;
+import lcmc.common.domain.AccessMode;
 
 @Named
 @Singleton
@@ -97,10 +99,6 @@ public class Access {
         return accessType;
     }
 
-    AccessMode.Type getMaxAccessType() {
-        return maxAccessType;
-    }
-
     /**
      * Returns true if the access type is greater than the one that is
      * required and advanced mode is required and we are not in advanced mode.
@@ -119,7 +117,7 @@ public class Access {
                 break;
             }
         }
-        return modes.toArray(new String[modes.size()]);
+        return modes.toArray(new String[0]);
     }
 
     public void setMaxAccessType(final AccessMode.Type maxAccessType) {

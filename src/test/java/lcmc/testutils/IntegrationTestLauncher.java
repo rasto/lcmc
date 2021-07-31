@@ -28,25 +28,25 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import lcmc.LCMC;
-import lcmc.cluster.service.storage.FileSystemService;
-import lcmc.common.domain.UserConfig;
-import lcmc.common.ui.main.MainPresenter;
-import lcmc.common.ui.MainPanel;
-import lcmc.common.domain.Application;
-import lcmc.cluster.domain.Cluster;
-import lcmc.common.ui.utils.SwingUtils;
-import lcmc.host.domain.Host;
-import lcmc.cluster.service.NetworkService;
-import lcmc.host.domain.HostFactory;
-import lcmc.logger.LoggerFactory;
-import lcmc.common.domain.util.Tools;
-import lcmc.cluster.ui.ClusterTabFactory;
-
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Provider;
 import javax.inject.Singleton;
+
+import lcmc.LCMC;
+import lcmc.cluster.domain.Cluster;
+import lcmc.cluster.service.NetworkService;
+import lcmc.cluster.service.storage.FileSystemService;
+import lcmc.cluster.ui.ClusterTabFactory;
+import lcmc.common.domain.Application;
+import lcmc.common.domain.UserConfig;
+import lcmc.common.domain.util.Tools;
+import lcmc.common.ui.MainPanel;
+import lcmc.common.ui.main.MainPresenter;
+import lcmc.common.ui.utils.SwingUtils;
+import lcmc.host.domain.Host;
+import lcmc.host.domain.HostFactory;
+import lcmc.logger.LoggerFactory;
 
 /**
  * This class provides tools for testing.
@@ -61,7 +61,7 @@ public class IntegrationTestLauncher {
     private static final int NUMBER_OF_HOSTS = 2;
     private static final String TEST_USERNAME = "root";
 
-    private final List<Host> hosts = new ArrayList<Host>();
+    private final List<Host> hosts = new ArrayList<>();
     private volatile boolean clusterLoaded = false;
 
     @Inject
@@ -94,7 +94,7 @@ public class IntegrationTestLauncher {
 
     /** Returns test hosts. */
     public List<Host> getHosts() {
-        return Collections.unmodifiableList(this.hosts);
+        return Collections.unmodifiableList(hosts);
     }
 
     public boolean isClusterLoaded() {
@@ -121,7 +121,6 @@ public class IntegrationTestLauncher {
         swingUtils.waitForSwing();
 
         LoggerFactory.setDebugLevel(-1);
-        final String username = TEST_USERNAME;
         final boolean useSudo = false;
         final Cluster cluster = clusterProvider.get();
         cluster.setName("test");
@@ -130,7 +129,7 @@ public class IntegrationTestLauncher {
             final Host host = hostFactory.createInstance();
             host.init();
 
-            initHost(host, hostName, username, useSudo);
+            initHost(host, hostName, TEST_USERNAME, useSudo);
             hosts.add(host);
             host.setCluster(cluster);
             cluster.addHost(host);
@@ -142,24 +141,13 @@ public class IntegrationTestLauncher {
         }
         cluster.connect(null, true, 0);
         for (final Host host : hosts) {
-            final boolean r = waitForCondition(
-                new Condition() {
-                    @Override
-                    public boolean passed() {
-                        return host.isConnected();
-                    }
-                }, 300, 20000);
+            final boolean r = waitForCondition(host::isConnected, 300, 20000);
             if (!r) {
                 error("could not establish connection to " + host.getName());
             }
         }
         application.addClusterToClusters(cluster);
-        swingUtils.invokeAndWait(new Runnable() {
-            @Override
-            public void run() {
-                clusterTabFactory.createClusterTab(cluster);
-            }
-        });
+        swingUtils.invokeAndWait(() -> clusterTabFactory.createClusterTab(cluster));
         
         final String saveFile = application.getDefaultSaveFile();
         userConfig.saveConfig(saveFile, false);

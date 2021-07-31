@@ -20,14 +20,14 @@
 
 package lcmc.vm.domain.data;
 
-import lcmc.common.domain.Value;
-
 import java.util.HashMap;
 import java.util.Map;
 
+import lcmc.common.domain.Value;
+
 /** Class that holds data about virtual hardware. */
 abstract class HardwareData {
-    private final Map<String, Value> valueMap = new HashMap<String, Value>();
+    private final Map<String, Value> valueMap = new HashMap<>();
 
     final void setValue(final String param, final Value value) {
         valueMap.put(param, value);

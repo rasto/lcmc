@@ -25,16 +25,16 @@ import java.awt.Color;
 import java.util.ArrayList;
 import java.util.List;
 
-import lcmc.common.ui.CategoryInfo;
-import lcmc.cluster.ui.widget.WidgetFactory;
-import lcmc.host.domain.Host;
-import lcmc.common.ui.Browser;
-import lcmc.cluster.ui.ClusterBrowser;
-import lcmc.crm.ui.resource.HostInfo;
-import lcmc.common.ui.utils.MyButton;
-
 import javax.inject.Inject;
 import javax.inject.Named;
+
+import lcmc.cluster.ui.ClusterBrowser;
+import lcmc.cluster.ui.widget.WidgetFactory;
+import lcmc.common.ui.Browser;
+import lcmc.common.ui.CategoryInfo;
+import lcmc.common.ui.utils.MyButton;
+import lcmc.crm.ui.resource.HostInfo;
+import lcmc.host.domain.Host;
 
 /**
  * This class holds the information hosts in this cluster.
@@ -56,7 +56,7 @@ public final class ClusterHostsInfo extends CategoryInfo {
 
     @Override
     protected Object[][] getTableData(final String tableName) {
-        final List<Object[]> rows = new ArrayList<Object[]>();
+        final List<Object[]> rows = new ArrayList<>();
         for (final Host host : getBrowser().getClusterHosts()) {
             final MyButton hostLabel = widgetFactory.createButton(host.getName(), HostBrowser.HOST_ICON_LARGE);
             hostLabel.setOpaque(true);

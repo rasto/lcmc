@@ -32,22 +32,22 @@ import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.SpringLayout;
 
-import lcmc.common.domain.AccessMode;
-import lcmc.common.domain.Application;
-import lcmc.common.ui.utils.SwingUtils;
-import lcmc.host.domain.Host;
-import lcmc.common.domain.StringValue;
-import lcmc.common.domain.Value;
-import lcmc.common.ui.SpringUtilities;
-import lcmc.common.ui.WizardDialog;
-import lcmc.cluster.ui.widget.Widget;
-import lcmc.cluster.ui.widget.WidgetFactory;
-import lcmc.common.domain.ExecCallback;
-import lcmc.logger.Logger;
-import lcmc.logger.LoggerFactory;
 import lcmc.cluster.service.ssh.ExecCommandConfig;
 import lcmc.cluster.service.ssh.ExecCommandThread;
+import lcmc.cluster.ui.widget.Widget;
+import lcmc.cluster.ui.widget.WidgetFactory;
+import lcmc.common.domain.AccessMode;
+import lcmc.common.domain.Application;
+import lcmc.common.domain.ExecCallback;
+import lcmc.common.domain.StringValue;
+import lcmc.common.domain.Value;
 import lcmc.common.domain.util.Tools;
+import lcmc.common.ui.SpringUtilities;
+import lcmc.common.ui.WizardDialog;
+import lcmc.common.ui.utils.SwingUtils;
+import lcmc.host.domain.Host;
+import lcmc.logger.Logger;
+import lcmc.logger.LoggerFactory;
 import lombok.val;
 
 /**
@@ -156,26 +156,20 @@ final class CommStack extends DialogCluster {
         final boolean ais = aisIsPossible;
         final boolean hb = hbIsPossible;
         if (ais || hb) {
-            swingUtils.invokeLater(new Runnable() {
-                @Override
-                public void run() {
-                    if (ais) {
-                        chooseStackCombo.setEnabled(Application.COROSYNC_NAME, true);
-                    }
-                    if (hb) {
-                        chooseStackCombo.setEnabled(Application.HEARTBEAT_NAME, true);
-                    }
+            swingUtils.invokeLater(() -> {
+                if (ais) {
+                    chooseStackCombo.setEnabled(Application.COROSYNC_NAME, true);
+                }
+                if (hb) {
+                    chooseStackCombo.setEnabled(Application.HEARTBEAT_NAME, true);
                 }
             });
         }
         enableComponents();
         if (ais || hb) {
-            swingUtils.invokeLater(new Runnable() {
-                @Override
-                public void run() {
-                    buttonClass(nextButton()).setEnabled(true);
-                    makeDefaultAndRequestFocus(buttonClass(nextButton()));
-                }
+            swingUtils.invokeLater(() -> {
+                buttonClass(nextButton()).setEnabled(true);
+                makeDefaultAndRequestFocus(buttonClass(nextButton()));
             });
             if (!application.getAutoClusters().isEmpty()) {
                 Tools.sleep(1000);

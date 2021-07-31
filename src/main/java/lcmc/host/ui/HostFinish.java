@@ -23,8 +23,7 @@
 package lcmc.host.ui;
 
 import java.awt.Dimension;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Provider;
@@ -32,17 +31,18 @@ import javax.swing.ImageIcon;
 import javax.swing.JCheckBox;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
-import lcmc.cluster.ui.wizard.AddClusterDialog;
-import lcmc.common.domain.UserConfig;
-import lcmc.common.ui.main.MainPresenter;
+
 import lcmc.cluster.ui.widget.WidgetFactory;
+import lcmc.cluster.ui.wizard.AddClusterDialog;
 import lcmc.common.domain.Application;
+import lcmc.common.domain.UserConfig;
+import lcmc.common.domain.util.Tools;
+import lcmc.common.ui.WizardDialog;
+import lcmc.common.ui.main.MainPresenter;
+import lcmc.common.ui.utils.MyButton;
 import lcmc.common.ui.utils.SwingUtils;
 import lcmc.host.domain.Host;
 import lcmc.host.domain.HostFactory;
-import lcmc.common.ui.WizardDialog;
-import lcmc.common.ui.utils.MyButton;
-import lcmc.common.domain.util.Tools;
 
 /**
  * Host finish dialog with buttons to configure next host or configure the
@@ -107,21 +107,11 @@ final class HostFinish extends DialogHost {
         if (application.getAutoHosts().isEmpty()) {
             if (!application.getAutoClusters().isEmpty()) {
                 Tools.sleep(1000);
-                swingUtils.invokeLater(new Runnable() {
-                    @Override
-                    public void run() {
-                        configureClusterButton.pressButton();
-                    }
-                });
+                swingUtils.invokeLater(() -> configureClusterButton.pressButton());
             }
         } else {
             Tools.sleep(1000);
-            swingUtils.invokeLater(new Runnable() {
-                @Override
-                public void run() {
-                    addAnotherHostButton.pressButton();
-                }
-            });
+            swingUtils.invokeLater(() -> addAnotherHostButton.pressButton());
         }
     }
 
@@ -142,53 +132,35 @@ final class HostFinish extends DialogHost {
         addAnotherHostButton = widgetFactory.createButton(Tools.getString("Dialog.Host.Finish.AddAnotherHostButton"), HOST_ICON);
         addAnotherHostButton.setPreferredSize(BUTTON_DIMENSION);
         final DialogHost thisClass = this;
-        addAnotherHostButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(final ActionEvent e) {
-                final Thread t = new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        final Host newHost = hostFactory.createInstance();
-                        newHost.getSSH().setPasswords(getHost().getSSH().getLastSuccessfulDsaKey(),
-                                getHost().getSSH().getLastSuccessfulRsaKey(),
+        addAnotherHostButton.addActionListener(e -> {
+            final Thread t = new Thread(() -> {
+                final Host newHost = hostFactory.createInstance();
+                newHost.getSSH()
+                        .setPasswords(getHost().getSSH().getLastSuccessfulDsaKey(), getHost().getSSH().getLastSuccessfulRsaKey(),
                                 getHost().getSSH().getLastSuccessfulPassword());
-                        newHostDialog = newHostDialogFactory.get();
-                        newHostDialog.init(thisClass, newHost, getDrbdInstallation());
-                        mainPresenter.allHostsUpdate();
-                        swingUtils.invokeLater(new Runnable() {
-                            @Override
-                            public void run() {
-                                addAnotherHostButton.setEnabled(false);
-                                buttonClass(nextButton()).pressButton();
-                            }
-                        });
-                    }
+                newHostDialog = newHostDialogFactory.get();
+                newHostDialog.init(thisClass, newHost, getDrbdInstallation());
+                mainPresenter.allHostsUpdate();
+                swingUtils.invokeLater(() -> {
+                    addAnotherHostButton.setEnabled(false);
+                    buttonClass(nextButton()).pressButton();
                 });
-                t.start();
-            }
+            });
+            t.start();
         });
         /* cluster wizard button */
-        configureClusterButton = widgetFactory.createButton(Tools.getString("Dialog.Host.Finish.ConfigureClusterButton"),
-                                                            CLUSTER_ICON);
+        configureClusterButton =
+                widgetFactory.createButton(Tools.getString("Dialog.Host.Finish.ConfigureClusterButton"), CLUSTER_ICON);
         configureClusterButton.setPreferredSize(BUTTON_DIMENSION);
-        configureClusterButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(final ActionEvent e) {
-                final Thread t = new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        swingUtils.invokeLater(new Runnable() {
-                            @Override
-                            public void run() {
-                                configureClusterButton.setEnabled(false);
-                                buttonClass(finishButton()).pressButton();
-                            }
-                        });
-                        addClusterDialog.showDialogs();
-                    }
+        configureClusterButton.addActionListener(e -> {
+            final Thread t = new Thread(() -> {
+                swingUtils.invokeLater(() -> {
+                    configureClusterButton.setEnabled(false);
+                    buttonClass(finishButton()).pressButton();
                 });
-                t.start();
-            }
+                addClusterDialog.showDialogs();
+            });
+            t.start();
         });
         pane.add(addAnotherHostButton);
         if (application.danglingHostsCount() < 1) {

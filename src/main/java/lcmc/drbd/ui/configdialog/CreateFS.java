@@ -23,33 +23,33 @@
 
 package lcmc.drbd.ui.configdialog;
 
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.util.Set;
+
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SpringLayout;
+
 import lcmc.Exceptions;
 import lcmc.cluster.service.storage.FileSystemService;
-import lcmc.common.domain.AccessMode;
-import lcmc.common.domain.Application;
-import lcmc.common.ui.utils.SwingUtils;
-import lcmc.host.domain.Host;
-import lcmc.common.domain.StringValue;
-import lcmc.common.domain.Value;
-import lcmc.common.ui.SpringUtilities;
-import lcmc.common.ui.WizardDialog;
-import lcmc.drbd.ui.resource.BlockDevInfo;
 import lcmc.cluster.ui.widget.Widget;
 import lcmc.cluster.ui.widget.WidgetFactory;
+import lcmc.common.domain.AccessMode;
+import lcmc.common.domain.Application;
+import lcmc.common.domain.StringValue;
+import lcmc.common.domain.Value;
+import lcmc.common.domain.util.Tools;
+import lcmc.common.ui.SpringUtilities;
+import lcmc.common.ui.WizardDialog;
+import lcmc.common.ui.utils.MyButton;
+import lcmc.common.ui.utils.SwingUtils;
+import lcmc.common.ui.utils.WidgetListener;
+import lcmc.drbd.ui.resource.BlockDevInfo;
+import lcmc.host.domain.Host;
 import lcmc.logger.Logger;
 import lcmc.logger.LoggerFactory;
-import lcmc.common.ui.utils.MyButton;
-import lcmc.common.domain.util.Tools;
-import lcmc.common.ui.utils.WidgetListener;
 
 /**
  * An implementation of a dialog where drbd block devices are initialized.
@@ -99,7 +99,7 @@ final class CreateFS extends DrbdConfig {
         }
     }
 
-    protected BlockDevInfo getPrimaryBlockDevice() {
+    public BlockDevInfo getPrimaryBlockDevice() {
         final BlockDevInfo bdi1 = getDrbdVolumeInfo().getFirstBlockDevInfo();
         final BlockDevInfo bdi2 = getDrbdVolumeInfo().getSecondBlockDevInfo();
         final String h = hostChoiceWidget.getStringValue();
@@ -112,37 +112,31 @@ final class CreateFS extends DrbdConfig {
         }
     }
 
-    protected void createFilesystem() {
-        final Runnable runnable = new Runnable() {
-            @Override
-            public void run() {
-                getProgressBar().start(1);
-                answerPaneSetText(Tools.getString("Dialog.DrbdConfig.CreateFS.MakeFS"));
-                swingUtils.invokeLater(new Runnable() {
-                    @Override
-                    public void run() {
-                        buttonClass(finishButton()).setEnabled(false);
-                        makeFileSystemButton.setEnabled(false);
-                    }
-                });
-                final BlockDevInfo bdiPri = getPrimaryBlockDevice();
-                final Application.RunMode runMode = Application.RunMode.LIVE;
-                if (SKIP_SYNC_TRUE.equals(skipInitialSyncWidget.getValue())) {
-                    bdiPri.skipInitialFullSync(runMode);
-                }
-                bdiPri.forcePrimary(runMode);
-                final String fs = filesystemWidget.getStringValue();
-                bdiPri.makeFilesystem(fs, runMode);
-                if (bdiPri.getDrbdVolumeInfo() != null) {
-                    /* could be canceled */
-                    getDrbdVolumeInfo().setCreatedFs(fs);
-                    bdiPri.setSecondary(runMode);
-                    hostChoiceWidget.setValue(NO_HOST_STRING);
-                    filesystemWidget.setValue(NO_FILESYSTEM_STRING);
-                    answerPaneSetText(Tools.getString("Dialog.DrbdConfig.CreateFS.MakeFS.Done"));
-                }
-                progressBarDone();
+    public void createFilesystem() {
+        final Runnable runnable = () -> {
+            getProgressBar().start(1);
+            answerPaneSetText(Tools.getString("Dialog.DrbdConfig.CreateFS.MakeFS"));
+            swingUtils.invokeLater(() -> {
+                buttonClass(finishButton()).setEnabled(false);
+                makeFileSystemButton.setEnabled(false);
+            });
+            final BlockDevInfo bdiPri = getPrimaryBlockDevice();
+            final Application.RunMode runMode = Application.RunMode.LIVE;
+            if (SKIP_SYNC_TRUE.equals(skipInitialSyncWidget.getValue())) {
+                bdiPri.skipInitialFullSync(runMode);
             }
+            bdiPri.forcePrimary(runMode);
+            final String fs = filesystemWidget.getStringValue();
+            bdiPri.makeFilesystem(fs, runMode);
+            if (bdiPri.getDrbdVolumeInfo() != null) {
+                /* could be canceled */
+                getDrbdVolumeInfo().setCreatedFs(fs);
+                bdiPri.setSecondary(runMode);
+                hostChoiceWidget.setValue(NO_HOST_STRING);
+                filesystemWidget.setValue(NO_FILESYSTEM_STRING);
+                answerPaneSetText(Tools.getString("Dialog.DrbdConfig.CreateFS.MakeFS.Done"));
+            }
+            progressBarDone();
         };
         final Thread thread = new Thread(runnable);
         thread.start();
@@ -174,64 +168,44 @@ final class CreateFS extends DrbdConfig {
     protected void initDialogAfterVisible() {
         enableComponents();
         if (application.getAutoOptionGlobal("autodrbd") != null) {
-            swingUtils.invokeLater(new Runnable() {
-                @Override
-                public void run() {
-                    makeFileSystemButton.pressButton();
-                }
-            });
+            swingUtils.invokeLater(() -> makeFileSystemButton.pressButton());
         }
     }
 
     /**
-     * Enables and disables the make fs and finish buttons depending on what
-     * was chosen by user.
+     * Enables and disables the make fs and finish buttons depending on what was chosen by user.
      */
-    protected void checkButtons() {
+    private void checkButtons() {
         final boolean noHost = hostChoiceWidget.getValue().equals(NO_HOST_STRING);
         final boolean noFileSystem = filesystemWidget.getValue().equals(NO_FILESYSTEM_STRING);
-        swingUtils.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                if (noHost) {
-                    skipInitialSyncWidget.setEnabled(false);
-                    skipInitialSyncLabel.setEnabled(false);
-                    skipInitialSyncWidget.setValue(SKIP_SYNC_FALSE);
-                } else {
-                    if (skipSyncAvailable()) {
-                        skipInitialSyncWidget.setEnabled(true);
-                        skipInitialSyncLabel.setEnabled(true);
-                    }
+        swingUtils.invokeLater(() -> {
+            if (noHost) {
+                skipInitialSyncWidget.setEnabled(false);
+                skipInitialSyncLabel.setEnabled(false);
+                skipInitialSyncWidget.setValue(SKIP_SYNC_FALSE);
+            } else {
+                if (skipSyncAvailable()) {
+                    skipInitialSyncWidget.setEnabled(true);
+                    skipInitialSyncLabel.setEnabled(true);
                 }
             }
         });
         if (noFileSystem) {
-            swingUtils.invokeLater(new Runnable() {
-                @Override
-                public void run() {
-                    buttonClass(finishButton()).setEnabled(true);
-                    makeFileSystemButton.setEnabled(false);
-                    skipInitialSyncWidget.setValue(SKIP_SYNC_FALSE);
-                }
+            swingUtils.invokeLater(() -> {
+                buttonClass(finishButton()).setEnabled(true);
+                makeFileSystemButton.setEnabled(false);
+                skipInitialSyncWidget.setValue(SKIP_SYNC_FALSE);
             });
         } else if (noHost) {
-            swingUtils.invokeLater(new Runnable() {
-                @Override
-                public void run() {
-                    buttonClass(finishButton()).setEnabled(false);
-                }
-            });
+            swingUtils.invokeLater(() -> buttonClass(finishButton()).setEnabled(false));
             makeFileSystemButton.setEnabled(false);
         } else {
-            swingUtils.invokeLater(new Runnable() {
-                @Override
-                public void run() {
-                    buttonClass(finishButton()).setEnabled(false);
-                    makeFileSystemButton.setEnabled(true);
-                    if (skipSyncAvailable()) {
-                        skipInitialSyncWidget.setValue(SKIP_SYNC_TRUE);
-                        skipInitialSyncWidget.setEnabled(true);
-                    }
+            swingUtils.invokeLater(() -> {
+                buttonClass(finishButton()).setEnabled(false);
+                makeFileSystemButton.setEnabled(true);
+                if (skipSyncAvailable()) {
+                    skipInitialSyncWidget.setValue(SKIP_SYNC_TRUE);
+                    skipInitialSyncWidget.setEnabled(true);
                 }
             });
         }
@@ -308,12 +282,7 @@ final class CreateFS extends DrbdConfig {
             }
         });
 
-        makeFileSystemButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(final ActionEvent e) {
-                createFilesystem();
-            }
-        });
+        makeFileSystemButton.addActionListener(e -> createFilesystem());
         inputPane.add(makeFileSystemButton);
         /* skip initial full sync */
         skipInitialSyncLabel = new JLabel(Tools.getString("Dialog.DrbdConfig.CreateFS.SkipSync"));

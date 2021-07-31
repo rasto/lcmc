@@ -21,9 +21,37 @@
  */
 package lcmc.common.ui;
 
-import com.google.common.base.Optional;
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.FlowLayout;
+import java.awt.Font;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.swing.BoxLayout;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.SpringLayout;
+import javax.swing.border.TitledBorder;
+
+import org.apache.commons.collections15.map.MultiKeyMap;
+
 import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.Table;
+
 import lcmc.cluster.ui.widget.Check;
 import lcmc.cluster.ui.widget.Label;
 import lcmc.cluster.ui.widget.Widget;
@@ -41,24 +69,6 @@ import lcmc.common.ui.utils.WidgetListener;
 import lcmc.crm.domain.CrmXml;
 import lcmc.logger.Logger;
 import lcmc.logger.LoggerFactory;
-import org.apache.commons.collections15.map.MultiKeyMap;
-
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.swing.*;
-import javax.swing.border.TitledBorder;
-import java.awt.*;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.TimeUnit;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 /**
  * This class provides textfields, combo boxes etc. for editable info objects.
@@ -66,24 +76,36 @@ import java.util.regex.Pattern;
 @Named
 public abstract class EditableInfo extends Info {
     private static final Logger LOG = LoggerFactory.getLogger(EditableInfo.class);
-    /** Whether is's a wizard element. */
+    /**
+     * Whether is's a wizard element.
+     */
     public static final boolean WIZARD = true;
-    /** Hash from parameter to boolean value if the last entered value was correct. */
-    private final Map<String, Boolean> paramCorrectValueMap = new ConcurrentHashMap<String, Boolean>();
+    /**
+     * Hash from parameter to boolean value if the last entered value was correct.
+     */
+    private final Map<String, Boolean> paramCorrectValueMap = new ConcurrentHashMap<>();
     private final Table<String, String, JPanel> sectionPanels = HashBasedTable.create();
-    /** Old apply button, is used for wizards. */
+    /**
+     * Old apply button, is used for wizards.
+     */
     private MyButton oldApplyButton = null;
     private MyButton applyButton;
     private MyButton revertButton;
-    /** Is counted down, first time the info panel is initialized. */
+    /**
+     * Is counted down, first time the info panel is initialized.
+     */
     private CountDownLatch infoPanelLatch = new CountDownLatch(1);
-    private final Collection<JPanel> advancedPanelList = new ArrayList<JPanel>();
-    private final Collection<String> advancedOnlySectionList = new ArrayList<String>();
+    private final Collection<JPanel> advancedPanelList = new ArrayList<>();
+    private final Collection<String> advancedOnlySectionList = new ArrayList<>();
     private final JPanel moreOptionsPanel = new JPanel();
-    /** Whether dialog was started. It disables the apply button. */
+    /**
+     * Whether dialog was started. It disables the apply button.
+     */
     private boolean dialogStarted = false;
-    /** Disabled section, not visible. */
-    private final Collection<String> disabledSections = new HashSet<String>();
+    /**
+     * Disabled section, not visible.
+     */
+    private final Collection<String> disabledSections = new HashSet<>();
     @Inject
     private Application application;
     @Inject
@@ -243,31 +265,27 @@ public abstract class EditableInfo extends Info {
         addParams(optionsPanel, Widget.WIZARD_PREFIX, params, wizardApplyButton, leftWidth, rightWidth, sameAsFields);
     }
 
-    /** Adds parameters to the panel. */
-    public final void addParams(final JPanel optionsPanel,
-                                final String[] params,
-                                final int leftWidth,
-                                final int rightWidth,
-                                final Map<String, Widget> sameAsFields) {
+    /**
+     * Adds parameters to the panel.
+     */
+    public final void addParams(final JPanel optionsPanel, final String[] params, final int leftWidth, final int rightWidth,
+            final Map<String, Widget> sameAsFields) {
         addParams(optionsPanel, null, params, applyButton, leftWidth, rightWidth, sameAsFields);
     }
 
-    /** Adds parameters to the panel. */
-    private void addParams(final JPanel optionsPanel,
-                           final String prefix,
-                           final String[] params,
-                           final MyButton thisApplyButton,
-                           final int leftWidth,
-                           final int rightWidth,
-                           final Map<String, Widget> sameAsFields) {
+    /**
+     * Adds parameters to the panel.
+     */
+    private void addParams(final JPanel optionsPanel, final String prefix, final String[] params, final MyButton thisApplyButton,
+            final int leftWidth, final int rightWidth, final Map<String, Widget> sameAsFields) {
         swingUtils.isSwingThread();
         if (params == null) {
             return;
         }
-        final MultiKeyMap<String, JPanel> panelPartsMap = new MultiKeyMap<String, JPanel>();
-        final Collection<PanelPart> panelPartsList = new ArrayList<PanelPart>();
-        final MultiKeyMap<String, Integer> panelPartRowsMap = new MultiKeyMap<String, Integer>();
-        
+        final MultiKeyMap<String, JPanel> panelPartsMap = new MultiKeyMap<>();
+        final Collection<PanelPart> panelPartsList = new ArrayList<>();
+        final MultiKeyMap<String, Integer> panelPartRowsMap = new MultiKeyMap<>();
+
         for (final String param : params) {
             final Widget paramWi = createWidget(param, prefix, rightWidth);
             /* sub panel */
@@ -275,14 +293,12 @@ public abstract class EditableInfo extends Info {
             final JPanel panel;
             final AccessMode.Type accessType = getAccessType(param);
             final String accessTypeString = accessType.toString();
-            final Boolean advanced = isAdvanced(param);
-            final String advancedString = advanced.toString();
+            final boolean advanced = isAdvanced(param);
+            final String advancedString = Boolean.toString(advanced);
             if (panelPartsMap.containsKey(section, accessTypeString, advancedString)) {
                 panel = panelPartsMap.get(section, accessTypeString, advancedString);
-                panelPartRowsMap.put(section,
-                                     accessTypeString,
-                                     advancedString,
-                                     panelPartRowsMap.get(section, accessTypeString, advancedString) + 1);
+                panelPartRowsMap.put(section, accessTypeString, advancedString,
+                        panelPartRowsMap.get(section, accessTypeString, advancedString) + 1);
             } else {
                 panel = new JPanel(new SpringLayout());
 
@@ -344,22 +360,21 @@ public abstract class EditableInfo extends Info {
         }
 
         /* add sub panels to the option panel */
-        final Map<String, JPanel> sectionMap = new HashMap<String, JPanel>();
-        final Collection<JPanel> notAdvancedSections = new HashSet<JPanel>();
-        final Collection<JPanel> advancedSections = new HashSet<JPanel>();
+        final Map<String, JPanel> sectionMap = new HashMap<>();
+        final Collection<JPanel> notAdvancedSections = new HashSet<>();
+        final Collection<JPanel> advancedSections = new HashSet<>();
         for (final PanelPart panelPart : panelPartsList) {
             final String section = panelPart.getSection();
             final AccessMode.Type accessType = panelPart.getType();
             final String accessTypeString = accessType.toString();
-            final Boolean advanced = panelPart.isAdvanced();
-            final String advancedString = advanced.toString();
+            final boolean advanced = panelPart.isAdvanced();
+            final String advancedString = Boolean.toString(advanced);
 
             final JPanel panel = panelPartsMap.get(section, accessTypeString, advancedString);
             final int rows = panelPartRowsMap.get(section, accessTypeString, advancedString);
             final int columns = 2;
-            SpringUtilities.makeCompactGrid(panel, rows, columns,
-                                                         1, 1,  // initX, initY
-                                                         1, 1); // xPad, yPad
+            SpringUtilities.makeCompactGrid(panel, rows, columns, 1, 1,  // initX, initY
+                    1, 1); // xPad, yPad
             final JPanel sectionPanel;
             if (sectionMap.containsKey(section)) {
                 sectionPanel = sectionMap.get(section);
@@ -429,55 +444,46 @@ public abstract class EditableInfo extends Info {
                                      final String param,
                                      final String[] params,
                                      final MyButton thisApplyButton) {
-        final Thread thread = new Thread(new Runnable() {
-            @Override
-            public void run() {
-                final Check check;
-                if (realParamWi == null) {
-                    swingUtils.waitForSwing();
-                    check = checkResourceFields(param, params);
-                } else {
-                    swingUtils.invokeLater(new Runnable() {
-                        @Override
-                        public void run() {
-                            if (paramWi.getValue() == null || paramWi.getValue().isNothingSelected()) {
-                                realParamWi.setValueAndWait(null);
-                            } else {
-                                final Value value = paramWi.getValue();
-                                realParamWi.setValueAndWait(value);
-                            }
-                        }
-                    });
-                    swingUtils.waitForSwing();
-                    check = checkResourceFields(param, params);
-                }
-                swingUtils.invokeLater(new Runnable() {
-                    @Override
-                    public void run() {
-                        if (resource.get().isNew()) {
-                            check.addChanged("new resource");
-                        }
-                        if (thisApplyButton == applyButton) {
-                            /* not a wizard button */
-                            if (isDialogStarted()) {
-                                check.addIncorrect("dialog started");
-                            }
-                            thisApplyButton.setEnabled(check);
-                        } else {
-                            /* wizard button */
-                            thisApplyButton.setEnabledCorrect(check);
-                        }
-                        if (revertButton != null) {
-                            revertButton.setEnabledChanged(check);
-                        }
-                        final String toolTip = getToolTipText(param, paramWi);
-                        paramWi.setToolTipText(toolTip);
-                        if (realParamWi != null) {
-                            realParamWi.setToolTipText(toolTip);
-                        }
+        final Thread thread = new Thread(() -> {
+            final Check check;
+            if (realParamWi == null) {
+                swingUtils.waitForSwing();
+                check = checkResourceFields(param, params);
+            } else {
+                swingUtils.invokeLater(() -> {
+                    if (paramWi.getValue() == null || paramWi.getValue().isNothingSelected()) {
+                        realParamWi.setValueAndWait(null);
+                    } else {
+                        final Value value = paramWi.getValue();
+                        realParamWi.setValueAndWait(value);
                     }
                 });
+                swingUtils.waitForSwing();
+                check = checkResourceFields(param, params);
             }
+            swingUtils.invokeLater(() -> {
+                if (resource.get().isNew()) {
+                    check.addChanged("new resource");
+                }
+                if (thisApplyButton == applyButton) {
+                    /* not a wizard button */
+                    if (isDialogStarted()) {
+                        check.addIncorrect("dialog started");
+                    }
+                    thisApplyButton.setEnabled(check);
+                } else {
+                    /* wizard button */
+                    thisApplyButton.setEnabledCorrect(check);
+                }
+                if (revertButton != null) {
+                    revertButton.setEnabledChanged(check);
+                }
+                final String toolTip = getToolTipText(param, paramWi);
+                paramWi.setToolTipText(toolTip);
+                if (realParamWi != null) {
+                    realParamWi.setToolTipText(toolTip);
+                }
+            });
         });
         thread.start();
     }
@@ -526,9 +532,9 @@ public abstract class EditableInfo extends Info {
             }
         }
         final String regexp = getParamRegexp(param);
-        Map<String, String> abbreviations = new HashMap<String, String>();
+        Map<String, String> abbreviations = new HashMap<>();
         if (isInteger(param)) {
-            abbreviations = new HashMap<String, String>();
+            abbreviations = new HashMap<>();
             abbreviations.put("i", CrmXml.INFINITY_VALUE.getValueForConfig());
             abbreviations.put("I", CrmXml.INFINITY_VALUE.getValueForConfig());
             abbreviations.put("+", CrmXml.PLUS_INFINITY_VALUE.getValueForConfig());
@@ -692,20 +698,17 @@ public abstract class EditableInfo extends Info {
     /** Enables and disabled apply and revert button. */
     public final void setApplyButtons(final String param, final String[] params) {
         final Check check = checkResourceFields(param, params);
-        swingUtils.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                final MyButton ab = getApplyButton();
-                if (ab != null) {
-                    if (resource.isPresent() && resource.get().isNew()) {
-                        check.addChanged("new resource");
-                    }
-                    ab.setEnabled(check);
+        swingUtils.invokeLater(() -> {
+            final MyButton ab = getApplyButton();
+            if (ab != null) {
+                if (resource.isPresent() && resource.get().isNew()) {
+                    check.addChanged("new resource");
                 }
-                final MyButton rb = getRevertButton();
-                if (rb != null) {
-                    rb.setEnabledChanged(check);
-                }
+                ab.setEnabled(check);
+            }
+            final MyButton rb = getRevertButton();
+            if (rb != null) {
+                rb.setEnabledChanged(check);
             }
         });
     }
@@ -718,8 +721,8 @@ public abstract class EditableInfo extends Info {
      */
     public Check checkResourceFields(final String param, final String[] params) {
         /* check if values are correct */
-        final List<String> incorrect = new ArrayList<String>();
-        final List<String> changed = new ArrayList<String>();
+        final List<String> incorrect = new ArrayList<>();
+        final List<String> changed = new ArrayList<>();
         if (params != null) {
             for (final String otherParam : params) {
                 final Widget wi = getWidget(otherParam, null);
@@ -822,36 +825,23 @@ public abstract class EditableInfo extends Info {
         final boolean advancedMode = access.isAdvancedMode();
         boolean advanced = false;
         for (final JPanel apl : advancedPanelList) {
-            swingUtils.invokeLater(new Runnable() {
-                @Override
-                public void run() {
-                    apl.setVisible(advancedMode);
-                }
-            });
+            swingUtils.invokeLater(() -> apl.setVisible(advancedMode));
             advanced = true;
         }
         for (final String section : advancedOnlySectionList) {
             final JPanel p = sectionPanels.get(section, Boolean.toString(!WIZARD));
             final JPanel pw = sectionPanels.get(section, Boolean.toString(WIZARD));
-            swingUtils.invokeLater(new Runnable() {
-                @Override
-                public void run() {
-                    final boolean v = advancedMode && isSectionEnabled(section);
-                    p.setVisible(v);
-                    if (pw != null) {
-                        pw.setVisible(v);
-                    }
+            swingUtils.invokeLater(() -> {
+                final boolean v = advancedMode && isSectionEnabled(section);
+                p.setVisible(v);
+                if (pw != null) {
+                    pw.setVisible(v);
                 }
             });
             advanced = true;
         }
         final boolean a = advanced;
-        swingUtils.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                moreOptionsPanel.setVisible(a && !advancedMode);
-            }
-        });
+        swingUtils.invokeLater(() -> moreOptionsPanel.setVisible(a && !advancedMode));
     }
 
     /** Revert values. */
@@ -959,7 +949,7 @@ public abstract class EditableInfo extends Info {
     }
 
     protected final String[] getEnabledSectionParams(final Iterable<String> params) {
-        final List<String> newParams = new ArrayList<String>();
+        final List<String> newParams = new ArrayList<>();
         for (final String param : params) {
             if (isSectionEnabled(getSection(param))) {
                 newParams.add(param);

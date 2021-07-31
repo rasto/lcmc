@@ -21,9 +21,46 @@
  */
 package lcmc.crm.ui.resource;
 
-import com.google.common.base.Optional;
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import java.awt.geom.Point2D;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.Set;
+import java.util.TreeSet;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReadWriteLock;
+import java.util.concurrent.locks.ReentrantLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
+import java.util.regex.Matcher;
+
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Provider;
+import javax.swing.AbstractButton;
+import javax.swing.BoxLayout;
+import javax.swing.ImageIcon;
+import javax.swing.JComponent;
+import javax.swing.JLabel;
+import javax.swing.JMenuBar;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.SpringLayout;
+import javax.swing.tree.DefaultMutableTreeNode;
+
 import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.Table;
+
 import lcmc.cluster.ui.ClusterBrowser;
 import lcmc.cluster.ui.widget.Check;
 import lcmc.cluster.ui.widget.Widget;
@@ -31,7 +68,6 @@ import lcmc.cluster.ui.widget.WidgetFactory;
 import lcmc.common.domain.AccessMode;
 import lcmc.common.domain.Application;
 import lcmc.common.domain.ColorText;
-import lcmc.common.domain.ResourceValue;
 import lcmc.common.domain.StringValue;
 import lcmc.common.domain.Unit;
 import lcmc.common.domain.Value;
@@ -61,32 +97,6 @@ import lcmc.logger.Logger;
 import lcmc.logger.LoggerFactory;
 import lcmc.vm.ui.resource.DomainInfo;
 import lombok.val;
-
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Provider;
-import javax.swing.*;
-import javax.swing.tree.DefaultMutableTreeNode;
-import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
-import java.awt.geom.Point2D;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.TreeSet;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReadWriteLock;
-import java.util.concurrent.locks.ReentrantLock;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
-import java.util.regex.Matcher;
 
 /**
  * This class holds info data for one hearteat service and allows to enter
@@ -145,38 +155,63 @@ public class ServiceInfo extends EditableInfo {
     public static final String GUI_ID = "__drbdmcid";
     public static final String PCMK_ID = "__pckmkid";
     public static final String RA_PARAM = "__ra";
-    /** String that appears as a tooltip in menu items if item is being removed. */
+    /**
+     * String that appears as a tooltip in menu items if item is being removed.
+     */
     static final String IS_BEING_REMOVED_STRING = "it is being removed";
-    /** String that appears as a tooltip in menu items if item is orphan. */
+    /**
+     * String that appears as a tooltip in menu items if item is orphan.
+     */
     static final String IS_ORPHANED_STRING = "cannot do that to an ophan";
-    /** String that appears as a tooltip in menu items if item is new. */
+    /**
+     * String that appears as a tooltip in menu items if item is new.
+     */
     static final String IS_NEW_STRING = "it is not applied yet";
-    private static final Map<String, Value> PING_ATTRIBUTES = new HashMap<String, Value>();
+    private static final Map<String, Value> PING_ATTRIBUTES = new HashMap<>();
+
     static {
         PING_ATTRIBUTES.put("eq0", new StringValue("eq0", "no ping: stop")); /* eq 0 */
         PING_ATTRIBUTES.put("defined", new StringValue("defined", "most connections"));
     }
-    private final Map<HostInfo, Widget> scoreComboBoxHash = new HashMap<HostInfo, Widget>();
-    private final Map<HostInfo, HostLocation> savedHostLocations = new HashMap<HostInfo, HostLocation>();
-    /** A combobox with pingd constraint. */
+
+    private final Map<HostInfo, Widget> scoreComboBoxHash = new HashMap<>();
+    private final Map<HostInfo, HostLocation> savedHostLocations = new HashMap<>();
+    /**
+     * A combobox with pingd constraint.
+     */
     private Widget pingComboBox = null;
-    /** Saved ping constraint. */
+    /**
+     * Saved ping constraint.
+     */
     private Value savedPingOperation = NOTHING_SELECTED_VALUE;
-    /** Saved meta attrs id. */
+    /**
+     * Saved meta attrs id.
+     */
     private String savedMetaAttrsId = null;
-    /** Saved operations id. */
+    /**
+     * Saved operations id.
+     */
     private String savedOperationsId = null;
-    /** A map from operation to the stored value. First key is
-     * operation name like "start" and second key is parameter like
-     * "timeout". */
+    /**
+     * A map from operation to the stored value. First key is operation name like "start" and second key is parameter like
+     * "timeout".
+     */
     private final Table<String, String, Value> savedOperation = HashBasedTable.create();
-    /** Whether id-ref for meta-attributes is used. */
+    /**
+     * Whether id-ref for meta-attributes is used.
+     */
     private ServiceInfo savedMetaAttrInfoRef = null;
-    /** Combo box with same as operations option. */
+    /**
+     * Combo box with same as operations option.
+     */
     private Widget sameAsMetaAttrsWi = null;
-    /** Whether id-ref for operations is used. */
+    /**
+     * Whether id-ref for operations is used.
+     */
     private ServiceInfo savedOperationIdRef = null;
-    /** Combo box with same as operations option. */
+    /**
+     * Combo box with same as operations option.
+     */
     private Widget sameAsOperationsWi = null;
     private final Lock mSavedOperationsLock = new ReentrantLock();
     private final ReadWriteLock mOperationsComboBoxHashLock = new ReentrantReadWriteLock();
@@ -184,14 +219,18 @@ public class ServiceInfo extends EditableInfo {
     private final Lock mOperationsComboBoxHashWriteLock = mOperationsComboBoxHashLock.writeLock();
     private final Table<String, String, Widget> operationsComboBoxHash = HashBasedTable.create();
     private JComponent infoPanel = null;
-    /** Group info object of the group this service is in or null, if it is
-     * not in any group. */
+    /**
+     * Group info object of the group this service is in or null, if it is not in any group.
+     */
     private GroupInfo groupInfo = null;
-    /** Master/Slave info object, if is null, it is not master/slave
-     * resource. */
+    /**
+     * Master/Slave info object, if is null, it is not master/slave resource.
+     */
     private volatile CloneInfo cloneInfo = null;
     private ResourceAgent resourceAgent;
-    /** Radio buttons for clone/master/slave primitive resources. */
+    /**
+     * Radio buttons for clone/master/slave primitive resources.
+     */
     private Widget typeRadioGroup;
     @Inject
     private ProgressIndicator progressIndicator;
@@ -214,7 +253,7 @@ public class ServiceInfo extends EditableInfo {
 
     public void init(final String name, final ResourceAgent resourceAgent, final Browser browser) {
         final boolean isStonith = resourceAgent != null && resourceAgent.isStonith();
-        super.einit(Optional.<ResourceValue>of(new Service(isStonith ? name.replaceAll("/", "_") : name)), name, browser);
+        super.einit(Optional.of(new Service(isStonith ? name.replaceAll("/", "_") : name)), name, browser);
         this.resourceAgent = resourceAgent;
         if (isStonith) {
             getService().setStonith(true);
@@ -309,7 +348,7 @@ public class ServiceInfo extends EditableInfo {
 
     private boolean checkSameAsMetaAttrsFieldsChanged(final String[] params) {
         final Value info = sameAsMetaAttrsWiValue();
-        final boolean defaultValues = info != null && META_ATTRS_DEFAULT_VALUES.equals(info);
+        final boolean defaultValues = META_ATTRS_DEFAULT_VALUES.equals(info);
         final boolean nothingSelected = info == null || info.isNothingSelected();
         if (!nothingSelected && !defaultValues && info != savedMetaAttrInfoRef) {
             sameAsMetaAttrsWi.processAccessMode();
@@ -323,19 +362,9 @@ public class ServiceInfo extends EditableInfo {
             if (savedMetaAttrInfoRef == null
                 && defaultValues != allMetaAttrsAreDefaultValues) {
                 if (allMetaAttrsAreDefaultValues) {
-                    swingUtils.invokeLater(new Runnable() {
-                        @Override
-                        public void run() {
-                            sameAsMetaAttrsWi.setValueNoListeners(META_ATTRS_DEFAULT_VALUES);
-                        }
-                    });
+                    swingUtils.invokeLater(() -> sameAsMetaAttrsWi.setValueNoListeners(META_ATTRS_DEFAULT_VALUES));
                 } else {
-                    swingUtils.invokeLater(new Runnable() {
-                        @Override
-                        public void run() {
-                            sameAsMetaAttrsWi.setValueNoListeners(null);
-                        }
-                    });
+                    swingUtils.invokeLater(() -> sameAsMetaAttrsWi.setValueNoListeners(null));
                 }
             }
         }
@@ -344,15 +373,11 @@ public class ServiceInfo extends EditableInfo {
     }
 
     /**
-     * Returns whether the specified parameter or any of the parameters
-     * have changed. If param is null, only param will be checked,
+     * Returns whether the specified parameter or any of the parameters have changed. If param is null, only param will be checked,
      * otherwise all parameters will be checked.
      */
-    public Check checkResourceFields(final String param,
-                                     final String[] params,
-                                     final boolean fromServicesInfo,
-                                     final boolean fromCloneInfo,
-                                     final boolean fromGroupInfo) {
+    public Check checkResourceFields(final String param, final String[] params, final boolean fromServicesInfo,
+            final boolean fromCloneInfo, final boolean fromGroupInfo) {
         final Value idV = getComboBoxValue(GUI_ID);
         String id = null;
         if (idV != null) {
@@ -363,16 +388,13 @@ public class ServiceInfo extends EditableInfo {
             return ci.checkResourceFields(param, ci.getParametersFromXML(), fromServicesInfo);
         }
 
-        final List<String> incorrect = new ArrayList<String>();
-        final List<String> changed = new ArrayList<String>();
+        final List<String> incorrect = new ArrayList<>();
+        final List<String> changed = new ArrayList<>();
 
         final Check check = new Check(incorrect, changed);
         final GroupInfo gi = getGroupInfo();
         if (!fromGroupInfo && gi != null) {
-            final Check groupCheck = gi.checkResourceFields(param,
-                                                            gi.getParametersFromXML(),
-                                                            fromServicesInfo,
-                                                            fromCloneInfo);
+            final Check groupCheck = gi.checkResourceFields(param, gi.getParametersFromXML(), fromServicesInfo, fromCloneInfo);
             check.addCheck(groupCheck);
             if (!fromServicesInfo) {
                 gi.setApplyButtons(null, gi.getParametersFromXML());
@@ -417,14 +439,14 @@ public class ServiceInfo extends EditableInfo {
                 }
             }
         } else {
-            if (heartbeatId == null) {
-            } else if (heartbeatId.equals(Service.RES_ID_PREFIX + getService().getName() + '_' + id)
-                       || heartbeatId.equals(Service.STONITH_ID_PREFIX + getService().getName() + '_' + id)
-                       || heartbeatId.equals(id)) {
-                if (ci == null) {
-                    check.addCheck(checkHostLocationsFields());
+            if (heartbeatId != null) {
+                if (heartbeatId.equals(Service.RES_ID_PREFIX + getService().getName() + '_' + id) || heartbeatId.equals(
+                        Service.STONITH_ID_PREFIX + getService().getName() + '_' + id) || heartbeatId.equals(id)) {
+                    if (ci == null) {
+                        check.addCheck(checkHostLocationsFields());
+                    }
+                    check.addCheck(checkOperationFields());
                 }
-                check.addCheck(checkOperationFields());
             }
         }
         final String cl = getService().getResourceClass();
@@ -683,12 +705,7 @@ public class ServiceInfo extends EditableInfo {
                             } finally {
                                 mOperationsComboBoxHashReadLock.unlock();
                             }
-                            swingUtils.invokeLater(new Runnable() {
-                                @Override
-                                public void run() {
-                                    wi.setEnabled(operationIdRef == null);
-                                }
-                            });
+                            swingUtils.invokeLater(() -> wi.setEnabled(operationIdRef == null));
                             if (value != null) {
                                 wi.setValue(value);
                             }
@@ -852,10 +869,9 @@ public class ServiceInfo extends EditableInfo {
                 score = hostLocation.getScore();
                 op = hostLocation.getOperation();
             }
-            if ((CrmXml.INFINITY_VALUE.getValueForConfig().equals(score)
-                 || CrmXml.PLUS_INFINITY_VALUE.getValueForConfig().equals(score))
-                && "eq".equals(op)) {
-                final List<Host> hosts = new ArrayList<Host>();
+            if ((CrmXml.INFINITY_VALUE.getValueForConfig().equals(score) || CrmXml.PLUS_INFINITY_VALUE.getValueForConfig()
+                    .equals(score)) && "eq".equals(op)) {
+                final List<Host> hosts = new ArrayList<>();
                 hosts.add(host);
                 return hosts;
             }
@@ -877,7 +893,7 @@ public class ServiceInfo extends EditableInfo {
                 score = hostLocation.getScore();
             }
             if (CrmXml.MINUS_INFINITY_VALUE.getValueForConfig().equals(score)) {
-                final List<Host> hosts = new ArrayList<Host>();
+                final List<Host> hosts = new ArrayList<>();
                 hosts.add(host);
                 return hosts;
             }
@@ -905,7 +921,7 @@ public class ServiceInfo extends EditableInfo {
                 op = hostLocation.getOperation();
             }
             if (CrmXml.MINUS_INFINITY_VALUE.getValueForConfig().equals(score) && "eq".equals(op)) {
-                final List<Host> hosts = new ArrayList<Host>();
+                final List<Host> hosts = new ArrayList<>();
                 hosts.add(host);
                 return hosts;
             }
@@ -1055,7 +1071,7 @@ public class ServiceInfo extends EditableInfo {
     }
 
     private Check checkOperationFields() {
-        final List<String> changed = new ArrayList<String>();
+        final List<String> changed = new ArrayList<>();
         mSavedOperationsLock.lock();
         boolean allAreDefaultValues = true;
         for (final String op : getResourceAgent().getOperationNames()) {
@@ -1107,7 +1123,7 @@ public class ServiceInfo extends EditableInfo {
         }
         if (sameAsOperationsWi != null) {
             final Value info = sameAsOperationsWiValue();
-            final boolean defaultValues = info != null && OPERATIONS_DEFAULT_VALUES.equals(info);
+            final boolean defaultValues = OPERATIONS_DEFAULT_VALUES.equals(info);
             final boolean nothingSelected = info == null || info.isNothingSelected();
             if (!nothingSelected && !defaultValues && info != savedOperationIdRef) {
                 changed.add("operation id ref");
@@ -1117,32 +1133,22 @@ public class ServiceInfo extends EditableInfo {
                 }
                 if (savedOperationIdRef == null && defaultValues != allAreDefaultValues) {
                     if (allAreDefaultValues) {
-                        swingUtils.invokeLater(new Runnable() {
-                            @Override
-                            public void run() {
-                                sameAsOperationsWi.setValueNoListeners(OPERATIONS_DEFAULT_VALUES);
-                            }
-                        });
+                        swingUtils.invokeLater(() -> sameAsOperationsWi.setValueNoListeners(OPERATIONS_DEFAULT_VALUES));
                     } else {
-                        swingUtils.invokeLater(new Runnable() {
-                            @Override
-                            public void run() {
-                                sameAsOperationsWi.setValueNoListeners(null);
-                            }
-                        });
+                        swingUtils.invokeLater(() -> sameAsOperationsWi.setValueNoListeners(null));
                     }
                 }
             }
             sameAsOperationsWi.processAccessMode();
         }
         mSavedOperationsLock.unlock();
-        final List<String> incorrect = new ArrayList<String>();
+        final List<String> incorrect = new ArrayList<>();
         return new Check(incorrect, changed);
     }
 
     private Check checkHostLocationsFields() {
-        final List<String> changed = new ArrayList<String>();
-        final List<String> incorrect = new ArrayList<String>();
+        final List<String> changed = new ArrayList<>();
+        final List<String> incorrect = new ArrayList<>();
         boolean hostLocationFound = false;
         for (final Host host : getBrowser().getClusterHosts()) {
             final HostInfo hi = host.getBrowser().getHostInfo();
@@ -1170,8 +1176,7 @@ public class ServiceInfo extends EditableInfo {
                 }
             }
             if (!Tools.areEqual(hsSaved, wi.getValue())
-                || (!Tools.areEqual(opSavedLabel, labelText)
-                    && (hsSaved != null  && !hsSaved.isNothingSelected()))) {
+                || !Tools.areEqual(opSavedLabel, labelText) && !hsSaved.isNothingSelected()) {
                 changed.add("host location");
             }
             wi.setBackground(getHostLocationLabel(host.getName(), "eq"), null, opSavedLabel, hsSaved, false);
@@ -1247,7 +1252,7 @@ public class ServiceInfo extends EditableInfo {
         panel.setLayout(new SpringLayout());
         for (final Host host : getBrowser().getClusterHosts()) {
             final HostInfo hi = host.getBrowser().getHostInfo();
-            final Map<String, String> abbreviations = new HashMap<String, String>();
+            final Map<String, String> abbreviations = new HashMap<>();
             abbreviations.put("i", CrmXml.INFINITY_VALUE.getValueForConfig());
             abbreviations.put("+", CrmXml.PLUS_INFINITY_VALUE.getValueForConfig());
             abbreviations.put("I", CrmXml.INFINITY_VALUE.getValueForConfig());
@@ -1321,17 +1326,14 @@ public class ServiceInfo extends EditableInfo {
                 @Override
                 public void mousePressed(final MouseEvent e) {
                     final String currentText = label.getText();
-                    swingUtils.invokeLater(new Runnable() {
-                        @Override
-                        public void run() {
-                            if (currentText.equals(onText)) {
-                                label.setText(notOnText);
-                            } else {
-                                label.setText(onText);
-                            }
-                            final String[] params = getParametersFromXML();
-                            setApplyButtons(CACHED_FIELD, params);
+                    swingUtils.invokeLater(() -> {
+                        if (currentText.equals(onText)) {
+                            label.setText(notOnText);
+                        } else {
+                            label.setText(onText);
                         }
+                        final String[] params = getParametersFromXML();
+                        setApplyButtons(CACHED_FIELD, params);
                     });
                 }
                 @Override
@@ -1410,14 +1412,8 @@ public class ServiceInfo extends EditableInfo {
         if (sameAsMetaAttrsWi == null || info == null || info.isNothingSelected()) {
             return;
         }
-        boolean nothingSelected = false;
-        if (info.isNothingSelected()) {
-            nothingSelected = true;
-        }
-        boolean sameAs = true;
-        if (META_ATTRS_DEFAULT_VALUES.equals(info)) {
-            sameAs = false;
-        }
+        boolean nothingSelected = info.isNothingSelected();
+        boolean sameAs = !META_ATTRS_DEFAULT_VALUES.equals(info);
         final String[] params = getParametersFromXML();
         if (params != null) {
             for (final String param : params) {
@@ -1485,21 +1481,20 @@ public class ServiceInfo extends EditableInfo {
      * for meta attributes.
      */
     private Value[] getSameServicesMetaAttrs() {
-        final List<Value> sl = new ArrayList<Value>();
+        final List<Value> sl = new ArrayList<>();
         sl.add(NOTHING_SELECTED_VALUE);
         sl.add(META_ATTRS_DEFAULT_VALUES);
                               
         final Host dcHost = getBrowser().getDCHost();
         if (isMetaAttrReferenced() || Tools.versionBeforePacemaker(dcHost)) {
-            return sl.toArray(new Value[sl.size()]);
+            return sl.toArray(new Value[0]);
         }
         getBrowser().lockNameToServiceInfo();
         final Map<String, ServiceInfo> idToInfoHash = getBrowser().getNameToServiceInfoHash().get(getName());
         final ClusterStatus cs = getBrowser().getClusterStatus();
         if (idToInfoHash != null) {
-            for (final ServiceInfo si : new TreeSet<ServiceInfo>(idToInfoHash.values())) {
-                if (si != this
-                    && cs.getMetaAttrsId(si.getService().getCrmId()) != null
+            for (final ServiceInfo si : new TreeSet<>(idToInfoHash.values())) {
+                if (si != this && cs.getMetaAttrsId(si.getService().getCrmId()) != null
                     && cs.getMetaAttrsRef(si.getService().getCrmId()) == null) {
                     sl.add(si);
                 }
@@ -1508,19 +1503,16 @@ public class ServiceInfo extends EditableInfo {
         final boolean clone = getResourceAgent().isClone();
         for (final String name : getBrowser().getNameToServiceInfoHash().keySet()) {
             final Map<String, ServiceInfo> idToInfo = getBrowser().getNameToServiceInfoHash().get(name);
-            for (final ServiceInfo si : new TreeSet<ServiceInfo>(idToInfo.values())) {
-                if (si != this
-                    && !si.getName().equals(getName())
-                    && si.getResourceAgent() != null
-                    && si.getResourceAgent().isClone() == clone
-                    && cs.getMetaAttrsId(si.getService().getCrmId()) != null
+            for (final ServiceInfo si : new TreeSet<>(idToInfo.values())) {
+                if (si != this && !si.getName().equals(getName()) && si.getResourceAgent() != null
+                    && si.getResourceAgent().isClone() == clone && cs.getMetaAttrsId(si.getService().getCrmId()) != null
                     && cs.getMetaAttrsRef(si.getService().getCrmId()) == null) {
                     sl.add(si);
                 }
             }
         }
         getBrowser().unlockNameToServiceInfo();
-        return sl.toArray(new Value[sl.size()]);
+        return sl.toArray(new Value[0]);
     }
 
     /**
@@ -1528,20 +1520,19 @@ public class ServiceInfo extends EditableInfo {
      * for operations.
      */
     private Value[] getSameServicesOperations() {
-        final List<Value> sl = new ArrayList<Value>();
+        final List<Value> sl = new ArrayList<>();
         sl.add(NOTHING_SELECTED_VALUE);
         sl.add(OPERATIONS_DEFAULT_VALUES);
         final Host dcHost = getBrowser().getDCHost();
         if (isOperationReferenced() || Tools.versionBeforePacemaker(dcHost)) {
-            return sl.toArray(new Value[sl.size()]);
+            return sl.toArray(new Value[0]);
         }
         getBrowser().lockNameToServiceInfo();
         final Map<String, ServiceInfo> idToInfoHash = getBrowser().getNameToServiceInfoHash().get(getName());
         final ClusterStatus cs = getBrowser().getClusterStatus();
         if (idToInfoHash != null) {
-            for (final ServiceInfo si : new TreeSet<ServiceInfo>(idToInfoHash.values())) {
-                if (si != this
-                    && cs.getOperationsId(si.getService().getCrmId()) != null
+            for (final ServiceInfo si : new TreeSet<>(idToInfoHash.values())) {
+                if (si != this && cs.getOperationsId(si.getService().getCrmId()) != null
                     && cs.getOperationsRef(si.getService().getCrmId()) == null) {
                     sl.add(si);
                 }
@@ -1550,19 +1541,16 @@ public class ServiceInfo extends EditableInfo {
         final boolean clone = getResourceAgent().isClone();
         for (final String name : getBrowser().getNameToServiceInfoHash().keySet()) {
             final Map<String, ServiceInfo> idToInfo = getBrowser().getNameToServiceInfoHash().get(name);
-            for (final ServiceInfo si : new TreeSet<ServiceInfo>(idToInfo.values())) {
-                if (si != this
-                    && si.getResourceAgent() != null
-                    && si.getResourceAgent().isClone() == clone
-                    && !si.getName().equals(getName())
-                    && cs.getOperationsId(si.getService().getCrmId()) != null
+            for (final ServiceInfo si : new TreeSet<>(idToInfo.values())) {
+                if (si != this && si.getResourceAgent() != null && si.getResourceAgent().isClone() == clone && !si.getName()
+                        .equals(getName()) && cs.getOperationsId(si.getService().getCrmId()) != null
                     && cs.getOperationsRef(si.getService().getCrmId()) == null) {
                     sl.add(si);
                 }
             }
         }
         getBrowser().unlockNameToServiceInfo();
-        return sl.toArray(new Value[sl.size()]);
+        return sl.toArray(new Value[0]);
     }
 
     /**
@@ -1574,14 +1562,8 @@ public class ServiceInfo extends EditableInfo {
         if (sameAsOperationsWi == null) {
             return;
         }
-        boolean nothingSelected = false;
-        if (info == null || info.isNothingSelected()) {
-            nothingSelected = true;
-        }
-        boolean sameAs = true;
-        if (info == null || OPERATIONS_DEFAULT_VALUES.equals(info)) {
-            sameAs = false;
-        }
+        boolean nothingSelected = info == null || info.isNothingSelected();
+        boolean sameAs = info != null && !OPERATIONS_DEFAULT_VALUES.equals(info);
         mSavedOperationsLock.lock();
         for (final String op : getResourceAgent().getOperationNames()) {
             for (final String param : getBrowser().getCrmOperationParams(op)) {
@@ -1739,12 +1721,7 @@ public class ServiceInfo extends EditableInfo {
                     normalRows++;
                 }
                 addField(panel, wiLabel, wi.getComponent(), leftWidth, rightWidth, 0);
-                swingUtils.invokeLater(new Runnable() {
-                    @Override
-                    public void run() {
-                        wiLabel.setToolTipText(labelText);
-                    }
-                });
+                swingUtils.invokeLater(() -> wiLabel.setToolTipText(labelText));
             }
         }
         SpringUtilities.makeCompactGrid(normalOpPanel, normalRows, 2,
@@ -1765,21 +1742,18 @@ public class ServiceInfo extends EditableInfo {
                     @Override
                     public void check(final Value value) {
                         final String[] params = getParametersFromXML();
-                        swingUtils.invokeLater(new Runnable() {
-                            @Override
-                            public void run() {
-                                final Value info = sameAsOperationsWiValue();
-                                    setOperationsSameAs(info);
-                                    sameAsOperationsWi.setEditable();
-                                    if (info == null) {
-                                        sameAsOperationsWi.setToolTipText("");
-                                    } else {
-                                        sameAsOperationsWi.setToolTipText(info.getValueForConfig());
-                                    }
-                                    setApplyButtons(CACHED_FIELD, params);
+                        swingUtils.invokeLater(() -> {
+                            final Value info = sameAsOperationsWiValue();
+                            setOperationsSameAs(info);
+                            sameAsOperationsWi.setEditable();
+                            if (info == null) {
+                                sameAsOperationsWi.setToolTipText("");
+                            } else {
+                                sameAsOperationsWi.setToolTipText(info.getValueForConfig());
                             }
+                            setApplyButtons(CACHED_FIELD, params);
                         });
-                }
+                    }
             });
         optionsPanel.add(sectionPanel);
     }
@@ -1928,14 +1902,8 @@ public class ServiceInfo extends EditableInfo {
             if (info == null) {
                 return null;
             }
-            boolean nothingSelected = false;
-            if (info.isNothingSelected()) {
-                nothingSelected = true;
-            }
-            boolean sameAs = true;
-            if (META_ATTRS_DEFAULT_VALUES.equals(info)) {
-                sameAs = false;
-            }
+            boolean nothingSelected = info.isNothingSelected();
+            boolean sameAs = !META_ATTRS_DEFAULT_VALUES.equals(info);
             if (!sameAs || nothingSelected) {
                 return null;
             } else {
@@ -2103,14 +2071,11 @@ public class ServiceInfo extends EditableInfo {
         final boolean clone = clone0;
         final boolean masterSlave = masterSlave0;
 
-        swingUtils.invokeInEdt(new Runnable() {
-            @Override
-            public void run() {
-                if (clone) {
-                    changeTypeToClone(masterSlave);
-                } else if (PRIMITIVE_TYPE_STRING.equals(value)) {
-                    changeTypeToPrimitive();
-                }
+        swingUtils.invokeInEdt(() -> {
+            if (clone) {
+                changeTypeToClone(masterSlave);
+            } else if (PRIMITIVE_TYPE_STRING.equals(value)) {
+                changeTypeToPrimitive();
             }
         });
     }
@@ -2124,13 +2089,7 @@ public class ServiceInfo extends EditableInfo {
                                 @Override
                                 public void check(final Value value) {
                                     setApplyButtons(CACHED_FIELD, params);
-                                    swingUtils.invokeLater(
-                                        new Runnable() {
-                                            @Override
-                                            public void run() {
-                                                wi.setEditable();
-                                            }
-                                    });
+                                    swingUtils.invokeLater(wi::setEditable);
                                 }
                                 @Override
                                 public void checkText(final String text) {
@@ -2192,21 +2151,18 @@ public class ServiceInfo extends EditableInfo {
             toolTip = savedMAIdRef.getValueForGui();
         }
         sameAsMetaAttrsWi.setToolTipText(toolTip);
-        final Map<String, Widget> sameAsFields = new HashMap<String, Widget>();
+        final Map<String, Widget> sameAsFields = new HashMap<>();
         sameAsFields.put(Tools.getString("CRMXML.MetaAttrOptions"), sameAsMetaAttrsWi);
         sameAsMetaAttrsWi.addListeners(new WidgetListener() {
                 @Override
                 public void check(final Value value) {
                     final String[] params = getParametersFromXML();
-                    swingUtils.invokeLater(new Runnable() {
-                        @Override
-                        public void run() {
-                            final Value v = sameAsMetaAttrsWiValue();
-                            if (v != null) {
-                                setMetaAttrsSameAs(v);
-                                sameAsMetaAttrsWi.setToolTipText(v.getValueForGui());
-                                setApplyButtons(CACHED_FIELD, params);
-                            }
+                    swingUtils.invokeLater(() -> {
+                        final Value v = sameAsMetaAttrsWiValue();
+                        if (v != null) {
+                            setMetaAttrsSameAs(v);
+                            sameAsMetaAttrsWi.setToolTipText(v.getValueForGui());
+                            setApplyButtons(CACHED_FIELD, params);
                         }
                     });
                 }
@@ -2236,11 +2192,7 @@ public class ServiceInfo extends EditableInfo {
             return new JPanel();
         }
         final CloneInfo ci = getCloneInfo();
-        if (ci == null) {
-            getBrowser().getCrmGraph().pickInfo(this);
-        } else {
-            getBrowser().getCrmGraph().pickInfo(ci);
-        }
+        getBrowser().getCrmGraph().pickInfo(Objects.requireNonNullElse(ci, this));
         if (infoPanel != null) {
             LOG.debug1("getInfoPanel: " + getName() + ": cached end");
             return infoPanel;
@@ -2305,41 +2257,25 @@ public class ServiceInfo extends EditableInfo {
         }
         /* add item listeners to the apply button. */
         if (!abExisted) {
-            getApplyButton().addActionListener(
-                new ActionListener() {
-                    @Override
-                    public void actionPerformed(final ActionEvent e) {
-                        LOG.debug1("getInfoPanel: BUTTON: apply");
-                        final Thread thread = new Thread(new Runnable() {
-                            @Override
-                            public void run() {
-                                getBrowser().clStatusLock();
-                                apply(getBrowser().getDCHost(), Application.RunMode.LIVE);
-                                getBrowser().clStatusUnlock();
-                            }
-                        });
-                        thread.start();
-                    }
-                }
-            );
+            getApplyButton().addActionListener(e -> {
+                LOG.debug1("getInfoPanel: BUTTON: apply");
+                final Thread thread = new Thread(() -> {
+                    getBrowser().clStatusLock();
+                    apply(getBrowser().getDCHost(), Application.RunMode.LIVE);
+                    getBrowser().clStatusUnlock();
+                });
+                thread.start();
+            });
 
-            getRevertButton().addActionListener(
-                new ActionListener() {
-                    @Override
-                    public void actionPerformed(final ActionEvent e) {
-                        LOG.debug1("getInfoPanel: BUTTON: revert");
-                        final Thread thread = new Thread(new Runnable() {
-                            @Override
-                            public void run() {
-                                getBrowser().clStatusLock();
-                                revert();
-                                getBrowser().clStatusUnlock();
-                            }
-                        });
-                        thread.start();
-                    }
-                }
-            );
+            getRevertButton().addActionListener(e -> {
+                LOG.debug1("getInfoPanel: BUTTON: revert");
+                final Thread thread = new Thread(() -> {
+                    getBrowser().clStatusLock();
+                    revert();
+                    getBrowser().clStatusUnlock();
+                });
+                thread.start();
+            });
         }
         /* main, button and options panels */
         final JPanel mainPanel = new JPanel();
@@ -2452,21 +2388,16 @@ public class ServiceInfo extends EditableInfo {
         /* apply button */
         addApplyButton(buttonPanel);
         addRevertButton(buttonPanel);
-        swingUtils.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                /* invoke later on purpose  */
-                setApplyButtons(null, params);
-            }
+        swingUtils.invokeLater(() -> {
+            /* invoke later on purpose  */
+            setApplyButtons(null, params);
         });
         mainPanel.add(optionsPanel);
         final JPanel newPanel = new JPanel();
         newPanel.setBackground(ClusterBrowser.PANEL_BACKGROUND);
         newPanel.setLayout(new BoxLayout(newPanel, BoxLayout.PAGE_AXIS));
         newPanel.add(buttonPanel);
-        newPanel.add(getMoreOptionsPanel(application.getServiceLabelWidth()
-                                         + application.getServiceFieldWidth()
-                                         + 4));
+        newPanel.add(getMoreOptionsPanel(application.getServiceLabelWidth() + application.getServiceFieldWidth() + 4));
         newPanel.add(new JScrollPane(mainPanel));
         /* if id textfield was changed and this id is not used,
          * enable apply button */
@@ -2565,12 +2496,12 @@ public class ServiceInfo extends EditableInfo {
      * This works for new heartbeats >= 2.99.0
      */
     protected Map<String, Map<String, String>> getOperations(final String heartbeatId) {
-        final Map<String, Map<String, String>> operations = new LinkedHashMap<String, Map<String, String>>();
+        final Map<String, Map<String, String>> operations = new LinkedHashMap<>();
 
         final ClusterStatus cs = getBrowser().getClusterStatus();
         final CloneInfo ci = getCloneInfo();
         for (final String op : getResourceAgent().getOperationNames()) {
-            final Map<String, String> opHash = new LinkedHashMap<String, String>();
+            final Map<String, String> opHash = new LinkedHashMap<>();
             String opId = cs.getOpId(heartbeatId, op);
             if (opId == null) {
                 /* generate one */
@@ -2659,7 +2590,7 @@ public class ServiceInfo extends EditableInfo {
 
     /** Returns attributes of this resource. */
     protected Map<String, String> getPacemakerResAttrs(final Application.RunMode runMode) {
-        final Map<String, String> pacemakerResAttrs = new LinkedHashMap<String, String>();
+        final Map<String, String> pacemakerResAttrs = new LinkedHashMap<>();
         final String raClass = getService().getResourceClass();
         final String type = getName();
         final String provider = resourceAgent.getProvider();
@@ -2684,7 +2615,7 @@ public class ServiceInfo extends EditableInfo {
 
     /** Returns arguments of this resource. */
     protected Map<String, String> getPacemakerResArgs() {
-        final Map<String, String> pacemakerResArgs = new LinkedHashMap<String, String>();
+        final Map<String, String> pacemakerResArgs = new LinkedHashMap<>();
         final String[] params = getParametersFromXML();
         for (final String param : params) {
             if (isMetaAttr(param)) {
@@ -2707,7 +2638,7 @@ public class ServiceInfo extends EditableInfo {
 
     /** Returns meta arguments of this resource. */
     protected Map<String, String> getPacemakerMetaArgs() {
-        final Map<String, String> pacemakerMetaArgs = new LinkedHashMap<String, String>();
+        final Map<String, String> pacemakerMetaArgs = new LinkedHashMap<>();
         final String[] params = getParametersFromXML();
         for (final String param : params) {
             if (!isMetaAttr(param)) {
@@ -2884,12 +2815,7 @@ public class ServiceInfo extends EditableInfo {
                         mOperationsComboBoxHashReadLock.unlock();
                     }
                     if (wi != null) {
-                        swingUtils.invokeLater(new Runnable() {
-                            @Override
-                            public void run() {
-                                wi.setEnabled(savedOpIdRef == null);
-                            }
-                        });
+                        swingUtils.invokeLater(() -> wi.setEnabled(savedOpIdRef == null));
                         if (value != null) {
                             wi.setValue(value);
                         }
@@ -2904,12 +2830,9 @@ public class ServiceInfo extends EditableInfo {
     public void apply(final Host dcHost, final Application.RunMode runMode) {
         LOG.debug1("apply: start: test: " + runMode);
         if (Application.isLive(runMode)) {
-            swingUtils.invokeAndWait(new Runnable() {
-                @Override
-                public void run() {
-                    getApplyButton().setEnabled(false);
-                    getRevertButton().setEnabled(false);
-                }
+            swingUtils.invokeAndWait(() -> {
+                getApplyButton().setEnabled(false);
+                getRevertButton().setEnabled(false);
             });
         }
         getInfoPanel();
@@ -2936,14 +2859,11 @@ public class ServiceInfo extends EditableInfo {
             master = clInfo.getService().isMaster();
         }
         if (Application.isLive(runMode)) {
-            swingUtils.invokeLater(new Runnable() {
-                @Override
-                public void run() {
-                    getApplyButton().setToolTipText("");
-                    getWidget(GUI_ID, null).setEnabled(false);
-                    if (clInfo != null) {
-                        clInfo.getWidget(GUI_ID, null).setEnabled(false);
-                    }
+            swingUtils.invokeLater(() -> {
+                getApplyButton().setToolTipText("");
+                getWidget(GUI_ID, null).setEnabled(false);
+                if (clInfo != null) {
+                    clInfo.getWidget(GUI_ID, null).setEnabled(false);
                 }
             });
 
@@ -2980,8 +2900,8 @@ public class ServiceInfo extends EditableInfo {
             addResourceBefore(dcHost, runMode);
         }
 
-        final Map<String, String> cloneMetaArgs = new LinkedHashMap<String, String>();
-        final Map<String, String> groupMetaArgs = new LinkedHashMap<String, String>();
+        final Map<String, String> cloneMetaArgs = new LinkedHashMap<>();
+        final Map<String, String> groupMetaArgs = new LinkedHashMap<>();
         final Map<String, String> pacemakerResAttrs = getPacemakerResAttrs(runMode);
         final Map<String, String> pacemakerResArgs = getPacemakerResArgs();
         final Map<String, String> pacemakerMetaArgs = getPacemakerMetaArgs();
@@ -3036,7 +2956,7 @@ public class ServiceInfo extends EditableInfo {
                     }
                     final Value value = gInfo.getComboBoxValue(param);
                     if (Tools.areEqual(value, gInfo.getParamDefault(param))) {
-                            continue;
+                        continue;
                     }
                     if (!GUI_ID.equals(param) && value != null && !value.isNothingSelected()) {
                         groupMetaArgs.put(param, value.getValueForConfig());
@@ -3044,65 +2964,36 @@ public class ServiceInfo extends EditableInfo {
                 }
             }
             String command = CRM.CIB_OP_CREATE;
-            if ((gInfo != null && !gInfo.getService().isNew())
-                || (clInfo != null && !clInfo.getService().isNew())) {
+            if ((gInfo != null && !gInfo.getService().isNew()) || (clInfo != null && !clInfo.getService().isNew())) {
                 command = CRM.CIB_OP_MODIFY;
             }
-            CRM.setParameters(dcHost,
-                              command,
-                              heartbeatId,
-                              cloneId,
-                              master,
-                              cloneMetaArgs,
-                              groupMetaArgs,
-                              groupId,
-                              pacemakerResAttrs,
-                              pacemakerResArgs,
-                              pacemakerMetaArgs,
-                              null,
-                              null,
-                              getOperations(heartbeatId),
-                              null,
-                              getMetaAttrsRefId(),
-                              cloneMetaAttrsRefIds,
-                              groupMetaAttrsRefIds,
-                              refCRMId,
-                              resourceAgent.isStonith(),
-                              runMode);
+            CRM.setParameters(dcHost, command, heartbeatId, cloneId, master, cloneMetaArgs, groupMetaArgs, groupId,
+                    pacemakerResAttrs, pacemakerResArgs, pacemakerMetaArgs, null, null, getOperations(heartbeatId), null,
+                    getMetaAttrsRefId(), cloneMetaAttrsRefIds, groupMetaAttrsRefIds, refCRMId, resourceAgent.isStonith(), runMode);
             if (gInfo == null) {
                 String hbId = heartbeatId;
                 if (clInfo != null) {
                     hbId = clInfo.getHeartbeatId(runMode);
                 }
-                final List<Map<String, String>> colAttrsList = new ArrayList<Map<String, String>>();
-                final List<Map<String, String>> ordAttrsList = new ArrayList<Map<String, String>>();
-                final List<String> parentIds = new ArrayList<String>();
-                final ServiceInfo infoForDependency;
-                if (clInfo == null) {
-                    infoForDependency = this;
-                } else {
-                    infoForDependency = clInfo;
-                }
+                final List<Map<String, String>> colAttrsList = new ArrayList<>();
+                final List<Map<String, String>> ordAttrsList = new ArrayList<>();
+                final List<String> parentIds = new ArrayList<>();
+                final ServiceInfo infoForDependency = Objects.requireNonNullElse(clInfo, this);
                 final Set<ServiceInfo> parents = getBrowser().getCrmGraph().getParents(infoForDependency);
                 for (final ServiceInfo parentInfo : parents) {
                     if (parentInfo.isConstraintPlaceholder()) {
-                        final Collection<ServiceInfo> with = new TreeSet<ServiceInfo>();
+                        final Collection<ServiceInfo> with = new TreeSet<>();
                         with.add(infoForDependency);
-                        final Collection<ServiceInfo> withFrom = new TreeSet<ServiceInfo>();
+                        final Collection<ServiceInfo> withFrom = new TreeSet<>();
                         final boolean colocation = true;
                         final boolean order = true;
-                        ((ConstraintPHInfo) parentInfo).addConstraintWithPlaceholder(with,
-                                                                                     withFrom,
-                                                                                     colocation,
-                                                                                     order,
-                                                                                     dcHost,
-                                                                                     !parentInfo.getService().isNew(),
-                                                                                     runMode);
+                        ((ConstraintPHInfo) parentInfo).addConstraintWithPlaceholder(with, withFrom, colocation, order, dcHost,
+                                !parentInfo.getService().isNew(), runMode);
                     } else {
                         final String parentId = parentInfo.getService().getCrmId();
                         parentIds.add(parentId);
-                        final Map<String, String> colAttrs = new LinkedHashMap<String, String>();
-                        final Map<String, String> ordAttrs = new LinkedHashMap<String, String>();
+                        final Map<String, String> colAttrs = new LinkedHashMap<>();
+                        final Map<String, String> ordAttrs = new LinkedHashMap<>();
                         if (getBrowser().getCrmGraph().isColocation(parentInfo, infoForDependency)) {
                             colAttrs.put(CrmXml.SCORE_CONSTRAINT_PARAM, CrmXml.INFINITY_VALUE.getValueForConfig());
                             if (parentInfo.getService().isMaster()) {
@@ -3213,25 +3104,22 @@ public class ServiceInfo extends EditableInfo {
                 clInfo.storeComboBoxValues(cloneParams);
             }
 
-            swingUtils.invokeInEdt(new Runnable() {
-                @Override
-                public void run() {
-                    getWidget(PCMK_ID, null).setValueAndWait(getParamSaved(PCMK_ID));
-                    if (clInfo != null) {
-                        clInfo.getWidget(PCMK_ID, null).setValueAndWait(clInfo.getParamSaved(PCMK_ID));
-                    }
+            swingUtils.invokeInEdt(() -> {
+                getWidget(PCMK_ID, null).setValueAndWait(getParamSaved(PCMK_ID));
+                if (clInfo != null) {
+                    clInfo.getWidget(PCMK_ID, null).setValueAndWait(clInfo.getParamSaved(PCMK_ID));
+                }
 
-                    setApplyButtons(null, params);
-                    final DefaultMutableTreeNode node = getNode();
-                    if (node != null) {
-                        if (clInfo == null) {
-                            clusterTreeMenu.reloadNodeDontSelect(node);
-                        } else {
-                            clusterTreeMenu.reloadNodeDontSelect(clInfo.getNode());
-                            clusterTreeMenu.reloadNodeDontSelect(node);
-                        }
-                        getBrowser().getCrmGraph().repaint();
+                setApplyButtons(null, params);
+                final DefaultMutableTreeNode node = getNode();
+                if (node != null) {
+                    if (clInfo == null) {
+                        clusterTreeMenu.reloadNodeDontSelect(node);
+                    } else {
+                        clusterTreeMenu.reloadNodeDontSelect(clInfo.getNode());
+                        clusterTreeMenu.reloadNodeDontSelect(node);
                     }
+                    getBrowser().getCrmGraph().repaint();
                 }
             });
         }
@@ -3256,10 +3144,9 @@ public class ServiceInfo extends EditableInfo {
             } else {
                 cphi = (ConstraintPHInfo) parent;
             }
-            final Map<CrmXml.RscSet, Map<String, String>> rscSetsOrdAttrs =
-                                                            new LinkedHashMap<CrmXml.RscSet, Map<String, String>>();
+            final Map<CrmXml.RscSet, Map<String, String>> rscSetsOrdAttrs = new LinkedHashMap<>();
             final RscSetConnectionData rdata = cphi.getRscSetConnectionDataOrder();
-            /** resource set */
+            /* resource set */
             final String ordId = rdata.getConstraintId();
             String idToRemove;
             if (isConstraintPlaceholder()) {
@@ -3272,8 +3159,7 @@ public class ServiceInfo extends EditableInfo {
             if (ordRscSets != null) {
                 for (final CrmXml.RscSet rscSet : ordRscSets) {
                     if (rscSet.equals(rdata.getRscSet1()) || rscSet.equals(rdata.getRscSet2())) {
-                        final List<String> newRscIds = new ArrayList<String>();
-                        newRscIds.addAll(rscSet.getRscIds());
+                        final List<String> newRscIds = new ArrayList<>(rscSet.getRscIds());
                         if (newRscIds.remove(idToRemove)
                             && Application.isLive(runMode)) {
                             modifiedRscSet = rscSet;
@@ -3295,8 +3181,7 @@ public class ServiceInfo extends EditableInfo {
             if (Application.isLive(runMode) && rscSetsOrdAttrs.isEmpty()) {
                 cphi.getRscSetConnectionDataOrder().setConstraintId(null);
             }
-            final Map<String, String> attrs =
-                                        new LinkedHashMap<String, String>();
+            final Map<String, String> attrs = new LinkedHashMap<>();
             final CrmXml.OrderData od = clStatus.getOrderData(ordId);
             if (od != null) {
                 final String score = od.getScore();
@@ -3361,7 +3246,7 @@ public class ServiceInfo extends EditableInfo {
             }
             final ConstraintPHInfo cphi;
             final ServiceInfo withService;
-            final Collection<ServiceInfo> withFrom = new TreeSet<ServiceInfo>();
+            final Collection<ServiceInfo> withFrom = new TreeSet<>();
             if (isConstraintPlaceholder()) {
                 cphi = (ConstraintPHInfo) this;
                 withService = child;
@@ -3370,18 +3255,12 @@ public class ServiceInfo extends EditableInfo {
                 withService = this;
                 withFrom.add(this);
             }
-            final Collection<ServiceInfo> with = new TreeSet<ServiceInfo>();
+            final Collection<ServiceInfo> with = new TreeSet<>();
             with.add(withService);
-            cphi.addConstraintWithPlaceholder(with,
-                                              withFrom,
-                                              false,
-                                              true,
-                                              dcHost,
-                                              !cphi.getService().isNew(),
-                                              runMode);
+            cphi.addConstraintWithPlaceholder(with, withFrom, false, true, dcHost, !cphi.getService().isNew(), runMode);
         } else {
             final String childHbId = child.getHeartbeatId(runMode);
-            final Map<String, String> attrs = new LinkedHashMap<String, String>();
+            final Map<String, String> attrs = new LinkedHashMap<>();
             attrs.put(CrmXml.SCORE_CONSTRAINT_PARAM, CrmXml.INFINITY_VALUE.getValueForConfig());
             final CloneInfo chCI = child.getCloneInfo();
             if (chCI != null && chCI.getService().isMaster()) {
@@ -3414,8 +3293,7 @@ public class ServiceInfo extends EditableInfo {
             rscId = getHeartbeatId(runMode);
         }
         if (isConstraintPlaceholder() || parent.isConstraintPlaceholder()) {
-            final Map<CrmXml.RscSet, Map<String, String>> rscSetsColAttrs =
-                                                            new LinkedHashMap<CrmXml.RscSet, Map<String, String>>();
+            final Map<CrmXml.RscSet, Map<String, String>> rscSetsColAttrs = new LinkedHashMap<>();
             final ConstraintPHInfo cphi;
             if (isConstraintPlaceholder()) {
                 cphi = (ConstraintPHInfo) this;
@@ -3423,7 +3301,7 @@ public class ServiceInfo extends EditableInfo {
                 cphi = (ConstraintPHInfo) parent;
             }
             final RscSetConnectionData rdata = cphi.getRscSetConnectionDataColocation();
-            /** resource set */
+            /* resource set */
             final String colId = rdata.getConstraintId();
             final String idToRemove;
             if (isConstraintPlaceholder()) {
@@ -3436,8 +3314,7 @@ public class ServiceInfo extends EditableInfo {
                 CrmXml.RscSet modifiedRscSet = null;
                 for (final CrmXml.RscSet rscSet : colRscSets) {
                     if (rscSet.equals(rdata.getRscSet1()) || rscSet.equals(rdata.getRscSet2())) {
-                        final List<String> newRscIds = new ArrayList<String>();
-                        newRscIds.addAll(rscSet.getRscIds());
+                        final List<String> newRscIds = new ArrayList<>(rscSet.getRscIds());
                         if (newRscIds.remove(idToRemove) && Application.isLive(runMode)) {
                             modifiedRscSet = rscSet;
                         }
@@ -3458,7 +3335,7 @@ public class ServiceInfo extends EditableInfo {
             if (Application.isLive(runMode) && rscSetsColAttrs.isEmpty()) {
                 cphi.getRscSetConnectionDataColocation().setConstraintId(null);
             }
-            final Map<String, String> attrs = new LinkedHashMap<String, String>();
+            final Map<String, String> attrs = new LinkedHashMap<>();
             final CrmXml.ColocationData cd = clStatus.getColocationData(colId);
             if (cd != null) {
                 final String score = cd.getScore();
@@ -3510,7 +3387,7 @@ public class ServiceInfo extends EditableInfo {
             }
             final ConstraintPHInfo cphi;
             final ServiceInfo withService;
-            final Collection<ServiceInfo> withFrom = new TreeSet<ServiceInfo>();
+            final Collection<ServiceInfo> withFrom = new TreeSet<>();
             if (isConstraintPlaceholder()) {
                 cphi = (ConstraintPHInfo) this;
                 withService = child;
@@ -3519,18 +3396,12 @@ public class ServiceInfo extends EditableInfo {
                 withService = this;
                 withFrom.add(this);
             }
-            final Collection<ServiceInfo> with = new TreeSet<ServiceInfo>();
+            final Collection<ServiceInfo> with = new TreeSet<>();
             with.add(withService);
-            cphi.addConstraintWithPlaceholder(with,
-                                              withFrom,
-                                              true,
-                                              false,
-                                              dcHost,
-                                              !cphi.getService().isNew(),
-                                              runMode);
+            cphi.addConstraintWithPlaceholder(with, withFrom, true, false, dcHost, !cphi.getService().isNew(), runMode);
         } else {
             final String childHbId = child.getHeartbeatId(runMode);
-            final Map<String, String> attrs = new LinkedHashMap<String, String>();
+            final Map<String, String> attrs = new LinkedHashMap<>();
             attrs.put(CrmXml.SCORE_CONSTRAINT_PARAM, CrmXml.INFINITY_VALUE.getValueForConfig());
             final CloneInfo pCI = child.getCloneInfo();
             if (pCI != null && pCI.getService().isMaster()) {
@@ -3593,7 +3464,7 @@ public class ServiceInfo extends EditableInfo {
             if (isConstraintPlaceholder() || serviceInfo.isConstraintPlaceholder()) {
                 final ConstraintPHInfo cphi;
                 final ServiceInfo withService;
-                final Collection<ServiceInfo> withFrom = new TreeSet<ServiceInfo>();
+                final Collection<ServiceInfo> withFrom = new TreeSet<>();
                 if (isConstraintPlaceholder()) {
                     cphi = (ConstraintPHInfo) this;
                     withService = serviceInfo;
@@ -3603,7 +3474,7 @@ public class ServiceInfo extends EditableInfo {
                     withFrom.add(this);
                 }
                 withFrom.addAll(getBrowser().getCrmGraph().getParents(cphi));
-                final Collection<ServiceInfo> with = new TreeSet<ServiceInfo>();
+                final Collection<ServiceInfo> with = new TreeSet<>();
                 with.add(withService);
                 cphi.addConstraintWithPlaceholder(with,
                                                   withFrom,
@@ -3619,10 +3490,10 @@ public class ServiceInfo extends EditableInfo {
             } else {
                 final String parentId = getHeartbeatId(runMode);
                 final String heartbeatId = serviceInfo.getHeartbeatId(runMode);
-                final List<Map<String, String>> colAttrsList = new ArrayList<Map<String, String>>();
-                final List<Map<String, String>> ordAttrsList = new ArrayList<Map<String, String>>();
-                final Map<String, String> colAttrs = new LinkedHashMap<String, String>();
-                final Map<String, String> ordAttrs = new LinkedHashMap<String, String>();
+                final List<Map<String, String>> colAttrsList = new ArrayList<>();
+                final List<Map<String, String>> ordAttrsList = new ArrayList<>();
+                final Map<String, String> colAttrs = new LinkedHashMap<>();
+                final Map<String, String> ordAttrs = new LinkedHashMap<>();
                 colAttrs.put(CrmXml.SCORE_CONSTRAINT_PARAM, CrmXml.INFINITY_VALUE.getValueForConfig());
                 ordAttrs.put(CrmXml.SCORE_CONSTRAINT_PARAM, CrmXml.INFINITY_VALUE.getValueForConfig());
                 if (getService().isMaster()) {
@@ -3652,16 +3523,12 @@ public class ServiceInfo extends EditableInfo {
             }
         } else {
             getBrowser().addNameToServiceInfoHash(serviceInfo);
-            swingUtils.invokeInEdt(new Runnable() {
-                @Override
-                public void run() {
-                    final DefaultMutableTreeNode newServiceNode = clusterTreeMenu.createMenuItem(
-                            getBrowser().getServicesNode(),
-                            serviceInfo);
-                    if (reloadNode) {
-                        clusterTreeMenu.reloadNodeDontSelect(getBrowser().getServicesNode());
-                        clusterTreeMenu.reloadNodeDontSelect(newServiceNode);
-                    }
+            swingUtils.invokeInEdt(() -> {
+                final DefaultMutableTreeNode newServiceNode =
+                        clusterTreeMenu.createMenuItem(getBrowser().getServicesNode(), serviceInfo);
+                if (reloadNode) {
+                    clusterTreeMenu.reloadNodeDontSelect(getBrowser().getServicesNode());
+                    clusterTreeMenu.reloadNodeDontSelect(newServiceNode);
                 }
             });
             getBrowser().reloadAllComboBoxes(serviceInfo);
@@ -3675,12 +3542,7 @@ public class ServiceInfo extends EditableInfo {
         }
         getBrowser().getCrmGraph().reloadServiceMenus();
         if (reloadNode) {
-            swingUtils.invokeLater(new Runnable() {
-                @Override
-                public void run() {
-                    getBrowser().getCrmGraph().scale();
-                }
-            });
+            swingUtils.invokeLater(() -> getBrowser().getCrmGraph().scale());
         }
     }
 
@@ -3710,7 +3572,7 @@ public class ServiceInfo extends EditableInfo {
         final List<ServiceInfo> groupServices = gi.getSubServices();
         final int index = groupServices.indexOf(this);
         if (index > 0) {
-            final List<ServiceInfo> newOrder = new ArrayList<ServiceInfo>(groupServices);
+            final List<ServiceInfo> newOrder = new ArrayList<>(groupServices);
             final ServiceInfo el = newOrder.remove(index);
             newOrder.add(index - 1,  el);
             if (Application.isLive(runMode)) {
@@ -3726,7 +3588,7 @@ public class ServiceInfo extends EditableInfo {
         final List<ServiceInfo> groupServices = groupInfo.getSubServices();
         final int index = groupServices.indexOf(this);
         if (index < groupServices.size() - 1) {
-            final List<ServiceInfo> newOrder = new ArrayList<ServiceInfo>(groupServices);
+            final List<ServiceInfo> newOrder = new ArrayList<>(groupServices);
             final ServiceInfo el = newOrder.remove(index);
             newOrder.add(index + 1,  el);
             if (Application.isLive(runMode)) {
@@ -3789,14 +3651,14 @@ public class ServiceInfo extends EditableInfo {
             }
         }
         if (!failedClone) {
-            final List<Host> dirtyHosts = new ArrayList<Host>();
+            final List<Host> dirtyHosts = new ArrayList<>();
             for (final Host host : getBrowser().getClusterHosts()) {
                 if (isInLRMOnHost(host.getName(), runMode) || getFailCount(host.getName(), runMode) != null) {
                     dirtyHosts.add(host);
                 }
             }
             if (!dirtyHosts.isEmpty()) {
-                CRM.cleanupResource(dcHost, rscId, dirtyHosts.toArray(new Host[dirtyHosts.size()]), runMode);
+                CRM.cleanupResource(dcHost, rscId, dirtyHosts.toArray(new Host[0]), runMode);
             }
         }
     }
@@ -3911,13 +3773,10 @@ public class ServiceInfo extends EditableInfo {
     /** Removes the service from some global hashes and lists. */
     public void removeInfo() {
         final CloneInfo ci = cloneInfo;
-        swingUtils.invokeInEdt(new Runnable() {
-            @Override
-            public void run() {
-                clusterTreeMenu.removeNode(getNode());
-                if (ci != null) {
-                    clusterTreeMenu.removeNode(ci.getNode());
-                }
+        swingUtils.invokeInEdt(() -> {
+            clusterTreeMenu.removeNode(getNode());
+            if (ci != null) {
+                clusterTreeMenu.removeNode(ci.getNode());
             }
         });
         super.removeMyself(Application.RunMode.LIVE);
@@ -3967,7 +3826,7 @@ public class ServiceInfo extends EditableInfo {
         String nodeString = null;
         final List<String> nodes = getRunningOnNodes(runMode);
         if (nodes != null && !nodes.isEmpty()) {
-            nodeString = Tools.join(", ", nodes.toArray(new String[nodes.size()]));
+            nodeString = Tools.join(", ", nodes.toArray(new String[0]));
         }
         if (getBrowser().allHostsWithoutClusterStatus()) {
             nodeString = "unknown";
@@ -4051,7 +3910,7 @@ public class ServiceInfo extends EditableInfo {
 
     /** Returns text with lines as array that appears in the cluster graph. */
     public ColorText[] getSubtextsForGraph(final Application.RunMode runMode) {
-        final List<ColorText> texts = new ArrayList<ColorText>();
+        final List<ColorText> texts = new ArrayList<>();
         final String textOn;
         final String textNotOn;
         if (getResourceAgent().isFilesystem()) {
@@ -4108,7 +3967,7 @@ public class ServiceInfo extends EditableInfo {
                 }
             }
         }
-        return texts.toArray(new ColorText[texts.size()]);
+        return texts.toArray(new ColorText[0]);
     }
 
     public ServiceInfo getContainedService() {
@@ -4205,21 +4064,11 @@ public class ServiceInfo extends EditableInfo {
     public void reloadComboBoxes() {
         if (sameAsOperationsWi != null) {
             final Value savedOpIdRef = sameAsOperationsWiValue();
-            swingUtils.invokeLater(new Runnable() {
-                @Override
-                public void run() {
-                    sameAsOperationsWi.reloadComboBox(savedOpIdRef, getSameServicesOperations());
-                }
-            });
+            swingUtils.invokeLater(() -> sameAsOperationsWi.reloadComboBox(savedOpIdRef, getSameServicesOperations()));
         }
         if (sameAsMetaAttrsWi != null) {
             final Value savedMAIdRef = sameAsMetaAttrsWiValue();
-            swingUtils.invokeLater(new Runnable() {
-                @Override
-                public void run() {
-                    sameAsMetaAttrsWi.reloadComboBox(savedMAIdRef, getSameServicesMetaAttrs());
-                }
-            });
+            swingUtils.invokeLater(() -> sameAsMetaAttrsWi.reloadComboBox(savedMAIdRef, getSameServicesMetaAttrs()));
         }
     }
 
@@ -4320,7 +4169,7 @@ public class ServiceInfo extends EditableInfo {
     }
 
     public List<ServiceInfo> getSubServices() {
-        return new ArrayList<ServiceInfo>();
+        return new ArrayList<>();
     }
 
     public void setNew(boolean isNew) {
@@ -4331,6 +4180,7 @@ public class ServiceInfo extends EditableInfo {
         getService().setCrmId(crmId);
     }
 
+    @Override
     public boolean isNew() {
         return getService().isNew();
     }

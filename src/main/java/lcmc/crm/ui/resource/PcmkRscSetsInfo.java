@@ -31,20 +31,22 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
+
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.SpringLayout;
+
+import lcmc.cluster.ui.widget.Check;
 import lcmc.common.domain.Application;
-import lcmc.crm.domain.CrmXml;
-import lcmc.host.domain.Host;
+import lcmc.common.domain.util.Tools;
 import lcmc.common.ui.Browser;
 import lcmc.common.ui.SpringUtilities;
-import lcmc.cluster.ui.widget.Check;
-import lcmc.crm.service.CRM;
-import lcmc.common.domain.util.Tools;
 import lcmc.common.ui.utils.UpdatableItem;
+import lcmc.crm.domain.CrmXml;
+import lcmc.crm.service.CRM;
+import lcmc.host.domain.Host;
 
 /**
  * This class describes a connection between two heartbeat services.
@@ -52,7 +54,7 @@ import lcmc.common.ui.utils.UpdatableItem;
  */
 @Named
 public class PcmkRscSetsInfo extends HbConnectionInfo {
-    private final Collection<ConstraintPHInfo> constraintPHInfos = new LinkedHashSet<ConstraintPHInfo>();
+    private final Collection<ConstraintPHInfo> constraintPHInfos = new LinkedHashSet<>();
     private final Lock mConstraintPHLock = new ReentrantLock();
     @Inject
     private Application application;
@@ -120,8 +122,7 @@ public class PcmkRscSetsInfo extends HbConnectionInfo {
                                         final Map<String, String> appliedAttrs,
                                         final boolean isColocation,
                                         final Application.RunMode runMode) {
-        final Map<CrmXml.RscSet, Map<String, String>> rscSetsAttrs =
-                                                           new LinkedHashMap<CrmXml.RscSet, Map<String, String>>();
+        final Map<CrmXml.RscSet, Map<String, String>> rscSetsAttrs = new LinkedHashMap<>();
         final List<ConstraintPHInfo> allCphis = getAllConstrainPHInfos();
         if (isColocation) {
             for (final ConstraintPHInfo cphi : allCphis) {
@@ -142,7 +143,7 @@ public class PcmkRscSetsInfo extends HbConnectionInfo {
 
     private List<ConstraintPHInfo> getAllConstrainPHInfos() {
         final Map<String, ServiceInfo> idToInfoHash = getBrowser().getNameToServiceInfoHash(ConstraintPHInfo.NAME);
-        final List<ConstraintPHInfo> allCphis = new ArrayList<ConstraintPHInfo>();
+        final List<ConstraintPHInfo> allCphis = new ArrayList<>();
         if (idToInfoHash != null) {
             for (final Map.Entry<String, ServiceInfo> phEntry : idToInfoHash.entrySet()) {
                 final ConstraintPHInfo cphi = (ConstraintPHInfo) phEntry.getValue();
@@ -157,7 +158,7 @@ public class PcmkRscSetsInfo extends HbConnectionInfo {
         super.apply(dcHost, runMode);
         final List<ConstraintPHInfo> allCphis = getAllConstrainPHInfos();
         mConstraintPHLock.lock();
-        final Map<ServiceInfo, ServiceInfo> parentToChild = new HashMap<ServiceInfo, ServiceInfo>();
+        final Map<ServiceInfo, ServiceInfo> parentToChild = new HashMap<>();
         for (final ConstraintPHInfo cphi : constraintPHInfos) {
             final Set<ServiceInfo> cphiParents = getBrowser().getCrmGraph().getParents(cphi);
             boolean startComparing = false;
@@ -176,8 +177,8 @@ public class PcmkRscSetsInfo extends HbConnectionInfo {
                 }
             }
         }
-        final Collection<CrmXml.RscSet> rscSetsCol = new ArrayList<CrmXml.RscSet>();
-        final List<CrmXml.RscSet> rscSetsOrd = new ArrayList<CrmXml.RscSet>();
+        final Collection<CrmXml.RscSet> rscSetsCol = new ArrayList<>();
+        final List<CrmXml.RscSet> rscSetsOrd = new ArrayList<>();
         for (final ConstraintPHInfo cphi : constraintPHInfos) {
             if (cphi.getService().isNew()) {
                 //cphi.apply(dcHost, runMode);
@@ -226,19 +227,17 @@ public class PcmkRscSetsInfo extends HbConnectionInfo {
             }
         }
         mConstraintPHLock.unlock();
-        final Map<String, String> attrs = new LinkedHashMap<String, String>();
+        final Map<String, String> attrs = new LinkedHashMap<>();
         attrs.put(CrmXml.SCORE_CONSTRAINT_PARAM, CrmXml.INFINITY_VALUE.getValueForConfig());
         String colId = null;
-        final Map<CrmXml.RscSet, Map<String, String>> rscSetsColAttrs =
-                                                         new LinkedHashMap<CrmXml.RscSet, Map<String, String>>();
+        final Map<CrmXml.RscSet, Map<String, String>> rscSetsColAttrs = new LinkedHashMap<>();
         for (final CrmXml.RscSet colSet : rscSetsCol) {
             if (colId == null && colSet != null) {
                 colId = colSet.getId();
             }
             rscSetsColAttrs.put(colSet, null);
         }
-        final Map<CrmXml.RscSet, Map<String, String>> rscSetsOrdAttrs =
-                                                         new LinkedHashMap<CrmXml.RscSet, Map<String, String>>();
+        final Map<CrmXml.RscSet, Map<String, String>> rscSetsOrdAttrs = new LinkedHashMap<>();
         String ordId = null;
         for (final CrmXml.RscSet ordSet : rscSetsOrd) {
             if (ordId == null && ordSet != null) {
@@ -253,8 +252,8 @@ public class PcmkRscSetsInfo extends HbConnectionInfo {
 
     @Override
     public Check checkResourceFields(final String param, final String[] params) {
-        final List<String> incorrect = new ArrayList<String>();
-        final List<String> changed = new ArrayList<String>();
+        final List<String> incorrect = new ArrayList<>();
+        final List<String> changed = new ArrayList<>();
         mConstraintPHLock.lock();
         try {
             for (final ConstraintPHInfo cphi : constraintPHInfos) {

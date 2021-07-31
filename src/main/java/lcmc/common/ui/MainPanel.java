@@ -22,10 +22,13 @@
 package lcmc.common.ui;
 
 import java.awt.BorderLayout;
+
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
-import javax.swing.*;
+import javax.swing.JButton;
+import javax.swing.JPanel;
+import javax.swing.JSplitPane;
 import javax.swing.plaf.basic.BasicSplitPaneDivider;
 import javax.swing.plaf.basic.BasicSplitPaneUI;
 
@@ -70,15 +73,12 @@ public final class MainPanel extends JPanel {
         if (terminalPanel == null) {
             return;
         }
-        swingUtils.invokeInEdt(new Runnable() {
-            @Override
-            public void run() {
-                final java.awt.Component oldTerminalPanel = terminalSplitPane.getBottomComponent();
-                if (!terminalPanel.equals(oldTerminalPanel)) {
-                    expandTerminalSplitPane(TerminalSize.EXPAND);
-                    terminalSplitPane.setBottomComponent(terminalPanel);
-                    expandTerminalSplitPane(TerminalSize.COLLAPSE);
-                }
+        swingUtils.invokeInEdt(() -> {
+            final java.awt.Component oldTerminalPanel = terminalSplitPane.getBottomComponent();
+            if (!terminalPanel.equals(oldTerminalPanel)) {
+                expandTerminalSplitPane(TerminalSize.EXPAND);
+                terminalSplitPane.setBottomComponent(terminalPanel);
+                expandTerminalSplitPane(TerminalSize.COLLAPSE);
             }
         });
     }
@@ -100,37 +100,31 @@ public final class MainPanel extends JPanel {
         if (terminalSplitPane == null) {
             return;
         }
-        swingUtils.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                final int height = terminalSplitPane.getHeight() - terminalSplitPane.getDividerLocation() - 11;
-                if (!terminalAreaExpanded && terminalSize == TerminalSize.EXPAND) {
-                    terminalAreaExpanded = true;
-                    lastDividerLocation = terminalSplitPane.getDividerLocation();
-                    if (height < 10) {
-                        terminalSplitPane.setDividerLocation(terminalSplitPane.getHeight() - 150);
-                    }
-                } else if (terminalAreaExpanded && terminalSize == TerminalSize.COLLAPSE) {
-                    terminalAreaExpanded = false;
-                    if (lastDividerLocation < 0) {
-                        terminalSplitPane.setDividerLocation(1.0);
-                    } else {
-                        terminalSplitPane.setDividerLocation(lastDividerLocation);
-                    }
+        swingUtils.invokeLater(() -> {
+            final int height = terminalSplitPane.getHeight() - terminalSplitPane.getDividerLocation() - 11;
+            if (!terminalAreaExpanded && terminalSize == TerminalSize.EXPAND) {
+                terminalAreaExpanded = true;
+                lastDividerLocation = terminalSplitPane.getDividerLocation();
+                if (height < 10) {
+                    terminalSplitPane.setDividerLocation(terminalSplitPane.getHeight() - 150);
+                }
+            } else if (terminalAreaExpanded && terminalSize == TerminalSize.COLLAPSE) {
+                terminalAreaExpanded = false;
+                if (lastDividerLocation < 0) {
+                    terminalSplitPane.setDividerLocation(1.0);
+                } else {
+                    terminalSplitPane.setDividerLocation(lastDividerLocation);
                 }
             }
         });
     }
 
     public void initTerminalSplitPane() {
-        swingUtils.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                final BasicSplitPaneUI ui = (BasicSplitPaneUI) terminalSplitPane.getUI();
-                final BasicSplitPaneDivider divider = ui.getDivider();
-                final JButton button = (JButton) divider.getComponent(1);
-                button.doClick();
-            }
+        swingUtils.invokeLater(() -> {
+            final BasicSplitPaneUI ui = (BasicSplitPaneUI) terminalSplitPane.getUI();
+            final BasicSplitPaneDivider divider = ui.getDivider();
+            final JButton button = (JButton) divider.getComponent(1);
+            button.doClick();
         });
     }
 

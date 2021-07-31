@@ -30,10 +30,11 @@ import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import lcmc.common.domain.util.Tools;
 
 import javax.inject.Named;
 import javax.inject.Singleton;
+
+import lcmc.common.domain.util.Tools;
 
 /**
  * This class holds a set of all clusters.
@@ -41,7 +42,7 @@ import javax.inject.Singleton;
 @Named
 @Singleton
 public final class Clusters {
-    private final Set<Cluster> clusters = new TreeSet<Cluster>();
+    private final Set<Cluster> clusters = new TreeSet<>();
     private final ReadWriteLock mClustersLock = new ReentrantReadWriteLock();
     private final Lock mClustersReadLock = mClustersLock.readLock();
     private final Lock mClustersWriteLock = mClustersLock.writeLock();
@@ -76,7 +77,7 @@ public final class Clusters {
     public Set<Cluster> getClusterSet() {
         mClustersReadLock.lock();
         try {
-            return new LinkedHashSet<Cluster>(clusters);
+            return new LinkedHashSet<>(clusters);
         } finally {
             mClustersReadLock.unlock();
         }
@@ -120,6 +121,6 @@ public final class Clusters {
         } finally {
             mClustersReadLock.unlock();
         }
-        return defaultName + Integer.toString(index + 1);
+        return defaultName + (index + 1);
     }
 }

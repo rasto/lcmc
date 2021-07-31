@@ -28,12 +28,12 @@ import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.LayoutManager;
 import java.awt.Rectangle;
-import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.Map;
+
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.swing.ImageIcon;
@@ -44,26 +44,27 @@ import javax.swing.JScrollPane;
 import javax.swing.Scrollable;
 import javax.swing.SwingConstants;
 
-import lcmc.common.ui.main.MainPresenter;
 import lcmc.common.domain.Application;
+import lcmc.common.domain.util.Tools;
+import lcmc.common.ui.WizardDialog;
+import lcmc.common.ui.main.MainPresenter;
 import lcmc.common.ui.utils.SwingUtils;
 import lcmc.host.domain.Host;
 import lcmc.host.domain.Hosts;
-import lcmc.common.ui.WizardDialog;
-import lcmc.common.domain.util.Tools;
 
 /**
- * An implementation of a dialog where user can choose which hosts belong to
- * the cluster.
+ * An implementation of a dialog where user can choose which hosts belong to the cluster.
  */
 @Named
 final class ClusterHosts extends DialogCluster {
-    private static final ImageIcon HOST_CHECKED_ICON = Tools.createImageIcon(
-                                               Tools.getDefault("Dialog.Cluster.ClusterHosts.HostCheckedIcon"));
-    private static final ImageIcon HOST_UNCHECKED_ICON = Tools.createImageIcon(
-                                               Tools.getDefault("Dialog.Cluster.ClusterHosts.HostUncheckedIcon"));
-    /** Map from checkboxes to the host, which they choose. */
-    private final Map<JCheckBox, Host> checkBoxToHost = new LinkedHashMap<JCheckBox, Host>();
+    private static final ImageIcon HOST_CHECKED_ICON =
+            Tools.createImageIcon(Tools.getDefault("Dialog.Cluster.ClusterHosts.HostCheckedIcon"));
+    private static final ImageIcon HOST_UNCHECKED_ICON =
+            Tools.createImageIcon(Tools.getDefault("Dialog.Cluster.ClusterHosts.HostUncheckedIcon"));
+    /**
+     * Map from checkboxes to the host, which they choose.
+     */
+    private final Map<JCheckBox, Host> checkBoxToHost = new LinkedHashMap<>();
 
     @Inject
     private CommStack commStackDialog;
@@ -110,8 +111,10 @@ final class ClusterHosts extends DialogCluster {
         return nextDialog;
     }
 
-    /** Checks whether at least two hosts are selected for the cluster. */
-    protected void checkCheckBoxes() {
+    /**
+     * Checks whether at least two hosts are selected for the cluster.
+     */
+    private void checkCheckBoxes() {
         allHosts.removeHostsFromCluster(getCluster());
         int selected = 0;
         for (final JCheckBox button : checkBoxToHost.keySet()) {
@@ -120,7 +123,7 @@ final class ClusterHosts extends DialogCluster {
             }
         }
         boolean enable = true;
-        final Collection<String> hostNames = new ArrayList<String>();
+        final Collection<String> hostNames = new ArrayList<>();
         if (selected < 1 || (selected == 1 && !application.isOneHostCluster())) {
             enable = false;
         } else {
@@ -139,12 +142,7 @@ final class ClusterHosts extends DialogCluster {
             }
         }
         final boolean enableButton = enable;
-        swingUtils.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                buttonClass(nextButton()).setEnabled(enableButton);
-            }
-        });
+        swingUtils.invokeLater(() -> buttonClass(nextButton()).setEnabled(enableButton));
         if (!application.getAutoClusters().isEmpty()) {
             Tools.sleep(1000);
             pressNextButton();
@@ -166,12 +164,7 @@ final class ClusterHosts extends DialogCluster {
         super.initDialogBeforeVisible();
         enableComponentsLater(new JComponent[]{buttonClass(nextButton())});
 
-        final Thread thread = new Thread(new Runnable() {
-            @Override
-            public void run() {
-                checkCheckBoxes();
-            }
-        });
+        final Thread thread = new Thread(this::checkCheckBoxes);
         thread.start();
     }
 
@@ -186,12 +179,7 @@ final class ClusterHosts extends DialogCluster {
         final ScrollableFlowPanel p1 = new ScrollableFlowPanel(new FlowLayout(FlowLayout.LEADING, 1, 1));
         final Hosts hosts = allHosts;
 
-        final ItemListener chListener = new ItemListener() {
-                @Override
-                public void itemStateChanged(final ItemEvent e) {
-                    checkCheckBoxes();
-                }
-            };
+        final ItemListener chListener = e -> checkCheckBoxes();
         Host lastHost1 = null;
         Host lastHost2 = null;
         if (getCluster().getHosts().isEmpty()) {
@@ -229,11 +217,7 @@ final class ClusterHosts extends DialogCluster {
             if (getCluster().getHosts().contains(host)) {
                 button.setSelected(true);
             } else {
-                if (host == lastHost1 || host == lastHost2) {
-                    button.setSelected(true);
-                } else {
-                    button.setSelected(false);
-                }
+                button.setSelected(host == lastHost1 || host == lastHost2);
             }
             button.addItemListener(chListener);
             p1.add(button);
@@ -242,8 +226,10 @@ final class ClusterHosts extends DialogCluster {
         return sp;
     }
 
-    /** Workaround so that flow layout scrolls right. */
-    private class ScrollableFlowPanel extends JPanel implements Scrollable {
+    /**
+     * Workaround so that flow layout scrolls right.
+     */
+    private static class ScrollableFlowPanel extends JPanel implements Scrollable {
         ScrollableFlowPanel(final LayoutManager layout) {
             super(layout);
         }

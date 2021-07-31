@@ -27,10 +27,11 @@ import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
-import lcmc.cluster.domain.Cluster;
-import lcmc.crm.ui.ClusterLogs;
 
 import javax.inject.Named;
+
+import lcmc.cluster.domain.Cluster;
+import lcmc.crm.ui.ClusterLogs;
 
 /**
  * An implementation of an dialog with log files from many hosts.
@@ -57,7 +58,7 @@ public final class DrbdLogs extends ClusterLogs {
     /** Returns which pattern names are selected by default. */
     @Override
     protected Set<String> getSelectedSet() {
-        final Set<String> selected = new HashSet<String>();
+        final Set<String> selected = new HashSet<>();
         selected.add(drbdDeviceName);
         return selected;
     }
@@ -65,7 +66,7 @@ public final class DrbdLogs extends ClusterLogs {
     /** Returns a map from pattern name to its pattern. */
     @Override
     protected Map<String, String> getPatternMap() {
-        final Map<String, String> patternMap = new LinkedHashMap<String, String>();
+        final Map<String, String> patternMap = new LinkedHashMap<>();
         patternMap.put(drbdDeviceName, wordBoundary(drbdDeviceName));
         return patternMap;
     }

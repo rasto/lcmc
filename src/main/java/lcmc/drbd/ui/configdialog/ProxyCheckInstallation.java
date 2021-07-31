@@ -20,9 +20,6 @@
 
 package lcmc.drbd.ui.configdialog;
 
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.swing.ImageIcon;
@@ -31,20 +28,20 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SpringLayout;
 
+import lcmc.cluster.service.ssh.ExecCommandConfig;
+import lcmc.cluster.ui.widget.Widget;
 import lcmc.cluster.ui.widget.WidgetFactory;
 import lcmc.common.domain.Application;
-import lcmc.common.ui.utils.SwingUtils;
-import lcmc.host.domain.Host;
-import lcmc.drbd.domain.DrbdInstallation;
+import lcmc.common.domain.ExecCallback;
+import lcmc.common.domain.util.Tools;
 import lcmc.common.ui.SpringUtilities;
 import lcmc.common.ui.WizardDialog;
-import lcmc.host.ui.DialogHost;
-import lcmc.drbd.ui.resource.VolumeInfo;
-import lcmc.cluster.ui.widget.Widget;
-import lcmc.common.domain.ExecCallback;
 import lcmc.common.ui.utils.MyButton;
-import lcmc.common.domain.util.Tools;
-import lcmc.cluster.service.ssh.ExecCommandConfig;
+import lcmc.common.ui.utils.SwingUtils;
+import lcmc.drbd.domain.DrbdInstallation;
+import lcmc.drbd.ui.resource.VolumeInfo;
+import lcmc.host.domain.Host;
+import lcmc.host.ui.DialogHost;
 
 @Named
 final class ProxyCheckInstallation extends DialogHost {
@@ -101,41 +98,28 @@ final class ProxyCheckInstallation extends DialogHost {
     protected void initDialogAfterVisible() {
         nextDialogObject = null;
         final ProxyCheckInstallation thisClass = this;
-        swingUtils.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                installProxyButton.setBackgroundColor(Tools.getDefaultColor("ConfigDialog.Button"));
-                installProxyButton.setEnabled(false);
-                proxyInstallationMethodWidget.setEnabled(false);
-            }
+        swingUtils.invokeLater(() -> {
+            installProxyButton.setBackgroundColor(Tools.getDefaultColor("ConfigDialog.Button"));
+            installProxyButton.setEnabled(false);
+            proxyInstallationMethodWidget.setEnabled(false);
         });
-        installProxyButton.addActionListener(
-            new ActionListener() {
-                @Override
-                public void actionPerformed(final ActionEvent e) {
-                    proxyInstDialog.init(thisClass, getHost(), volumeInfo, origDialog, getDrbdInstallation());
-                    nextDialogObject = proxyInstDialog;
-                    final InstallMethods im = (InstallMethods) proxyInstallationMethodWidget.getValue();
-                    getDrbdInstallation().setProxyInstallMethodIndex(im.getIndex());
-                    swingUtils.invokeLater(new Runnable() {
-                        @Override
-                        public void run() {
-                            buttonClass(nextButton()).pressButton();
-                        }
-                    });
-                }
-            }
-        );
+        installProxyButton.addActionListener(e -> {
+            proxyInstDialog.init(thisClass, getHost(), volumeInfo, origDialog, getDrbdInstallation());
+            nextDialogObject = proxyInstDialog;
+            final InstallMethods im = (InstallMethods) proxyInstallationMethodWidget.getValue();
+            getDrbdInstallation().setProxyInstallMethodIndex(im.getIndex());
+            swingUtils.invokeLater(() -> buttonClass(nextButton()).pressButton());
+        });
 
         getHost().execCommand(new ExecCommandConfig().commandString("ProxyCheck.version")
-                                                .progressBar(getProgressBar())
-                                                .execCallback(new ExecCallback() {
-                                                    @Override
-                                                    public void done(final String answer) {
-                                                        checkProxyInstallation(answer);
-                                                    }
+                .progressBar(getProgressBar())
+                .execCallback(new ExecCallback() {
+                    @Override
+                    public void done(final String answer) {
+                        checkProxyInstallation(answer);
+                    }
 
-                                                    @Override
+                    @Override
                                                     public void doneError(final String answer, final int errorCode) {
                                                         checkProxyInstallation(""); // not installed
                                                     }
@@ -144,44 +128,33 @@ final class ProxyCheckInstallation extends DialogHost {
 
     void checkProxyInstallation(final String ans) {
         if (ans != null && ans.isEmpty() || "\n".equals(ans)) {
-            swingUtils.invokeLater(new Runnable() {
-                @Override
-                public void run() {
-                    checkingProxyLabel.setText(": " + Tools.getString("ProxyCheckInstallation.ProxyNotInstalled"));
-                    proxyCheckingIcon.setIcon(NOT_INSTALLED_ICON);
-                    final String toolTip = getInstToolTip(PROXY_PREFIX, "1");
-                    proxyInstallationMethodWidget.setToolTipText(toolTip);
-                    installProxyButton.setToolTipText(toolTip);
-                    installProxyButton.setEnabled(true);
-                    proxyInstallationMethodWidget.setEnabled(true);
-                }
+            swingUtils.invokeLater(() -> {
+                checkingProxyLabel.setText(": " + Tools.getString("ProxyCheckInstallation.ProxyNotInstalled"));
+                proxyCheckingIcon.setIcon(NOT_INSTALLED_ICON);
+                final String toolTip = getInstToolTip(PROXY_PREFIX, "1");
+                proxyInstallationMethodWidget.setToolTipText(toolTip);
+                installProxyButton.setToolTipText(toolTip);
+                installProxyButton.setEnabled(true);
+                proxyInstallationMethodWidget.setEnabled(true);
             });
             progressBarDone();
             printErrorAndRetry(Tools.getString("Dialog.Host.CheckInstallation.SomeFailed"));
         } else {
-            swingUtils.invokeLater(new Runnable() {
-                @Override
-                public void run() {
-                    checkingProxyLabel.setText(": " + ans.trim());
-                    installProxyButton.setText(Tools.getString("ProxyCheckInstallation.ProxyCheckForUpgradeButton"));
-                    if (false) {
-                        // TODO: disabled
-                        installProxyButton.setEnabled(true);
-                        proxyInstallationMethodWidget.setEnabled(true);
-                    }
-                    proxyCheckingIcon.setIcon(ALREADY_INSTALLED_ICON);
-                    buttonClass(finishButton()).setEnabled(true);
-                    makeDefaultAndRequestFocus(buttonClass(finishButton()));
+            swingUtils.invokeLater(() -> {
+                checkingProxyLabel.setText(": " + ans.trim());
+                installProxyButton.setText(Tools.getString("ProxyCheckInstallation.ProxyCheckForUpgradeButton"));
+                if (false) {
+                    // TODO: disabled
+                    installProxyButton.setEnabled(true);
+                    proxyInstallationMethodWidget.setEnabled(true);
                 }
+                proxyCheckingIcon.setIcon(ALREADY_INSTALLED_ICON);
+                buttonClass(finishButton()).setEnabled(true);
+                makeDefaultAndRequestFocus(buttonClass(finishButton()));
             });
             progressBarDone();
             enableComponents();
-            swingUtils.invokeLater(new Runnable() {
-                @Override
-                public void run() {
-                    answerPaneSetText(Tools.getString("Dialog.Host.CheckInstallation.AllOk"));
-                }
-            });
+            swingUtils.invokeLater(() -> answerPaneSetText(Tools.getString("Dialog.Host.CheckInstallation.AllOk")));
         }
     }
 

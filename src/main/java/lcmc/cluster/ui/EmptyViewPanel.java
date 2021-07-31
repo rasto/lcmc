@@ -21,6 +21,21 @@
  */
 package lcmc.cluster.ui;
 
+import java.awt.BorderLayout;
+import java.awt.CardLayout;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.FlowLayout;
+
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Provider;
+import javax.swing.BoxLayout;
+import javax.swing.ImageIcon;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JTree;
+
 import lcmc.cluster.ui.widget.WidgetFactory;
 import lcmc.cluster.ui.wizard.AddClusterDialog;
 import lcmc.common.domain.AllHostsUpdatable;
@@ -35,14 +50,6 @@ import lcmc.common.ui.utils.SwingUtils;
 import lcmc.host.domain.Host;
 import lcmc.host.domain.HostFactory;
 import lcmc.host.ui.AddHostDialog;
-
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Provider;
-import javax.swing.*;
-import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 
 /**
  * An implementation of an empty tab panel with new cluster and host button.
@@ -101,19 +108,12 @@ public final class EmptyViewPanel extends ViewPanel implements AllHostsUpdatable
         final MyButton addHostButton = widgetFactory.createButton(Tools.getString("ClusterTab.AddNewHost"), HOST_ICON);
         addHostButton.setBackgroundColor(Browser.STATUS_BACKGROUND);
         addHostButton.setPreferredSize(BIG_BUTTON_DIMENSION);
-        addHostButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(final ActionEvent e) {
-                final Thread thread = new Thread(
-                    new Runnable() {
-                        @Override
-                        public void run() {
-                            final Host host = hostFactory.createInstance();
-                            addHostDialogProvider.get().showDialogs(host);
-                        }
-                    });
-                thread.start();
-            }
+        addHostButton.addActionListener(e -> {
+            final Thread thread = new Thread(() -> {
+                final Host host = hostFactory.createInstance();
+                addHostDialogProvider.get().showDialogs(host);
+            });
+            thread.start();
         });
         mainData.registerAddHostButton(addHostButton);
         buttonPanel.add(addHostButton);
@@ -127,29 +127,15 @@ public final class EmptyViewPanel extends ViewPanel implements AllHostsUpdatable
         addClusterButton.setBackgroundColor(Browser.STATUS_BACKGROUND);
         addClusterButton.setPreferredSize(BIG_BUTTON_DIMENSION);
         addClusterButton.setMinimumSize(BIG_BUTTON_DIMENSION);
-        addClusterButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(final ActionEvent e) {
-                final Thread thread = new Thread(
-                    new Runnable() {
-                        @Override
-                        public void run() {
-                            addClusterDialogProvider.get().showDialogs();
-                        }
-                    });
-                thread.start();
-            }
+        addClusterButton.addActionListener(e -> {
+            final Thread thread = new Thread(() -> addClusterDialogProvider.get().showDialogs());
+            thread.start();
         });
         mainData.registerAddClusterButton(addClusterButton);
         mainPresenter.checkAddClusterButtons();
         buttonPanel.add(addClusterButton);
         if (!application.getAutoHosts().isEmpty()) {
-            swingUtils.invokeLater(new Runnable() {
-                @Override
-                public void run() {
-                    addHostButton.pressButton();
-                }
-            });
+            swingUtils.invokeLater(addHostButton::pressButton);
         }
     }
 

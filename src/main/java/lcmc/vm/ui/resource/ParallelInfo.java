@@ -21,6 +21,14 @@
  */
 package lcmc.vm.ui.resource;
 
+import java.util.HashMap;
+import java.util.Map;
+
+import javax.inject.Inject;
+import javax.inject.Named;
+
+import org.w3c.dom.Node;
+
 import lcmc.cluster.ui.widget.Widget;
 import lcmc.common.domain.Application;
 import lcmc.common.domain.Value;
@@ -31,12 +39,6 @@ import lcmc.common.ui.utils.MyButton;
 import lcmc.host.domain.Host;
 import lcmc.vm.domain.VmsXml;
 import lcmc.vm.domain.data.ParallelData;
-import org.w3c.dom.Node;
-
-import javax.inject.Inject;
-import javax.inject.Named;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * This class holds info about virtual parallel device.
@@ -46,6 +48,7 @@ public class ParallelInfo extends ParallelSerialInfo {
     @Inject
     private ClusterTreeMenu clusterTreeMenu;
 
+    @Override
     void init(final String name, final Browser browser, final DomainInfo vmsVirtualDomainInfo) {
         super.init(name, browser, vmsVirtualDomainInfo);
     }
@@ -129,8 +132,7 @@ public class ParallelInfo extends ParallelSerialInfo {
         for (final Host h : getVMSVirtualDomainInfo().getDefinedOnHosts()) {
             final VmsXml vmsXml = getBrowser().getVmsXml(h);
             if (vmsXml != null) {
-                final Map<String, String> parameters =
-                    new HashMap<String, String>();
+                final Map<String, String> parameters = new HashMap<>();
                 parameters.put(ParallelData.SAVED_TYPE,
                                getParamSaved(ParallelData.TYPE).getValueForConfig());
                 vmsXml.removeParallelXML(

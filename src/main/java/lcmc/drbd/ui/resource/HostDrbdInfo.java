@@ -26,8 +26,6 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -41,21 +39,21 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.SpringLayout;
 
+import lcmc.cluster.service.ssh.ExecCommandConfig;
 import lcmc.cluster.ui.widget.WidgetFactory;
 import lcmc.common.domain.Application;
 import lcmc.common.domain.ColorText;
-import lcmc.host.domain.Host;
-import lcmc.common.ui.Browser;
-import lcmc.host.ui.HostBrowser;
-import lcmc.common.ui.SpringUtilities;
-import lcmc.common.ui.Info;
 import lcmc.common.domain.ExecCallback;
+import lcmc.common.domain.util.Tools;
+import lcmc.common.ui.Browser;
+import lcmc.common.ui.Info;
+import lcmc.common.ui.SpringUtilities;
+import lcmc.common.ui.utils.MyButton;
+import lcmc.common.ui.utils.UpdatableItem;
+import lcmc.host.domain.Host;
+import lcmc.host.ui.HostBrowser;
 import lcmc.logger.Logger;
 import lcmc.logger.LoggerFactory;
-import lcmc.common.ui.utils.MyButton;
-import lcmc.common.domain.util.Tools;
-import lcmc.common.ui.utils.UpdatableItem;
-import lcmc.cluster.service.ssh.ExecCommandConfig;
 
 /**
  * This class holds info data for a host.
@@ -126,26 +124,16 @@ public class HostDrbdInfo extends Info {
             };
         // TODO: disable buttons if disconnected?
         final MyButton procDrbdButton = widgetFactory.createButton("/proc/drbd");
-        procDrbdButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(final ActionEvent e) {
-                host.execCommand(new ExecCommandConfig().commandString("DRBD.getProcDrbd")
-                                                        .silentCommand()
-                                                        .silentOutput()
-                                                        .execCallback(execCallback));
-            }
-        });
+        procDrbdButton.addActionListener(e -> host.execCommand(new ExecCommandConfig().commandString("DRBD.getProcDrbd")
+                .silentCommand()
+                .silentOutput()
+                .execCallback(execCallback)));
         host.registerEnableOnConnect(procDrbdButton);
         final MyButton drbdProcsButton = widgetFactory.createButton("DRBD Processes");
-        drbdProcsButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(final ActionEvent e) {
-                host.execCommand(new ExecCommandConfig().commandString("DRBD.getProcesses")
-                                                        .silentCommand()
-                                                        .silentOutput()
-                                                        .execCallback(execCallback));
-            }
-        });
+        drbdProcsButton.addActionListener(e -> host.execCommand(new ExecCommandConfig().commandString("DRBD.getProcesses")
+                .silentCommand()
+                .silentOutput()
+                .execCallback(execCallback)));
         host.registerEnableOnConnect(drbdProcsButton);
 
         final JPanel mainPanel = new JPanel();
@@ -215,7 +203,7 @@ public class HostDrbdInfo extends Info {
     }
 
     public ColorText[] getSubtextsForDrbdGraph(final Application.RunMode runMode) {
-        final List<ColorText> texts = new ArrayList<ColorText>();
+        final List<ColorText> texts = new ArrayList<>();
         if (getHost().isConnected()) {
             if (!getHost().isDrbdLoaded()) {
                texts.add(new ColorText("DRBD not loaded", null, Color.BLACK));
@@ -225,7 +213,7 @@ public class HostDrbdInfo extends Info {
         } else {
             texts.add(new ColorText("connecting...", null, Color.BLACK));
         }
-        return texts.toArray(new ColorText[texts.size()]);
+        return texts.toArray(new ColorText[0]);
     }
 
     public String getIconTextForDrbdGraph(final Application.RunMode runMode) {

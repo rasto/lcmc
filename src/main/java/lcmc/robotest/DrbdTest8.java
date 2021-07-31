@@ -21,18 +21,19 @@
 package lcmc.robotest;
 
 import java.awt.event.KeyEvent;
-import lcmc.Exceptions;
-import lcmc.cluster.domain.Cluster;
-import lcmc.cluster.ui.widget.GenericWidget.MTextField;
-import lcmc.cluster.ui.widget.MComboBox;
-import lcmc.common.ui.MainPanel;
-import lcmc.logger.Logger;
-import lcmc.logger.LoggerFactory;
-import lcmc.common.domain.util.Tools;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
+
+import lcmc.Exceptions;
+import lcmc.cluster.domain.Cluster;
+import lcmc.cluster.ui.widget.GenericWidget.MTextField;
+import lcmc.cluster.ui.widget.MComboBox;
+import lcmc.common.domain.util.Tools;
+import lcmc.common.ui.MainPanel;
+import lcmc.logger.Logger;
+import lcmc.logger.LoggerFactory;
 
 /**
  * This class is used to test the GUI.
@@ -60,8 +61,8 @@ final class DrbdTest8 {
             if (i == 1 && cluster.getHostsArray()[0].hasVolumes()) {
                 drbdTest1.newDrbdResource();
             }
-            drbdTest1.chooseDrbdResourceInterface(cluster.getHostsArray()[0].getName(), roboTest.PROXY);
-            drbdTest1.chooseDrbdResourceInterface(cluster.getHostsArray()[1].getName(), roboTest.PROXY);
+            drbdTest1.chooseDrbdResourceInterface(cluster.getHostsArray()[0].getName(), RoboTest.PROXY);
+            drbdTest1.chooseDrbdResourceInterface(cluster.getHostsArray()[1].getName(), RoboTest.PROXY);
 
             roboTest.moveTo(700, 450);
             roboTest.leftClick();

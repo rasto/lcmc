@@ -20,11 +20,11 @@
 
 package lcmc.cluster.ui.wizard;
 
-import lcmc.cluster.ui.EmptyBrowser;
-import lcmc.cluster.domain.Cluster;
-
 import javax.inject.Inject;
 import javax.inject.Named;
+
+import lcmc.cluster.domain.Cluster;
+import lcmc.cluster.ui.EmptyBrowser;
 
 @Named
 public class ClusterPresenter {
@@ -36,13 +36,10 @@ public class ClusterPresenter {
     }
 
     private void disconnectCluster(final Cluster cluster) {
-        final Thread t = new Thread(new Runnable() {
-            @Override
-            public void run() {
-                if (cluster.isClusterTabClosable()) {
-                    cluster.removeClusterAndDisconnect();
-                    emptyBrowser.setDisconnected(cluster);
-                }
+        final Thread t = new Thread(() -> {
+            if (cluster.isClusterTabClosable()) {
+                cluster.removeClusterAndDisconnect();
+                emptyBrowser.setDisconnected(cluster);
             }
         });
         t.start();

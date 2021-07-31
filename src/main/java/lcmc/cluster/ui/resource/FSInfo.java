@@ -25,14 +25,14 @@ import javax.inject.Named;
 import javax.swing.ImageIcon;
 import javax.swing.JEditorPane;
 
-import lcmc.common.ui.Info;
-import lcmc.common.ui.main.MainData;
-import lcmc.common.domain.Application;
-import lcmc.host.domain.Host;
-import lcmc.host.ui.HostBrowser;
-import lcmc.common.domain.util.Tools;
 import lcmc.cluster.service.ssh.ExecCommandConfig;
 import lcmc.cluster.service.ssh.SshOutput;
+import lcmc.common.domain.Application;
+import lcmc.common.domain.util.Tools;
+import lcmc.common.ui.Info;
+import lcmc.common.ui.main.MainData;
+import lcmc.host.domain.Host;
+import lcmc.host.ui.HostBrowser;
 
 /**
  * This class holds info data for a filesystem.
@@ -66,17 +66,13 @@ public final class FSInfo extends Info {
     /** Updates info of the file system. */
     @Override
     public void updateInfo(final JEditorPane ep) {
-        final Runnable runnable = new Runnable() {
-            @Override
-            public void run() {
-                if (cachedModinfoOutput == null) {
-                    final Host host = getBrowser().getHost();
-                    final SshOutput ret = host.captureCommand(new ExecCommandConfig()
-                                                                  .command("/sbin/modinfo " + getName()));
-                    cachedModinfoOutput = ret.getOutput();
-                }
-                ep.setText("<html><pre>" + cachedModinfoOutput + "</html></pre>");
+        final Runnable runnable = () -> {
+            if (cachedModinfoOutput == null) {
+                final Host host = getBrowser().getHost();
+                final SshOutput ret = host.captureCommand(new ExecCommandConfig().command("/sbin/modinfo " + getName()));
+                cachedModinfoOutput = ret.getOutput();
             }
+            ep.setText("<html><pre>" + cachedModinfoOutput + "</html></pre>");
         };
         final Thread thread = new Thread(runnable);
         thread.start();

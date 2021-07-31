@@ -28,27 +28,34 @@ import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import lcmc.crm.service.CRM;
+
 import lcmc.common.domain.util.Tools;
+import lcmc.crm.service.CRM;
 
 /**
  * This class holds data that were retrieved from ptest command.
  */
 public final class PtestData {
-    /** Pattern for LogActions. e.g. "Start res_IPaddr2_1     (hardy-a)" */
+    /**
+     * Pattern for LogActions. e.g. "Start res_IPaddr2_1     (hardy-a)"
+     */
     private static final Pattern PTEST_ACTIONS_PATTERN =
-          Pattern.compile(".*LogActions:\\s+(\\S+)\\s*(?:resource)?\\s+(\\S+)\\s+\\(([^)]*)\\).*");
-    /** Pattern for pending actions. */
-    private static final Pattern PTEST_ERROR_PATTERN = Pattern.compile(
-                        "(?i).*ERROR: print_elem:\\s+\\[Action.*?: Pending \\(id: (\\S+)_(\\S+)_.*?, loc: ([^,]+).*");
-    /** Pattern that gets cloned resource id. */
+            Pattern.compile(".*LogActions:\\s+(\\S+)\\s*(?:resource)?\\s+(\\S+)\\s+\\(([^)]*)\\).*");
+    /**
+     * Pattern for pending actions.
+     */
+    private static final Pattern PTEST_ERROR_PATTERN =
+            Pattern.compile("(?i).*ERROR: print_elem:\\s+\\[Action.*?: Pending \\(id: (\\S+)_(\\S+)_.*?, loc: ([^,]+).*");
+    /**
+     * Pattern that gets cloned resource id.
+     */
     private static final Pattern PTEST_CLONE_RESOURCE_ID_PATTERN = Pattern.compile("(.*):\\d+");
     private final String toolTip;
     private final String shadowCib;
-    private final Map<String, List<String>> runningOnNodes = new LinkedHashMap<String, List<String>>();
-    private final Map<String, List<String>> slaveOnNodes = new LinkedHashMap<String, List<String>>();
-    private final Map<String, List<String>> masterOnNodes = new LinkedHashMap<String, List<String>>();
-    private final Map<String, Boolean> managedResources = new LinkedHashMap<String, Boolean>();
+    private final Map<String, List<String>> runningOnNodes = new LinkedHashMap<>();
+    private final Map<String, List<String>> slaveOnNodes = new LinkedHashMap<>();
+    private final Map<String, List<String>> masterOnNodes = new LinkedHashMap<>();
+    private final Map<String, Boolean> managedResources = new LinkedHashMap<>();
 
     public PtestData(final String raw) {
         if (raw == null) {
@@ -85,20 +92,20 @@ public final class PtestData {
 
                 List<String> nodes = runningOnNodes.get(res);
                 if (nodes == null) {
-                    nodes = new ArrayList<String>();
+                    nodes = new ArrayList<>();
                 }
                 List<String> slaveNodes = null;
                 if (clone) {
                     slaveNodes = slaveOnNodes.get(res);
                     if (slaveNodes == null) {
-                        slaveNodes = new ArrayList<String>();
+                        slaveNodes = new ArrayList<>();
                     }
                 }
                 List<String> masterNodes = null;
                 if (clone) {
                     masterNodes = masterOnNodes.get(res);
                     if (masterNodes == null) {
-                        masterNodes = new ArrayList<String>();
+                        masterNodes = new ArrayList<>();
                     }
                 }
                 if ("Start".equals(action)) {
@@ -188,20 +195,20 @@ public final class PtestData {
                 }
                 List<String> nodes = runningOnNodes.get(res);
                 if (nodes == null) {
-                    nodes = new ArrayList<String>();
+                    nodes = new ArrayList<>();
                 }
                 List<String> slaveNodes = null;
                 if (clone) {
                     slaveNodes = slaveOnNodes.get(res);
                     if (slaveNodes == null) {
-                        slaveNodes = new ArrayList<String>();
+                        slaveNodes = new ArrayList<>();
                     }
                 }
                 List<String> masterNodes = null;
                 if (clone) {
                     masterNodes = masterOnNodes.get(res);
                     if (masterNodes == null) {
-                        masterNodes = new ArrayList<String>();
+                        masterNodes = new ArrayList<>();
                     }
                 }
                 if ("stop".equals(action)) {

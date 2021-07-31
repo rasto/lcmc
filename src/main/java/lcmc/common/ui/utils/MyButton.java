@@ -35,17 +35,17 @@ import java.awt.RenderingHints;
 import java.awt.Robot;
 import java.awt.Shape;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
+
 import javax.swing.Icon;
 import javax.swing.JButton;
 import javax.swing.JToolTip;
 
 import lcmc.cluster.ui.widget.Check;
+import lcmc.common.domain.util.Tools;
 import lcmc.logger.Logger;
 import lcmc.logger.LoggerFactory;
-import lcmc.common.domain.util.Tools;
 
 /**
  * This class creates a button with any gradient colors.
@@ -98,18 +98,6 @@ public class MyButton extends JButton implements ComponentWithTest {
         super.setIcon(icon);
         super.setToolTipText(toolTipText);
     }
-    /**
-     * @param c1
-     *          color 1 in the gradient
-     * @param c2
-     *          color 2 in the gradient
-     */
-    public MyButton(final Color c1, final Color c2) {
-        robot = createRobot();
-
-        color2 = c2;
-        setContentAreaFilled(false);  // *
-    }
 
     @Override
     public final JToolTip createToolTip() {
@@ -127,7 +115,7 @@ public class MyButton extends JButton implements ComponentWithTest {
 
     @Override
     public final void setToolTipText(final String simulationToolTip) {
-        this.simulationResultToolTip = simulationToolTip;
+        simulationResultToolTip = simulationToolTip;
         updateToolTip();
     }
 
@@ -239,12 +227,7 @@ public class MyButton extends JButton implements ComponentWithTest {
     }
 
     public MyButton addAction(final Runnable action) {
-        addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(final ActionEvent e) {
-                action.run();
-            }
-        });
+        addActionListener(e -> action.run());
         return this;
     }
 }

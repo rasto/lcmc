@@ -23,18 +23,18 @@
 
 package lcmc.common.domain;
 
-import lcmc.common.domain.util.Tools;
-
 import java.util.LinkedHashMap;
 import java.util.Map;
+
+import lcmc.common.domain.util.Tools;
 
 /**
  * This class holds access type and mode (advanced or not advanced).
  */
 public class AccessMode {
 
-    public static final Map<Type, String> OP_MODES_MAP = new LinkedHashMap<Type, String>();
-    public static final Map<String, AccessMode.Type> ACCESS_TYPE_MAP = new LinkedHashMap<String, Type>();
+    public static final Map<Type, String> OP_MODES_MAP = new LinkedHashMap<>();
+    public static final Map<String, AccessMode.Type> ACCESS_TYPE_MAP = new LinkedHashMap<>();
     public static final String OP_MODE_READONLY = Tools.getString("Application.OpMode.RO");
     private static final String OP_MODE_OPERATOR = Tools.getString("Application.OpMode.OP");
     private static final String OP_MODE_ADMIN = Tools.getString("Application.OpMode.ADMIN");
@@ -64,7 +64,7 @@ public class AccessMode {
     private final Mode advancedMode;
 
     public AccessMode(final Type accessType, final Mode advancedMode) {
-        this.type = accessType;
+        type = accessType;
         this.advancedMode = advancedMode;
     }
 

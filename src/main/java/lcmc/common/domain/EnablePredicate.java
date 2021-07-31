@@ -21,5 +21,5 @@
 package lcmc.common.domain;
 
 public interface EnablePredicate {
-    abstract String check();
+    String check();
 }

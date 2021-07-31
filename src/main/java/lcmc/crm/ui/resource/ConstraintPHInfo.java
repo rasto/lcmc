@@ -22,6 +22,16 @@
 
 package lcmc.crm.ui.resource;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.swing.JComponent;
+
 import lcmc.common.domain.AccessMode;
 import lcmc.common.domain.Application;
 import lcmc.common.domain.ColorText;
@@ -38,15 +48,6 @@ import lcmc.crm.service.CRM;
 import lcmc.host.domain.Host;
 import lcmc.logger.Logger;
 import lcmc.logger.LoggerFactory;
-
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.swing.*;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
 
 /**
  * Object that holds an order constraint information.
@@ -341,12 +342,9 @@ public class ConstraintPHInfo extends ServiceInfo {
                 }
                 getService().setNew(false);
                 getBrowser().removeFromServiceInfoHash(this);
-                swingUtils.invokeLater(new Runnable() {
-                    @Override
-                    public void run() {
-                        getBrowser().getCrmGraph().killRemovedVertices();
-                        getService().doneRemoving();
-                    }
+                swingUtils.invokeLater(() -> {
+                    getBrowser().getCrmGraph().killRemovedVertices();
+                    getService().doneRemoving();
                 });
             }
         } else {
@@ -480,7 +478,7 @@ public class ConstraintPHInfo extends ServiceInfo {
                 final ClusterStatus clStatus = getBrowser().getClusterStatus();
                 /* colocation */
                 if (colId == null) {
-                    final List<String> rscIds = new ArrayList<String>();
+                    final List<String> rscIds = new ArrayList<>();
                     rscIds.add(idToAdd);
                     int colIdInt = Integer.parseInt(getService().getId());
                     colId = "c" + colIdInt;
@@ -491,32 +489,16 @@ public class ConstraintPHInfo extends ServiceInfo {
                     createCol = true;
                     if (isFrom) {
                         /* require all for col is noop in pcmk 1.1.7 */
-                        colRscSet2 = new CrmXml.RscSet(colId,
-                                                       new ArrayList<String>(),
-                                                       "false",
-                                                       requireAll,
-                                                       null,
-                                                       null);
-                        colRscSet1 = new CrmXml.RscSet(colId,
-                                                       rscIds,
-                                                       "false",
-                                                       CrmXml.REQUIRE_ALL_TRUE_VALUE.getValueForConfig(),
-                                                       null,
-                                                       null);
+                        colRscSet2 = new CrmXml.RscSet(colId, new ArrayList<>(), "false", requireAll, null, null);
+                        colRscSet1 =
+                                new CrmXml.RscSet(colId, rscIds, "false", CrmXml.REQUIRE_ALL_TRUE_VALUE.getValueForConfig(), null,
+                                        null);
                         outColRscSet1 = colRscSet1;
                     } else {
-                        colRscSet2 = new CrmXml.RscSet(colId,
-                                                       rscIds,
-                                                       "false",
-                                                       CrmXml.REQUIRE_ALL_TRUE_VALUE.getValueForConfig(),
-                                                       null,
-                                                       null);
-                        colRscSet1 = new CrmXml.RscSet(colId,
-                                                       new ArrayList<String>(),
-                                                       "false",
-                                                       requireAll,
-                                                       null,
-                                                       null);
+                        colRscSet2 =
+                                new CrmXml.RscSet(colId, rscIds, "false", CrmXml.REQUIRE_ALL_TRUE_VALUE.getValueForConfig(), null,
+                                        null);
+                        colRscSet1 = new CrmXml.RscSet(colId, new ArrayList<>(), "false", requireAll, null, null);
                         outColRscSet2 = colRscSet2;
                     }
                 } else {
@@ -539,8 +521,7 @@ public class ConstraintPHInfo extends ServiceInfo {
                     if (rscSetsColList != null) {
                         for (final CrmXml.RscSet rscSet : rscSetsColList) {
                             if (rscSet.equals(toRscSet)) {
-                                final List<String> newRscIds = new ArrayList<String>();
-                                newRscIds.addAll(rscSet.getRscIds());
+                                final List<String> newRscIds = new ArrayList<>(rscSet.getRscIds());
 
                                 newRscIds.add(0, idToAdd);
                                 final CrmXml.RscSet newRscSet = new CrmXml.RscSet(rscSet.getId(),
@@ -565,7 +546,7 @@ public class ConstraintPHInfo extends ServiceInfo {
                         }
                     }
                     if (!colRscSetAdded) {
-                        final List<String> newRscIds = new ArrayList<String>();
+                        final List<String> newRscIds = new ArrayList<>();
                         final CrmXml.RscSet newRscSet;
                         if (toRscSet == null) {
                             newRscSet = new CrmXml.RscSet(colId, newRscIds, "false", requireAll, null, null);
@@ -592,7 +573,7 @@ public class ConstraintPHInfo extends ServiceInfo {
                 /* order */
                 final ClusterStatus clStatus = getBrowser().getClusterStatus();
                 if (ordId == null) {
-                    final List<String> rscIds = new ArrayList<String>();
+                    final List<String> rscIds = new ArrayList<>();
                     rscIds.add(idToAdd);
                     int ordIdInt = Integer.parseInt(getService().getId());
                     ordId = "o" + ordIdInt;
@@ -608,20 +589,10 @@ public class ConstraintPHInfo extends ServiceInfo {
                                                        CrmXml.REQUIRE_ALL_TRUE_VALUE.getValueForConfig(),
                                                        null,
                                                        null);
-                        ordRscSet2 = new CrmXml.RscSet(ordId,
-                                                       new ArrayList<String>(),
-                                                       "false",
-                                                       requireAll,
-                                                       null,
-                                                       null);
+                        ordRscSet2 = new CrmXml.RscSet(ordId, new ArrayList<>(), "false", requireAll, null, null);
                         outOrdRscSet1 = ordRscSet1;
                     } else {
-                        ordRscSet1 = new CrmXml.RscSet(ordId,
-                                                       new ArrayList<String>(),
-                                                       "false",
-                                                       requireAll,
-                                                       null,
-                                                       null);
+                        ordRscSet1 = new CrmXml.RscSet(ordId, new ArrayList<>(), "false", requireAll, null, null);
                         ordRscSet2 = new CrmXml.RscSet(ordId,
                                                        rscIds,
                                                        "false",
@@ -650,8 +621,7 @@ public class ConstraintPHInfo extends ServiceInfo {
                     if (rscSetsOrdList != null) {
                         for (final CrmXml.RscSet rscSet : rscSetsOrdList) {
                             if (rscSet.equals(toRscSet)) {
-                                final List<String> newRscIds = new ArrayList<String>();
-                                newRscIds.addAll(rscSet.getRscIds());
+                                final List<String> newRscIds = new ArrayList<>(rscSet.getRscIds());
 
                                 newRscIds.add(idToAdd);
                                 final CrmXml.RscSet newRscSet = new CrmXml.RscSet(rscSet.getId(),
@@ -676,7 +646,7 @@ public class ConstraintPHInfo extends ServiceInfo {
                         }
                     }
                     if (!ordRscSetAdded) {
-                        final List<String> newRscIds = new ArrayList<String>();
+                        final List<String> newRscIds = new ArrayList<>();
                         final CrmXml.RscSet newRscSet;
                         if (toRscSet == null) {
                             newRscSet = new CrmXml.RscSet(ordId, newRscIds, "false", requireAll, null, null);
@@ -702,28 +672,22 @@ public class ConstraintPHInfo extends ServiceInfo {
         if (Application.isLive(runMode)) {
             setUpdated(false);
         }
-        final List<CrmXml.RscSet> sets = new ArrayList<CrmXml.RscSet>();
+        final List<CrmXml.RscSet> sets = new ArrayList<>();
         sets.add(outColRscSet2);
         sets.add(outColRscSet1);
         sets.add(outOrdRscSet1);
         sets.add(outOrdRscSet2);
         if (force) {
-            final Map<String, String> attrs = new LinkedHashMap<String, String>();
+            final Map<String, String> attrs = new LinkedHashMap<>();
             attrs.put(CrmXml.SCORE_CONSTRAINT_PARAM, CrmXml.INFINITY_VALUE.getValueForConfig());
-            final Map<CrmXml.RscSet, Map<String, String>> rscSetsColAttrs =
-                                                            new LinkedHashMap<CrmXml.RscSet, Map<String, String>>();
-            final Map<CrmXml.RscSet, Map<String, String>> rscSetsOrdAttrs =
-                                                            new LinkedHashMap<CrmXml.RscSet, Map<String, String>>();
+            final Map<CrmXml.RscSet, Map<String, String>> rscSetsColAttrs = new LinkedHashMap<>();
+            final Map<CrmXml.RscSet, Map<String, String>> rscSetsOrdAttrs = new LinkedHashMap<>();
 
             rscSetsColAttrs.put(outColRscSet2, null);
             rscSetsColAttrs.put(outColRscSet1, null);
             rscSetsOrdAttrs.put(outOrdRscSet1, null);
             rscSetsOrdAttrs.put(outOrdRscSet2, null);
-            CRM.setRscSet(dcHost,
-                          colId,
-                          createCol,
-                          ordId,
-                          createOrd,
+            CRM.setRscSet(dcHost, colId, createCol, ordId, createOrd,
                           rscSetsColAttrs,
                           rscSetsOrdAttrs,
                           attrs,

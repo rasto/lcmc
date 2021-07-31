@@ -30,24 +30,24 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.swing.JPanel;
 
-import lcmc.common.domain.AccessMode;
-import lcmc.common.domain.Application;
-import lcmc.common.ui.utils.SwingUtils;
-import lcmc.host.domain.Host;
-import lcmc.common.domain.Value;
-import lcmc.drbd.domain.DrbdInstallation;
-import lcmc.common.ui.WizardDialog;
+import lcmc.cluster.service.ssh.ExecCommandThread;
 import lcmc.cluster.ui.widget.Check;
 import lcmc.cluster.ui.widget.Widget;
 import lcmc.cluster.ui.widget.WidgetFactory;
+import lcmc.common.domain.AccessMode;
+import lcmc.common.domain.Application;
 import lcmc.common.domain.CancelCallback;
-import lcmc.common.ui.utils.ComponentWithTest;
 import lcmc.common.domain.ConvertCmdCallback;
-import lcmc.common.ui.utils.MyButton;
-import lcmc.common.domain.util.Tools;
 import lcmc.common.domain.Unit;
+import lcmc.common.domain.Value;
+import lcmc.common.domain.util.Tools;
+import lcmc.common.ui.WizardDialog;
+import lcmc.common.ui.utils.ComponentWithTest;
+import lcmc.common.ui.utils.MyButton;
+import lcmc.common.ui.utils.SwingUtils;
 import lcmc.common.ui.utils.WidgetListener;
-import lcmc.cluster.service.ssh.ExecCommandThread;
+import lcmc.drbd.domain.DrbdInstallation;
+import lcmc.host.domain.Host;
 
 @Named
 public abstract class DialogHost extends WizardDialog {
@@ -88,12 +88,9 @@ public abstract class DialogHost extends WizardDialog {
      * and returns pane, where the progress bar is displayed.
      */
     public final JPanel getProgressBarPane(final String title) {
-        final CancelCallback cancelCallback = new CancelCallback() {
-            @Override
-            public void cancel() {
-                if (commandThread != null) {
-                    host.getSSH().cancelSession(commandThread);
-                }
+        final CancelCallback cancelCallback = () -> {
+            if (commandThread != null) {
+                host.getSSH().cancelSession(commandThread);
             }
         };
         return getProgressBarPane(title, cancelCallback);
@@ -104,12 +101,9 @@ public abstract class DialogHost extends WizardDialog {
      * and returns pane, where the progress bar is displayed.
      */
     protected final JPanel getProgressBarPane() {
-        final CancelCallback cancelCallback = new CancelCallback() {
-            @Override
-            public void cancel() {
-                if (commandThread != null) {
-                    host.getSSH().cancelSession(commandThread);
-                }
+        final CancelCallback cancelCallback = () -> {
+            if (commandThread != null) {
+                host.getSSH().cancelSession(commandThread);
             }
         };
         return getProgressBarPane(cancelCallback);
@@ -142,12 +136,7 @@ public abstract class DialogHost extends WizardDialog {
     }
 
     protected ConvertCmdCallback getDrbdInstallationConvertCmdCallback() {
-        return new ConvertCmdCallback() {
-            @Override
-            public String convert(final String command) {
-                return drbdInstallation.replaceVarsInCommand(command);
-            }
-        };
+        return command -> drbdInstallation.replaceVarsInCommand(command);
     }
 
     protected abstract String getHostDialogTitle();
@@ -157,7 +146,7 @@ public abstract class DialogHost extends WizardDialog {
                                                   final String lastInstalledMethod,
                                                   final String autoOption,
                                                   final ComponentWithTest installButton) {
-        final List<InstallMethods> methods = new ArrayList<InstallMethods>();
+        final List<InstallMethods> methods = new ArrayList<>();
         int i = 1;
         Value defaultValue = null;
         while (true) {
@@ -171,7 +160,7 @@ public abstract class DialogHost extends WizardDialog {
                 continue;
             }
             final String stagingMethod = getHost().getDistString(prefix + ".install.staging." + index);
-            if (stagingMethod != null && "true".equals(stagingMethod) && !staging) {
+            if ("true".equals(stagingMethod) && !staging) {
                 /* skip staging */
                 i++;
                 continue;
@@ -188,35 +177,21 @@ public abstract class DialogHost extends WizardDialog {
             methods.add(installMethod);
             i++;
         }
-        final Widget instMethodWidget = widgetFactory.createInstance(
-                       Widget.Type.COMBOBOX,
-                       defaultValue,
-                       methods.toArray(new InstallMethods[methods.size()]),
-                       Widget.NO_REGEXP,
-                       0,    /* width */
-                       Widget.NO_ABBRV,
-                       new AccessMode(AccessMode.RO, AccessMode.NORMAL),
-                       Widget.NO_BUTTON);
+        final Widget instMethodWidget = widgetFactory.createInstance(Widget.Type.COMBOBOX, defaultValue,
+                methods.toArray(new InstallMethods[0]), Widget.NO_REGEXP, 0,    /* width */
+                Widget.NO_ABBRV, new AccessMode(AccessMode.RO, AccessMode.NORMAL), Widget.NO_BUTTON);
         if (application.getAutoOptionHost(autoOption) != null) {
-            swingUtils.invokeLater(new Runnable() {
-                @Override
-                public void run() {
-                    instMethodWidget.setSelectedIndex(
-                            Integer.parseInt(application.getAutoOptionHost(autoOption)));
-                }
-            });
+            swingUtils.invokeLater(
+                    () -> instMethodWidget.setSelectedIndex(Integer.parseInt(application.getAutoOptionHost(autoOption))));
         }
         instMethodWidget.addListeners(new WidgetListener() {
             @Override
             public void check(final Value value) {
                 final InstallMethods method = (InstallMethods) instMethodWidget.getValue();
                 final String toolTip = getInstToolTip(prefix, method.getIndex());
-                swingUtils.invokeLater(new Runnable() {
-                    @Override
-                    public void run() {
-                        instMethodWidget.setToolTipText(toolTip);
-                        installButton.setToolTipText(toolTip);
-                    }
+                swingUtils.invokeLater(() -> {
+                    instMethodWidget.setToolTipText(toolTip);
+                    installButton.setToolTipText(toolTip);
                 });
             }
         });
@@ -235,13 +210,10 @@ public abstract class DialogHost extends WizardDialog {
 
     protected void enableNextButtons(final List<String> incorrect, final List<String> changed) {
         final Check check = new Check(incorrect, changed);
-        swingUtils.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                buttonClass(nextButton()).setEnabledCorrect(check);
-                for (final MyButton button : nextButtons()) {
-                    button.setEnabled(check.isCorrect());
-                }
+        swingUtils.invokeLater(() -> {
+            buttonClass(nextButton()).setEnabledCorrect(check);
+            for (final MyButton button : nextButtons()) {
+                button.setEnabled(check.isCorrect());
             }
         });
     }

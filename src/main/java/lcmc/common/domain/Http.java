@@ -20,9 +20,6 @@
 
 package lcmc.common.domain;
 
-import lcmc.logger.Logger;
-import lcmc.logger.LoggerFactory;
-
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -35,6 +32,9 @@ import java.net.URL;
 import java.net.URLEncoder;
 import java.util.HashMap;
 import java.util.Map;
+
+import lcmc.logger.Logger;
+import lcmc.logger.LoggerFactory;
 
 /**
  * This class provides Http functions.
@@ -88,7 +88,7 @@ public final class Http {
             return;
         }
         //conn.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
-        final Map<String, String> params = new HashMap<String, String>();
+        final Map<String, String> params = new HashMap<>();
         params.put("f", from);
         params.put("e", exception);
 

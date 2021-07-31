@@ -20,7 +20,25 @@
 
 package lcmc.vm.domain;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.TreeSet;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import javax.inject.Named;
+
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
 import com.google.common.collect.Maps;
+
 import lcmc.common.domain.StringValue;
 import lcmc.common.domain.Value;
 import lcmc.common.domain.XMLTools;
@@ -39,20 +57,6 @@ import lcmc.vm.domain.data.SerialData;
 import lcmc.vm.domain.data.SoundData;
 import lcmc.vm.domain.data.VideoData;
 import lombok.val;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
-import javax.inject.Named;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.TreeSet;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-import com.google.common.base.Optional;
 
 @Named
 public class VMParser {
@@ -61,10 +65,10 @@ public class VMParser {
 
     private final Map<String, DomainData> domainDataMap = Maps.newHashMap();
 
-    private final Collection<String> domainNames = new ArrayList<String>();
-    private final Map<Value, String> configsToNames = new HashMap<Value, String>();
-    private final Collection<String> usedMacAddresses = new HashSet<String>();
-    private final Collection<String> sourceFileDirs = new TreeSet<String>();
+    private final Collection<String> domainNames = new ArrayList<>();
+    private final Map<Value, String> configsToNames = new HashMap<>();
+    private final Collection<String> usedMacAddresses = new HashSet<>();
+    private final Collection<String> sourceFileDirs = new TreeSet<>();
 
     private DomainData getDomainData(final String domainName) {
         DomainData domainData = domainDataMap.get(domainName);
@@ -74,6 +78,7 @@ public class VMParser {
         }
         return domainData;
     }
+
     public void parseVM(final Node vmNode, final Host definedOnHost, final Map<String, String> namesToConfigs) {
         /* one vm */
         if (vmNode == null) {
@@ -87,7 +92,7 @@ public class VMParser {
         if (virshOptions != null) {
             domainData.setParameter(VMParams.VM_PARAM_VIRSH_OPTIONS, virshOptions);
         }
-        if (autostart != null && "True".equals(autostart)) {
+        if ("True".equals(autostart)) {
             domainData.setParameter(VMParams.VM_PARAM_AUTOSTART, definedOnHost.getName());
         } else {
             domainData.removeParameter(VMParams.VM_PARAM_AUTOSTART);
@@ -157,11 +162,7 @@ public class VMParser {
 
     public int getRemotePort(final String domainName) {
         final Integer port = getDomainData(domainName).getRemotePort();
-        if (port == null) {
-            return -1;
-        } else {
-            return port;
-        }
+        return Objects.requireNonNullElse(port, -1);
     }
 
     public Collection<Value> getConfigs() {
@@ -173,19 +174,11 @@ public class VMParser {
     }
 
     public boolean isRunning(final String domainName) {
-        final Boolean running = getDomainData(domainName).isRunning();
-        if (running != null) {
-            return running;
-        }
-        return false;
+        return getDomainData(domainName).isRunning();
     }
 
     public boolean isSuspended(final String domainName) {
-        final Boolean suspended = getDomainData(domainName).isSuspended();
-        if (suspended != null) {
-            return suspended;
-        }
-        return false;
+        return getDomainData(domainName).isSuspended();
     }
 
     /** Return set of mac addresses. */
@@ -236,7 +229,7 @@ public class VMParser {
         final String domainType = XMLTools.getAttribute(domainNode, "type");
         final NodeList options = domainNode.getChildNodes();
         boolean tabletOk = false;
-        Optional<DomainData> domainData = Optional.absent();
+        Optional<DomainData> domainData = Optional.empty();
         for (int i = 0; i < options.getLength(); i++) {
             final Node option = options.item(i);
             if (VMParams.VM_PARAM_NAME.equals(option.getNodeName())) {
@@ -308,7 +301,7 @@ public class VMParser {
                     domainData.get().setParameter(VMParams.VM_PARAM_CPU_MATCH, match);
                     final NodeList cpuMatchOptions = option.getChildNodes();
                     String policy = "";
-                    final Collection<String> features = new ArrayList<String>();
+                    final Collection<String> features = new ArrayList<>();
                     for (int j = 0; j < cpuMatchOptions.getLength(); j++) {
                         final Node cpuMatchOption = cpuMatchOptions.item(j);
                         final String op = cpuMatchOption.getNodeName();
@@ -342,15 +335,15 @@ public class VMParser {
             } else if (VMParams.VM_PARAM_ON_CRASH.equals(option.getNodeName())) {
                 domainData.get().setParameter(VMParams.VM_PARAM_ON_CRASH, XMLTools.getText(option));
             } else if ("devices".equals(option.getNodeName())) {
-                final Map<String, DiskData> devMap = new LinkedHashMap<String, DiskData>();
-                final Map<String, FilesystemData> fsMap = new LinkedHashMap<String, FilesystemData>();
-                final Map<String, InterfaceData> macMap = new LinkedHashMap<String, InterfaceData>();
-                final Map<String, InputDevData> inputMap = new LinkedHashMap<String, InputDevData>();
-                final Map<String, GraphicsData> graphicsMap = new LinkedHashMap<String, GraphicsData>();
-                final Map<String, SoundData> soundMap = new LinkedHashMap<String, SoundData>();
-                final Map<String, SerialData> serialMap = new LinkedHashMap<String, SerialData>();
-                final Map<String, ParallelData> parallelMap = new LinkedHashMap<String, ParallelData>();
-                final Map<String, VideoData> videoMap = new LinkedHashMap<String, VideoData>();
+                final Map<String, DiskData> devMap = new LinkedHashMap<>();
+                final Map<String, FilesystemData> fsMap = new LinkedHashMap<>();
+                final Map<String, InterfaceData> macMap = new LinkedHashMap<>();
+                final Map<String, InputDevData> inputMap = new LinkedHashMap<>();
+                final Map<String, GraphicsData> graphicsMap = new LinkedHashMap<>();
+                final Map<String, SoundData> soundMap = new LinkedHashMap<>();
+                final Map<String, SerialData> serialMap = new LinkedHashMap<>();
+                final Map<String, ParallelData> parallelMap = new LinkedHashMap<>();
+                final Map<String, VideoData> videoMap = new LinkedHashMap<>();
                 final NodeList devices = option.getChildNodes();
                 for (int j = 0; j < devices.getLength(); j++) {
                     final Node deviceNode = devices.item(j);
@@ -365,7 +358,7 @@ public class VMParser {
                         final InputDevData inputDevData = new InputDevData(type, bus);
                         inputMap.put(type + " : " + bus, inputDevData);
                     } else if ("graphics".equals(deviceNode.getNodeName())) {
-                        /** remotePort will be overwritten with virsh output */
+                        /* remotePort will be overwritten with virsh output */
                         final String type = XMLTools.getAttribute(deviceNode, "type");
                         final String port = XMLTools.getAttribute(deviceNode, "port");
                         final String autoport = XMLTools.getAttribute(deviceNode, "autoport");
@@ -381,11 +374,7 @@ public class VMParser {
                             if (port != null && Tools.isNumber(port)) {
                                 domainData.get().setRemotePort(Integer.parseInt(port));
                             }
-                            if ("yes".equals(autoport)) {
-                                domainData.get().setAutoport(true);
-                            } else {
-                                domainData.get().setAutoport(false);
-                            }
+                            domainData.get().setAutoport("yes".equals(autoport));
                         }
                         final GraphicsData graphicsData =
                                 new GraphicsData(type, port, listen, passwd, keymap, display, xauth);
@@ -632,8 +621,8 @@ public class VMParser {
         String sourceDev = null;
         String sourceProtocol = null;
         String sourceName = null;
-        final Collection<String> sourceHostNames = new ArrayList<String>();
-        final Collection<String> sourceHostPorts = new ArrayList<String>();
+        final Collection<String> sourceHostNames = new ArrayList<>();
+        final Collection<String> sourceHostPorts = new ArrayList<>();
         String authUsername = null;
         String authSecretType = null;
         String authSecretUuid = null;

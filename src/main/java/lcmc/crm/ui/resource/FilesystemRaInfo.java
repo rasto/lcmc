@@ -21,8 +21,20 @@
  */
 package lcmc.crm.ui.resource;
 
-import com.google.common.base.Optional;
+import java.util.ArrayList;
+import java.util.Enumeration;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
+
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.TreeNode;
+
 import com.google.common.eventbus.Subscribe;
+
 import lcmc.ClusterEventBus;
 import lcmc.cluster.service.ssh.ExecCommandConfig;
 import lcmc.cluster.service.ssh.SshOutput;
@@ -51,12 +63,6 @@ import lcmc.event.CommonBlockDevicesChangedEvent;
 import lcmc.event.CommonMountPointsEvent;
 import lcmc.host.domain.Host;
 
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.swing.tree.DefaultMutableTreeNode;
-import javax.swing.tree.TreeNode;
-import java.util.*;
-
 /**
  * This class holds info about Filesystem service. It is treated in special
  * way, so that it can use block device information and drbd devices. If
@@ -72,7 +78,7 @@ public class FilesystemRaInfo extends ServiceInfo {
     private DrbddiskInfo drbddiskInfo = null;
     private Widget blockDeviceParamWidget = null;
     private Widget fstypeParamWidget = null;
-    private Optional<Widget> directoryParamWidget = Optional.absent();
+    private Optional<Widget> directoryParamWidget = Optional.empty();
     private boolean drbddiskIsPreferred = false;
     @Inject
     private Application application;
@@ -144,13 +150,13 @@ public class FilesystemRaInfo extends ServiceInfo {
     @Override
     public Check checkResourceFields(final String param, final String[] params) {
         final Widget wi = getWidget(FS_RES_PARAM_DEV, null);
-        final List<String> incorrect = new ArrayList<String>();
+        final List<String> incorrect = new ArrayList<>();
 
         if (wi == null || wi.getValue() == null) {
             incorrect.add(FS_RES_PARAM_DEV);
         }
 
-        final Check check = new Check(incorrect, new ArrayList<String>());
+        final Check check = new Check(incorrect, new ArrayList<>());
         check.addCheck(super.checkResourceFields(param, params));
         return check;
     }
@@ -158,12 +164,9 @@ public class FilesystemRaInfo extends ServiceInfo {
     @Override
     public void apply(final Host dcHost, final Application.RunMode runMode) {
         if (Application.isLive(runMode)) {
-            swingUtils.invokeAndWait(new Runnable() {
-                @Override
-                public void run() {
-                    getApplyButton().setEnabled(false);
-                    getRevertButton().setEnabled(false);
-                }
+            swingUtils.invokeAndWait(() -> {
+                getApplyButton().setEnabled(false);
+                getRevertButton().setEnabled(false);
             });
             getInfoPanel();
             waitForInfoPanel();
@@ -172,8 +175,7 @@ public class FilesystemRaInfo extends ServiceInfo {
             for (final Host host : getBrowser().getClusterHosts()) {
                 final String statCmd = DistResource.SUDO + "stat -c \"%F\" " + dir + "||true";
                 final String text = statCmd.replaceAll(DistResource.SUDO, "");
-                final SshOutput ret = host.captureCommandProgressIndicator(text,
-                                                                           new ExecCommandConfig().command(statCmd));
+                final SshOutput ret = host.captureCommandProgressIndicator(text, new ExecCommandConfig().command(statCmd));
 
                 if (ret == null || !FS_RES_PARAM_DIRECTORY.equals(ret.getOutput().trim())) {
                     String title = Tools.getString("ClusterBrowser.CreateDir.Title");
@@ -340,12 +342,7 @@ public class FilesystemRaInfo extends ServiceInfo {
                                             getParamSaved(FS_RES_PARAM_DEV).getValueForConfig());
         super.removeMyselfNoConfirm(dcHost, runMode);
         if (oldDvi != null && Application.isLive(runMode)) {
-            final Thread t = new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    oldDvi.updateMenus(null);
-                }
-            });
+            final Thread t = new Thread(() -> oldDvi.updateMenus(null));
             t.start();
         }
         if (runMode == Application.RunMode.LIVE) {
@@ -381,20 +378,10 @@ public class FilesystemRaInfo extends ServiceInfo {
             } else {
                 oldDvi.removeLinbitDrbd(this, dcHost, runMode);
             }
-            final Thread t = new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    oldDvi.updateMenus(null);
-                }
-            });
+            final Thread t = new Thread(() -> oldDvi.updateMenus(null));
             t.start();
             oldDvi.getDrbdResourceInfo().setUsedByCRM(null);
-            //final Thread t = new Thread(new Runnable() {
-            //    @Override
-            //    public void run() {
-            //        oldDvi.updateMenus(null);
-            //    }
-            //});
+//            final Thread t = new Thread(() -> oldDvi.updateMenus(null));
             if (oldDrbddisk) {
                 setDrbddiskInfo(null);
             } else {
@@ -500,8 +487,7 @@ public class FilesystemRaInfo extends ServiceInfo {
                 }
             };
         }
-        final Value[] commonBlockDevInfos = getCommonBlockDevInfos(defaultValue, getName());
-        return commonBlockDevInfos;
+        return getCommonBlockDevInfos(defaultValue, getName());
     }
 
     /**
@@ -509,10 +495,9 @@ public class FilesystemRaInfo extends ServiceInfo {
      * same names and other attributes.
      */
     private Value[] getCommonBlockDevInfos(final Value defaultValue, final String serviceName) {
-        final List<Value> list = new ArrayList<Value>();
+        final List<Value> list = new ArrayList<>();
 
         /* drbd resources */
-        @SuppressWarnings("unchecked")
         final Enumeration<TreeNode> drbdResources = getBrowser().getDrbdNode().children();
 
         if (defaultValue != null) {
@@ -524,18 +509,13 @@ public class FilesystemRaInfo extends ServiceInfo {
             }
             final DefaultMutableTreeNode drbdResNode = drbdRes.getNode();
             if (drbdResNode != null) {
-                @SuppressWarnings("unchecked")
                 final Enumeration<TreeNode> drbdVolumes = drbdResNode.children();
-                for (final Value drbdVol : clusterTreeMenu.nodesToInfos(drbdVolumes)) {
-                    list.add(drbdVol);
-                }
+                list.addAll(clusterTreeMenu.nodesToInfos(drbdVolumes));
             }
         }
 
-        for (Value commonBlockDevice : blockDeviceService.getCommonBlockDevViews()) {
-            list.add(commonBlockDevice);
-        }
-        return list.toArray(new Value[list.size()]);
+        list.addAll(blockDeviceService.getCommonBlockDevViews());
+        return list.toArray(new Value[0]);
     }
 }
 

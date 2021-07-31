@@ -21,7 +21,35 @@
  */
 package lcmc.drbd.ui.resource;
 
-import com.google.common.base.Optional;
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.image.BufferedImage;
+import java.net.UnknownHostException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
+import java.util.concurrent.CountDownLatch;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Provider;
+import javax.swing.BoxLayout;
+import javax.swing.ImageIcon;
+import javax.swing.JComponent;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.tree.DefaultMutableTreeNode;
+
 import lcmc.Exceptions;
 import lcmc.cluster.domain.Cluster;
 import lcmc.cluster.ui.ClusterBrowser;
@@ -35,7 +63,11 @@ import lcmc.common.domain.Value;
 import lcmc.common.domain.util.Tools;
 import lcmc.common.ui.Browser;
 import lcmc.common.ui.treemenu.ClusterTreeMenu;
-import lcmc.common.ui.utils.*;
+import lcmc.common.ui.utils.ButtonCallback;
+import lcmc.common.ui.utils.ComponentWithTest;
+import lcmc.common.ui.utils.Dialogs;
+import lcmc.common.ui.utils.SwingUtils;
+import lcmc.common.ui.utils.UpdatableItem;
 import lcmc.configs.AppDefaults;
 import lcmc.drbd.domain.DRBDtestData;
 import lcmc.drbd.domain.DrbdXml;
@@ -45,22 +77,6 @@ import lcmc.host.domain.Host;
 import lcmc.host.domain.HostFactory;
 import lcmc.logger.Logger;
 import lcmc.logger.LoggerFactory;
-
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Provider;
-import javax.swing.*;
-import javax.swing.tree.DefaultMutableTreeNode;
-import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.image.BufferedImage;
-import java.net.UnknownHostException;
-import java.util.*;
-import java.util.List;
-import java.util.concurrent.CountDownLatch;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 /**
  * This class provides drbd info. For one it shows the editable global
@@ -176,7 +192,7 @@ public class GlobalInfo extends AbstractDrbdInfo {
 
     /** Creates drbd config. */
     public void createDrbdConfigLive() throws Exceptions.DrbdConfigException, UnknownHostException {
-        final Map<Host, String> testOutput = new LinkedHashMap<Host, String>();
+        final Map<Host, String> testOutput = new LinkedHashMap<>();
         if (!createConfigDryRun(testOutput)) {
             createConfigError(testOutput);
             return;
@@ -218,14 +234,11 @@ public class GlobalInfo extends AbstractDrbdInfo {
         if (Application.isLive(runMode)) {
             final String[] params = getParametersFromXML();
             storeComboBoxValues(params);
-            swingUtils.invokeLater(new Runnable() {
-                @Override
-                public void run() {
-                    for (final ResourceInfo dri : getDrbdResources()) {
-                        dri.setParameters();
-                    }
-                    setAllApplyButtons();
+            swingUtils.invokeLater(() -> {
+                for (final ResourceInfo dri : getDrbdResources()) {
+                    dri.setParameters();
                 }
+                setAllApplyButtons();
             });
         }
     }
@@ -243,10 +256,8 @@ public class GlobalInfo extends AbstractDrbdInfo {
                 }
             }
             return allOk;
-        } catch (final Exceptions.DrbdConfigException dce) {
+        } catch (final Exceptions.DrbdConfigException | UnknownHostException dce) {
             LOG.appError("getInfoPanel: config failed", dce);
-        } catch (final UnknownHostException e) {
-            LOG.appError("getInfoPanel: config failed", e);
         }
         return false;
     }
@@ -310,7 +321,7 @@ public class GlobalInfo extends AbstractDrbdInfo {
                 getBrowser().drbdtestLockAcquire();
                 try {
                     getBrowser().setDRBDtestData(null);
-                    final Map<Host, String> testOutput = new LinkedHashMap<Host, String>();
+                    final Map<Host, String> testOutput = new LinkedHashMap<>();
                     createConfigDryRun(testOutput);
                     final DRBDtestData dtd = new DRBDtestData(testOutput);
                     component.setToolTipText(dtd.getToolTip());
@@ -343,65 +354,41 @@ public class GlobalInfo extends AbstractDrbdInfo {
 
         final String[] params = getParametersFromXML();
         enableSection(SECTION_COMMON_PROXY, false, !WIZARD);
-        addParams(optionsPanel,
-                  params,
-                  application.getDefaultSize("ClusterBrowser.DrbdResLabelWidth"),
-                  application.getDefaultSize("ClusterBrowser.DrbdResFieldWidth"),
-                  null);
+        addParams(optionsPanel, params, application.getDefaultSize("ClusterBrowser.DrbdResLabelWidth"),
+                application.getDefaultSize("ClusterBrowser.DrbdResFieldWidth"), null);
 
-        getApplyButton().addActionListener(
-            new ActionListener() {
-                @Override
-                public void actionPerformed(final ActionEvent e) {
-                    LOG.debug1("getInfoPanel: BUTTON: apply");
-                    final Thread thread = new Thread(new Runnable() {
-                        @Override
-                        public void run() {
-                            swingUtils.invokeAndWait(new Runnable() {
-                                @Override
-                                public void run() {
-                                    getApplyButton().setEnabled(false);
-                                    getRevertButton().setEnabled(false);
-                                    getApplyButton().setToolTipText("");
-                                }
-                            });
-                            getBrowser().drbdStatusLock();
-                            try {
-                                createDrbdConfigLive();
-                                for (final Host h : getCluster().getHosts()) {
-                                    DRBD.adjustApply(h, DRBD.ALL_DRBD_RESOURCES, null, Application.RunMode.LIVE);
-                                }
-                                apply(Application.RunMode.LIVE);
-                            } catch (final Exceptions.DrbdConfigException dce) {
-                                LOG.appError("getInfoPanel: config failed", dce);
-                            } catch (final UnknownHostException uhe) {
-                                LOG.appError("getInfoPanel: config failed", uhe);
-                            } finally {
-                                getBrowser().drbdStatusUnlock();
-                            }
-                        }
-                    });
-                    thread.start();
+        getApplyButton().addActionListener(e -> {
+            LOG.debug1("getInfoPanel: BUTTON: apply");
+            final Thread thread = new Thread(() -> {
+                swingUtils.invokeAndWait(() -> {
+                    getApplyButton().setEnabled(false);
+                    getRevertButton().setEnabled(false);
+                    getApplyButton().setToolTipText("");
+                });
+                getBrowser().drbdStatusLock();
+                try {
+                    createDrbdConfigLive();
+                    for (final Host h : getCluster().getHosts()) {
+                        DRBD.adjustApply(h, DRBD.ALL_DRBD_RESOURCES, null, RunMode.LIVE);
+                    }
+                    apply(RunMode.LIVE);
+                } catch (final Exceptions.DrbdConfigException | UnknownHostException dce) {
+                    LOG.appError("getInfoPanel: config failed", dce);
+                } finally {
+                    getBrowser().drbdStatusUnlock();
                 }
-            }
-        );
-        getRevertButton().addActionListener(
-            new ActionListener() {
-                @Override
-                public void actionPerformed(final ActionEvent e) {
-                    LOG.debug1("getInfoPanel: BUTTON: revert");
-                    final Thread thread = new Thread(new Runnable() {
-                        @Override
-                        public void run() {
-                            getBrowser().drbdStatusLock();
-                            revert();
-                            getBrowser().drbdStatusUnlock();
-                        }
-                    });
-                    thread.start();
-                }
-            }
-        );
+            });
+            thread.start();
+        });
+        getRevertButton().addActionListener(e -> {
+            LOG.debug1("getInfoPanel: BUTTON: revert");
+            final Thread thread = new Thread(() -> {
+                getBrowser().drbdStatusLock();
+                revert();
+                getBrowser().drbdStatusUnlock();
+            });
+            thread.start();
+        });
 
         /* apply button */
         addApplyButton(buttonPanel);
@@ -506,28 +493,25 @@ public class GlobalInfo extends AbstractDrbdInfo {
             final GlobalInfo thisClass = this;
             final AddDrbdConfigDialog addDrbdConfigDialog = addDrbdConfigDialogProvider.get();
             addDrbdConfigDialog.init(thisClass, bd1, bd2);
-            final Thread thread = new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    addDrbdConfigDialog.init(thisClass, bd1, bd2);
-                    addDrbdConfigDialog.showDialogs();
-                    /* remove wizard parameters from hashes. */
-                    for (final String p : bd1.getParametersFromXML()) {
-                        bd1.widgetRemove(p, Widget.WIZARD_PREFIX);
-                        bd2.widgetRemove(p, Widget.WIZARD_PREFIX);
-                    }
-                    if (addDrbdConfigDialog.isWizardCanceled()) {
-                        final VolumeInfo dvi = bd1.getDrbdVolumeInfo();
-                        if (dvi != null) {
-                            dvi.removeMyself(runMode);
-                        }
-                        getBrowser().getDrbdGraph().stopAnimation(bd1);
-                        getBrowser().getDrbdGraph().stopAnimation(bd2);
-                        return;
-                    }
-
-                    updateDrbdInfo();
+            final Thread thread = new Thread(() -> {
+                addDrbdConfigDialog.init(thisClass, bd1, bd2);
+                addDrbdConfigDialog.showDialogs();
+                /* remove wizard parameters from hashes. */
+                for (final String p : bd1.getParametersFromXML()) {
+                    bd1.widgetRemove(p, Widget.WIZARD_PREFIX);
+                    bd2.widgetRemove(p, Widget.WIZARD_PREFIX);
                 }
+                if (addDrbdConfigDialog.isWizardCanceled()) {
+                    final VolumeInfo dvi = bd1.getDrbdVolumeInfo();
+                    if (dvi != null) {
+                        dvi.removeMyself(runMode);
+                    }
+                    getBrowser().getDrbdGraph().stopAnimation(bd1);
+                    getBrowser().getDrbdGraph().stopAnimation(bd2);
+                    return;
+                }
+
+                updateDrbdInfo();
             });
             thread.start();
         } else {
@@ -550,11 +534,11 @@ public class GlobalInfo extends AbstractDrbdInfo {
     public VolumeInfo getNewDrbdVolume(final ResourceInfo dri, final List<BlockDevInfo> blockDevInfos) {
         final Map<String, VolumeInfo> drbdDevHash = getBrowser().getDrbdDeviceHash();
         int index = 0;
-        String drbdDevStr = "/dev/drbd" + Integer.toString(index);
+        String drbdDevStr = "/dev/drbd" + index;
 
         while (drbdDevHash.containsKey(drbdDevStr)) {
             index++;
-            drbdDevStr = "/dev/drbd" + Integer.toString(index);
+            drbdDevStr = "/dev/drbd" + index;
         }
         getBrowser().putDrbdDevHash();
         final String volumeNr = dri.getAvailVolumeNumber();
@@ -647,8 +631,8 @@ public class GlobalInfo extends AbstractDrbdInfo {
      */
     @Override
     public Check checkResourceFields(final String param, final String[] params) {
-        final List<String> incorrect = new ArrayList<String>();
-        final List<String> changed = new ArrayList<String>();
+        final List<String> incorrect = new ArrayList<>();
+        final List<String> changed = new ArrayList<>();
         final Check check = new Check(incorrect, changed);
         for (final ResourceInfo dri : getDrbdResources()) {
             check.addCheck(dri.checkResourceFields(param, dri.getParametersFromXML(), true));
@@ -688,7 +672,7 @@ public class GlobalInfo extends AbstractDrbdInfo {
 
     /** Returns all drbd resources in this cluster. */
     public Collection<ResourceInfo> getDrbdResources() {
-        final Collection<ResourceInfo> resources = new LinkedHashSet<ResourceInfo>();
+        final Collection<ResourceInfo> resources = new LinkedHashSet<>();
         final Host[] hosts = getCluster().getHostsArray();
         for (final ResourceInfo dri : getBrowser().getDrbdResHashValues()) {
             for (final Host host : hosts) {
@@ -806,8 +790,7 @@ public class GlobalInfo extends AbstractDrbdInfo {
     public void createDrbdConfig(final Application.RunMode runMode)
                throws Exceptions.DrbdConfigException, UnknownHostException {
         /* resources */
-        final Collection<Host> hosts = new LinkedHashSet<Host>(
-                                                    getCluster().getHosts());
+        final Collection<Host> hosts = new LinkedHashSet<>(getCluster().getHosts());
         hosts.addAll(getCluster().getProxyHosts());
         for (final Host host : hosts) {
             final StringBuilder globalConfig = new StringBuilder(160);
@@ -858,7 +841,7 @@ public class GlobalInfo extends AbstractDrbdInfo {
                 commonSectionConfig = "\ncommon {\n" + common + '}';
             }
 
-            final Map<String, String> resConfigs = new LinkedHashMap<String, String>();
+            final Map<String, String> resConfigs = new LinkedHashMap<>();
             final Set<Host> proxyHosts = getCluster().getProxyHosts();
             for (final ResourceInfo dri : getBrowser().getDrbdResHashValues()) {
                 if (dri.resourceInHost(host) || proxyHosts.contains(host)) {
@@ -960,13 +943,9 @@ public class GlobalInfo extends AbstractDrbdInfo {
 
     public void exportGraphAsPng() {
         final Optional<String> savePath = dialogs.getFileName("lcmc-drbd");
-        if (savePath.isPresent()) {
-            new Thread() {
-                public void run() {
-                    BufferedImage image = getBrowser().getDrbdGraph().createImage();
-                    Tools.writeImage(savePath.get(), image, "PNG");
-                }
-            }.start();
-        }
+        savePath.ifPresent(s -> new Thread(() -> {
+            BufferedImage image = getBrowser().getDrbdGraph().createImage();
+            Tools.writeImage(s, image, "PNG");
+        }).start());
     }
 }

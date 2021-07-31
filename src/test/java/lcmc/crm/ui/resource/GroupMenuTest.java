@@ -28,8 +28,6 @@ import static org.mockito.Mockito.when;
 
 import java.util.List;
 
-import javax.swing.ImageIcon;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -78,7 +76,7 @@ class GroupMenuTest {
         when(menuFactoryStub.createMenuItem(any(), any(), any(), any(), any())).thenReturn(menuItemStub);
         when(menuFactoryStub.createMenuItem(any(), any(), any(),
 
-                any(), (ImageIcon) any(), any(),
+                any(), any(), any(),
 
                 any(), any())).thenReturn(menuItemStub);
         when(menuFactoryStub.createMenu(any(), any(), any())).thenReturn(menuStub);

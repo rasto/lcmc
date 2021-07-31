@@ -21,17 +21,18 @@ package lcmc.cluster.service.ssh;
 
 import java.io.File;
 import java.io.IOException;
-import lcmc.cluster.ui.SSHGui;
-import lcmc.common.domain.Application;
-import lcmc.logger.Logger;
-import lcmc.logger.LoggerFactory;
-import lcmc.common.domain.util.Tools;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 
 import com.trilead.ssh2.KnownHosts;
 import com.trilead.ssh2.ServerHostKeyVerifier;
+
+import lcmc.cluster.ui.SSHGui;
+import lcmc.common.domain.Application;
+import lcmc.common.domain.util.Tools;
+import lcmc.logger.Logger;
+import lcmc.logger.LoggerFactory;
 
 /**
  * This ServerHostKeyVerifier asks the user on how to proceed if a key
@@ -92,12 +93,10 @@ public class PopupHostKeyVerifier implements ServerHostKeyVerifier {
             LOG.debug("verifyServerHostKey: not using known_hosts" + " file, because this is Windows.");
         } else {
             try {
-                KnownHosts.addHostkeyToFile(new File(application.getKnownHostPath()),
-                                            new String[]{hashedHostname},
-                                            serverHostKeyAlgorithm,
-                                            serverHostKey);
-            } catch (final IOException ignore) {
-                LOG.appWarning("verifyServerHostKey: SSH " + "addHostKeyToFile failed " + ignore.getMessage());
+                KnownHosts.addHostkeyToFile(new File(application.getKnownHostPath()), new String[]{hashedHostname},
+                        serverHostKeyAlgorithm, serverHostKey);
+            } catch (final IOException e) {
+                LOG.appWarning("verifyServerHostKey: SSH " + "addHostKeyToFile failed " + e.getMessage());
             }
         }
     }

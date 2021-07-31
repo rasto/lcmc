@@ -20,12 +20,11 @@
 
 package lcmc.vm.domain;
 
+import java.util.Map;
+
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
-import java.util.Map;
-
-/** Comparator. */
 interface VirtualHardwareComparator {
     Element getElement(final NodeList nodes, final Map<String, String> parameters);
 }

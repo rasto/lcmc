@@ -29,19 +29,18 @@ import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.SpringLayout;
 
-import lcmc.common.domain.Application;
-import lcmc.drbd.domain.DrbdInstallation;
-import lcmc.cluster.ui.ClusterBrowser;
-import lcmc.common.ui.SpringUtilities;
-import lcmc.common.ui.WizardDialog;
-import lcmc.drbd.ui.resource.GlobalInfo;
-import lcmc.common.domain.ConvertCmdCallback;
-import lcmc.common.domain.ExecCallback;
-import lcmc.logger.Logger;
-import lcmc.logger.LoggerFactory;
-import lcmc.common.domain.util.Tools;
 import lcmc.cluster.service.ssh.ExecCommandConfig;
 import lcmc.cluster.service.ssh.Ssh;
+import lcmc.cluster.ui.ClusterBrowser;
+import lcmc.common.domain.Application;
+import lcmc.common.domain.ExecCallback;
+import lcmc.common.domain.util.Tools;
+import lcmc.common.ui.SpringUtilities;
+import lcmc.common.ui.WizardDialog;
+import lcmc.drbd.domain.DrbdInstallation;
+import lcmc.drbd.ui.resource.GlobalInfo;
+import lcmc.logger.Logger;
+import lcmc.logger.LoggerFactory;
 
 /**
  * An implementation of a dialog where drbd is installed.
@@ -143,26 +142,20 @@ final class DrbdCommandInst extends DialogHost {
                              @Override
                              public void doneError(final String answer, final int errorCode) {
                                  LOG.debug1("installDrbd: done error: " + errorCode + " / " + answer);
-                                 printErrorAndRetry(Tools.getString("Dialog.Host.DrbdCommandInst.InstError"),
-                                                    answer,
-                                                    errorCode);
+                                 printErrorAndRetry(Tools.getString("Dialog.Host.DrbdCommandInst.InstError"), answer, errorCode);
                              }
-                         })
-                         .convertCmdCallback(new ConvertCmdCallback() {
-                             @Override
-                             public String convert(final String command) {
-                                 String replaced = command.replaceAll("@ARCH@", archString);
-                                 replaced = replaced.replaceAll("@VERSIONSTRING@", drbdVersionUrlString);
-                                 replaced = replaced.replaceAll("@VERSION@", drbdVersion);
-                                 if (utilFileName != null) {
-                                     replaced = replaced.replaceAll("@UTIL-VERSIONSTRING@", utilFileName);
-                                 }
-                                 if (utilVersion != null) {
-                                     replaced = replaced.replaceAll("@UTIL-VERSION@", utilVersion);
-                                 }
-                                 return replaced;
-                             }
-                         })
+                         }).convertCmdCallback(command -> {
+                    String replaced = command.replaceAll("@ARCH@", archString);
+                    replaced = replaced.replaceAll("@VERSIONSTRING@", drbdVersionUrlString);
+                    replaced = replaced.replaceAll("@VERSION@", drbdVersion);
+                    if (utilFileName != null) {
+                        replaced = replaced.replaceAll("@UTIL-VERSIONSTRING@", utilFileName);
+                    }
+                    if (utilVersion != null) {
+                        replaced = replaced.replaceAll("@UTIL-VERSION@", utilVersion);
+                    }
+                    return replaced;
+                })
                          .sshCommandTimeout(Ssh.DEFAULT_COMMAND_TIMEOUT_LONG));
     }
 

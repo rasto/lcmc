@@ -26,6 +26,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
+
 import javax.swing.AbstractListModel;
 import javax.swing.JTextField;
 import javax.swing.event.DocumentEvent;
@@ -37,8 +38,8 @@ import javax.swing.event.DocumentListener;
 public final class MyListModel<E> extends AbstractListModel<E> {
     private static final String START_TEXT = "type to search...";
 
-    private final Collection<E> items = new ArrayList<E>();
-    private final List<E> filteredItems = new ArrayList<E>();
+    private final Collection<E> items = new ArrayList<>();
+    private final List<E> filteredItems = new ArrayList<>();
     private final FilterField filterField = new FilterField(START_TEXT);
 
     public FilterField getFilterField() {

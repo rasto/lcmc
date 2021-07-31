@@ -24,12 +24,13 @@ package lcmc.crm.ui.resource;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
-import lcmc.cluster.ui.ClusterBrowser;
-import lcmc.cluster.ui.widget.WidgetFactory;
-import lcmc.common.ui.utils.MyButton;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+
+import lcmc.cluster.ui.ClusterBrowser;
+import lcmc.cluster.ui.widget.WidgetFactory;
+import lcmc.common.ui.utils.MyButton;
 
 /**
  * This class holds the information about available resource agent classes.
@@ -46,8 +47,7 @@ public final class AvailableServicesInfo extends HbCategoryInfo {
 
     @Override
     protected Object[][] getTableData(final String tableName) {
-        final List<Object[]> rows = new ArrayList<Object[]>();
-        /** Get classes */
+        final List<Object[]> rows = new ArrayList<>();
         for (final String cl : ClusterBrowser.CRM_CLASSES) {
             final MyButton className = widgetFactory.createButton(cl.toUpperCase(Locale.US));
             rows.add(new Object[]{className, ClusterBrowser.CRM_CLASS_MENU.get(cl)});

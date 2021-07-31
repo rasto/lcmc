@@ -21,7 +21,30 @@
  */
 package lcmc.drbd.ui.resource;
 
-import com.google.common.base.Optional;
+import java.awt.BorderLayout;
+import java.awt.Dimension;
+import java.awt.geom.Point2D;
+import java.net.UnknownHostException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
+import java.util.TreeSet;
+import java.util.concurrent.CountDownLatch;
+import java.util.regex.Matcher;
+
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Provider;
+import javax.swing.BoxLayout;
+import javax.swing.JComponent;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+
 import lcmc.Exceptions;
 import lcmc.cluster.ui.ClusterBrowser;
 import lcmc.cluster.ui.resource.CommonDeviceInterface;
@@ -29,7 +52,6 @@ import lcmc.cluster.ui.widget.Check;
 import lcmc.cluster.ui.wizard.DrbdLogs;
 import lcmc.common.domain.AccessMode;
 import lcmc.common.domain.Application;
-import lcmc.common.domain.ResourceValue;
 import lcmc.common.domain.StringValue;
 import lcmc.common.domain.Value;
 import lcmc.common.domain.util.Tools;
@@ -56,27 +78,6 @@ import lcmc.host.domain.Host;
 import lcmc.logger.Logger;
 import lcmc.logger.LoggerFactory;
 
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Provider;
-import javax.swing.*;
-import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.geom.Point2D;
-import java.net.UnknownHostException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.TreeSet;
-import java.util.concurrent.CountDownLatch;
-import java.util.regex.Matcher;
-
 /**
  * This class holds info data of a DRBD volume.
  */
@@ -85,57 +86,65 @@ public class VolumeInfo extends EditableInfo implements CommonDeviceInterface {
     private static final Logger LOG = LoggerFactory.getLogger(VolumeInfo.class);
     static final String DRBD_VOL_PARAM_DEV = "device";
     static final String DRBD_VOL_PARAM_NUMBER = "number";
-    /** String that is displayed as a tool tip if a menu item is used by CRM. */
+    /**
+     * String that is displayed as a tool tip if a menu item is used by CRM.
+     */
     public static final String IS_USED_BY_CRM_STRING = "it is used by cluster manager";
-    /** String that is displayed as a tool tip for disabled menu item. */
+    /**
+     * String that is displayed as a tool tip for disabled menu item.
+     */
     public static final String IS_SYNCING_STRING = "it is being full-synced";
-    /** String that is displayed as a tool tip for disabled menu item. */
+    /**
+     * String that is displayed as a tool tip for disabled menu item.
+     */
     public static final String IS_VERIFYING_STRING = "it is being verified";
     static final String[] PARAMS = {DRBD_VOL_PARAM_NUMBER, DRBD_VOL_PARAM_DEV};
     static final String SECTION_STRING = Tools.getString("VolumeInfo.VolumeSection");
-    /** Long descriptions for parameters. */
-    private static final Map<String, String> LONG_DESC =
-                Collections.unmodifiableMap(new HashMap<String, String>() {
-                {
-                    put(DRBD_VOL_PARAM_DEV, "DRBD device");
-                    put(DRBD_VOL_PARAM_NUMBER, "DRBD Volume number");
-                }});
-    /** Short descriptions for parameters. */
-    private static final Map<String, String> SHORT_DESC =
-            Collections.unmodifiableMap(new HashMap<String, String>() {
-            {
-                put(DRBD_VOL_PARAM_DEV, Tools.getString("VolumeInfo.Device"));
-                put(DRBD_VOL_PARAM_NUMBER, Tools.getString("VolumeInfo.Number"));
-            }});
+    /**
+     * Long descriptions for parameters.
+     */
+    private static final Map<String, String> LONG_DESC = Collections.unmodifiableMap(new HashMap<>() {
+        {
+            put(DRBD_VOL_PARAM_DEV, "DRBD device");
+            put(DRBD_VOL_PARAM_NUMBER, "DRBD Volume number");
+        }
+    });
+    /**
+     * Short descriptions for parameters.
+     */
+    private static final Map<String, String> SHORT_DESC = Collections.unmodifiableMap(new HashMap<>() {
+        {
+            put(DRBD_VOL_PARAM_DEV, Tools.getString("VolumeInfo.Device"));
+            put(DRBD_VOL_PARAM_NUMBER, Tools.getString("VolumeInfo.Number"));
+        }
+    });
 
-    /** Short descriptions for parameters. */
-    private static final Map<String, Value[]> POSSIBLE_CHOICES =
-                Collections.unmodifiableMap(new HashMap<String, Value[]>() {
-                {
-                    put(DRBD_VOL_PARAM_DEV, new Value[]{new StringValue("/dev/drbd0"),
-                                                        new StringValue("/dev/drbd1"),
-                                                        new StringValue("/dev/drbd2"),
-                                                        new StringValue("/dev/drbd3"),
-                                                        new StringValue("/dev/drbd4"),
-                                                        new StringValue("/dev/drbd5"),
-                                                        new StringValue("/dev/drbd6"),
-                                                        new StringValue("/dev/drbd7"),
-                                                        new StringValue("/dev/drbd8"),
-                                                        new StringValue("/dev/drbd9")});
-                    put(DRBD_VOL_PARAM_NUMBER, new Value[]{new StringValue("0"),
-                                                           new StringValue("1"),
-                                                           new StringValue("2"),
-                                                           new StringValue("3"),
-                                                           new StringValue("4"),
-                                                           new StringValue("5")});
-                }});
+    /**
+     * Short descriptions for parameters.
+     */
+    private static final Map<String, Value[]> POSSIBLE_CHOICES = Collections.unmodifiableMap(new HashMap<>() {
+        {
+            put(DRBD_VOL_PARAM_DEV,
+                    new Value[]{new StringValue("/dev/drbd0"), new StringValue("/dev/drbd1"), new StringValue("/dev/drbd2"),
+                            new StringValue("/dev/drbd3"), new StringValue("/dev/drbd4"), new StringValue("/dev/drbd5"),
+                            new StringValue("/dev/drbd6"), new StringValue("/dev/drbd7"), new StringValue("/dev/drbd8"),
+                            new StringValue("/dev/drbd9")});
+            put(DRBD_VOL_PARAM_NUMBER,
+                    new Value[]{new StringValue("0"), new StringValue("1"), new StringValue("2"), new StringValue("3"),
+                            new StringValue("4"), new StringValue("5")});
+        }
+    });
     private static final String BY_RES_DEV_DIR = "/dev/drbd/by-res/";
 
     private ResourceInfo resourceInfo;
     private List<BlockDevInfo> blockDevInfos;
-    /** Device name. TODO: */
+    /**
+     * Device name. TODO:
+     */
     private String device;
-    /** Last created filesystem. */
+    /**
+     * Last created filesystem.
+     */
     private String createdFs = null;
     private JComponent infoPanel = null;
     private Set<Host> hosts;
@@ -154,12 +163,9 @@ public class VolumeInfo extends EditableInfo implements CommonDeviceInterface {
     @Inject
     private ClusterTreeMenu clusterTreeMenu;
 
-    void init(final String name,
-              final String device,
-              final ResourceInfo resourceInfo,
-              final List<BlockDevInfo> blockDevInfos,
-              final Browser browser) {
-        super.einit(Optional.<ResourceValue>of(new DrbdVolume(name)), name, browser);
+    void init(final String name, final String device, final ResourceInfo resourceInfo, final List<BlockDevInfo> blockDevInfos,
+            final Browser browser) {
+        super.einit(Optional.of(new DrbdVolume(name)), name, browser);
         assert resourceInfo != null;
         assert blockDevInfos.size() >= 2;
 
@@ -173,12 +179,7 @@ public class VolumeInfo extends EditableInfo implements CommonDeviceInterface {
 
     /** Returns sorted hosts from the specified blockdevices. */
     public static Set<Host> getHostsFromBlockDevices(final Iterable<BlockDevInfo> bdis) {
-        final Set<Host> hosts = new TreeSet<Host>(new Comparator<Host>() {
-            @Override
-            public int compare(final Host o1, final Host o2) {
-                return o1.getName().compareToIgnoreCase(o2.getName());
-            }
-        });
+        final Set<Host> hosts = new TreeSet<>((o1, o2) -> o1.getName().compareToIgnoreCase(o2.getName()));
         for (final BlockDevInfo bdi : bdis) {
             hosts.add(bdi.getHost());
         }
@@ -235,8 +236,7 @@ public class VolumeInfo extends EditableInfo implements CommonDeviceInterface {
                 getBrowser().getDrbdGraph().startTestAnimation((JComponent) component, startTestLatch);
                 getBrowser().drbdtestLockAcquire();
                 getBrowser().setDRBDtestData(null);
-                final Map<Host, String> testOutput =
-                    new LinkedHashMap<Host, String>();
+                final Map<Host, String> testOutput = new LinkedHashMap<>();
                 try {
                     getBrowser().getGlobalInfo().createConfigDryRun(testOutput);
                     final DRBDtestData dtd = new DRBDtestData(testOutput);
@@ -275,68 +275,46 @@ public class VolumeInfo extends EditableInfo implements CommonDeviceInterface {
         getResource().setValue(DRBD_VOL_PARAM_DEV, new StringValue(getDevice()));
 
         final String[] params = getParametersFromXML();
-        addParams(optionsPanel,
-                  params,
-                  application.getDefaultSize("ClusterBrowser.DrbdResLabelWidth"),
-                  application.getDefaultSize("ClusterBrowser.DrbdResFieldWidth"),
-                  null);
+        addParams(optionsPanel, params, application.getDefaultSize("ClusterBrowser.DrbdResLabelWidth"),
+                application.getDefaultSize("ClusterBrowser.DrbdResFieldWidth"), null);
 
-        getApplyButton().addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(final ActionEvent e) {
-                LOG.debug1("getInfoPanelVolume: BUTTON: apply");
-                final Thread thread = new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        swingUtils.invokeAndWait(new Runnable() {
-                            @Override
-                            public void run() {
-                                getApplyButton().setEnabled(false);
-                                getRevertButton().setEnabled(false);
-                            }
-                        });
-                        getBrowser().drbdStatusLock();
-                        try {
-                            getBrowser().getGlobalInfo().createDrbdConfigLive();
-                            for (final Host h : getHosts()) {
-                                DRBD.adjustApply(h, DRBD.ALL_DRBD_RESOURCES, null, Application.RunMode.LIVE);
-                            }
-                            apply(Application.RunMode.LIVE);
-                        } catch (final Exceptions.DrbdConfigException dce) {
-                            LOG.appError("getInfoPanelVolume: config failed", dce);
-                        } catch (final UnknownHostException uhe) {
-                            LOG.appError("getInfoPanelVolume: config failed", uhe);
-                        } finally {
-                            getBrowser().drbdStatusUnlock();
-                        }
-                    }
+        getApplyButton().addActionListener(e -> {
+            LOG.debug1("getInfoPanelVolume: BUTTON: apply");
+            final Thread thread = new Thread(() -> {
+                swingUtils.invokeAndWait(() -> {
+                    getApplyButton().setEnabled(false);
+                    getRevertButton().setEnabled(false);
                 });
-                thread.start();
-            }
+                getBrowser().drbdStatusLock();
+                try {
+                    getBrowser().getGlobalInfo().createDrbdConfigLive();
+                    for (final Host h : getHosts()) {
+                        DRBD.adjustApply(h, DRBD.ALL_DRBD_RESOURCES, null, Application.RunMode.LIVE);
+                    }
+                    apply(Application.RunMode.LIVE);
+                } catch (final Exceptions.DrbdConfigException | UnknownHostException dce) {
+                    LOG.appError("getInfoPanelVolume: config failed", dce);
+                } finally {
+                    getBrowser().drbdStatusUnlock();
+                }
+            });
+            thread.start();
         });
 
-        getRevertButton().addActionListener(
-            new ActionListener() {
-                @Override
-                public void actionPerformed(final ActionEvent e) {
-                    LOG.debug1("getInfoPanelVolume: BUTTON: revert");
-                    final Thread thread = new Thread(new Runnable() {
-                        @Override
-                        public void run() {
-                            getBrowser().drbdStatusLock();
-                            try {
-                                revert();
-                            } finally {
-                                getBrowser().drbdStatusUnlock();
-                            }
-                        }
-                    });
-                    thread.start();
+        getRevertButton().addActionListener(e -> {
+            LOG.debug1("getInfoPanelVolume: BUTTON: revert");
+            final Thread thread = new Thread(() -> {
+                getBrowser().drbdStatusLock();
+                try {
+                    revert();
+                } finally {
+                    getBrowser().drbdStatusUnlock();
                 }
-            }
-        );
-        
-        
+            });
+            thread.start();
+        });
+
+
         addApplyButton(buttonPanel);
         addRevertButton(buttonPanel);
 
@@ -503,7 +481,7 @@ public class VolumeInfo extends EditableInfo implements CommonDeviceInterface {
             clusterBrowser.resetFilesystems();
 
             final DrbdXml dxml = drbdXmlProvider.get();
-            dxml.init(hosts0.toArray(new Host[hosts0.size()]), clusterBrowser.getHostDrbdParameters());
+            dxml.init(hosts0.toArray(new Host[0]), clusterBrowser.getHostDrbdParameters());
             for (final Host host : hosts0) {
                 final String conf = dxml.getConfig(host);
                 if (conf != null) {
@@ -511,26 +489,16 @@ public class VolumeInfo extends EditableInfo implements CommonDeviceInterface {
                 }
             }
             clusterBrowser.setDrbdXml(dxml);
-            swingUtils.invokeInEdt(new Runnable() {
-                @Override
-                public void run() {
-                    clusterBrowser.updateDrbdResources();
-                }
-            });
+            swingUtils.invokeInEdt(clusterBrowser::updateDrbdResources);
             if (Application.isLive(runMode)) {
-                swingUtils.invokeInEdt(new Runnable() {
-                    @Override
-                    public void run() {
-                        clusterBrowser.getDrbdGraph().updatePopupMenus();
-                        clusterTreeMenu.removeNode(getNode());
-                        clusterBrowser.getDrbdGraph().scale();
-                    }
+                swingUtils.invokeInEdt(() -> {
+                    clusterBrowser.getDrbdGraph().updatePopupMenus();
+                    clusterTreeMenu.removeNode(getNode());
+                    clusterBrowser.getDrbdGraph().scale();
                 });
             }
-        } catch (final Exceptions.DrbdConfigException dce) {
+        } catch (final Exceptions.DrbdConfigException | UnknownHostException dce) {
             LOG.appError("removeMyselfNoConfirm: config failed", dce);
-        } catch (final UnknownHostException e) {
-            LOG.appError("removeMyselfNoConfirm: config failed", e);
         } finally {
             clusterBrowser.drbdStatusUnlock();
         }
@@ -735,12 +703,7 @@ public class VolumeInfo extends EditableInfo implements CommonDeviceInterface {
         di.getWidget("1", null).setValueAndWait(new StringValue(getDrbdResourceInfo().getName()));
         di.apply(dcHost, runMode);
         di.getResource().setNew(false);
-        swingUtils.invokeInEdt(new Runnable() {
-            @Override
-            public void run() {
-                di.setApplyButtons(null, di.getParametersFromXML());
-            }
-        });
+        swingUtils.invokeInEdt(() -> di.setApplyButtons(null, di.getParametersFromXML()));
     }
 
     /** Adds linbit::drbd service in the pacemaker graph. */
@@ -779,12 +742,7 @@ public class VolumeInfo extends EditableInfo implements CommonDeviceInterface {
         swingUtils.waitForSwing();
         ldi.apply(dcHost, runMode);
         ldi.getResource().setNew(false);
-        swingUtils.invokeInEdt(new Runnable() {
-            @Override
-            public void run() {
-                ldi.setApplyButtons(null, ldi.getParametersFromXML());
-            }
-        });
+        swingUtils.invokeInEdt(() -> ldi.setApplyButtons(null, ldi.getParametersFromXML()));
     }
 
     /** Starts resolve split brain dialog. */
@@ -843,33 +801,27 @@ public class VolumeInfo extends EditableInfo implements CommonDeviceInterface {
     }
 
     /**
-     * Returns whether all the parameters are correct. If param is null,
-     * all paremeters will be checked, otherwise only the param, but other
-     * parameters will be checked only in the cache. This is good if only
-     * one value is changed and we don't want to check everything.
+     * Returns whether all the parameters are correct. If param is null, all paremeters will be checked, otherwise only the param,
+     * but other parameters will be checked only in the cache. This is good if only one value is changed and we don't want to check
+     * everything.
      */
-    Check checkResourceFields(final String param,
-                              final String[] params,
-                              final boolean fromDrbdInfo,
-                              final boolean fromDrbdResourceInfo) {
+    Check checkResourceFields(final String param, final String[] params, final boolean fromDrbdInfo,
+            final boolean fromDrbdResourceInfo) {
         final DrbdXml dxml = getBrowser().getDrbdXml();
         final GlobalInfo di = getBrowser().getGlobalInfo();
         if (di != null && !fromDrbdInfo && !fromDrbdResourceInfo) {
             di.setApplyButtons(null, di.getParametersFromXML());
         }
-        final List<String> incorrect = new ArrayList<String>();
-        final List<String> changed = new ArrayList<String>();
+        final List<String> incorrect = new ArrayList<>();
+        final List<String> changed = new ArrayList<>();
         if (dxml != null && dxml.isDrbdDisabled()) {
             incorrect.add("DRBD is disabled");
         }
         final Check check = new Check(incorrect, changed);
         for (final BlockDevInfo bdi : getBlockDevInfos()) {
             if (bdi != null) {
-                check.addCheck(bdi.checkResourceFields(param,
-                                                       bdi.getParametersFromXML(),
-                                                       fromDrbdInfo,
-                                                       fromDrbdResourceInfo,
-                                                       true));
+                check.addCheck(
+                        bdi.checkResourceFields(param, bdi.getParametersFromXML(), fromDrbdInfo, fromDrbdResourceInfo, true));
             }
         }
         check.addCheck(super.checkResourceFields(param, params));

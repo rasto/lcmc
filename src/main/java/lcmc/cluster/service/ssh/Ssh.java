@@ -23,24 +23,9 @@
 package lcmc.cluster.service.ssh;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
-
-import lcmc.common.domain.util.GuiHelperFiles;
-import lcmc.common.ui.main.MainData;
-import lcmc.common.ui.MainPanel;
-import lcmc.common.ui.main.ProgressIndicator;
-import lcmc.common.ui.utils.SwingUtils;
-import lcmc.configs.DistResource;
-import lcmc.common.domain.Application;
-import lcmc.host.domain.Host;
-import lcmc.common.ui.ProgressBar;
-import lcmc.cluster.ui.SSHGui;
-import lcmc.common.domain.ConnectionCallback;
-import lcmc.common.domain.ExecCallback;
-import lcmc.logger.Logger;
-import lcmc.logger.LoggerFactory;
-import lcmc.common.domain.util.Tools;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -49,13 +34,28 @@ import javax.inject.Provider;
 import com.trilead.ssh2.LocalPortForwarder;
 import com.trilead.ssh2.SCPClient;
 
+import lcmc.cluster.ui.SSHGui;
+import lcmc.common.domain.Application;
+import lcmc.common.domain.ConnectionCallback;
+import lcmc.common.domain.ExecCallback;
+import lcmc.common.domain.util.GuiHelperFiles;
+import lcmc.common.domain.util.Tools;
+import lcmc.common.ui.MainPanel;
+import lcmc.common.ui.ProgressBar;
+import lcmc.common.ui.main.MainData;
+import lcmc.common.ui.main.ProgressIndicator;
+import lcmc.common.ui.utils.SwingUtils;
+import lcmc.configs.DistResource;
+import lcmc.host.domain.Host;
+import lcmc.logger.Logger;
+import lcmc.logger.LoggerFactory;
+
 @Named
 public class Ssh {
     private static final Logger LOG = LoggerFactory.getLogger(Ssh.class);
     public static final int DEFAULT_COMMAND_TIMEOUT = Tools.getDefaultInt("SSH.Command.Timeout");
     public static final int DEFAULT_COMMAND_TIMEOUT_LONG =
                                                     Tools.getDefaultInt("SSH.Command.Timeout.Long");
-    public static final int NO_COMMAND_TIMEOUT = 0;
     public static final String SUDO_PROMPT = "DRBD MC sudo pwd: ";
     public static final String SUDO_FAIL = "Sorry, try again";
     private static final ConnectionCallback NO_CONNECTION_CALLBACK = null;
@@ -114,9 +114,9 @@ public class Ssh {
         }
         if (!isConnected()) {
             LOG.debug1("reconnect: connecting: " + host.getName());
-            this.connectionCallback = NO_CONNECTION_CALLBACK;
-            this.progressBar = NO_PROGRESS_BAR;
-            this.sshGui = new SSHGui(mainData.getMainFrame(), host, null);
+            connectionCallback = NO_CONNECTION_CALLBACK;
+            progressBar = NO_PROGRESS_BAR;
+            sshGui = new SSHGui(mainData.getMainFrame(), host, null);
             authenticateAndConnect();
         }
         return true;
@@ -216,8 +216,7 @@ public class Ssh {
     /** Cancels the session (execution of command). */
     public void cancelSession(final ExecCommandThread execCommandThread) {
         execCommandThread.cancelTheSession();
-        final String message = MESSAGE_CANCELED;
-        LOG.debug1("cancelSession: message" + message);
+        LOG.debug1("cancelSession: message" + MESSAGE_CANCELED);
         host.getTerminalPanel().addCommandOutput("\n");
         host.getTerminalPanel().nextCommand();
     }
@@ -374,7 +373,7 @@ public class Ssh {
         final String fileName = "lcmc-test.tar";
         final String file = Tools.readFile('/' + fileName);
         try {
-            scpClient.put(file.getBytes("UTF-8"), fileName, "/tmp");
+            scpClient.put(file.getBytes(StandardCharsets.UTF_8), fileName, "/tmp");
         } catch (final IOException e) {
             LOG.appError("installTestFiles: could not copy: " + fileName, "", e);
             return;
@@ -506,18 +505,12 @@ public class Ssh {
 
     private void scpCommandFailed(final String ans) {
         for (final String line : ans.split("\n")) {
-             if (line.indexOf("error:") != 0) {
-                 continue;
-             }
-             final Thread t = new Thread(
-             new Runnable() {
-                 @Override
-                 public void run() {
-                     progressIndicator.progressIndicatorFailed(host.getName(), line, 3000);
-                 }
-             });
-             t.start();
-         }
+            if (line.indexOf("error:") != 0) {
+                continue;
+            }
+            final Thread t = new Thread(() -> progressIndicator.progressIndicatorFailed(host.getName(), line, 3000));
+            t.start();
+        }
     }
 
     private void authenticateAndConnect() {

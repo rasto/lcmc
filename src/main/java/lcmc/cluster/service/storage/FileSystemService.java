@@ -20,8 +20,19 @@
 
 package lcmc.cluster.service.storage;
 
-import com.google.common.base.Optional;
+import java.util.Collection;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
+import java.util.TreeSet;
+import java.util.concurrent.ConcurrentHashMap;
+
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import com.google.common.eventbus.Subscribe;
+
 import lcmc.ClusterEventBus;
 import lcmc.HwEventBus;
 import lcmc.cluster.domain.Cluster;
@@ -31,15 +42,6 @@ import lcmc.event.FileSystemsChangedEvent;
 import lcmc.event.HwFileSystemsChangedEvent;
 import lcmc.host.domain.Host;
 
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Singleton;
-import java.util.Collection;
-import java.util.Map;
-import java.util.Set;
-import java.util.TreeSet;
-import java.util.concurrent.ConcurrentHashMap;
-
 @Named
 @Singleton
 public class FileSystemService {
@@ -47,8 +49,8 @@ public class FileSystemService {
     private HwEventBus hwEventBus;
     @Inject
     private ClusterEventBus clusterEventBus;
-    private Map<Host, Set<String>> fileSystemsByHost = new ConcurrentHashMap<Host, Set<String>>();
-    private Map<Cluster, Set<String>> commonFileSystemsByCluster = new ConcurrentHashMap<Cluster, Set<String>>();
+    private final Map<Host, Set<String>> fileSystemsByHost = new ConcurrentHashMap<>();
+    private final Map<Cluster, Set<String>> commonFileSystemsByCluster = new ConcurrentHashMap<>();
 
     public void init() {
         hwEventBus.register(this);
@@ -58,13 +60,13 @@ public class FileSystemService {
     public void onFileSystemsChanged(final HwFileSystemsChangedEvent event) {
         fileSystemsByHost.put(event.getHost(), event.getFileSystems());
         clusterEventBus.post(new FileSystemsChangedEvent(event.getHost(), event.getFileSystems()));
-                updateCommonFileSystems(Optional.fromNullable(event.getHost().getCluster()));
+        updateCommonFileSystems(Optional.ofNullable(event.getHost().getCluster()));
     }
 
     public Set<String> getCommonFileSystems(final Cluster cluster) {
         final Set<String> fileSystems = commonFileSystemsByCluster.get(cluster);
         if (fileSystems == null) {
-            return new TreeSet<String>();
+            return new TreeSet<>();
         }
         return fileSystems;
     }
@@ -74,19 +76,17 @@ public class FileSystemService {
     }
 
     private Set<String> getCommonFileSystems(final Collection<Host> hosts) {
-        Optional<Set<String>> fileSystemsIntersection = Optional.absent();
+        Optional<Set<String>> fileSystemsIntersection = Optional.empty();
 
         for (final Host host : hosts) {
             final Set<String> fileSystems = fileSystemsByHost.get(host);
-            fileSystemsIntersection = Tools.getIntersection(
-                    Optional.fromNullable(fileSystems),
-                    fileSystemsIntersection);
+            fileSystemsIntersection = Tools.getIntersection(Optional.ofNullable(fileSystems), fileSystemsIntersection);
         }
-        return fileSystemsIntersection.or(new TreeSet<String>());
+        return fileSystemsIntersection.orElse(new TreeSet<>());
     }
 
     private void updateCommonFileSystems(final Optional<Cluster> cluster) {
-        if (!cluster.isPresent()) {
+        if (cluster.isEmpty()) {
             return;
         }
         final Set<String> commonFileSystems = getCommonFileSystems(cluster.get().getHosts());

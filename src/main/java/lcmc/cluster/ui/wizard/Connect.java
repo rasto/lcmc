@@ -29,13 +29,13 @@ import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.SpringLayout;
 
-import lcmc.common.ui.utils.SwingUtils;
-import lcmc.host.domain.Host;
+import lcmc.common.domain.util.Tools;
 import lcmc.common.ui.SpringUtilities;
 import lcmc.common.ui.WizardDialog;
+import lcmc.common.ui.utils.SwingUtils;
+import lcmc.host.domain.Host;
 import lcmc.logger.Logger;
 import lcmc.logger.LoggerFactory;
-import lcmc.common.domain.util.Tools;
 
 /**
  * An implementation of a dialog where connection to every host will be checked
@@ -66,8 +66,10 @@ final class Connect extends DialogCluster {
         return Tools.getString("Dialog.Cluster.Connect.Description");
     }
 
-    /** Checks hosts, if they are connected and if not reconnects them. */
-    protected void checkHosts() {
+    /**
+     * Checks hosts, if they are connected and if not reconnects them.
+     */
+    private void checkHosts() {
         final StringBuilder text = new StringBuilder();
         boolean pending = false;
         boolean oneFailed = false;
@@ -97,16 +99,11 @@ final class Connect extends DialogCluster {
                  Thread.currentThread().interrupt();
              }
 
-             swingUtils.invokeLater(new Runnable() {
-                 @Override
-                 public void run() {
-                    buttonClass(nextButton()).pressButton();
-                 }
-             });
+            swingUtils.invokeLater(() -> buttonClass(nextButton()).pressButton());
         }
     }
 
-    protected void connectHosts() {
+    private void connectHosts() {
         getCluster().connect(getDialogPanel(), true, 1);
         for (final Host host : getCluster().getHosts()) {
             host.waitOnLoading();
@@ -122,12 +119,7 @@ final class Connect extends DialogCluster {
 
     @Override
     protected void initDialogAfterVisible() {
-        final Thread t = new Thread(new Runnable() {
-            @Override
-            public void run() {
-                connectHosts();
-            }
-        });
+        final Thread t = new Thread(this::connectHosts);
         t.start();
     }
 

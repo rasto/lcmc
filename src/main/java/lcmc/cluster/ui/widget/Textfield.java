@@ -21,6 +21,7 @@ package lcmc.cluster.ui.widget;
 
 import java.awt.Color;
 import java.util.Map;
+
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.swing.JComponent;
@@ -28,6 +29,7 @@ import javax.swing.event.DocumentListener;
 import javax.swing.text.AbstractDocument;
 import javax.swing.text.Document;
 import javax.swing.text.JTextComponent;
+
 import lcmc.common.domain.AccessMode;
 import lcmc.common.domain.StringValue;
 import lcmc.common.domain.Value;
@@ -137,12 +139,9 @@ public class Textfield extends GenericWidget<JComponent> {
 
     @Override
     public void setBackgroundColor(final Color bg) {
-        swingUtils.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                setBackground(bg);
-                getInternalComponent().setBackground(bg);
-            }
+        swingUtils.invokeLater(() -> {
+            setBackground(bg);
+            getInternalComponent().setBackground(bg);
         });
     }
 

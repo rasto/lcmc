@@ -25,9 +25,9 @@ package lcmc.cluster.domain;
 
 import lcmc.common.domain.StringValue;
 import lcmc.common.domain.Value;
+import lcmc.common.domain.util.Tools;
 import lcmc.logger.Logger;
 import lcmc.logger.LoggerFactory;
-import lcmc.common.domain.util.Tools;
 
 /**
  * This class holds data of one cluster network.
@@ -71,9 +71,7 @@ public final class Network {
 
         Network network = (Network) o;
 
-        if (!name.equals(network.name)) return false;
-
-        return true;
+        return name.equals(network.name);
     }
 
     @Override

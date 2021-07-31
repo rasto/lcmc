@@ -21,6 +21,19 @@
  */
 package lcmc.vm.ui.resource;
 
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.swing.JComponent;
+import javax.swing.JPanel;
+
+import org.w3c.dom.Node;
+
 import lcmc.cluster.ui.widget.Widget;
 import lcmc.common.domain.AccessMode;
 import lcmc.common.domain.Application;
@@ -33,47 +46,48 @@ import lcmc.common.ui.utils.SwingUtils;
 import lcmc.host.domain.Host;
 import lcmc.vm.domain.VmsXml;
 import lcmc.vm.domain.data.InputDevData;
-import org.w3c.dom.Node;
-
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.swing.*;
-import java.util.*;
 
 /**
  * This class holds info about Virtual input devices.
  */
 @Named
 final class InputDevInfo extends HardwareInfo {
-    /** Parameters. */
-    private static final String[] PARAMETERS = {InputDevData.TYPE,
-                                                InputDevData.BUS};
-    /** Field type. */
-    private static final Map<String, Widget.Type> FIELD_TYPES =
-                                       new HashMap<String, Widget.Type>();
-    /** Short name. */
-    private static final Map<String, String> SHORTNAME_MAP =
-                                                 new HashMap<String, String>();
+    /**
+     * Parameters.
+     */
+    private static final String[] PARAMETERS = {InputDevData.TYPE, InputDevData.BUS};
+    /**
+     * Field type.
+     */
+    private static final Map<String, Widget.Type> FIELD_TYPES = new HashMap<>();
+    /**
+     * Short name.
+     */
+    private static final Map<String, String> SHORTNAME_MAP = new HashMap<>();
 
-    /** Whether the parameter is editable only in advanced mode. */
-    private static final Collection<String> IS_ENABLED_ONLY_IN_ADVANCED =
-        new HashSet<String>(Arrays.asList(new String[]{InputDevData.BUS}));
+    /**
+     * Whether the parameter is editable only in advanced mode.
+     */
+    private static final Collection<String> IS_ENABLED_ONLY_IN_ADVANCED = new HashSet<>(List.of(InputDevData.BUS));
 
-    /** Whether the parameter is required. */
-    private static final Collection<String> IS_REQUIRED =
-        new HashSet<String>(Arrays.asList(new String[]{InputDevData.TYPE}));
+    /**
+     * Whether the parameter is required.
+     */
+    private static final Collection<String> IS_REQUIRED = new HashSet<>(List.of(InputDevData.TYPE));
 
-    /** Possible values. */
-    private static final Map<String, Value[]> POSSIBLE_VALUES =
-                                               new HashMap<String, Value[]>();
+    /**
+     * Possible values.
+     */
+    private static final Map<String, Value[]> POSSIBLE_VALUES = new HashMap<>();
+
     static {
         FIELD_TYPES.put(InputDevData.TYPE, Widget.Type.RADIOGROUP);
         SHORTNAME_MAP.put(InputDevData.TYPE, "Type");
         SHORTNAME_MAP.put(InputDevData.BUS, "Bus");
     }
+
     static {
-        POSSIBLE_VALUES.put(InputDevData.TYPE,
-                            new Value[]{new StringValue("tablet"),
+        POSSIBLE_VALUES.put(InputDevData.TYPE, new Value[]{new StringValue("tablet"),
                                         new StringValue("mouse"),
                                         new StringValue("keyboard")});
         POSSIBLE_VALUES.put(InputDevData.BUS,
@@ -88,6 +102,7 @@ final class InputDevInfo extends HardwareInfo {
     @Inject
     private ClusterTreeMenu clusterTreeMenu;
 
+    @Override
     void init(final String name, final Browser browser, final DomainInfo vmsVirtualDomainInfo) {
         super.init(name, browser, vmsVirtualDomainInfo);
     }
@@ -99,12 +114,7 @@ final class InputDevInfo extends HardwareInfo {
                                    DomainInfo.INPUTDEVS_TABLE,
                                    getVMSVirtualDomainInfo().getNewInputDevBtn());
         if (getResource().isNew()) {
-            swingUtils.invokeLater(new Runnable() {
-                @Override
-                public void run() {
-                    tablePanel.setVisible(false);
-                }
-            });
+            swingUtils.invokeLater(() -> tablePanel.setVisible(false));
         }
         mainPanel.add(tablePanel);
     }
@@ -209,17 +219,13 @@ final class InputDevInfo extends HardwareInfo {
         if (Application.isTest(runMode)) {
             return;
         }
-        swingUtils.invokeAndWait(new Runnable() {
-            @Override
-            public void run() {
-                getApplyButton().setEnabled(false);
-                getRevertButton().setEnabled(false);
-                getInfoPanel();
-            }
+        swingUtils.invokeAndWait(() -> {
+            getApplyButton().setEnabled(false);
+            getRevertButton().setEnabled(false);
+            getInfoPanel();
         });
         waitForInfoPanel();
-        final Map<String, String> parameters = getHWParameters(
-                                                        getResource().isNew());
+        final Map<String, String> parameters = getHWParameters(getResource().isNew());
         for (final Host h : getVMSVirtualDomainInfo().getDefinedOnHosts()) {
             final VmsXml vmsXml = getBrowser().getVmsXml(h);
             if (vmsXml != null) {
@@ -239,25 +245,17 @@ final class InputDevInfo extends HardwareInfo {
                                    bus.getValueForConfig());
                 }
 
-                final String domainName =
-                                getVMSVirtualDomainInfo().getDomainName();
+                final String domainName = getVMSVirtualDomainInfo().getDomainName();
                 final Node domainNode = vmsXml.getDomainNode(domainName);
                 modifyXML(vmsXml, domainNode, domainName, parameters);
-                final String virshOptions =
-                                   getVMSVirtualDomainInfo().getVirshOptions();
+                final String virshOptions = getVMSVirtualDomainInfo().getVirshOptions();
                 vmsXml.saveAndDefine(domainNode, domainName, virshOptions);
             }
         }
         getResource().setNew(false);
         clusterTreeMenu.reloadNodeDontSelect(getNode());
-        getBrowser().periodicalVmsUpdate(
-                getVMSVirtualDomainInfo().getDefinedOnHosts());
-        swingUtils.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                tablePanel.setVisible(true);
-            }
-        });
+        getBrowser().periodicalVmsUpdate(getVMSVirtualDomainInfo().getDefinedOnHosts());
+        swingUtils.invokeLater(() -> tablePanel.setVisible(true));
         final String[] params = getParametersFromXML();
         if (Application.isLive(runMode)) {
             storeComboBoxValues(params);
@@ -396,8 +394,7 @@ final class InputDevInfo extends HardwareInfo {
         for (final Host h : getVMSVirtualDomainInfo().getDefinedOnHosts()) {
             final VmsXml vmsXml = getBrowser().getVmsXml(h);
             if (vmsXml != null) {
-                final Map<String, String> parameters =
-                                                new HashMap<String, String>();
+                final Map<String, String> parameters = new HashMap<>();
                 parameters.put(InputDevData.SAVED_TYPE,
                                getParamSaved(InputDevData.TYPE).getValueForConfig());
                 parameters.put(InputDevData.SAVED_BUS,
@@ -419,9 +416,9 @@ final class InputDevInfo extends HardwareInfo {
     @Override
     protected String isRemoveable() {
         final String type = getParamSaved(InputDevData.TYPE).getValueForConfig();
-        if (type != null && "mouse".equals(type)) {
+        if ("mouse".equals(type)) {
             final String bus = getParamSaved(InputDevData.BUS).getValueForConfig();
-            if (bus != null && "ps2".equals(bus)) {
+            if ("ps2".equals(bus)) {
                 return "You can never remove this one";
             }
         }

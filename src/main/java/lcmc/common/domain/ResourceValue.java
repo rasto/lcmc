@@ -33,10 +33,10 @@ import java.util.Map;
  */
 public class ResourceValue {
     private String name = null;
-    private final Map<String, Value> savedValue = new HashMap<String, Value>();
-    private final Map<String, Value[]> possibleChoicesMap = new HashMap<String, Value[]>();
-    private final Map<String, Value> defaultValueMap = new HashMap<String, Value>();
-    private final Map<String, Value> preferredValueMap = new HashMap<String, Value>();
+    private final Map<String, Value> savedValue = new HashMap<>();
+    private final Map<String, Value[]> possibleChoicesMap = new HashMap<>();
+    private final Map<String, Value> defaultValueMap = new HashMap<>();
+    private final Map<String, Value> preferredValueMap = new HashMap<>();
 
     private boolean newResource = false;
 
@@ -74,7 +74,7 @@ public class ResourceValue {
      * value it also removes empty string from values array.
      */
     protected List<Value> getPossibleChoices(final String param, final Value[] values) {
-        final List<Value> possibleChoices = new ArrayList<Value>();
+        final List<Value> possibleChoices = new ArrayList<>();
         if (values == null) {
             return possibleChoices;
         }
@@ -89,7 +89,7 @@ public class ResourceValue {
 
     public Value[] getPossibleChoices(final String param) {
         final List<Value> possibleChoices = getPossibleChoices(param, possibleChoicesMap.get(param));
-        return possibleChoices.toArray(new Value[possibleChoices.size()]);
+        return possibleChoices.toArray(new Value[0]);
     }
 
     public final void setDefaultValue(final String param, final Value defaultValue) {

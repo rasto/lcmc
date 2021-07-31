@@ -26,15 +26,16 @@ package lcmc.drbd.domain;
 import java.math.BigInteger;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.util.Arrays;
 
 import com.google.common.base.Strings;
 
-import lcmc.common.domain.StringValue;
-import lcmc.common.domain.Value;
 import lcmc.common.domain.ResourceValue;
+import lcmc.common.domain.StringValue;
+import lcmc.common.domain.Unit;
+import lcmc.common.domain.Value;
 import lcmc.logger.Logger;
 import lcmc.logger.LoggerFactory;
-import lcmc.common.domain.Unit;
 
 /**
  * This class holds data of one network interface.
@@ -53,7 +54,7 @@ public final class NetInterface extends ResourceValue implements Value {
         try {
             return InetAddress.getByAddress(addr).getHostAddress();
         } catch (final UnknownHostException e) {
-            LOG.appWarning("getSymbolicIp: unkonwn host: " + addr);
+            LOG.appWarning("getSymbolicIp: unkonwn host: " + Arrays.toString(addr));
             return null;
         }
     }
@@ -103,16 +104,16 @@ public final class NetInterface extends ResourceValue implements Value {
                 addressFamily0 = AddressFamily.IPV4;
             }
         }
-        this.ip = ip0;
-        this.addressFamily = addressFamily0;
+        ip = ip0;
+        addressFamily = addressFamily0;
         if (cols.length > 3) {
-            this.cidr = new Integer(cols[3]);
-            this.networkIp = calcNetworkIp(getNumericIp(ip), cidr, size);
+            cidr = Integer.valueOf(cols[3]);
+            networkIp = calcNetworkIp(getNumericIp(ip), cidr, size);
         } else {
-            this.cidr = null;
-            this.networkIp = null;
+            cidr = null;
+            networkIp = null;
         }
-        this.bridge = cols.length > 4 && "bridge".equals(cols[4]);
+        bridge = cols.length > 4 && "bridge".equals(cols[4]);
         setName(iface);
     }
 
@@ -130,7 +131,7 @@ public final class NetInterface extends ResourceValue implements Value {
         if (addressFamily == AddressFamily.IPV6) {
             size = 16;
         }
-        this.networkIp = calcNetworkIp(getNumericIp(ip), cidr, size);
+        networkIp = calcNetworkIp(getNumericIp(ip), cidr, size);
     }
 
     private String calcNetworkIp(final BigInteger numericIp, final Integer cidr, final int size) {

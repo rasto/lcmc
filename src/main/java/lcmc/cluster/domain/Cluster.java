@@ -28,24 +28,24 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
-
-import com.google.common.base.Optional;
-import lcmc.Exceptions;
-import lcmc.common.ui.main.MainData;
-import lcmc.common.ui.utils.SwingUtils;
-import lcmc.host.domain.Host;
-import lcmc.drbd.domain.BlockDevice;
-import lcmc.cluster.ui.ClusterBrowser;
-import lcmc.cluster.ui.ClusterTab;
-import lcmc.cluster.ui.SSHGui;
-import lcmc.cluster.service.storage.BlockDeviceService;
-import lcmc.logger.Logger;
-import lcmc.logger.LoggerFactory;
-import lcmc.common.domain.util.Tools;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+
+import lcmc.Exceptions;
+import lcmc.cluster.service.storage.BlockDeviceService;
+import lcmc.cluster.ui.ClusterBrowser;
+import lcmc.cluster.ui.ClusterTab;
+import lcmc.cluster.ui.SSHGui;
+import lcmc.common.domain.util.Tools;
+import lcmc.common.ui.main.MainData;
+import lcmc.common.ui.utils.SwingUtils;
+import lcmc.drbd.domain.BlockDevice;
+import lcmc.host.domain.Host;
+import lcmc.logger.Logger;
+import lcmc.logger.LoggerFactory;
 
 /**
  * This class holds cluster data and implementation of cluster related
@@ -55,7 +55,7 @@ import javax.inject.Named;
 public class Cluster implements Comparable<Cluster> {
     private static final Logger LOG = LoggerFactory.getLogger(Cluster.class);
     private String name = null;
-    private final Set<Host> hosts = new LinkedHashSet<Host>();
+    private final Set<Host> hosts = new LinkedHashSet<>();
     private ClusterTab clusterTab = null;
     /** Default colors of the hosts. */
     private static final Color[] DEFAULT_HOST_COLORS = {new Color(228, 228, 32),
@@ -73,9 +73,9 @@ public class Cluster implements Comparable<Cluster> {
     @Inject
     private SwingUtils swingUtils;
     /**
-     * Proxy hosts. More can be added in the DRBD config
-     * wizard. */
-    private final Set<Host> proxyHosts = new LinkedHashSet<Host>();
+     * Proxy hosts. More can be added in the DRBD config wizard.
+     */
+    private final Set<Host> proxyHosts = new LinkedHashSet<>();
     @Inject
     private BlockDeviceService blockDeviceService;
 
@@ -116,15 +116,15 @@ public class Cluster implements Comparable<Cluster> {
     }
 
     public Host[] getHostsArray() {
-        return hosts.toArray(new Host [hosts.size()]);
+        return hosts.toArray(new Host[0]);
     }
 
     public String[] getHostNames() {
-        final List<String> hostNames = new ArrayList<String>();
+        final List<String> hostNames = new ArrayList<>();
         for (final Host host : hosts) {
             hostNames.add(host.getName());
         }
-        return hostNames.toArray(new String[hostNames.size()]);
+        return hostNames.toArray(new String[0]);
     }
 
     public void removeAllHosts() {
@@ -149,14 +149,12 @@ public class Cluster implements Comparable<Cluster> {
 
     /** Returns block device objects of all hosts. */
     public BlockDevice[] getHostBlockDevices(final String device) {
-        final List<BlockDevice> list = new ArrayList<BlockDevice>();
+        final List<BlockDevice> list = new ArrayList<>();
         for (final Host host : hosts) {
             final Optional<BlockDevice> bd = blockDeviceService.getBlockDeviceByName(host, device);
-            if (bd.isPresent()) {
-                list.add(bd.get());
-            }
+            bd.ifPresent(list::add);
         }
-        return list.toArray(new BlockDevice [list.size()]);
+        return list.toArray(new BlockDevice[0]);
     }
 
     public boolean contains(final String hostName) {
@@ -169,7 +167,7 @@ public class Cluster implements Comparable<Cluster> {
     }
 
     public List<Color> getHostColorsInGraphs(final Collection<String> nodes) {
-        final List<Color> colors = new ArrayList<Color>();
+        final List<Color> colors = new ArrayList<>();
         if (nodes == null || nodes.isEmpty()) {
             colors.add(Tools.getDefaultColor("CRMGraph.FillPaintStopped"));
             return colors;
@@ -307,11 +305,6 @@ public class Cluster implements Comparable<Cluster> {
             host.disconnect();
         }
         final Cluster thisCluster = this;
-        swingUtils.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                mainData.getClustersPanel().removeTabWithCluster(thisCluster);
-            }
-        });
+        swingUtils.invokeLater(() -> mainData.getClustersPanel().removeTabWithCluster(thisCluster));
     }
 }

@@ -24,10 +24,9 @@
 package lcmc.drbd.ui.configdialog;
 
 import java.awt.Dimension;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.util.HashMap;
 import java.util.Map;
+
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Provider;
@@ -37,24 +36,24 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
-import lcmc.common.ui.utils.SwingUtils;
-import lcmc.configs.AppDefaults;
+import lcmc.cluster.ui.widget.Widget;
 import lcmc.cluster.ui.widget.WidgetFactory;
 import lcmc.common.domain.Application;
-import lcmc.host.domain.Host;
-import lcmc.host.domain.HostFactory;
 import lcmc.common.domain.StringValue;
 import lcmc.common.domain.Value;
+import lcmc.common.domain.util.Tools;
+import lcmc.common.ui.WizardDialog;
+import lcmc.common.ui.utils.MyButton;
+import lcmc.common.ui.utils.SwingUtils;
+import lcmc.configs.AppDefaults;
 import lcmc.drbd.domain.DrbdInstallation;
 import lcmc.drbd.domain.DrbdXml;
-import lcmc.common.ui.WizardDialog;
 import lcmc.drbd.ui.resource.GlobalInfo;
 import lcmc.drbd.ui.resource.ResourceInfo;
-import lcmc.cluster.ui.widget.Widget;
+import lcmc.host.domain.Host;
+import lcmc.host.domain.HostFactory;
 import lcmc.logger.Logger;
 import lcmc.logger.LoggerFactory;
-import lcmc.common.ui.utils.MyButton;
-import lcmc.common.domain.util.Tools;
 
 /**
  * An implementation of a dialog where user can enter drbd resource
@@ -179,12 +178,7 @@ public final class Resource extends DrbdConfig {
             /* don't enable */
             enableComponents(new JComponent[]{buttonClass(nextButton())});
         }
-        swingUtils.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                makeDefaultButton(buttonClass(nextButton()));
-            }
-        });
+        swingUtils.invokeLater(() -> makeDefaultButton(buttonClass(nextButton())));
         if (application.getAutoOptionGlobal("autodrbd") != null) {
             pressNextButton();
         }
@@ -199,7 +193,7 @@ public final class Resource extends DrbdConfig {
         final JPanel optionsPanel = new JPanel();
         optionsPanel.setLayout(new BoxLayout(optionsPanel, BoxLayout.PAGE_AXIS));
         /* common options */
-        final Map<String, Value> commonPreferredValue = new HashMap<String, Value>();
+        final Map<String, Value> commonPreferredValue = new HashMap<>();
         commonPreferredValue.put(DrbdXml.PROTOCOL_PARAM, DrbdXml.PROTOCOL_C);
         commonPreferredValue.put(DEGR_WFC_TIMEOUT_PARAM, new StringValue("0"));
         commonPreferredValue.put(CRAM_HMAC_ALG_PARAM, new StringValue("sha1"));
@@ -272,24 +266,13 @@ public final class Resource extends DrbdConfig {
 
         final MyButton btn = widgetFactory.createButton(Tools.getString("Dialog.DrbdConfig.Resource.AddHost"));
         btn.setBackgroundColor(AppDefaults.LIGHT_ORANGE);
-        btn.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(final ActionEvent e) {
-                final Thread t = new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        swingUtils.invokeLater(new Runnable() {
-                            @Override
-                            public void run() {
-                                btn.setEnabled(false);
-                                proxyHostNextDialog = true;
-                                buttonClass(nextButton()).pressButton();
-                            }
-                        });
-                    }
-                });
-                t.start();
-            }
+        btn.addActionListener(e -> {
+            final Thread t = new Thread(() -> swingUtils.invokeLater(() -> {
+                btn.setEnabled(false);
+                proxyHostNextDialog = true;
+                buttonClass(nextButton()).pressButton();
+            }));
+            t.start();
         });
         panel.add(btn);
 

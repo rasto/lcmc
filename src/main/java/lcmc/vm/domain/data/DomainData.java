@@ -20,21 +20,13 @@
 
 package lcmc.vm.domain.data;
 
+import java.util.Map;
+
 import com.google.common.collect.Maps;
-import lcmc.vm.domain.data.DiskData;
-import lcmc.vm.domain.data.FilesystemData;
-import lcmc.vm.domain.data.GraphicsData;
-import lcmc.vm.domain.data.InputDevData;
-import lcmc.vm.domain.data.InterfaceData;
-import lcmc.vm.domain.data.ParallelData;
-import lcmc.vm.domain.data.SerialData;
-import lcmc.vm.domain.data.SoundData;
-import lcmc.vm.domain.data.VideoData;
+
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
-
-import java.util.Map;
 
 @RequiredArgsConstructor
 public class DomainData {

@@ -20,7 +20,6 @@
 package lcmc.cluster.service.ssh;
 
 import com.trilead.ssh2.Connection;
-import com.trilead.ssh2.channel.ChannelManager;
 
 /** Connection class that can cancel it's connection during openSession. */
 public class SshConnection extends Connection {

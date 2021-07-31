@@ -20,15 +20,17 @@
 
 package lcmc.robotest;
 
-import java.awt.event.KeyEvent;
-import lcmc.cluster.domain.Cluster;
-import lcmc.cluster.ui.widget.MComboBox;
 import static lcmc.robotest.RoboTest.CONFIRM_REMOVE;
-import lcmc.common.domain.util.Tools;
+
+import java.awt.event.KeyEvent;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
+
+import lcmc.cluster.domain.Cluster;
+import lcmc.cluster.ui.widget.MComboBox;
+import lcmc.common.domain.util.Tools;
 
 /**
  * This class is used to test the GUI.
@@ -56,7 +58,6 @@ final class PcmkTestF {
         roboTest.moveTo("Clone");
         roboTest.leftClick(); /* clone */
 
-        final int type = 1;
         for (int i = count; i > 0; i--) {
             roboTest.info("I: " + i);
             /* create dummy */
@@ -67,12 +68,6 @@ final class PcmkTestF {
             roboTest.moveTo("OCF Resource Agents");
             roboTest.typeDummy();
             roboTest.setTimeouts(true);
-            if (type == 1) {
-                roboTest.moveTo(Tools.getString("Browser.ApplyResource"));
-                roboTest.leftClick();
-            }
-        }
-        if (type != 1) {
             roboTest.moveTo(Tools.getString("Browser.ApplyResource"));
             roboTest.leftClick();
         }

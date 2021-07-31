@@ -25,29 +25,26 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.regex.Matcher;
+
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.swing.ImageIcon;
 
+import lcmc.cluster.ui.ClusterBrowser;
+import lcmc.cluster.ui.resource.NetInfo;
 import lcmc.common.domain.AccessMode;
 import lcmc.common.domain.Application;
-import lcmc.common.ui.Access;
-import lcmc.host.domain.Host;
-import lcmc.vm.domain.VmsXml;
 import lcmc.common.domain.ResourceValue;
-import lcmc.cluster.ui.ClusterBrowser;
-import lcmc.host.ui.HostBrowser;
-import lcmc.cluster.ui.resource.NetInfo;
-import lcmc.drbd.ui.resource.BlockDevInfo;
-import lcmc.common.domain.EnablePredicate;
-import lcmc.common.ui.utils.MenuAction;
+import lcmc.common.domain.util.Tools;
+import lcmc.common.ui.Access;
 import lcmc.common.ui.utils.MenuFactory;
 import lcmc.common.ui.utils.MyMenu;
 import lcmc.common.ui.utils.MyMenuItem;
-import lcmc.common.domain.Predicate;
-import lcmc.common.domain.util.Tools;
 import lcmc.common.ui.utils.UpdatableItem;
-import lcmc.common.domain.VisiblePredicate;
+import lcmc.drbd.ui.resource.BlockDevInfo;
+import lcmc.host.domain.Host;
+import lcmc.host.ui.HostBrowser;
+import lcmc.vm.domain.VmsXml;
 
 @Named
 public class DomainMenu {
@@ -65,7 +62,7 @@ public class DomainMenu {
 
     public List<UpdatableItem> getPulldownMenu(final DomainInfo domainInfo) {
         this.domainInfo = domainInfo;
-        final List<UpdatableItem> items = new ArrayList<UpdatableItem>();
+        final List<UpdatableItem> items = new ArrayList<>();
         /* vnc viewers */
         for (final Host h : getBrowser().getClusterHosts()) {
             addVncViewersToTheMenu(items, h);
@@ -95,20 +92,12 @@ public class DomainMenu {
         for (final Host h : getBrowser().getClusterHosts()) {
             addResumeMenu(items, h);
         }
-        items.add(getAddNewHardwareMenu(
-                Tools.getString("DomainInfo.AddNewHardware")));
+        items.add(getAddNewHardwareMenu(Tools.getString("DomainInfo.AddNewHardware")));
 
         /* advanced options */
-        final MyMenu advancedSubmenu = menuFactory.createMenu(
-                Tools.getString("DomainInfo.MoreOptions"),
-                new AccessMode(AccessMode.OP, AccessMode.NORMAL),
-                new AccessMode(AccessMode.OP, AccessMode.NORMAL))
-                .enablePredicate(new EnablePredicate() {
-                    @Override
-                    public String check() {
-                        return null;
-                    }
-                });
+        final MyMenu advancedSubmenu =
+                menuFactory.createMenu(Tools.getString("DomainInfo.MoreOptions"), new AccessMode(AccessMode.OP, AccessMode.NORMAL),
+                        new AccessMode(AccessMode.OP, AccessMode.NORMAL)).enablePredicate(() -> null);
         items.add(advancedSubmenu);
 
         /* suspend */
@@ -122,48 +111,34 @@ public class DomainMenu {
         }
 
         /* remove domain */
-        final UpdatableItem removeMenuItem = menuFactory.createMenuItem(
-                Tools.getString("DomainInfo.RemoveDomain"),
-                ClusterBrowser.REMOVE_ICON,
-                Tools.getString("DomainInfo.RemoveDomain"),
+        final UpdatableItem removeMenuItem =
+                menuFactory.createMenuItem(Tools.getString("DomainInfo.RemoveDomain"), ClusterBrowser.REMOVE_ICON,
+                                Tools.getString("DomainInfo.RemoveDomain"),
 
-                Tools.getString("DomainInfo.CancelDomain"),
-                ClusterBrowser.REMOVE_ICON,
-                Tools.getString("DomainInfo.CancelDomain"),
+                                Tools.getString("DomainInfo.CancelDomain"), ClusterBrowser.REMOVE_ICON,
+                                Tools.getString("DomainInfo.CancelDomain"),
 
-                new AccessMode(AccessMode.ADMIN, AccessMode.NORMAL),
-                new AccessMode(AccessMode.OP, AccessMode.NORMAL))
-                .predicate(new Predicate() {
-                    @Override
-                    public boolean check() {
-                        return !domainInfo.getResource().isNew();
-                    }
-                })
-                .enablePredicate(new EnablePredicate() {
-                    @Override
-                    public String check() {
-                        if (!access.isAdvancedMode() && domainInfo.isUsedByCRM()) {
-                            return DomainInfo.IS_USED_BY_CRM_STRING;
-                        }
-                        for (final Host host : getBrowser().getClusterHosts()) {
-                            final VmsXml vmsXml = getBrowser().getVmsXml(host);
-                            if (vmsXml == null) {
-                                continue;
+                                new AccessMode(AccessMode.ADMIN, AccessMode.NORMAL), new AccessMode(AccessMode.OP, AccessMode.NORMAL))
+                        .predicate(() -> !domainInfo.getResource().isNew())
+                        .enablePredicate(() -> {
+                            if (!access.isAdvancedMode() && domainInfo.isUsedByCRM()) {
+                                return DomainInfo.IS_USED_BY_CRM_STRING;
                             }
-                            if (vmsXml.isRunning(domainInfo.getDomainName())) {
-                                return "it is running";
+                            for (final Host host : getBrowser().getClusterHosts()) {
+                                final VmsXml vmsXml = getBrowser().getVmsXml(host);
+                                if (vmsXml == null) {
+                                    continue;
+                                }
+                                if (vmsXml.isRunning(domainInfo.getDomainName())) {
+                                    return "it is running";
+                                }
                             }
-                        }
-                        return null;
-                    }
-                })
-                .addAction(new MenuAction() {
-                    @Override
-                    public void run(final String text) {
-                        domainInfo.hidePopup();
-                        domainInfo.removeMyself(Application.RunMode.LIVE);
-                    }
-                });
+                            return null;
+                        })
+                        .addAction(text -> {
+                            domainInfo.hidePopup();
+                            domainInfo.removeMyself(Application.RunMode.LIVE);
+                        });
         items.add(removeMenuItem);
         return items;
     }
@@ -172,161 +147,106 @@ public class DomainMenu {
      * Add new hardware.
      */
     private UpdatableItem getAddNewHardwareMenu(final String name) {
-        final MyMenu newHardwareMenu = menuFactory.createMenu(
-                name,
-                new AccessMode(AccessMode.ADMIN, AccessMode.NORMAL),
+        final MyMenu newHardwareMenu = menuFactory.createMenu(name, new AccessMode(AccessMode.ADMIN, AccessMode.NORMAL),
                 new AccessMode(AccessMode.OP, AccessMode.NORMAL));
-        newHardwareMenu.onUpdate(new Runnable() {
-            @Override
-            public void run() {
-                newHardwareMenu.removeAll();
-                final Point2D pos = newHardwareMenu.getPos();
-                /* disk */
-                final MyMenuItem newDiskMenuItem = menuFactory.createMenuItem(
-                        Tools.getString("DomainInfo.AddNewDisk"),
-                        BlockDevInfo.HARDDISK_ICON_LARGE,
-                        new AccessMode(AccessMode.ADMIN, AccessMode.NORMAL),
-                        new AccessMode(AccessMode.OP, AccessMode.NORMAL))
-                        .addAction(new MenuAction() {
-                            @Override
-                            public void run(final String text) {
+        newHardwareMenu.onUpdate(() -> {
+            newHardwareMenu.removeAll();
+            final Point2D pos = newHardwareMenu.getPos();
+            /* disk */
+            final MyMenuItem newDiskMenuItem =
+                    menuFactory.createMenuItem(Tools.getString("DomainInfo.AddNewDisk"), BlockDevInfo.HARDDISK_ICON_LARGE,
+                                    new AccessMode(AccessMode.ADMIN, AccessMode.NORMAL), new AccessMode(AccessMode.OP, AccessMode.NORMAL))
+                            .addAction(text -> {
                                 domainInfo.hidePopup();
                                 domainInfo.addDiskPanel();
-                            }
-                        });
-                newDiskMenuItem.setPos(pos);
-                newHardwareMenu.add(newDiskMenuItem);
+                            });
+            newDiskMenuItem.setPos(pos);
+            newHardwareMenu.add(newDiskMenuItem);
 
-                /* fs */
-                final MyMenuItem newFilesystemMenuItem = menuFactory.createMenuItem(
-                        Tools.getString("DomainInfo.AddNewFilesystem"),
-                        BlockDevInfo.HARDDISK_ICON_LARGE,
-                        new AccessMode(AccessMode.ADMIN, AccessMode.NORMAL),
-                        new AccessMode(AccessMode.OP, AccessMode.NORMAL))
-                        .addAction(new MenuAction() {
-                            @Override
-                            public void run(final String text) {
+            /* fs */
+            final MyMenuItem newFilesystemMenuItem =
+                    menuFactory.createMenuItem(Tools.getString("DomainInfo.AddNewFilesystem"), BlockDevInfo.HARDDISK_ICON_LARGE,
+                                    new AccessMode(AccessMode.ADMIN, AccessMode.NORMAL), new AccessMode(AccessMode.OP, AccessMode.NORMAL))
+                            .addAction(text -> {
                                 domainInfo.hidePopup();
                                 domainInfo.addFilesystemPanel();
-                            }
-                        });
-                newFilesystemMenuItem.setPos(pos);
-                newHardwareMenu.add(newFilesystemMenuItem);
+                            });
+            newFilesystemMenuItem.setPos(pos);
+            newHardwareMenu.add(newFilesystemMenuItem);
 
-                /* interface */
-                final MyMenuItem newInterfaceMenuItem = menuFactory.createMenuItem(
-                        Tools.getString("DomainInfo.AddNewInterface"),
-                        NetInfo.NET_INTERFACE_ICON_LARGE,
-                        new AccessMode(AccessMode.ADMIN, AccessMode.NORMAL),
-                        new AccessMode(AccessMode.OP, AccessMode.NORMAL))
-                        .addAction(new MenuAction() {
-                            @Override
-                            public void run(final String text) {
+            /* interface */
+            final MyMenuItem newInterfaceMenuItem =
+                    menuFactory.createMenuItem(Tools.getString("DomainInfo.AddNewInterface"), NetInfo.NET_INTERFACE_ICON_LARGE,
+                                    new AccessMode(AccessMode.ADMIN, AccessMode.NORMAL), new AccessMode(AccessMode.OP, AccessMode.NORMAL))
+                            .addAction(text -> {
                                 domainInfo.hidePopup();
                                 domainInfo.addInterfacePanel();
-                            }
-                        });
-                newInterfaceMenuItem.setPos(pos);
-                newHardwareMenu.add(newInterfaceMenuItem);
+                            });
+            newInterfaceMenuItem.setPos(pos);
+            newHardwareMenu.add(newInterfaceMenuItem);
 
-                /* graphics */
-                final MyMenuItem newGraphicsMenuItem = menuFactory.createMenuItem(
-                        Tools.getString("DomainInfo.AddNewGraphics"),
-                        DomainInfo.VNC_ICON,
-                        new AccessMode(AccessMode.ADMIN, AccessMode.NORMAL),
-                        new AccessMode(AccessMode.OP, AccessMode.NORMAL))
-                        .addAction(new MenuAction() {
-                            @Override
-                            public void run(final String text) {
+            /* graphics */
+            final MyMenuItem newGraphicsMenuItem =
+                    menuFactory.createMenuItem(Tools.getString("DomainInfo.AddNewGraphics"), DomainInfo.VNC_ICON,
+                                    new AccessMode(AccessMode.ADMIN, AccessMode.NORMAL), new AccessMode(AccessMode.OP, AccessMode.NORMAL))
+                            .addAction(text -> {
                                 domainInfo.hidePopup();
                                 domainInfo.addGraphicsPanel();
-                            }
-                        });
-                newGraphicsMenuItem.setPos(pos);
-                newHardwareMenu.add(newGraphicsMenuItem);
+                            });
+            newGraphicsMenuItem.setPos(pos);
+            newHardwareMenu.add(newGraphicsMenuItem);
 
-                /* input dev */
-                final MyMenuItem newInputDevMenuItem = menuFactory.createMenuItem(
-                        Tools.getString("DomainInfo.AddNewInputDev"),
-                        null,
-                        new AccessMode(AccessMode.ADMIN, AccessMode.NORMAL),
-                        new AccessMode(AccessMode.OP, AccessMode.NORMAL))
-                        .addAction(new MenuAction() {
-                            @Override
-                            public void run(final String text) {
-                                domainInfo.hidePopup();
-                                domainInfo.addInputDevPanel();
-                            }
-                        });
-                newInputDevMenuItem.setPos(pos);
-                newHardwareMenu.add(newInputDevMenuItem);
+            /* input dev */
+            final MyMenuItem newInputDevMenuItem = menuFactory.createMenuItem(Tools.getString("DomainInfo.AddNewInputDev"), null,
+                            new AccessMode(AccessMode.ADMIN, AccessMode.NORMAL), new AccessMode(AccessMode.OP, AccessMode.NORMAL))
+                    .addAction(text -> {
+                        domainInfo.hidePopup();
+                        domainInfo.addInputDevPanel();
+                    });
+            newInputDevMenuItem.setPos(pos);
+            newHardwareMenu.add(newInputDevMenuItem);
 
-                /* sounds */
-                final MyMenuItem newSoundsMenuItem = menuFactory.createMenuItem(
-                        Tools.getString("DomainInfo.AddNewSound"),
-                        null,
-                        new AccessMode(AccessMode.ADMIN, AccessMode.NORMAL),
-                        new AccessMode(AccessMode.OP, AccessMode.NORMAL))
-                        .addAction(new MenuAction() {
-                            @Override
-                            public void run(final String text) {
-                                domainInfo.hidePopup();
-                                domainInfo.addSoundsPanel();
-                            }
-                        });
-                newSoundsMenuItem.setPos(pos);
-                newHardwareMenu.add(newSoundsMenuItem);
+            /* sounds */
+            final MyMenuItem newSoundsMenuItem = menuFactory.createMenuItem(Tools.getString("DomainInfo.AddNewSound"), null,
+                            new AccessMode(AccessMode.ADMIN, AccessMode.NORMAL), new AccessMode(AccessMode.OP, AccessMode.NORMAL))
+                    .addAction(text -> {
+                        domainInfo.hidePopup();
+                        domainInfo.addSoundsPanel();
+                    });
+            newSoundsMenuItem.setPos(pos);
+            newHardwareMenu.add(newSoundsMenuItem);
 
-                /* serials */
-                final MyMenuItem newSerialsMenuItem = menuFactory.createMenuItem(
-                        Tools.getString("DomainInfo.AddNewSerial"),
-                        null,
-                        new AccessMode(AccessMode.ADMIN, AccessMode.NORMAL),
-                        new AccessMode(AccessMode.OP, AccessMode.NORMAL))
-                        .addAction(new MenuAction() {
-                            @Override
-                            public void run(final String text) {
-                                domainInfo.hidePopup();
-                                domainInfo.addSerialsPanel();
-                            }
-                        });
-                newSerialsMenuItem.setPos(pos);
-                newHardwareMenu.add(newSerialsMenuItem);
+            /* serials */
+            final MyMenuItem newSerialsMenuItem = menuFactory.createMenuItem(Tools.getString("DomainInfo.AddNewSerial"), null,
+                            new AccessMode(AccessMode.ADMIN, AccessMode.NORMAL), new AccessMode(AccessMode.OP, AccessMode.NORMAL))
+                    .addAction(text -> {
+                        domainInfo.hidePopup();
+                        domainInfo.addSerialsPanel();
+                    });
+            newSerialsMenuItem.setPos(pos);
+            newHardwareMenu.add(newSerialsMenuItem);
 
-                /* parallels */
-                final MyMenuItem newParallelsMenuItem = menuFactory.createMenuItem(
-                        Tools.getString("DomainInfo.AddNewParallel"),
-                        null,
-                        new AccessMode(AccessMode.ADMIN, AccessMode.NORMAL),
-                        new AccessMode(AccessMode.OP, AccessMode.NORMAL))
-                        .addAction(new MenuAction() {
-                            @Override
-                            public void run(final String text) {
-                                domainInfo.hidePopup();
-                                domainInfo.addParallelsPanel();
-                            }
-                        });
-                newParallelsMenuItem.setPos(pos);
-                newHardwareMenu.add(newParallelsMenuItem);
+            /* parallels */
+            final MyMenuItem newParallelsMenuItem = menuFactory.createMenuItem(Tools.getString("DomainInfo.AddNewParallel"), null,
+                            new AccessMode(AccessMode.ADMIN, AccessMode.NORMAL), new AccessMode(AccessMode.OP, AccessMode.NORMAL))
+                    .addAction(text -> {
+                        domainInfo.hidePopup();
+                        domainInfo.addParallelsPanel();
+                    });
+            newParallelsMenuItem.setPos(pos);
+            newHardwareMenu.add(newParallelsMenuItem);
 
-                /* videos */
-                final MyMenuItem newVideosMenuItem = menuFactory.createMenuItem(
-                        Tools.getString("DomainInfo.AddNewVideo"),
-                        null,
-                        new AccessMode(AccessMode.ADMIN, AccessMode.ADVANCED),
-                        new AccessMode(AccessMode.OP, AccessMode.NORMAL))
-                        .addAction(new MenuAction() {
-                            @Override
-                            public void run(final String text) {
-                                domainInfo.hidePopup();
-                                domainInfo.addVideosPanel();
-                            }
-                        });
-                newVideosMenuItem.setPos(pos);
-                newHardwareMenu.add(newVideosMenuItem);
-                newHardwareMenu.updateMenuComponents();
-                newHardwareMenu.processAccessMode();
-            }
+            /* videos */
+            final MyMenuItem newVideosMenuItem = menuFactory.createMenuItem(Tools.getString("DomainInfo.AddNewVideo"), null,
+                            new AccessMode(AccessMode.ADMIN, AccessMode.ADVANCED), new AccessMode(AccessMode.OP, AccessMode.NORMAL))
+                    .addAction(text -> {
+                        domainInfo.hidePopup();
+                        domainInfo.addVideosPanel();
+                    });
+            newVideosMenuItem.setPos(pos);
+            newHardwareMenu.add(newVideosMenuItem);
+            newHardwareMenu.updateMenuComponents();
+            newHardwareMenu.processAccessMode();
         });
         return newHardwareMenu;
     }
@@ -335,38 +255,23 @@ public class DomainMenu {
      * Adds vm domain start menu item.
      */
     private void addStartMenu(final Collection<UpdatableItem> items, final Host host) {
-        final UpdatableItem startMenuItem = menuFactory.createMenuItem(
-                Tools.getString("DomainInfo.StartOn") + host.getName(),
-                HostBrowser.HOST_ON_ICON_LARGE,
-                Tools.getString("DomainInfo.StartOn") + host.getName(),
-                new AccessMode(AccessMode.OP, AccessMode.NORMAL),
-                new AccessMode(AccessMode.OP, AccessMode.NORMAL))
-                .visiblePredicate(new VisiblePredicate() {
-                    @Override
-                    public boolean check() {
-                        final VmsXml vmsXml = getBrowser().getVmsXml(host);
-                        return vmsXml != null
-                                && vmsXml.getDomainNames().contains(domainInfo.getDomainName())
-                                && !vmsXml.isRunning(domainInfo.getDomainName());
+        final UpdatableItem startMenuItem =
+                menuFactory.createMenuItem(Tools.getString("DomainInfo.StartOn") + host.getName(), HostBrowser.HOST_ON_ICON_LARGE,
+                        Tools.getString("DomainInfo.StartOn") + host.getName(), new AccessMode(AccessMode.OP, AccessMode.NORMAL),
+                        new AccessMode(AccessMode.OP, AccessMode.NORMAL)).visiblePredicate(() -> {
+                    final VmsXml vmsXml = getBrowser().getVmsXml(host);
+                    return vmsXml != null && vmsXml.getDomainNames().contains(domainInfo.getDomainName()) && !vmsXml.isRunning(
+                            domainInfo.getDomainName());
+                }).enablePredicate(() -> {
+                    if (!access.isAdvancedMode() && domainInfo.isUsedByCRM()) {
+                        return DomainInfo.IS_USED_BY_CRM_STRING;
                     }
-                })
-                .enablePredicate(new EnablePredicate() {
-                    @Override
-                    public String check() {
-                        if (!access.isAdvancedMode() && domainInfo.isUsedByCRM()) {
-                            return DomainInfo.IS_USED_BY_CRM_STRING;
-                        }
-                        return null;
-                    }
-                })
-                .addAction(new MenuAction() {
-                    @Override
-                    public void run(final String text) {
-                        domainInfo.hidePopup();
-                        final VmsXml vxml = getBrowser().getVmsXml(host);
-                        if (vxml != null && host != null) {
-                            domainInfo.start(host);
-                        }
+                    return null;
+                }).addAction(text -> {
+                    domainInfo.hidePopup();
+                    final VmsXml vxml = getBrowser().getVmsXml(host);
+                    if (vxml != null) {
+                        domainInfo.start(host);
                     }
                 });
         items.add(startMenuItem);
@@ -376,38 +281,23 @@ public class DomainMenu {
      * Adds vm domain shutdown menu item.
      */
     void addShutdownMenu(final Collection<UpdatableItem> items, final Host host) {
-        final UpdatableItem shutdownMenuItem = menuFactory.createMenuItem(
-                Tools.getString("DomainInfo.ShutdownOn") + host.getName(),
-                SHUTDOWN_ICON,
-                Tools.getString("DomainInfo.ShutdownOn") + host.getName(),
-                new AccessMode(AccessMode.OP, AccessMode.NORMAL),
-                new AccessMode(AccessMode.OP, AccessMode.NORMAL))
-                .visiblePredicate(new VisiblePredicate() {
-                    @Override
-                    public boolean check() {
-                        final VmsXml vmsXml = getBrowser().getVmsXml(host);
-                        return vmsXml != null
-                               && vmsXml.getDomainNames().contains(domainInfo.getDomainName())
-                               && vmsXml.isRunning(domainInfo.getDomainName());
+        final UpdatableItem shutdownMenuItem =
+                menuFactory.createMenuItem(Tools.getString("DomainInfo.ShutdownOn") + host.getName(), SHUTDOWN_ICON,
+                        Tools.getString("DomainInfo.ShutdownOn") + host.getName(), new AccessMode(AccessMode.OP, AccessMode.NORMAL),
+                        new AccessMode(AccessMode.OP, AccessMode.NORMAL)).visiblePredicate(() -> {
+                    final VmsXml vmsXml = getBrowser().getVmsXml(host);
+                    return vmsXml != null && vmsXml.getDomainNames().contains(domainInfo.getDomainName()) && vmsXml.isRunning(
+                            domainInfo.getDomainName());
+                }).enablePredicate(() -> {
+                    if (!access.isAdvancedMode() && domainInfo.isUsedByCRM()) {
+                        return DomainInfo.IS_USED_BY_CRM_STRING;
                     }
-                })
-                .enablePredicate(new EnablePredicate() {
-                    @Override
-                    public String check() {
-                        if (!access.isAdvancedMode() && domainInfo.isUsedByCRM()) {
-                            return DomainInfo.IS_USED_BY_CRM_STRING;
-                        }
-                        return null;
-                    }
-                })
-                .addAction(new MenuAction() {
-                    @Override
-                    public void run(final String text) {
-                        domainInfo.hidePopup();
-                        final VmsXml vxml = getBrowser().getVmsXml(host);
-                        if (vxml != null && host != null) {
-                            domainInfo.shutdown(host);
-                        }
+                    return null;
+                }).addAction(text -> {
+                    domainInfo.hidePopup();
+                    final VmsXml vxml = getBrowser().getVmsXml(host);
+                    if (vxml != null) {
+                        domainInfo.shutdown(host);
                     }
                 });
         items.add(shutdownMenuItem);
@@ -417,38 +307,23 @@ public class DomainMenu {
      * Adds vm domain reboot menu item.
      */
     void addRebootMenu(final Collection<UpdatableItem> items, final Host host) {
-        final UpdatableItem rebootMenuItem = menuFactory.createMenuItem(
-                Tools.getString("DomainInfo.RebootOn") + host.getName(),
-                REBOOT_ICON,
-                Tools.getString("DomainInfo.RebootOn") + host.getName(),
-                new AccessMode(AccessMode.OP, AccessMode.NORMAL),
-                new AccessMode(AccessMode.OP, AccessMode.NORMAL))
-                .visiblePredicate(new VisiblePredicate() {
-                    @Override
-                    public boolean check() {
-                        final VmsXml vmsXml = getBrowser().getVmsXml(host);
-                        return vmsXml != null
-                               && vmsXml.getDomainNames().contains(domainInfo.getDomainName())
-                               && vmsXml.isRunning(domainInfo.getDomainName());
+        final UpdatableItem rebootMenuItem =
+                menuFactory.createMenuItem(Tools.getString("DomainInfo.RebootOn") + host.getName(), REBOOT_ICON,
+                        Tools.getString("DomainInfo.RebootOn") + host.getName(), new AccessMode(AccessMode.OP, AccessMode.NORMAL),
+                        new AccessMode(AccessMode.OP, AccessMode.NORMAL)).visiblePredicate(() -> {
+                    final VmsXml vmsXml = getBrowser().getVmsXml(host);
+                    return vmsXml != null && vmsXml.getDomainNames().contains(domainInfo.getDomainName()) && vmsXml.isRunning(
+                            domainInfo.getDomainName());
+                }).enablePredicate(() -> {
+                    if (!access.isAdvancedMode() && domainInfo.isUsedByCRM()) {
+                        return DomainInfo.IS_USED_BY_CRM_STRING;
                     }
-                })
-                .enablePredicate(new EnablePredicate() {
-                    @Override
-                    public String check() {
-                        if (!access.isAdvancedMode() && domainInfo.isUsedByCRM()) {
-                            return DomainInfo.IS_USED_BY_CRM_STRING;
-                        }
-                        return null;
-                    }
-                })
-                .addAction(new MenuAction() {
-                    @Override
-                    public void run(final String text) {
-                        domainInfo.hidePopup();
-                        final VmsXml vxml = getBrowser().getVmsXml(host);
-                        if (vxml != null && host != null) {
-                            domainInfo.reboot(host);
-                        }
+                    return null;
+                }).addAction(text -> {
+                    domainInfo.hidePopup();
+                    final VmsXml vxml = getBrowser().getVmsXml(host);
+                    if (vxml != null) {
+                        domainInfo.reboot(host);
                     }
                 });
         items.add(rebootMenuItem);
@@ -458,45 +333,30 @@ public class DomainMenu {
      * Adds vm domain resume menu item.
      */
     private void addResumeMenu(final Collection<UpdatableItem> items, final Host host) {
-        final UpdatableItem resumeMenuItem = menuFactory.createMenuItem(
-                Tools.getString("DomainInfo.ResumeOn") + host.getName(),
-                RESUME_ICON,
-                Tools.getString("DomainInfo.ResumeOn") + host.getName(),
-                new AccessMode(AccessMode.OP, AccessMode.NORMAL),
-                new AccessMode(AccessMode.OP, AccessMode.NORMAL))
-                .visiblePredicate(new VisiblePredicate() {
-                    @Override
-                    public boolean check() {
-                        final VmsXml vmsXml = getBrowser().getVmsXml(host);
-                        return vmsXml != null
-                               && vmsXml.getDomainNames().contains(domainInfo.getDomainName())
-                               && vmsXml.isSuspended(domainInfo.getDomainName());
+        final UpdatableItem resumeMenuItem =
+                menuFactory.createMenuItem(Tools.getString("DomainInfo.ResumeOn") + host.getName(), RESUME_ICON,
+                        Tools.getString("DomainInfo.ResumeOn") + host.getName(), new AccessMode(AccessMode.OP, AccessMode.NORMAL),
+                        new AccessMode(AccessMode.OP, AccessMode.NORMAL)).visiblePredicate(() -> {
+                    final VmsXml vmsXml = getBrowser().getVmsXml(host);
+                    return vmsXml != null && vmsXml.getDomainNames().contains(domainInfo.getDomainName()) && vmsXml.isSuspended(
+                            domainInfo.getDomainName());
+                }).enablePredicate(() -> {
+                    if (getResource().isNew()) {
+                        return DomainInfo.NOT_APPLIED;
                     }
-                })
-                .enablePredicate(new EnablePredicate() {
-                    @Override
-                    public String check() {
-                        if (getResource().isNew()) {
-                            return DomainInfo.NOT_APPLIED;
-                        }
-                        final VmsXml vmsXml = getBrowser().getVmsXml(host);
-                        if (vmsXml == null) {
-                            return DomainInfo.NO_VM_STATUS_STRING;
-                        }
-                        if (!vmsXml.isSuspended(domainInfo.getDomainName())) {
-                            return "it is not suspended";
-                        }
-                        return null;
+                    final VmsXml vmsXml = getBrowser().getVmsXml(host);
+                    if (vmsXml == null) {
+                        return DomainInfo.NO_VM_STATUS_STRING;
                     }
-                })
-                .addAction(new MenuAction() {
-                    @Override
-                    public void run(final String text) {
-                        domainInfo.hidePopup();
-                        final VmsXml vxml = getBrowser().getVmsXml(host);
-                        if (vxml != null && host != null) {
-                            domainInfo.resume(host);
-                        }
+                    if (!vmsXml.isSuspended(domainInfo.getDomainName())) {
+                        return "it is not suspended";
+                    }
+                    return null;
+                }).addAction(text -> {
+                    domainInfo.hidePopup();
+                    final VmsXml vxml = getBrowser().getVmsXml(host);
+                    if (vxml != null) {
+                        domainInfo.resume(host);
                     }
                 });
         items.add(resumeMenuItem);
@@ -506,39 +366,29 @@ public class DomainMenu {
      * Adds vm domain destroy menu item.
      */
     void addDestroyMenu(final Collection<UpdatableItem> items, final Host host) {
-        final UpdatableItem destroyMenuItem = menuFactory.createMenuItem(
-                Tools.getString("DomainInfo.DestroyOn") + host.getName(),
-                DESTROY_ICON,
-                Tools.getString("DomainInfo.DestroyOn") + host.getName(),
-                new AccessMode(AccessMode.OP, AccessMode.NORMAL),
-                new AccessMode(AccessMode.OP, AccessMode.NORMAL))
-                .enablePredicate(new EnablePredicate() {
-                    @Override
-                    public String check() {
-                        if (!access.isAdvancedMode() && domainInfo.isUsedByCRM()) {
-                            return DomainInfo.IS_USED_BY_CRM_STRING;
-                        }
-                        if (getResource().isNew()) {
-                            return DomainInfo.NOT_APPLIED;
-                        }
-                        final VmsXml vmsXml = getBrowser().getVmsXml(host);
-                        if (vmsXml == null || !vmsXml.getDomainNames().contains(domainInfo.getDomainName())) {
-                            return DomainInfo.NO_VM_STATUS_STRING;
-                        }
-                        if (!vmsXml.isRunning(domainInfo.getDomainName())) {
-                            return "not running";
-                        }
-                        return null;
+        final UpdatableItem destroyMenuItem =
+                menuFactory.createMenuItem(Tools.getString("DomainInfo.DestroyOn") + host.getName(), DESTROY_ICON,
+                        Tools.getString("DomainInfo.DestroyOn") + host.getName(), new AccessMode(AccessMode.OP, AccessMode.NORMAL),
+                        new AccessMode(AccessMode.OP, AccessMode.NORMAL)).enablePredicate(() -> {
+                    if (!access.isAdvancedMode() && domainInfo.isUsedByCRM()) {
+                        return DomainInfo.IS_USED_BY_CRM_STRING;
                     }
-                })
-                .addAction(new MenuAction() {
-                    @Override
-                    public void run(final String text) {
-                        domainInfo.hidePopup();
-                        final VmsXml vxml = getBrowser().getVmsXml(host);
-                        if (vxml != null && host != null) {
-                            domainInfo.destroy(host);
-                        }
+                    if (getResource().isNew()) {
+                        return DomainInfo.NOT_APPLIED;
+                    }
+                    final VmsXml vmsXml = getBrowser().getVmsXml(host);
+                    if (vmsXml == null || !vmsXml.getDomainNames().contains(domainInfo.getDomainName())) {
+                        return DomainInfo.NO_VM_STATUS_STRING;
+                    }
+                    if (!vmsXml.isRunning(domainInfo.getDomainName())) {
+                        return "not running";
+                    }
+                    return null;
+                }).addAction(text -> {
+                    domainInfo.hidePopup();
+                    final VmsXml vxml = getBrowser().getVmsXml(host);
+                    if (vxml != null) {
+                        domainInfo.destroy(host);
                     }
                 });
         items.add(destroyMenuItem);
@@ -548,39 +398,29 @@ public class DomainMenu {
      * Adds vm domain suspend menu item.
      */
     private void addSuspendMenu(final MyMenu advancedSubmenu, final Host host) {
-        final MyMenuItem suspendMenuItem = menuFactory.createMenuItem(
-                Tools.getString("DomainInfo.SuspendOn") + host.getName(),
-                DomainInfo.PAUSE_ICON,
-                Tools.getString("DomainInfo.SuspendOn") + host.getName(),
-                new AccessMode(AccessMode.OP, AccessMode.NORMAL),
-                new AccessMode(AccessMode.OP, AccessMode.NORMAL))
-                .enablePredicate(new EnablePredicate() {
-                    @Override
-                    public String check() {
-                        if (getResource().isNew()) {
-                            return DomainInfo.NOT_APPLIED;
-                        }
-                        final VmsXml vmsXml = getBrowser().getVmsXml(host);
-                        if (vmsXml == null || !vmsXml.getDomainNames().contains(domainInfo.getDomainName())) {
-                            return DomainInfo.NO_VM_STATUS_STRING;
-                        }
-                        if (!vmsXml.isRunning(domainInfo.getDomainName())) {
-                            return "not running";
-                        }
-                        if (vmsXml.isSuspended(domainInfo.getDomainName())) {
-                            return "it is already suspended";
-                        }
-                        return null;
+        final MyMenuItem suspendMenuItem =
+                menuFactory.createMenuItem(Tools.getString("DomainInfo.SuspendOn") + host.getName(), DomainInfo.PAUSE_ICON,
+                        Tools.getString("DomainInfo.SuspendOn") + host.getName(), new AccessMode(AccessMode.OP, AccessMode.NORMAL),
+                        new AccessMode(AccessMode.OP, AccessMode.NORMAL)).enablePredicate(() -> {
+                    if (getResource().isNew()) {
+                        return DomainInfo.NOT_APPLIED;
                     }
-                })
-                .addAction(new MenuAction() {
-                    @Override
-                    public void run(final String text) {
-                        domainInfo.hidePopup();
-                        final VmsXml vxml = getBrowser().getVmsXml(host);
-                        if (vxml != null && host != null) {
-                            domainInfo.suspend(host);
-                        }
+                    final VmsXml vmsXml = getBrowser().getVmsXml(host);
+                    if (vmsXml == null || !vmsXml.getDomainNames().contains(domainInfo.getDomainName())) {
+                        return DomainInfo.NO_VM_STATUS_STRING;
+                    }
+                    if (!vmsXml.isRunning(domainInfo.getDomainName())) {
+                        return "not running";
+                    }
+                    if (vmsXml.isSuspended(domainInfo.getDomainName())) {
+                        return "it is already suspended";
+                    }
+                    return null;
+                }).addAction(text -> {
+                    domainInfo.hidePopup();
+                    final VmsXml vxml = getBrowser().getVmsXml(host);
+                    if (vxml != null) {
+                        domainInfo.suspend(host);
                     }
                 });
         advancedSubmenu.add(suspendMenuItem);
@@ -590,39 +430,29 @@ public class DomainMenu {
      * Adds vm domain resume menu item.
      */
     void addResumeAdvancedMenu(final MyMenu advancedSubmenu, final Host host) {
-        final MyMenuItem resumeMenuItem = menuFactory.createMenuItem(
-                Tools.getString("DomainInfo.ResumeOn") + host.getName(),
-                RESUME_ICON,
-                Tools.getString("DomainInfo.ResumeOn") + host.getName(),
-                new AccessMode(AccessMode.OP, AccessMode.NORMAL),
-                new AccessMode(AccessMode.OP, AccessMode.NORMAL))
-                .enablePredicate(new EnablePredicate() {
-                    @Override
-                    public String check() {
-                        if (getResource().isNew()) {
-                            return DomainInfo.NOT_APPLIED;
-                        }
-                        final VmsXml vmsXml = getBrowser().getVmsXml(host);
-                        if (vmsXml == null || !vmsXml.getDomainNames().contains(domainInfo.getDomainName())) {
-                            return DomainInfo.NO_VM_STATUS_STRING;
-                        }
-                        if (!vmsXml.isRunning(domainInfo.getDomainName())) {
-                            return "not running";
-                        }
-                        if (!vmsXml.isSuspended(domainInfo.getDomainName())) {
-                            return "it is not suspended";
-                        }
-                        return null;
+        final MyMenuItem resumeMenuItem =
+                menuFactory.createMenuItem(Tools.getString("DomainInfo.ResumeOn") + host.getName(), RESUME_ICON,
+                        Tools.getString("DomainInfo.ResumeOn") + host.getName(), new AccessMode(AccessMode.OP, AccessMode.NORMAL),
+                        new AccessMode(AccessMode.OP, AccessMode.NORMAL)).enablePredicate(() -> {
+                    if (getResource().isNew()) {
+                        return DomainInfo.NOT_APPLIED;
                     }
-                })
-                .addAction(new MenuAction() {
-                    @Override
-                    public void run(final String text) {
-                        domainInfo.hidePopup();
-                        final VmsXml vxml = getBrowser().getVmsXml(host);
-                        if (vxml != null && host != null) {
-                            domainInfo.resume(host);
-                        }
+                    final VmsXml vmsXml = getBrowser().getVmsXml(host);
+                    if (vmsXml == null || !vmsXml.getDomainNames().contains(domainInfo.getDomainName())) {
+                        return DomainInfo.NO_VM_STATUS_STRING;
+                    }
+                    if (!vmsXml.isRunning(domainInfo.getDomainName())) {
+                        return "not running";
+                    }
+                    if (!vmsXml.isSuspended(domainInfo.getDomainName())) {
+                        return "it is not suspended";
+                    }
+                    return null;
+                }).addAction(text -> {
+                    domainInfo.hidePopup();
+                    final VmsXml vxml = getBrowser().getVmsXml(host);
+                    if (vxml != null) {
+                        domainInfo.resume(host);
                     }
                 });
         advancedSubmenu.add(resumeMenuItem);
@@ -631,39 +461,29 @@ public class DomainMenu {
     private void addVncViewersToTheMenu(final Collection<UpdatableItem> items, final Host host) {
         if (application.isUseTightvnc()) {
             /* tight vnc test menu */
-            final UpdatableItem tightvncViewerMenu = menuFactory.createMenuItem(
-                    getVNCMenuString("TIGHT", host),
-                    DomainInfo.VNC_ICON,
-                    getVNCMenuString("TIGHT", host),
-                    new AccessMode(AccessMode.RO, AccessMode.NORMAL),
-                    new AccessMode(AccessMode.RO, AccessMode.NORMAL))
-                    .enablePredicate(new EnablePredicate() {
-                        @Override
-                        public String check() {
-                            if (getResource().isNew()) {
-                                return DomainInfo.NOT_APPLIED;
-                            }
-                            final VmsXml vmsXml = getBrowser().getVmsXml(host);
-                            if (vmsXml == null) {
-                                return DomainInfo.NO_VM_STATUS_STRING;
-                            }
-                            if (!vmsXml.isRunning(domainInfo.getDomainName())) {
-                                return "not running";
-                            }
-                            return null;
+            final UpdatableItem tightvncViewerMenu =
+                    menuFactory.createMenuItem(getVNCMenuString("TIGHT", host), DomainInfo.VNC_ICON,
+                            getVNCMenuString("TIGHT", host), new AccessMode(AccessMode.RO, AccessMode.NORMAL),
+                            new AccessMode(AccessMode.RO, AccessMode.NORMAL)).enablePredicate(() -> {
+                        if (getResource().isNew()) {
+                            return DomainInfo.NOT_APPLIED;
                         }
-                    })
-                    .addAction(new MenuAction() {
-                        @Override
-                        public void run(final String text) {
-                            domainInfo.hidePopup();
-                            final VmsXml vxml = getBrowser().getVmsXml(host);
-                            if (vxml != null) {
-                                final int remotePort = vxml.getRemotePort(domainInfo.getDomainName());
-                                final Host host = vxml.getDefinedOnHost();
-                                if (host != null && remotePort > 0) {
-                                    application.startTightVncViewer(host, remotePort);
-                                }
+                        final VmsXml vmsXml = getBrowser().getVmsXml(host);
+                        if (vmsXml == null) {
+                            return DomainInfo.NO_VM_STATUS_STRING;
+                        }
+                        if (!vmsXml.isRunning(domainInfo.getDomainName())) {
+                            return "not running";
+                        }
+                        return null;
+                    }).addAction(text -> {
+                        domainInfo.hidePopup();
+                        final VmsXml vxml = getBrowser().getVmsXml(host);
+                        if (vxml != null) {
+                            final int remotePort = vxml.getRemotePort(domainInfo.getDomainName());
+                            final Host host13 = vxml.getDefinedOnHost();
+                            if (host13 != null && remotePort > 0) {
+                                application.startTightVncViewer(host13, remotePort);
                             }
                         }
                     });
@@ -671,39 +491,29 @@ public class DomainMenu {
         }
 
         if (application.isUseUltravnc()) {
-            final UpdatableItem ultravncViewerMenu = menuFactory.createMenuItem(
-                    getVNCMenuString("ULTRA", host),
-                    DomainInfo.VNC_ICON,
-                    getVNCMenuString("ULTRA", host),
-                    new AccessMode(AccessMode.RO, AccessMode.NORMAL),
-                    new AccessMode(AccessMode.RO, AccessMode.NORMAL))
-                    .enablePredicate(new EnablePredicate() {
-                        @Override
-                        public String check() {
-                            if (getResource().isNew()) {
-                                return DomainInfo.NOT_APPLIED;
-                            }
-                            final VmsXml vmsXml = getBrowser().getVmsXml(host);
-                            if (vmsXml == null) {
-                                return DomainInfo.NO_VM_STATUS_STRING;
-                            }
-                            if (!vmsXml.isRunning(domainInfo.getDomainName())) {
-                                return "not running";
-                            }
-                            return null;
+            final UpdatableItem ultravncViewerMenu =
+                    menuFactory.createMenuItem(getVNCMenuString("ULTRA", host), DomainInfo.VNC_ICON,
+                            getVNCMenuString("ULTRA", host), new AccessMode(AccessMode.RO, AccessMode.NORMAL),
+                            new AccessMode(AccessMode.RO, AccessMode.NORMAL)).enablePredicate(() -> {
+                        if (getResource().isNew()) {
+                            return DomainInfo.NOT_APPLIED;
                         }
-                    })
-                    .addAction(new MenuAction() {
-                        @Override
-                        public void run(final String text) {
-                            domainInfo.hidePopup();
-                            final VmsXml vxml = getBrowser().getVmsXml(host);
-                            if (vxml != null) {
-                                final int remotePort = vxml.getRemotePort(domainInfo.getDomainName());
-                                final Host host = vxml.getDefinedOnHost();
-                                if (host != null && remotePort > 0) {
-                                    application.startUltraVncViewer(host, remotePort);
-                                }
+                        final VmsXml vmsXml = getBrowser().getVmsXml(host);
+                        if (vmsXml == null) {
+                            return DomainInfo.NO_VM_STATUS_STRING;
+                        }
+                        if (!vmsXml.isRunning(domainInfo.getDomainName())) {
+                            return "not running";
+                        }
+                        return null;
+                    }).addAction(text -> {
+                        domainInfo.hidePopup();
+                        final VmsXml vxml = getBrowser().getVmsXml(host);
+                        if (vxml != null) {
+                            final int remotePort = vxml.getRemotePort(domainInfo.getDomainName());
+                            final Host host12 = vxml.getDefinedOnHost();
+                            if (host12 != null && remotePort > 0) {
+                                application.startUltraVncViewer(host12, remotePort);
                             }
                         }
                     });
@@ -711,42 +521,33 @@ public class DomainMenu {
         }
 
         if (application.isUseRealvnc()) {
-            final UpdatableItem realvncViewerMenu = menuFactory.createMenuItem(
-                    getVNCMenuString("REAL", host),
-                    DomainInfo.VNC_ICON,
-                    getVNCMenuString("REAL", host),
-                    new AccessMode(AccessMode.RO, AccessMode.NORMAL),
-                    new AccessMode(AccessMode.RO, AccessMode.NORMAL))
-                    .enablePredicate(new EnablePredicate() {
-                        @Override
-                        public String check() {
-                            if (getResource().isNew()) {
-                                return DomainInfo.NOT_APPLIED;
-                            }
-                            final VmsXml vmsXml = getBrowser().getVmsXml(host);
-                            if (vmsXml == null) {
-                                return DomainInfo.NO_VM_STATUS_STRING;
-                            }
-                            if (!vmsXml.isRunning(domainInfo.getDomainName())) {
-                                return "not running";
-                            }
-                            return null;
-                        }
-                    })
-                    .addAction(new MenuAction() {
-                        @Override
-                        public void run(final String text) {
-                            domainInfo.hidePopup();
-                            final VmsXml vxml = getBrowser().getVmsXml(host);
-                            if (vxml != null) {
-                                final int remotePort = vxml.getRemotePort(domainInfo.getDomainName());
-                                final Host host = vxml.getDefinedOnHost();
-                                if (host != null && remotePort > 0) {
-                                    application.startRealVncViewer(host, remotePort);
+            final UpdatableItem realvncViewerMenu =
+                    menuFactory.createMenuItem(getVNCMenuString("REAL", host), DomainInfo.VNC_ICON, getVNCMenuString("REAL", host),
+                                    new AccessMode(AccessMode.RO, AccessMode.NORMAL), new AccessMode(AccessMode.RO, AccessMode.NORMAL))
+                            .enablePredicate(() -> {
+                                if (getResource().isNew()) {
+                                    return DomainInfo.NOT_APPLIED;
                                 }
-                            }
-                        }
-                    });
+                                final VmsXml vmsXml = getBrowser().getVmsXml(host);
+                                if (vmsXml == null) {
+                                    return DomainInfo.NO_VM_STATUS_STRING;
+                                }
+                                if (!vmsXml.isRunning(domainInfo.getDomainName())) {
+                                    return "not running";
+                                }
+                                return null;
+                            })
+                            .addAction(text -> {
+                                domainInfo.hidePopup();
+                                final VmsXml vxml = getBrowser().getVmsXml(host);
+                                if (vxml != null) {
+                                    final int remotePort = vxml.getRemotePort(domainInfo.getDomainName());
+                                    final Host host1 = vxml.getDefinedOnHost();
+                                    if (host1 != null && remotePort > 0) {
+                                        application.startRealVncViewer(host1, remotePort);
+                                    }
+                                }
+                            });
             items.add(realvncViewerMenu);
         }
     }

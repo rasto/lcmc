@@ -20,20 +20,22 @@
 
 package lcmc.robotest;
 
+import static lcmc.robotest.RoboTest.CONFIRM_REMOVE;
+
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
-import lcmc.Exceptions;
-import lcmc.cluster.domain.Cluster;
-import lcmc.cluster.ui.widget.GenericWidget.MTextField;
-import lcmc.cluster.ui.widget.MComboBox;
-import static lcmc.robotest.RoboTest.CONFIRM_REMOVE;
-import lcmc.logger.Logger;
-import lcmc.logger.LoggerFactory;
-import lcmc.common.domain.util.Tools;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
+
+import lcmc.Exceptions;
+import lcmc.cluster.domain.Cluster;
+import lcmc.cluster.ui.widget.GenericWidget.MTextField;
+import lcmc.cluster.ui.widget.MComboBox;
+import lcmc.common.domain.util.Tools;
+import lcmc.logger.Logger;
+import lcmc.logger.LoggerFactory;
 
 /**
  * This class is used to test the GUI.
@@ -97,7 +99,7 @@ final class PcmkTest1 {
         roboTest.setSlowFactor(0.00001f);
         for (final Integer pos1 : new Integer[]{850, 900, 1000}) {
             for (final Integer pos2 : new Integer[]{850, 900, 1000}) {
-                if (pos1 == pos2) {
+                if (pos1.equals(pos2)) {
                     continue;
                 }
                 for (int i = 0; i < 10; i++) {
@@ -499,7 +501,7 @@ final class PcmkTest1 {
         roboTest.moveTo(gx + 10, gy - 25);
         roboTest.addConstraint(1);
         roboTest.checkTest(testName, 11.8);
-        /** Add m/s Stateful resource */
+        /* Add m/s Stateful resource */
         final int statefulX = 500;
         final int statefulY = 207;
         roboTest.moveTo(statefulX, statefulY);

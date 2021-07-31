@@ -27,9 +27,10 @@ import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
-import lcmc.cluster.domain.Cluster;
 
 import javax.inject.Named;
+
+import lcmc.cluster.domain.Cluster;
 
 /**
  * An implementation of an dialog with log files from many hosts.
@@ -48,7 +49,7 @@ public final class ServiceLogs extends ClusterLogs {
 
     @Override
     protected Map<String, String> getPatternMap() {
-        final Map<String, String> patternMap = new LinkedHashMap<String, String>();
+        final Map<String, String> patternMap = new LinkedHashMap<>();
         patternMap.put("lrmd", wordBoundary("lrmd"));
         patternMap.put(serviceType, wordBoundary(serviceType));
         patternMap.put(serviceCrmId, wordBoundary(serviceCrmId));
@@ -58,7 +59,7 @@ public final class ServiceLogs extends ClusterLogs {
 
     @Override
     protected Set<String> getSelectedSet() {
-        final Set<String> selected = new HashSet<String>();
+        final Set<String> selected = new HashSet<>();
         selected.add(serviceType); // TODO: till pacemaker 1.0.8
         selected.add("ERROR");
         return selected;

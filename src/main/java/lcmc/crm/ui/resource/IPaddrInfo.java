@@ -25,18 +25,18 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+
 import lcmc.cluster.domain.Network;
-import lcmc.common.domain.AccessMode;
-import lcmc.common.domain.StringValue;
-import lcmc.common.domain.Value;
+import lcmc.cluster.service.NetworkService;
 import lcmc.cluster.ui.widget.Check;
 import lcmc.cluster.ui.widget.Widget;
 import lcmc.cluster.ui.widget.WidgetFactory;
+import lcmc.common.domain.AccessMode;
+import lcmc.common.domain.StringValue;
+import lcmc.common.domain.Value;
 import lcmc.common.domain.util.Tools;
-import lcmc.cluster.service.NetworkService;
-
-import javax.inject.Inject;
-import javax.inject.Named;
 
 /**
  * This class holds info about IPaddr/IPaddr2 heartbeat service. It adds a
@@ -57,8 +57,8 @@ final class IPaddrInfo extends ServiceInfo {
      */
     @Override
     public Check checkResourceFields(final String param, final String[] params) {
-        final List<String> incorrect = new ArrayList<String>();
-        final List<String> changed = new ArrayList<String>();
+        final List<String> incorrect = new ArrayList<>();
+        final List<String> changed = new ArrayList<>();
         final Check check = new Check(incorrect, changed);
         check.addCheck(super.checkResourceFields(param, params));
         final Widget wi;
@@ -98,7 +98,6 @@ final class IPaddrInfo extends ServiceInfo {
             } else {
                 defaultValue = new StringValue(ip.getValueForConfig());
             }
-            @SuppressWarnings("unchecked")
             final Collection<Network> networks = networkService.getCommonNetworks(getBrowser().getCluster());
 
             final Value[] networkValues = new Value[networks.size() + 1];

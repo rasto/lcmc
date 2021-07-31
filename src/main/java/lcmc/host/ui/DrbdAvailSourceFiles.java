@@ -32,21 +32,21 @@ import javax.swing.JPanel;
 import javax.swing.SpringLayout;
 
 import lcmc.Exceptions;
+import lcmc.cluster.service.ssh.ExecCommandConfig;
+import lcmc.cluster.service.ssh.SshOutput;
+import lcmc.cluster.ui.widget.Widget;
+import lcmc.cluster.ui.widget.WidgetFactory;
 import lcmc.common.domain.AccessMode;
 import lcmc.common.domain.Application;
 import lcmc.common.domain.Value;
-import lcmc.common.ui.utils.SwingUtils;
-import lcmc.drbd.domain.DrbdInstallation;
+import lcmc.common.domain.util.Tools;
 import lcmc.common.ui.SpringUtilities;
 import lcmc.common.ui.WizardDialog;
-import lcmc.cluster.ui.widget.Widget;
-import lcmc.cluster.ui.widget.WidgetFactory;
+import lcmc.common.ui.utils.SwingUtils;
+import lcmc.common.ui.utils.WidgetListener;
+import lcmc.drbd.domain.DrbdInstallation;
 import lcmc.logger.Logger;
 import lcmc.logger.LoggerFactory;
-import lcmc.common.domain.util.Tools;
-import lcmc.common.ui.utils.WidgetListener;
-import lcmc.cluster.service.ssh.ExecCommandConfig;
-import lcmc.cluster.service.ssh.SshOutput;
 
 /**
  * An implementation of a dialog where available versions of drbd will be
@@ -84,10 +84,10 @@ final class DrbdAvailSourceFiles extends DialogHost {
         findAvailTarballs();
     }
 
-    protected void findAvailTarballs() {
-        final SshOutput ret = getHost().captureCommand(new ExecCommandConfig()
-                                    .commandString("DrbdAvailVersionsSource")
-                                    .convertCmdCallback(getDrbdInstallationConvertCmdCallback()).silentOutput());
+    private void findAvailTarballs() {
+        final SshOutput ret = getHost().captureCommand(new ExecCommandConfig().commandString("DrbdAvailVersionsSource")
+                .convertCmdCallback(getDrbdInstallationConvertCmdCallback())
+                .silentOutput());
         final int exitCode = ret.getExitCode();
         final String output = ret.getOutput();
         if (exitCode == 0) {
@@ -102,7 +102,7 @@ final class DrbdAvailSourceFiles extends DialogHost {
                 printErrorAndRetry(Tools.getString("Dialog.Host.DrbdAvailSourceFiles.NoBuilds"), output, exitCode);
                 return;
             }
-            final List<DrbdVersions> items = new ArrayList<DrbdVersions>();
+            final List<DrbdVersions> items = new ArrayList<>();
             for (final String moduleFileName : moduleFileNames) {
                 if (moduleFileName != null && moduleFileName.length() > 16) {
                     String moduleVersion = moduleFileName.substring(9, moduleFileName.length() - 7);
@@ -122,25 +122,19 @@ final class DrbdAvailSourceFiles extends DialogHost {
                 }
             }
             drbdTarballCombo.clear();
-            swingUtils.invokeLater(new Runnable() {
-                @Override
-                public void run() {
-                    if (!items.isEmpty()) {
-                        drbdTarballCombo.reloadComboBox(items.get(0), items.toArray(new DrbdVersions[items.size()]));
-                    }
-                    final DrbdVersions selectedItem = (DrbdVersions) drbdTarballCombo.getValue();
-                    drbdTarballCombo.setEnabled(true);
-                    allDone(selectedItem);
+            swingUtils.invokeLater(() -> {
+                if (!items.isEmpty()) {
+                    drbdTarballCombo.reloadComboBox(items.get(0), items.toArray(new DrbdVersions[0]));
                 }
+                final DrbdVersions selectedItem = (DrbdVersions) drbdTarballCombo.getValue();
+                drbdTarballCombo.setEnabled(true);
+                allDone(selectedItem);
             });
 
         } else {
-            swingUtils.invokeLater(new Runnable() {
-                @Override
-                public void run() {
-                    progressBarDoneError();
-                    printErrorAndRetry(Tools.getString("Dialog.Host.DrbdAvailSourceFiles.NoBuilds"), output, exitCode);
-                }
+            swingUtils.invokeLater(() -> {
+                progressBarDoneError();
+                printErrorAndRetry(Tools.getString("Dialog.Host.DrbdAvailSourceFiles.NoBuilds"), output, exitCode);
             });
         }
     }
@@ -165,12 +159,9 @@ final class DrbdAvailSourceFiles extends DialogHost {
             }
             return versions[0];
         } else {
-            swingUtils.invokeLater(new Runnable() {
-                @Override
-                public void run() {
-                    progressBarDoneError();
-                    printErrorAndRetry(Tools.getString("Dialog.Host.DrbdAvailSourceFiles.NoBuilds"), output, exitCode);
-                }
+            swingUtils.invokeLater(() -> {
+                progressBarDoneError();
+                printErrorAndRetry(Tools.getString("Dialog.Host.DrbdAvailSourceFiles.NoBuilds"), output, exitCode);
             });
             return null;
         }
@@ -185,10 +176,9 @@ final class DrbdAvailSourceFiles extends DialogHost {
     }
 
     /**
-     * Is called after everything is done. It adds listeners if called for the
-     * first time.
+     * Is called after everything is done. It adds listeners if called for the first time.
      */
-    protected void allDone(final DrbdVersions drbdVersions) {
+    private void allDone(final DrbdVersions drbdVersions) {
         if (drbdVersions != null) {
             answerPaneSetText("http://oss.linbit.com/drbd/" + drbdVersions.getModuleFileName());
             final DrbdInstallation drbdInstallation = getDrbdInstallation();
@@ -225,18 +215,13 @@ final class DrbdAvailSourceFiles extends DialogHost {
         return Tools.getString("Dialog.Host.DrbdAvailSourceFiles.Description");
     }
 
-    protected JPanel getChoiceBoxes() {
+    private JPanel getChoiceBoxes() {
         final JPanel pane = new JPanel(new SpringLayout());
 
         /* build combo box */
-        drbdTarballCombo = widgetFactory.createInstance(
-                                      Widget.Type.COMBOBOX,
-                                      Widget.NO_DEFAULT,
-                                      Widget.NO_ITEMS,
-                                      Widget.NO_REGEXP,
-                                      0,    /* width */
-                                      Widget.NO_ABBRV,
-                                      new AccessMode(AccessMode.RO, AccessMode.NORMAL),
+        drbdTarballCombo = widgetFactory.createInstance(Widget.Type.COMBOBOX, Widget.NO_DEFAULT, Widget.NO_ITEMS, Widget.NO_REGEXP,
+                0,    /* width */
+                Widget.NO_ABBRV, new AccessMode(AccessMode.RO, AccessMode.NORMAL),
                                       Widget.NO_BUTTON);
 
         //drbdTarballCombo.setEnabled(false);

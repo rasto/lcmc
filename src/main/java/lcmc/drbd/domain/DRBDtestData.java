@@ -28,8 +28,9 @@ import java.util.regex.Pattern;
 
 import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.Table;
-import lcmc.host.domain.Host;
+
 import lcmc.common.domain.util.Tools;
+import lcmc.host.domain.Host;
 
 /**
  * This class holds data that were retrieved while running drbdadm -d commands.
@@ -78,7 +79,7 @@ public final class DRBDtestData {
                 }
                 final int index = line.indexOf("--set-defaults");
                 if (index >= 0) {
-                    sb.append(line.substring(0, index));
+                    sb.append(line, 0, index);
                 } else {
                     sb.append(line);
                 }

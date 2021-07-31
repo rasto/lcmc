@@ -24,15 +24,19 @@ package lcmc.common.domain;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
-import lcmc.logger.Logger;
-import lcmc.logger.LoggerFactory;
+
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
+
+import lcmc.logger.Logger;
+import lcmc.logger.LoggerFactory;
 
 /**
  * This class parses xml.
@@ -94,7 +98,7 @@ public class XMLTools {
         final Document document;
         try {
             final DocumentBuilder builder = factory.newDocumentBuilder();
-            document = builder.parse(new ByteArrayInputStream(xml.getBytes("UTF-8")));
+            document = builder.parse(new ByteArrayInputStream(xml.getBytes(StandardCharsets.UTF_8)));
         } catch (final SAXException sxe) {
             LOG.appError("getXMLDocument: could not parse: " + xml, sxe);
             return null;

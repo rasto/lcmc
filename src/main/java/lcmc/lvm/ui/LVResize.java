@@ -24,12 +24,9 @@ package lcmc.lvm.ui;
 
 import java.awt.Dimension;
 import java.awt.FlowLayout;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
 import java.util.Map;
 import java.util.Set;
+
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.swing.JCheckBox;
@@ -39,27 +36,27 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.SpringLayout;
 
+import lcmc.cluster.domain.Cluster;
+import lcmc.cluster.ui.widget.Widget;
 import lcmc.cluster.ui.widget.WidgetFactory;
 import lcmc.common.domain.AccessMode;
 import lcmc.common.domain.Application;
-import lcmc.cluster.domain.Cluster;
-import lcmc.common.ui.utils.SwingUtils;
-import lcmc.host.domain.Host;
 import lcmc.common.domain.StringValue;
-import lcmc.vm.domain.VmsXml;
 import lcmc.common.domain.Value;
-import lcmc.drbd.domain.BlockDevice;
+import lcmc.common.domain.util.Tools;
 import lcmc.common.ui.Browser;
 import lcmc.common.ui.SpringUtilities;
+import lcmc.common.ui.utils.MyButton;
+import lcmc.common.ui.utils.SwingUtils;
+import lcmc.common.ui.utils.WidgetListener;
+import lcmc.drbd.domain.BlockDevice;
 import lcmc.drbd.ui.resource.BlockDevInfo;
 import lcmc.drbd.ui.resource.VolumeInfo;
-import lcmc.cluster.ui.widget.Widget;
-import lcmc.lvm.service.LVM;
+import lcmc.host.domain.Host;
 import lcmc.logger.Logger;
 import lcmc.logger.LoggerFactory;
-import lcmc.common.ui.utils.MyButton;
-import lcmc.common.domain.util.Tools;
-import lcmc.common.ui.utils.WidgetListener;
+import lcmc.lvm.service.LVM;
+import lcmc.vm.domain.VmsXml;
 
 /**
  * This class implements LVM resize dialog.
@@ -215,57 +212,37 @@ public final class LVResize extends LV {
         final JLabel sizeLabel = new JLabel("New Size");
 
         sizeWidget =  widgetFactory.createInstance(
-                       Widget.Type.TEXTFIELDWITHUNIT,
-                       VmsXml.convertKilobytes(newBlockSize),
-                       Widget.NO_ITEMS,
-                       getUnits(),
-                       Widget.NO_REGEXP,
-                       250,
-                       Widget.NO_ABBRV,
-                       new AccessMode(AccessMode.OP, AccessMode.NORMAL),
-                       Widget.NO_BUTTON);
+                       Widget.Type.TEXTFIELDWITHUNIT, VmsXml.convertKilobytes(newBlockSize), Widget.NO_ITEMS, getUnits(),
+                Widget.NO_REGEXP, 250, Widget.NO_ABBRV, new AccessMode(AccessMode.OP, AccessMode.NORMAL), Widget.NO_BUTTON);
         inputPane.add(sizeLabel);
         inputPane.add(sizeWidget.getComponent());
-        resizeButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(final ActionEvent e) {
-                final Thread thread = new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        if (checkDRBD()) {
-                            swingUtils.invokeAndWait(new Runnable() {
-                                @Override
-                                public void run() {
-                                    enableResizeButton(false);
-                                }
-                            });
-                            disableComponents();
-                            getProgressBar().start(RESIZE_LV_TIMEOUT * hostCheckBoxes.size());
-                            final boolean ret = lvAndDrbdResize(sizeWidget.getStringValue());
-                            final Host host = blockDevInfo.getHost();
-                            host.getBrowser().getClusterBrowser().updateHWInfo(host, Host.UPDATE_LVM);
-                            setComboBoxes();
-                            if (ret) {
-                                progressBarDone();
-                            } else {
-                                progressBarDoneError();
-                            }
-                            enableComponents();
-                        }
+        resizeButton.addActionListener(e -> {
+            final Thread thread = new Thread(() -> {
+                if (checkDRBD()) {
+                    swingUtils.invokeAndWait(() -> enableResizeButton(false));
+                    disableComponents();
+                    getProgressBar().start(RESIZE_LV_TIMEOUT * hostCheckBoxes.size());
+                    final boolean ret = lvAndDrbdResize(sizeWidget.getStringValue());
+                    final Host host = blockDevInfo.getHost();
+                    host.getBrowser().getClusterBrowser().updateHWInfo(host, Host.UPDATE_LVM);
+                    setComboBoxes();
+                    if (ret) {
+                        progressBarDone();
+                    } else {
+                        progressBarDoneError();
                     }
-                });
-                thread.start();
-            }
+                    enableComponents();
+                }
+            });
+            thread.start();
         });
 
         inputPane.add(resizeButton);
         /* max size */
         final JLabel maxSizeLabel = new JLabel("Max Size");
         maxSizeLabel.setEnabled(false);
-        maxSizeWidget = widgetFactory.createInstance(
-                                         Widget.Type.TEXTFIELDWITHUNIT,
-                                         VmsXml.convertKilobytes(maxBlockSize),
-                                         Widget.NO_ITEMS,
+        maxSizeWidget =
+                widgetFactory.createInstance(Widget.Type.TEXTFIELDWITHUNIT, VmsXml.convertKilobytes(maxBlockSize), Widget.NO_ITEMS,
                                          getUnits(),
                                          Widget.NO_REGEXP,
                                          250,
@@ -296,13 +273,7 @@ public final class LVResize extends LV {
         final String lv = blockDevInfo.getBlockDevice().getLogicalVolume();
         for (final Map.Entry<Host, JCheckBox> hostEntry : hostCheckBoxes.entrySet()) {
             final Set<String> allLVS = hostEntry.getKey().getHostParser().getAllLogicalVolumes();
-            hostEntry.getValue().addItemListener(
-                    new ItemListener() {
-                        @Override
-                        public void itemStateChanged(final ItemEvent e) {
-                            enableResizeButton(true);
-                        }
-                    });
+            hostEntry.getValue().addItemListener(e -> enableResizeButton(true));
             if (host == hostEntry.getKey()
                 || blockDevInfo.getBlockDevice().isDrbd()
                 && blockDevInfo.getOtherBlockDevInfo().getHost() == hostEntry.getKey()) {

@@ -20,6 +20,17 @@
 
 package lcmc.common.ui.main;
 
+import java.awt.Dimension;
+import java.util.regex.Matcher;
+
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+import javax.swing.JComponent;
+import javax.swing.JEditorPane;
+import javax.swing.JOptionPane;
+import javax.swing.JScrollPane;
+
 import lcmc.common.domain.AllHostsUpdatable;
 import lcmc.common.domain.Application;
 import lcmc.common.domain.UserConfig;
@@ -27,13 +38,6 @@ import lcmc.common.domain.util.Tools;
 import lcmc.common.ui.utils.SwingUtils;
 import lcmc.logger.Logger;
 import lcmc.logger.LoggerFactory;
-
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Singleton;
-import javax.swing.*;
-import java.awt.*;
-import java.util.regex.Matcher;
 
 @Named
 @Singleton
@@ -56,43 +60,19 @@ public class MainPresenter {
     private MainData mainData;
 
     public void renameSelectedClusterTab(final String newName) {
-        swingUtils.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                mainData.getClustersPanel().renameSelectedTab(newName);
-            }
-        });
+        swingUtils.invokeLater(() -> mainData.getClustersPanel().renameSelectedTab(newName));
     }
 
     /**
      * This is used, if cluster was added, but than it was canceled.
      */
     public void removeSelectedClusterTab() {
-        swingUtils.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                mainData.getClustersPanel().removeTab();
-            }
-        });
+        swingUtils.invokeLater(() -> mainData.getClustersPanel().removeTab());
     }
 
     /** Revalidates and repaints clusters panel. */
     public void refreshClustersPanel() {
-        swingUtils.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                mainData.getClustersPanel().refreshView();
-            }
-        });
-    }
-
-    /**
-     * Adds the 'Add Cluster' button to the list, so that it can be enabled or
-     * disabled.
-     */
-    public void registerAddClusterButton(final JComponent addClusterButton) {
-        mainData.registerAddClusterButton(addClusterButton);
-        addClusterButton.setEnabled(application.danglingHostsCount() >= 1);
+        swingUtils.invokeLater(() -> mainData.getClustersPanel().refreshView());
     }
 
     /**
@@ -109,23 +89,17 @@ public class MainPresenter {
     }
 
     public void enableAddClusterButtons(final boolean enable) {
-        swingUtils.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                for (final JComponent addClusterButton : mainData.getAddClusterButtonList()) {
-                    addClusterButton.setEnabled(enable);
-                }
+        swingUtils.invokeLater(() -> {
+            for (final JComponent addClusterButton : mainData.getAddClusterButtonList()) {
+                addClusterButton.setEnabled(enable);
             }
         });
     }
 
     public void enableAddHostButtons(final boolean enable) {
-        swingUtils.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                for (final JComponent addHostButton : mainData.getAddHostButtonList()) {
-                    addHostButton.setEnabled(enable);
-                }
+        swingUtils.invokeLater(() -> {
+            for (final JComponent addHostButton : mainData.getAddHostButtonList()) {
+                addHostButton.setEnabled(enable);
             }
         });
     }
@@ -135,12 +109,7 @@ public class MainPresenter {
         for (final AllHostsUpdatable component : mainData.getAllHostsUpdateList()) {
             component.allHostsUpdate();
         }
-        swingUtils.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                checkAddClusterButtons();
-            }
-        });
+        swingUtils.invokeLater(this::checkAddClusterButtons);
     }
 
     /** Dialog that informs a user about something with ok button. */
@@ -150,15 +119,8 @@ public class MainPresenter {
         infoPane.setMinimumSize(DIALOG_PANEL_SIZE);
         infoPane.setMaximumSize(DIALOG_PANEL_SIZE);
         infoPane.setPreferredSize(DIALOG_PANEL_SIZE);
-        swingUtils.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                JOptionPane.showMessageDialog(mainData.getMainFrame(),
-                        new JScrollPane(infoPane),
-                        title,
-                        JOptionPane.ERROR_MESSAGE);
-            }
-        });
+        swingUtils.invokeLater(() -> JOptionPane.showMessageDialog(mainData.getMainFrame(), new JScrollPane(infoPane), title,
+                JOptionPane.ERROR_MESSAGE));
     }
 
     /** Removes all the hosts and clusters from all the panels and data. */

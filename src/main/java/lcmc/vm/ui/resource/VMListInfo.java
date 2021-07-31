@@ -21,6 +21,27 @@
  */
 package lcmc.vm.ui.resource;
 
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.FlowLayout;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.TreeSet;
+
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Provider;
+import javax.swing.AbstractButton;
+import javax.swing.ImageIcon;
+import javax.swing.JComponent;
+import javax.swing.JPanel;
+import javax.swing.SwingConstants;
+
 import lcmc.cluster.ui.ClusterBrowser;
 import lcmc.cluster.ui.widget.WidgetFactory;
 import lcmc.common.domain.AccessMode;
@@ -31,19 +52,14 @@ import lcmc.common.ui.Browser;
 import lcmc.common.ui.CategoryInfo;
 import lcmc.common.ui.Info;
 import lcmc.common.ui.treemenu.ClusterTreeMenu;
-import lcmc.common.ui.utils.*;
+import lcmc.common.ui.utils.MenuFactory;
+import lcmc.common.ui.utils.MyButton;
+import lcmc.common.ui.utils.SwingUtils;
+import lcmc.common.ui.utils.UpdatableItem;
 import lcmc.host.domain.Host;
 import lcmc.host.ui.HostBrowser;
 import lcmc.vm.domain.VmsXml;
 import lcmc.vm.ui.AddVMConfigDialog;
-
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Provider;
-import javax.swing.*;
-import java.awt.*;
-import java.util.*;
-import java.util.List;
 
 /**
  * This class shows a list of virtual machines.
@@ -53,24 +69,21 @@ public final class VMListInfo extends CategoryInfo {
     /**
      * Default widths for columns.
      */
-    private static final Map<Integer, Integer> DEFAULT_WIDTHS =
-            Collections.unmodifiableMap(new HashMap<Integer, Integer>() {
-                private static final long serialVersionUID = 1L;
+    private static final Map<Integer, Integer> DEFAULT_WIDTHS = Collections.unmodifiableMap(new HashMap<>() {
+        private static final long serialVersionUID = 1L;
 
-                {
-                    put(4, 80); /* remove button column */
-                }
-            });
+        {
+            put(4, 80); /* remove button column */
+        }
+    });
     /**
      * On what raw is the vms virtual domain info object.
      */
-    private volatile Map<String, DomainInfo> domainToInfo =
-            new HashMap<String, DomainInfo>();
+    private volatile Map<String, DomainInfo> domainToInfo = new HashMap<>();
     /**
      * Colors for some rows.
      */
-    private volatile Map<String, Color> domainToColor =
-            new HashMap<String, Color>();
+    private volatile Map<String, Color> domainToColor = new HashMap<>();
     @Inject
     private Provider<AddVMConfigDialog> addVMConfigDialogProvider;
     @Inject
@@ -107,17 +120,16 @@ public final class VMListInfo extends CategoryInfo {
      */
     @Override
     protected Object[][] getTableData(final String tableName) {
-        final List<Object[]> rows = new ArrayList<Object[]>();
-        final Collection<String> domainNames = new TreeSet<String>();
+        final List<Object[]> rows = new ArrayList<>();
+        final Collection<String> domainNames = new TreeSet<>();
         for (final Host host : getBrowser().getClusterHosts()) {
             final VmsXml vxml = getBrowser().getVmsXml(host);
             if (vxml != null) {
                 domainNames.addAll(vxml.getDomainNames());
             }
         }
-        final Map<String, DomainInfo> dti =
-                new HashMap<String, DomainInfo>();
-        final Map<String, Color> dtc = new HashMap<String, Color>();
+        final Map<String, DomainInfo> dti = new HashMap<>();
+        final Map<String, Color> dtc = new HashMap<>();
         for (final String domainName : domainNames) {
             ImageIcon hostIcon = HostBrowser.HOST_OFF_ICON_LARGE;
             for (final Host host : getBrowser().getClusterHosts()) {
@@ -174,15 +186,12 @@ public final class VMListInfo extends CategoryInfo {
                               final int column) {
         final DomainInfo vmsvdi = domainToInfo.get(key);
         if (vmsvdi != null) {
-            final Thread t = new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    if (DEFAULT_WIDTHS.containsKey(column)) {
-                        /* remove button */
-                        vmsvdi.removeMyself(Application.RunMode.LIVE);
-                    } else {
-                        vmsvdi.selectMyself();
-                    }
+            final Thread t = new Thread(() -> {
+                if (DEFAULT_WIDTHS.containsKey(column)) {
+                    /* remove button */
+                    vmsvdi.removeMyself(Application.RunMode.LIVE);
+                } else {
+                    vmsvdi.selectMyself();
                 }
             });
             t.start();
@@ -209,28 +218,13 @@ public final class VMListInfo extends CategoryInfo {
                                                   final int col) {
         if (col == 0) {
             /* memory */
-            return new Comparator<Object>() {
-                @Override
-                public int compare(final Object o1, final Object o2) {
-                    return ((AbstractButton) o1).getText().compareToIgnoreCase(
-                            ((AbstractButton) o2).getText());
-                }
-            };
+            return (o1, o2) -> ((AbstractButton) o1).getText().compareToIgnoreCase(((AbstractButton) o2).getText());
         } else if (col == 3) {
             /* memory */
-            return new Comparator<Object>() {
-                @Override
-                public int compare(final Object o1, final Object o2) {
-                    final long i1 = VmsXml.convertToKilobytes((Value) o1);
-                    final long i2 = VmsXml.convertToKilobytes((Value) o2);
-                    if (i1 < i2) {
-                        return -1;
-                    } else if (i1 > i2) {
-                        return 1;
-                    } else {
-                        return 0;
-                    }
-                }
+            return (o1, o2) -> {
+                final long i1 = VmsXml.convertToKilobytes((Value) o1);
+                final long i2 = VmsXml.convertToKilobytes((Value) o2);
+                return Long.compare(i1, i2);
             };
         }
         return null;
@@ -254,19 +248,10 @@ public final class VMListInfo extends CategoryInfo {
      */
     @Override
     protected JComponent getNewButton() {
-        final MyButton newButton = widgetFactory.createButton(Tools.getString("VMListInfo.AddNewDomain"))
-                .addAction(new Runnable() {
-                    @Override
-                    public void run() {
-                        final Thread t = new Thread(new Runnable() {
-                            @Override
-                            public void run() {
-                                addDomainPanel();
-                            }
-                        });
-                        t.start();
-                    }
-                });
+        final MyButton newButton = widgetFactory.createButton(Tools.getString("VMListInfo.AddNewDomain")).addAction(() -> {
+            final Thread t = new Thread(this::addDomainPanel);
+            t.start();
+        });
         final JPanel bp = new JPanel(new FlowLayout(FlowLayout.LEADING, 0, 0));
         bp.setBackground(ClusterBrowser.BUTTON_PANEL_BACKGROUND);
         bp.add(newButton);
@@ -283,22 +268,16 @@ public final class VMListInfo extends CategoryInfo {
         domainInfo.einit("domainInfo", getBrowser());
         domainInfo.getResource().setNew(true);
         clusterTreeMenu.createMenuItem(getNode(), domainInfo);
-        swingUtils.invokeInEdt(new Runnable() {
-            @Override
-            public void run() {
-                clusterTreeMenu.reloadNode(getNode());
-                domainInfo.getInfoPanel();
-                domainInfo.selectMyself();
-                final Thread t = new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        final AddVMConfigDialog addVMConfigDialog = addVMConfigDialogProvider.get();
-                        addVMConfigDialog.init(domainInfo);
-                        addVMConfigDialog.showDialogs();
-                    }
-                });
-                t.start();
-            }
+        swingUtils.invokeInEdt(() -> {
+            clusterTreeMenu.reloadNode(getNode());
+            domainInfo.getInfoPanel();
+            domainInfo.selectMyself();
+            final Thread t = new Thread(() -> {
+                final AddVMConfigDialog addVMConfigDialog = addVMConfigDialogProvider.get();
+                addVMConfigDialog.init(domainInfo);
+                addVMConfigDialog.showDialogs();
+            });
+            t.start();
         });
     }
 
@@ -307,20 +286,15 @@ public final class VMListInfo extends CategoryInfo {
      */
     @Override
     public List<UpdatableItem> createPopup() {
-        final List<UpdatableItem> items = new ArrayList<UpdatableItem>();
+        final List<UpdatableItem> items = new ArrayList<>();
         /* New domain */
-        final UpdatableItem newDomainMenuItem = menuFactory.createMenuItem(
-                Tools.getString("VMListInfo.AddNewDomain"),
-                HostBrowser.HOST_OFF_ICON_LARGE,
-                new AccessMode(AccessMode.ADMIN, AccessMode.NORMAL),
-                new AccessMode(AccessMode.OP, AccessMode.NORMAL))
-            .addAction(new MenuAction() {
-                @Override
-                public void run(final String text) {
-                    hidePopup();
-                    addDomainPanel();
-                }
-            });
+        final UpdatableItem newDomainMenuItem =
+                menuFactory.createMenuItem(Tools.getString("VMListInfo.AddNewDomain"), HostBrowser.HOST_OFF_ICON_LARGE,
+                                new AccessMode(AccessMode.ADMIN, AccessMode.NORMAL), new AccessMode(AccessMode.OP, AccessMode.NORMAL))
+                        .addAction(text -> {
+                            hidePopup();
+                            addDomainPanel();
+                        });
         items.add(newDomainMenuItem);
         return items;
     }

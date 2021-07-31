@@ -25,6 +25,7 @@ package lcmc.host.ui;
 import java.awt.BorderLayout;
 import java.util.ArrayList;
 import java.util.List;
+
 import javax.annotation.Resource;
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -33,18 +34,18 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SpringLayout;
 
-import lcmc.common.domain.AccessMode;
-import lcmc.common.domain.Application;
-import lcmc.common.ui.MainPanel;
-import lcmc.common.ui.utils.SwingUtils;
-import lcmc.host.domain.Host;
-import lcmc.common.domain.StringValue;
-import lcmc.common.domain.Value;
-import lcmc.common.ui.SpringUtilities;
-import lcmc.common.ui.WizardDialog;
 import lcmc.cluster.ui.widget.Widget;
 import lcmc.cluster.ui.widget.WidgetFactory;
+import lcmc.common.domain.AccessMode;
+import lcmc.common.domain.Application;
+import lcmc.common.domain.StringValue;
+import lcmc.common.domain.Value;
 import lcmc.common.domain.util.Tools;
+import lcmc.common.ui.MainPanel;
+import lcmc.common.ui.SpringUtilities;
+import lcmc.common.ui.WizardDialog;
+import lcmc.common.ui.utils.SwingUtils;
+import lcmc.host.domain.Host;
 
 /**
  * An implementation of a dialog where user can enter either ip or hostname of
@@ -112,7 +113,7 @@ public class NewHostDialog extends DialogHost {
         final boolean pf = !ps.isEmpty();
         final int hc = Tools.charCount(hs, ',');
         final int uc = Tools.charCount(us, ',');
-        final List<String> incorrect = new ArrayList<String>();
+        final List<String> incorrect = new ArrayList<>();
         if (hf && uf) {
             if (hc != uc) {
                 uf = false;
@@ -139,34 +140,24 @@ public class NewHostDialog extends DialogHost {
         }
 
         if (hf) {
-            swingUtils.invokeLater(new Runnable() {
-                @Override
-                public void run() {
-                    hostField.setBackground(new StringValue(getHost().getEnteredHostOrIp()),
-                                            new StringValue(getHost().getEnteredHostOrIp()),
-                                            true);
-                }
-            });
+            swingUtils.invokeLater(() -> hostField.setBackground(new StringValue(getHost().getEnteredHostOrIp()),
+                    new StringValue(getHost().getEnteredHostOrIp()), true));
         } else {
             hostField.wrongValue();
             incorrect.add("host");
         }
 
         if (uf) {
-            swingUtils.invokeLater(new Runnable() {
-                @Override
-                public void run() {
-                    usernameField.setBackground(new StringValue(getHost().getUsername()),
-                                                new StringValue(getHost().getUsername()),
-                                                true);
-                    if (useSudoField != null) {
-                        if (Host.ROOT_USER.equals(us)) {
-                            useSudoField.setValueAndWait(new StringValue("false"));
-                            useSudoField.setEnabled(false);
-                        } else {
-                            useSudoField.setValueAndWait(new StringValue("true"));
-                            useSudoField.setEnabled(true);
-                        }
+            swingUtils.invokeLater(() -> {
+                usernameField.setBackground(new StringValue(getHost().getUsername()), new StringValue(getHost().getUsername()),
+                        true);
+                if (useSudoField != null) {
+                    if (Host.ROOT_USER.equals(us)) {
+                        useSudoField.setValueAndWait(new StringValue("false"));
+                        useSudoField.setEnabled(false);
+                    } else {
+                        useSudoField.setValueAndWait(new StringValue("true"));
+                        useSudoField.setEnabled(true);
                     }
                 }
             });
@@ -176,20 +167,14 @@ public class NewHostDialog extends DialogHost {
         }
 
         if (pf) {
-            swingUtils.invokeLater(new Runnable() {
-                @Override
-                public void run() {
-                    sshPortField.setBackground(new StringValue(getHost().getSSHPort()),
-                                               new StringValue(getHost().getSSHPort()),
-                                               true);
-                }
-            });
+            swingUtils.invokeLater(() -> sshPortField.setBackground(new StringValue(getHost().getSSHPort()),
+                    new StringValue(getHost().getSSHPort()), true));
         } else {
             sshPortField.wrongValue();
             incorrect.add("SSH port");
         }
 
-        final List<String> changed = new ArrayList<String>();
+        final List<String> changed = new ArrayList<>();
         enableNextButtons(incorrect, changed);
     }
 
@@ -213,19 +198,9 @@ public class NewHostDialog extends DialogHost {
         enableComponents();
         makeDefaultButton(buttonClass(nextButton()));
         checkFields(null);
-        swingUtils.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                hostField.requestFocus();
-            }
-        });
+        swingUtils.invokeLater(() -> hostField.requestFocus());
         if (!application.getAutoHosts().isEmpty()) {
-            swingUtils.invokeLater(new Runnable() {
-                @Override
-                public void run() {
-                    hostField.setValue(new StringValue(application.getAutoHosts().get(0)));
-                }
-            });
+            swingUtils.invokeLater(() -> hostField.setValue(new StringValue(application.getAutoHosts().get(0))));
             Tools.sleep(3000);
             pressNextButton();
         }
@@ -317,21 +292,14 @@ public class NewHostDialog extends DialogHost {
                 userName = DEFAULT_SSH_ROOT_USER;
             }
         }
-        final List<Value> users = new ArrayList<Value>();
+        final List<Value> users = new ArrayList<>();
         final String user = System.getProperty("user.name");
         if (!DEFAULT_SSH_ROOT_USER.equals(user)) {
             users.add(new StringValue(DEFAULT_SSH_ROOT_USER));
         }
         users.add(new StringValue(user));
-        usernameField = widgetFactory.createInstance(
-                                   Widget.GUESS_TYPE,
-                                   new StringValue(userName),
-                                   users.toArray(new Value[users.size()]),
-                                   regexp,
-                                   FIELD_WIDTH,
-                                   Widget.NO_ABBRV,
-                                   new AccessMode(AccessMode.RO, AccessMode.NORMAL),
-                                   Widget.NO_BUTTON);
+        usernameField = widgetFactory.createInstance(Widget.GUESS_TYPE, new StringValue(userName), users.toArray(new Value[0]),
+                regexp, FIELD_WIDTH, Widget.NO_ABBRV, new AccessMode(AccessMode.RO, AccessMode.NORMAL), Widget.NO_BUTTON);
         usernameField.setEditable(true);
         addCheckField(usernameField);
         usernameLabel.setLabelFor(usernameField.getComponent());

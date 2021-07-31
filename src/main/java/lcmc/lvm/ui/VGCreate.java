@@ -35,6 +35,7 @@ import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
+
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.swing.JCheckBox;
@@ -43,21 +44,22 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.SpringLayout;
-import lcmc.common.domain.AccessMode;
-import lcmc.common.domain.Application;
+
 import lcmc.cluster.domain.Cluster;
-import lcmc.common.ui.utils.SwingUtils;
-import lcmc.host.domain.Host;
-import lcmc.common.domain.StringValue;
-import lcmc.drbd.domain.BlockDevice;
-import lcmc.common.ui.Browser;
-import lcmc.common.ui.SpringUtilities;
-import lcmc.drbd.ui.resource.BlockDevInfo;
 import lcmc.cluster.ui.widget.Widget;
 import lcmc.cluster.ui.widget.WidgetFactory;
-import lcmc.lvm.service.LVM;
-import lcmc.common.ui.utils.MyButton;
+import lcmc.common.domain.AccessMode;
+import lcmc.common.domain.Application;
+import lcmc.common.domain.StringValue;
 import lcmc.common.domain.util.Tools;
+import lcmc.common.ui.Browser;
+import lcmc.common.ui.SpringUtilities;
+import lcmc.common.ui.utils.MyButton;
+import lcmc.common.ui.utils.SwingUtils;
+import lcmc.drbd.domain.BlockDevice;
+import lcmc.drbd.ui.resource.BlockDevInfo;
+import lcmc.host.domain.Host;
+import lcmc.lvm.service.LVM;
 
 /** Create VG dialog. */
 @Named
@@ -65,7 +67,7 @@ public final class VGCreate extends LV {
     private static final String VG_CREATE_DESCRIPTION = "Create a volume group.";
     private static final int CREATE_TIMEOUT = 5000;
     private Host host;
-    private final Collection<BlockDevInfo> selectedBlockDevInfos = new ArrayList<BlockDevInfo>();
+    private final Collection<BlockDevInfo> selectedBlockDevInfos = new ArrayList<>();
     private Widget vgNameWi;
     private Map<Host, JCheckBox> hostCheckBoxes = null;
     private Map<String, JCheckBox> pvCheckBoxes = null;
@@ -115,7 +117,7 @@ public final class VGCreate extends LV {
         makeDefaultButton(createButton);
     }
 
-    protected void checkButtons() {
+    private void checkButtons() {
         boolean enable = true;
         for (final Map.Entry<Host, JCheckBox> hostEntry : hostCheckBoxes.entrySet()) {
             if (hostEntry.getValue().isSelected() && !hostHasPVSWithoutVGs(hostEntry.getKey())) {
@@ -153,7 +155,7 @@ public final class VGCreate extends LV {
     }
 
     private Map<String, JCheckBox> getPVCheckBoxes(final Collection<String> selectedPVs) {
-        final Map<String, JCheckBox> components = new LinkedHashMap<String, JCheckBox>();
+        final Map<String, JCheckBox> components = new LinkedHashMap<>();
         for (final BlockDevice pv : host.getHostParser().getPhysicalVolumes()) {
             final String pvName = pv.getName();
             final JCheckBox button = new JCheckBox(pvName, selectedPVs.contains(pvName));
@@ -164,7 +166,7 @@ public final class VGCreate extends LV {
     }
 
     private boolean hostHasPVSWithoutVGs(final Host host) {
-        final Map<String, BlockDevice> oPVS = new HashMap<String, BlockDevice>();
+        final Map<String, BlockDevice> oPVS = new HashMap<>();
         for (final BlockDevice bd : host.getHostParser().getPhysicalVolumes()) {
             oPVS.put(bd.getName(), bd);
         }
@@ -220,14 +222,14 @@ public final class VGCreate extends LV {
         createButton.addActionListener(new CreateActionListener());
         inputPane.add(createButton);
         SpringUtilities.makeCompactGrid(inputPane, 1, 3,  /* rows, cols */
-                                                   1, 1,  /* initX, initY */
-                                                   1, 1); /* xPad, yPad */
+                1, 1,  /* initX, initY */
+                1, 1); /* xPad, yPad */
 
         pane.add(inputPane);
         /* Volume groups. */
         final JPanel pvsPane = new JPanel(new FlowLayout(FlowLayout.LEADING));
-        final Collection<String> selectedPVs = new HashSet<String>();
-        final Collection<Host> selectedHosts = new HashSet<Host>();
+        final Collection<String> selectedPVs = new HashSet<>();
+        final Collection<Host> selectedHosts = new HashSet<>();
         for (final BlockDevInfo sbdi : selectedBlockDevInfos) {
             if (sbdi.getBlockDevice().isDrbd()) {
                 selectedPVs.add(sbdi.getBlockDevice().getDrbdBlockDevice().getName());
@@ -325,19 +327,14 @@ public final class VGCreate extends LV {
     private class CreateRunnable implements Runnable {
         @Override
         public void run() {
-            swingUtils.invokeAndWait(new Runnable() {
-                @Override
-                public void run() {
-                    enableCreateButton(false);
-                }
-            });
+            swingUtils.invokeAndWait(() -> enableCreateButton(false));
                     
             disableComponents();
             getProgressBar().start(CREATE_TIMEOUT * hostCheckBoxes.size());
             boolean oneFailed = false;
             for (final Map.Entry<Host, JCheckBox> hostEntry : hostCheckBoxes.entrySet()) {
                 if (hostEntry.getValue().isSelected()) {
-                    final Collection<String> pvNames = new ArrayList<String>();
+                    final Collection<String> pvNames = new ArrayList<>();
                     for (final Map.Entry<String, JCheckBox> pvEntry : pvCheckBoxes.entrySet()) {
                         if (pvEntry.getValue().isSelected()) {
                             pvNames.add(pvEntry.getKey());
@@ -354,12 +351,7 @@ public final class VGCreate extends LV {
                 for (final Host h : hostCheckBoxes.keySet()) {
                     h.getBrowser().getClusterBrowser().updateHWInfo(h, Host.UPDATE_LVM);
                 }
-                swingUtils.invokeLater(new Runnable() {
-                    @Override
-                    public void run() {
-                        checkButtons();
-                    }
-                });
+                swingUtils.invokeLater(VGCreate.this::checkButtons);
                 progressBarDoneError();
             } else {
                 progressBarDone();

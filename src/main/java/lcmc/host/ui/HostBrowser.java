@@ -21,7 +21,26 @@
  */
 package lcmc.host.ui;
 
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.Set;
+import java.util.TreeSet;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReadWriteLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
+
+import javax.annotation.Resource;
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Provider;
+import javax.swing.ImageIcon;
+import javax.swing.tree.DefaultMutableTreeNode;
+
 import com.google.common.eventbus.Subscribe;
+
 import lcmc.ClusterEventBus;
 import lcmc.cluster.domain.Cluster;
 import lcmc.cluster.service.ssh.ExecCommandConfig;
@@ -29,7 +48,6 @@ import lcmc.cluster.ui.ClusterBrowser;
 import lcmc.cluster.ui.resource.ClusterViewFactory;
 import lcmc.cluster.ui.resource.FSInfo;
 import lcmc.common.domain.AccessMode;
-import lcmc.common.domain.EnablePredicate;
 import lcmc.common.domain.util.Tools;
 import lcmc.common.ui.Browser;
 import lcmc.common.ui.CategoryInfo;
@@ -37,7 +55,10 @@ import lcmc.common.ui.CmdLog;
 import lcmc.common.ui.Info;
 import lcmc.common.ui.main.ProgressIndicator;
 import lcmc.common.ui.treemenu.TreeMenuController;
-import lcmc.common.ui.utils.*;
+import lcmc.common.ui.utils.MenuFactory;
+import lcmc.common.ui.utils.MyMenu;
+import lcmc.common.ui.utils.MyMenuItem;
+import lcmc.common.ui.utils.SwingUtils;
 import lcmc.crm.ui.resource.HostInfo;
 import lcmc.drbd.domain.BlockDevice;
 import lcmc.drbd.domain.NetInterface;
@@ -48,17 +69,6 @@ import lcmc.event.BlockDevicesChangedEvent;
 import lcmc.event.FileSystemsChangedEvent;
 import lcmc.event.NetInterfacesChangedEvent;
 import lcmc.host.domain.Host;
-
-import javax.annotation.Resource;
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Provider;
-import javax.swing.*;
-import javax.swing.tree.DefaultMutableTreeNode;
-import java.util.*;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReadWriteLock;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 /**
  * This class holds host resource data in a tree. It shows panels that allow
@@ -90,8 +100,8 @@ public class HostBrowser extends Browser {
     /**
      * List of used network interface ports.
      */
-    private final Collection<String> usedPorts = new HashSet<String>();
-    private final Collection<String> usedProxyPorts = new HashSet<String>();
+    private final Collection<String> usedPorts = new HashSet<>();
+    private final Collection<String> usedProxyPorts = new HashSet<>();
     private Host host;
     @Inject
     private HostInfo hostInfo;
@@ -103,7 +113,7 @@ public class HostBrowser extends Browser {
     /**
      * Map of block devices and their info objects.
      */
-    private final Map<BlockDevice, BlockDevInfo> blockDevInfos = new LinkedHashMap<BlockDevice, BlockDevInfo>();
+    private final Map<BlockDevice, BlockDevInfo> blockDevInfos = new LinkedHashMap<>();
     private final ReadWriteLock mBlockDevInfosLock = new ReentrantReadWriteLock();
     private final Lock mBlockDevInfosReadLock = mBlockDevInfosLock.readLock();
     private final Lock mBlockDevInfosWriteLock = mBlockDevInfosLock.writeLock();
@@ -136,12 +146,7 @@ public class HostBrowser extends Browser {
         hostInfo.init(host, this);
         hostDrbdInfo.init(host, this);
         treeTop = treeMenuController.createMenuTreeTop(hostInfo);
-        swingUtils.invokeInEdt(new Runnable() {
-            @Override
-            public void run() {
-                initHostResources();
-            }
-        });
+        swingUtils.invokeInEdt(this::initHostResources);
         clusterEventBus.register(this);
     }
 
@@ -205,7 +210,7 @@ public class HostBrowser extends Browser {
         mBlockDevInfosWriteLock.lock();
         boolean changed = false;
         try {
-            final Map<BlockDevice, BlockDevInfo> oldBlockDevices = new HashMap<BlockDevice, BlockDevInfo>(blockDevInfos);
+            final Map<BlockDevice, BlockDevInfo> oldBlockDevices = new HashMap<>(blockDevInfos);
             if (oldBlockDevices.size() != blockDevices.size()) {
                 changed = true;
             }
@@ -259,7 +264,7 @@ public class HostBrowser extends Browser {
     public Set<BlockDevInfo> getSortedBlockDevInfos() {
         mBlockDevInfosReadLock.lock();
         try {
-            return new TreeSet<BlockDevInfo>(blockDevInfos.values());
+            return new TreeSet<>(blockDevInfos.values());
         } finally {
             mBlockDevInfosReadLock.unlock();
         }
@@ -273,86 +278,60 @@ public class HostBrowser extends Browser {
             return;
         }
         /* Command log */
-        final MyMenuItem cmdLogMenuItem = menuFactory.createMenuItem(
-                Tools.getString("HostBrowser.CmdLog"),
-                Info.LOGFILE_ICON,
-                "",
-                new AccessMode(AccessMode.ADMIN, AccessMode.NORMAL),
-                new AccessMode(AccessMode.ADMIN, AccessMode.NORMAL))
+        final MyMenuItem cmdLogMenuItem = menuFactory.createMenuItem(Tools.getString("HostBrowser.CmdLog"), Info.LOGFILE_ICON, "",
+                        new AccessMode(AccessMode.ADMIN, AccessMode.NORMAL), new AccessMode(AccessMode.ADMIN, AccessMode.NORMAL))
 
-                .enablePredicate(new EnablePredicate() {
-                    @Override
-                    public String check() {
-                        if (!host.isConnected()) {
-                            return Host.NOT_CONNECTED_MENU_TOOLTIP_TEXT;
-                        }
-                        return null;
+                .enablePredicate(() -> {
+                    if (!host.isConnected()) {
+                        return Host.NOT_CONNECTED_MENU_TOOLTIP_TEXT;
                     }
+                    return null;
                 })
 
-                .addAction(new MenuAction() {
-                    @Override
-                    public void run(final String text) {
-                        final CmdLog cmdLog = cmdLogProvider.get();
-                        cmdLog.init(host);
-                        cmdLog.showDialog();
-                    }
+                .addAction(text -> {
+                    final CmdLog cmdLog = cmdLogProvider.get();
+                    cmdLog.init(host);
+                    cmdLog.showDialog();
                 });
         submenu.add(cmdLogMenuItem);
 
         /* panic */
-        final MyMenuItem panicMenuItem = menuFactory.createMenuItem(
-                Tools.getString("HostBrowser.MakeKernelPanic") + host.getName(),
-                null,
-                new AccessMode(AccessMode.GOD, AccessMode.NORMAL),
-                new AccessMode(AccessMode.ADMIN, AccessMode.NORMAL))
-                .enablePredicate(new EnablePredicate() {
-                    @Override
-                    public String check() {
-                        if (!host.isConnected()) {
-                            return Host.NOT_CONNECTED_MENU_TOOLTIP_TEXT;
-                        }
-                        return null;
-                    }
-                })
-                .addAction(new MenuAction() {
-                    @Override
-                    public void run(final String text) {
-                        final String hostName = host.getName();
-                        final String command = "MakeKernelPanic";
-                        progressIndicator.startProgressIndicator(hostName, host.getDistString(command));
-                        host.execCommand(new ExecCommandConfig().commandString(command));
-                        progressIndicator.stopProgressIndicator(hostName, host.getDistString(command));
-                    }
-                });
+        final MyMenuItem panicMenuItem =
+                menuFactory.createMenuItem(Tools.getString("HostBrowser.MakeKernelPanic") + host.getName(), null,
+                                new AccessMode(AccessMode.GOD, AccessMode.NORMAL), new AccessMode(AccessMode.ADMIN, AccessMode.NORMAL))
+                        .enablePredicate(() -> {
+                            if (!host.isConnected()) {
+                                return Host.NOT_CONNECTED_MENU_TOOLTIP_TEXT;
+                            }
+                            return null;
+                        })
+                        .addAction(text -> {
+                            final String hostName = host.getName();
+                            final String command = "MakeKernelPanic";
+                            progressIndicator.startProgressIndicator(hostName, host.getDistString(command));
+                            host.execCommand(new ExecCommandConfig().commandString(command));
+                            progressIndicator.stopProgressIndicator(hostName, host.getDistString(command));
+                        });
         submenu.add(panicMenuItem);
 
         /* reboot */
-        final MyMenuItem rebootMenuItem = menuFactory.createMenuItem(
-                Tools.getString("HostBrowser.MakeKernelReboot") + host.getName(),
-                null,
-                new AccessMode(AccessMode.GOD, AccessMode.NORMAL),
-                new AccessMode(AccessMode.ADMIN, AccessMode.NORMAL))
-                .enablePredicate(new EnablePredicate() {
-                    @Override
-                    public String check() {
-                        if (!host.isConnected()) {
-                            return Host.NOT_CONNECTED_MENU_TOOLTIP_TEXT;
-                        }
-                        return null;
-                    }
-                })
+        final MyMenuItem rebootMenuItem =
+                menuFactory.createMenuItem(Tools.getString("HostBrowser.MakeKernelReboot") + host.getName(), null,
+                                new AccessMode(AccessMode.GOD, AccessMode.NORMAL), new AccessMode(AccessMode.ADMIN, AccessMode.NORMAL))
+                        .enablePredicate(() -> {
+                            if (!host.isConnected()) {
+                                return Host.NOT_CONNECTED_MENU_TOOLTIP_TEXT;
+                            }
+                            return null;
+                        })
 
-                .addAction(new MenuAction() {
-                    @Override
-                    public void run(final String text) {
-                        final String hostName = host.getName();
-                        final String command = "MakeKernelReboot";
-                        progressIndicator.startProgressIndicator(hostName, host.getDistString(command));
-                        host.execCommand(new ExecCommandConfig().commandString(command));
-                        progressIndicator.stopProgressIndicator(hostName, host.getDistString(command));
-                    }
-                });
+                        .addAction(text -> {
+                            final String hostName = host.getName();
+                            final String command = "MakeKernelReboot";
+                            progressIndicator.startProgressIndicator(hostName, host.getDistString(command));
+                            host.execCommand(new ExecCommandConfig().commandString(command));
+                            progressIndicator.stopProgressIndicator(hostName, host.getDistString(command));
+                        });
         submenu.add(rebootMenuItem);
     }
 

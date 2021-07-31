@@ -20,6 +20,8 @@
 
 package lcmc.common.domain;
 
+import java.util.Objects;
+
 public class StringValue implements Value, Comparable<Value> {
 
     private static final String NOTHING_VALUE = null;
@@ -81,9 +83,9 @@ public class StringValue implements Value, Comparable<Value> {
             this.valueForConfig = valueForConfig;
         }
         if (isNothingSelected()) {
-            this.valueForGui = null;
+            valueForGui = null;
         } else {
-            this.valueForGui = valueForConfig;
+            valueForGui = valueForConfig;
         }
         unit = null;
     }
@@ -123,11 +125,7 @@ public class StringValue implements Value, Comparable<Value> {
 
     @Override
     public final boolean isNothingSelected() {
-        final String nv = NOTHING_VALUE;
-        if (nv == null && valueForConfig == null) {
-            return true;
-        }
-        return nv != null && (nv.equals(valueForConfig));
+        return valueForConfig == null;
     }
 
     @Override
@@ -138,8 +136,8 @@ public class StringValue implements Value, Comparable<Value> {
     @Override
     public int hashCode() {
         int hash = 5;
-        hash = 59 * hash + (this.valueForConfig != null ? this.valueForConfig.hashCode() : 0);
-        hash = 59 * hash + (unit != null ? this.unit.hashCode() : 0);
+        hash = 59 * hash + (valueForConfig != null ? valueForConfig.hashCode() : 0);
+        hash = 59 * hash + (unit != null ? unit.hashCode() : 0);
         return hash;
     }
 
@@ -152,13 +150,10 @@ public class StringValue implements Value, Comparable<Value> {
             return false;
         }
         final Value other = (Value) obj;
-        if ((this.valueForConfig == null) ? (other.getValueForConfig() != null) : !this.valueForConfig.equals(other.getValueForConfig())) {
+        if ((valueForConfig == null) ? (other.getValueForConfig() != null) : !valueForConfig.equals(other.getValueForConfig())) {
             return false;
         }
-        if (this.unit != other.getUnit() && (this.unit == null || !this.unit.equals(other.getUnit()))) {
-            return false;
-        }
-        return true;
+        return unit == other.getUnit() || (unit != null && unit.equals(other.getUnit()));
     }
 
     @Override
@@ -170,9 +165,6 @@ public class StringValue implements Value, Comparable<Value> {
         if (otherValue == null) {
             otherValue = "";
         }
-        if (valueForConfig == null) {
-            return "".compareTo(otherValue);
-        }
-        return valueForConfig.compareTo(otherValue);
+        return Objects.requireNonNullElse(valueForConfig, "").compareTo(otherValue);
     }
 }

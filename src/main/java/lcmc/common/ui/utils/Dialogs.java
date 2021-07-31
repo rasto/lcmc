@@ -20,16 +20,18 @@
 
 package lcmc.common.ui.utils;
 
-import com.google.common.base.Optional;
-import lcmc.common.domain.Application;
-import lcmc.common.domain.util.Tools;
-import lcmc.common.ui.main.MainData;
+import java.io.File;
+import java.util.Optional;
 
 import javax.inject.Inject;
 import javax.inject.Named;
-import javax.swing.*;
+import javax.swing.JFileChooser;
+import javax.swing.JOptionPane;
 import javax.swing.filechooser.FileFilter;
-import java.io.File;
+
+import lcmc.common.domain.Application;
+import lcmc.common.domain.util.Tools;
+import lcmc.common.ui.main.MainData;
 
 @Named
 public class Dialogs {
@@ -67,10 +69,12 @@ public class Dialogs {
         chooser.setAcceptAllFileFilterUsed(true);
         chooser.setCurrentDirectory(new File("."));
         chooser.addChoosableFileFilter(new FileFilter() {
+            @Override
             public String getDescription() {
                 return "PNG Images (*.png)";
             }
 
+            @Override
             public boolean accept(File f) {
                 if (f.isDirectory()) {
                     return true;
@@ -82,7 +86,7 @@ public class Dialogs {
 
         int r = chooser.showSaveDialog(mainData.getClustersPanel());
         if (r != JFileChooser.APPROVE_OPTION) {
-            return Optional.absent();
+            return Optional.empty();
         }
         return Optional.of(chooser.getSelectedFile().getAbsolutePath());
     }
@@ -100,9 +104,7 @@ public class Dialogs {
                 final int i = name.lastIndexOf('.');
                 if (i > 0 && i < name.length() - 1) {
                     final String ext = name.substring(i + 1);
-                    if (ext.equals(Tools.getDefault("MainMenu.DrbdGuiFiles.Extension"))) {
-                        return true;
-                    }
+                    return ext.equals(Tools.getDefault("MainMenu.DrbdGuiFiles.Extension"));
                 }
                 return false;
             }
@@ -114,7 +116,7 @@ public class Dialogs {
         };
         chooser.setFileFilter(filter);
         final int ret = chooser.showOpenDialog(mainData.getMainFrame());
-        Optional<String> name = Optional.absent();
+        Optional<String> name = Optional.empty();
         if (ret == JFileChooser.APPROVE_OPTION) {
             name = Optional.of(chooser.getSelectedFile().getAbsolutePath());
         }

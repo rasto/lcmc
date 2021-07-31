@@ -48,15 +48,23 @@ import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 
-import lcmc.host.domain.Host;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
+import lcmc.cluster.service.ssh.ExecCommandConfig;
+import lcmc.cluster.service.ssh.SshOutput;
+import lcmc.common.domain.ConvertCmdCallback;
 import lcmc.common.domain.StringValue;
+import lcmc.common.domain.Unit;
 import lcmc.common.domain.Value;
 import lcmc.common.domain.XMLTools;
-import lcmc.common.domain.ConvertCmdCallback;
+import lcmc.common.domain.util.Tools;
+import lcmc.host.domain.Host;
 import lcmc.logger.Logger;
 import lcmc.logger.LoggerFactory;
-import lcmc.common.domain.util.Tools;
-import lcmc.common.domain.Unit;
 import lcmc.vm.domain.data.DiskData;
 import lcmc.vm.domain.data.FilesystemData;
 import lcmc.vm.domain.data.GraphicsData;
@@ -67,15 +75,7 @@ import lcmc.vm.domain.data.SerialData;
 import lcmc.vm.domain.data.SoundData;
 import lcmc.vm.domain.data.VideoData;
 import lcmc.vm.service.VIRSH;
-import lcmc.cluster.service.ssh.ExecCommandConfig;
-import lcmc.cluster.service.ssh.SshOutput;
-
 import lombok.val;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 
 @Named
 public class VmsXml {
@@ -88,7 +88,7 @@ public class VmsXml {
     @Autowired
     private Provider<VMCreator> vmCreatorProvider;
 
-    private final Map<String, String> namesToConfigs = new HashMap<String, String>();
+    private final Map<String, String> namesToConfigs = new HashMap<>();
 
     /** Returns string representation of the port; it can be autoport. */
     static String portString(final String port) {
@@ -432,7 +432,7 @@ public class VmsXml {
             if (hwNode == null) {
                 hwNode = (Element) devicesNode.appendChild(domainNode.getOwnerDocument().createElement(elementName));
             }
-            final Map<String, Element> parentNodes = new HashMap<String, Element>();
+            final Map<String, Element> parentNodes = new HashMap<>();
             for (final String param : parametersMap.keySet()) {
                 final String value = parametersMap.get(param);
                 final String tag = tagMap.get(param);
@@ -786,188 +786,161 @@ public class VmsXml {
 
     /** Returns function that gets the node that belongs to the paremeters. */
     protected VirtualHardwareComparator getDiskDataComparator() {
-        return new VirtualHardwareComparator() {
-            @Override
-            public Element getElement(final NodeList nodes, final Map<String, String> parameters) {
-                Element el = null;
-                final String targetDev = parameters.get(DiskData.SAVED_TARGET_DEVICE);
-                if (targetDev != null) {
-                    for (int i = 0; i < nodes.getLength(); i++) {
-                        final Node mn = XMLTools.getChildNode(nodes.item(i), "target");
-                        if (targetDev.equals(XMLTools.getAttribute(mn, "dev"))) {
-                            el = (Element) nodes.item(i);
-                        }
+        return (nodes, parameters) -> {
+            Element el = null;
+            final String targetDev = parameters.get(DiskData.SAVED_TARGET_DEVICE);
+            if (targetDev != null) {
+                for (int i = 0; i < nodes.getLength(); i++) {
+                    final Node mn = XMLTools.getChildNode(nodes.item(i), "target");
+                    if (targetDev.equals(XMLTools.getAttribute(mn, "dev"))) {
+                        el = (Element) nodes.item(i);
                     }
                 }
-                return el;
             }
+            return el;
         };
     }
 
     /** Returns function that gets the node that belongs to the paremeters. */
     protected VirtualHardwareComparator getFilesystemDataComparator() {
-        return new VirtualHardwareComparator() {
-            @Override
-            public Element getElement(final NodeList nodes, final Map<String, String> parameters) {
-                Element el = null;
-                final String targetDev = parameters.get(FilesystemData.SAVED_TARGET_DIR);
-                if (targetDev != null) {
-                    for (int i = 0; i < nodes.getLength(); i++) {
-                        final Node mn = XMLTools.getChildNode(nodes.item(i), "target");
-                        if (targetDev.equals(XMLTools.getAttribute(mn, "dir"))) {
-                            el = (Element) nodes.item(i);
-                        }
+        return (nodes, parameters) -> {
+            Element el = null;
+            final String targetDev = parameters.get(FilesystemData.SAVED_TARGET_DIR);
+            if (targetDev != null) {
+                for (int i = 0; i < nodes.getLength(); i++) {
+                    final Node mn = XMLTools.getChildNode(nodes.item(i), "target");
+                    if (targetDev.equals(XMLTools.getAttribute(mn, "dir"))) {
+                        el = (Element) nodes.item(i);
                     }
                 }
-                return el;
             }
+            return el;
         };
     }
 
     /** Returns function that gets the node that belongs to the paremeters. */
     protected VirtualHardwareComparator getInterfaceDataComparator() {
-        return new VirtualHardwareComparator() {
-            @Override
-            public Element getElement(final NodeList nodes, final Map<String, String> parameters) {
-                final String macAddress = parameters.get(InterfaceData.SAVED_MAC_ADDRESS);
-                Element el = null;
-                if (macAddress != null) {
-                    for (int i = 0; i < nodes.getLength(); i++) {
-                        final Node mn = XMLTools.getChildNode(nodes.item(i), "mac");
-                        if (macAddress.equals(XMLTools.getAttribute(mn, "address"))) {
-                            el = (Element) nodes.item(i);
-                            break;
-                        }
+        return (nodes, parameters) -> {
+            final String macAddress = parameters.get(InterfaceData.SAVED_MAC_ADDRESS);
+            Element el = null;
+            if (macAddress != null) {
+                for (int i = 0; i < nodes.getLength(); i++) {
+                    final Node mn = XMLTools.getChildNode(nodes.item(i), "mac");
+                    if (macAddress.equals(XMLTools.getAttribute(mn, "address"))) {
+                        el = (Element) nodes.item(i);
+                        break;
                     }
                 }
-                return el;
             }
+            return el;
         };
     }
 
     /** Returns function that gets the node that belongs to the paremeters. */
     protected VirtualHardwareComparator getInputDevDataComparator() {
-        return new VirtualHardwareComparator() {
-            @Override
-            public Element getElement(final NodeList nodes, final Map<String, String> parameters) {
-                final String type = parameters.get(InputDevData.SAVED_TYPE);
-                final String bus = parameters.get(InputDevData.SAVED_BUS);
-                Element el = null;
-                if (type != null && bus != null) {
-                    for (int i = 0; i < nodes.getLength(); i++) {
-                        final Node mn = nodes.item(i);
-                        if (type.equals(XMLTools.getAttribute(mn, "type")) && bus.equals(XMLTools.getAttribute(mn, "bus"))) {
-                            el = (Element) nodes.item(i);
-                            break;
-                        }
+        return (nodes, parameters) -> {
+            final String type = parameters.get(InputDevData.SAVED_TYPE);
+            final String bus = parameters.get(InputDevData.SAVED_BUS);
+            Element el = null;
+            if (type != null && bus != null) {
+                for (int i = 0; i < nodes.getLength(); i++) {
+                    final Node mn = nodes.item(i);
+                    if (type.equals(XMLTools.getAttribute(mn, "type")) && bus.equals(XMLTools.getAttribute(mn, "bus"))) {
+                        el = (Element) nodes.item(i);
+                        break;
                     }
                 }
-                return el;
             }
+            return el;
         };
     }
 
     /** Returns function that gets the node that belongs to the paremeters. */
     protected VirtualHardwareComparator getGraphicsDataComparator() {
-        return new VirtualHardwareComparator() {
-            @Override
-            public Element getElement(final NodeList nodes, final Map<String, String> parameters) {
-                final String type = parameters.get(GraphicsData.SAVED_TYPE);
-                Element el = null;
-                if (type != null) {
-                    for (int i = 0; i < nodes.getLength(); i++) {
-                        final Node mn = nodes.item(i);
-                        if (type.equals(XMLTools.getAttribute(mn, "type"))) {
-                            el = (Element) nodes.item(i);
-                            break;
-                        }
+        return (nodes, parameters) -> {
+            final String type = parameters.get(GraphicsData.SAVED_TYPE);
+            Element el = null;
+            if (type != null) {
+                for (int i = 0; i < nodes.getLength(); i++) {
+                    final Node mn = nodes.item(i);
+                    if (type.equals(XMLTools.getAttribute(mn, "type"))) {
+                        el = (Element) nodes.item(i);
+                        break;
                     }
                 }
-                return el;
             }
+            return el;
         };
     }
 
     /** Returns function that gets the node that belongs to the paremeters. */
     protected VirtualHardwareComparator getSoundDataComparator() {
-        return new VirtualHardwareComparator() {
-            @Override
-            public Element getElement(final NodeList nodes, final Map<String, String> parameters) {
-                final String model = parameters.get(SoundData.SAVED_MODEL);
-                Element el = null;
-                if (model != null) {
-                    for (int i = 0; i < nodes.getLength(); i++) {
-                        final Node mn = nodes.item(i);
-                        if (model.equals(XMLTools.getAttribute(mn, "model"))) {
-                            el = (Element) nodes.item(i);
-                            break;
-                        }
+        return (nodes, parameters) -> {
+            final String model = parameters.get(SoundData.SAVED_MODEL);
+            Element el = null;
+            if (model != null) {
+                for (int i = 0; i < nodes.getLength(); i++) {
+                    final Node mn = nodes.item(i);
+                    if (model.equals(XMLTools.getAttribute(mn, "model"))) {
+                        el = (Element) nodes.item(i);
+                        break;
                     }
                 }
-                return el;
             }
+            return el;
         };
     }
 
     /** Returns function that gets the node that belongs to the paremeters. */
     protected VirtualHardwareComparator getSerialDataComparator() {
-        return new VirtualHardwareComparator() {
-            @Override
-            public Element getElement(final NodeList nodes, final Map<String, String> parameters) {
-                final String type = parameters.get(SerialData.SAVED_TYPE);
-                Element el = null;
-                if (type != null) {
-                    for (int i = 0; i < nodes.getLength(); i++) {
-                        final Node mn = nodes.item(i);
-                        if (type.equals(XMLTools.getAttribute(mn, "type"))) {
-                            el = (Element) nodes.item(i);
-                            break;
-                        }
+        return (nodes, parameters) -> {
+            final String type = parameters.get(SerialData.SAVED_TYPE);
+            Element el = null;
+            if (type != null) {
+                for (int i = 0; i < nodes.getLength(); i++) {
+                    final Node mn = nodes.item(i);
+                    if (type.equals(XMLTools.getAttribute(mn, "type"))) {
+                        el = (Element) nodes.item(i);
+                        break;
                     }
                 }
-                return el;
             }
+            return el;
         };
     }
 
     /** Returns function that gets the node that belongs to the paremeters. */
     protected VirtualHardwareComparator getParallelDataComparator() {
-        return new VirtualHardwareComparator() {
-            @Override
-            public Element getElement(final NodeList nodes, final Map<String, String> parameters) {
-                final String type = parameters.get(ParallelData.SAVED_TYPE);
-                Element el = null;
-                if (type != null) {
-                    for (int i = 0; i < nodes.getLength(); i++) {
-                        final Node mn = nodes.item(i);
-                        if (type.equals(XMLTools.getAttribute(mn, "type"))) {
-                            el = (Element) nodes.item(i);
-                            break;
-                        }
+        return (nodes, parameters) -> {
+            final String type = parameters.get(ParallelData.SAVED_TYPE);
+            Element el = null;
+            if (type != null) {
+                for (int i = 0; i < nodes.getLength(); i++) {
+                    final Node mn = nodes.item(i);
+                    if (type.equals(XMLTools.getAttribute(mn, "type"))) {
+                        el = (Element) nodes.item(i);
+                        break;
                     }
                 }
-                return el;
             }
+            return el;
         };
     }
 
     /** Returns function that gets the node that belongs to the paremeters. */
     protected VirtualHardwareComparator getVideoDataComparator() {
-        return new VirtualHardwareComparator() {
-            @Override
-            public Element getElement(final NodeList nodes, final Map<String, String> parameters) {
-                Element el = null;
-                final String modelType = parameters.get(VideoData.SAVED_MODEL_TYPE);
-                if (modelType != null) {
-                    for (int i = 0; i < nodes.getLength(); i++) {
-                        final Node mn = XMLTools.getChildNode(nodes.item(i), "model");
-                        if (modelType.equals(XMLTools.getAttribute(mn, "type"))) {
-                            el = (Element) nodes.item(i);
-                        }
+        return (nodes, parameters) -> {
+            Element el = null;
+            final String modelType = parameters.get(VideoData.SAVED_MODEL_TYPE);
+            if (modelType != null) {
+                for (int i = 0; i < nodes.getLength(); i++) {
+                    final Node mn = XMLTools.getChildNode(nodes.item(i), "model");
+                    if (modelType.equals(XMLTools.getAttribute(mn, "type"))) {
+                        el = (Element) nodes.item(i);
                     }
                 }
-                return el;
             }
+            return el;
         };
     }
 

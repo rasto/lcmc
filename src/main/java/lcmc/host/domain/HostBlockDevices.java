@@ -20,27 +20,28 @@
 
 package lcmc.host.domain;
 
-import com.google.common.base.Optional;
-import lcmc.drbd.domain.BlockDevice;
-
-import javax.inject.Named;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
+import javax.inject.Named;
+
+import lcmc.drbd.domain.BlockDevice;
+
 @Named
 public class HostBlockDevices {
-    private Set<BlockDevice> blockDevices = new LinkedHashSet<BlockDevice>();
-    private ConcurrentMap<String, BlockDevice> byName = new ConcurrentHashMap<String, BlockDevice>();
+    private final Set<BlockDevice> blockDevices = new LinkedHashSet<>();
+    private final ConcurrentMap<String, BlockDevice> byName = new ConcurrentHashMap<>();
 
     public Set<BlockDevice> getBlockDevices() {
-        return new LinkedHashSet<BlockDevice>(blockDevices);
+        return new LinkedHashSet<>(blockDevices);
     }
 
     public void setBlockDevices(final Collection<BlockDevice> newBlockDevices) {
@@ -48,10 +49,10 @@ public class HostBlockDevices {
             blockDevices.add(newBlockDevice);
             byName.put(newBlockDevice.getName(), newBlockDevice);
         }
-        for (final BlockDevice oldBlockDevice : new HashSet<BlockDevice>(blockDevices)) {
+        for (final BlockDevice oldBlockDevice : new HashSet<>(blockDevices)) {
             if (!newBlockDevices.contains(oldBlockDevice)) {
                 blockDevices.remove(oldBlockDevice);
-                byName.remove(oldBlockDevice);
+                byName.remove(oldBlockDevice.getName());
             }
         }
     }
@@ -61,7 +62,7 @@ public class HostBlockDevices {
      * ones that are in the drbd and are already used in CRM.
      */
     public List<String> getBlockDevicesNames() {
-        final List<String> blockDevicesNames = new ArrayList<String>();
+        final List<String> blockDevicesNames = new ArrayList<>();
         for (final String bdName : byName.keySet()) {
             final BlockDevice bd = byName.get(bdName);
             if (!bd.isDrbd() && !bd.isUsedByCRM()) {
@@ -80,10 +81,10 @@ public class HostBlockDevices {
      *
      */
     public Optional<List<String>> getBlockDevicesNamesIntersection(final Optional<List<String>> otherBlockDevices) {
-        if (!otherBlockDevices.isPresent()) {
+        if (otherBlockDevices.isEmpty()) {
             return Optional.of(getBlockDevicesNames());
         }
-        final List<String> blockDevicesIntersection = new ArrayList<String>();
+        final List<String> blockDevicesIntersection = new ArrayList<>();
         for (final String otherBlockDevice : otherBlockDevices.get()) {
             final BlockDevice blockDevice = byName.get(otherBlockDevice);
             if (blockDevice != null && !blockDevice.isDrbd()) {
@@ -102,7 +103,7 @@ public class HostBlockDevices {
     }
 
     public Optional<BlockDevice> getBlockDeviceByName(final String device) {
-        return Optional.fromNullable(byName.get(device));
+        return Optional.ofNullable(byName.get(device));
     }
 
     public void setDiskSpace(final Map<String, String> diskSpaces) {

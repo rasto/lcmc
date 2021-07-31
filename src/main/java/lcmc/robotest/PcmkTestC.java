@@ -20,13 +20,15 @@
 
 package lcmc.robotest;
 
-import java.awt.event.KeyEvent;
 import static lcmc.robotest.RoboTest.CONFIRM_REMOVE;
-import lcmc.common.domain.util.Tools;
+
+import java.awt.event.KeyEvent;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
+
+import lcmc.common.domain.util.Tools;
 
 /**
  * This class is used to test the GUI.
@@ -48,7 +50,7 @@ final class PcmkTestC {
                 roboTest.info(testName + " I: " + i);
             }
             roboTest.checkTest(testName, 1);
-            /** Add m/s Stateful resource */
+            /* Add m/s Stateful resource */
             roboTest.moveTo(statefulX, statefulY);
             roboTest.rightClick(); /* popup */
             roboTest.moveTo(Tools.getString("ClusterBrowser.Hb.AddService"));

@@ -20,11 +20,24 @@
  */
 package lcmc.drbd.ui.resource;
 
-import com.google.common.base.Optional;
+import java.awt.BorderLayout;
+import java.awt.Dimension;
+import java.util.List;
+import java.util.Optional;
+import java.util.concurrent.CountDownLatch;
+
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.swing.AbstractButton;
+import javax.swing.BoxLayout;
+import javax.swing.JComponent;
+import javax.swing.JMenuBar;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+
 import lcmc.cluster.ui.ClusterBrowser;
 import lcmc.common.domain.AccessMode;
 import lcmc.common.domain.Application;
-import lcmc.common.domain.ResourceValue;
 import lcmc.common.domain.Value;
 import lcmc.common.domain.util.Tools;
 import lcmc.common.ui.Browser;
@@ -39,15 +52,6 @@ import lcmc.crm.domain.ClusterStatus;
 import lcmc.crm.domain.PtestData;
 import lcmc.crm.service.CRM;
 import lcmc.host.domain.Host;
-
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.swing.*;
-import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.util.List;
-import java.util.concurrent.CountDownLatch;
 
 /**
  * This class provides menus for block device and host multi selection.
@@ -64,7 +68,7 @@ public class MultiSelectionInfo extends EditableInfo {
     private SwingUtils swingUtils;
 
     public void init(final List<Info> selectedInfos, final Browser browser) {
-        super.einit(Optional.<ResourceValue>absent(), "selection", browser);
+        super.einit(Optional.empty(), "selection", browser);
         this.selectedInfos = selectedInfos;
     }
 
@@ -248,39 +252,23 @@ public class MultiSelectionInfo extends EditableInfo {
         initApplyButton(buttonCallback);
         /* add item listeners to the apply button. */
         if (!abExisted) {
-            getApplyButton().addActionListener(
-                new ActionListener() {
-                    @Override
-                    public void actionPerformed(final ActionEvent e) {
-                        final Thread thread = new Thread(new Runnable() {
-                            @Override
-                            public void run() {
-                                getBrowser().clStatusLock();
-                                apply(getBrowser().getDCHost(), Application.RunMode.LIVE);
-                                getBrowser().clStatusUnlock();
-                            }
-                        });
-                        thread.start();
-                    }
-                }
-            );
+            getApplyButton().addActionListener(e -> {
+                final Thread thread = new Thread(() -> {
+                    getBrowser().clStatusLock();
+                    apply(getBrowser().getDCHost(), Application.RunMode.LIVE);
+                    getBrowser().clStatusUnlock();
+                });
+                thread.start();
+            });
 
-            getRevertButton().addActionListener(
-                new ActionListener() {
-                    @Override
-                    public void actionPerformed(final ActionEvent e) {
-                        final Thread thread = new Thread(new Runnable() {
-                            @Override
-                            public void run() {
-                                getBrowser().clStatusLock();
-                                revert();
-                                getBrowser().clStatusUnlock();
-                            }
-                        });
-                        thread.start();
-                    }
-                }
-            );
+            getRevertButton().addActionListener(e -> {
+                final Thread thread = new Thread(() -> {
+                    getBrowser().clStatusLock();
+                    revert();
+                    getBrowser().clStatusUnlock();
+                });
+                thread.start();
+            });
         }
         /* main, button and options panels */
         final JPanel mainPanel = new JPanel();
@@ -307,12 +295,9 @@ public class MultiSelectionInfo extends EditableInfo {
         addApplyButton(buttonPanel);
         addRevertButton(buttonPanel);
         final String[] params = getParametersFromXML();
-        swingUtils.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                /* invoke later on purpose  */
-                setApplyButtons(null, params);
-            }
+        swingUtils.invokeLater(() -> {
+            /* invoke later on purpose  */
+            setApplyButtons(null, params);
         });
         mainPanel.add(optionsPanel);
         mainPanel.add(super.getInfoPanel());

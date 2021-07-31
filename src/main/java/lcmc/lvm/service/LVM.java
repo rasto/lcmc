@@ -26,12 +26,12 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
-import lcmc.configs.DistResource;
-import lcmc.common.domain.Application;
-import lcmc.host.domain.Host;
-import lcmc.common.domain.util.Tools;
 import lcmc.cluster.service.ssh.ExecCommandConfig;
 import lcmc.cluster.service.ssh.SshOutput;
+import lcmc.common.domain.Application;
+import lcmc.common.domain.util.Tools;
+import lcmc.configs.DistResource;
+import lcmc.host.domain.Host;
 
 /**
  * This class provides LVM commands.
@@ -61,7 +61,7 @@ public final class LVM {
                                  final String blockDevice,
                                  final String size,
                                  final Application.RunMode runMode) {
-        final Map<String, String> replaceHash = new HashMap<String, String>();
+        final Map<String, String> replaceHash = new HashMap<>();
         replaceHash.put(SIZE_PLACE_HOLDER, size);
         replaceHash.put(DEVICE_PLACE_HOLDER, blockDevice);
         final String command = host.getHostParser().getDistCommand("LVM.resize", replaceHash);
@@ -73,7 +73,7 @@ public final class LVM {
     public static boolean pvCreate(final Host host,
                                    final String blockDevice,
                                    final Application.RunMode runMode) {
-        final Map<String, String> replaceHash = new HashMap<String, String>();
+        final Map<String, String> replaceHash = new HashMap<>();
         replaceHash.put(DEVICE_PLACE_HOLDER, blockDevice);
         final String command = host.getHostParser().getDistCommand("LVM.pvcreate", replaceHash);
         final SshOutput ret = execCommand(host, command);
@@ -84,7 +84,7 @@ public final class LVM {
     public static boolean pvRemove(final Host host,
                                    final String blockDevice,
                                    final Application.RunMode runMode) {
-        final Map<String, String> replaceHash = new HashMap<String, String>();
+        final Map<String, String> replaceHash = new HashMap<>();
         replaceHash.put(DEVICE_PLACE_HOLDER, blockDevice);
         final String command = host.getHostParser().getDistCommand("LVM.pvremove", replaceHash);
         final SshOutput ret = execCommand(host, command);
@@ -95,7 +95,7 @@ public final class LVM {
     public static boolean vgRemove(final Host host,
                                    final String vgName,
                                    final Application.RunMode runMode) {
-        final Map<String, String> replaceHash = new HashMap<String, String>();
+        final Map<String, String> replaceHash = new HashMap<>();
         replaceHash.put(VG_NAME_PLACE_HOLDER, vgName);
         final String command = host.getHostParser().getDistCommand("LVM.vgremove", replaceHash);
         final SshOutput ret = execCommand(host, command);
@@ -106,7 +106,7 @@ public final class LVM {
     public static boolean lvRemove(final Host host,
                                    final String blockDevice,
                                    final Application.RunMode runMode) {
-        final Map<String, String> replaceHash = new HashMap<String, String>();
+        final Map<String, String> replaceHash = new HashMap<>();
         replaceHash.put(DEVICE_PLACE_HOLDER, blockDevice);
         final String command = host.getHostParser().getDistCommand("LVM.lvremove", replaceHash);
         final SshOutput ret = execCommand(host, command);
@@ -119,7 +119,7 @@ public final class LVM {
                                    final String vgName,
                                    final String size,
                                    final Application.RunMode runMode) {
-        final Map<String, String> replaceHash = new HashMap<String, String>();
+        final Map<String, String> replaceHash = new HashMap<>();
         replaceHash.put(SIZE_PLACE_HOLDER, size);
         replaceHash.put(LV_NAME_PLACE_HOLDER, lvName);
         replaceHash.put(VG_NAME_PLACE_HOLDER, vgName);
@@ -132,7 +132,7 @@ public final class LVM {
                                    final String vgName,
                                    final Collection<String> pvNames,
                                    final Application.RunMode runMode) {
-        final Map<String, String> replaceHash = new HashMap<String, String>();
+        final Map<String, String> replaceHash = new HashMap<>();
         replaceHash.put(PV_NAMES_PLACE_HOLDER, Tools.join(" ", pvNames));
         replaceHash.put(VG_NAME_PLACE_HOLDER, vgName);
         final String command = host.getHostParser().getDistCommand("LVM.vgcreate", replaceHash);
@@ -145,7 +145,7 @@ public final class LVM {
                                            final String device,
                                            final String size,
                                            final Application.RunMode runMode) {
-        final Map<String, String> replaceHash = new HashMap<String, String>();
+        final Map<String, String> replaceHash = new HashMap<>();
         replaceHash.put(SIZE_PLACE_HOLDER, size);
         replaceHash.put(DEVICE_PLACE_HOLDER, device);
         replaceHash.put(LV_NAME_PLACE_HOLDER, snapshotName);

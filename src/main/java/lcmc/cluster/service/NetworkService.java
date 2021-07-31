@@ -20,9 +20,23 @@
 
 package lcmc.cluster.service;
 
-import com.google.common.base.Optional;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import com.google.common.collect.ImmutableList;
 import com.google.common.eventbus.Subscribe;
+
 import lcmc.ClusterEventBus;
 import lcmc.HwEventBus;
 import lcmc.cluster.domain.Cluster;
@@ -36,18 +50,6 @@ import lcmc.event.NetworkChangedEvent;
 import lcmc.host.domain.Host;
 import lcmc.host.domain.HostNetworks;
 
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Singleton;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
-
 @Named
 @Singleton
 public class NetworkService {
@@ -55,8 +57,8 @@ public class NetworkService {
     private HwEventBus hwEventBus;
     @Inject
     private ClusterEventBus clusterEventBus;
-    private Map<Host, HostNetworks> hostNetInterfacesByHost = new ConcurrentHashMap<Host, HostNetworks>();
-    private Map<Cluster, List<Network>> networksByCluster = new ConcurrentHashMap<Cluster, List<Network>>();
+    private final Map<Host, HostNetworks> hostNetInterfacesByHost = new ConcurrentHashMap<>();
+    private final Map<Cluster, List<Network>> networksByCluster = new ConcurrentHashMap<>();
 
     public void init() {
         hwEventBus.register(this);
@@ -68,7 +70,7 @@ public class NetworkService {
         final HostNetworks hostNetworks = new HostNetworks();
         hostNetworks.setNetworkIntefaces(event.getNetInterfaces());
         hostNetInterfacesByHost.put(event.getHost(), hostNetworks);
-        updateCommonNetworks(Optional.fromNullable(event.getHost().getCluster()));
+        updateCommonNetworks(Optional.ofNullable(event.getHost().getCluster()));
         clusterEventBus.post(new NetInterfacesChangedEvent(event.getHost(), hostNetworks.getNetInterfaces()));
     }
 
@@ -91,7 +93,7 @@ public class NetworkService {
     }
 
     public Map<String,Integer> getNetworksIntersection(final Collection<Host> hosts) {
-        Optional<Map<String, Integer>> networksIntersection = Optional.absent();
+        Optional<Map<String, Integer>> networksIntersection = Optional.empty();
 
         for (final Host host : hosts) {
             final HostNetworks hostNetworks = hostNetInterfacesByHost.get(host);
@@ -99,7 +101,7 @@ public class NetworkService {
                 networksIntersection = hostNetworks.getNetworksIntersection(networksIntersection);
             }
         }
-        return networksIntersection.or(new HashMap<String, Integer>());
+        return networksIntersection.orElse(new HashMap<>());
     }
 
     public NetInterface[] getNetInterfacesWithBridges(final Host host) {
@@ -114,7 +116,7 @@ public class NetworkService {
     public Collection<String> getIpsFromNetwork(final Host host, final String netIp) {
         final HostNetworks hostNetworks = hostNetInterfacesByHost.get(host);
         if (hostNetworks == null) {
-            return new ArrayList<String>();
+            return new ArrayList<>();
         } else {
             return hostNetworks.getIpsFromNetwork(netIp);
         }
@@ -123,7 +125,7 @@ public class NetworkService {
     public List<Network> getCommonNetworks(final Cluster cluster) {
         final List<Network> networks = networksByCluster.get(cluster);
         if (networks == null) {
-            return new ArrayList<Network>();
+            return new ArrayList<>();
         }
         return ImmutableList.copyOf(networks);
     }
@@ -134,20 +136,20 @@ public class NetworkService {
         if (index >= 0) {
             return Optional.of(networks.get(index));
         }
-        return Optional.absent();
+        return Optional.empty();
     }
 
     private List<Network> getCommonNetworks(final Set<Host> hosts) {
         final Map<String, Integer> networksIntersection = getNetworksIntersection(hosts);
 
-        final List<Network> commonNetworks = new ArrayList<Network>();
+        final List<Network> commonNetworks = new ArrayList<>();
         for (final Map.Entry<String, Integer> stringIntegerEntry : networksIntersection.entrySet()) {
-            final List<String> ips = new ArrayList<String>();
+            final List<String> ips = new ArrayList<>();
             for (final Host host : hosts) {
                 ips.addAll(getIpsFromNetwork(host, stringIntegerEntry.getKey()));
             }
             final Integer cidr = stringIntegerEntry.getValue();
-            final Network network = new Network(stringIntegerEntry.getKey(), ips.toArray(new String[ips.size()]), cidr);
+            final Network network = new Network(stringIntegerEntry.getKey(), ips.toArray(new String[0]), cidr);
             commonNetworks.add(network);
         }
 
@@ -155,7 +157,7 @@ public class NetworkService {
     }
 
     private void updateCommonNetworks(final Optional<Cluster> cluster) {
-        if (!cluster.isPresent()) {
+        if (cluster.isEmpty()) {
             return;
         }
         final List<Network> commonNetworks = getCommonNetworks(cluster.get().getHosts());

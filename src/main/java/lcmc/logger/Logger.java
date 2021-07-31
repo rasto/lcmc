@@ -21,54 +21,57 @@
 
 package lcmc.logger;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.regex.Pattern;
+
 import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.SwingUtilities;
 
 import lcmc.AppContext;
-import lcmc.common.domain.AccessMode;
-import lcmc.common.ui.main.MainData;
-import lcmc.common.ui.MainMenu;
 import lcmc.cluster.domain.Cluster;
-import lcmc.host.domain.Host;
-import lcmc.common.ui.BugReport;
+import lcmc.common.domain.AccessMode;
 import lcmc.common.domain.util.Tools;
+import lcmc.common.ui.BugReport;
+import lcmc.common.ui.MainMenu;
+import lcmc.common.ui.main.MainData;
+import lcmc.host.domain.Host;
 
 /**
  * This class provides tools for logging.
  */
 public final class Logger {
-    private static final String ERROR_STRING      = "ERROR   : ";
-    private static final String INFO_STRING       = "INFO    : ";
-    private static final String DEBUG_STRING      = "DEBUG   : ";
-    private static final String DEBUG1_STRING     = "DEBUG(1): ";
-    private static final String DEBUG2_STRING     = "DEBUG(2): ";
-    private static final String TRACE_STRING      = "TRACE   : ";
+    private static final String ERROR_STRING = "ERROR   : ";
+    private static final String INFO_STRING = "INFO    : ";
+    private static final String DEBUG_STRING = "DEBUG   : ";
+    private static final String DEBUG1_STRING = "DEBUG(1): ";
+    private static final String DEBUG2_STRING = "DEBUG(2): ";
+    private static final String TRACE_STRING = "TRACE   : ";
     private static final String APPWARNING_STRING = "WARN    : ";
-    private static final String APPERROR_STRING   = "APPERROR: ";
+    private static final String APPERROR_STRING = "APPERROR: ";
     private static final long APP_START_TIME_SECONDS = System.currentTimeMillis() / 1000;
     public static final List<Pattern> IGNORE_EXCEPTION_PATTERNS =
-        Collections.unmodifiableList(new ArrayList<Pattern>(Arrays.asList(
-            Pattern.compile(".*:1.6.0_27:.*ToolTipManager\\.java.*", Pattern.DOTALL))));
+            List.copyOf(List.of(Pattern.compile(".*:1.6.0_27:.*ToolTipManager\\.java.*", Pattern.DOTALL)));
     private final String className;
-    /** Map with all warnings, so that they don't appear more than once. */
-    private final Collection<String> appWarningHash = new HashSet<String>();
-    /** Map with all errors, so that they don't appear more than once. */
-    private final Collection<String> appErrorHash = new HashSet<String>();
+    /**
+     * Map with all warnings, so that they don't appear more than once.
+     */
+    private final Collection<String> appWarningHash = new HashSet<>();
+    /**
+     * Map with all errors, so that they don't appear more than once.
+     */
+    private final Collection<String> appErrorHash = new HashSet<>();
 
     public Logger(final String className) {
         this.className = className;
     }
 
-    /** Returns seconds since start. */
+    /**
+     * Returns seconds since start.
+     */
     private long secondsSinceStart() {
         return System.currentTimeMillis() / 1000 - APP_START_TIME_SECONDS;
     }
@@ -106,15 +109,7 @@ public final class Logger {
      */
     private void debug(final String prefix, final String msg, final int level) {
         if (level <= LoggerFactory.getDebugLevel() + 1) {
-            final String msg0 = new StringBuilder()
-                                .append(prefix)
-                                .append('[')
-                                .append(secondsSinceStart())
-                                .append("s] ")
-                                .append(className)
-                                .append(": ")
-                                .append(msg)
-                                .toString();
+            final String msg0 = prefix + '[' + secondsSinceStart() + "s] " + className + ": " + msg;
             if (level <= LoggerFactory.getDebugLevel()) {
                 System.out.println(msg0);
             }
@@ -133,15 +128,9 @@ public final class Logger {
         System.out.println(msg0);
         LoggerFactory.LOG_BUFFER.add(msg0);
         final MainData mainData = AppContext.getBean(MainData.class);
-        SwingUtilities.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                JOptionPane.showMessageDialog(mainData.getMainFrame(),
-                                              new JScrollPane(new JTextArea(msg, 20, 60)),
-                                              Tools.getString("Error.Title"),
-                                              JOptionPane.ERROR_MESSAGE);
-            }
-        });
+        SwingUtilities.invokeLater(
+                () -> JOptionPane.showMessageDialog(mainData.getMainFrame(), new JScrollPane(new JTextArea(msg, 20, 60)),
+                        Tools.getString("Error.Title"), JOptionPane.ERROR_MESSAGE));
 
     }
 
@@ -151,7 +140,7 @@ public final class Logger {
                          final String ans,
                          final String stacktrace,
                          final int exitCode) {
-        final StringBuilder onHost = new StringBuilder("");
+        final StringBuilder onHost = new StringBuilder();
         if (host != null) {
             onHost.append(" on host ");
             final Cluster cluster = host.getCluster();
@@ -272,13 +261,10 @@ public final class Logger {
 
         AppContext.getBean(MainMenu.class).setOperatingMode(AccessMode.OP_MODE_READONLY);
 
-        final Thread t = new Thread(new Runnable() {
-            @Override
-            public void run() {
-                final BugReport bugReport = AppContext.getBean(BugReport.class);
-                bugReport.init(BugReport.UNKNOWN_CLUSTER, errorString.toString());
-                bugReport.showDialog();
-            }
+        final Thread t = new Thread(() -> {
+            final BugReport bugReport = AppContext.getBean(BugReport.class);
+            bugReport.init(BugReport.UNKNOWN_CLUSTER, errorString.toString());
+            bugReport.showDialog();
         });
         t.start();
     }
@@ -288,14 +274,7 @@ public final class Logger {
         final String vendor = System.getProperty("java.vendor");
         final String version = System.getProperty("java.version");
         final String stackTrace = Tools.getStackTrace(e);
-        final String exception = new StringBuilder(vendor)
-                                        .append(':')
-                                        .append(version)
-                                        .append(':')
-                                        .append(e.getMessage())
-                                        .append('\n')
-                                        .append(stackTrace)
-                                        .toString();
+        final String exception = vendor + ':' + version + ':' + e.getMessage() + '\n' + stackTrace;
         for (final Pattern p : IGNORE_EXCEPTION_PATTERNS) {
             if (p.matcher(exception).matches()) {
                 return true;

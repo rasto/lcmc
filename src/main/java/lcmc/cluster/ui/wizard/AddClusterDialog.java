@@ -22,17 +22,17 @@
 
 package lcmc.cluster.ui.wizard;
 
-import lcmc.common.ui.main.MainPresenter;
-import lcmc.common.domain.Application;
+import javax.inject.Inject;
+import javax.inject.Named;
+
 import lcmc.cluster.domain.Cluster;
+import lcmc.common.domain.Application;
 import lcmc.common.ui.MainPanel;
+import lcmc.common.ui.main.MainPresenter;
 import lcmc.common.ui.utils.SwingUtils;
 import lcmc.host.domain.Hosts;
 import lcmc.logger.Logger;
 import lcmc.logger.LoggerFactory;
-
-import javax.inject.Inject;
-import javax.inject.Named;
 
 /**
  * Shows step by step dialogs that add and configure new cluster.
@@ -73,12 +73,7 @@ public final class AddClusterDialog {
                 allHosts.removeHostsFromCluster(cluster);
                 application.removeClusterFromClusters(cluster);
                 dialog.cancelDialog();
-                swingUtils.invokeLater(new Runnable() {
-                    @Override
-                    public void run() {
-                        mainPresenter.checkAddClusterButtons();
-                    }
-                });
+                swingUtils.invokeLater(() -> mainPresenter.checkAddClusterButtons());
                 mainPanel.expandTerminalSplitPane(MainPanel.TerminalSize.COLLAPSE);
                 if (newDialog == null) {
                     LOG.debug1("showDialogs: dialog: " + dialog.getClass().getName() + " canceled");
@@ -94,19 +89,11 @@ public final class AddClusterDialog {
             }
         }
         mainPanel.expandTerminalSplitPane(MainPanel.TerminalSize.COLLAPSE);
-        swingUtils.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                cluster.getClusterTab().addClusterView();
-                cluster.getClusterTab().requestFocus();
-            }
+        swingUtils.invokeLater(() -> {
+            cluster.getClusterTab().addClusterView();
+            cluster.getClusterTab().requestFocus();
         });
-        swingUtils.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                mainPresenter.checkAddClusterButtons();
-            }
-        });
+        swingUtils.invokeLater(() -> mainPresenter.checkAddClusterButtons());
         cluster.setClusterTabClosable(true);
     }
 }

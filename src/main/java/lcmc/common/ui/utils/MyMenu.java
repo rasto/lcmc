@@ -25,13 +25,15 @@ package lcmc.common.ui.utils;
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
+
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JScrollPane;
+
 import lcmc.common.domain.AccessMode;
-import lcmc.common.domain.Application;
 import lcmc.common.domain.EnablePredicate;
 import lcmc.common.ui.Access;
 
@@ -40,27 +42,19 @@ import lcmc.common.ui.Access;
  */
 @Named
 public class MyMenu extends JMenu implements UpdatableItem {
-    /** Position of the menu that can be stored and retrieved. */
+    /**
+     * Position of the menu that can be stored and retrieved.
+     */
     private Point2D pos = null;
     private AccessMode enableAccessMode;
     @Inject
-    private Application application;
-    @Inject
     private Access access;
 
-    private EnablePredicate enablePredicate = new EnablePredicate() {
-        @Override
-        public String check() {
-            return null;
-        }
-    };
+    private EnablePredicate enablePredicate = () -> null;
 
-    private Runnable update = new Runnable() {
-        @Override
-        public void run() {
-            updateMenuComponents();
-            processAccessMode();
-        }
+    private Runnable update = () -> {
+        updateMenuComponents();
+        processAccessMode();
     };
 
     void init(final String text, final AccessMode enableAccessMode, final AccessMode visibleAccessMode) {
@@ -70,20 +64,23 @@ public class MyMenu extends JMenu implements UpdatableItem {
         setEnabled(false);
     }
 
-    /** Stores the position. */
+    /**
+     * Stores the position.
+     */
     @Override
     public final void setPos(final Point2D pos) {
         this.pos = pos;
     }
 
-    /** Gets the position. */
+    /**
+     * Gets the position.
+     */
     public final Point2D getPos() {
         return pos;
     }
 
     /**
-     * This function is usually overriden and is called when the menu and its
-     * items are to be updated.
+     * This function is usually overriden and is called when the menu and its items are to be updated.
      */
     @Override
     public void updateAndWait() {
@@ -91,10 +88,8 @@ public class MyMenu extends JMenu implements UpdatableItem {
     }
 
     public void updateMenuComponents() {
-        final Collection<java.awt.Component> copy = new ArrayList<java.awt.Component>();
-        for (final java.awt.Component m : getMenuComponents()) {
-            copy.add(m);
-        }
+        final Collection<java.awt.Component> copy = new ArrayList<>();
+        Collections.addAll(copy, getMenuComponents());
         for (final java.awt.Component m : copy) {
             if (m instanceof UpdatableItem) {
                 ((UpdatableItem) m).updateAndWait();

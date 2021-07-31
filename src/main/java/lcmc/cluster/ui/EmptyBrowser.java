@@ -21,6 +21,17 @@
  */
 package lcmc.cluster.ui;
 
+import java.util.TreeSet;
+import java.util.function.BiConsumer;
+
+import javax.annotation.Resource;
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+import javax.swing.JTree;
+import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.MutableTreeNode;
+
 import lcmc.cluster.domain.Cluster;
 import lcmc.cluster.ui.network.InfoPresenter;
 import lcmc.common.domain.util.Tools;
@@ -31,16 +42,6 @@ import lcmc.host.domain.Host;
 import lcmc.host.domain.Hosts;
 import lcmc.host.ui.AllHostsInfo;
 import lcmc.host.ui.HostBrowser;
-
-import javax.annotation.Resource;
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Singleton;
-import javax.swing.*;
-import javax.swing.tree.DefaultMutableTreeNode;
-import javax.swing.tree.MutableTreeNode;
-import java.util.TreeSet;
-import java.util.function.BiConsumer;
 
 /**
  * This class holds cluster resource data in a tree. It shows panels that allow
@@ -86,7 +87,7 @@ public final class EmptyBrowser extends Browser {
 
     /** Updates resources of a cluster in the tree. */
     void updateHosts() {
-        final Iterable<Host> allHostsSorted = new TreeSet<Host>(allHosts.getHostSet());
+        final Iterable<Host> allHostsSorted = new TreeSet<>(allHosts.getHostSet());
         treeMenuController.removeChildren(allHostsNode);
         for (final Host host : allHostsSorted) {
             final HostBrowser hostBrowser = host.getBrowser();

@@ -20,7 +20,19 @@
 
 package lcmc.vm.domain;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+
+import javax.inject.Named;
+
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
 import com.google.common.collect.Maps;
+
 import lcmc.common.domain.StringValue;
 import lcmc.common.domain.Value;
 import lcmc.common.domain.XMLTools;
@@ -28,15 +40,6 @@ import lcmc.logger.Logger;
 import lcmc.logger.LoggerFactory;
 import lcmc.vm.domain.data.NetworkData;
 import lombok.val;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
-import javax.inject.Named;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
 
 @Named
 public class NetworkParser {
@@ -46,15 +49,12 @@ public class NetworkParser {
     public static final String NET_PARAM_UUID = "uuid";
     public static final String NET_PARAM_AUTOSTART = "autostart";
 
-    private final Map<String, String> netToConfigs = new HashMap<String, String>();
-    private final Map<String, String> netNamesConfigsMap = new HashMap<String, String>();
-    private Map<Value, NetworkData> networkMap = new LinkedHashMap<Value, NetworkData>();
+    private final Map<String, String> netToConfigs = new HashMap<>();
+    private final Map<String, String> netNamesConfigsMap = new HashMap<>();
+    private Map<Value, NetworkData> networkMap = new LinkedHashMap<>();
 
     public void parseNetwork(final Node netNode) {
         /* one vm */
-        if (netNode == null) {
-            Maps.newHashMap();
-        }
         val name = XMLTools.getAttribute(netNode, NET_PARAM_NAME);
         val config = XMLTools.getAttribute(netNode, "config");
         netToConfigs.put(config, name);
@@ -69,10 +69,7 @@ public class NetworkParser {
         if (networkNode == null) {
             return;
         }
-        boolean autostart = false;
-        if (autostartString != null && "true".equals(autostartString)) {
-            autostart = true;
-        }
+        boolean autostart = "true".equals(autostartString);
         final NodeList options = networkNode.getChildNodes();
         String name = null;
         String uuid = null;
@@ -119,10 +116,10 @@ public class NetworkParser {
 
             newNetworkMap.put(new StringValue(name), networkData);
         }
-        this.networkMap = newNetworkMap;
+        networkMap = newNetworkMap;
     }
 
     public List<Value> getNetworks() {
-        return new ArrayList<Value>(networkMap.keySet());
+        return new ArrayList<>(networkMap.keySet());
     }
 }

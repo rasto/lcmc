@@ -21,11 +21,12 @@
 package lcmc.robotest;
 
 import static lcmc.robotest.RoboTest.CONFIRM_REMOVE;
-import lcmc.common.domain.util.Tools;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
+
+import lcmc.common.domain.util.Tools;
 
 /**
  * This class is used to test the GUI.
@@ -94,19 +95,18 @@ final class PcmkTest2 {
         roboTest.checkTest("test2", 9);
 
         final int dum3PopX = dummy3X + 165;
-        final int dum3PopY = dummy3Y;
         for (int i = 0; i < 2; i++) {
-            roboTest.removeColocation(dum3PopX, dum3PopY);
+            roboTest.removeColocation(dum3PopX, dummy3Y);
 
             roboTest.checkTest("test2", 9.1);
 
-            roboTest.addColocation(dum3PopX, dum3PopY);
+            roboTest.addColocation(dum3PopX, dummy3Y);
             roboTest.checkTest("test2", 9.2);
 
-            roboTest.removeOrder(dum3PopX, dum3PopY);
+            roboTest.removeOrder(dum3PopX, dummy3Y);
             roboTest.checkTest("test2", 9.3);
 
-            roboTest.addOrder(dum3PopX, dum3PopY);
+            roboTest.addOrder(dum3PopX, dummy3Y);
             roboTest.checkTest("test2", 9.4);
         }
 
@@ -133,21 +133,20 @@ final class PcmkTest2 {
 
         /* dummy4 -> ph */
         final int dum4PopX = dummy4X - 40;
-        final int dum4PopY = dummy4Y;
-        roboTest.removeConstraint(dum4PopX, dum4PopY);
+        roboTest.removeConstraint(dum4PopX, dummy4Y);
         roboTest.checkTest("test2", 11.6);
         roboTest.moveTo(dummy4X + 20, dummy4Y + 5);
         roboTest.rightClick(); /* workaround for the next popup not working. */
         roboTest.rightClick(); /* workaround for the next popup not working. */
         roboTest.addConstraintColocationOnly(dummy4X, dummy4Y, 5); /* with ph */
         roboTest.checkTest("test2", 11.7);
-        roboTest.removeColocation(dum4PopX, dum4PopY);
+        roboTest.removeColocation(dum4PopX, dummy4Y);
         roboTest.checkTest("test2", 11.8);
         roboTest.moveTo(dummy4X + 20, dummy4Y + 5);
         roboTest.rightClick(); /* workaround for the next popup not working. */
         roboTest.addConstraintOrderOnly(dummy4X, dummy4Y, 5); /* ph 2 */
         roboTest.checkTest("test2", 11.9);
-        roboTest.addColocation(dum4PopX, dum4PopY);
+        roboTest.addColocation(dum4PopX, dummy4Y);
         roboTest.checkTest("test2", 11.91);
         /* remove one dummy */
         roboTest.stopResource(dummy1X, dummy1Y);

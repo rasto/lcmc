@@ -29,12 +29,12 @@ package lcmc;
 import javax.swing.JApplet;
 import javax.swing.JFrame;
 
-import lcmc.common.ui.main.MainData;
 import lcmc.common.domain.Application;
+import lcmc.common.domain.util.Tools;
+import lcmc.common.ui.main.MainData;
 import lcmc.common.ui.utils.SwingUtils;
 import lcmc.logger.Logger;
 import lcmc.logger.LoggerFactory;
-import lcmc.common.domain.util.Tools;
 
 
 /**
@@ -65,21 +65,18 @@ public final class LCMCApplet extends JApplet {
         final Application application = AppContext.getBean(Application.class);
         final SwingUtils swingUtils = AppContext.getBean(SwingUtils.class);
         final LCMCApplet thisObject = this;
-        swingUtils.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                if (!application.isEmbedApplet()) {
-                    mainData.setMainFrame(thisObject);
-                    setJMenuBar(lcmc.getMenuBar());
-                    setContentPane(lcmc.getMainPanel());
-                    setGlassPane(lcmc.getMainGlassPane());
-                    lcmc.createAndShowGUI(thisObject);
-                } else {
-                    final JFrame mainFrame = new JFrame();
-                    mainData.setMainFrame(mainFrame);
-                    lcmc.createMainFrame(mainFrame);
-                    lcmc.createAndShowGUI(mainFrame);
-                }
+        swingUtils.invokeLater(() -> {
+            if (!application.isEmbedApplet()) {
+                mainData.setMainFrame(thisObject);
+                setJMenuBar(lcmc.getMenuBar());
+                setContentPane(lcmc.getMainPanel());
+                setGlassPane(lcmc.getMainGlassPane());
+                lcmc.createAndShowGUI(thisObject);
+            } else {
+                final JFrame mainFrame = new JFrame();
+                mainData.setMainFrame(mainFrame);
+                lcmc.createMainFrame(mainFrame);
+                lcmc.createAndShowGUI(mainFrame);
             }
         });
         //TODO: save on quit

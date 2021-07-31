@@ -24,13 +24,13 @@ package lcmc.common.ui;
 
 import java.awt.Dimension;
 import java.awt.FlowLayout;
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
+
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.swing.BoxLayout;
@@ -43,16 +43,16 @@ import javax.swing.JTextPane;
 
 import lcmc.cluster.domain.Cluster;
 import lcmc.cluster.domain.Clusters;
+import lcmc.cluster.ui.ClusterBrowser;
+import lcmc.common.domain.Http;
+import lcmc.common.domain.util.Tools;
 import lcmc.common.ui.utils.SwingUtils;
 import lcmc.crm.domain.ClusterStatus;
 import lcmc.drbd.domain.DrbdXml;
 import lcmc.host.domain.Host;
-import lcmc.vm.domain.VmsXml;
-import lcmc.cluster.ui.ClusterBrowser;
-import lcmc.common.domain.Http;
 import lcmc.logger.Logger;
 import lcmc.logger.LoggerFactory;
-import lcmc.common.domain.util.Tools;
+import lcmc.vm.domain.VmsXml;
 
 /**
  * An implementation of a bug report dialog.
@@ -73,8 +73,8 @@ public final class BugReport extends ConfigDialog {
     private Cluster selectedCluster;
     private String errorText;
     private final JTextPane bugReportTextArea = new JTextPane();
-    private final Map<String, JCheckBox> configCheckBoxMap = new HashMap<String, JCheckBox>();
-    private final Map<Cluster, JCheckBox> clusterCheckBoxMap = new HashMap<Cluster, JCheckBox>();
+    private final Map<String, JCheckBox> configCheckBoxMap = new HashMap<>();
+    private final Map<Cluster, JCheckBox> clusterCheckBoxMap = new HashMap<>();
     private String logBuffer;
     @Inject
     private SwingUtils swingUtils;
@@ -95,12 +95,9 @@ public final class BugReport extends ConfigDialog {
     }
 
     private void enableAllComponents(final boolean enable) {
-        swingUtils.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                for (final Map.Entry<String, JCheckBox> configEntry : configCheckBoxMap.entrySet()) {
-                    configEntry.getValue().setEnabled(enable);
-                }
+        swingUtils.invokeLater(() -> {
+            for (final Map.Entry<String, JCheckBox> configEntry : configCheckBoxMap.entrySet()) {
+                configEntry.getValue().setEnabled(enable);
             }
         });
     }
@@ -116,7 +113,7 @@ public final class BugReport extends ConfigDialog {
     }
 
     private List<String> getConfigChoices() {
-        final List<String> choices = new ArrayList<String>();
+        final List<String> choices = new ArrayList<>();
         choices.add(CONFIG_CIB);
         choices.add(CONFIG_DRBD);
         choices.add(CONFIG_LIBVIRT);
@@ -131,12 +128,7 @@ public final class BugReport extends ConfigDialog {
             final JCheckBox cb = new JCheckBox(name, true);
             cb.setBackground(Tools.getDefaultColor("ConfigDialog.Background.Dark"));
             configCheckBoxMap.put(name, cb);
-            cb.addItemListener(new ItemListener() {
-                @Override
-                public void itemStateChanged(final ItemEvent e) {
-                    refresh();
-                }
-            });
+            cb.addItemListener(e -> refresh());
             pane.add(cb);
         }
         return pane;
@@ -150,12 +142,7 @@ public final class BugReport extends ConfigDialog {
             final JCheckBox cb = new JCheckBox(cluster.getName(), true);
             cb.setBackground(Tools.getDefaultColor("ConfigDialog.Background.Dark"));
             clusterCheckBoxMap.put(cluster, cb);
-            cb.addItemListener(new ItemListener() {
-                @Override
-                public void itemStateChanged(final ItemEvent e) {
-                    refresh();
-                }
-            });
+            cb.addItemListener(e -> refresh());
             clusterPane.add(cb);
         }
         final JScrollPane sp = new JScrollPane(clusterPane,
@@ -188,7 +175,7 @@ public final class BugReport extends ConfigDialog {
         return pane;
     }
 
-    protected void refresh() {
+    private void refresh() {
         enableAllComponents(false);
         final Set<Cluster> clusters = allClusters.getClusterSet();
         final String allOldText = bugReportTextArea.getText();
@@ -209,12 +196,9 @@ public final class BugReport extends ConfigDialog {
             }
         }
         appendLogText(text);
-        swingUtils.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                bugReportTextArea.setText(text.toString());
-                bugReportTextArea.setCaretPosition(0);
-            }
+        swingUtils.invokeLater(() -> {
+            bugReportTextArea.setText(text.toString());
+            bugReportTextArea.setCaretPosition(0);
         });
         enableAllComponents(true);
     }
@@ -224,7 +208,7 @@ public final class BugReport extends ConfigDialog {
             .append(cluster.getName())
             .append(", br: ")
             .append(cluster.getBrowser() != null);
-        if (cluster == this.selectedCluster) {
+        if (cluster == selectedCluster) {
             text.append(" *");
         }
         text.append(" ==\n");
@@ -258,11 +242,7 @@ public final class BugReport extends ConfigDialog {
                     cib = cs.getCibXml();
                 }
             }
-            if (cib == null) {
-                text.append("not available\n");
-            } else {
-                text.append(cib);
-            }
+            text.append(Objects.requireNonNullElse(cib, "not available\n"));
         }
     }
 
@@ -277,11 +257,7 @@ public final class BugReport extends ConfigDialog {
                     cib = drbdXml.getOldConfig();
                 }
             }
-            if (cib == null) {
-                text.append("not available\n");
-            } else {
-                text.append(cib);
-            }
+            text.append(Objects.requireNonNullElse(cib, "not available\n"));
         }
     }
 
@@ -302,11 +278,7 @@ public final class BugReport extends ConfigDialog {
                         cfg = vmsXml.getConfig();
                     }
                 }
-                if (cfg == null) {
-                    text.append("not available\n");
-                } else {
-                    text.append(cfg);
-                }
+                text.append(Objects.requireNonNullElse(cfg, "not available\n"));
             }
         }
     }

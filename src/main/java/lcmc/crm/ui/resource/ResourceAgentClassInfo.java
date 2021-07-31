@@ -23,41 +23,41 @@ package lcmc.crm.ui.resource;
 
 import java.awt.Dimension;
 import java.awt.FlowLayout;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.swing.ImageIcon;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 
+import lcmc.cluster.ui.ClusterBrowser;
 import lcmc.cluster.ui.widget.WidgetFactory;
 import lcmc.common.domain.Application;
-import lcmc.crm.domain.ResourceAgent;
-import lcmc.common.ui.Browser;
-import lcmc.cluster.ui.ClusterBrowser;
-import lcmc.common.ui.utils.MyButton;
 import lcmc.common.domain.util.Tools;
+import lcmc.common.ui.Browser;
+import lcmc.common.ui.utils.MyButton;
+import lcmc.crm.domain.ResourceAgent;
 
 /**
- * This class holds the information about resource agent class and its
- * services.
+ * This class holds the information about resource agent class and its services.
  */
 @Named
 public final class ResourceAgentClassInfo extends HbCategoryInfo {
     private static final ImageIcon BACK_TO_OVERVIEW_ICON = Tools.createImageIcon(Tools.getDefault("BackIcon"));
-    /** Map from ResourceAgent name to its object. It is possible only within
-     * a class. */
-    private final Map<String, ResourceAgent> raMap = new HashMap<String, ResourceAgent>();
+    /**
+     * Map from ResourceAgent name to its object. It is possible only within a class.
+     */
+    private final Map<String, ResourceAgent> raMap = new HashMap<>();
     @Inject
     private Application application;
     @Inject
     private WidgetFactory widgetFactory;
 
+    @Override
     public void init(final String name, final Browser browser) {
         super.init(name, browser);
         for (final ResourceAgent ra : getBrowser().getCrmXml().getServices(name)) {
@@ -73,8 +73,7 @@ public final class ResourceAgentClassInfo extends HbCategoryInfo {
     /** Returns data for the table. */
     @Override
     protected Object[][] getTableData(final String tableName) {
-        final List<Object[]> rows = new ArrayList<Object[]>();
-        /** Get classes */
+        final List<Object[]> rows = new ArrayList<>();
         for (final ResourceAgent ra : getBrowser().getCrmXml().getServices(getName())) {
             final MyButton nameLabel = widgetFactory.createButton(ra.getServiceName());
             rows.add(new Object[]{nameLabel, ra.getProvider()});
@@ -111,12 +110,7 @@ public final class ResourceAgentClassInfo extends HbCategoryInfo {
                                                             Tools.getString("ClusterBrowser.ClassesOverviewButton"),
                                                             BACK_TO_OVERVIEW_ICON);
         overviewButton.setPreferredSize(new Dimension(application.scaled(180), 50));
-        overviewButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(final ActionEvent e) {
-                getBrowser().getAvailableServicesInfo().selectMyself();
-            }
-        });
+        overviewButton.addActionListener(e -> getBrowser().getAvailableServicesInfo().selectMyself());
         buttonPanel.add(overviewButton);
         return buttonPanel;
     }

@@ -22,6 +22,45 @@
 
 package lcmc.common.ui;
 
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.Font;
+import java.awt.GradientPaint;
+import java.awt.Graphics2D;
+import java.awt.Paint;
+import java.awt.Shape;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseWheelEvent;
+import java.awt.font.FontRenderContext;
+import java.awt.font.TextLayout;
+import java.awt.geom.Area;
+import java.awt.geom.Line2D;
+import java.awt.geom.Path2D;
+import java.awt.geom.Point2D;
+import java.awt.geom.Rectangle2D;
+import java.awt.image.BufferedImage;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.ConcurrentModificationException;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
+
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.swing.ImageIcon;
+import javax.swing.JComponent;
+import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
+import javax.swing.JScrollBar;
+
+import org.apache.commons.collections15.Transformer;
+import org.apache.commons.collections15.TransformerUtils;
+
 import edu.uci.ics.jung.algorithms.layout.GraphElementAccessor;
 import edu.uci.ics.jung.algorithms.layout.StaticLayout;
 import edu.uci.ics.jung.graph.Graph;
@@ -53,58 +92,17 @@ import edu.uci.ics.jung.visualization.picking.ShapePickSupport;
 import edu.uci.ics.jung.visualization.renderers.BasicVertexRenderer;
 import edu.uci.ics.jung.visualization.renderers.Renderer;
 import edu.uci.ics.jung.visualization.util.VertexShapeFactory;
-
-import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.Font;
-import java.awt.GradientPaint;
-import java.awt.Graphics2D;
-import java.awt.Paint;
-import java.awt.Shape;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseWheelEvent;
-import java.awt.event.MouseWheelListener;
-import java.awt.font.FontRenderContext;
-import java.awt.font.TextLayout;
-import java.awt.geom.Area;
-import java.awt.geom.Line2D;
-import java.awt.geom.Path2D;
-import java.awt.geom.Point2D;
-import java.awt.geom.Rectangle2D;
-import java.awt.image.BufferedImage;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.ConcurrentModificationException;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
-
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.swing.ImageIcon;
-import javax.swing.JComponent;
-import javax.swing.JPanel;
-import javax.swing.JPopupMenu;
-import javax.swing.JScrollBar;
-
+import lcmc.cluster.ui.ClusterBrowser;
 import lcmc.common.domain.Application;
 import lcmc.common.domain.ColorText;
-import lcmc.cluster.ui.ClusterBrowser;
+import lcmc.common.domain.util.Tools;
 import lcmc.common.ui.main.MainData;
 import lcmc.common.ui.main.ProgressIndicator;
+import lcmc.common.ui.utils.MyMenuItem;
 import lcmc.common.ui.utils.SwingUtils;
 import lcmc.host.domain.Host;
 import lcmc.logger.Logger;
 import lcmc.logger.LoggerFactory;
-import lcmc.common.ui.utils.MyMenuItem;
-import lcmc.common.domain.util.Tools;
-
-import org.apache.commons.collections15.Transformer;
-import org.apache.commons.collections15.TransformerUtils;
 
 /**
  * This class creates graph and provides methods for scaling etc.,
@@ -121,6 +119,7 @@ public abstract class ResourceGraph {
     private static final Path2D HOLLOW_INSTANCE = new Path2D.Float();
     private static final Paint EDGE_DRAW_PAINT = Tools.getDefaultColor("ResourceGraph.EdgeDrawPaint");
     private static final Paint EDGE_PICKED_PAINT = Tools.getDefaultColor("ResourceGraph.EdgePickedPaint");
+
     static {
         final float d = 0.05f;
         for (float i = 0; i < 1.0f; i += d) {
@@ -129,40 +128,53 @@ public abstract class ResourceGraph {
         }
         HOLLOW_INSTANCE.lineTo(1.0f, 0.0f);
     }
-    private final Renderer.Vertex<Vertex, Edge> pluggableRenderer = new MyPluggableRenderer<Vertex, Edge>();
-    private final Map<Vertex, Info> vertexToInfoMap = new LinkedHashMap<Vertex, Info>();
-    private final Map<Info, Vertex> infoToVertexMap = new LinkedHashMap<Info, Vertex>();
-    private final Map<Edge, JPopupMenu> edgeToPopupMap = new LinkedHashMap<Edge, JPopupMenu>();
-    private final Map<Vertex, List<MyMenuItem>> vertexToMenus = new LinkedHashMap<Vertex, List<MyMenuItem>>();
-    private final Map<Edge, List<MyMenuItem>> edgeToMenus = new LinkedHashMap<Edge, List<MyMenuItem>>();
+
+    private final Renderer.Vertex<Vertex, Edge> pluggableRenderer = new MyPluggableRenderer<>();
+    private final Map<Vertex, Info> vertexToInfoMap = new LinkedHashMap<>();
+    private final Map<Info, Vertex> infoToVertexMap = new LinkedHashMap<>();
+    private final Map<Edge, JPopupMenu> edgeToPopupMap = new LinkedHashMap<>();
+    private final Map<Vertex, List<MyMenuItem>> vertexToMenus = new LinkedHashMap<>();
+    private final Map<Edge, List<MyMenuItem>> edgeToMenus = new LinkedHashMap<>();
     private final Lock mGraphLock = new ReentrantLock();
     private Graph<Vertex, Edge> graph;
     private VisualizationViewer<Vertex, Edge> visualizationViewer;
     private StaticLayout<Vertex, Edge> layout;
     private GraphZoomScrollPane scrollPane;
     private final Lock mVertexLocationsLock = new ReentrantLock();
-    private final Map<Vertex, Point2D> vertexLocations = new HashMap<Vertex, Point2D>();
+    private final Map<Vertex, Point2D> vertexLocations = new HashMap<>();
     private ViewScalingControl myScaler;
-    /** List with resources that should be animated. */
-    private final Collection<Info> animationList = new ArrayList<Info>();
+    /**
+     * List with resources that should be animated.
+     */
+    private final Collection<Info> animationList = new ArrayList<>();
     private final Lock mAnimationListLock = new ReentrantLock();
-    /** List with resources that should be animated for test view. */
-    private final Collection<JComponent> testAnimationList = new ArrayList<JComponent>();
-    /** This mutex is for protecting the test animation list. */
+    /**
+     * List with resources that should be animated for test view.
+     */
+    private final Collection<JComponent> testAnimationList = new ArrayList<>();
+    /**
+     * This mutex is for protecting the test animation list.
+     */
     private final Lock mTestAnimationListLock = new ReentrantLock();
     private volatile Thread animationThread = null;
     private final Lock mAnimationThreadLock = new ReentrantLock();
-    private final Map<Vertex, Integer> vertexWidth = new HashMap<Vertex, Integer>();
-    private final Map<Vertex, Integer> vertexHeight = new HashMap<Vertex, Integer>();
-    /** Whether something in the graph changed that requires visualizationViewer to restart. */
+    private final Map<Vertex, Integer> vertexWidth = new HashMap<>();
+    private final Map<Vertex, Integer> vertexHeight = new HashMap<>();
+    /**
+     * Whether something in the graph changed that requires visualizationViewer to restart.
+     */
     private volatile boolean changed = false;
 
-    /** Whether only test or real thing should show. */
+    /**
+     * Whether only test or real thing should show.
+     */
     private volatile Application.RunMode runModeFlag = Application.RunMode.LIVE;
     private final Lock mRunModeFlag = new ReentrantLock();
     private volatile Thread testAnimationThread = null;
     private final Lock mTestAnimationThreadLock = new ReentrantLock();
-    /** List of edges that are made only during test. */
+    /**
+     * List of edges that are made only during test.
+     */
     private volatile Edge testEdge = null;
     /** List of edges that are being tested during test. */
     private volatile Edge existingTestEdge = null;
@@ -171,7 +183,7 @@ public abstract class ResourceGraph {
     private Application application;
     @Inject
     private SwingUtils swingUtils;
-    private final Map<String, TextLayout> textLayoutCache = new HashMap<String, TextLayout>();
+    private final Map<String, TextLayout> textLayoutCache = new HashMap<>();
     private double scaledSoFar = 1.0;
 
     private ClusterBrowser clusterBrowser;
@@ -188,31 +200,28 @@ public abstract class ResourceGraph {
             /* start animation thread */
             mAnimationThreadLock.lock();
             if (animationThread == null) {
-                animationThread = new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        while (true) {
-                            try {
-                                Thread.sleep(animInterval);
-                            } catch (final InterruptedException ex) {
-                                Thread.currentThread().interrupt();
-                            }
+                animationThread = new Thread(() -> {
+                    while (true) {
+                        try {
+                            Thread.sleep(animInterval);
+                        } catch (final InterruptedException ex) {
+                            Thread.currentThread().interrupt();
+                        }
 
-                            mAnimationListLock.lock();
-                            if (animationList.isEmpty()) {
-                                mAnimationListLock.unlock();
-                                repaint();
-                                mAnimationThreadLock.lock();
-                                animationThread = null;
-                                mAnimationThreadLock.unlock();
-                                break;
-                            }
-                            for (final Info animation : animationList) {
-                                animation.incAnimationIndex();
-                            }
+                        mAnimationListLock.lock();
+                        if (animationList.isEmpty()) {
                             mAnimationListLock.unlock();
                             repaint();
+                            mAnimationThreadLock.lock();
+                            animationThread = null;
+                            mAnimationThreadLock.unlock();
+                            break;
                         }
+                        for (final Info animation : animationList) {
+                            animation.incAnimationIndex();
+                        }
+                        mAnimationListLock.unlock();
+                        repaint();
                     }
                 });
                 animationThread.start();
@@ -239,76 +248,69 @@ public abstract class ResourceGraph {
         mRunModeFlag.lock();
         runModeFlag = Application.RunMode.LIVE;
         mRunModeFlag.unlock();
-        swingUtils.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                Tools.setMenuOpaque(component, false);
-            }
-        });
+        swingUtils.invokeLater(() -> Tools.setMenuOpaque(component, false));
         if (testAnimationList.isEmpty()) {
             mTestAnimationThreadLock.lock();
             if (testAnimationThread == null) {
                 /* start test animation thread */
-                testAnimationThread = new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        FOREVER: while (true) {
-                            try {
-                                startTestLatch.await();
-                            } catch (final InterruptedException ignored) {
-                                Thread.currentThread().interrupt();
-                            }
-                            mRunModeFlag.lock();
-                            final Application.RunMode runModeFlagLast;
-                            try {
-                                /* invert run mode */
-                                if (Application.isTest(runModeFlag)) {
-                                    runModeFlag = Application.RunMode.LIVE;
-                                } else {
-                                    runModeFlag = Application.RunMode.TEST;
-                                }
-                                runModeFlagLast = runModeFlag;
-                            } finally {
-                                mRunModeFlag.unlock();
-                            }
-                            repaint();
-                            int sleep = 300;
+                testAnimationThread = new Thread(() -> {
+                    FOREVER:
+                    while (true) {
+                        try {
+                            startTestLatch.await();
+                        } catch (final InterruptedException ignored) {
+                            Thread.currentThread().interrupt();
+                        }
+                        mRunModeFlag.lock();
+                        final Application.RunMode runModeFlagLast;
+                        try {
+                            /* invert run mode */
                             if (Application.isTest(runModeFlag)) {
-                                sleep = 1200;
+                                runModeFlag = Application.RunMode.LIVE;
+                            } else {
+                                runModeFlag = Application.RunMode.TEST;
                             }
-                            for (int s = 0; s < sleep; s += animInterval) {
-                                mRunModeFlag.lock();
-                                if (runModeFlag == runModeFlagLast) {
-                                    mRunModeFlag.unlock();
-                                } else {
-                                    mRunModeFlag.unlock();
-                                    repaint();
-                                }
-                                if (!component.isShowing()) {
-                                    stopTestAnimation(component);
-                                }
-                                mTestAnimationListLock.lock();
+                            runModeFlagLast = runModeFlag;
+                        } finally {
+                            mRunModeFlag.unlock();
+                        }
+                        repaint();
+                        int sleep = 300;
+                        if (Application.isTest(runModeFlag)) {
+                            sleep = 1200;
+                        }
+                        for (int s = 0; s < sleep; s += animInterval) {
+                            mRunModeFlag.lock();
+                            if (runModeFlag == runModeFlagLast) {
+                                mRunModeFlag.unlock();
+                            } else {
+                                mRunModeFlag.unlock();
+                                repaint();
+                            }
+                            if (!component.isShowing()) {
+                                stopTestAnimation(component);
+                            }
+                            mTestAnimationListLock.lock();
 
-                                if (testAnimationList.isEmpty()) {
-                                    mTestAnimationListLock.unlock();
-                                    mRunModeFlag.lock();
-                                    try {
-                                        runModeFlag = Application.RunMode.LIVE;
-                                    } finally {
-                                        mRunModeFlag.unlock();
-                                    }
-                                    repaint();
-                                    mTestAnimationThreadLock.lock();
-                                    try {
-                                        testAnimationThread = null;
-                                    } finally {
-                                        mTestAnimationThreadLock.unlock();
-                                    }
-                                    break FOREVER;
-                                }
+                            if (testAnimationList.isEmpty()) {
                                 mTestAnimationListLock.unlock();
-                                Tools.sleep(animInterval);
+                                mRunModeFlag.lock();
+                                try {
+                                    runModeFlag = Application.RunMode.LIVE;
+                                } finally {
+                                    mRunModeFlag.unlock();
+                                }
+                                repaint();
+                                mTestAnimationThreadLock.lock();
+                                try {
+                                    testAnimationThread = null;
+                                } finally {
+                                    mTestAnimationThreadLock.unlock();
+                                }
+                                break FOREVER;
                             }
+                            mTestAnimationListLock.unlock();
+                            Tools.sleep(animInterval);
                         }
                     }
                 });
@@ -354,7 +356,7 @@ public abstract class ResourceGraph {
         final Transformer<Vertex, Point2D> vlf = TransformerUtils.mapTransformer(getVertexLocations());
         putVertexLocations();
 
-        layout = new StaticLayout<Vertex, Edge>(graph, vlf) {
+        layout = new StaticLayout<>(graph, vlf) {
             /* remove the adjust locations part, because scaling is from 0, 0 */
             @Override
             public void setSize(final Dimension size) {
@@ -364,9 +366,9 @@ public abstract class ResourceGraph {
                 }
             }
         };
-        visualizationViewer = new VisualizationViewer<Vertex, Edge>(layout);
-        visualizationViewer.setVertexToolTipTransformer(new MyVertexToolTipFunction<Vertex>());
-        visualizationViewer.setEdgeToolTipTransformer(new MyEdgeToolTipFunction<Edge>());
+        visualizationViewer = new VisualizationViewer<>(layout);
+        visualizationViewer.setVertexToolTipTransformer(new MyVertexToolTipFunction<>());
+        visualizationViewer.setEdgeToolTipTransformer(new MyEdgeToolTipFunction<>());
         initializeRendering(visualizationViewer);
 
         /* scaling */
@@ -375,37 +377,32 @@ public abstract class ResourceGraph {
 
         /* picking and popups */
         /* overwriting loadPlugins method only to set scaler */
-        final DefaultModalGraphMouse<Vertex, Edge> graphMouse =
-            new DefaultModalGraphMouse<Vertex, Edge>() {
+        final DefaultModalGraphMouse<Vertex, Edge> graphMouse = new DefaultModalGraphMouse<>() {
             @Override
-                protected void loadPlugins() {
-                    super.loadPlugins();
-                    ((ScalingGraphMousePlugin) scalingPlugin).setScaler(myScaler);
-                    remove(animatedPickingPlugin);
-                    animatedPickingPlugin = null;
-                }
+            protected void loadPlugins() {
+                super.loadPlugins();
+                ((ScalingGraphMousePlugin) scalingPlugin).setScaler(myScaler);
+                remove(animatedPickingPlugin);
+                animatedPickingPlugin = null;
+            }
         };
         visualizationViewer.setGraphMouse(graphMouse);
         graphMouse.add(new MyPopupGraphMousePlugin<Vertex, Edge>());
-        visualizationViewer.addGraphMouseListener(new MyGraphMouseListener<Vertex>());
-        visualizationViewer.setPickSupport(new ShapePickSupport<Vertex, Edge>(visualizationViewer, 50));
+        visualizationViewer.addGraphMouseListener(new MyGraphMouseListener<>());
+        visualizationViewer.setPickSupport(new ShapePickSupport<>(visualizationViewer, 50));
         graphMouse.setMode(ModalGraphMouse.Mode.PICKING);
         layout.initialize();
         scrollPane = new GraphZoomScrollPane(visualizationViewer);
         final JScrollBar vScrollBar = scrollPane.getVerticalScrollBar();
-        visualizationViewer.addMouseWheelListener(
-            new MouseWheelListener() {
-                @Override
-                public void mouseWheelMoved(final MouseWheelEvent e) {
-                    if ((e.getModifiers() & MouseWheelEvent.CTRL_MASK) > 0) {
-                        final int amount = e.getWheelRotation();
-                        vScrollBar.setValue(vScrollBar.getValue() + amount * 20);
-                        e.consume();
-                        visualizationViewer.repaint();
+        visualizationViewer.addMouseWheelListener(e -> {
+            if ((e.getModifiers() & MouseWheelEvent.CTRL_MASK) > 0) {
+                final int amount = e.getWheelRotation();
+                vScrollBar.setValue(vScrollBar.getValue() + amount * 20);
+                e.consume();
+                visualizationViewer.repaint();
 
-                    }
-                }
-            });
+            }
+        });
     }
 
     private void initializeRendering(final BasicVisualizationServer visualizationServer) {
@@ -415,34 +412,24 @@ public abstract class ResourceGraph {
         renderContext.setEdgeArrowTransformer(new MyEdgeArrowFunction<Vertex, Edge>());
         renderContext.setEdgeLabelClosenessTransformer(
                 new ConstantDirectionalEdgeValueTransformer<Vertex, Edge>(0.5, 0.5));
-        renderContext.setVertexShapeTransformer(
-                new MyVertexShapeSize<Vertex, Edge>(graph, vlf));
+        renderContext.setVertexShapeTransformer(new MyVertexShapeSize<>(graph, vlf));
         renderContext.setVertexFillPaintTransformer(
-                new MyPickableVertexPaintFunction<Vertex>(visualizationViewer.getPickedVertexState(), false));
+                new MyPickableVertexPaintFunction<>(visualizationViewer.getPickedVertexState(), false));
         renderContext.setVertexDrawPaintTransformer(
-                new MyPickableVertexPaintFunction<Vertex>(visualizationViewer.getPickedVertexState(), true));
+                new MyPickableVertexPaintFunction<>(visualizationViewer.getPickedVertexState(), true));
         visualizationServer.getRenderer().setVertexRenderer(pluggableRenderer);
 
         renderContext.setEdgeLabelTransformer(new ToStringLabeller<Edge>());
         visualizationServer.setBackground(Tools.getDefaultColor("ResourceGraph.Background"));
         renderContext.setEdgeShapeTransformer(new MyLine<Vertex, Edge>());
         renderContext.setEdgeDrawPaintTransformer(
-                new MyPickableEdgePaintFunction<Edge>(visualizationViewer.getPickedEdgeState(),
-                        EDGE_DRAW_PAINT,
-                        EDGE_PICKED_PAINT));
+                new MyPickableEdgePaintFunction<>(visualizationViewer.getPickedEdgeState(), EDGE_DRAW_PAINT, EDGE_PICKED_PAINT));
         renderContext.setEdgeFillPaintTransformer(
-                new MyPickableEdgePaintFunction<Edge>(visualizationViewer.getPickedEdgeState(),
-                        EDGE_DRAW_PAINT,
-                        EDGE_PICKED_PAINT));
+                new MyPickableEdgePaintFunction<>(visualizationViewer.getPickedEdgeState(), EDGE_DRAW_PAINT, EDGE_PICKED_PAINT));
         renderContext.setArrowDrawPaintTransformer(
-                new MyPickableEdgePaintFunction<Edge>(visualizationViewer.getPickedEdgeState(),
-                        EDGE_DRAW_PAINT,
-                        EDGE_PICKED_PAINT));
+                new MyPickableEdgePaintFunction<>(visualizationViewer.getPickedEdgeState(), EDGE_DRAW_PAINT, EDGE_PICKED_PAINT));
         renderContext.setArrowFillPaintTransformer(
-                new MyPickableArrowEdgePaintFunction<Edge>(
-                        visualizationViewer.getPickedEdgeState(),
-                        EDGE_DRAW_PAINT,
-                        EDGE_PICKED_PAINT));
+                new MyPickableArrowEdgePaintFunction<>(visualizationViewer.getPickedEdgeState(), EDGE_DRAW_PAINT, EDGE_PICKED_PAINT));
     }
 
     /** Repaints the graph. */
@@ -536,11 +523,11 @@ public abstract class ResourceGraph {
         if (maxXPos <= 0 || maxYPos <= 0) {
             return;
         }
-        final Float vvX = new Float(getLayout().getSize().getWidth());
-        final Float vvY = new Float(getLayout().getSize().getHeight());
+        final double vvX = getLayout().getSize().getWidth();
+        final double vvY = getLayout().getSize().getHeight();
         if (maxXPos > vvX || maxYPos > vvY) {
-            final float x = maxXPos > vvX ? maxXPos : vvX;
-            final float y = maxYPos > vvY ? maxYPos : vvY;
+            final double x = maxXPos > vvX ? maxXPos : vvX;
+            final double y = maxYPos > vvY ? maxYPos : vvY;
             getLayout().setSize(new Dimension((int) x, (int) y));
             visualizationViewer.setGraphLayout(getLayout());
         }
@@ -651,13 +638,10 @@ public abstract class ResourceGraph {
     protected final void showPopup(final JPopupMenu popup, final Point2D p) {
         final int posX = (int) p.getX();
         final int posY = (int) p.getY();
-        swingUtils.invokeAndWait(new Runnable() {
-            @Override
-            public void run() {
-                if (visualizationViewer.isShowing() && visualizationViewer.isDisplayable()) {
-                    popup.show(visualizationViewer, posX, posY);
-                    popup.repaint();
-                }
+        swingUtils.invokeAndWait(() -> {
+            if (visualizationViewer.isShowing() && visualizationViewer.isDisplayable()) {
+                popup.show(visualizationViewer, posX, posY);
+                popup.repaint();
             }
         });
     }
@@ -941,19 +925,16 @@ public abstract class ResourceGraph {
 
     protected final void removeTestEdge() {
         if (testEdge != null) {
-            swingUtils.invokeLater(new Runnable() {
-                @Override
-                public void run() {
-                    mTestEdgeLock.lock();
-                    mGraphLock.lock();
-                    try {
-                        getGraph().removeEdge(testEdge);
-                    } finally {
-                        mGraphLock.unlock();
-                    }
-                    testEdge = null;
-                    mTestEdgeLock.unlock();
+            swingUtils.invokeLater(() -> {
+                mTestEdgeLock.lock();
+                mGraphLock.lock();
+                try {
+                    getGraph().removeEdge(testEdge);
+                } finally {
+                    mGraphLock.unlock();
                 }
+                testEdge = null;
+                mTestEdgeLock.unlock();
             });
         }
     }
@@ -962,34 +943,31 @@ public abstract class ResourceGraph {
         if (vP == null || v == null) {
             throw new IllegalArgumentException("addTestEdge: vP: " + vP + ", v: " + v);
         }
-        swingUtils.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                if (!mTestEdgeLock.tryLock()) {
-                    return;
-                }
-                if (testEdge != null) {
-                    mGraphLock.lock();
-                    try {
-                        getGraph().removeEdge(testEdge);
-                    } finally {
-                        mGraphLock.unlock();
-                    }
-                }
-                if (!isTestAnimation()) {
-                    mTestEdgeLock.unlock();
-                    return;
-                }
-                final Edge edge = new Edge(vP, v);
+        swingUtils.invokeLater(() -> {
+            if (!mTestEdgeLock.tryLock()) {
+                return;
+            }
+            if (testEdge != null) {
                 mGraphLock.lock();
                 try {
-                    getGraph().addEdge(edge, vP, v);
+                    getGraph().removeEdge(testEdge);
                 } finally {
                     mGraphLock.unlock();
                 }
-                testEdge = edge;
-                mTestEdgeLock.unlock();
             }
+            if (!isTestAnimation()) {
+                mTestEdgeLock.unlock();
+                return;
+            }
+            final Edge edge = new Edge(vP, v);
+            mGraphLock.lock();
+            try {
+                getGraph().addEdge(edge, vP, v);
+            } finally {
+                mGraphLock.unlock();
+            }
+            testEdge = edge;
+            mTestEdgeLock.unlock();
         });
     }
 
@@ -1047,41 +1025,37 @@ public abstract class ResourceGraph {
             public void scale(final VisualizationServer vv, final float amount, final Point2D from) {
                 final JScrollBar sbV = getScrollPane().getVerticalScrollBar();
                 final JScrollBar sbH = getScrollPane().getHorizontalScrollBar();
-                swingUtils.invokeLater(new Runnable() {
-                    @Override
-                    public void run() {
-                        final Point2D prevPoint = getVisualizationViewer().getRenderContext()
-                                                                          .getMultiLayerTransformer()
-                                                                          .inverseTransform(Layer.VIEW, from);
-                        final double scaledSoFar0 = getScaledSoFar();
-                        float am = amount;
-                        if (am < 1) {
-                            if (scaledSoFar0 < 0.3) {
-                                am = 1;
-                            } else {
-                                superScale(vv, 1 / am, new Point2D.Double(0, 0));
-                            }
-                        } else if (am > 1) {
-                            if (scaledSoFar0 > 5) {
-                                am = 1;
-                            } else {
-                                superScale(vv, 1 / am, new Point2D.Double(0, 0));
-                            }
+                swingUtils.invokeLater(() -> {
+                    final Point2D prevPoint = getVisualizationViewer().getRenderContext()
+                            .getMultiLayerTransformer()
+                            .inverseTransform(Layer.VIEW, from);
+                    final double scaledSoFar0 = getScaledSoFar();
+                    float am = amount;
+                    if (am < 1) {
+                        if (scaledSoFar0 < 0.3) {
+                            am = 1;
+                        } else {
+                            superScale(vv, 1 / am, new Point2D.Double(0, 0));
                         }
-                        setScaledSoFar(scaledSoFar0 * am);
-                        final Point2D p2 =
-                            getVisualizationViewer().getRenderContext()
-                                                    .getMultiLayerTransformer()
-                                                    .inverseTransform(Layer.VIEW, from);
-                        final int valueY = (int) (sbV.getValue() + prevPoint.getY() - p2.getY());
-                        sbV.setValue(valueY);
-                        sbV.repaint();
-                        final int valueX = (int) (sbH.getValue() + prevPoint.getX() - p2.getX());
-                        sbH.setValue(valueX);
-                        sbH.repaint();
-
-                        vv.repaint();
+                    } else if (am > 1) {
+                        if (scaledSoFar0 > 5) {
+                            am = 1;
+                        } else {
+                            superScale(vv, 1 / am, new Point2D.Double(0, 0));
+                        }
                     }
+                    setScaledSoFar(scaledSoFar0 * am);
+                    final Point2D p2 = getVisualizationViewer().getRenderContext()
+                            .getMultiLayerTransformer()
+                            .inverseTransform(Layer.VIEW, from);
+                    final int valueY = (int) (sbV.getValue() + prevPoint.getY() - p2.getY());
+                    sbV.setValue(valueY);
+                    sbV.repaint();
+                    final int valueX = (int) (sbH.getValue() + prevPoint.getX() - p2.getX());
+                    sbH.setValue(valueX);
+                    sbH.repaint();
+
+                    vv.repaint();
                 });
             }
         };
@@ -1119,7 +1093,7 @@ public abstract class ResourceGraph {
     public List<Info> getSelectedComponents() {
         final String cn = clusterBrowser.getCluster().getName();
         progressIndicator.startProgressIndicator(cn, "copy");
-        final List<Info> selected = new ArrayList<Info>();
+        final List<Info> selected = new ArrayList<>();
         for (final Vertex v : getPickedVertices()) {
             final Info i = getInfo(v);
             selected.add(i);
@@ -1143,13 +1117,13 @@ public abstract class ResourceGraph {
         /* workaround for ConcurrentModificationException */
         for (int i = 0; i < 3; i++) {
             try {
-                return new ArrayList<Vertex>(ps.getPicked());
+                return new ArrayList<>(ps.getPicked());
             } catch (final ConcurrentModificationException cme) {
                 /* try it again */
                 LOG.appWarning("getPickedVertices: ignoring " + "ConcurrentModificationException");
             }
         }
-        return new ArrayList<Vertex>();
+        return new ArrayList<>();
     }
 
     /** This class allows to change direction of the edge. */
@@ -1258,21 +1232,10 @@ public abstract class ResourceGraph {
             super();
             graph = graphIn;
             vlf = vlfIn;
-            setSizeTransformer(new Transformer<V, Integer>() {
-                                   @Override
-                                   public Integer transform(final V v) {
-                                       return getVertexWidth((Vertex) v);
-                                   }
-                               });
-            setAspectRatioTransformer(new Transformer<V, Float>() {
-                                          @Override
-                                          public Float transform(final V v) {
-                                              return getVertexAspectRatio((Vertex) v);
-                                          }
-                                      });
+            setSizeTransformer(v -> getVertexWidth((Vertex) v));
+            setAspectRatioTransformer(v -> getVertexAspectRatio((Vertex) v));
         }
 
-        @SuppressWarnings("unchecked")
         @Override
         public Shape transform(final V v) {
             return getVertexShape((Vertex) v, (VertexShapeFactory<Vertex>) factory);
@@ -1324,32 +1287,29 @@ public abstract class ResourceGraph {
 
         /** Creates and displays popup menus for vertices and edges. */
         private void handlePopup0(final MouseEvent me) {
-            final Thread thread = new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    final Point2D popP = me.getPoint();
+            final Thread thread = new Thread(() -> {
+                final Point2D popP = me.getPoint();
 
-                    final int posX = (int) popP.getX();
-                    final int posY = (int) popP.getY();
+                final int posX = (int) popP.getX();
+                final int posY = (int) popP.getY();
 
-                    final GraphElementAccessor<Vertex, Edge> pickSupport = visualizationViewer.getPickSupport();
-                    final Vertex v = pickSupport.getVertex(layout, posX, posY);
-                    if (v == null) {
-                        final Edge edge = pickSupport.getEdge(layout, posX, posY);
-                        if (edge == null) {
-                            /* background was clicked */
-                            handlePopupBackground(popP);
-                            backgroundClicked();
-                        } else {
-                            handlePopupEdge(edge, popP);
-                            oneEdgePressed(edge);
-                        }
+                final GraphElementAccessor<Vertex, Edge> pickSupport = visualizationViewer.getPickSupport();
+                final Vertex v = pickSupport.getVertex(layout, posX, posY);
+                if (v == null) {
+                    final Edge edge = pickSupport.getEdge(layout, posX, posY);
+                    if (edge == null) {
+                        /* background was clicked */
+                        handlePopupBackground(popP);
+                        backgroundClicked();
                     } else {
-                        final List<Vertex> pickedV = getPickedVertices();
-                        handlePopupVertex(v, pickedV, popP);
-                        if (pickedV.size() < 2) {
-                            oneVertexPressed(v); /* select this vertex */
-                        }
+                        handlePopupEdge(edge, popP);
+                        oneEdgePressed(edge);
+                    }
+                } else {
+                    final List<Vertex> pickedV = getPickedVertices();
+                    handlePopupVertex(v, pickedV, popP);
+                    if (pickedV.size() < 2) {
+                        oneVertexPressed(v); /* select this vertex */
                     }
                 }
             });
@@ -1382,20 +1342,16 @@ public abstract class ResourceGraph {
 
         @Override
         public void graphPressed(final V v, final MouseEvent me) {
-            final Thread t = new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    final PickedState<Vertex> psVertex =
-                        visualizationViewer.getRenderContext().getPickedVertexState();
-                    if ((me.getModifiers() & MouseEvent.CTRL_MASK) == 0) {
-                        final List<Vertex> picked = getPickedVertices();
-                        if (picked.size() == 1 || !picked.contains(v)) {
-                            oneVertexPressed((Vertex) v);
-                        }
-                    } else {
-                        /* ctrl-click */
-                        psVertex.pick((Vertex) v, true);
+            final Thread t = new Thread(() -> {
+                final PickedState<Vertex> psVertex = visualizationViewer.getRenderContext().getPickedVertexState();
+                if ((me.getModifiers() & MouseEvent.CTRL_MASK) == 0) {
+                    final List<Vertex> picked = getPickedVertices();
+                    if (picked.size() == 1 || !picked.contains(v)) {
+                        oneVertexPressed((Vertex) v);
                     }
+                } else {
+                    /* ctrl-click */
+                    psVertex.pick((Vertex) v, true);
                 }
             });
             t.start();
@@ -1625,12 +1581,7 @@ public abstract class ResourceGraph {
                         y -= (oldShapeHeight - getVertexHeight((Vertex) v)) / 2;
                     }
                     pos.setLocation(x, y);
-                    swingUtils.invokeLater(new Runnable() {
-                                          @Override
-                                          public void run() {
-                                              scale();
-                                          }
-                                      });
+                    swingUtils.invokeLater(ResourceGraph.this::scale);
                 }
             }
 
@@ -1658,11 +1609,8 @@ public abstract class ResourceGraph {
             if (mainTextLayout != null) {
                 final int textW = (int) mainTextLayout.getBounds().getWidth();
                 final int textH = (int) mainTextLayout.getBounds().getHeight();
-                drawVertexText(g2d,
-                               mainTextLayout,
-                               x + shapeWidth / 2 - textW / 2, /* middle */
-                               y + height / 2 + textH / 2,
-                               new Color(0, 0, 0),
+                drawVertexText(g2d, mainTextLayout, x + shapeWidth / 2.0 - textW / 2.0, /* middle */
+                        y + height / 2.0 + textH / 2.0, new Color(0, 0, 0),
                                255);
             }
             if (iconTextLayout != null) {
@@ -1765,14 +1713,12 @@ public abstract class ResourceGraph {
 
     public BufferedImage createImage() {
         VisualizationImageServer<Vertex, Edge> vis =
-                new VisualizationImageServer<Vertex, Edge>(visualizationViewer.getGraphLayout(),
-                    visualizationViewer.getGraphLayout().getSize());
+                new VisualizationImageServer<>(visualizationViewer.getGraphLayout(), visualizationViewer.getGraphLayout().getSize());
 
         initializeRendering(vis);
 
-        return (BufferedImage) vis.getImage(
-                new Point2D.Double(visualizationViewer.getGraphLayout().getSize().getWidth() / 2,
-                        visualizationViewer.getGraphLayout().getSize().getHeight() / 2),
+        return (BufferedImage) vis.getImage(new Point2D.Double(visualizationViewer.getGraphLayout().getSize().getWidth() / 2.0,
+                        visualizationViewer.getGraphLayout().getSize().getHeight() / 2.0),
                 new Dimension(visualizationViewer.getGraphLayout().getSize()));
     }
 }

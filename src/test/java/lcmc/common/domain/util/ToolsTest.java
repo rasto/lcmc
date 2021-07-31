@@ -571,16 +571,16 @@ final class ToolsTest {
     }
 
     private static Stream<Arguments> unequalCollections() {
-        return Stream.of(Arguments.of(new ArrayList<String>(), new ArrayList<>(Arrays.asList("a"))),
-                Arguments.of(new ArrayList<>(Arrays.asList("a")), new ArrayList<String>()),
-                Arguments.of(new ArrayList<>(Arrays.asList("a")), new ArrayList<>(Arrays.asList("a", "b"))),
-                Arguments.of(new ArrayList<>(Arrays.asList("a", "b")), new ArrayList<>(Arrays.asList("b"))),
+        return Stream.of(Arguments.of(new ArrayList<String>(), new ArrayList<>(List.of("a"))),
+                Arguments.of(new ArrayList<>(List.of("a")), new ArrayList<String>()),
+                Arguments.of(new ArrayList<>(List.of("a")), new ArrayList<>(Arrays.asList("a", "b"))),
+                Arguments.of(new ArrayList<>(Arrays.asList("a", "b")), new ArrayList<>(List.of("b"))),
                 Arguments.of(new ArrayList<>(Arrays.asList("a", "a")), new ArrayList<>(Arrays.asList("a", "b"))),
                 Arguments.of(new ArrayList<>(Arrays.asList("b", "b")), new ArrayList<>(Arrays.asList("a", "b"))),
-                Arguments.of(new TreeSet<String>(), new TreeSet<>(Arrays.asList("a"))),
-                Arguments.of(new TreeSet<>(Arrays.asList("a")), new TreeSet<String>()),
-                Arguments.of(new TreeSet<>(Arrays.asList("a")), new TreeSet<>(Arrays.asList("a", "b"))),
-                Arguments.of(new TreeSet<>(Arrays.asList("a", "b")), new TreeSet<>(Arrays.asList("b"))),
+                Arguments.of(new TreeSet<String>(), new TreeSet<>(List.of("a"))),
+                Arguments.of(new TreeSet<>(List.of("a")), new TreeSet<String>()),
+                Arguments.of(new TreeSet<>(List.of("a")), new TreeSet<>(Arrays.asList("a", "b"))),
+                Arguments.of(new TreeSet<>(Arrays.asList("a", "b")), new TreeSet<>(List.of("b"))),
                 Arguments.of(new TreeSet<>(Arrays.asList("a", "a")), new TreeSet<>(Arrays.asList("a", "b"))),
                 Arguments.of(new TreeSet<>(Arrays.asList("b", "b")), new TreeSet<>(Arrays.asList("a", "b"))));
     }

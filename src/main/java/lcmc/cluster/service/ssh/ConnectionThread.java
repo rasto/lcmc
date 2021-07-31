@@ -22,19 +22,19 @@ package lcmc.cluster.service.ssh;
 
 import java.io.IOException;
 
-import lcmc.common.domain.Application;
-import lcmc.common.ui.utils.SwingUtils;
-import lcmc.host.domain.Host;
-import lcmc.common.ui.ProgressBar;
-import lcmc.cluster.ui.SSHGui;
-import lcmc.common.domain.ConnectionCallback;
-import lcmc.logger.Logger;
-import lcmc.logger.LoggerFactory;
-import lcmc.common.domain.util.Tools;
-
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Provider;
+
+import lcmc.cluster.ui.SSHGui;
+import lcmc.common.domain.Application;
+import lcmc.common.domain.ConnectionCallback;
+import lcmc.common.domain.util.Tools;
+import lcmc.common.ui.ProgressBar;
+import lcmc.common.ui.utils.SwingUtils;
+import lcmc.host.domain.Host;
+import lcmc.logger.Logger;
+import lcmc.logger.LoggerFactory;
 
 @Named
 public class ConnectionThread extends Thread {
@@ -146,7 +146,7 @@ public class ConnectionThread extends Thread {
         final int connectTimeout = Tools.getDefaultInt("SSH.ConnectTimeout");
         final int kexTimeout = Tools.getDefaultInt("SSH.KexTimeout");
         if (progressBar != null) {
-            final int timeout = (connectTimeout < kexTimeout) ? connectTimeout : kexTimeout;
+            final int timeout = Math.min(connectTimeout, kexTimeout);
             progressBar.start(timeout);
         }
         LOG.debug2("run: connect");
@@ -193,18 +193,10 @@ public class ConnectionThread extends Thread {
         sshConnection = newSshConnection;
         connectionEstablished = true;
         host.setConnected();
-        swingUtils.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                host.getTerminalPanel().nextCommand();
-            }
-        });
-        final Thread thread = new Thread(new Runnable() {
-            @Override
-            public void run() {
-                if (connectionCallback != null) {
-                    connectionCallback.done(0);
-                }
+        swingUtils.invokeLater(() -> host.getTerminalPanel().nextCommand());
+        final Thread thread = new Thread(() -> {
+            if (connectionCallback != null) {
+                connectionCallback.done(0);
             }
         });
         thread.start();

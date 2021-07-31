@@ -20,23 +20,24 @@
 
 package lcmc.host.domain;
 
-import com.google.common.base.Optional;
-import lcmc.common.domain.Value;
-import lcmc.drbd.domain.NetInterface;
-
-import javax.inject.Named;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
+
+import javax.inject.Named;
+
+import lcmc.common.domain.Value;
+import lcmc.drbd.domain.NetInterface;
 
 @Named
 public class HostNetworks {
-    private List<NetInterface> netInterfacesWithBridges = new ArrayList<NetInterface>();
-    private List<Value> bridges = new ArrayList<Value>();
+    private List<NetInterface> netInterfacesWithBridges = new ArrayList<>();
+    private List<Value> bridges = new ArrayList<>();
 
     public NetInterface[] getNetInterfacesWithBridges() {
-        return netInterfacesWithBridges.toArray(new NetInterface[netInterfacesWithBridges.size()]);
+        return netInterfacesWithBridges.toArray(new NetInterface[0]);
     }
 
     public List<NetInterface> getNetInterfaces() {
@@ -44,11 +45,11 @@ public class HostNetworks {
     }
 
     public List<Value> getBridges() {
-        return new ArrayList<Value>(bridges);
+        return new ArrayList<>(bridges);
     }
 
     private Map<String, Integer> getNetworkIps() {
-        final Map<String, Integer> networkIps = new LinkedHashMap<String, Integer>();
+        final Map<String, Integer> networkIps = new LinkedHashMap<>();
         for (final NetInterface ni : netInterfacesWithBridges) {
             final String netIp = ni.getNetworkIp();
 
@@ -59,10 +60,10 @@ public class HostNetworks {
 
     /** Returns list of networks that exist on all hosts. */
     public Optional<Map<String, Integer>> getNetworksIntersection(final Optional<Map<String, Integer>> otherNetworkIps) {
-        if (!otherNetworkIps.isPresent()) {
+        if (otherNetworkIps.isEmpty()) {
             return Optional.of(getNetworkIps());
         }
-        final Map<String, Integer> networksIntersection = new LinkedHashMap<String, Integer>();
+        final Map<String, Integer> networksIntersection = new LinkedHashMap<>();
         for (final NetInterface netInterface : netInterfacesWithBridges) {
             if (netInterface.isLocalHost()) {
                 continue;
@@ -76,7 +77,7 @@ public class HostNetworks {
     }
 
     public List<String> getIpsFromNetwork(final String netIp) {
-        final List<String> networkIps = new ArrayList<String>();
+        final List<String> networkIps = new ArrayList<>();
         for (final NetInterface ni : netInterfacesWithBridges) {
             if (netIp.equals(ni.getNetworkIp())) {
                 networkIps.add(ni.getIp());
@@ -86,7 +87,7 @@ public class HostNetworks {
     }
 
     public void setNetworkIntefaces(final List<NetInterface> networkIntefaces) {
-        this.netInterfacesWithBridges = networkIntefaces;
+        netInterfacesWithBridges = networkIntefaces;
     }
 
     public void setBridges(List<Value> bridges) {

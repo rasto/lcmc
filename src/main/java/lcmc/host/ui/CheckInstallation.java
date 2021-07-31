@@ -22,6 +22,18 @@
 
 package lcmc.host.ui;
 
+import java.awt.Color;
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.swing.ImageIcon;
+import javax.swing.JComponent;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.SpringLayout;
+
 import lcmc.cluster.service.ssh.ExecCommandConfig;
 import lcmc.cluster.ui.widget.Widget;
 import lcmc.cluster.ui.widget.WidgetFactory;
@@ -37,15 +49,6 @@ import lcmc.host.domain.Host;
 import lcmc.logger.Logger;
 import lcmc.logger.LoggerFactory;
 import lombok.val;
-
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.swing.*;
-import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * An implementation of a dialog where
@@ -140,100 +143,66 @@ final class CheckInstallation extends DialogHost {
         nextDialogObject = hostFinishDialog;
 
         final CheckInstallation thisClass = this;
-        swingUtils.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                installDrbdButton.setBackgroundColor(Tools.getDefaultColor("ConfigDialog.Button"));
-                installDrbdButton.setEnabled(false);
-                drbdInstMethodWidget.setEnabled(false);
-                installPacemakerButton.setEnabled(false);
-                pacemakerInstMethodWidget.setEnabled(false);
-                installHeartbeatPacemakerButton.setEnabled(false);
-                heartbeatPacemakerInstMethodWidget.setEnabled(false);
+        swingUtils.invokeLater(() -> {
+            installDrbdButton.setBackgroundColor(Tools.getDefaultColor("ConfigDialog.Button"));
+            installDrbdButton.setEnabled(false);
+            drbdInstMethodWidget.setEnabled(false);
+            installPacemakerButton.setEnabled(false);
+            pacemakerInstMethodWidget.setEnabled(false);
+            installHeartbeatPacemakerButton.setEnabled(false);
+            heartbeatPacemakerInstMethodWidget.setEnabled(false);
+        });
+        installDrbdButton.addActionListener(e -> {
+            if (drbdInstallationOk) {
+                getDrbdInstallation().setDrbdWillBeUpgraded(true);
+            }
+            final InstallMethods im = (InstallMethods) drbdInstMethodWidget.getValue();
+            getDrbdInstallation().setDrbdInstallMethodIndex(im.getIndex());
+            final String button = e.getActionCommand();
+            if (!drbdInstallationOk || button.equals(Tools.getString("Dialog.Host.CheckInstallation.DrbdCheckForUpgradeButton"))) {
+                if (im.isSourceMethod()) {
+                    nextDialogObject = drbdAvailSourceFilesDialog;
+                } else {
+                    // TODO: this only when there is no drbd installed
+                    nextDialogObject = drbdCommandInstDialog;
+                    getDrbdInstallation().setDrbdInstallMethodIndex(im.getIndex());
+                }
+                nextDialogObject.init(thisClass, getHost(), getDrbdInstallation());
+                swingUtils.invokeLater(() -> buttonClass(nextButton()).pressButton());
             }
         });
-        installDrbdButton.addActionListener(
-            new ActionListener() {
-                @Override
-                public void actionPerformed(final ActionEvent e) {
-                    if (drbdInstallationOk) {
-                        getDrbdInstallation().setDrbdWillBeUpgraded(true);
-                    }
-                    final InstallMethods im = (InstallMethods) drbdInstMethodWidget.getValue();
-                    getDrbdInstallation().setDrbdInstallMethodIndex(im.getIndex());
-                    final String button = e.getActionCommand();
-                    if (!drbdInstallationOk || button.equals(Tools.getString(
-                                                    "Dialog.Host.CheckInstallation.DrbdCheckForUpgradeButton"))) {
-                        if (im.isSourceMethod()) {
-                            nextDialogObject = drbdAvailSourceFilesDialog;
-                        } else {
-                            // TODO: this only when there is no drbd installed
-                            nextDialogObject = drbdCommandInstDialog;
-                            getDrbdInstallation().setDrbdInstallMethodIndex(im.getIndex());
-                        }
-                        nextDialogObject.init(thisClass, getHost(), getDrbdInstallation());
-                        swingUtils.invokeLater(new Runnable() {
-                            @Override
-                            public void run() {
-                                buttonClass(nextButton()).pressButton();
-                            }
-                        });
-                    }
-                }
-            }
-        );
 
         installHeartbeatPacemakerButton.setBackgroundColor(Tools.getDefaultColor("ConfigDialog.Button"));
-        installHeartbeatPacemakerButton.addActionListener(
-            new ActionListener() {
-                @Override
-                public void actionPerformed(final ActionEvent e) {
-                    nextDialogObject = heartbeatInstDialog;
-                    nextDialogObject.init(thisClass, getHost(), getDrbdInstallation());
-                    final InstallMethods im = (InstallMethods) heartbeatPacemakerInstMethodWidget.getValue();
-                    getHost().setHeartbeatPacemakerInstallMethodIndex(im.getIndex());
-                    swingUtils.invokeLater(new Runnable() {
-                        @Override
-                        public void run() {
-                            buttonClass(nextButton()).pressButton();
-                        }
-                    });
-                }
-            }
-        );
+        installHeartbeatPacemakerButton.addActionListener(e -> {
+            nextDialogObject = heartbeatInstDialog;
+            nextDialogObject.init(thisClass, getHost(), getDrbdInstallation());
+            final InstallMethods im = (InstallMethods) heartbeatPacemakerInstMethodWidget.getValue();
+            getHost().setHeartbeatPacemakerInstallMethodIndex(im.getIndex());
+            swingUtils.invokeLater(() -> buttonClass(nextButton()).pressButton());
+        });
 
         installPacemakerButton.setBackgroundColor(Tools.getDefaultColor("ConfigDialog.Button"));
-        installPacemakerButton.addActionListener(
-            new ActionListener() {
-                @Override
-                public void actionPerformed(final ActionEvent e) {
-                    nextDialogObject = pacemakerInstDialog;
-                    nextDialogObject.init(thisClass, getHost(), getDrbdInstallation());
-                    final InstallMethods im = (InstallMethods) pacemakerInstMethodWidget.getValue();
-                    getHost().setPacemakerInstallMethodIndex(im.getIndex());
-                    swingUtils.invokeLater(new Runnable() {
-                        @Override
-                        public void run() {
-                            buttonClass(nextButton()).pressButton();
-                        }
-                    });
-                }
-            }
-        );
+        installPacemakerButton.addActionListener(e -> {
+            nextDialogObject = pacemakerInstDialog;
+            nextDialogObject.init(thisClass, getHost(), getDrbdInstallation());
+            final InstallMethods im = (InstallMethods) pacemakerInstMethodWidget.getValue();
+            getHost().setPacemakerInstallMethodIndex(im.getIndex());
+            swingUtils.invokeLater(() -> buttonClass(nextButton()).pressButton());
+        });
 
         getHost().execCommand(new ExecCommandConfig().commandString("DrbdCheck.version")
-                                                     .progressBar(getProgressBar())
-                                                     .execCallback(new ExecCallback() {
-                                                         @Override
-                                                         public void done(final String answer) {
-                                                             checkDrbd(answer);
-                                                         }
-                                                         @Override
-                                                         public void doneError(final String answer,
-                                                                               final int errorCode) {
-                                                             checkDrbd(""); // not installed
-                                                         }
-                                                     })
+                .progressBar(getProgressBar())
+                .execCallback(new ExecCallback() {
+                    @Override
+                    public void done(final String answer) {
+                        checkDrbd(answer);
+                    }
+
+                    @Override
+                    public void doneError(final String answer, final int errorCode) {
+                        checkDrbd(""); // not installed
+                    }
+                })
                                                      .silentCommand()
                                                      .silentOutput());
     }
@@ -243,40 +212,32 @@ final class CheckInstallation extends DialogHost {
      */
     void checkDrbd(final String ans) {
         if (ans != null && ans.isEmpty() || "\n".equals(ans)) {
-            swingUtils.invokeLater(new Runnable() {
-                @Override
-                public void run() {
-                    checkingDrbdLabel.setText(": " + Tools.getString("Dialog.Host.CheckInstallation.DrbdNotInstalled"));
-                    checkingDrbdIcon.setIcon(NOT_INSTALLED_ICON);
-                    final String toolTip = getInstToolTip(DRBD_PREFIX, "1");
-                    drbdInstMethodWidget.setToolTipText(toolTip);
-                    installDrbdButton.setToolTipText(toolTip);
-                    installDrbdButton.setEnabled(true);
-                    drbdInstMethodWidget.setEnabled(true);
-                }
+            swingUtils.invokeLater(() -> {
+                checkingDrbdLabel.setText(": " + Tools.getString("Dialog.Host.CheckInstallation.DrbdNotInstalled"));
+                checkingDrbdIcon.setIcon(NOT_INSTALLED_ICON);
+                final String toolTip = getInstToolTip(DRBD_PREFIX, "1");
+                drbdInstMethodWidget.setToolTipText(toolTip);
+                installDrbdButton.setToolTipText(toolTip);
+                installDrbdButton.setEnabled(true);
+                drbdInstMethodWidget.setEnabled(true);
             });
         } else {
             drbdInstallationOk = true;
-            swingUtils.invokeLater(new Runnable() {
-                @Override
-                @SuppressWarnings("DeadBranch")
-                public void run() {
-                    checkingDrbdLabel.setText(": " + ans.trim());
-                    if (getDrbdInstallation().isDrbdUpgradeAvailable(ans.trim())) {
-                        checkingDrbdIcon.setIcon(UPGRADE_AVAILABLE_ICON);
-                        installDrbdButton.setText(Tools.getString("Dialog.Host.CheckInstallation.DrbdUpgradeButton"));
+            swingUtils.invokeLater(() -> {
+                checkingDrbdLabel.setText(": " + ans.trim());
+                if (getDrbdInstallation().isDrbdUpgradeAvailable(ans.trim())) {
+                    checkingDrbdIcon.setIcon(UPGRADE_AVAILABLE_ICON);
+                    installDrbdButton.setText(Tools.getString("Dialog.Host.CheckInstallation.DrbdUpgradeButton"));
+                    installDrbdButton.setEnabled(true);
+                    drbdInstMethodWidget.setEnabled(true);
+                } else {
+                    installDrbdButton.setText(Tools.getString("Dialog.Host.CheckInstallation.DrbdCheckForUpgradeButton"));
+                    if (false) {
+                        // TODO: disabled
                         installDrbdButton.setEnabled(true);
                         drbdInstMethodWidget.setEnabled(true);
-                    } else {
-                        installDrbdButton.setText(
-                                          Tools.getString("Dialog.Host.CheckInstallation.DrbdCheckForUpgradeButton"));
-                        if (false) {
-                            // TODO: disabled
-                            installDrbdButton.setEnabled(true);
-                            drbdInstMethodWidget.setEnabled(true);
-                        }
-                        checkingDrbdIcon.setIcon(ALREADY_INSTALLED_ICON);
                     }
+                    checkingDrbdIcon.setIcon(ALREADY_INSTALLED_ICON);
                 }
             });
         }
@@ -298,7 +259,7 @@ final class CheckInstallation extends DialogHost {
     }
 
     void checkAisHbPm(final String ans) {
-        final val hostParser = getHost().getHostParser();
+        val hostParser = getHost().getHostParser();
         hostParser.setPacemakerVersion(null);
         hostParser.setOpenaisVersion(null);
         hostParser.setHeartbeatVersion(null);
@@ -332,19 +293,14 @@ final class CheckInstallation extends DialogHost {
         }
         if (hbVersion == null) {
             /* hb */
-            swingUtils.invokeLater(new Runnable() {
-                @Override
-                public void run() {
-                    heartbeatPacemakerIcon.setIcon(NOT_INSTALLED_ICON);
-                    checkingHeartbeatPacemakerLabel.setText(
-                                            ": " + Tools.getString("Dialog.Host.CheckInstallation.HbPmNotInstalled"));
-                }
+            swingUtils.invokeLater(() -> {
+                heartbeatPacemakerIcon.setIcon(NOT_INSTALLED_ICON);
+                checkingHeartbeatPacemakerLabel.setText(": " + Tools.getString("Dialog.Host.CheckInstallation.HbPmNotInstalled"));
             });
         } else {
             heartbeatPacemakerInstallationOk = true;
             final String text;
-            if ("2.1.3".equals(hbVersion)
-                && "sles10".equals(hostParser.getDistributionVersion())) {
+            if ("2.1.3".equals(hbVersion) && "sles10".equals(hostParser.getDistributionVersion())) {
                 /* sles10 heartbeat 2.1.3 looks like hb 2.1.4 */
                 hbVersion = "2.1.4";
                 text = "2.1.3 (2.1.4)";
@@ -352,70 +308,50 @@ final class CheckInstallation extends DialogHost {
                 text = hbVersion;
             }
             hostParser.setHeartbeatVersion(hbVersion);
-            swingUtils.invokeLater(new Runnable() {
-                @Override
-                public void run() {
-                    if (hostParser.getPacemakerVersion() == null
-                        || hostParser.getHeartbeatVersion().equals(hostParser.getPacemakerVersion())) {
-                        heartbeatPacemakerLabel.setText("Heartbeat");
-                        checkingHeartbeatPacemakerLabel.setText(": " + text);
-                    } else {
-                        checkingHeartbeatPacemakerLabel.setText(": " + hostParser.getPacemakerVersion() + '/' + text);
-                    }
-                    heartbeatPacemakerIcon.setIcon(ALREADY_INSTALLED_ICON);
+            swingUtils.invokeLater(() -> {
+                if (hostParser.getPacemakerVersion() == null || hostParser.getHeartbeatVersion()
+                        .equals(hostParser.getPacemakerVersion())) {
+                    heartbeatPacemakerLabel.setText("Heartbeat");
+                    checkingHeartbeatPacemakerLabel.setText(": " + text);
+                } else {
+                    checkingHeartbeatPacemakerLabel.setText(": " + hostParser.getPacemakerVersion() + '/' + text);
                 }
+                heartbeatPacemakerIcon.setIcon(ALREADY_INSTALLED_ICON);
             });
         }
         if (hostParser.getPacemakerVersion() == null || (aisVersion == null && corosyncVersion == null)) {
             /* corosync */
-            swingUtils.invokeLater(new Runnable() {
-                @Override
-                public void run() {
-                    checkingPacemakerIcon.setIcon(NOT_INSTALLED_ICON);
-                    checkingPacemakerLabel.setText(
-                                            ": " + Tools.getString("Dialog.Host.CheckInstallation.PmNotInstalled"));
-                    pacemakerLabel.setText("Pcmk/Corosync");
-                }
+            swingUtils.invokeLater(() -> {
+                checkingPacemakerIcon.setIcon(NOT_INSTALLED_ICON);
+                checkingPacemakerLabel.setText(": " + Tools.getString("Dialog.Host.CheckInstallation.PmNotInstalled"));
+                pacemakerLabel.setText("Pcmk/Corosync");
             });
         } else {
             pacemakerInstallationOk = true;
-            swingUtils.invokeLater(new Runnable() {
-                @Override
-                public void run() {
-                    checkingPacemakerIcon.setIcon(ALREADY_INSTALLED_ICON);
-                    String coroAisVersion = "no";
-                    if (corosyncVersion != null) {
-                        pacemakerLabel.setText("Pcmk/Corosync");
-                        coroAisVersion = corosyncVersion;
-                    } else if (aisVersion != null) {
-                        pacemakerLabel.setText("Pcmk/AIS");
-                        coroAisVersion = aisVersion;
-                    }
-                    pacemakerLabel.repaint();
-                    checkingPacemakerLabel.setText(": " + hostParser.getPacemakerVersion() + '/' + coroAisVersion);
+            swingUtils.invokeLater(() -> {
+                checkingPacemakerIcon.setIcon(ALREADY_INSTALLED_ICON);
+                String coroAisVersion;
+                if (corosyncVersion != null) {
+                    pacemakerLabel.setText("Pcmk/Corosync");
+                    coroAisVersion = corosyncVersion;
+                } else {
+                    pacemakerLabel.setText("Pcmk/AIS");
+                    coroAisVersion = aisVersion;
                 }
+                pacemakerLabel.repaint();
+                checkingPacemakerLabel.setText(": " + hostParser.getPacemakerVersion() + '/' + coroAisVersion);
             });
         }
 
-        final List<String> incorrect = new ArrayList<String>();
+        final List<String> incorrect = new ArrayList<>();
         if (drbdInstallationOk && (heartbeatPacemakerInstallationOk || pacemakerInstallationOk)) {
             progressBarDone();
-            swingUtils.invokeLater(new Runnable() {
-                @Override
-                public void run() {
-                    answerPaneSetText(Tools.getString("Dialog.Host.CheckInstallation.AllOk"));
-                }
-            });
+            swingUtils.invokeLater(() -> answerPaneSetText(Tools.getString("Dialog.Host.CheckInstallation.AllOk")));
             if (application.getAutoOptionHost("drbdinst") != null
                 || application.getAutoOptionHost("hbinst") != null
                 || application.getAutoOptionHost("pminst") != null) {
                 Tools.sleep(1000);
-                swingUtils.invokeLater(new Runnable() {
-                    @Override
-                    public void run() {
-                        pressNextButton();
-                    }
-                });
+                swingUtils.invokeLater(this::pressNextButton);
             }
         } else {
             progressBarDoneError();
@@ -429,14 +365,10 @@ final class CheckInstallation extends DialogHost {
             printErrorAndRetry(error);
             incorrect.add(error);
         }
-        final List<String> changed = new ArrayList<String>();
+        final List<String> changed = new ArrayList<>();
         enableComponents();
         enableNextButtons(incorrect, changed);
-        swingUtils.invokeLater(new Runnable() {
-            public void run() {
-                makeDefaultAndRequestFocus(buttonClass(nextButton()));
-            }
-        });
+        swingUtils.invokeLater(() -> makeDefaultAndRequestFocus(buttonClass(nextButton())));
         if (!drbdInstallationOk && application.getAutoOptionHost("drbdinst") != null) {
             Tools.sleep(1000);
             installDrbdButton.pressButton();

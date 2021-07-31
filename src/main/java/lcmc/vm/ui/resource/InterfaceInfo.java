@@ -21,6 +21,23 @@
  */
 package lcmc.vm.ui.resource;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.swing.ImageIcon;
+import javax.swing.JComponent;
+import javax.swing.JPanel;
+
+import org.w3c.dom.Node;
+
 import lcmc.cluster.service.NetworkService;
 import lcmc.cluster.ui.resource.NetInfo;
 import lcmc.cluster.ui.widget.Widget;
@@ -35,12 +52,6 @@ import lcmc.common.ui.utils.SwingUtils;
 import lcmc.host.domain.Host;
 import lcmc.vm.domain.VmsXml;
 import lcmc.vm.domain.data.InterfaceData;
-import org.w3c.dom.Node;
-
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.swing.*;
-import java.util.*;
 
 /**
  * This class holds info about Virtual Interfaces.
@@ -63,42 +74,45 @@ public final class InterfaceInfo extends HardwareInfo {
                                                 InterfaceData.SCRIPT_PATH,
                                                 InterfaceData.TARGET_DEV,
                                                 InterfaceData.MODEL_TYPE};
-    /** Bridge parameters. */
-    private static final String[] BRIDGE_PARAMETERS = {
-                                                InterfaceData.TYPE,
-                                                InterfaceData.MAC_ADDRESS,
-                                                InterfaceData.SOURCE_BRIDGE,
-                                                InterfaceData.SCRIPT_PATH,
-                                                InterfaceData.TARGET_DEV,
-                                                InterfaceData.MODEL_TYPE};
-    /** Field type. */
-    private static final Map<String, Widget.Type> FIELD_TYPES =
-                                       new HashMap<String, Widget.Type>();
-    /** Short name. */
-    private static final Map<String, String> SHORTNAME_MAP =
-                                                 new HashMap<String, String>();
+    /**
+     * Bridge parameters.
+     */
+    private static final String[] BRIDGE_PARAMETERS =
+            {InterfaceData.TYPE, InterfaceData.MAC_ADDRESS, InterfaceData.SOURCE_BRIDGE, InterfaceData.SCRIPT_PATH,
+                    InterfaceData.TARGET_DEV, InterfaceData.MODEL_TYPE};
+    /**
+     * Field type.
+     */
+    private static final Map<String, Widget.Type> FIELD_TYPES = new HashMap<>();
+    /**
+     * Short name.
+     */
+    private static final Map<String, String> SHORTNAME_MAP = new HashMap<>();
 
-    /** Whether the parameter is editable only in advanced mode. */
+    /**
+     * Whether the parameter is editable only in advanced mode.
+     */
     private static final Collection<String> IS_ENABLED_ONLY_IN_ADVANCED =
-        new HashSet<String>(Arrays.asList(new String[]{
-                                                InterfaceData.MAC_ADDRESS,
-                                                InterfaceData.TARGET_DEV,
-                                                InterfaceData.MODEL_TYPE}));
+            new HashSet<>(Arrays.asList(InterfaceData.MAC_ADDRESS, InterfaceData.TARGET_DEV, InterfaceData.MODEL_TYPE));
 
-    /** Whether the parameter is required. */
-    private static final Collection<String> IS_REQUIRED =
-        new HashSet<String>(Arrays.asList(new String[]{
-                                                InterfaceData.TYPE }));
+    /**
+     * Whether the parameter is required.
+     */
+    private static final Collection<String> IS_REQUIRED = new HashSet<>(List.of(InterfaceData.TYPE));
 
-    /** Preferred values. */
-    private static final Map<String, Value> PREFERRED_MAP =
-                                                 new HashMap<String, Value>();
+    /**
+     * Preferred values.
+     */
+    private static final Map<String, Value> PREFERRED_MAP = new HashMap<>();
 
-    /** Possible values. */
-    private static final Map<String, Value[]> POSSIBLE_VALUES =
-                                               new HashMap<String, Value[]>();
+    /**
+     * Possible values.
+     */
+    private static final Map<String, Value[]> POSSIBLE_VALUES = new HashMap<>();
 
-    /** Network interface type */
+    /**
+     * Network interface type
+     */
     public static final Value TYPE_NETWORK = new StringValue("network");
     public static final Value TYPE_BRIDGE = new StringValue("bridge");
 
@@ -134,19 +148,20 @@ public final class InterfaceInfo extends HardwareInfo {
     @Inject
     private NetworkService networkService;
 
-    /** Source network combo box, so that it can be disabled, depending on
-     * type. */
-    private final Map<String, Widget> sourceNetworkWi =
-                                            new HashMap<String, Widget>();
-    /** Source bridge combo box, so that it can be disabled, depending on
-     * type. */
-    private final Map<String, Widget> sourceBridgeWi =
-                                            new HashMap<String, Widget>();
+    /**
+     * Source network combo box, so that it can be disabled, depending on type.
+     */
+    private final Map<String, Widget> sourceNetworkWi = new HashMap<>();
+    /**
+     * Source bridge combo box, so that it can be disabled, depending on type.
+     */
+    private final Map<String, Widget> sourceBridgeWi = new HashMap<>();
     /** Table panel. */
     private JComponent tablePanel = null;
     @Inject
     private ClusterTreeMenu clusterTreeMenu;
 
+    @Override
     void init(final String name, final Browser browser, final DomainInfo vmsVirtualDomainInfo) {
         super.init(name, browser, vmsVirtualDomainInfo);
     }
@@ -158,12 +173,7 @@ public final class InterfaceInfo extends HardwareInfo {
                                    DomainInfo.INTERFACES_TABLE,
                                    getVMSVirtualDomainInfo().getNewInterfaceBtn());
         if (getResource().isNew()) {
-            swingUtils.invokeLater(new Runnable() {
-                @Override
-                public void run() {
-                    tablePanel.setVisible(false);
-                }
-            });
+            swingUtils.invokeLater(() -> tablePanel.setVisible(false));
         }
         mainPanel.add(tablePanel);
     }
@@ -235,16 +245,16 @@ public final class InterfaceInfo extends HardwareInfo {
                 if (vmsXml != null) {
                     final List<Value> networks = vmsXml.getNetworks();
                     networks.add(0, null);
-                    return networks.toArray(new Value[networks.size()]);
+                    return networks.toArray(new Value[0]);
                 }
             }
         } else if (InterfaceData.SOURCE_BRIDGE.equals(param)) {
             for (final Host host : getVMSVirtualDomainInfo().getDefinedOnHosts()) {
                 final VmsXml vmsXml = getBrowser().getVmsXml(host);
                 if (vmsXml != null) {
-                    final List<Value> bridges = new ArrayList<Value>(networkService.getBridges(host));
+                    final List<Value> bridges = new ArrayList<>(networkService.getBridges(host));
                     bridges.add(0, null);
-                    return bridges.toArray(new Value[bridges.size()]);
+                    return bridges.toArray(new Value[0]);
                 }
             }
         }
@@ -318,15 +328,10 @@ public final class InterfaceInfo extends HardwareInfo {
     /** Returns device parameters. */
     @Override
     protected Map<String, String> getHWParameters(final boolean allParams) {
-        swingUtils.invokeAndWait(new Runnable() {
-            @Override
-            public void run() {
-                getInfoPanel();
-            }
-        });
+        swingUtils.invokeAndWait(this::getInfoPanel);
         final String[] params = getRealParametersFromXML();
 
-        final Map<String, String> parameters = new HashMap<String, String>();
+        final Map<String, String> parameters = new HashMap<>();
         for (final String param : params) {
             final Value value = getComboBoxValue(param);
             if (allParams
@@ -361,18 +366,14 @@ public final class InterfaceInfo extends HardwareInfo {
         if (Application.isTest(runMode)) {
             return;
         }
-        swingUtils.invokeAndWait(new Runnable() {
-            @Override
-            public void run() {
-                getApplyButton().setEnabled(false);
-                getRevertButton().setEnabled(false);
-                getInfoPanel();
-            }
+        swingUtils.invokeAndWait(() -> {
+            getApplyButton().setEnabled(false);
+            getRevertButton().setEnabled(false);
+            getInfoPanel();
         });
         waitForInfoPanel();
 
-        final Map<String, String> parameters = getHWParameters(
-                                                        getResource().isNew());
+        final Map<String, String> parameters = getHWParameters(getResource().isNew());
         for (final Host h : getVMSVirtualDomainInfo().getDefinedOnHosts()) {
             final VmsXml vmsXml = getBrowser().getVmsXml(h);
             if (vmsXml != null) {
@@ -388,14 +389,8 @@ public final class InterfaceInfo extends HardwareInfo {
             getResource().setNew(false);
         }
         clusterTreeMenu.reloadNodeDontSelect(getNode());
-        getBrowser().periodicalVmsUpdate(
-                getVMSVirtualDomainInfo().getDefinedOnHosts());
-        swingUtils.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                tablePanel.setVisible(true);
-            }
-        });
+        getBrowser().periodicalVmsUpdate(getVMSVirtualDomainInfo().getDefinedOnHosts());
+        swingUtils.invokeLater(() -> tablePanel.setVisible(true));
         final String[] params = getRealParametersFromXML();
         if (Application.isLive(runMode)) {
             storeComboBoxValues(params);
@@ -470,18 +465,10 @@ public final class InterfaceInfo extends HardwareInfo {
         if (InterfaceData.TYPE.equals(param)) {
             paramWi.setAlwaysEditable(false);
         } else if (InterfaceData.SOURCE_NETWORK.equals(param)) {
-            if (prefix == null) {
-                sourceNetworkWi.put("", paramWi);
-            } else {
-                sourceNetworkWi.put(prefix, paramWi);
-            }
+            sourceNetworkWi.put(Objects.requireNonNullElse(prefix, ""), paramWi);
             paramWi.setAlwaysEditable(false);
         } else if (InterfaceData.SOURCE_BRIDGE.equals(param)) {
-            if (prefix == null) {
-                sourceBridgeWi.put("", paramWi);
-            } else {
-                sourceBridgeWi.put(prefix, paramWi);
-            }
+            sourceBridgeWi.put(Objects.requireNonNullElse(prefix, ""), paramWi);
             paramWi.setAlwaysEditable(false);
         }
         return paramWi;
@@ -565,8 +552,7 @@ public final class InterfaceInfo extends HardwareInfo {
         for (final Host h : getVMSVirtualDomainInfo().getDefinedOnHosts()) {
             final VmsXml vmsXml = getBrowser().getVmsXml(h);
             if (vmsXml != null) {
-                final Map<String, String> parameters =
-                                                new HashMap<String, String>();
+                final Map<String, String> parameters = new HashMap<>();
                 parameters.put(InterfaceData.SAVED_MAC_ADDRESS, getName());
                 vmsXml.removeInterfaceXML(
                                     getVMSVirtualDomainInfo().getDomainName(),

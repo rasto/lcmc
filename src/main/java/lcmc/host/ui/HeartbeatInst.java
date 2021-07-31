@@ -29,14 +29,13 @@ import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.SpringLayout;
 
-import lcmc.common.domain.Application;
-import lcmc.common.ui.SpringUtilities;
-import lcmc.common.ui.WizardDialog;
-import lcmc.common.domain.ConvertCmdCallback;
-import lcmc.common.domain.ExecCallback;
-import lcmc.common.domain.util.Tools;
 import lcmc.cluster.service.ssh.ExecCommandConfig;
 import lcmc.cluster.service.ssh.Ssh;
+import lcmc.common.domain.Application;
+import lcmc.common.domain.ExecCallback;
+import lcmc.common.domain.util.Tools;
+import lcmc.common.ui.SpringUtilities;
+import lcmc.common.ui.WizardDialog;
 
 /**
  * An implementation of a dialog where heartbeat is installed.
@@ -104,17 +103,9 @@ final class HeartbeatInst extends DialogHost {
 
                     @Override
                     public void doneError(final String answer, final int errorCode) {
-                        printErrorAndRetry(Tools.getString("Dialog.Host.HeartbeatInst.InstError"),
-                                           answer,
-                                           errorCode);
+                        printErrorAndRetry(Tools.getString("Dialog.Host.HeartbeatInst.InstError"), answer, errorCode);
                     }
-                })
-                .convertCmdCallback(new ConvertCmdCallback() {
-                    @Override
-                    public String convert(final String command) {
-                        return command.replaceAll("@ARCH@", archString);
-                    }
-                })
+                }).convertCmdCallback(command -> command.replaceAll("@ARCH@", archString))
                 .sshCommandTimeout(Ssh.DEFAULT_COMMAND_TIMEOUT_LONG));
     }
 

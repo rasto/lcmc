@@ -24,6 +24,7 @@ package lcmc.host.ui;
 
 import java.util.ArrayList;
 import java.util.List;
+
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.swing.BoxLayout;
@@ -31,13 +32,12 @@ import javax.swing.JComponent;
 import javax.swing.JPanel;
 
 import lcmc.cluster.ui.SSHGui;
-import lcmc.common.ui.WizardDialog;
-import lcmc.common.domain.CancelCallback;
 import lcmc.common.domain.ConnectionCallback;
+import lcmc.common.domain.util.Tools;
+import lcmc.common.ui.WizardDialog;
 import lcmc.common.ui.utils.SwingUtils;
 import lcmc.logger.Logger;
 import lcmc.logger.LoggerFactory;
-import lcmc.common.domain.util.Tools;
 
 /**
  * An implementation of a dialog where ssh connection will be established.
@@ -50,44 +50,36 @@ public class SSH extends DialogHost {
     @Inject
     private SwingUtils swingUtils;
 
-    private String connectHost() {
+    private void connectHost() {
         final SSHGui sshGui = new SSHGui(getDialogPanel(), getHost(), getProgressBar());
 
-        getHost().connect(sshGui, getProgressBar(),
-                     new ConnectionCallback() {
-                         @Override
-                         public void done(final int flag) {
-                             /* flag 0 now connected
-                              * flag 1 already connected. */
-                             LOG.debug1("done: callback done flag: " + flag);
-                             getHost().setConnected();
-                             progressBarDone();
-                             answerPaneSetText(Tools.getString("Dialog.Host.SSH.Connected"));
-                             swingUtils.invokeLater(new Runnable() {
-                                 @Override
-                                 public void run() {
-                                    buttonClass(nextButton()).pressButton();
-                                 }
-                             });
-                             final List<String> incorrect = new ArrayList<String>();
-                             final List<String> changed = new ArrayList<String>();
-                             enableNextButtons(incorrect, changed);
-                         }
+        getHost().connect(sshGui, getProgressBar(), new ConnectionCallback() {
+            @Override
+            public void done(final int flag) {
+                /* flag 0 now connected
+                 * flag 1 already connected. */
+                LOG.debug1("done: callback done flag: " + flag);
+                getHost().setConnected();
+                progressBarDone();
+                answerPaneSetText(Tools.getString("Dialog.Host.SSH.Connected"));
+                swingUtils.invokeLater(() -> buttonClass(nextButton()).pressButton());
+                final List<String> incorrect = new ArrayList<>();
+                final List<String> changed = new ArrayList<>();
+                enableNextButtons(incorrect, changed);
+            }
 
                          @Override
                          public void doneError(final String errorText) {
                              getHost().setConnected();
                              final String error = Tools.getString("Dialog.Host.SSH.NotConnected") + '\n' + errorText;
                              printErrorAndRetry(error);
-                             final List<String> incorrect = new ArrayList<String>();
+                             final List<String> incorrect = new ArrayList<>();
                              incorrect.add(error);
-                             final List<String> changed = new ArrayList<String>();
+                             final List<String> changed = new ArrayList<>();
                              enableNextButtons(incorrect, changed);
                          }
                       });
         getProgressBar().setCancelEnabled(true);
-
-        return null;
     }
 
     @Override
@@ -103,13 +95,7 @@ public class SSH extends DialogHost {
 
     @Override
     protected final void initDialogAfterVisible() {
-        final Thread thread = new Thread(
-            new Runnable() {
-                @Override
-                public void run() {
-                    connectHost();
-                }
-            });
+        final Thread thread = new Thread(this::connectHost);
         thread.start();
     }
 
@@ -127,15 +113,10 @@ public class SSH extends DialogHost {
     protected final JComponent getInputPane() {
         final JPanel pane = new JPanel();
         pane.setLayout(new BoxLayout(pane, BoxLayout.PAGE_AXIS));
-        pane.add(getProgressBarPane(
-                    new CancelCallback() {
-                        @Override
-                        public void cancel() {
-                            LOG.debug("cancel: callback");
-                            getHost().getSSH().cancelConnection();
-                        }
-                    }
-                ));
+        pane.add(getProgressBarPane(() -> {
+            LOG.debug("cancel: callback");
+            getHost().getSSH().cancelConnection();
+        }));
         pane.add(getAnswerPane(Tools.getString("Dialog.Host.SSH.Connecting")));
 
         return pane;

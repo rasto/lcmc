@@ -30,6 +30,7 @@ import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.concurrent.CountDownLatch;
@@ -40,7 +41,6 @@ import java.util.regex.Pattern;
 
 import javax.inject.Provider;
 
-import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -111,35 +111,25 @@ public class HostParser {
     private static final String DRBD_PROXY_INFO_DELIM = "drbd-proxy-info";
 
     public static final Pattern BLOCK_DEV_FILE_PATTERN = Pattern.compile("(\\D+)\\d+");
-    public static final Pattern DRBD_DEV_FILE_PATTERN = Pattern.compile(".*\\/drbd\\d+$");
+    public static final Pattern DRBD_DEV_FILE_PATTERN = Pattern.compile(".*/drbd\\d+$");
     public static final Pattern USED_DISK_SPACE_PATTERN = Pattern.compile("^(.*) (\\d+)$");
 
     private static final String LOG_COMMANDS_ON_SERVER_OPTION = "--cmd-log";
 
-    private static final Collection<String> INFO_TYPES =
-            new HashSet<String>(Arrays.asList(new String[]{NET_INFO_DELIM,
-                    BRIDGE_INFO_DELIM,
-                    DISK_INFO_DELIM,
-                    DISK_SPACE_DELIM,
-                    VG_INFO_DELIM,
-                    FILESYSTEMS_INFO_DELIM,
-                    CRYPTO_INFO_DELIM,
-                    QEMU_KEYMAPS_INFO_DELIM,
-                    CPU_MAP_MODEL_INFO_DELIM,
-                    CPU_MAP_VENDOR_INFO_DELIM,
-                    MOUNT_POINTS_INFO_DELIM,
-                    GUI_INFO_DELIM,
-                    INSTALLATION_INFO_DELIM,
-                    GUI_OPTIONS_INFO_DELIM,
-                    VERSION_INFO_DELIM,
-                    DRBD_PROXY_INFO_DELIM}));
+    private static final Collection<String> INFO_TYPES = new HashSet<>(
+            Arrays.asList(NET_INFO_DELIM, BRIDGE_INFO_DELIM, DISK_INFO_DELIM, DISK_SPACE_DELIM, VG_INFO_DELIM,
+                    FILESYSTEMS_INFO_DELIM, CRYPTO_INFO_DELIM, QEMU_KEYMAPS_INFO_DELIM, CPU_MAP_MODEL_INFO_DELIM,
+                    CPU_MAP_VENDOR_INFO_DELIM, MOUNT_POINTS_INFO_DELIM, GUI_INFO_DELIM, INSTALLATION_INFO_DELIM,
+                    GUI_OPTIONS_INFO_DELIM, VERSION_INFO_DELIM, DRBD_PROXY_INFO_DELIM));
 
     private Set<String> availableCryptoModules = Sets.newTreeSet();
-    private Set<Value> availableQemuKeymaps = new TreeSet<Value>();
-    private Set<Value> availableCpuMapModels = new TreeSet<Value>();
-    private Set<Value> availableCpuMapVendors = new TreeSet<Value>();
+    private Set<Value> availableQemuKeymaps = new TreeSet<>();
+    private Set<Value> availableCpuMapModels = new TreeSet<>();
+    private Set<Value> availableCpuMapVendors = new TreeSet<>();
     private Map<String, BlockDevice> drbdBlockDevices = Maps.newLinkedHashMap();
-    /** Options for GUI drop down lists. */
+    /**
+     * Options for GUI drop down lists.
+     */
     private Map<String, List<String>> guiOptions = Maps.newHashMap();
     private Set<String> drbdResourcesWithProxy = Sets.newHashSet();
     private String pacemakerVersion = null;
@@ -164,14 +154,16 @@ public class HostParser {
     private boolean pacemakerInRc = false;
     private boolean pacemakerRunning = false;
     private boolean pacemakerHasInitScript = false;
-    /** Pacemaker service version. From version 1, use pacamker init script. */
+    /**
+     * Pacemaker service version. From version 1, use pacamker init script.
+     */
     private int pcmkServiceVersion = -1;
     private String corosyncVersion = null;
     private String heartbeatVersion = null;
     private Boolean corosyncOrHeartbeatRunning = null;
     private String libvirtVersion = null;
-    private List<BlockDevice> physicalVolumes = new ArrayList<BlockDevice>();
-    private Map<String, Long> volumeGroups = new LinkedHashMap<String, Long>();
+    private List<BlockDevice> physicalVolumes = new ArrayList<>();
+    private Map<String, Long> volumeGroups = new LinkedHashMap<>();
     private Map<String, Set<String>> volumeGroupsWithLvs = Maps.newHashMap();
     private String heartbeatLibPath = null;
 
@@ -180,24 +172,25 @@ public class HostParser {
     private final Lock mDRBDStatusLock = new ReentrantLock();
     private ExecCommandThread serverStatusThread = null;
     private final CountDownLatch waitForServerStatusLatch = new CountDownLatch(1);
-    /** Time stamp hash. */
+    /**
+     * Time stamp hash.
+     */
     private final Map<String, Double> infoTimestamp = Maps.newHashMap();
     private boolean drbdStatusOk = false;
 
     private static final String TOKEN_DISK_ID = "disk-id";
-    private static final String TOKEN_UUID    = "uuid";
-    private static final String TOKEN_SIZE    = "size";
-    private static final String TOKEN_MP      = "mp";
-    private static final String TOKEN_FS      = "fs";
-    private static final String TOKEN_VG      = "vg";
-    private static final String TOKEN_LV      = "lv";
-    private static final String TOKEN_PV      = "pv";
+    private static final String TOKEN_UUID = "uuid";
+    private static final String TOKEN_SIZE = "size";
+    private static final String TOKEN_MP = "mp";
+    private static final String TOKEN_FS = "fs";
+    private static final String TOKEN_VG = "vg";
+    private static final String TOKEN_LV = "lv";
+    private static final String TOKEN_PV = "pv";
 
     private static final int HW_INFO_TIMEOUT = 40000;
-    /** List of positions of the services.
-     *  Question is this: the saved positions can be different on different
-     *  hosts, but only one can be used in the crm graph.
-     *  Only one will be used and by next save the problem solves itself.
+    /**
+     * List of positions of the services. Question is this: the saved positions can be different on different hosts, but only one
+     * can be used in the crm graph. Only one will be used and by next save the problem solves itself.
      */
     private final Map<String, Point2D> servicePositions = Maps.newHashMap();
 
@@ -214,9 +207,9 @@ public class HostParser {
         final List<BlockDevice> newPhysicalVolumes = Lists.newArrayList();
         final Set<String> fileSystems = Sets.newTreeSet();
         final Set<String> newCryptoModules = Sets.newTreeSet();
-        final Set<Value> newQemuKeymaps = new TreeSet<Value>();
-        final Set<Value> newCpuMapModels = new TreeSet<Value>();
-        final Set<Value> newCpuMapVendors = new TreeSet<Value>();
+        final Set<Value> newQemuKeymaps = new TreeSet<>();
+        final Set<Value> newCpuMapModels = new TreeSet<>();
+        final Set<Value> newCpuMapVendors = new TreeSet<>();
         final Set<String> mountPoints = Sets.newTreeSet();
 
         final Map<String, List<String>> newGuiOptions = Maps.newHashMap();
@@ -254,7 +247,7 @@ public class HostParser {
                 newBridges.add(new StringValue(line));
             } else if (DISK_INFO_DELIM.equals(type)) {
                 final Optional<BlockDevice> blockDevice = createBlockDevice(line);
-                if (!blockDevice.isPresent()) {
+                if (blockDevice.isEmpty()) {
                     continue;
                 }
                 final String bdName = blockDevice.get().getName();
@@ -279,11 +272,7 @@ public class HostParser {
                 }
                 final String vg = blockDevice.get().getVolumeGroup();
                 if (vg != null) {
-                    Set<String> logicalVolumes = newVolumeGroupsLVS.get(vg);
-                    if (logicalVolumes == null) {
-                        logicalVolumes = new HashSet<String>();
-                        newVolumeGroupsLVS.put(vg, logicalVolumes);
-                    }
+                    Set<String> logicalVolumes = newVolumeGroupsLVS.computeIfAbsent(vg, k -> new HashSet<>());
                     final String lv = blockDevice.get().getLogicalVolume();
                     if (lv != null) {
                         logicalVolumes.add(lv);
@@ -479,9 +468,9 @@ public class HostParser {
     public String parseGuiOptionsInfo(final String line,
                                       final String guiOptionName,
                                       final Map<String, List<String>> goptions) {
-        if (line.length() > 2 && line.substring(0, 2).equals("o:")) {
+        if (line.length() > 2 && line.startsWith("o:")) {
             final String op = line.substring(2);
-            goptions.put(op, new ArrayList<String>());
+            goptions.put(op, new ArrayList<>());
             return op;
         }
         if (guiOptionName != null) {
@@ -907,12 +896,9 @@ public class HostParser {
                             dxml.init(host.getCluster().getHostsArray(), cb.getHostDrbdParameters());
                             dxml.update(drbdUpdate);
                             cb.setDrbdXml(dxml);
-                            swingUtils.invokeLater(new Runnable() {
-                                @Override
-                                public void run() {
-                                    host.getBrowser().getClusterBrowser().getGlobalInfo().setParameters();
-                                    cb.updateDrbdResources();
-                                }
+                            swingUtils.invokeLater(() -> {
+                                host.getBrowser().getClusterBrowser().getGlobalInfo().setParameters();
+                                cb.updateDrbdResources();
                             });
                         }
                         if (drbdUpdate != null
@@ -1078,7 +1064,7 @@ public class HostParser {
     }
 
     public Set<String> getAllLogicalVolumes() {
-        final Set<String> allLVS = new LinkedHashSet<String>();
+        final Set<String> allLVS = new LinkedHashSet<>();
         for (final String vg : volumeGroups.keySet()) {
             final Set<String> lvs = volumeGroupsWithLvs.get(vg);
             if (lvs != null) {
@@ -1217,7 +1203,7 @@ public class HostParser {
     }
 
     public Iterable<BlockDevice> getPhysicalVolumes(final String vg) {
-        final Collection<BlockDevice> bds = new ArrayList<BlockDevice>();
+        final Collection<BlockDevice> bds = new ArrayList<>();
         if (vg == null) {
             return bds;
         }
@@ -1233,9 +1219,9 @@ public class HostParser {
     public Iterable<String> getGuiOptions(final String name) {
         final List<String> opts = guiOptions.get(name);
         if (opts == null) {
-            return new ArrayList<String>();
+            return new ArrayList<>();
         }
-        return new ArrayList<String>(guiOptions.get(name));
+        return new ArrayList<>(guiOptions.get(name));
     }
 
     public boolean isDrbdProxyUp(final String drbdResource) {
@@ -1307,7 +1293,7 @@ public class HostParser {
         if (command.contains("@USER@")) {
             command = command.replaceAll("@USER@", application.getDownloadUser());
         }
-        if (command.indexOf("@PASSWORD@") > -1) {
+        if (command.contains("@PASSWORD@")) {
             if (hidePassword) {
                 command = command.replaceAll("@PASSWORD@", "*****");
             } else {
@@ -1366,9 +1352,9 @@ public class HostParser {
         final String[] cols = line.split(" ");
         if (cols.length < 2) {
             LOG.appWarning("update: cannot parse block device line: " + line);
-            return Optional.absent();
+            return Optional.empty();
         } else {
-            final Collection<String> diskIds = new HashSet<String>();
+            final Collection<String> diskIds = new HashSet<>();
             final String device = cols[0];
             final Map<String, String> tokens = Maps.newHashMap();
             for (int i = 1; i < cols.length; i++) {

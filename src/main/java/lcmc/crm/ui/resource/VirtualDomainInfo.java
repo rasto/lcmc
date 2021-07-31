@@ -27,16 +27,17 @@ import java.util.Set;
 import java.util.TreeSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import lcmc.common.domain.Application;
-import lcmc.host.domain.Host;
-import lcmc.common.domain.StringValue;
-import lcmc.vm.domain.VmsXml;
-import lcmc.common.domain.Value;
-import lcmc.vm.ui.resource.DomainInfo;
-import lcmc.common.ui.utils.UpdatableItem;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+
+import lcmc.common.domain.Application;
+import lcmc.common.domain.StringValue;
+import lcmc.common.domain.Value;
+import lcmc.common.ui.utils.UpdatableItem;
+import lcmc.host.domain.Host;
+import lcmc.vm.domain.VmsXml;
+import lcmc.vm.ui.resource.DomainInfo;
 
 /**
  * This class holds info about VirtualDomain service in the cluster menu.
@@ -101,14 +102,14 @@ public class VirtualDomainInfo extends ServiceInfo {
     @Override
     protected Value[] getParamPossibleChoices(final String param) {
         if (CONFIG_PARAM.equals(param)) {
-            final Set<Value> configs = new TreeSet<Value>();
+            final Set<Value> configs = new TreeSet<>();
             for (final Host host : getBrowser().getClusterHosts()) {
                 final VmsXml vxml = getBrowser().getVmsXml(host);
                 if (vxml != null) {
                     configs.addAll(vxml.getConfigs());
                 }
             }
-            return configs.toArray(new Value[configs.size()]);
+            return configs.toArray(new Value[0]);
         } else if (HYPERVISOR_PARAM.equals(param)) {
             return HYPERVISORS;
         } else {

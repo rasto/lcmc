@@ -21,6 +21,23 @@
  */
 package lcmc.vm.ui.resource;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
+
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.swing.ImageIcon;
+import javax.swing.JComponent;
+import javax.swing.JPanel;
+
+import org.w3c.dom.Node;
+
 import lcmc.cluster.service.NetworkService;
 import lcmc.cluster.ui.widget.Widget;
 import lcmc.common.domain.AccessMode;
@@ -34,12 +51,6 @@ import lcmc.common.ui.utils.SwingUtils;
 import lcmc.host.domain.Host;
 import lcmc.vm.domain.VmsXml;
 import lcmc.vm.domain.data.GraphicsData;
-import org.w3c.dom.Node;
-
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.swing.*;
-import java.util.*;
 
 /**
  * This class holds info about virtual graphics displays.
@@ -47,46 +58,49 @@ import java.util.*;
 @Named
 public final class GraphicsInfo extends HardwareInfo {
 
-    /** Parameters. AUTOPORT is generated */
-    private static final String[] PARAMETERS = {GraphicsData.TYPE,
-                                                GraphicsData.PORT,
-                                                GraphicsData.LISTEN,
-                                                GraphicsData.PASSWD,
-                                                GraphicsData.KEYMAP,
-                                                GraphicsData.DISPLAY,
-                                                GraphicsData.XAUTH};
+    /**
+     * Parameters. AUTOPORT is generated
+     */
+    private static final String[] PARAMETERS =
+            {GraphicsData.TYPE, GraphicsData.PORT, GraphicsData.LISTEN, GraphicsData.PASSWD, GraphicsData.KEYMAP,
+                    GraphicsData.DISPLAY, GraphicsData.XAUTH};
 
-    /** VNC parameters. */
-    private static final String[] VNC_PARAMETERS = {GraphicsData.TYPE,
-                                                    GraphicsData.PORT,
-                                                    GraphicsData.LISTEN,
-                                                    GraphicsData.PASSWD,
-                                                    GraphicsData.KEYMAP};
-    /** SDL parameters. */
-    private static final String[] SDL_PARAMETERS = {GraphicsData.TYPE,
-                                                    GraphicsData.DISPLAY,
-                                                    GraphicsData.XAUTH};
+    /**
+     * VNC parameters.
+     */
+    private static final String[] VNC_PARAMETERS =
+            {GraphicsData.TYPE, GraphicsData.PORT, GraphicsData.LISTEN, GraphicsData.PASSWD, GraphicsData.KEYMAP};
+    /**
+     * SDL parameters.
+     */
+    private static final String[] SDL_PARAMETERS = {GraphicsData.TYPE, GraphicsData.DISPLAY, GraphicsData.XAUTH};
 
-    /** Field type. */
-    private static final Map<String, Widget.Type> FIELD_TYPES =
-                                       new HashMap<String, Widget.Type>();
-    /** Short name. */
-    private static final Map<String, String> SHORTNAME_MAP =
-                                                 new HashMap<String, String>();
-    /** Preferred values. */
-    private static final Map<String, Value> PREFERRED_VALUES =
-                                                 new HashMap<String, Value>();
-    /** Whether the parameter is editable only in advanced mode. */
-    private static final Collection<String> IS_ENABLED_ONLY_IN_ADVANCED =
-        new HashSet<String>(Arrays.asList(new String[]{GraphicsData.KEYMAP}));
+    /**
+     * Field type.
+     */
+    private static final Map<String, Widget.Type> FIELD_TYPES = new HashMap<>();
+    /**
+     * Short name.
+     */
+    private static final Map<String, String> SHORTNAME_MAP = new HashMap<>();
+    /**
+     * Preferred values.
+     */
+    private static final Map<String, Value> PREFERRED_VALUES = new HashMap<>();
+    /**
+     * Whether the parameter is editable only in advanced mode.
+     */
+    private static final Collection<String> IS_ENABLED_ONLY_IN_ADVANCED = new HashSet<>(List.of(GraphicsData.KEYMAP));
 
-    /** Whether the parameter is required. */
-    private static final Collection<String> IS_REQUIRED =
-        new HashSet<String>(Arrays.asList(new String[]{GraphicsData.TYPE}));
+    /**
+     * Whether the parameter is required.
+     */
+    private static final Collection<String> IS_REQUIRED = new HashSet<>(List.of(GraphicsData.TYPE));
 
-    /** Possible values. */
-    private static final Map<String, Value[]> POSSIBLE_VALUES =
-                                               new HashMap<String, Value[]>();
+    /**
+     * Possible values.
+     */
+    private static final Map<String, Value[]> POSSIBLE_VALUES = new HashMap<>();
 
     public static final Value TYPE_VNC = new StringValue("vnc");
     public static final Value TYPE_SDL = new StringValue("sdl");
@@ -105,43 +119,52 @@ public final class GraphicsInfo extends HardwareInfo {
         SHORTNAME_MAP.put(GraphicsData.XAUTH, "Xauth File");
         PREFERRED_VALUES.put(GraphicsData.PORT, new StringValue("-1"));
         PREFERRED_VALUES.put(GraphicsData.DISPLAY, new StringValue(":0.0"));
-        PREFERRED_VALUES.put(GraphicsData.XAUTH,
-                             new StringValue(System.getProperty("user.home") + "/.Xauthority"));
+        PREFERRED_VALUES.put(GraphicsData.XAUTH, new StringValue(System.getProperty("user.home") + "/.Xauthority"));
         POSSIBLE_VALUES.put(GraphicsData.TYPE, new Value[]{TYPE_VNC, TYPE_SDL});
-        POSSIBLE_VALUES.put(
-            GraphicsData.XAUTH,
-            new Value[]{new StringValue(),
-                        new StringValue(System.getProperty("user.home") + "/.Xauthority")});
-        POSSIBLE_VALUES.put(GraphicsData.DISPLAY, new Value[]{new StringValue(),
-                                                              new StringValue(":0.0")});
+        POSSIBLE_VALUES.put(GraphicsData.XAUTH,
+                new Value[]{new StringValue(), new StringValue(System.getProperty("user.home") + "/.Xauthority")});
+        POSSIBLE_VALUES.put(GraphicsData.DISPLAY, new Value[]{new StringValue(), new StringValue(":0.0")});
         POSSIBLE_VALUES.put(GraphicsData.PORT,
-                            new Value[]{PORT_AUTO,
-                                        new StringValue("5900", "5900"),
-                                        new StringValue("5901", "5901")});
+                new Value[]{PORT_AUTO, new StringValue("5900", "5900"), new StringValue("5901", "5901")});
     }
 
     @Inject
     private SwingUtils swingUtils;
 
-    /** Combo box that can be made invisible. */
-    private final Map<String, Widget> portWi = new HashMap<String, Widget>();
-    /** Combo box that can be made invisible. */
-    private final Map<String, Widget> listenWi = new HashMap<String, Widget>();
-    /** Combo box that can be made invisible. */
-    private final Map<String, Widget> passwdWi = new HashMap<String, Widget>();
-    /** Combo box that can be made invisible. */
-    private final Map<String, Widget> keymapWi = new HashMap<String, Widget>();
-    /** Combo box that can be made invisible. */
-    private final Map<String, Widget> displayWi = new HashMap<String, Widget>();
-    /** Combo box that can be made invisible. */
-    private final Map<String, Widget> xauthWi = new HashMap<String, Widget>();
-    /** Table panel. */
+    /**
+     * Combo box that can be made invisible.
+     */
+    private final Map<String, Widget> portWi = new HashMap<>();
+    /**
+     * Combo box that can be made invisible.
+     */
+    private final Map<String, Widget> listenWi = new HashMap<>();
+    /**
+     * Combo box that can be made invisible.
+     */
+    private final Map<String, Widget> passwdWi = new HashMap<>();
+    /**
+     * Combo box that can be made invisible.
+     */
+    private final Map<String, Widget> keymapWi = new HashMap<>();
+    /**
+     * Combo box that can be made invisible.
+     */
+    private final Map<String, Widget> displayWi = new HashMap<>();
+    /**
+     * Combo box that can be made invisible.
+     */
+    private final Map<String, Widget> xauthWi = new HashMap<>();
+    /**
+     * Table panel.
+     */
     private JComponent tablePanel = null;
     @Inject
     private ClusterTreeMenu clusterTreeMenu;
     @Inject
     private NetworkService networkService;
 
+    @Override
     void init(final String name, final Browser browser, final DomainInfo vmsVirtualDomainInfo) {
         super.init(name, browser, vmsVirtualDomainInfo);
     }
@@ -153,12 +176,7 @@ public final class GraphicsInfo extends HardwareInfo {
                                    DomainInfo.GRAPHICS_TABLE,
                                    getVMSVirtualDomainInfo().getNewGraphicsBtn());
         if (getResource().isNew()) {
-            swingUtils.invokeLater(new Runnable() {
-                @Override
-                public void run() {
-                    tablePanel.setVisible(false);
-                }
-            });
+            swingUtils.invokeLater(() -> tablePanel.setVisible(false));
         }
         mainPanel.add(tablePanel);
     }
@@ -208,10 +226,9 @@ public final class GraphicsInfo extends HardwareInfo {
     protected Value[] getParamPossibleChoices(final String param) {
         if (GraphicsData.LISTEN.equals(param)) {
 
-            final List<Host> definedOnHosts =
-                                getVMSVirtualDomainInfo().getDefinedOnHosts();
+            final List<Host> definedOnHosts = getVMSVirtualDomainInfo().getDefinedOnHosts();
             final Map<String, Integer> networksIntersection = networkService.getNetworksIntersection(definedOnHosts);
-            final List<Value> commonNetworks = new ArrayList<Value>();
+            final List<Value> commonNetworks = new ArrayList<>();
             commonNetworks.add(new StringValue());
             commonNetworks.add(new StringValue("0.0.0.0", "All Interfaces/0.0.0.0"));
             commonNetworks.add(new StringValue("127.0.0.1", "localhost/127.0.0.1"));
@@ -221,20 +238,19 @@ public final class GraphicsInfo extends HardwareInfo {
                     commonNetworks.add(network);
                 }
             }
-            return commonNetworks.toArray(
-                                        new StringValue[commonNetworks.size()]);
+            return commonNetworks.toArray(new Value[0]);
         } else if (GraphicsData.KEYMAP.equals(param)) {
             List<Value> keymaps = null;
             final List<Host> definedOnHosts =
                                 getVMSVirtualDomainInfo().getDefinedOnHosts();
             for (final Host host : definedOnHosts) {
                 if (keymaps == null) {
-                    keymaps = new ArrayList<Value>();
+                    keymaps = new ArrayList<>();
                     keymaps.add(new StringValue());
                     keymaps.addAll(host.getHostParser().getAvailableQemuKeymaps());
                 } else {
                     final Set<Value> hostKeymaps = host.getHostParser().getAvailableQemuKeymaps();
-                    final List<Value> newKeymaps = new ArrayList<Value>();
+                    final List<Value> newKeymaps = new ArrayList<>();
                     newKeymaps.add(new StringValue());
                     for (final Value km : keymaps) {
                         if (km != null && hostKeymaps.contains(km)) {
@@ -247,7 +263,7 @@ public final class GraphicsInfo extends HardwareInfo {
             if (keymaps == null) {
                 return new StringValue[]{new StringValue()};
             }
-            return keymaps.toArray(new Value[keymaps.size()]);
+            return keymaps.toArray(new Value[0]);
         }
         return POSSIBLE_VALUES.get(param);
     }
@@ -316,13 +332,8 @@ public final class GraphicsInfo extends HardwareInfo {
     /** Returns device parameters. */
     @Override
     protected Map<String, String> getHWParameters(final boolean allParams) {
-        swingUtils.invokeAndWait(new Runnable() {
-            @Override
-            public void run() {
-                getInfoPanel();
-            }
-        });
-        final Map<String, String> parameters = new HashMap<String, String>();
+        swingUtils.invokeAndWait(this::getInfoPanel);
+        final Map<String, String> parameters = new HashMap<>();
         String[] params = {};
         boolean vnc = false;
         if (TYPE_VNC.equals(getComboBoxValue(GraphicsData.TYPE))) {
@@ -361,42 +372,29 @@ public final class GraphicsInfo extends HardwareInfo {
         if (Application.isTest(runMode)) {
             return;
         }
-        swingUtils.invokeAndWait(new Runnable() {
-            @Override
-            public void run() {
-                getApplyButton().setEnabled(false);
-                getRevertButton().setEnabled(false);
-                getInfoPanel();
-            }
+        swingUtils.invokeAndWait(() -> {
+            getApplyButton().setEnabled(false);
+            getRevertButton().setEnabled(false);
+            getInfoPanel();
         });
         waitForInfoPanel();
-        final Map<String, String> parameters =
-                                     getHWParameters(getResource().isNew());
+        final Map<String, String> parameters = getHWParameters(getResource().isNew());
         final String[] params = getRealParametersFromXML();
         for (final Host h : getVMSVirtualDomainInfo().getDefinedOnHosts()) {
             final VmsXml vmsXml = getBrowser().getVmsXml(h);
             if (vmsXml != null) {
-                parameters.put(GraphicsData.SAVED_TYPE,
-                               getParamSavedForConfig(GraphicsData.TYPE));
-                final String domainName =
-                                getVMSVirtualDomainInfo().getDomainName();
+                parameters.put(GraphicsData.SAVED_TYPE, getParamSavedForConfig(GraphicsData.TYPE));
+                final String domainName = getVMSVirtualDomainInfo().getDomainName();
                 final Node domainNode = vmsXml.getDomainNode(domainName);
                 modifyXML(vmsXml, domainNode, domainName, parameters);
-                final String virshOptions =
-                                   getVMSVirtualDomainInfo().getVirshOptions();
+                final String virshOptions = getVMSVirtualDomainInfo().getVirshOptions();
                 vmsXml.saveAndDefine(domainNode, domainName, virshOptions);
             }
         }
         getResource().setNew(false);
         clusterTreeMenu.reloadNodeDontSelect(getNode());
-        getBrowser().periodicalVmsUpdate(
-                getVMSVirtualDomainInfo().getDefinedOnHosts());
-        swingUtils.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                tablePanel.setVisible(true);
-            }
-        });
+        getBrowser().periodicalVmsUpdate(getVMSVirtualDomainInfo().getDefinedOnHosts());
+        swingUtils.invokeLater(() -> tablePanel.setVisible(true));
         if (Application.isLive(runMode)) {
             storeComboBoxValues(params);
         }
@@ -455,27 +453,24 @@ public final class GraphicsInfo extends HardwareInfo {
         if (GraphicsData.TYPE.equals(param)) {
             final boolean vnc = TYPE_VNC.equals(newValue);
             final boolean sdl = TYPE_SDL.equals(newValue);
-            swingUtils.invokeLater(new Runnable() {
-                @Override
-                public void run() {
-                    for (final Map.Entry<String, Widget> entry : listenWi.entrySet()) {
-                        entry.getValue().setVisible(vnc);
-                    }
-                    for (final Map.Entry<String, Widget> entry : passwdWi.entrySet()) {
-                        entry.getValue().setVisible(vnc);
-                    }
-                    for (final Map.Entry<String, Widget> entry : keymapWi.entrySet()) {
-                        entry.getValue().setVisible(vnc);
-                    }
-                    for (final Map.Entry<String, Widget> entry : portWi.entrySet()) {
-                        entry.getValue().setVisible(vnc);
-                    }
-                    for (final Map.Entry<String, Widget> entry : displayWi.entrySet()) {
-                        entry.getValue().setVisible(sdl);
-                    }
-                    for (final Map.Entry<String, Widget> entry : xauthWi.entrySet()) {
-                        entry.getValue().setVisible(sdl);
-                    }
+            swingUtils.invokeLater(() -> {
+                for (final Map.Entry<String, Widget> entry : listenWi.entrySet()) {
+                    entry.getValue().setVisible(vnc);
+                }
+                for (final Map.Entry<String, Widget> entry : passwdWi.entrySet()) {
+                    entry.getValue().setVisible(vnc);
+                }
+                for (final Map.Entry<String, Widget> entry : keymapWi.entrySet()) {
+                    entry.getValue().setVisible(vnc);
+                }
+                for (final Map.Entry<String, Widget> entry : portWi.entrySet()) {
+                    entry.getValue().setVisible(vnc);
+                }
+                for (final Map.Entry<String, Widget> entry : displayWi.entrySet()) {
+                    entry.getValue().setVisible(sdl);
+                }
+                for (final Map.Entry<String, Widget> entry : xauthWi.entrySet()) {
+                    entry.getValue().setVisible(sdl);
                 }
             });
         }
@@ -548,8 +543,7 @@ public final class GraphicsInfo extends HardwareInfo {
         for (final Host h : getVMSVirtualDomainInfo().getDefinedOnHosts()) {
             final VmsXml vmsXml = getBrowser().getVmsXml(h);
             if (vmsXml != null) {
-                final Map<String, String> parameters =
-                                                new HashMap<String, String>();
+                final Map<String, String> parameters = new HashMap<>();
                 parameters.put(GraphicsData.SAVED_TYPE,
                                getParamSavedForConfig(GraphicsData.TYPE));
                 vmsXml.removeGraphicsXML(
@@ -576,41 +570,17 @@ public final class GraphicsInfo extends HardwareInfo {
     protected Widget createWidget(final String param, final String prefix, final int width) {
         final Widget paramWi = super.createWidget(param, prefix, width);
         if (GraphicsData.PORT.equals(param)) {
-            if (prefix == null) {
-                portWi.put("", paramWi);
-            } else {
-                portWi.put(prefix, paramWi);
-            }
+            portWi.put(Objects.requireNonNullElse(prefix, ""), paramWi);
         } else if (GraphicsData.LISTEN.equals(param)) {
-            if (prefix == null) {
-                listenWi.put("", paramWi);
-            } else {
-                listenWi.put(prefix, paramWi);
-            }
+            listenWi.put(Objects.requireNonNullElse(prefix, ""), paramWi);
         } else if (GraphicsData.PASSWD.equals(param)) {
-            if (prefix == null) {
-                passwdWi.put("", paramWi);
-            } else {
-                passwdWi.put(prefix, paramWi);
-            }
+            passwdWi.put(Objects.requireNonNullElse(prefix, ""), paramWi);
         } else if (GraphicsData.KEYMAP.equals(param)) {
-            if (prefix == null) {
-                keymapWi.put("", paramWi);
-            } else {
-                keymapWi.put(prefix, paramWi);
-            }
+            keymapWi.put(Objects.requireNonNullElse(prefix, ""), paramWi);
         } else if (GraphicsData.DISPLAY.equals(param)) {
-            if (prefix == null) {
-                displayWi.put("", paramWi);
-            } else {
-                displayWi.put(prefix, paramWi);
-            }
+            displayWi.put(Objects.requireNonNullElse(prefix, ""), paramWi);
         } else if (GraphicsData.XAUTH.equals(param)) {
-            if (prefix == null) {
-                xauthWi.put("", paramWi);
-            } else {
-                xauthWi.put(prefix, paramWi);
-            }
+            xauthWi.put(Objects.requireNonNullElse(prefix, ""), paramWi);
         }
         return paramWi;
     }

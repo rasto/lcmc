@@ -20,20 +20,21 @@
 
 package lcmc.cluster.ui.resource;
 
-import lcmc.cluster.domain.Cluster;
-import lcmc.common.domain.ResourceValue;
-import lcmc.common.ui.Browser;
-import lcmc.common.ui.Info;
-import lcmc.drbd.domain.NetInterface;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Provider;
 import javax.inject.Singleton;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
+
+import lcmc.cluster.domain.Cluster;
+import lcmc.common.domain.ResourceValue;
+import lcmc.common.ui.Browser;
+import lcmc.common.ui.Info;
+import lcmc.drbd.domain.NetInterface;
 
 @Named
 @Singleton
@@ -44,8 +45,8 @@ public class ClusterViewFactory {
     @Inject
     private Provider<FSInfo> fsInfoProvider;
 
-    private final ConcurrentMap<ResourceValue, Info> viewByResource = new ConcurrentHashMap<ResourceValue, Info>();
-    private final ConcurrentMap<String, Info> viewByFileSystemName = new ConcurrentHashMap<String, Info>();
+    private final ConcurrentMap<ResourceValue, Info> viewByResource = new ConcurrentHashMap<>();
+    private final ConcurrentMap<String, Info> viewByFileSystemName = new ConcurrentHashMap<>();
 
     private final Lock viewLock = new ReentrantLock();
     @Inject

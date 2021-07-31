@@ -36,18 +36,16 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 import javax.swing.UIManager;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
 import javax.swing.plaf.basic.BasicTabbedPaneUI;
 
-import lcmc.common.ui.main.MainPresenter;
-import lcmc.common.domain.Application;
 import lcmc.cluster.domain.Cluster;
+import lcmc.common.domain.Application;
 import lcmc.common.domain.UserConfig;
+import lcmc.common.domain.util.Tools;
 import lcmc.common.ui.main.MainData;
+import lcmc.common.ui.main.MainPresenter;
 import lcmc.logger.Logger;
 import lcmc.logger.LoggerFactory;
-import lcmc.common.domain.util.Tools;
 
 /**
  * An implementation of a panel that holds cluster tabs. Clicking on the tab,
@@ -86,27 +84,24 @@ public final class ClustersPanel extends JPanel {
 
         addClustersTab(ALL_CLUSTERS_LABEL);
 
-        tabbedPane.addChangeListener(new ChangeListener() {
-            @Override
-            public void stateChanged(final ChangeEvent changeEvent) {
-                final JTabbedPane prevSource = (JTabbedPane) changeEvent.getSource();
-                final ClusterTab source = previouslySelectedTab;
-                previouslySelectedTab = (ClusterTab) prevSource.getSelectedComponent();
+        tabbedPane.addChangeListener(changeEvent -> {
+            final JTabbedPane prevSource = (JTabbedPane) changeEvent.getSource();
+            final ClusterTab source = previouslySelectedTab;
+            previouslySelectedTab = (ClusterTab) prevSource.getSelectedComponent();
 
-                /* show dialogs only if got here from other tab. */
-                if (source == null || source.getName() == null) {
-                    return;
-                }
+            /* show dialogs only if got here from other tab. */
+            if (source == null || source.getName() == null) {
+                return;
+            }
 
-                final ClusterTab clusterTab = getClusterTab();
-                if (clusterTab == null) {
-                    return;
-                }
+            final ClusterTab clusterTab = getClusterTab();
+            if (clusterTab == null) {
+                return;
+            }
 
-                final Cluster cluster = clusterTab.getCluster();
-                if (cluster != null) {
-                    refreshView();
-                }
+            final Cluster cluster = clusterTab.getCluster();
+            if (cluster != null) {
+                refreshView();
             }
         });
         add(tabbedPane);

@@ -22,18 +22,17 @@ package lcmc.crm.ui.resource;
 
 import java.util.Collection;
 import java.util.List;
-import lcmc.common.domain.AccessMode;
-import lcmc.common.domain.Application;
-import lcmc.host.domain.Host;
-import lcmc.vm.domain.VmsXml;
-import lcmc.vm.ui.resource.DomainInfo;
-import lcmc.common.domain.EnablePredicate;
-import lcmc.common.ui.utils.MenuAction;
-import lcmc.common.ui.utils.MenuFactory;
-import lcmc.common.ui.utils.UpdatableItem;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+
+import lcmc.common.domain.AccessMode;
+import lcmc.common.domain.Application;
+import lcmc.common.ui.utils.MenuFactory;
+import lcmc.common.ui.utils.UpdatableItem;
+import lcmc.host.domain.Host;
+import lcmc.vm.domain.VmsXml;
+import lcmc.vm.ui.resource.DomainInfo;
 
 @Named
 public class VirtualDomainMenu extends ServiceMenu {
@@ -59,116 +58,90 @@ public class VirtualDomainMenu extends ServiceMenu {
     private void addVncViewersToTheMenu(final Collection<UpdatableItem> items) {
         if (application.isUseTightvnc()) {
             /* tight vnc test menu */
-            final UpdatableItem tightvncViewerMenu = menuFactory.createMenuItem(
-                            "start TIGHT VNC viewer",
-                            null,
-                            null,
-                            new AccessMode(AccessMode.RO, AccessMode.NORMAL),
-                            new AccessMode(AccessMode.RO, AccessMode.NORMAL))
-                    .enablePredicate(new EnablePredicate() {
-                        @Override
-                        public String check() {
-                            final VmsXml vxml = virtualDomainInfo.getVMSXML(getRunningOnHost());
-                            if (vxml == null || domainInfo == null) {
-                                return "VM is not available";
-                            }
-                            final int remotePort = vxml.getRemotePort(domainInfo.getName());
-                            if (remotePort <= 0) {
-                                return "remote port is not greater than 0";
-                            }
-                            return null;
+            final UpdatableItem tightvncViewerMenu = menuFactory.createMenuItem("start TIGHT VNC viewer", null, null,
+                            new AccessMode(AccessMode.RO, AccessMode.NORMAL), new AccessMode(AccessMode.RO, AccessMode.NORMAL))
+                    .enablePredicate(() -> {
+                        final VmsXml vxml = virtualDomainInfo.getVMSXML(getRunningOnHost());
+                        if (vxml == null || domainInfo == null) {
+                            return "VM is not available";
                         }
+                        final int remotePort = vxml.getRemotePort(domainInfo.getName());
+                        if (remotePort <= 0) {
+                            return "remote port is not greater than 0";
+                        }
+                        return null;
                     })
-                .addAction(new MenuAction() {
-                        @Override
-                        public void run(final String text) {
-                    virtualDomainInfo.hidePopup();
-                    final DomainInfo vvdi = domainInfo;
-                    final VmsXml vxml = virtualDomainInfo.getVMSXML(getRunningOnHost());
-                    if (vxml != null && vvdi != null) {
-                        final int remotePort = vxml.getRemotePort(vvdi.getName());
-                        final Host host = vxml.getDefinedOnHost();
-                        if (host != null && remotePort > 0) {
-                            application.startTightVncViewer(host, remotePort);
+                    .addAction(text -> {
+                        virtualDomainInfo.hidePopup();
+                        final DomainInfo vvdi = domainInfo;
+                        final VmsXml vxml = virtualDomainInfo.getVMSXML(getRunningOnHost());
+                        if (vxml != null && vvdi != null) {
+                            final int remotePort = vxml.getRemotePort(vvdi.getName());
+                            final Host host = vxml.getDefinedOnHost();
+                            if (host != null && remotePort > 0) {
+                                application.startTightVncViewer(host, remotePort);
+                            }
                         }
-                    }
-                }});
+                    });
             items.add(tightvncViewerMenu);
         }
 
         if (application.isUseUltravnc()) {
             /* ultra vnc test menu */
-            final UpdatableItem ultravncViewerMenu = menuFactory.createMenuItem(
-                            "start ULTRA VNC viewer",
-                            null,
-                            null,
-                            new AccessMode(AccessMode.RO, AccessMode.NORMAL),
-                            new AccessMode(AccessMode.RO, AccessMode.NORMAL))
-                    .enablePredicate(new EnablePredicate() {
-                            @Override
-                            public String check() {
-                    final VmsXml vxml = virtualDomainInfo.getVMSXML(getRunningOnHost());
-                    if (vxml == null || domainInfo == null) {
-                        return "VM is not available";
-                    }
-                    final int remotePort = vxml.getRemotePort(domainInfo.getName());
-                    if (remotePort <= 0) {
-                        return "remote port is not greater than 0";
-                    }
-                    return null;
-                }})
-                .addAction(new MenuAction() {
-                        @Override
-                        public void run(final String text) {
-                    virtualDomainInfo.hidePopup();
-                    final DomainInfo vvdi = domainInfo;
-                    final VmsXml vxml = virtualDomainInfo.getVMSXML(getRunningOnHost());
-                    if (vxml != null && vvdi != null) {
-                        final int remotePort = vxml.getRemotePort(vvdi.getName());
-                        final Host host = vxml.getDefinedOnHost();
-                        if (host != null && remotePort > 0) {
-                            application.startUltraVncViewer(host, remotePort);
+            final UpdatableItem ultravncViewerMenu = menuFactory.createMenuItem("start ULTRA VNC viewer", null, null,
+                            new AccessMode(AccessMode.RO, AccessMode.NORMAL), new AccessMode(AccessMode.RO, AccessMode.NORMAL))
+                    .enablePredicate(() -> {
+                        final VmsXml vxml = virtualDomainInfo.getVMSXML(getRunningOnHost());
+                        if (vxml == null || domainInfo == null) {
+                            return "VM is not available";
                         }
-                    }
-                }});
+                        final int remotePort = vxml.getRemotePort(domainInfo.getName());
+                        if (remotePort <= 0) {
+                            return "remote port is not greater than 0";
+                        }
+                        return null;
+                    })
+                    .addAction(text -> {
+                        virtualDomainInfo.hidePopup();
+                        final DomainInfo vvdi = domainInfo;
+                        final VmsXml vxml = virtualDomainInfo.getVMSXML(getRunningOnHost());
+                        if (vxml != null && vvdi != null) {
+                            final int remotePort = vxml.getRemotePort(vvdi.getName());
+                            final Host host = vxml.getDefinedOnHost();
+                            if (host != null && remotePort > 0) {
+                                application.startUltraVncViewer(host, remotePort);
+                            }
+                        }
+                    });
             items.add(ultravncViewerMenu);
         }
 
         if (application.isUseRealvnc()) {
             /* real vnc test menu */
-            final UpdatableItem realvncViewerMenu = menuFactory.createMenuItem(
-                            "start REAL VNC test",
-                            null,
-                            null,
-                            new AccessMode(AccessMode.RO, AccessMode.NORMAL),
-                            new AccessMode(AccessMode.RO, AccessMode.NORMAL))
-                    .enablePredicate(new EnablePredicate() {
-                            @Override
-                            public String check() {
-                    final VmsXml vxml = virtualDomainInfo.getVMSXML(getRunningOnHost());
-                    if (vxml == null || domainInfo == null) {
-                        return "VM is not available";
-                    }
-                    final int remotePort = vxml.getRemotePort(domainInfo.getName());
-                    if (remotePort <= 0) {
-                        return "remote port is not greater than 0";
-                    }
-                    return null;
-                }})
-                .addAction(new MenuAction() {
-                        @Override
-                        public void run(final String text) {
-                    virtualDomainInfo.hidePopup();
-                    final DomainInfo vvdi = domainInfo;
-                    final VmsXml vxml = virtualDomainInfo.getVMSXML(getRunningOnHost());
-                    if (vxml != null && vvdi != null) {
-                        final int remotePort = vxml.getRemotePort(vvdi.getName());
-                        final Host host = vxml.getDefinedOnHost();
-                        if (host != null && remotePort > 0) {
-                            application.startRealVncViewer(host, remotePort);
+            final UpdatableItem realvncViewerMenu =
+                    menuFactory.createMenuItem("start REAL VNC test", null, null, new AccessMode(AccessMode.RO, AccessMode.NORMAL),
+                            new AccessMode(AccessMode.RO, AccessMode.NORMAL)).enablePredicate(() -> {
+                        final VmsXml vxml = virtualDomainInfo.getVMSXML(getRunningOnHost());
+                        if (vxml == null || domainInfo == null) {
+                            return "VM is not available";
                         }
-                    }
-                }});
+                        final int remotePort = vxml.getRemotePort(domainInfo.getName());
+                        if (remotePort <= 0) {
+                            return "remote port is not greater than 0";
+                        }
+                        return null;
+                    }).addAction(text -> {
+                        virtualDomainInfo.hidePopup();
+                        final DomainInfo vvdi = domainInfo;
+                        final VmsXml vxml = virtualDomainInfo.getVMSXML(getRunningOnHost());
+                        if (vxml != null && vvdi != null) {
+                            final int remotePort = vxml.getRemotePort(vvdi.getName());
+                            final Host host = vxml.getDefinedOnHost();
+                            if (host != null && remotePort > 0) {
+                                application.startRealVncViewer(host, remotePort);
+                            }
+                        }
+                    });
             items.add(realvncViewerMenu);
         }
     }

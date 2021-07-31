@@ -22,12 +22,13 @@ package lcmc.logger;
 
 import java.util.HashMap;
 import java.util.Map;
+
 import org.apache.commons.collections15.Buffer;
 import org.apache.commons.collections15.BufferUtils;
 import org.apache.commons.collections15.buffer.CircularFifoBuffer;
 
 public final class LoggerFactory {
-    private static final Map<String, Logger> LOGGER_MAP = new HashMap<String, Logger>();
+    private static final Map<String, Logger> LOGGER_MAP = new HashMap<>();
     private static int debugLevel = -1;
     private static boolean showAppWarning = false;
     /** Whether application errors should show a dialog. */
@@ -35,7 +36,7 @@ public final class LoggerFactory {
     private static final int CIRCULAR_LOG_SIZE = 200;
     /** Synchronized, Circular log. */
     static final Buffer<String> LOG_BUFFER =
-                                  BufferUtils.synchronizedBuffer(new CircularFifoBuffer<String>(CIRCULAR_LOG_SIZE));
+                                  BufferUtils.synchronizedBuffer(new CircularFifoBuffer<>(CIRCULAR_LOG_SIZE));
     public static void incrementDebugLevel() {
         debugLevel++;
         System.out.println("debug level: " + debugLevel);

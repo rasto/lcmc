@@ -24,56 +24,39 @@
 package lcmc.drbd.domain;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
 import lcmc.common.domain.ResourceValue;
-import lcmc.host.domain.Host;
-import lcmc.logger.Logger;
-import lcmc.logger.LoggerFactory;
 import lcmc.common.domain.util.Tools;
+import lcmc.host.domain.Host;
 
 /**
  * This class holds data of one block device.
  */
 public class BlockDevice extends ResourceValue {
-    private static final Logger LOG = LoggerFactory.getLogger(BlockDevice.class);
     private final Host host;
     private final String deviceName;
     private static final Set<String> CONNECTED_STATES =
-        Collections.unmodifiableSet(new HashSet<String>(Arrays.asList("Connected",
-                                                                      "SyncTarget",
-                                                                      "SyncSource",
-                                                                      "StartingSyncS",
-                                                                      "StartingSyncT",
-                                                                      "WFBitMapS",
-                                                                      "WFBitMapT",
-                                                                      "WFSyncUUID",
-                                                                      "PausedSyncS",
-                                                                      "PausedSyncT",
-                                                                      "VerifyS",
-                                                                      "VerifyT")));
+            Set.of("Connected", "SyncTarget", "SyncSource", "StartingSyncS", "StartingSyncT", "WFBitMapS", "WFBitMapT",
+                    "WFSyncUUID", "PausedSyncS", "PausedSyncT", "VerifyS", "VerifyT");
 
-    private static final Set<String> SYNCING_STATES =
-        Collections.unmodifiableSet(new HashSet<String>(Arrays.asList("SyncTarget",
-                                                                      "SyncSource",
-                                                                      "PausedSyncS",
-                                                                      "PausedSyncT")));
+    private static final Set<String> SYNCING_STATES = Set.of("SyncTarget", "SyncSource", "PausedSyncS", "PausedSyncT");
 
     private String blockSize;
     private String diskUuid;
-    private Collection<String> diskIds = new HashSet<String>();
+    private Collection<String> diskIds = new HashSet<>();
     private String mountedOn;
     private String fsType;
     private boolean drbd = false;
     private boolean isUsedByCRM;
     private BlockDevice metaDisk = null;
-    /** Block device of which this block device is a meta disk. */
-    private List<BlockDevice> metaDiskOfBlockDevices = new ArrayList<BlockDevice>();
+    /**
+     * Block device of which this block device is a meta disk.
+     */
+    private List<BlockDevice> metaDiskOfBlockDevices = new ArrayList<>();
     private boolean splitBrain = false;
     private String connectionState = null;
     private String nodeState = null;
@@ -93,7 +76,7 @@ public class BlockDevice extends ResourceValue {
     public BlockDevice(final Host host, final String device) {
         super(device);
         this.host = host;
-        this.deviceName = device;
+        deviceName = device;
     }
 
     public void updateFrom(final BlockDevice blockDevice) {
@@ -180,7 +163,7 @@ public class BlockDevice extends ResourceValue {
                 metaDisk.removeMetadiskOfBlockDevice(this);
                 metaDisk = null;
             }
-            metaDiskOfBlockDevices = new ArrayList<BlockDevice>();
+            metaDiskOfBlockDevices = new ArrayList<>();
         }
     }
 
@@ -458,7 +441,7 @@ public class BlockDevice extends ResourceValue {
     }
 
     public boolean isSwap() {
-        return fsType != null && "swap".equals(fsType);
+        return "swap".equals(fsType);
     }
 
     public String getDiskUuid() {
@@ -521,7 +504,7 @@ public class BlockDevice extends ResourceValue {
 
     public void setUsed(final String usedStr) {
         if (usedStr != null) {
-            this.used = Integer.parseInt(usedStr);
+            used = Integer.parseInt(usedStr);
         }
     }
 
@@ -533,9 +516,7 @@ public class BlockDevice extends ResourceValue {
         BlockDevice that = (BlockDevice) o;
 
         if (!deviceName.equals(that.deviceName)) return false;
-        if (!host.equals(that.host)) return false;
-
-        return true;
+        return host.equals(that.host);
     }
 
     @Override

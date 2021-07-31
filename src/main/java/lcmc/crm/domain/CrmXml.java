@@ -22,15 +22,48 @@
 
 package lcmc.crm.domain;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReadWriteLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Provider;
+
+import org.apache.commons.collections15.map.MultiKeyMap;
+import org.w3c.dom.Document;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
 import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Table;
+
 import lcmc.Exceptions;
 import lcmc.cluster.service.ssh.ExecCommandConfig;
 import lcmc.cluster.service.ssh.SshOutput;
 import lcmc.cluster.ui.ClusterBrowser;
 import lcmc.cluster.ui.network.InfoPresenter;
-import lcmc.common.domain.*;
+import lcmc.common.domain.AccessMode;
+import lcmc.common.domain.Application;
+import lcmc.common.domain.ConvertCmdCallback;
+import lcmc.common.domain.StringValue;
+import lcmc.common.domain.Unit;
+import lcmc.common.domain.Value;
+import lcmc.common.domain.XMLTools;
 import lcmc.common.domain.util.Tools;
 import lcmc.common.ui.main.ProgressIndicator;
 import lcmc.crm.ui.resource.ServiceInfo;
@@ -41,21 +74,6 @@ import lcmc.logger.Logger;
 import lcmc.logger.LoggerFactory;
 import lcmc.robotest.StartTests;
 import lcmc.robotest.Test;
-import org.apache.commons.collections15.map.MultiKeyMap;
-import org.w3c.dom.Document;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Provider;
-import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReadWriteLock;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 /**
  * This class parses ocf crm xml, stores information like
@@ -139,29 +157,29 @@ public class CrmXml {
     private static final String GLOBALLY_UNIQUE_META_ATTR = "globally-unique";
     private static final String ORDERED_META_ATTR = "ordered";
     private static final String INTERLEAVE_META_ATTR = "interleave";
-    /** It has different default than clone "ordered". */
+    /**
+     * It has different default than clone "ordered".
+     */
     public static final String GROUP_ORDERED_META_ATTR = "group-ordered";
     private static final String GROUP_COLLOCATED_META_ATTR = "collocated";
     public static final Value REQUIRE_ALL_TRUE_VALUE = PCMK_TRUE_VALUE;
     public static final Value REQUIRE_ALL_FALSE_VALUE = PCMK_FALSE_VALUE;
     public static final String REQUIRE_ALL_ATTR = "require-all";
 
-    private static final Map<String, String> RSC_DEFAULTS_META_ATTR_SECTION = new HashMap<String, String>();
-    private static final Collection<String> META_ATTR_NOT_ADVANCED = new ArrayList<String>();
-    private static final Collection<String> GROUP_META_ATTR_NOT_ADVANCED = new ArrayList<String>();
-    private static final Map<String, AccessMode.Type> META_ATTR_ACCESS_TYPE =
-                                                                  new HashMap<String, AccessMode.Type>();
-    private static final Map<String, AccessMode.Type> RSC_DEFAULTS_META_ATTR_ACCESS_TYPE =
-                                                                        new HashMap<String, AccessMode.Type>();
-    private static final Map<String, Value[]> META_ATTR_COMBO_BOX_CHOICES = new HashMap<String, Value[]>();
-    private static final Map<String, Value[]> META_ATTR_POSSIBLE_CHOICES_MASTER_SLAVE = new HashMap<String, Value[]>();
-    private static final Map<String, String> META_ATTR_SHORT_DESC = new HashMap<String, String>();
-    private static final Map<String, String> META_ATTR_LONG_DESC = new HashMap<String, String>();
-    private static final Map<String, Value> META_ATTR_DEFAULT = new HashMap<String, Value>();
-    private static final Map<String, String> META_ATTR_TYPE = new HashMap<String, String>();
-    private static final Map<String, Value> META_ATTR_PREFERRED = new HashMap<String, Value>();
+    private static final Map<String, String> RSC_DEFAULTS_META_ATTR_SECTION = new HashMap<>();
+    private static final Collection<String> META_ATTR_NOT_ADVANCED = new ArrayList<>();
+    private static final Collection<String> GROUP_META_ATTR_NOT_ADVANCED = new ArrayList<>();
+    private static final Map<String, AccessMode.Type> META_ATTR_ACCESS_TYPE = new HashMap<>();
+    private static final Map<String, AccessMode.Type> RSC_DEFAULTS_META_ATTR_ACCESS_TYPE = new HashMap<>();
+    private static final Map<String, Value[]> META_ATTR_COMBO_BOX_CHOICES = new HashMap<>();
+    private static final Map<String, Value[]> META_ATTR_POSSIBLE_CHOICES_MASTER_SLAVE = new HashMap<>();
+    private static final Map<String, String> META_ATTR_SHORT_DESC = new HashMap<>();
+    private static final Map<String, String> META_ATTR_LONG_DESC = new HashMap<>();
+    private static final Map<String, Value> META_ATTR_DEFAULT = new HashMap<>();
+    private static final Map<String, String> META_ATTR_TYPE = new HashMap<>();
+    private static final Map<String, Value> META_ATTR_PREFERRED = new HashMap<>();
     private static final Value[] PCMK_BOOLEAN_VALUES = {PCMK_TRUE_VALUE, PCMK_FALSE_VALUE};
-    private static final Collection<String> IGNORE_RA_DEFAULTS_FOR = new ArrayList<String>();
+    private static final Collection<String> IGNORE_RA_DEFAULTS_FOR = new ArrayList<>();
 
     private static final String STONITH_PARAM_PCMK_HOST_CHECK = "pcmk_host_check";
     private static final String STONITH_PARAM_PCMK_HOST_LIST = "pcmk_host_list";
@@ -169,9 +187,13 @@ public class CrmXml {
 
     private static final String FENCING_ACTION_PARAM = "action";
 
-    /** TODO: If this is set PCMK_HOST_LIST must be set. */
+    /**
+     * TODO: If this is set PCMK_HOST_LIST must be set.
+     */
     private static final String PCMK_HOST_CHECK_STATIC = "static-list";
-    /** TODO: If this is set PCMK_HOST_LIST must not be set. */
+    /**
+     * TODO: If this is set PCMK_HOST_LIST must not be set.
+     */
     private static final String PCMK_HOST_CHECK_DYNAMIC = "dynamic-list";
     public static final String PARAM_OCF_CHECK_LEVEL = "OCF_CHECK_LEVEL";
 
@@ -179,15 +201,11 @@ public class CrmXml {
 
     static {
         /* target-role */
-        META_ATTR_COMBO_BOX_CHOICES.put(TARGET_ROLE_META_ATTR, new Value[]{new StringValue(),
-                new StringValue(TARGET_ROLE_STARTED),
-                new StringValue(TARGET_ROLE_STOPPED)});
+        META_ATTR_COMBO_BOX_CHOICES.put(TARGET_ROLE_META_ATTR,
+                new Value[]{new StringValue(), new StringValue(TARGET_ROLE_STARTED), new StringValue(TARGET_ROLE_STOPPED)});
         META_ATTR_POSSIBLE_CHOICES_MASTER_SLAVE.put(TARGET_ROLE_META_ATTR,
-                                                    new Value[]{new StringValue(),
-                                                                new StringValue(TARGET_ROLE_MASTER),
-                                                                new StringValue(TARGET_ROLE_STARTED),
-                                                                new StringValue(TARGET_ROLE_SLAVE),
-                                                                new StringValue(TARGET_ROLE_STOPPED)});
+                new Value[]{new StringValue(), new StringValue(TARGET_ROLE_MASTER), new StringValue(TARGET_ROLE_STARTED),
+                        new StringValue(TARGET_ROLE_SLAVE), new StringValue(TARGET_ROLE_STOPPED)});
         META_ATTR_SHORT_DESC.put(TARGET_ROLE_META_ATTR, Tools.getString("CRMXML.TargetRole.ShortDesc"));
         META_ATTR_LONG_DESC.put(TARGET_ROLE_META_ATTR, Tools.getString("CRMXML.TargetRole.LongDesc"));
         META_ATTR_DEFAULT.put(TARGET_ROLE_META_ATTR, null);
@@ -359,58 +377,61 @@ public class CrmXml {
     }
 
     private Host host;
-    private final List<String> globalParams = new ArrayList<String>();
-    private final Collection<String> globalNotAdvancedParams = new ArrayList<String>();
-    private final Map<String, AccessMode.Type> paramGlobalAccessTypes =
-                                                              new HashMap<String, AccessMode.Type>();
-    private final Collection<String> globalRequiredParams = new ArrayList<String>();
-    private final Map<String, List<ResourceAgent>> classToServicesMap = new ConcurrentHashMap<String, List<ResourceAgent>>();
-    private final Map<String, String> globalShortDescMap = new HashMap<String, String>();
-    private final Map<String, String> globalLongDescMap = new HashMap<String, String>();
-    private final Map<String, Value> globalDefaultMap = new HashMap<String, Value>();
-    private final Map<String, Value> globalPreferredValuesMap = new HashMap<String, Value>();
-    private final Map<String, String> globalTypeMap = new HashMap<String, String>();
-    private final Map<String, Value[]> globalComboBoxChoices = new HashMap<String, Value[]>();
-    private final List<String> colocationParams = new ArrayList<String>();
-    /**  (rsc_colocation tag) */
-    private final List<String> resourceSetColocationParams = new ArrayList<String>();
-    /** (resource_set tag) */
-    private final List<String> resourceSetColocationConnectionParams = new ArrayList<String>();
-    private final Collection<String> cololcationRequiredParams = new ArrayList<String>();
-    private final Map<String, String> paramColocationShortDescMap = new HashMap<String, String>();
-    private final Map<String, String> paramColocationLongDescMap = new HashMap<String, String>();
-    private final Map<String, Value> paramColocationDefaultMap = new HashMap<String, Value>();
-    private final Map<String, Value> paramColocationPreferredMap = new HashMap<String, Value>();
-    private final Map<String, String> paramColocationTypeMap = new HashMap<String, String>();
-    private final Map<String, Value[]> paramColocationPossibleChoices = new HashMap<String, Value[]>();
-    private final Map<String, Value[]> paramColocationPossibleChoicesMasterSlave = new HashMap<String, Value[]>();
+    private final List<String> globalParams = new ArrayList<>();
+    private final Collection<String> globalNotAdvancedParams = new ArrayList<>();
+    private final Map<String, AccessMode.Type> paramGlobalAccessTypes = new HashMap<>();
+    private final Collection<String> globalRequiredParams = new ArrayList<>();
+    private final Map<String, List<ResourceAgent>> classToServicesMap = new ConcurrentHashMap<>();
+    private final Map<String, String> globalShortDescMap = new HashMap<>();
+    private final Map<String, String> globalLongDescMap = new HashMap<>();
+    private final Map<String, Value> globalDefaultMap = new HashMap<>();
+    private final Map<String, Value> globalPreferredValuesMap = new HashMap<>();
+    private final Map<String, String> globalTypeMap = new HashMap<>();
+    private final Map<String, Value[]> globalComboBoxChoices = new HashMap<>();
+    private final List<String> colocationParams = new ArrayList<>();
+    /**
+     * (rsc_colocation tag)
+     */
+    private final List<String> resourceSetColocationParams = new ArrayList<>();
+    /**
+     * (resource_set tag)
+     */
+    private final List<String> resourceSetColocationConnectionParams = new ArrayList<>();
+    private final Collection<String> cololcationRequiredParams = new ArrayList<>();
+    private final Map<String, String> paramColocationShortDescMap = new HashMap<>();
+    private final Map<String, String> paramColocationLongDescMap = new HashMap<>();
+    private final Map<String, Value> paramColocationDefaultMap = new HashMap<>();
+    private final Map<String, Value> paramColocationPreferredMap = new HashMap<>();
+    private final Map<String, String> paramColocationTypeMap = new HashMap<>();
+    private final Map<String, Value[]> paramColocationPossibleChoices = new HashMap<>();
+    private final Map<String, Value[]> paramColocationPossibleChoicesMasterSlave = new HashMap<>();
 
-    private final List<String> orderParams = new ArrayList<String>();
-    /**  (rsc_order tag) */
-    private final List<String> resourceSetOrderParams = new ArrayList<String>();
-    /** (resource_set tag) */
-    private final List<String> resourceSetOrderConnectionParams = new ArrayList<String>();
-    private final Collection<String> orderRequiredParams = new ArrayList<String>();
-    private final Map<String, String> paramOrderShortDescMap = new HashMap<String, String>();
-    private final Map<String, String> paramOrderLongDescMap = new HashMap<String, String>();
-    private final Map<String, Value> paramOrderDefaultMap = new HashMap<String, Value>();
-    private final Map<String, Value> paramOrderPreferredMap = new HashMap<String, Value>();
-    private final Map<String, String> paramOrderTypeMap = new HashMap<String, String>();
-    private final Map<String, Value[]> paramOrderPossibleChoices = new HashMap<String, Value[]>();
-    private final Map<String, Value[]> paramOrderPossibleChoicesMasterSlave = new HashMap<String, Value[]>();
+    private final List<String> orderParams = new ArrayList<>();
+    /**
+     * (rsc_order tag)
+     */
+    private final List<String> resourceSetOrderParams = new ArrayList<>();
+    /**
+     * (resource_set tag)
+     */
+    private final List<String> resourceSetOrderConnectionParams = new ArrayList<>();
+    private final Collection<String> orderRequiredParams = new ArrayList<>();
+    private final Map<String, String> paramOrderShortDescMap = new HashMap<>();
+    private final Map<String, String> paramOrderLongDescMap = new HashMap<>();
+    private final Map<String, Value> paramOrderDefaultMap = new HashMap<>();
+    private final Map<String, Value> paramOrderPreferredMap = new HashMap<>();
+    private final Map<String, String> paramOrderTypeMap = new HashMap<>();
+    private final Map<String, Value[]> paramOrderPossibleChoices = new HashMap<>();
+    private final Map<String, Value[]> paramOrderPossibleChoicesMasterSlave = new HashMap<>();
     private final ResourceAgent groupResourceAgent = new ResourceAgent(Application.PACEMAKER_GROUP_NAME, "", "group");
     private ResourceAgent cloneResourceAgent;
-    private final ResourceAgent drbddiskResourceAgent = new ResourceAgent("drbddisk",
-                                                                          ResourceAgent.HEARTBEAT_PROVIDER,
-                                                                          ResourceAgent.HEARTBEAT_CLASS_NAME);
-    private final ResourceAgent linbitDrbdResourceAgent = new ResourceAgent("drbd",
-                                                                            "linbit",
-                                                                            ResourceAgent.OCF_CLASS_NAME);
-    private final MultiKeyMap<String, ResourceAgent> serviceToResourceAgentMap =
-                                                                    new MultiKeyMap<String, ResourceAgent>();
+    private final ResourceAgent drbddiskResourceAgent =
+            new ResourceAgent("drbddisk", ResourceAgent.HEARTBEAT_PROVIDER, ResourceAgent.HEARTBEAT_CLASS_NAME);
+    private final ResourceAgent linbitDrbdResourceAgent = new ResourceAgent("drbd", "linbit", ResourceAgent.OCF_CLASS_NAME);
+    private final MultiKeyMap<String, ResourceAgent> serviceToResourceAgentMap = new MultiKeyMap<>();
     private boolean drbddiskResourceAgentPresent;
     private boolean linbitDrbdResourceAgentPresent;
-    private final List<Value> stonithHostlistChoices = new ArrayList<Value>();
+    private final List<Value> stonithHostlistChoices = new ArrayList<>();
     private Map<String, String> metaAttrParams = null;
     private Map<String, String> resourceDefaultsMetaAttrs = null;
 
@@ -766,7 +787,7 @@ public class CrmXml {
         final Pattern cp = Pattern.compile("^class:\\s*(.*?)\\s*$");
         final Pattern pp = Pattern.compile("^provider:\\s*(.*?)\\s*$");
         final Pattern sp = Pattern.compile("^ra:\\s*(.*?)\\s*$");
-        final StringBuilder xml = new StringBuilder("");
+        final StringBuilder xml = new StringBuilder();
         String resourceClass = null;
         String provider = null;
         String serviceName = null;
@@ -814,11 +835,7 @@ public class CrmXml {
                     }
                 }
                 serviceToResourceAgentMap.put(serviceName, provider, resourceClass, ra);
-                List<ResourceAgent> raList = classToServicesMap.get(resourceClass);
-                if (raList == null) {
-                    raList = new ArrayList<ResourceAgent>();
-                    classToServicesMap.put(resourceClass, raList);
-                }
+                List<ResourceAgent> raList = classToServicesMap.computeIfAbsent(resourceClass, k -> new ArrayList<>());
                 raList.add(ra);
                 serviceName = null;
                 xml.delete(0, xml.length());
@@ -942,14 +959,9 @@ public class CrmXml {
     public List<ResourceAgent> getServices(final String raClass) {
         final List<ResourceAgent> services = classToServicesMap.get(raClass);
         if (services == null) {
-            return new ArrayList<ResourceAgent>();
+            return new ArrayList<>();
         }
-        Collections.sort(Lists.newArrayList(services), new Comparator<ResourceAgent>() {
-                                       @Override
-                                       public int compare(final ResourceAgent ra1, final ResourceAgent ra2) {
-                                           return ra1.getServiceName().compareToIgnoreCase(ra2.getServiceName());
-                                       }
-                                   });
+        Lists.newArrayList(services).sort((ra1, ra2) -> ra1.getServiceName().compareToIgnoreCase(ra2.getServiceName()));
         return services;
     }
 
@@ -959,10 +971,7 @@ public class CrmXml {
     }
 
     public String[] getGlobalParameters() {
-        if (globalParams != null) {
-            return globalParams.toArray(new String[globalParams.size()]);
-        }
-        return null;
+        return globalParams.toArray(new String[globalParams.size()]);
     }
 
     /** Return version of the service ocf script. */
@@ -1307,7 +1316,7 @@ public class CrmXml {
                 correctValue = false;
             }
         } else if (PARAM_TYPE_INTEGER.equals(type)) {
-            final Pattern p = Pattern.compile("^(-?\\d*|(-|\\+)?" + INFINITY_VALUE + ")$");
+            final Pattern p = Pattern.compile("^(-?\\d*|([-+])?" + INFINITY_VALUE + ")$");
             if (value != null && !value.isNothingSelected()) {
                 final Matcher m = p.matcher(value.getValueForConfig());
                 if (!m.matches()) {
@@ -1345,7 +1354,7 @@ public class CrmXml {
                 correctValue = false;
             }
         } else if (PARAM_TYPE_INTEGER.equals(type)) {
-            final Pattern p = Pattern.compile("^(-?\\d*|(-|\\+)?" + INFINITY_VALUE + ")$");
+            final Pattern p = Pattern.compile("^(-?\\d*|([-+])?" + INFINITY_VALUE + ")$");
             if (value != null && !value.isNothingSelected()) {
                 final Matcher m = p.matcher(value.getValueForConfig());
                 if (!m.matches()) {
@@ -1397,7 +1406,7 @@ public class CrmXml {
         if (metaAttrParams != null) {
             return metaAttrParams;
         }
-        metaAttrParams = new LinkedHashMap<String, String>();
+        metaAttrParams = new LinkedHashMap<>();
         if (Tools.versionBeforePacemaker(host)) {
             metaAttrParams.put("target_role", TARGET_ROLE_META_ATTR);
             metaAttrParams.put("is_managed", IS_MANAGED_META_ATTR);
@@ -1430,7 +1439,7 @@ public class CrmXml {
         if (resourceDefaultsMetaAttrs != null) {
             return resourceDefaultsMetaAttrs;
         }
-        resourceDefaultsMetaAttrs = new LinkedHashMap<String, String>();
+        resourceDefaultsMetaAttrs = new LinkedHashMap<>();
         if (host == null || Tools.versionBeforePacemaker(host)) {
             /* no rsc defaults in older versions. */
             return resourceDefaultsMetaAttrs;
@@ -1625,7 +1634,7 @@ public class CrmXml {
     /** Parses the actions node that is list of values for action param. */
     private void parseStonithActions(final ResourceAgent ra, final Node actionsNode) {
         final NodeList actionNodes = actionsNode.getChildNodes();
-        final List<Value> actions = new ArrayList<Value>();
+        final List<Value> actions = new ArrayList<>();
         for (int i = 0; i < actionNodes.getLength(); i++) {
             final Node actionNode = actionNodes.item(i);
             if (actionNode.getNodeName().equals("action")) {
@@ -1769,7 +1778,6 @@ public class CrmXml {
 
         /* get <resource-agent> */
         final NodeList resAgents = metadataNode.getChildNodes();
-        final Value[] booleanValues = PCMK_BOOLEAN_VALUES;
 
         for (int i = 0; i < resAgents.getLength(); i++) {
             final Node resAgentNode = resAgents.item(i);
@@ -1827,7 +1835,7 @@ public class CrmXml {
                             globalDefaultMap.put(param, defaultValue);
                         }
                         if (PARAM_TYPE_BOOLEAN.equals(type)) {
-                            globalComboBoxChoices.put(param, booleanValues);
+                            globalComboBoxChoices.put(param, PCMK_BOOLEAN_VALUES);
                         }
                         if (PARAM_TYPE_INTEGER.equals(type)) {
                             globalComboBoxChoices.put(param, INTEGER_VALUES);
@@ -1938,24 +1946,18 @@ public class CrmXml {
         }
     }
 
-    /** Parses attributes, operations etc. from primitives and clones. */
-    private void parseAttributes(final Node resourceNode,
-                                 final String crmId,
-                                 final Map<String, Map<String, String>> parametersMap,
-                                 final Map<String, Map<String, String>> parametersNvpairsIdsMap,
-                                 final Map<String, String> resourceInstanceAttrIdMap,
-                                 final MultiKeyMap<String, Value> operationsMap,
-                                 final Map<String, String> metaAttrsIdMap,
-                                 final Map<String, String> operationsIdMap,
-                                 final Map<String, Map<String, String>> resOpIdsMap,
-                                 final Map<String, String> operationsIdRefs,
-                                 final Map<String, String> operationsIdtoCRMId,
-                                 final Map<String, String> metaAttrsIdRefs,
-                                 final Map<String, String> metaAttrsIdToCRMId,
-                                 final boolean stonith) {
-        final Map<String, String> params = new HashMap<String, String>();
+    /**
+     * Parses attributes, operations etc. from primitives and clones.
+     */
+    private void parseAttributes(final Node resourceNode, final String crmId, final Map<String, Map<String, String>> parametersMap,
+            final Map<String, Map<String, String>> parametersNvpairsIdsMap, final Map<String, String> resourceInstanceAttrIdMap,
+            final MultiKeyMap<String, Value> operationsMap, final Map<String, String> metaAttrsIdMap,
+            final Map<String, String> operationsIdMap, final Map<String, Map<String, String>> resOpIdsMap,
+            final Map<String, String> operationsIdRefs, final Map<String, String> operationsIdtoCRMId,
+            final Map<String, String> metaAttrsIdRefs, final Map<String, String> metaAttrsIdToCRMId, final boolean stonith) {
+        final Map<String, String> params = new HashMap<>();
         parametersMap.put(crmId, params);
-        final Map<String, String> nvpairIds = new HashMap<String, String>();
+        final Map<String, String> nvpairIds = new HashMap<>();
         parametersNvpairsIdsMap.put(crmId, nvpairIds);
         /* <instance_attributes> */
         final Node instanceAttrNode = XMLTools.getChildNode(resourceNode, "instance_attributes");
@@ -1995,7 +1997,7 @@ public class CrmXml {
                 final String operationsId = XMLTools.getAttribute(operationsNode, "id");
                 operationsIdMap.put(crmId, operationsId);
                 operationsIdtoCRMId.put(operationsId, crmId);
-                final Map<String, String> opIds = new HashMap<String, String>();
+                final Map<String, String> opIds = new HashMap<>();
                 resOpIdsMap.put(crmId, opIds);
                 /* <op> */
                 final NodeList ops = operationsNode.getChildNodes();
@@ -2098,18 +2100,14 @@ public class CrmXml {
                                 final Map<String, String> metaAttrsIdToCRMId) {
         final NodeList primitives = groupNode.getChildNodes();
         final String groupId = XMLTools.getAttribute(groupNode, "id");
-        final Map<String, String> params = new HashMap<String, String>();
+        final Map<String, String> params = new HashMap<>();
         parametersMap.put(groupId, params);
-        final Map<String, String> nvpairIds = new HashMap<String, String>();
+        final Map<String, String> nvpairIds = new HashMap<>();
         parametersNvpairsIdsMap.put(groupId, nvpairIds);
         if (resList != null) {
             resList.add(groupId);
         }
-        List<String> groupResList = groupsToResourcesMap.get(groupId);
-        if (groupResList == null) {
-            groupResList = new ArrayList<String>();
-            groupsToResourcesMap.put(groupId, groupResList);
-        }
+        List<String> groupResList = groupsToResourcesMap.computeIfAbsent(groupId, k -> new ArrayList<>());
 
         for (int j = 0; j < primitives.getLength(); j++) {
             final Node primitiveNode = primitives.item(j);
@@ -2216,7 +2214,7 @@ public class CrmXml {
     }
 
     private Map<String, String> parseAllocationScores(final NodeList scores) {
-        final Map<String, String> allocationScores = new LinkedHashMap<String, String>();
+        final Map<String, String> allocationScores = new LinkedHashMap<>();
         for (int i = 0; i < scores.getLength(); i++) {
             final Node scoreNode = scores.item(i);
             if (scoreNode.getNodeName().equals("score")) {
@@ -2230,7 +2228,7 @@ public class CrmXml {
 
     /** Returns a hash with resource information. (running_on) */
     Map<String, ResourceStatus> parseResStatus(final String resStatus) {
-        final Map<String, ResourceStatus> resStatusMap = new HashMap<String, ResourceStatus>();
+        final Map<String, ResourceStatus> resStatusMap = new HashMap<>();
         final Document document = XMLTools.getXMLDocument(resStatus);
         if (document == null) {
             return null;
@@ -2249,35 +2247,29 @@ public class CrmXml {
                 final String id = XMLTools.getAttribute(resourceNode, "id");
                 final String isManaged = XMLTools.getAttribute(resourceNode, "managed");
                 final NodeList statusList = resourceNode.getChildNodes();
-                boolean managed = false;
-                if ("managed".equals(isManaged)) {
-                    managed = true;
-                }
-                Map<String, String> allocationScores = new HashMap<String, String>();
+                boolean managed = "managed".equals(isManaged);
+                Map<String, String> allocationScores = new HashMap<>();
                 List<String> runningOnList = null;
                 List<String> masterOnList = null;
                 List<String> slaveOnList = null;
                 for (int j = 0; j < statusList.getLength(); j++) {
                     final Node setNode = statusList.item(j);
-                    if (TARGET_ROLE_STARTED.equalsIgnoreCase(
-                        setNode.getNodeName())) {
+                    if (TARGET_ROLE_STARTED.equalsIgnoreCase(setNode.getNodeName())) {
                         final String node = XMLTools.getText(setNode);
                         if (runningOnList == null) {
-                            runningOnList = new ArrayList<String>();
+                            runningOnList = new ArrayList<>();
                         }
                         runningOnList.add(node);
-                    } else if (TARGET_ROLE_MASTER.equalsIgnoreCase(
-                        setNode.getNodeName())) {
+                    } else if (TARGET_ROLE_MASTER.equalsIgnoreCase(setNode.getNodeName())) {
                         final String node = XMLTools.getText(setNode);
                         if (masterOnList == null) {
-                            masterOnList = new ArrayList<String>();
+                            masterOnList = new ArrayList<>();
                         }
                         masterOnList.add(node);
-                    } else if (TARGET_ROLE_SLAVE.equalsIgnoreCase(
-                        setNode.getNodeName())) {
+                    } else if (TARGET_ROLE_SLAVE.equalsIgnoreCase(setNode.getNodeName())) {
                         final String node = XMLTools.getText(setNode);
                         if (slaveOnList == null) {
-                            slaveOnList = new ArrayList<String>();
+                            slaveOnList = new ArrayList<>();
                         }
                         slaveOnList.add(node);
                     } else if ("scores".equals(setNode.getNodeName())) {
@@ -2329,7 +2321,7 @@ public class CrmXml {
                             final String crmId = m.group(1);
                             Set<String> clones = failedClonesMap.get(unameLowerCase, crmId);
                             if (clones == null) {
-                                clones = new LinkedHashSet<String>();
+                                clones = new LinkedHashSet<>();
                                 failedClonesMap.put(unameLowerCase, crmId, clones);
                             }
                             clones.add(m.group(2));
@@ -2385,7 +2377,7 @@ public class CrmXml {
                 final String orderAction = XMLTools.getAttribute(rscSetNode, "action");
                 final String colocationRole = XMLTools.getAttribute(rscSetNode, "role");
                 final NodeList rscNodes = rscSetNode.getChildNodes();
-                final List<String> rscIds = new ArrayList<String>();
+                final List<String> rscIds = new ArrayList<>();
                 for (int j = 0; j < rscNodes.getLength(); j++) {
                     final Node rscRefNode = rscNodes.item(j);
                     if (rscRefNode.getNodeName().equals("resource_ref")) {
@@ -2443,7 +2435,7 @@ public class CrmXml {
         }
 
         /* get fenced nodes */
-        final Set<String> fencedNodes = new HashSet<String>();
+        final Set<String> fencedNodes = new HashSet<>();
         final Node fencedNode = XMLTools.getChildNode(pcmkNode, "fenced");
         if (fencedNode != null) {
             final NodeList nodes = fencedNode.getChildNodes();
@@ -2478,15 +2470,15 @@ public class CrmXml {
         /* <rsc_defaults> */
         final Node rscDefaultsNode = XMLTools.getChildNode(confNode, "rsc_defaults");
         String rscDefaultsId = null;
-        final Map<String, String> rscDefaultsParams = new HashMap<String, String>();
-        final Map<String, String> rscDefaultsParamsNvpairIds = new HashMap<String, String>();
+        final Map<String, String> rscDefaultsParams = new HashMap<>();
+        final Map<String, String> rscDefaultsParamsNvpairIds = new HashMap<>();
         if (rscDefaultsNode != null) {
             rscDefaultsId = parseResourceDefaults(rscDefaultsNode, rscDefaultsParams, rscDefaultsParamsNvpairIds);
         }
 
         /* <op_defaults> */
         final Node opDefaultsNode = XMLTools.getChildNode(confNode, "op_defaults");
-        final Map<String, Value> opDefaultsParams = new HashMap<String, Value>();
+        final Map<String, Value> opDefaultsParams = new HashMap<>();
         if (opDefaultsNode != null) {
             parseOpDefaults(opDefaultsNode, opDefaultsParams);
         }
@@ -2512,8 +2504,7 @@ public class CrmXml {
             } else {
                 nvpairs = cpsNode.getChildNodes();
             }
-            final Map<String, String> crmConfMap =
-                new HashMap<String, String>();
+            final Map<String, String> crmConfMap = new HashMap<>();
             /*              <nvpair...> */
             for (int i = 0; i < nvpairs.getLength(); i++) {
                 final Node optionNode = nvpairs.item(i);
@@ -2528,20 +2519,20 @@ public class CrmXml {
 
         /* <nodes> */
         /* xml node with cluster node make stupid variable names, but let's
-        * keep the convention. */
+         * keep the convention. */
         String dc = null;
         final Table<String, String, String> nodeParametersMap = HashBasedTable.create();
         final Node nodesNode = XMLTools.getChildNode(confNode, "nodes");
-        final Map<String, String> nodeOnline = new HashMap<String, String>();
-        final Map<String, String> nodeID = new HashMap<String, String>();
+        final Map<String, String> nodeOnline = new HashMap<>();
+        final Map<String, String> nodeID = new HashMap<>();
         if (nodesNode != null) {
             final NodeList nodes = nodesNode.getChildNodes();
             for (int i = 0; i < nodes.getLength(); i++) {
                 final Node nodeNode = nodes.item(i);
                 if (nodeNode.getNodeName().equals("node")) {
                     /* TODO: doing nothing with the info, just getting the dc,
-                    * for now.
-                    */
+                     * for now.
+                     */
                     final String id = XMLTools.getAttribute(nodeNode, "id");
                     final String uname = XMLTools.getAttribute(nodeNode, "uname");
                     if (!nodeID.containsKey(uname)) {
@@ -2565,51 +2556,40 @@ public class CrmXml {
             return cibQueryData;
         }
         /*      <primitive> */
-        final Map<String, Map<String, String>> parametersMap = new HashMap<String, Map<String, String>>();
-        final Map<String, Map<String, String>> parametersNvpairsIdsMap = new HashMap<String, Map<String, String>>();
-        final Map<String, ResourceAgent> resourceTypeMap = new HashMap<String, ResourceAgent>();
-        final Set<String> orphanedList = new HashSet<String>();
+        final Map<String, Map<String, String>> parametersMap = new HashMap<>();
+        final Map<String, Map<String, String>> parametersNvpairsIdsMap = new HashMap<>();
+        final Map<String, ResourceAgent> resourceTypeMap = new HashMap<>();
+        final Set<String> orphanedList = new HashSet<>();
         /* host -> inLRMList list */
-        final Map<String, Set<String>> inLRMList = new HashMap<String, Set<String>>();
-        final Map<String, String> resourceInstanceAttrIdMap = new HashMap<String, String>();
-        final MultiKeyMap<String, Value> operationsMap = new MultiKeyMap<String, Value>();
-        final Map<String, String> metaAttrsIdMap = new HashMap<String, String>();
-        final Map<String, String> operationsIdMap = new HashMap<String, String>();
-        final Map<String, Map<String, String>> resOpIdsMap = new HashMap<String, Map<String, String>>();
+        final Map<String, Set<String>> inLRMList = new HashMap<>();
+        final Map<String, String> resourceInstanceAttrIdMap = new HashMap<>();
+        final MultiKeyMap<String, Value> operationsMap = new MultiKeyMap<>();
+        final Map<String, String> metaAttrsIdMap = new HashMap<>();
+        final Map<String, String> operationsIdMap = new HashMap<>();
+        final Map<String, Map<String, String>> resOpIdsMap = new HashMap<>();
         /* must be linked, so that clone from group is before the group itself.
-        */
-        final Map<String, List<String>> groupsToResourcesMap = new LinkedHashMap<String, List<String>>();
-        final Map<String, String> cloneToResourceMap = new HashMap<String, String>();
-        final List<String> masterList = new ArrayList<String>();
+         */
+        final Map<String, List<String>> groupsToResourcesMap = new LinkedHashMap<>();
+        final Map<String, String> cloneToResourceMap = new HashMap<>();
+        final List<String> masterList = new ArrayList<>();
         final Table<String, String, String> failedMap = HashBasedTable.create();
         final Table<String, String, Set<String>> failedClonesMap = HashBasedTable.create();
-        final Map<String, String> pingCountMap = new HashMap<String, String>();
-        groupsToResourcesMap.put("none", new ArrayList<String>());
+        final Map<String, String> pingCountMap = new HashMap<>();
+        groupsToResourcesMap.put("none", new ArrayList<>());
 
         final NodeList primitivesGroups = resourcesNode.getChildNodes();
-        final Map<String, String> operationsIdRefs = new HashMap<String, String>();
-        final Map<String, String> operationsIdtoCRMId = new HashMap<String, String>();
-        final Map<String, String> metaAttrsIdRefs = new HashMap<String, String>();
-        final Map<String, String> metaAttrsIdToCRMId = new HashMap<String, String>();
+        final Map<String, String> operationsIdRefs = new HashMap<>();
+        final Map<String, String> operationsIdtoCRMId = new HashMap<>();
+        final Map<String, String> metaAttrsIdRefs = new HashMap<>();
+        final Map<String, String> metaAttrsIdToCRMId = new HashMap<>();
         for (int i = 0; i < primitivesGroups.getLength(); i++) {
             final Node primitiveGroupNode = primitivesGroups.item(i);
             final String nodeName = primitiveGroupNode.getNodeName();
             if ("primitive".equals(nodeName)) {
                 final List<String> resList = groupsToResourcesMap.get("none");
-                parsePrimitiveNode(primitiveGroupNode,
-                                   resList,
-                                   resourceTypeMap,
-                                   parametersMap,
-                                   parametersNvpairsIdsMap,
-                                   resourceInstanceAttrIdMap,
-                                   operationsMap,
-                                   metaAttrsIdMap,
-                                   operationsIdMap,
-                                   resOpIdsMap,
-                                   operationsIdRefs,
-                                   operationsIdtoCRMId,
-                                   metaAttrsIdRefs,
-                                   metaAttrsIdToCRMId);
+                parsePrimitiveNode(primitiveGroupNode, resList, resourceTypeMap, parametersMap, parametersNvpairsIdsMap,
+                        resourceInstanceAttrIdMap, operationsMap, metaAttrsIdMap, operationsIdMap, resOpIdsMap, operationsIdRefs,
+                        operationsIdtoCRMId, metaAttrsIdRefs, metaAttrsIdToCRMId);
             } else if ("group".equals(nodeName)) {
                 parseGroupNode(primitiveGroupNode,
                                null,
@@ -2629,11 +2609,7 @@ public class CrmXml {
             } else if ("master".equals(nodeName) || "master_slave".equals(nodeName) || "clone".equals(nodeName)) {
                 final NodeList primitives = primitiveGroupNode.getChildNodes();
                 final String cloneId = XMLTools.getAttribute(primitiveGroupNode, "id");
-                List<String> resList = groupsToResourcesMap.get(cloneId);
-                if (resList == null) {
-                    resList = new ArrayList<String>();
-                    groupsToResourcesMap.put(cloneId, resList);
-                }
+                List<String> resList = groupsToResourcesMap.computeIfAbsent(cloneId, k -> new ArrayList<>());
                 parseAttributes(primitiveGroupNode,
                                 cloneId,
                                 parametersMap,
@@ -2693,163 +2669,153 @@ public class CrmXml {
         }
 
         /* operationsRefs crm id -> crm id */
-        final Map<String, String> operationsRefs = new HashMap<String, String>();
+        final Map<String, String> operationsRefs = new HashMap<>();
         for (final String crmId : operationsIdRefs.keySet()) {
             final String idRef = operationsIdRefs.get(crmId);
             operationsRefs.put(crmId, operationsIdtoCRMId.get(idRef));
         }
 
         /* mettaAttrsRefs crm id -> crm id */
-        final Map<String, String> metaAttrsRefs = new HashMap<String, String>();
+        final Map<String, String> metaAttrsRefs = new HashMap<>();
         for (final String crmId : metaAttrsIdRefs.keySet()) {
             final String idRef = metaAttrsIdRefs.get(crmId);
             metaAttrsRefs.put(crmId, metaAttrsIdToCRMId.get(idRef));
         }
 
         /* <constraints> */
-        final Map<String, ColocationData> colocationIdMap = new LinkedHashMap<String, ColocationData>();
-        final Map<String, List<ColocationData>> colocationRscMap = new HashMap<String, List<ColocationData>>();
-        final Map<String, OrderData> orderIdMap = new LinkedHashMap<String, OrderData>();
-        final Map<String, List<RscSet>> orderIdRscSetsMap = new HashMap<String, List<RscSet>>();
-        final Map<String, List<RscSet>> colocationIdRscSetsMap = new HashMap<String, List<RscSet>>();
-        final List<RscSetConnectionData> rscSetConnections = new ArrayList<RscSetConnectionData>();
-        final Map<String, List<OrderData>> orderRscMap = new HashMap<String, List<OrderData>>();
-        final Map<String, Map<String, HostLocation>> locationMap = new HashMap<String, Map<String, HostLocation>>();
-        final Map<String, HostLocation> pingLocationMap = new HashMap<String, HostLocation>();
-        final Map<String, List<String>> locationsIdMap = new HashMap<String, List<String>>();
+        final Map<String, ColocationData> colocationIdMap = new LinkedHashMap<>();
+        final Map<String, List<ColocationData>> colocationRscMap = new HashMap<>();
+        final Map<String, OrderData> orderIdMap = new LinkedHashMap<>();
+        final Map<String, List<RscSet>> orderIdRscSetsMap = new HashMap<>();
+        final Map<String, List<RscSet>> colocationIdRscSetsMap = new HashMap<>();
+        final List<RscSetConnectionData> rscSetConnections = new ArrayList<>();
+        final Map<String, List<OrderData>> orderRscMap = new HashMap<>();
+        final Map<String, Map<String, HostLocation>> locationMap = new HashMap<>();
+        final Map<String, HostLocation> pingLocationMap = new HashMap<>();
+        final Map<String, List<String>> locationsIdMap = new HashMap<>();
         final Table<String, String, String> resHostToLocIdMap = HashBasedTable.create();
-        
-        final Map<String, String> resPingToLocIdMap = new HashMap<String, String>();
+
+        final Map<String, String> resPingToLocIdMap = new HashMap<>();
         final Node constraintsNode = XMLTools.getChildNode(confNode, "constraints");
         if (constraintsNode != null) {
             final NodeList constraints = constraintsNode.getChildNodes();
-            String rscString         = "rsc";
-            String rscRoleString     = "rsc-role";
-            String withRscString     = "with-rsc";
+            String rscString = "rsc";
+            String rscRoleString = "rsc-role";
+            String withRscString = "with-rsc";
             String withRscRoleString = "with-rsc-role";
-            String firstString       = "first";
-            String thenString        = "then";
+            String firstString = "first";
+            String thenString = "then";
             String firstActionString = "first-action";
-            String thenActionString  = "then-action";
+            String thenActionString = "then-action";
             if (Tools.versionBeforePacemaker(host)) {
-                rscString         = "from";
-                rscRoleString     = "from_role";
-                withRscString     = "to";
+                rscString = "from";
+                rscRoleString = "from_role";
+                withRscString = "to";
                 withRscRoleString = "to_role";
-                firstString       = "to";
-                thenString        = "from";
+                firstString = "to";
+                thenString = "from";
                 firstActionString = "to_action";
-                thenActionString  = "action";
+                thenActionString = "action";
             }
             for (int i = 0; i < constraints.getLength(); i++) {
                 final Node constraintNode = constraints.item(i);
-                if (constraintNode.getNodeName().equals("rsc_colocation")) {
-                    final String colId = XMLTools.getAttribute(constraintNode, "id");
-                    final String rsc = XMLTools.getAttribute(constraintNode, rscString);
-                    final String withRsc = XMLTools.getAttribute(constraintNode, withRscString);
-                    if (rsc == null || withRsc == null) {
-                        final List<RscSet> rscSets = new ArrayList<RscSet>();
-                        parseResourceSets(constraintNode, colId, null, rscSets, rscSetConnections);
-                        colocationIdRscSetsMap.put(colId, rscSets);
-                    }
-                    final String rscRole = XMLTools.getAttribute(constraintNode, rscRoleString);
-                    final String withRscRole = XMLTools.getAttribute(constraintNode, withRscRoleString);
-                    final String score = XMLTools.getAttribute(constraintNode, SCORE_CONSTRAINT_PARAM);
-                    final ColocationData colocationData =
-                                                 new ColocationData(colId, rsc, withRsc, rscRole, withRscRole, score);
-                    colocationIdMap.put(colId, colocationData);
-                    List<ColocationData> withs = colocationRscMap.get(rsc);
-                    if (withs == null) {
-                        withs = new ArrayList<ColocationData>();
-                    }
-                    withs.add(colocationData);
-                    colocationRscMap.put(rsc, withs);
-                } else if (constraintNode.getNodeName().equals("rsc_order")) {
-                    String rscFirst = XMLTools.getAttribute(constraintNode, firstString);
-                    String rscThen = XMLTools.getAttribute(constraintNode, thenString);
-                    final String ordId = XMLTools.getAttribute(constraintNode, "id");
-                    if (rscFirst == null || rscThen == null) {
-                        final List<RscSet> rscSets = new ArrayList<RscSet>();
-                        parseResourceSets(constraintNode, null, ordId, rscSets, rscSetConnections);
-                        orderIdRscSetsMap.put(ordId, rscSets);
-                    }
-                    final String score = XMLTools.getAttribute(constraintNode, SCORE_CONSTRAINT_PARAM);
-                    final String symmetrical = XMLTools.getAttribute(constraintNode, "symmetrical");
-                    String firstAction = XMLTools.getAttribute(constraintNode, firstActionString);
-                    String thenAction = XMLTools.getAttribute(constraintNode, thenActionString);
-                    final String type = XMLTools.getAttribute(constraintNode, "type");
-                    if (type != null && "before".equals(type)) {
-                        /* exchange resoruces */
-                        final String rsc = rscFirst;
-                        rscFirst = rscThen;
-                        rscThen = rsc;
-                        final String act = firstAction;
-                        firstAction = thenAction;
-                        thenAction = act;
-                    }
-                    final OrderData orderData = new OrderData(ordId,
-                                                              rscFirst,
-                                                              rscThen,
-                                                              score,
-                                                              symmetrical,
-                                                              firstAction,
-                                                              thenAction);
-                    orderIdMap.put(ordId, orderData);
-                    List<OrderData> thens = orderRscMap.get(rscFirst);
-                    if (thens == null) {
-                        thens = new ArrayList<OrderData>();
-                    }
-                    thens.add(orderData);
-                    orderRscMap.put(rscFirst, thens);
-                } else if ("rsc_location".equals(constraintNode.getNodeName())) {
-                    final String locId = XMLTools.getAttribute(constraintNode, "id");
-                    final String node  = XMLTools.getAttribute(constraintNode, "node");
-                    final String rsc   = XMLTools.getAttribute(constraintNode, "rsc");
-                    final String score = XMLTools.getAttribute(constraintNode, SCORE_CONSTRAINT_PARAM);
-
-                    List<String> locs = locationsIdMap.get(rsc);
-                    if (locs == null) {
-                        locs = new ArrayList<String>();
-                        locationsIdMap.put(rsc, locs);
-                    }
-                    Map<String, HostLocation> hostScoreMap = locationMap.get(rsc);
-                    if (hostScoreMap == null) {
-                        hostScoreMap = new HashMap<String, HostLocation>();
-                        locationMap.put(rsc, hostScoreMap);
-                    }
-                    final String role = null; // TODO
-                    if (node != null) {
-                        resHostToLocIdMap.put(rsc, node.toLowerCase(Locale.US), locId);
-                        if (score != null) {
-                            hostScoreMap.put(node.toLowerCase(Locale.US), new HostLocation(score, "eq", null, role));
+                switch (constraintNode.getNodeName()) {
+                    case "rsc_colocation": {
+                        final String colId = XMLTools.getAttribute(constraintNode, "id");
+                        final String rsc = XMLTools.getAttribute(constraintNode, rscString);
+                        final String withRsc = XMLTools.getAttribute(constraintNode, withRscString);
+                        if (rsc == null || withRsc == null) {
+                            final List<RscSet> rscSets = new ArrayList<>();
+                            parseResourceSets(constraintNode, colId, null, rscSets, rscSetConnections);
+                            colocationIdRscSetsMap.put(colId, rscSets);
                         }
+                        final String rscRole = XMLTools.getAttribute(constraintNode, rscRoleString);
+                        final String withRscRole = XMLTools.getAttribute(constraintNode, withRscRoleString);
+                        final String score = XMLTools.getAttribute(constraintNode, SCORE_CONSTRAINT_PARAM);
+                        final ColocationData colocationData = new ColocationData(colId, rsc, withRsc, rscRole, withRscRole, score);
+                        colocationIdMap.put(colId, colocationData);
+                        List<ColocationData> withs = colocationRscMap.get(rsc);
+                        if (withs == null) {
+                            withs = new ArrayList<>();
+                        }
+                        withs.add(colocationData);
+                        colocationRscMap.put(rsc, withs);
+                        break;
                     }
-                    locs.add(locId);
-                    final Node ruleNode = XMLTools.getChildNode(constraintNode, "rule");
-                    if (ruleNode != null) {
-                        final String score2 = XMLTools.getAttribute(ruleNode, SCORE_CONSTRAINT_PARAM);
-                        final String booleanOp = XMLTools.getAttribute(ruleNode, "boolean-op");
-                        // TODO: I know only "and", ignoring everything we
-                        // don't know.
-                        final Node expNode = XMLTools.getChildNode(ruleNode, "expression");
-                        if (expNode != null
-                            && "expression".equals(expNode.getNodeName())) {
-                            final String attr = XMLTools.getAttribute(expNode, "attribute");
-                            final String op = XMLTools.getAttribute(expNode, "operation");
-                            final String value = XMLTools.getAttribute(expNode, "value");
-                            if ((booleanOp == null || "and".equals(booleanOp))
-                                && "#uname".equals(attr)
-                                && value != null) {
-                                hostScoreMap.put(value.toLowerCase(Locale.US),
-                                                 new HostLocation(score2, op, null, role));
-                                resHostToLocIdMap.put(rsc, value.toLowerCase(Locale.US), locId);
-                            } else if ((booleanOp == null || "and".equals(booleanOp)) && "pingd".equals(attr)) {
-                                pingLocationMap.put(rsc, new HostLocation(score2, op, value, null));
-                                resPingToLocIdMap.put(rsc, locId);
-                            } else {
-                                LOG.appWarning("parseCibQuery: could not parse rsc_location: " + locId);
+                    case "rsc_order": {
+                        String rscFirst = XMLTools.getAttribute(constraintNode, firstString);
+                        String rscThen = XMLTools.getAttribute(constraintNode, thenString);
+                        final String ordId = XMLTools.getAttribute(constraintNode, "id");
+                        if (rscFirst == null || rscThen == null) {
+                            final List<RscSet> rscSets = new ArrayList<>();
+                            parseResourceSets(constraintNode, null, ordId, rscSets, rscSetConnections);
+                            orderIdRscSetsMap.put(ordId, rscSets);
+                        }
+                        final String score = XMLTools.getAttribute(constraintNode, SCORE_CONSTRAINT_PARAM);
+                        final String symmetrical = XMLTools.getAttribute(constraintNode, "symmetrical");
+                        String firstAction = XMLTools.getAttribute(constraintNode, firstActionString);
+                        String thenAction = XMLTools.getAttribute(constraintNode, thenActionString);
+                        final String type = XMLTools.getAttribute(constraintNode, "type");
+                        if ("before".equals(type)) {
+                            /* exchange resoruces */
+                            final String rsc = rscFirst;
+                            rscFirst = rscThen;
+                            rscThen = rsc;
+                            final String act = firstAction;
+                            firstAction = thenAction;
+                            thenAction = act;
+                        }
+                        final OrderData orderData =
+                                new OrderData(ordId, rscFirst, rscThen, score, symmetrical, firstAction, thenAction);
+                        orderIdMap.put(ordId, orderData);
+                        List<OrderData> thens = orderRscMap.get(rscFirst);
+                        if (thens == null) {
+                            thens = new ArrayList<>();
+                        }
+                        thens.add(orderData);
+                        orderRscMap.put(rscFirst, thens);
+                        break;
+                    }
+                    case "rsc_location": {
+                        final String locId = XMLTools.getAttribute(constraintNode, "id");
+                        final String node = XMLTools.getAttribute(constraintNode, "node");
+                        final String rsc = XMLTools.getAttribute(constraintNode, "rsc");
+                        final String score = XMLTools.getAttribute(constraintNode, SCORE_CONSTRAINT_PARAM);
+
+                        List<String> locs = locationsIdMap.computeIfAbsent(rsc, k -> new ArrayList<>());
+                        Map<String, HostLocation> hostScoreMap = locationMap.computeIfAbsent(rsc, k -> new HashMap<>());
+                        final String role = null; // TODO
+
+                        if (node != null) {
+                            resHostToLocIdMap.put(rsc, node.toLowerCase(Locale.US), locId);
+                            if (score != null) {
+                                hostScoreMap.put(node.toLowerCase(Locale.US), new HostLocation(score, "eq", null, role));
                             }
                         }
+                        locs.add(locId);
+                        final Node ruleNode = XMLTools.getChildNode(constraintNode, "rule");
+                        if (ruleNode != null) {
+                            final String score2 = XMLTools.getAttribute(ruleNode, SCORE_CONSTRAINT_PARAM);
+                            final String booleanOp = XMLTools.getAttribute(ruleNode, "boolean-op");
+                            // TODO: I know only "and", ignoring everything we
+                            // don't know.
+                            final Node expNode = XMLTools.getChildNode(ruleNode, "expression");
+                            if (expNode != null && "expression".equals(expNode.getNodeName())) {
+                                final String attr = XMLTools.getAttribute(expNode, "attribute");
+                                final String op = XMLTools.getAttribute(expNode, "operation");
+                                final String value = XMLTools.getAttribute(expNode, "value");
+                                if ((booleanOp == null || "and".equals(booleanOp)) && "#uname".equals(attr) && value != null) {
+                                    hostScoreMap.put(value.toLowerCase(Locale.US), new HostLocation(score2, op, null, role));
+                                    resHostToLocIdMap.put(rsc, value.toLowerCase(Locale.US), locId);
+                                } else if ((booleanOp == null || "and".equals(booleanOp)) && "pingd".equals(attr)) {
+                                    pingLocationMap.put(rsc, new HostLocation(score2, op, value, null));
+                                    resPingToLocIdMap.put(rsc, locId);
+                                } else {
+                                    LOG.appWarning("parseCibQuery: could not parse rsc_location: " + locId);
+                                }
+                            }
+                        }
+                        break;
                     }
                 }
             }
@@ -2857,7 +2823,7 @@ public class CrmXml {
 
         /* <status> */
         final Node statusNode = XMLTools.getChildNode(cibNode, "status");
-        final Set<String> nodePending = new HashSet<String>();
+        final Set<String> nodePending = new HashSet<>();
         if (statusNode != null) {
             /* <node_state ...> */
             final NodeList nodes = statusNode.getChildNodes();
@@ -2954,26 +2920,17 @@ public class CrmXml {
     }
 
     public String[] getOrderParameters() {
-        if (orderParams != null) {
-            return orderParams.toArray(new String[orderParams.size()]);
-        }
-        return null;
+        return orderParams.toArray(new String[orderParams.size()]);
     }
 
     public String[] getResourceSetOrderParameters() {
-        if (resourceSetOrderParams != null) {
-            return resourceSetOrderParams.toArray(new String[resourceSetOrderParams.size()]);
-        }
-        return null;
+        return resourceSetOrderParams.toArray(new String[resourceSetOrderParams.size()]);
     }
 
     /** Returns order parameters for resource sets. (Shown when an edge
      * is clicked, resource_set tag). */
     public String[] getRscSetOrdConnectionParameters() {
-        if (resourceSetOrderConnectionParams != null) {
-            return resourceSetOrderConnectionParams.toArray(new String[resourceSetOrderConnectionParams.size()]);
-        }
-        return null;
+        return resourceSetOrderConnectionParams.toArray(new String[resourceSetOrderConnectionParams.size()]);
     }
 
     public boolean isOrderRequired(final String param) {
@@ -3066,7 +3023,7 @@ public class CrmXml {
                 correctValue = false;
             }
         } else if (PARAM_TYPE_INTEGER.equals(type)) {
-            final Pattern p = Pattern.compile("^(-?\\d*|(-|\\+)?" + INFINITY_VALUE + ")$");
+            final Pattern p = Pattern.compile("^(-?\\d*|([-+])?" + INFINITY_VALUE + ")$");
             if (value != null && !value.isNothingSelected()) {
                 final Matcher m = p.matcher(value.getValueForConfig());
                 if (!m.matches()) {
@@ -3088,29 +3045,19 @@ public class CrmXml {
     }
 
     public String[] getColocationParameters() {
-        if (colocationParams != null) {
-            return colocationParams.toArray(new String[colocationParams.size()]);
-        }
-        return null;
+        return colocationParams.toArray(new String[colocationParams.size()]);
     }
 
     /** Returns colocation parameters for resource sets. (Shown when a
      * placeholder is clicked, rsc_colocation tag). */
     public String[] getResourceSetColocationParameters() {
-        if (resourceSetColocationParams != null) {
-            return resourceSetColocationParams.toArray(new String[resourceSetColocationParams.size()]);
-        }
-        return null;
+        return resourceSetColocationParams.toArray(new String[resourceSetColocationParams.size()]);
     }
 
     /** Returns colocation parameters for resource sets. (Shown when an edge
      * is clicked, resource_set tag). */
     public String[] getResourceSetColConnectionParameters() {
-        if (resourceSetColocationConnectionParams != null) {
-            return resourceSetColocationConnectionParams.toArray(
-                new String[resourceSetColocationConnectionParams.size()]);
-        }
-        return null;
+        return resourceSetColocationConnectionParams.toArray(new String[resourceSetColocationConnectionParams.size()]);
     }
 
     public boolean isColocationRequired(final String param) {
@@ -3191,7 +3138,7 @@ public class CrmXml {
                 correctValue = false;
             }
         } else if (PARAM_TYPE_INTEGER.equals(type)) {
-            final Pattern p = Pattern.compile("^(-?\\d*|(-|\\+)?" + INFINITY_VALUE + ")$");
+            final Pattern p = Pattern.compile("^(-?\\d*|([-+])?" + INFINITY_VALUE + ")$");
             if (value != null && value.getValueForConfig() != null) {
                 final Matcher m = p.matcher(value.getValueForConfig());
                 if (!m.matches()) {
@@ -3243,7 +3190,7 @@ public class CrmXml {
                     crmId = m.group(1);
                     Set<String> clones = failedClonesMap.get(unameLowerCase, crmId);
                     if (clones == null) {
-                        clones = new LinkedHashSet<String>();
+                        clones = new LinkedHashSet<>();
                         failedClonesMap.put(unameLowerCase, crmId, clones);
                     }
                     clones.add(m.group(2));
@@ -3259,15 +3206,11 @@ public class CrmXml {
                     final String type = XMLTools.getAttribute(rscNode, "type");
                     resourceTypeMap.put(crmId, getResourceAgent(type, provider, raClass));
                     resList.add(crmId);
-                    parametersMap.put(crmId, new HashMap<String, String>());
+                    parametersMap.put(crmId, new HashMap<>());
                     orphanedList.add(crmId);
                 }
                 /* it is in LRM */
-                Set<String> inLRMOnHost = inLRMList.get(unameLowerCase);
-                if (inLRMOnHost == null) {
-                    inLRMOnHost = new HashSet<String>();
-                    inLRMList.put(unameLowerCase, inLRMOnHost);
-                }
+                Set<String> inLRMOnHost = inLRMList.computeIfAbsent(unameLowerCase, k -> new HashSet<>());
                 inLRMOnHost.add(crmId);
             }
         }
@@ -3480,13 +3423,12 @@ public class CrmXml {
         public String getId() {
             return id;
         }
+
         public List<String> getRscIds() {
-            final List<String> copy = new ArrayList<String>();
+            final List<String> copy = new ArrayList<>();
             mRscIdsReadLock.lock();
             try {
-                for (final String rscId : rscIds) {
-                    copy.add(rscId);
-                }
+                copy.addAll(rscIds);
             } finally {
                 mRscIdsReadLock.unlock();
             }
@@ -3566,12 +3508,7 @@ public class CrmXml {
 
         @Override
         public String toString() {
-            final StringBuilder s = new StringBuilder(20);
-            s.append("rscset id: ");
-            s.append(id);
-            s.append(" ids: ");
-            s.append(rscIds);
-            return s.toString();
+            return "rscset id: " + id + " ids: " + rscIds;
         }
 
         public String getOrderAction() {

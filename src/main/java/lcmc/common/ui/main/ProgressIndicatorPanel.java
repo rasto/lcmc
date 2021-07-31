@@ -20,7 +20,7 @@
  * the Free Software Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-/**
+/*
  * 18:12 17/02/2005
  * Romain Guy <romain.guy@jext.org>
  * Subject to the BSD license.
@@ -49,19 +49,21 @@ import java.util.LinkedList;
 import java.util.Map;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
+
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
-import javax.swing.*;
+import javax.swing.ImageIcon;
+import javax.swing.JComponent;
 
+import lcmc.cluster.ui.widget.WidgetFactory;
+import lcmc.common.domain.util.Tools;
 import lcmc.common.ui.Browser;
 import lcmc.common.ui.MainPanel;
+import lcmc.common.ui.utils.MyButton;
 import lcmc.configs.AppDefaults;
-import lcmc.cluster.ui.widget.WidgetFactory;
 import lcmc.logger.Logger;
 import lcmc.logger.LoggerFactory;
-import lcmc.common.ui.utils.MyButton;
-import lcmc.common.domain.util.Tools;
 
 /**
  * An infinite progress panel displays a rotating figure and
@@ -97,45 +99,70 @@ import lcmc.common.domain.util.Tools;
 @Singleton
 class ProgressIndicatorPanel extends JComponent implements MouseListener, KeyListener {
     private static final Logger LOG = LoggerFactory.getLogger(ProgressIndicatorPanel.class);
-    private static final int RAMP_DELAY_STOP  = 1000;
-    private static final ImageIcon CANCEL_ICON = Tools.createImageIcon(
-                                                            Tools.getDefault("ProgressIndicatorPanel.CancelIcon"));
+    private static final int RAMP_DELAY_STOP = 1000;
+    private static final ImageIcon CANCEL_ICON = Tools.createImageIcon(Tools.getDefault("ProgressIndicatorPanel.CancelIcon"));
     private static final int MAX_ALPHA_LEVEL = 255;
     private static final Color VEIL2_COLOR = Browser.STATUS_BACKGROUND;
-    /** Text color. */
+    /**
+     * Text color.
+     */
     private static final Color VEIL_COLOR = Browser.PANEL_BACKGROUND;
-    /** Notifies whether the animation is running or not. */
-    private boolean started    = false;
-    /** Alpha level of the veil, used for fade in/out. */
+    /**
+     * Notifies whether the animation is running or not.
+     */
+    private boolean started = false;
+    /**
+     * Alpha level of the veil, used for fade in/out.
+     */
     private volatile int alphaLevel = 0;
-    /** Duration of the veil's fade in/out. */
-    private int rampDelay  = 1000;
-    /** Alpha level of the veil. */
-    private float shield     = 0.80f;
-    /** Message displayed. */
-    private final Map<String, Integer> texts =
-                                        new LinkedHashMap<String, Integer>();
-    /** Message positions or null. */
-    private final Map<String, Point2D> textsPositions =
-                                              new HashMap<String, Point2D>();
-    /** List of failed commands. */
-    private final Collection<String> failuresMap = new LinkedList<String>();
-    /** Rendering hints to set anti aliasing. */
+    /**
+     * Duration of the veil's fade in/out.
+     */
+    private int rampDelay = 1000;
+    /**
+     * Alpha level of the veil.
+     */
+    private float shield = 0.80f;
+    /**
+     * Message displayed.
+     */
+    private final Map<String, Integer> texts = new LinkedHashMap<>();
+    /**
+     * Message positions or null.
+     */
+    private final Map<String, Point2D> textsPositions = new HashMap<>();
+    /**
+     * List of failed commands.
+     */
+    private final Collection<String> failuresMap = new LinkedList<>();
+    /**
+     * Rendering hints to set anti aliasing.
+     */
     private RenderingHints hints = null;
     private final Lock mAnimatorLock = new ReentrantLock();
     private final Lock mTextsLock = new ReentrantLock();
     @Inject
     private WidgetFactory widgetFactory;
-    /** Cancel button. TODO: not used. */
+    /**
+     * Cancel button. TODO: not used.
+     */
     private MyButton cancelButton;
-    /** Animator thread. */
+    /**
+     * Animator thread.
+     */
     private Animator animator;
 
-    /** Old width of the whole frame. */
-    private int oldWidth  = getWidth();
-    /** Old height of the whole frame. */
+    /**
+     * Old width of the whole frame.
+     */
+    private int oldWidth = getWidth();
+    /**
+     * Old height of the whole frame.
+     */
     private int oldHeight = getHeight();
-    /** Beginning position of the bar. */
+    /**
+     * Beginning position of the bar.
+     */
     private double barPos = -1;
     @Inject
     private MainPanel mainPanel;
@@ -143,12 +170,12 @@ class ProgressIndicatorPanel extends JComponent implements MouseListener, KeyLis
     private MainData mainData;
 
     public void init() {
-        this.rampDelay = 300;
-        this.shield = 0.40f;
+        rampDelay = 300;
+        shield = 0.40f;
 
-        this.hints = new RenderingHints(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
-        this.hints.put(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-        this.hints.put(RenderingHints.KEY_FRACTIONALMETRICS, RenderingHints.VALUE_FRACTIONALMETRICS_ON);
+        hints = new RenderingHints(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
+        hints.put(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+        hints.put(RenderingHints.KEY_FRACTIONALMETRICS, RenderingHints.VALUE_FRACTIONALMETRICS_ON);
         cancelButton = widgetFactory.createButton(Tools.getString("ProgressIndicatorPanel.Cancel"), CANCEL_ICON);
         cancelButton.setBounds(0, 0, cancelButton.getPreferredSize().width, cancelButton.getPreferredSize().height);
     }
@@ -270,33 +297,29 @@ class ProgressIndicatorPanel extends JComponent implements MouseListener, KeyLis
             final int startAtHeight = getHeight() / 2 - barHeight / 2;
             g2.fillRect(0, 20, width, mainPanel.getTerminalPanelPos() - 20);
             if (barPos < 0) {
-                barPos = width / 2;
+                barPos = width / 2.0;
             }
             if (barPos < width) {
-                g2.setColor(new Color(VEIL2_COLOR.getRed(),
-                                      VEIL2_COLOR.getGreen(),
-                                      VEIL2_COLOR.getBlue(),
-                                      (int) (alphaLevel * shield * 0.5)));
-                if (barPos < width / 2) {
+                g2.setColor(new Color(VEIL2_COLOR.getRed(), VEIL2_COLOR.getGreen(), VEIL2_COLOR.getBlue(),
+                        (int) (alphaLevel * shield * 0.5)));
+                if (barPos < width / 2.0) {
                     g2.fillRect((int) barPos, startAtHeight, (int) (width - barPos * 2), barHeight);
                 } else {
-                    g2.fillRect((int) (width  - barPos), startAtHeight, (int) (barPos * 2 - width), barHeight);
+                    g2.fillRect((int) (width - barPos), startAtHeight, (int) (barPos * 2 - width), barHeight);
                 }
             }
             barPos += 5.0 * 20.0 / mainData.getAnimFPS();
-            if (barPos >= width / 2 + getWidth() / 2) {
-                barPos = width / 2 - getWidth() / 2;
+            if (barPos >= width / 2.0 + getWidth() / 2.0) {
+                barPos = width / 2.0 - getWidth() / 2.0;
             }
 
 
             mTextsLock.lock();
             if (!texts.isEmpty()) {
                 final FontRenderContext context = g2.getFontRenderContext();
-                final Font font = new Font(getFont().getName(),
-                                           getFont().getStyle(),
-                                           (int) (getFont().getSize() * 1.75));
+                final Font font = new Font(getFont().getName(), getFont().getStyle(), (int) (getFont().getSize() * 1.75));
 
-                final double maxY = getHeight() / 2 - 30;
+                final double maxY = getHeight() / 2.0 - 30;
 
                 int y = 0;
                 for (final Map.Entry<String, Integer> textEntry : texts.entrySet()) {
@@ -415,9 +438,7 @@ class ProgressIndicatorPanel extends JComponent implements MouseListener, KeyLis
                     if (newAlphaLevel >= MAX_ALPHA_LEVEL) {
                         newAlphaLevel = MAX_ALPHA_LEVEL;
                     } else if (newAlphaLevel < 0) {
-                        LOG.appWarning("wrong alpha: " + newAlphaLevel
-                                       + ", prev alpha: " + alphaLevel
-                                       + ", rampDelay: " + rampDelay
+                        LOG.appWarning("wrong alpha: " + newAlphaLevel + ", prev alpha: " + alphaLevel + ", rampDelay: " + rampDelay
                                        + ", t-s: " + (time - start));
                     }
                     alphaLevel = newAlphaLevel;
@@ -436,7 +457,7 @@ class ProgressIndicatorPanel extends JComponent implements MouseListener, KeyLis
                     alphaLevel = newAlphaLevel;
                 }
 
-                final Collection<String> toRemove = new ArrayList<String>();
+                final Collection<String> toRemove = new ArrayList<>();
                 mTextsLock.lock();
                 for (final Map.Entry<String, Integer> textEntry : texts.entrySet()) {
                     int alpha = textEntry.getValue();

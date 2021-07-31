@@ -69,13 +69,9 @@ public final class AisCastAddress {
      */
     public String getConfigString(final int ringnumber, final String tab) {
         if ("mcast".equals(type)) {
-            return tab + "interface {\n"
-                 + tab + tab + "ringnumber: "  + Integer.toString(ringnumber)
-                 + '\n'
-                 + tab + tab + "bindnetaddr: " + bindNetAddr + '\n'
-                 + tab + tab + "mcastaddr: "   + multicastAddr + '\n'
-                 + tab + tab + "mcastport: "   + port + '\n'
-                 + tab + '}';
+            return tab + "interface {\n" + tab + tab + "ringnumber: " + ringnumber + '\n' + tab + tab + "bindnetaddr: "
+                   + bindNetAddr + '\n' + tab + tab + "mcastaddr: " + multicastAddr + '\n' + tab + tab + "mcastport: " + port + '\n'
+                   + tab + '}';
         } else {
             return "";
         }

@@ -20,19 +20,20 @@
 
 package lcmc.robotest;
 
-import lcmc.common.ui.main.MainData;
-import lcmc.common.domain.Application;
-import lcmc.cluster.domain.Cluster;
-import lcmc.common.ui.MainPanel;
-import lcmc.host.domain.Host;
-import lcmc.logger.Logger;
-import lcmc.logger.LoggerFactory;
-import lcmc.common.domain.util.Tools;
+import java.io.IOException;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
-import java.io.IOException;
+
+import lcmc.cluster.domain.Cluster;
+import lcmc.common.domain.Application;
+import lcmc.common.domain.util.Tools;
+import lcmc.common.ui.MainPanel;
+import lcmc.common.ui.main.MainData;
+import lcmc.host.domain.Host;
+import lcmc.logger.Logger;
+import lcmc.logger.LoggerFactory;
 
 @Named
 @Singleton
@@ -126,228 +127,223 @@ public class StartTests {
             final Host firstHost = cluster.getHostsArray()[0];
             mainPanel.setTerminalPanel(firstHost.getTerminalPanel());
         }
-        final Thread thread = new Thread(new Runnable() {
-            @Override
-            public void run() {
-                roboTest.sleepNoFactor(3000);
-                if (type == Type.GUI) {
-                    roboTest.moveTo(30, 20);
-                    roboTest.leftClick();
-                    final int count = 200;
-                    if (index == '1') {
-                        /* cluster wizard deadlock */
+        final Thread thread = new Thread(() -> {
+            roboTest.sleepNoFactor(3000);
+            if (type == Type.GUI) {
+                roboTest.moveTo(30, 20);
+                roboTest.leftClick();
+                final int count = 200;
+                if (index == '1') {
+                    /* cluster wizard deadlock */
+                    final long startTime = System.currentTimeMillis();
+                    roboTest.info("test" + index);
+                    guiTest1.start(count);
+                    final int secs = (int) (System.currentTimeMillis() - startTime) / 1000;
+                    roboTest.info("test" + index + ", secs: " + secs);
+                } else if (index == '2') {
+                    /* cluster wizard deadlock */
+                    final long startTime = System.currentTimeMillis();
+                    roboTest.info("test" + index);
+                    guiTest2.start(count);
+                    final int secs = (int) (System.currentTimeMillis() - startTime) / 1000;
+                    roboTest.info("test" + index + ", secs: " + secs);
+                }
+            } else if (type == Type.PCMK) {
+                startPcmkTests(index, cluster);
+            } else if (type == Type.DRBD) {
+                roboTest.moveToMenu(Tools.getString("Dialog.vm.Storage.Title"));
+                roboTest.leftClick();
+                mainPanel.expandTerminalSplitPane(MainPanel.TerminalSize.COLLAPSE);
+                if (index == '0') {
+                    /* all DRBD tests */
+                    int i = 1;
+                    final int blockDevY = roboTest.getBlockDevY();
+                    while (!roboTest.isAborted()) {
                         final long startTime = System.currentTimeMillis();
-                        roboTest.info("test" + index);
-                        guiTest1.start(count);
-                        final int secs = (int) (System.currentTimeMillis()
-                                - startTime) / 1000;
-                        roboTest.info("test" + index + ", secs: " + secs);
-                    } else if (index == '2') {
-                        /* cluster wizard deadlock */
-                        final long startTime = System.currentTimeMillis();
-                        roboTest.info("test" + index);
-                        guiTest2.start(count);
-                        final int secs = (int) (System.currentTimeMillis()
-                                - startTime) / 1000;
-                        roboTest.info("test" + index + ", secs: " + secs);
-                    }
-                } else if (type == Type.PCMK) {
-                    startPcmkTests(index, cluster);
-                } else if (type == Type.DRBD) {
-                    roboTest.moveToMenu(Tools.getString("Dialog.vm.Storage.Title"));
-                    roboTest.leftClick();
-                    mainPanel.expandTerminalSplitPane(MainPanel.TerminalSize.COLLAPSE);
-                    if (index == '0') {
-                        /* all DRBD tests */
-                        int i = 1;
-                        final int blockDevY = roboTest.getBlockDevY();
-                        while (!roboTest.isAborted()) {
-                            final long startTime = System.currentTimeMillis();
-                            roboTest.info("test" + index + " no " + i);
-                            drbdTest1.start(cluster, blockDevY);
-                            if (roboTest.isAborted()) {
-                                break;
-                            }
-                            drbdTest2.start(cluster, blockDevY);
-                            if (roboTest.isAborted()) {
-                                break;
-                            }
-                            drbdTest3.start(cluster, blockDevY);
-                            if (roboTest.isAborted()) {
-                                break;
-                            }
-                            if (cluster.getHostsArray()[0].hasVolumes()) {
-                                drbdTest4.start(cluster, blockDevY);
-                                if (roboTest.isAborted()) {
-                                    break;
-                                }
-                            }
-                            final int secs = (int) (System.currentTimeMillis() - startTime) / 1000;
-                            roboTest.info("test" + index + " no " + i + ", secs: " + secs);
-                            roboTest.resetTerminalAreas();
-                            i++;
-                            if (cluster.getHostsArray()[0].hasVolumes()) {
-                                application.setBigDRBDConf(!application.getBigDRBDConf());
-                            }
+                        roboTest.info("test" + index + " no " + i);
+                        drbdTest1.start(cluster, blockDevY);
+                        if (roboTest.isAborted()) {
+                            break;
                         }
-                    } else if (index == '1') {
-                        /* DRBD 1 link */
-                        int i = 1;
-                        final int blockDevY = roboTest.getBlockDevY();
-                        while (!roboTest.isAborted()) {
-                            final long startTime = System.currentTimeMillis();
-                            roboTest.info("test" + index + " no " + i);
-                            drbdTest1.start(cluster, blockDevY);
-                            final int secs = (int) (System.currentTimeMillis() - startTime) / 1000;
-                            roboTest.info("test" + index + " no " + i + ", secs: " + secs);
-                            roboTest.resetTerminalAreas();
-                            i++;
-                            if (cluster.getHostsArray()[0].hasVolumes()) {
-                                application.setBigDRBDConf(!application.getBigDRBDConf());
-                            }
+                        drbdTest2.start(cluster, blockDevY);
+                        if (roboTest.isAborted()) {
+                            break;
                         }
-                    } else if (index == '2') {
-                        /* DRBD cancel */
-                        int i = 1;
-                        final int blockDevY = roboTest.getBlockDevY();
-                        while (!roboTest.isAborted()) {
-                            final long startTime = System.currentTimeMillis();
-                            roboTest.info("test" + index + " no " + i);
-                            drbdTest2.start(cluster, blockDevY);
-                            final int secs = (int) (System.currentTimeMillis() - startTime) / 1000;
-                            roboTest.info("test" + index + " no " + i + ", secs: " + secs);
-                            roboTest.resetTerminalAreas();
-                            i++;
+                        drbdTest3.start(cluster, blockDevY);
+                        if (roboTest.isAborted()) {
+                            break;
                         }
-                    } else if (index == '3') {
-                        /* DRBD 2 resoruces */
-                        int i = 1;
-                        final int blockDevY = roboTest.getBlockDevY();
-                        while (!roboTest.isAborted()) {
-                            final long startTime = System.currentTimeMillis();
-                            roboTest.info("test" + index + " no " + i);
-                            drbdTest3.start(cluster, blockDevY);
-                            final int secs = (int) (System.currentTimeMillis() - startTime) / 1000;
-                            roboTest.info("test" + index + " no " + i + ", secs: " + secs);
-                            roboTest.resetTerminalAreas();
-                            i++;
-                            if (cluster.getHostsArray()[0].hasVolumes()) {
-                                application.setBigDRBDConf(!application.getBigDRBDConf());
-                            }
-                        }
-                    } else if (index == '4') {
-                        /* DRBD 2 volumes */
-                        int i = 1;
-                        final int blockDevY = roboTest.getBlockDevY();
-                        while (!roboTest.isAborted()) {
-                            final long startTime = System.currentTimeMillis();
-                            roboTest.info("test" + index + " no " + i);
+                        if (cluster.getHostsArray()[0].hasVolumes()) {
                             drbdTest4.start(cluster, blockDevY);
-                            final int secs = (int) (System.currentTimeMillis() - startTime) / 1000;
-                            roboTest.info("test" + index + " no " + i + ", secs: " + secs);
-                            roboTest.resetTerminalAreas();
-                            i++;
-                            if (cluster.getHostsArray()[0].hasVolumes()) {
-                                application.setBigDRBDConf(!application.getBigDRBDConf());
-                            }
-                        }
-                    } else if (index == '5') {
-                        int i = 1;
-                        final int blockDevY = roboTest.getBlockDevY();
-                        while (!roboTest.isAborted()) {
-                            final long startTime = System.currentTimeMillis();
-                            roboTest.info("test" + index + " no " + i);
-                            drbdTest5.start(cluster, blockDevY);
                             if (roboTest.isAborted()) {
                                 break;
                             }
-                            final int secs = (int) (System.currentTimeMillis() - startTime) / 1000;
-                            roboTest.info("test" + index + " no " + i + ", secs: " + secs);
-                            roboTest.resetTerminalAreas();
-                            i++;
                         }
-                    } else if (index == '8') {
-                        /* proxy */
-                        int i = 1;
-                        final int blockDevY = roboTest.getBlockDevY();
-                        while (!roboTest.isAborted()) {
-                            final long startTime = System.currentTimeMillis();
-                            roboTest.info("test" + index + " no " + i);
-                            drbdTest8.start(cluster, blockDevY);
-                            final int secs = (int) (System.currentTimeMillis() - startTime) / 1000;
-                            roboTest.info("test" + index + " no " + i + ", secs: " + secs);
-                            roboTest.resetTerminalAreas();
-                            i++;
-                            if (cluster.getHostsArray()[0].hasVolumes()) {
-                                application.setBigDRBDConf(!application.getBigDRBDConf());
-                            }
+                        final int secs = (int) (System.currentTimeMillis() - startTime) / 1000;
+                        roboTest.info("test" + index + " no " + i + ", secs: " + secs);
+                        roboTest.resetTerminalAreas();
+                        i++;
+                        if (cluster.getHostsArray()[0].hasVolumes()) {
+                            application.setBigDRBDConf(!application.getBigDRBDConf());
                         }
                     }
-                } else if (type == Type.VM) {
-                    roboTest.moveToMenu("VMs ");
-                    roboTest.leftClick();
-                    if (index == '1') {
-                        /* VMs */
-                        int i = 1;
-                        while (!roboTest.isAborted()) {
-                            final long startTime = System.currentTimeMillis();
-                            roboTest.info("test" + index + " no " + i);
-                            vmTest1.start(cluster, "vm-test" + index, 2);
-                            final int secs = (int) (System.currentTimeMillis() - startTime) / 1000;
-                            roboTest.info("test" + index + " no " + i + ", secs: " + secs);
-                            roboTest.resetTerminalAreas();
-                            i++;
-                        }
-                    } else if (index == '2') {
-                        /* VMs */
-                        int i = 1;
-                        final String testIndex = "1";
-                        while (!roboTest.isAborted()) {
-                            final long startTime = System.currentTimeMillis();
-                            roboTest.info("test" + index + " no " + i);
-                            vmTest1.start(cluster, "vm-test" + testIndex, 10);
-                            final int secs = (int) (System.currentTimeMillis() - startTime) / 1000;
-                            roboTest.info("test" + index + " no " + i + ", secs: " + secs);
-                            roboTest.resetTerminalAreas();
-                            i++;
-                        }
-                    } else if (index == '3') {
-                        /* VMs */
-                        int i = 1;
-                        final String testIndex = "1";
-                        while (!roboTest.isAborted()) {
-                            final long startTime = System.currentTimeMillis();
-                            roboTest.info("test" + index + " no " + i);
-                            vmTest1.start(cluster, "vm-test" + testIndex, 30);
-                            final int secs = (int) (System.currentTimeMillis() - startTime) / 1000;
-                            roboTest.info("test" + index + " no " + i + ", secs: " + secs);
-                            roboTest.resetTerminalAreas();
-                            i++;
-                        }
-                    } else if (index == '4') {
-                        /* VMs dialog disabled textfields check. */
+                } else if (index == '1') {
+                    /* DRBD 1 link */
+                    int i = 1;
+                    final int blockDevY = roboTest.getBlockDevY();
+                    while (!roboTest.isAborted()) {
                         final long startTime = System.currentTimeMillis();
-                        roboTest.info("test" + index);
-                        vmTest4.start("vm-test" + index, 100);
+                        roboTest.info("test" + index + " no " + i);
+                        drbdTest1.start(cluster, blockDevY);
                         final int secs = (int) (System.currentTimeMillis() - startTime) / 1000;
-                        roboTest.info("test" + index + ", secs: " + secs);
+                        roboTest.info("test" + index + " no " + i + ", secs: " + secs);
                         roboTest.resetTerminalAreas();
-                    } else if (index == '5') {
-                        /* VMs */
-                        int i = 1;
-                        while (!roboTest.isAborted()) {
-                            final long startTime = System.currentTimeMillis();
-                            roboTest.info("test" + index + " no " + i);
-                            vmTest5.start(cluster, "vm-test" + index, 2);
-                            final int secs = (int) (System.currentTimeMillis() - startTime) / 1000;
-                            roboTest.info("test" + index + " no " + i + ", secs: " + secs);
-                            roboTest.resetTerminalAreas();
-                            i++;
+                        i++;
+                        if (cluster.getHostsArray()[0].hasVolumes()) {
+                            application.setBigDRBDConf(!application.getBigDRBDConf());
+                        }
+                    }
+                } else if (index == '2') {
+                    /* DRBD cancel */
+                    int i = 1;
+                    final int blockDevY = roboTest.getBlockDevY();
+                    while (!roboTest.isAborted()) {
+                        final long startTime = System.currentTimeMillis();
+                        roboTest.info("test" + index + " no " + i);
+                        drbdTest2.start(cluster, blockDevY);
+                        final int secs = (int) (System.currentTimeMillis() - startTime) / 1000;
+                        roboTest.info("test" + index + " no " + i + ", secs: " + secs);
+                        roboTest.resetTerminalAreas();
+                        i++;
+                    }
+                } else if (index == '3') {
+                    /* DRBD 2 resoruces */
+                    int i = 1;
+                    final int blockDevY = roboTest.getBlockDevY();
+                    while (!roboTest.isAborted()) {
+                        final long startTime = System.currentTimeMillis();
+                        roboTest.info("test" + index + " no " + i);
+                        drbdTest3.start(cluster, blockDevY);
+                        final int secs = (int) (System.currentTimeMillis() - startTime) / 1000;
+                        roboTest.info("test" + index + " no " + i + ", secs: " + secs);
+                        roboTest.resetTerminalAreas();
+                        i++;
+                        if (cluster.getHostsArray()[0].hasVolumes()) {
+                            application.setBigDRBDConf(!application.getBigDRBDConf());
+                        }
+                    }
+                } else if (index == '4') {
+                    /* DRBD 2 volumes */
+                    int i = 1;
+                    final int blockDevY = roboTest.getBlockDevY();
+                    while (!roboTest.isAborted()) {
+                        final long startTime = System.currentTimeMillis();
+                        roboTest.info("test" + index + " no " + i);
+                        drbdTest4.start(cluster, blockDevY);
+                        final int secs = (int) (System.currentTimeMillis() - startTime) / 1000;
+                        roboTest.info("test" + index + " no " + i + ", secs: " + secs);
+                        roboTest.resetTerminalAreas();
+                        i++;
+                        if (cluster.getHostsArray()[0].hasVolumes()) {
+                            application.setBigDRBDConf(!application.getBigDRBDConf());
+                        }
+                    }
+                } else if (index == '5') {
+                    int i = 1;
+                    final int blockDevY = roboTest.getBlockDevY();
+                    while (!roboTest.isAborted()) {
+                        final long startTime = System.currentTimeMillis();
+                        roboTest.info("test" + index + " no " + i);
+                        drbdTest5.start(cluster, blockDevY);
+                        if (roboTest.isAborted()) {
+                            break;
+                        }
+                        final int secs = (int) (System.currentTimeMillis() - startTime) / 1000;
+                        roboTest.info("test" + index + " no " + i + ", secs: " + secs);
+                        roboTest.resetTerminalAreas();
+                        i++;
+                    }
+                } else if (index == '8') {
+                    /* proxy */
+                    int i = 1;
+                    final int blockDevY = roboTest.getBlockDevY();
+                    while (!roboTest.isAborted()) {
+                        final long startTime = System.currentTimeMillis();
+                        roboTest.info("test" + index + " no " + i);
+                        drbdTest8.start(cluster, blockDevY);
+                        final int secs = (int) (System.currentTimeMillis() - startTime) / 1000;
+                        roboTest.info("test" + index + " no " + i + ", secs: " + secs);
+                        roboTest.resetTerminalAreas();
+                        i++;
+                        if (cluster.getHostsArray()[0].hasVolumes()) {
+                            application.setBigDRBDConf(!application.getBigDRBDConf());
                         }
                     }
                 }
-                roboTest.info(type + " test " + index + " done");
+            } else if (type == Type.VM) {
+                roboTest.moveToMenu("VMs ");
+                roboTest.leftClick();
+                if (index == '1') {
+                    /* VMs */
+                    int i = 1;
+                    while (!roboTest.isAborted()) {
+                        final long startTime = System.currentTimeMillis();
+                        roboTest.info("test" + index + " no " + i);
+                        vmTest1.start(cluster, "vm-test" + index, 2);
+                        final int secs = (int) (System.currentTimeMillis() - startTime) / 1000;
+                        roboTest.info("test" + index + " no " + i + ", secs: " + secs);
+                        roboTest.resetTerminalAreas();
+                        i++;
+                    }
+                } else if (index == '2') {
+                    /* VMs */
+                    int i = 1;
+                    final String testIndex = "1";
+                    while (!roboTest.isAborted()) {
+                        final long startTime = System.currentTimeMillis();
+                        roboTest.info("test" + index + " no " + i);
+                        vmTest1.start(cluster, "vm-test" + testIndex, 10);
+                        final int secs = (int) (System.currentTimeMillis() - startTime) / 1000;
+                        roboTest.info("test" + index + " no " + i + ", secs: " + secs);
+                        roboTest.resetTerminalAreas();
+                        i++;
+                    }
+                } else if (index == '3') {
+                    /* VMs */
+                    int i = 1;
+                    final String testIndex = "1";
+                    while (!roboTest.isAborted()) {
+                        final long startTime = System.currentTimeMillis();
+                        roboTest.info("test" + index + " no " + i);
+                        vmTest1.start(cluster, "vm-test" + testIndex, 30);
+                        final int secs = (int) (System.currentTimeMillis() - startTime) / 1000;
+                        roboTest.info("test" + index + " no " + i + ", secs: " + secs);
+                        roboTest.resetTerminalAreas();
+                        i++;
+                    }
+                } else if (index == '4') {
+                    /* VMs dialog disabled textfields check. */
+                    final long startTime = System.currentTimeMillis();
+                    roboTest.info("test" + index);
+                    vmTest4.start("vm-test" + index, 100);
+                    final int secs = (int) (System.currentTimeMillis() - startTime) / 1000;
+                    roboTest.info("test" + index + ", secs: " + secs);
+                    roboTest.resetTerminalAreas();
+                } else if (index == '5') {
+                    /* VMs */
+                    int i = 1;
+                    while (!roboTest.isAborted()) {
+                        final long startTime = System.currentTimeMillis();
+                        roboTest.info("test" + index + " no " + i);
+                        vmTest5.start(cluster, "vm-test" + index, 2);
+                        final int secs = (int) (System.currentTimeMillis() - startTime) / 1000;
+                        roboTest.info("test" + index + " no " + i + ", secs: " + secs);
+                        roboTest.resetTerminalAreas();
+                        i++;
+                    }
+                }
             }
+            roboTest.info(type + " test " + index + " done");
         });
         thread.start();
     }
@@ -577,7 +573,7 @@ public class StartTests {
 
         private final String testName;
 
-        private Type(final String name) {
+        Type(final String name) {
             testName = "start" + name + "test";
         }
 

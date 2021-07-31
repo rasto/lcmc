@@ -21,7 +21,13 @@
  */
 package lcmc.crm.ui.resource;
 
-import com.google.common.base.Optional;
+import java.util.Collection;
+import java.util.Map;
+import java.util.Optional;
+
+import javax.inject.Named;
+import javax.swing.JPanel;
+
 import lcmc.cluster.ui.ClusterBrowser;
 import lcmc.cluster.ui.widget.Check;
 import lcmc.cluster.ui.widget.Widget;
@@ -37,11 +43,6 @@ import lcmc.crm.domain.ClusterStatus;
 import lcmc.crm.domain.CrmXml;
 import lcmc.logger.Logger;
 import lcmc.logger.LoggerFactory;
-
-import javax.inject.Named;
-import javax.swing.*;
-import java.util.Collection;
-import java.util.Map;
 
 /**
  * This class is for resource defaults or rsc_defaults.
@@ -99,7 +100,7 @@ public final class RscDefaultsInfo extends EditableInfo {
             return null;
         }
         final Collection<String> params = crmXML.getRscDefaultsParameters().keySet();
-        return params.toArray(new String[params.size()]);
+        return params.toArray(new String[0]);
     }
 
     /** Returns true if the value of the parameter is ok. */

@@ -23,6 +23,7 @@
 package lcmc.drbd.ui.configdialog;
 
 import java.net.UnknownHostException;
+
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.swing.BoxLayout;
@@ -33,21 +34,21 @@ import javax.swing.SpringLayout;
 
 import lcmc.AppContext;
 import lcmc.Exceptions;
-import lcmc.common.ui.main.MainData;
-import lcmc.common.ui.MainPanel;
-import lcmc.common.ui.utils.SwingUtils;
-import lcmc.drbd.ui.resource.GlobalInfo;
-import lcmc.common.domain.Application;
 import lcmc.cluster.ui.ClusterBrowser;
+import lcmc.common.domain.Application;
+import lcmc.common.domain.util.Tools;
+import lcmc.common.ui.MainPanel;
 import lcmc.common.ui.SpringUtilities;
 import lcmc.common.ui.WizardDialog;
+import lcmc.common.ui.main.MainData;
+import lcmc.common.ui.utils.SwingUtils;
+import lcmc.drbd.service.DRBD;
 import lcmc.drbd.ui.resource.BlockDevInfo;
+import lcmc.drbd.ui.resource.GlobalInfo;
 import lcmc.drbd.ui.resource.ResourceInfo;
 import lcmc.drbd.ui.resource.VolumeInfo;
-import lcmc.drbd.service.DRBD;
 import lcmc.logger.Logger;
 import lcmc.logger.LoggerFactory;
-import lcmc.common.domain.util.Tools;
 
 /**
  * An implementation of a dialog where user can enter drbd block device
@@ -111,21 +112,11 @@ final class BlockDev extends DrbdConfig {
                 final VolumeInfo dvi = getDrbdVolumeInfo();
                 globalInfo.apply(runMode);
                 final ResourceInfo dri = dvi.getDrbdResourceInfo();
-                swingUtils.invokeAndWait(new Runnable() {
-                    @Override
-                    public void run() {
-                        dri.getInfoPanel();
-                    }
-                });
+                swingUtils.invokeAndWait(dri::getInfoPanel);
                 dri.waitForInfoPanel();
                 dri.apply(runMode);
 
-                swingUtils.invokeAndWait(new Runnable() {
-                    @Override
-                    public void run() {
-                        dvi.getInfoPanel();
-                    }
-                });
+                swingUtils.invokeAndWait(dvi::getInfoPanel);
                 dvi.waitForInfoPanel();
                 dvi.apply(runMode);
                 blockDevInfo.apply(runMode);
@@ -142,10 +133,8 @@ final class BlockDev extends DrbdConfig {
                 browser.reloadAllComboBoxes(null);
                 mainPanel.expandTerminalSplitPane(MainPanel.TerminalSize.COLLAPSE);
                 mainData.getMainFrame().requestFocus();
-            } catch (final Exceptions.DrbdConfigException dce) {
+            } catch (final Exceptions.DrbdConfigException | UnknownHostException dce) {
                 LOG.appError("nextDialog: config failed", dce);
-            } catch (final UnknownHostException e) {
-                LOG.appError("nextDialog: config failed", e);
             }
             createMDDialog.init(this, getDrbdVolumeInfo());
             return createMDDialog;
@@ -165,13 +154,8 @@ final class BlockDev extends DrbdConfig {
     @Override
     protected void initDialogAfterVisible() {
         final String[] params = blockDevInfo.getParametersFromXML();
-        swingUtils.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                buttonClass(nextButton()).setEnabled(
-                   blockDevInfo.checkResourceFields(null, params).isCorrect());
-            }
-        });
+        swingUtils.invokeLater(
+                () -> buttonClass(nextButton()).setEnabled(blockDevInfo.checkResourceFields(null, params).isCorrect()));
         enableComponents();
         if (application.getAutoOptionGlobal("autodrbd") != null) {
             pressNextButton();

@@ -26,14 +26,9 @@ package lcmc.common.ui;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
@@ -43,6 +38,7 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.swing.BoxLayout;
@@ -57,15 +53,15 @@ import javax.swing.text.Document;
 import javax.swing.text.SimpleAttributeSet;
 import javax.swing.text.StyleConstants;
 
+import lcmc.cluster.service.ssh.ExecCommandConfig;
 import lcmc.cluster.ui.widget.WidgetFactory;
+import lcmc.common.domain.ExecCallback;
+import lcmc.common.domain.util.Tools;
+import lcmc.common.ui.utils.MyButton;
 import lcmc.common.ui.utils.SwingUtils;
 import lcmc.host.domain.Host;
-import lcmc.common.domain.ExecCallback;
 import lcmc.logger.Logger;
 import lcmc.logger.LoggerFactory;
-import lcmc.common.ui.utils.MyButton;
-import lcmc.common.domain.util.Tools;
-import lcmc.cluster.service.ssh.ExecCommandConfig;
 
 /**
  * An implementation of an dialog with log files from many hosts.
@@ -74,9 +70,9 @@ import lcmc.cluster.service.ssh.ExecCommandConfig;
 public class Logs extends ConfigDialog {
     private static final Logger LOG = LoggerFactory.getLogger(Logs.class);
     private final JTextPane logTextArea = new JTextPane();
-    private final Map<String, JCheckBox> patternToCheckBoxMap = new HashMap<String, JCheckBox>();
+    private final Map<String, JCheckBox> patternToCheckBoxMap = new HashMap<>();
     private final Lock mRefreshLock = new ReentrantLock();
-    private final Collection<JComponent> additionalComponents = new ArrayList<JComponent>();
+    private final Collection<JComponent> additionalComponents = new ArrayList<>();
     @Inject
     private SwingUtils swingUtils;
     @Inject
@@ -116,20 +112,16 @@ public class Logs extends ConfigDialog {
     }
 
     protected void refreshLogsThread() {
-        final Thread thread = new Thread(
-            new Runnable() {
-                @Override
-                public void run() {
-                    if (!mRefreshLock.tryLock()) {
-                        return;
-                    }
-                    try {
-                        refreshLogs();
-                    } finally {
-                        mRefreshLock.unlock();
-                    }
-                }
-            });
+        final Thread thread = new Thread(() -> {
+            if (!mRefreshLock.tryLock()) {
+                return;
+            }
+            try {
+                refreshLogs();
+            } finally {
+                mRefreshLock.unlock();
+            }
+        });
         thread.start();
     }
 
@@ -138,21 +130,18 @@ public class Logs extends ConfigDialog {
     }
 
     protected void enableAllComponents(final boolean enable) {
-        swingUtils.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                for (final Map.Entry<String, JCheckBox> checkBoxEntry : patternToCheckBoxMap.entrySet()) {
-                    checkBoxEntry.getValue().setEnabled(enable);
-                }
-                for (final JComponent ac : additionalComponents) {
-                    ac.setEnabled(enable);
-                }
+        swingUtils.invokeLater(() -> {
+            for (final Map.Entry<String, JCheckBox> checkBoxEntry : patternToCheckBoxMap.entrySet()) {
+                checkBoxEntry.getValue().setEnabled(enable);
+            }
+            for (final JComponent ac : additionalComponents) {
+                ac.setEnabled(enable);
             }
         });
     }
 
     protected Map<String, String> getOptionsHash() {
-        final Map<String, String> replaceHash = new HashMap<String, String>();
+        final Map<String, String> replaceHash = new HashMap<>();
         replaceHash.put("@GREPPATTERN@", grepPattern());
         return replaceHash;
     }
@@ -195,7 +184,7 @@ public class Logs extends ConfigDialog {
             i++;
         }
         i = 0;
-        final StringBuilder ans = new StringBuilder("");
+        final StringBuilder ans = new StringBuilder();
         for (final Thread t : threads) {
             try {
                 t.join();
@@ -206,56 +195,51 @@ public class Logs extends ConfigDialog {
             i++;
         }
         final String[] output = ans.toString().split("\r\n");
-        final String[] months = {"Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec" };
+        final String[] months = {"Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"};
         final Pattern p = Pattern.compile('(' + Tools.join("|", months) + ") +(\\d+) +(\\d+):(\\d+):(\\d+).*");
-        final Map<String, Integer> monthsHash = new HashMap<String, Integer>();
+        final Map<String, Integer> monthsHash = new HashMap<>();
         i = 0;
         for (final String m : months) {
             monthsHash.put(m, i);
             i++;
         }
-        Arrays.sort(output,
-                    new Comparator<String>() {
-                        @Override
-                        public int compare(final String o1, final String o2) {
-                            final Matcher m1 = p.matcher(o1);
-                            final Matcher m2 = p.matcher(o2);
-                            if (m1.matches() && m2.matches()) {
-                                final int month1 = monthsHash.get(m1.group(1));
-                                final int month2 = monthsHash.get(m2.group(1));
+        Arrays.sort(output, (o1, o2) -> {
+            final Matcher m1 = p.matcher(o1);
+            final Matcher m2 = p.matcher(o2);
+            if (m1.matches() && m2.matches()) {
+                final int month1 = monthsHash.get(m1.group(1));
+                final int month2 = monthsHash.get(m2.group(1));
 
-                                final int day1 = Integer.parseInt(m1.group(2));
-                                final int day2 = Integer.parseInt(m2.group(2));
+                final int day1 = Integer.parseInt(m1.group(2));
+                final int day2 = Integer.parseInt(m2.group(2));
 
-                                final int hour1 = Integer.parseInt(m1.group(3));
-                                final int hour2 = Integer.parseInt(m2.group(3));
+                final int hour1 = Integer.parseInt(m1.group(3));
+                final int hour2 = Integer.parseInt(m2.group(3));
 
-                                final int min1 = Integer.parseInt(m1.group(4));
-                                final int min2 = Integer.parseInt(m2.group(4));
+                final int min1 = Integer.parseInt(m1.group(4));
+                final int min2 = Integer.parseInt(m2.group(4));
 
-                                final int sec1 = Integer.parseInt(m1.group(5));
-                                final int sec2 = Integer.parseInt(m2.group(5));
+                final int sec1 = Integer.parseInt(m1.group(5));
+                final int sec2 = Integer.parseInt(m2.group(5));
 
-                                if (month1 != month2) {
-                                    return month1 < month2 ? -1 : 1;
-                                }
-                                if (day1 != day2) {
-                                    return day1 < day2 ? -1 : 1;
-                                }
-                                if (hour1 != hour2) {
-                                    return hour1 < hour2 ? -1 : 1;
-                                }
-                                if (min1 != min2) {
-                                    return min1 < min2 ? -1 : 1;
-                                }
-                                if (sec1 != sec2) {
-                                    return sec1 < sec2 ? -1 : 1;
-                                }
-                            }
-                            return 0;
-                        }
-                    }
-                   );
+                if (month1 != month2) {
+                    return month1 < month2 ? -1 : 1;
+                }
+                if (day1 != day2) {
+                    return day1 < day2 ? -1 : 1;
+                }
+                if (hour1 != hour2) {
+                    return hour1 < hour2 ? -1 : 1;
+                }
+                if (min1 != min2) {
+                    return min1 < min2 ? -1 : 1;
+                }
+                if (sec1 != sec2) {
+                    return sec1 < sec2 ? -1 : 1;
+                }
+            }
+            return 0;
+        });
         logTextArea.setText("");
         final Document doc = logTextArea.getStyledDocument();
         final SimpleAttributeSet color1 = new SimpleAttributeSet();
@@ -313,12 +297,12 @@ public class Logs extends ConfigDialog {
 
     /** Returns a map from pattern name to its pattern. */
     protected Map<String, String> getPatternMap() {
-        return new LinkedHashMap<String, String>();
+        return new LinkedHashMap<>();
     }
 
     /** Returns which pattern names are selected by default. */
     protected Set<String> getSelectedSet() {
-        return new HashSet<String>();
+        return new HashSet<>();
     }
 
     /** Returns panel with checkboxes. */
@@ -330,12 +314,7 @@ public class Logs extends ConfigDialog {
             final JCheckBox cb = new JCheckBox(name, getSelectedSet().contains(name));
             cb.setBackground(Tools.getDefaultColor("ConfigDialog.Background.Dark"));
             patternToCheckBoxMap.put(name, cb);
-            cb.addItemListener(new ItemListener() {
-                @Override
-                public void itemStateChanged(final ItemEvent e) {
-                    refreshLogsThread();
-                }
-            });
+            cb.addItemListener(e -> refreshLogsThread());
             pane.add(cb);
         }
         for (final JComponent ac : getAdditionalComponents()) {
@@ -347,12 +326,7 @@ public class Logs extends ConfigDialog {
 
     protected MyButton getRefreshBtn() {
         final MyButton refreshBtn = widgetFactory.createButton(Tools.getString("Dialog.Logs.RefreshButton"));
-        refreshBtn.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(final ActionEvent e) {
-                refreshLogsThread();
-            }
-        });
+        refreshBtn.addActionListener(e -> refreshLogsThread());
         return refreshBtn;
     }
 

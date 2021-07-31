@@ -40,6 +40,7 @@ import java.util.Map;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
+
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
@@ -58,21 +59,20 @@ import javax.swing.event.MenuEvent;
 import javax.swing.event.MenuListener;
 
 import lcmc.cluster.domain.Cluster;
+import lcmc.cluster.ui.ClusterTab;
+import lcmc.cluster.ui.ClustersPanel;
+import lcmc.common.domain.AllHostsUpdatable;
 import lcmc.common.ui.Info;
 import lcmc.common.ui.ResourceGraph;
-import lcmc.common.ui.utils.SwingUtils;
-import lcmc.crm.ui.resource.ServicesInfo;
-import lcmc.common.domain.AllHostsUpdatable;
 import lcmc.common.ui.utils.ButtonCallback;
 import lcmc.common.ui.utils.MyList;
 import lcmc.common.ui.utils.MyListModel;
 import lcmc.common.ui.utils.MyMenu;
 import lcmc.common.ui.utils.MyMenuItem;
-import lcmc.cluster.ui.ClusterTab;
-import lcmc.cluster.ui.ClustersPanel;
+import lcmc.common.ui.utils.SwingUtils;
+import lcmc.crm.ui.resource.ServicesInfo;
 import lombok.Getter;
 import lombok.Setter;
-
 /**
  * Holds global GUI data, so that they can be retrieved easily throughout
  * the application and some functions that use this data.
@@ -85,17 +85,18 @@ public class MainData {
     private final ReadWriteLock mAddClusterButtonListLock = new ReentrantReadWriteLock();
     private final Lock mAddClusterButtonListReadLock = mAddClusterButtonListLock.readLock();
     private final Lock mAddClusterButtonListWriteLock = mAddClusterButtonListLock.writeLock();
-    private final Collection<JComponent> addClusterButtonList = new ArrayList<JComponent>();
+    private final Collection<JComponent> addClusterButtonList = new ArrayList<>();
     private final ReadWriteLock mAddHostButtonListLock = new ReentrantReadWriteLock();
     private final Lock mAddHostButtonListReadLock = mAddHostButtonListLock.readLock();
     private final Lock mAddHostButtonListWriteLock = mAddHostButtonListLock.writeLock();
-    private final Collection<JComponent> addHostButtonList = new ArrayList<JComponent>();
+    private final Collection<JComponent> addHostButtonList = new ArrayList<>();
     /**
-     * List of components that have allHostsUpdate method that must be called
-     * when a host is added.
+     * List of components that have allHostsUpdate method that must be called when a host is added.
      */
-    private final Collection<AllHostsUpdatable> allHostsUpdateList = new ArrayList<AllHostsUpdatable>();
-    /** Selected components for copy/paste. */
+    private final Collection<AllHostsUpdatable> allHostsUpdateList = new ArrayList<>();
+    /**
+     * Selected components for copy/paste.
+     */
     private List<Info> selectedComponents = null;
 
     private static volatile int prevScrollingMenuIndex = -1;
@@ -236,7 +237,7 @@ public class MainData {
     public Collection<JComponent> getAddClusterButtonList() {
         mAddClusterButtonListReadLock.lock();
         try {
-            return new ArrayList<JComponent>(addClusterButtonList);
+            return new ArrayList<>(addClusterButtonList);
         } finally {
             mAddClusterButtonListReadLock.unlock();
         }
@@ -245,7 +246,7 @@ public class MainData {
     public Collection<JComponent> getAddHostButtonList() {
         mAddHostButtonListReadLock.lock();
         try {
-            return new ArrayList<JComponent>(addHostButtonList);
+            return new ArrayList<>(addHostButtonList);
         } finally {
             mAddHostButtonListReadLock.unlock();
         }
@@ -274,12 +275,7 @@ public class MainData {
         if (ssi == null) {
             return;
         }
-        final Thread t = new Thread(new Runnable() {
-            @Override
-            public void run() {
-                ssi.pasteServices(scs);
-            }
-        });
+        final Thread t = new Thread(() -> ssi.pasteServices(scs));
         t.start();
     }
 
@@ -298,11 +294,7 @@ public class MainData {
         }
         prevScrollingMenuIndex = -1;
         list.setFixedCellHeight(25);
-        if (maxSize > 10) {
-            list.setVisibleRowCount(10);
-        } else {
-            list.setVisibleRowCount(maxSize);
-        }
+        list.setVisibleRowCount(Math.min(maxSize, 10));
         final JScrollPane sp = new JScrollPane(list);
         sp.setViewportBorder(null);
         sp.setBorder(null);
@@ -354,15 +346,12 @@ public class MainData {
                     }
                 }
                 final int index = list.locationToIndex(e.getPoint());
-                swingUtils.invokeLater(new Runnable() {
-                    @Override
-                    public void run() {
-                        list.setSelectedIndex(index);
-                        //TODO: some submenus stay visible, during
-                        //ptest, but this breaks group popup menu
-                        //setMenuVisible(menu, false);
-                        menu.setSelected(false);
-                    }
+                swingUtils.invokeLater(() -> {
+                    list.setSelectedIndex(index);
+                    //TODO: some submenus stay visible, during
+                    //ptest, but this breaks group popup menu
+                    //setMenuVisible(menu, false);
+                    menu.setSelected(false);
                 });
                 final MyMenuItem item = dlm.getElementAt(index);
                 item.actionThread();
@@ -372,46 +361,35 @@ public class MainData {
         list.addMouseMotionListener(new MouseMotionAdapter() {
             @Override
             public void mouseMoved(final MouseEvent e) {
-                final Thread thread = new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        int pIndex = list.locationToIndex(e.getPoint());
-                        final Rectangle r = list.getCellBounds(pIndex, pIndex);
-                        if (r == null) {
-                            return;
-                        }
-                        if (!r.contains(e.getPoint())) {
-                            pIndex = -1;
-                        }
-                        final int index = pIndex;
-                        final int lastIndex = prevScrollingMenuIndex;
-                        if (index == lastIndex) {
-                            return;
-                        }
-                        prevScrollingMenuIndex = index;
-                        swingUtils.invokeLater(new Runnable() {
-                            @Override
-                            public void run() {
-                                list.setSelectedIndex(index);
+                final Thread thread = new Thread(() -> {
+                    int pIndex = list.locationToIndex(e.getPoint());
+                    final Rectangle r = list.getCellBounds(pIndex, pIndex);
+                    if (r == null) {
+                        return;
+                    }
+                    if (!r.contains(e.getPoint())) {
+                        pIndex = -1;
+                    }
+                    final int index = pIndex;
+                    final int lastIndex = prevScrollingMenuIndex;
+                    if (index == lastIndex) {
+                        return;
+                    }
+                    prevScrollingMenuIndex = index;
+                    swingUtils.invokeLater(() -> list.setSelectedIndex(index));
+                    if (callbackHash != null) {
+                        if (lastIndex >= 0) {
+                            final MyMenuItem lastItem = dlm.getElementAt(lastIndex);
+                            final ButtonCallback bc = callbackHash.get(lastItem);
+                            if (bc != null) {
+                                bc.mouseOut(lastItem);
                             }
-                        });
-                        if (callbackHash != null) {
-                            if (lastIndex >= 0) {
-                                final MyMenuItem lastItem =
-                                        dlm.getElementAt(lastIndex);
-                                final ButtonCallback bc =
-                                        callbackHash.get(lastItem);
-                                if (bc != null) {
-                                    bc.mouseOut(lastItem);
-                                }
-                            }
-                            if (index >= 0) {
-                                final MyMenuItem item = dlm.getElementAt(index);
-                                final ButtonCallback bc =
-                                        callbackHash.get(item);
-                                if (bc != null) {
-                                    bc.mouseOver(item);
-                                }
+                        }
+                        if (index >= 0) {
+                            final MyMenuItem item = dlm.getElementAt(index);
+                            final ButtonCallback bc = callbackHash.get(item);
+                            if (bc != null) {
+                                bc.mouseOver(item);
                             }
                         }
                     }
@@ -424,19 +402,11 @@ public class MainData {
             public void keyPressed(final KeyEvent e) {
                 final int ch = e.getKeyCode();
                 if (ch == KeyEvent.VK_UP && list.getSelectedIndex() == 0) {
-                    swingUtils.invokeLater(new Runnable() {
-                        @Override
-                        public void run() {
-                            typeToSearchField.requestFocus();
-                        }
-                    });
+                    swingUtils.invokeLater(typeToSearchField::requestFocus);
                 } else if (ch == KeyEvent.VK_ESCAPE) {
-                    swingUtils.invokeLater(new Runnable() {
-                        @Override
-                        public void run() {
-                            for (final JDialog otherP : popups) {
-                                otherP.dispose();
-                            }
+                    swingUtils.invokeLater(() -> {
+                        for (final JDialog otherP : popups) {
+                            otherP.dispose();
                         }
                     });
                     infoObject.hidePopup();
@@ -468,33 +438,24 @@ public class MainData {
             @Override
             public void keyPressed(final KeyEvent e) {
                 final int ch = e.getKeyCode();
-                final Thread thread = new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        if (ch == KeyEvent.VK_DOWN) {
-                            swingUtils.invokeLater(new Runnable() {
-                                @Override
-                                public void run() {
-                                    list.requestFocus();
-                                    /* don't need to press down arrow twice */
-                                    list.setSelectedIndex(0);
-                                }
-                            });
-                        } else if (ch == KeyEvent.VK_ESCAPE) {
-                            swingUtils.invokeLater(new Runnable() {
-                                @Override
-                                public void run() {
-                                    for (final JDialog otherP : popups) {
-                                        otherP.dispose();
-                                    }
-                                }
-                            });
-                            infoObject.hidePopup();
-                        } else if (ch == KeyEvent.VK_SPACE || ch == KeyEvent.VK_ENTER) {
-                            final MyMenuItem item = list.getModel().getElementAt(0);
-                            if (item != null) {
-                                item.actionThread();
+                final Thread thread = new Thread(() -> {
+                    if (ch == KeyEvent.VK_DOWN) {
+                        swingUtils.invokeLater(() -> {
+                            list.requestFocus();
+                            /* don't need to press down arrow twice */
+                            list.setSelectedIndex(0);
+                        });
+                    } else if (ch == KeyEvent.VK_ESCAPE) {
+                        swingUtils.invokeLater(() -> {
+                            for (final JDialog otherP : popups) {
+                                otherP.dispose();
                             }
+                        });
+                        infoObject.hidePopup();
+                    } else if (ch == KeyEvent.VK_SPACE || ch == KeyEvent.VK_ENTER) {
+                        final MyMenuItem item = list.getModel().getElementAt(0);
+                        if (item != null) {
+                            item.actionThread();
                         }
                     }
                 });

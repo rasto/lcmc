@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Provider;
@@ -31,32 +32,29 @@ import javax.swing.JCheckBox;
 import javax.swing.JDialog;
 import javax.swing.JMenuItem;
 
-import lcmc.common.ui.main.MainData;
+import lcmc.cluster.ui.ClusterBrowser;
 import lcmc.common.domain.AccessMode;
 import lcmc.common.domain.Application;
-import lcmc.common.ui.utils.SwingUtils;
-import lcmc.crm.domain.ResourceAgent;
-import lcmc.cluster.ui.ClusterBrowser;
+import lcmc.common.domain.util.Tools;
+import lcmc.common.ui.main.MainData;
 import lcmc.common.ui.utils.ButtonCallback;
-import lcmc.common.domain.EnablePredicate;
-import lcmc.common.ui.utils.MenuAction;
 import lcmc.common.ui.utils.MenuFactory;
 import lcmc.common.ui.utils.MyList;
 import lcmc.common.ui.utils.MyListModel;
 import lcmc.common.ui.utils.MyMenu;
 import lcmc.common.ui.utils.MyMenuItem;
-import lcmc.common.domain.util.Tools;
+import lcmc.common.ui.utils.SwingUtils;
 import lcmc.common.ui.utils.UpdatableItem;
+import lcmc.crm.domain.ResourceAgent;
 
 @Named
 public class GroupMenu extends ServiceMenu {
 
-    @Inject @Named("serviceMenu")
+    @Inject
+    @Named("serviceMenu")
     private Provider<ServiceMenu> serviceMenuProvider;
     @Inject
     private MenuFactory menuFactory;
-    @Inject
-    private Application application;
     @Inject
     private SwingUtils swingUtils;
     @Inject
@@ -67,111 +65,78 @@ public class GroupMenu extends ServiceMenu {
         final GroupInfo groupInfo = (GroupInfo) serviceInfo;
 
         /* add group service */
-        final MyMenu addGroupServiceMenuItem = menuFactory.createMenu(
-                        Tools.getString("ClusterBrowser.Hb.AddGroupService"),
-                        new AccessMode(AccessMode.ADMIN, AccessMode.NORMAL),
-                        new AccessMode(AccessMode.OP, AccessMode.NORMAL))
-                .enablePredicate(new EnablePredicate() {
-                    @Override
-                    public String check() {
-                        if (groupInfo.getBrowser().crmStatusFailed()) {
-                            return ClusterBrowser.UNKNOWN_CLUSTER_STATUS_STRING;
-                        } else {
-                            return null;
-                        }
+        final MyMenu addGroupServiceMenuItem = menuFactory.createMenu(Tools.getString("ClusterBrowser.Hb.AddGroupService"),
+                        new AccessMode(AccessMode.ADMIN, AccessMode.NORMAL), new AccessMode(AccessMode.OP, AccessMode.NORMAL))
+                .enablePredicate(() -> {
+                    if (groupInfo.getBrowser().crmStatusFailed()) {
+                        return ClusterBrowser.UNKNOWN_CLUSTER_STATUS_STRING;
+                    } else {
+                        return null;
                     }
                 });
-        addGroupServiceMenuItem.onUpdate(new Runnable() {
-            @Override
-            public void run() {
-                swingUtils.isSwingThread();
-                addGroupServiceMenuItem.removeAll();
-                final Collection<JDialog> popups = new ArrayList<JDialog>();
-                for (final String cl : ClusterBrowser.CRM_CLASSES) {
-                    final MyMenu classItem = menuFactory.createMenu(
-                                                        ClusterBrowser.CRM_CLASS_MENU.get(cl),
-                                                        new AccessMode(AccessMode.ADMIN, AccessMode.NORMAL),
-                                                        new AccessMode(AccessMode.OP, AccessMode.NORMAL));
-                    final MyListModel<MyMenuItem> dlm = new MyListModel<MyMenuItem>();
-                    for (final ResourceAgent ra : groupInfo.getAddGroupServiceList(cl)) {
-                        final MyMenuItem mmi = menuFactory.createMenuItem(
-                                        ra.getPullDownMenuName(),
-                                        null,
-                                        null,
-                                        new AccessMode(AccessMode.ADMIN, AccessMode.NORMAL),
-                                        new AccessMode(AccessMode.OP, AccessMode.NORMAL));
-                        mmi.addAction(new MenuAction() {
-                                @Override
-                                public void run(final String text) {
-                                    final CloneInfo ci = groupInfo.getCloneInfo();
-                                    if (ci != null) {
-                                        ci.hidePopup();
-                                    }
-                                    groupInfo.hidePopup();
-                                    swingUtils.invokeLater(new Runnable() {
-                                        @Override
-                                        public void run() {
-                                            for (final JDialog otherP : popups) {
-                                                otherP.dispose();
-                                            }
-                                        }
-                                    });
-                                    if (ra.isLinbitDrbd() && !groupInfo.getBrowser().linbitDrbdConfirmDialog()) {
-                                        return;
-                                    }
-                                    groupInfo.addGroupServicePanel(ra, true);
-                                    mmi.repaint();
-                                }
-                            });
-                        dlm.addElement(mmi);
-                    }
-                    final boolean ret = mainData.getScrollingMenu(
-                            ClusterBrowser.CRM_CLASS_MENU.get(cl),
-                            null, /* options */
-                            classItem,
-                            dlm,
-                            new MyList<MyMenuItem>(dlm, addGroupServiceMenuItem.getBackground()),
-                            groupInfo,
-                            popups,
-                            null);
-                    if (!ret) {
-                        classItem.setEnabled(false);
-                    }
-                    addGroupServiceMenuItem.add(classItem);
+        addGroupServiceMenuItem.onUpdate(() -> {
+            swingUtils.isSwingThread();
+            addGroupServiceMenuItem.removeAll();
+            final Collection<JDialog> popups = new ArrayList<>();
+            for (final String cl : ClusterBrowser.CRM_CLASSES) {
+                final MyMenu classItem = menuFactory.createMenu(ClusterBrowser.CRM_CLASS_MENU.get(cl),
+                        new AccessMode(AccessMode.ADMIN, AccessMode.NORMAL), new AccessMode(AccessMode.OP, AccessMode.NORMAL));
+                final MyListModel<MyMenuItem> dlm = new MyListModel<>();
+                for (final ResourceAgent ra : groupInfo.getAddGroupServiceList(cl)) {
+                    final MyMenuItem mmi = menuFactory.createMenuItem(ra.getPullDownMenuName(), null, null,
+                            new AccessMode(AccessMode.ADMIN, AccessMode.NORMAL), new AccessMode(AccessMode.OP, AccessMode.NORMAL));
+                    mmi.addAction(text -> {
+                        final CloneInfo ci = groupInfo.getCloneInfo();
+                        if (ci != null) {
+                            ci.hidePopup();
+                        }
+                        groupInfo.hidePopup();
+                        swingUtils.invokeLater(() -> {
+                            for (final JDialog otherP : popups) {
+                                otherP.dispose();
+                            }
+                        });
+                        if (ra.isLinbitDrbd() && !groupInfo.getBrowser().linbitDrbdConfirmDialog()) {
+                            return;
+                        }
+                        groupInfo.addGroupServicePanel(ra, true);
+                        mmi.repaint();
+                    });
+                    dlm.addElement(mmi);
                 }
-                addGroupServiceMenuItem.updateMenuComponents();
-                addGroupServiceMenuItem.processAccessMode();
+                final boolean ret = mainData.getScrollingMenu(ClusterBrowser.CRM_CLASS_MENU.get(cl), null, /* options */
+                        classItem, dlm, new MyList<>(dlm, addGroupServiceMenuItem.getBackground()), groupInfo, popups, null);
+                if (!ret) {
+                    classItem.setEnabled(false);
+                }
+                addGroupServiceMenuItem.add(classItem);
             }
+            addGroupServiceMenuItem.updateMenuComponents();
+            addGroupServiceMenuItem.processAccessMode();
         });
-        final List<UpdatableItem> items = new ArrayList<UpdatableItem>();
+        final List<UpdatableItem> items = new ArrayList<>();
         items.add(addGroupServiceMenuItem);
-        for (final UpdatableItem item : super.getPulldownMenu(groupInfo)) {
-            items.add(item);
-        }
+        items.addAll(super.getPulldownMenu(groupInfo));
 
         /* group services */
         if (!mainData.isSlow()) {
             for (final ServiceInfo child : groupInfo.getSubServices()) {
-                final MyMenu groupServicesMenu = menuFactory.createMenu(
-                        child.toString(),
-                        new AccessMode(AccessMode.RO, AccessMode.NORMAL),
-                        new AccessMode(AccessMode.RO, AccessMode.NORMAL));
-                groupServicesMenu.onUpdate(new Runnable() {
-                    @Override
-                    public void run() {
-                        swingUtils.isSwingThread();
-                        groupServicesMenu.removeAll();
-                        final Collection<UpdatableItem> serviceMenus = new ArrayList<UpdatableItem>();
-                        for (final UpdatableItem u : child.createPopup()) {
-                            serviceMenus.add(u);
-                            u.updateAndWait();
-                        }
-                        for (final UpdatableItem u : serviceMenus) {
-                            groupServicesMenu.add((JMenuItem) u);
-                        }
-                        groupServicesMenu.updateMenuComponents();
-                        groupServicesMenu.processAccessMode();
+                final MyMenu groupServicesMenu =
+                        menuFactory.createMenu(child.toString(), new AccessMode(AccessMode.RO, AccessMode.NORMAL),
+                                new AccessMode(AccessMode.RO, AccessMode.NORMAL));
+                groupServicesMenu.onUpdate(() -> {
+                    swingUtils.isSwingThread();
+                    groupServicesMenu.removeAll();
+                    final Collection<UpdatableItem> serviceMenus = new ArrayList<>();
+                    for (final UpdatableItem u : child.createPopup()) {
+                        serviceMenus.add(u);
+                        u.updateAndWait();
                     }
+                    for (final UpdatableItem u : serviceMenus) {
+                        groupServicesMenu.add((JMenuItem) u);
+                    }
+                    groupServicesMenu.updateMenuComponents();
+                    groupServicesMenu.processAccessMode();
                 });
                 items.add(groupServicesMenu);
             }
@@ -191,18 +156,10 @@ public class GroupMenu extends ServiceMenu {
                         final JCheckBox orderWi,
                         final List<JDialog> popups,
                         final Application.RunMode runMode) {
-        for (final ServiceInfo child : ((GroupInfo) existingService).getSubServices()) {
+        for (final ServiceInfo child : existingService.getSubServices()) {
             final ServiceMenu subServiceMenu = serviceMenuProvider.get();
-            subServiceMenu.addExistingServiceMenuItem(serviceInfo,
-                                                      "         " + child,
-                                                      child,
-                                                      dlm,
-                                                      callbackHash,
-                                                      list,
-                                                      colocationWi,
-                                                      orderWi,
-                                                      popups,
-                                                      runMode);
+            subServiceMenu.addExistingServiceMenuItem(serviceInfo, "         " + child, child, dlm, callbackHash, list,
+                    colocationWi, orderWi, popups, runMode);
         }
     }
 }

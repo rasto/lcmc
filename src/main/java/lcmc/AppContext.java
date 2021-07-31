@@ -23,7 +23,7 @@ import org.springframework.context.annotation.AnnotationConfigApplicationContext
 import org.springframework.context.annotation.Jsr330ScopeMetadataResolver;
 
 public final class AppContext {
-	private static AnnotationConfigApplicationContext context;
+	private static final AnnotationConfigApplicationContext context;
 
 	static {
 		final AnnotationConfigApplicationContext ctx = new AnnotationConfigApplicationContext();

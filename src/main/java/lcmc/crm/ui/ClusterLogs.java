@@ -28,11 +28,11 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
 
-import lcmc.common.ui.Logs;
-import lcmc.cluster.domain.Cluster;
-import lcmc.host.domain.Host;
-
 import javax.inject.Named;
+
+import lcmc.cluster.domain.Cluster;
+import lcmc.common.ui.Logs;
+import lcmc.host.domain.Host;
 
 /**
  * An implementation of an dialog with log files from many hosts.
@@ -57,7 +57,7 @@ public class ClusterLogs extends Logs {
     /** Returns a map from pattern name to its pattern. */
     @Override
     protected Map<String, String> getPatternMap() {
-        final Map<String, String> patternMap = new LinkedHashMap<String, String>();
+        final Map<String, String> patternMap = new LinkedHashMap<>();
         patternMap.put("lrmd", wordBoundary("lrmd"));
         patternMap.put("crmd", wordBoundary("crmd"));
         patternMap.put("pengine", wordBoundary("pengine"));
@@ -67,7 +67,7 @@ public class ClusterLogs extends Logs {
 
     @Override
     protected Set<String> getSelectedSet() {
-        final Set<String> selected = new HashSet<String>();
+        final Set<String> selected = new HashSet<>();
         selected.add("ERROR");
         return selected;
     }

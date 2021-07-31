@@ -21,16 +21,22 @@
  */
 package lcmc.common.ui;
 
-import lcmc.cluster.ui.network.InfoPresenter;
-import lcmc.common.domain.util.Tools;
-import lcmc.common.ui.utils.SwingUtils;
+import java.awt.BorderLayout;
+import java.awt.Dimension;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 import javax.inject.Inject;
 import javax.inject.Named;
-import javax.swing.*;
-import java.awt.*;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
+import javax.swing.JComponent;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JSplitPane;
+import javax.swing.JTree;
+
+import lcmc.cluster.ui.network.InfoPresenter;
+import lcmc.common.domain.util.Tools;
+import lcmc.common.ui.utils.SwingUtils;
 
 /**
  * An implementation of a host view with tree of resources. This view is used
@@ -65,7 +71,7 @@ public class ViewPanel extends JPanel {
         setBackground(Tools.getDefaultColor("ViewPanel.Status.Background"));
     }
 
-    public final JTree createPanels(final JTree tree) {
+    public final void createPanels(final JTree tree) {
 
         final JScrollPane resourcesTreePane = new JScrollPane(tree);
 
@@ -77,8 +83,6 @@ public class ViewPanel extends JPanel {
         viewSP.setDividerLocation(DIVIDER_LOCATION);
         viewSP.setPreferredSize(MENU_TREE_SIZE);
         add(viewSP);
-
-        return tree;
     }
 
     public final void setRightComponentInView(final Browser browser,

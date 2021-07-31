@@ -39,8 +39,6 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.swing.JScrollPane;
 import javax.swing.JTextPane;
-import javax.swing.event.CaretEvent;
-import javax.swing.event.CaretListener;
 import javax.swing.plaf.TextUI;
 import javax.swing.text.AttributeSet;
 import javax.swing.text.BadLocationException;
@@ -51,21 +49,21 @@ import javax.swing.text.MutableAttributeSet;
 import javax.swing.text.SimpleAttributeSet;
 import javax.swing.text.StyleConstants;
 
+import lcmc.cluster.service.ssh.ExecCommandConfig;
 import lcmc.common.domain.Application;
+import lcmc.common.domain.ExecCallback;
+import lcmc.common.domain.util.Tools;
 import lcmc.common.ui.Access;
 import lcmc.common.ui.MainMenu;
 import lcmc.common.ui.main.MainData;
 import lcmc.common.ui.main.ProgressIndicator;
 import lcmc.common.ui.utils.SwingUtils;
 import lcmc.host.domain.Host;
+import lcmc.logger.Logger;
+import lcmc.logger.LoggerFactory;
 import lcmc.robotest.RoboTest;
 import lcmc.robotest.StartTests;
 import lcmc.robotest.Test;
-import lcmc.common.domain.ExecCallback;
-import lcmc.logger.Logger;
-import lcmc.logger.LoggerFactory;
-import lcmc.common.domain.util.Tools;
-import lcmc.cluster.service.ssh.ExecCommandConfig;
 
 /**
  * An implementation of a terminal panel that show commands and output from
@@ -91,42 +89,65 @@ public class TerminalPanel extends JScrollPane {
     private static final String CLICKTEST_LAZY_SHORT = "lclicklazysh";
     /** Command to start lazy clicking for longer period. */
     private static final String CLICKTEST_LAZY_LONG = "lclicklazylo";
-    /** Command to start frenzy rigth clicking for short period. */
+    /**
+     * Command to start frenzy rigth clicking for short period.
+     */
     private static final String RIGHT_CLICKTEST_SHORT = "rclicksh";
-    /** Command to start frenzy rigth clicking for longer period. */
+    /**
+     * Command to start frenzy rigth clicking for longer period.
+     */
     private static final String RIGHT_CLICKTEST_LONG = "rclicklo";
-    /** Command to start lazy rigth clicking for short period. */
+    /**
+     * Command to start lazy rigth clicking for short period.
+     */
     private static final String RIGHT_CLICKTEST_LAZY_SHORT = "rclicklazysh";
-    /** Command to start lazy rigth clicking for longer period. */
+    /**
+     * Command to start lazy rigth clicking for longer period.
+     */
     private static final String RIGHT_CLICKTEST_LAZY_LONG = "rclicklazylo";
-    /** Command to start short mouse moving. */
+    /**
+     * Command to start short mouse moving.
+     */
     private static final String MOVETEST_SHORT = "movetestsh";
-    /** Command to start mouse moving. */
+    /**
+     * Command to start mouse moving.
+     */
     private static final String MOVETEST_LONG = "movetestlo";
-    /** Command to start mouse moving. */
+    /**
+     * Command to start mouse moving.
+     */
     private static final String MOVETEST_LAZY_SHORT = "movetestlazysh";
-    /** Command to start mouse moving. */
+    /**
+     * Command to start mouse moving.
+     */
     private static final String MOVETEST_LAZY_LONG = "movetestlazylo";
-    /** Command to increment debug level. */
+    /**
+     * Command to increment debug level.
+     */
     private static final String DEBUG_INC = "debuginc";
-    /** Command to decrement debug level. */
+    /**
+     * Command to decrement debug level.
+     */
     private static final String DEBUG_DEC = "debugdec";
-    /** Register mouse movement. */
+    /**
+     * Register mouse movement.
+     */
     private static final String REGISTER_MOVEMENT = "registermovement";
-    /** List of cheats, with positions while typing them. */
-    private static final Map<String, Integer> CHEATS_MAP = new LinkedHashMap<String, Integer>();
+    /**
+     * List of cheats, with positions while typing them.
+     */
+    private static final Map<String, Integer> CHEATS_MAP = new LinkedHashMap<>();
     @Inject
     private RoboTest roboTest;
     @Inject
     private MainMenu mainMenu;
-    private static final Map<String, Test> TEST_CHEATS = new HashMap<String, Test>();
+    private static final Map<String, Test> TEST_CHEATS = new HashMap<>();
+
     static {
-        for (final StartTests.Type type : new StartTests.Type[]{StartTests.Type.PCMK,
-                                                                StartTests.Type.DRBD,
-                                                                StartTests.Type.VM,
-                                                                StartTests.Type.GUI}) {
-            for (final char index : new Character[]{
-                '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j'}) {
+        for (final StartTests.Type type : new StartTests.Type[]{StartTests.Type.PCMK, StartTests.Type.DRBD, StartTests.Type.VM,
+                StartTests.Type.GUI}) {
+            for (final char index : new Character[]{'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f',
+                    'g', 'h', 'i', 'j'}) {
                 TEST_CHEATS.put(type.getTestName() + index, new Test(type, index));
             }
         }
@@ -165,16 +186,26 @@ public class TerminalPanel extends JScrollPane {
     private int commandOffset = 0;
     private boolean userCommand = false;
     private boolean editEnabled = false;
-    /** Beginning of the previous line. */
+    /**
+     * Beginning of the previous line.
+     */
     private int prevLine = 0;
-    /** Position of the cursor in the text. */
+    /**
+     * Position of the cursor in the text.
+     */
     private int pos = 0;
-    /** Position in terminal area lock. */
+    /**
+     * Position in terminal area lock.
+     */
     private final Lock mPosLock = new ReentrantLock();
-    /** Maximum position of the cursor in the text. */
+    /**
+     * Maximum position of the cursor in the text.
+     */
     private int maxPos = 0;
-    /** Terminal output colors. */
-    private final Map<String, Color> terminalColor = new HashMap<String, Color>();
+    /**
+     * Terminal output colors.
+     */
+    private final Map<String, Color> terminalColor = new HashMap<>();
     private Color defaultOutputColor;
     @Inject
     private MainData mainData;
@@ -238,18 +269,15 @@ public class TerminalPanel extends JScrollPane {
             }
         };
         terminalArea.setCaret(caret);
-        terminalArea.addCaretListener(new CaretListener() {
-            @Override
-            public void caretUpdate(final CaretEvent e) {
-                /* don't do this if caret moved because of selection */
-                mPosLock.lock();
-                try {
-                    if (e != null && e.getDot() < commandOffset && e.getDot() == e.getMark()) {
-                        terminalArea.setCaretPosition(commandOffset);
-                    }
-                } finally {
-                    mPosLock.unlock();
+        terminalArea.addCaretListener(e -> {
+            /* don't do this if caret moved because of selection */
+            mPosLock.lock();
+            try {
+                if (e != null && e.getDot() < commandOffset && e.getDot() == e.getMark()) {
+                    terminalArea.setCaretPosition(commandOffset);
                 }
+            } finally {
+                mPosLock.unlock();
             }
         });
 
@@ -282,7 +310,7 @@ public class TerminalPanel extends JScrollPane {
     /** Returns terminal output color. */
     private Color getColorFromString(final CharSequence s) {
         /* "]" default color */
-        if ("[".equals(s)) {
+        if ("[".equals(s.toString())) {
             return null;
         }
         final Pattern p1 = Pattern.compile("^\\[\\d+;(\\d+)$");
@@ -457,53 +485,37 @@ public class TerminalPanel extends JScrollPane {
      * and scrolls the text up.
      */
     public void nextCommand() {
-        swingUtils.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                append(prompt(), promptColor);
-            }
-        });
+        swingUtils.invokeLater(() -> append(prompt(), promptColor));
     }
 
     /** Adds command to the terminal textarea and scrolls up. */
     public void addCommand(final String command) {
         final String[] lines = command.split("\\r?\\n");
 
-        swingUtils.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                append(lines[0], commandColor);
-                for (int i = 1; i < lines.length; i++) {
-                    append(" \\\n> " + lines[i], commandColor);
-                }
-                append("\n", commandColor);
+        swingUtils.invokeLater(() -> {
+            append(lines[0], commandColor);
+            for (int i = 1; i < lines.length; i++) {
+                append(" \\\n> " + lines[i], commandColor);
             }
+            append("\n", commandColor);
         });
     }
 
     /** Adds command output to the terminal textarea and scrolls up. */
     public void addCommandOutput(final String output) {
-        swingUtils.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                append(output, outputColor);
-            }
-        });
+        swingUtils.invokeLater(() -> append(output, outputColor));
     }
 
     /** Adds array of command output to the terminal textarea and scrolls up. */
     public void addCommandOutput(final String[] output) {
-        swingUtils.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                for (int i = 0; i < output.length; i++) {
-                    if (output[i] != null) {
-                        String newLine = "";
-                        if (i != output.length - 1) {
-                            newLine = "\n";
-                        }
-                        append(output[i] + newLine, outputColor);
+        swingUtils.invokeLater(() -> {
+            for (int i = 0; i < output.length; i++) {
+                if (output[i] != null) {
+                    String newLine = "";
+                    if (i != output.length - 1) {
+                        newLine = "\n";
                     }
+                    append(output[i] + newLine, outputColor);
                 }
             }
         });
@@ -511,22 +523,12 @@ public class TerminalPanel extends JScrollPane {
 
     /** Adds content string (output of a command) to the terminal area. */
     public void addContent(final String c) {
-        swingUtils.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                append(c, outputColor);
-            }
-        });
+        swingUtils.invokeLater(() -> append(c, outputColor));
     }
 
     /** Adds content to the terminal textarea and scrolls up. */
     public void addContentErr(final String c) {
-        swingUtils.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                append(c, errorColor);
-            }
-        });
+        swingUtils.invokeLater(() -> append(c, errorColor));
     }
 
     /** Starts action after cheat was entered. */
@@ -551,17 +553,14 @@ public class TerminalPanel extends JScrollPane {
             System.gc();
             LOG.info("startCheat: run gc");
         } else if (ALLOCATE_10.equals(cheat)) {
-            final Thread t = new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    LOG.info("startCheat: allocate mem");
-                    LOG.info("startCheat: allocate mem done");
+            final Thread t = new Thread(() -> {
+                LOG.info("startCheat: allocate mem");
+                LOG.info("startCheat: allocate mem done");
 
-                    System.gc();
-                    LOG.info("startCheat: run gc");
-                    Tools.sleep(60000);
-                    LOG.info("startCheat: free mem");
-                }
+                System.gc();
+                LOG.info("startCheat: run gc");
+                Tools.sleep(60000);
+                LOG.info("startCheat: free mem");
             });
             t.start();
         } else if (CLICKTEST_SHORT.equals(cheat)) {
@@ -660,9 +659,7 @@ public class TerminalPanel extends JScrollPane {
                         cheatPos++;
                         CHEATS_MAP.put(cheatEntry.getKey(), cheatPos);
                         if (cheatPos == cheatEntry.getKey().length()) {
-                            for (final String ch : CHEATS_MAP.keySet()) {
-                                CHEATS_MAP.put(ch, 0);
-                            }
+                            CHEATS_MAP.replaceAll((c, v) -> 0);
                             startCheat(cheatEntry.getKey());
                         }
                     } else {

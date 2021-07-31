@@ -23,6 +23,7 @@
 package lcmc.vm.ui.configdialog;
 
 import java.awt.Dimension;
+
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.swing.BoxLayout;
@@ -31,11 +32,11 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
 import lcmc.common.domain.Application;
+import lcmc.common.domain.util.Tools;
+import lcmc.common.ui.WizardDialog;
 import lcmc.common.ui.utils.SwingUtils;
 import lcmc.vm.domain.data.FilesystemData;
-import lcmc.common.ui.WizardDialog;
 import lcmc.vm.ui.resource.FilesystemInfo;
-import lcmc.common.domain.util.Tools;
 
 /**
  * An implementation of a dialog where user can enter a new domain.
@@ -95,13 +96,9 @@ final class Filesystem extends VMConfig {
     @Override
     protected void initDialogAfterVisible() {
         enableComponents();
-        swingUtils.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                final boolean enable = filesystemInfo.checkResourceFields(null, filesystemInfo.getRealParametersFromXML())
-                                                     .isCorrect();
-                buttonClass(nextButton()).setEnabled(enable);
-            }
+        swingUtils.invokeLater(() -> {
+            final boolean enable = filesystemInfo.checkResourceFields(null, filesystemInfo.getRealParametersFromXML()).isCorrect();
+            buttonClass(nextButton()).setEnabled(enable);
         });
     }
 

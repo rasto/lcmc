@@ -26,37 +26,45 @@
  */
 package lcmc;
 
-import java.awt.*;
+import java.awt.Container;
+import java.awt.Image;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.logging.Level;
+
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
-import javax.swing.*;
+import javax.swing.JComponent;
+import javax.swing.JFrame;
+import javax.swing.JMenuBar;
+import javax.swing.JPanel;
+import javax.swing.ToolTipManager;
+import javax.swing.UIManager;
+import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.plaf.ColorUIResource;
 import javax.swing.plaf.metal.MetalLookAndFeel;
 import javax.swing.plaf.metal.OceanTheme;
 
+import lcmc.cluster.service.NetworkService;
+import lcmc.cluster.service.storage.BlockDeviceService;
 import lcmc.cluster.service.storage.FileSystemService;
 import lcmc.cluster.service.storage.MountPointService;
+import lcmc.cluster.ui.ClusterBrowser;
+import lcmc.common.domain.Application;
+import lcmc.common.domain.util.Tools;
+import lcmc.common.ui.MainMenu;
+import lcmc.common.ui.MainPanel;
+import lcmc.common.ui.main.MainData;
 import lcmc.common.ui.main.MainPresenter;
+import lcmc.common.ui.main.ProgressIndicator;
 import lcmc.common.ui.utils.SwingUtils;
 import lcmc.configs.AppDefaults;
-import lcmc.cluster.ui.ClusterBrowser;
-import lcmc.common.ui.main.MainData;
-import lcmc.common.ui.MainMenu;
-import lcmc.common.domain.Application;
-import lcmc.common.ui.MainPanel;
-import lcmc.common.ui.main.ProgressIndicator;
-import lcmc.cluster.service.storage.BlockDeviceService;
-import lcmc.cluster.service.NetworkService;
 import lcmc.logger.Logger;
 import lcmc.logger.LoggerFactory;
-import lcmc.common.domain.util.Tools;
 import lombok.Getter;
 
 /**
@@ -100,29 +108,30 @@ public final class LCMC extends JPanel {
     @Inject
     private ProgressIndicator progressInidicator;
 
-    protected void createAndShowGUI(final Container mainFrame) {
+    void createAndShowGUI(final Container mainFrame) {
         setupUiManager();
         displayMainFrame(mainFrame);
     }
 
-    protected JPanel getMainPanel() {
+    JPanel getMainPanel() {
         mainPanel.init();
         mainPanel.setOpaque(true); //content panes must be opaque
         return mainPanel;
     }
 
-    protected JMenuBar getMenuBar() {
+    JMenuBar getMenuBar() {
         /* glass pane is used for progress bar etc. */
         menu.init();
         return menu.getMenuBar();
     }
 
-    protected void initApp(final String[] args) {
+    void initApp(final String[] args) {
         setupUiLookupFeelAndFeel();
         setupUncaughtExceptionHandler();
         argumentParser.parseOptionsAndReturnAutoArguments(args);
         setupServices();
     }
+
     public static void main(final String[] args) {
         final LCMC lcmc = AppContext.getBean(LCMC.class);
         lcmc.launch(args);
@@ -131,30 +140,20 @@ public final class LCMC extends JPanel {
     public void launch(final String[] args) {
         Tools.init();
         final JFrame mainFrame = new JFrame(Tools.getString("DrbdMC.Title") + ' ' + Tools.getRelease());
-        final List<Image> il = new ArrayList<Image>();
-        for (final String iconS : new String[]{"LCMC.AppIcon32",
-                                               "LCMC.AppIcon48",
-                                               "LCMC.AppIcon64",
-                                               "LCMC.AppIcon128",
-                                               "LCMC.AppIcon256"}) {
+        final List<Image> il = new ArrayList<>();
+        for (final String iconS : new String[]{"LCMC.AppIcon32", "LCMC.AppIcon48", "LCMC.AppIcon64", "LCMC.AppIcon128",
+                "LCMC.AppIcon256"}) {
             il.add(Tools.createImageIcon(Tools.getDefault(iconS)).getImage());
         }
         mainFrame.setIconImages(il);
         initApp(args);
-        swingUtils.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                createMainFrame(mainFrame);
-                createAndShowGUI(mainFrame);
-            }
+        swingUtils.invokeLater(() -> {
+            createMainFrame(mainFrame);
+            createAndShowGUI(mainFrame);
         });
         mainData.setMainFrame(mainFrame);
-        //final Thread t = new Thread(new Runnable() {
-        //    public void run() {
-        //        drbd.utilities.RoboTest.startMover(600000, true);
-        //    }
-        //});
-        //t.start();
+//        final Thread t = new Thread(() -> drbd.utilities.RoboTest.startMover(600000, true));
+//        t.start();
     }
 
     void createMainFrame(final JFrame mainFrame) {
@@ -182,20 +181,17 @@ public final class LCMC extends JPanel {
 
     /** Cleanup before closing. */
     private void cleanupBeforeClosing() {
-        final Thread t = new Thread(new Runnable() {
-            @Override
-            public void run() {
-                // TODO: don't try to reconnect when exiting
-                System.out.println("saving...");
-                for (int i = 0; i < 10; i++) {
-                    System.out.println(".");
-                    System.out.flush();
-                    Tools.sleep(2000);
-                }
-                System.out.println();
-                System.out.println("force exit.");
-                System.exit(5);
+        final Thread t = new Thread(() -> {
+            // TODO: don't try to reconnect when exiting
+            System.out.println("saving...");
+            for (int i = 0; i < 10; i++) {
+                System.out.println(".");
+                System.out.flush();
+                Tools.sleep(2000);
             }
+            System.out.println();
+            System.out.println("force exit.");
+            System.exit(5);
         });
         t.start();
         mainData.getMainFrame().setVisible(false);
@@ -251,13 +247,7 @@ public final class LCMC extends JPanel {
         try {
             /* Metal */
             UIManager.setLookAndFeel("javax.swing.plaf.metal.MetalLookAndFeel");
-        } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(LCMC.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(LCMC.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(LCMC.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (UnsupportedLookAndFeelException ex) {
+        } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | UnsupportedLookAndFeelException ex) {
             java.util.logging.Logger.getLogger(LCMC.class.getName()).log(Level.SEVERE, null, ex);
         }
         MetalLookAndFeel.setCurrentTheme(
@@ -301,18 +291,14 @@ public final class LCMC extends JPanel {
     }
 
     private void setupUncaughtExceptionHandler() {
-        Thread.setDefaultUncaughtExceptionHandler(
-                new Thread.UncaughtExceptionHandler() {
-                    @Override
-                    public void uncaughtException(final Thread t, final Throwable e) {
-                        System.out.println(e);
-                        System.out.println(Tools.getStackTrace(e));
-                        if (!uncaughtExceptionFlag && mainData.getMainFrame() != null) {
-                            uncaughtExceptionFlag = true;
-                            LOG.appError("", e.toString(), e);
-                        }
-                    }
-                });
+        Thread.setDefaultUncaughtExceptionHandler((t, e) -> {
+            System.out.println(e);
+            System.out.println(Tools.getStackTrace(e));
+            if (!uncaughtExceptionFlag && mainData.getMainFrame() != null) {
+                uncaughtExceptionFlag = true;
+                LOG.appError("", e.toString(), e);
+            }
+        });
     }
 
     private void setupServices() {

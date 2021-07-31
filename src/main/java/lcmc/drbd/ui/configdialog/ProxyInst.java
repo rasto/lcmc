@@ -27,19 +27,18 @@ import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.SpringLayout;
 
-import lcmc.common.domain.Application;
-import lcmc.host.domain.Host;
-import lcmc.drbd.domain.DrbdInstallation;
-import lcmc.common.ui.SpringUtilities;
-import lcmc.common.ui.WizardDialog;
-import lcmc.host.ui.DialogHost;
-import lcmc.drbd.ui.resource.VolumeInfo;
-import lcmc.common.domain.ConvertCmdCallback;
-import lcmc.drbd.service.DRBD;
-import lcmc.common.domain.ExecCallback;
-import lcmc.common.domain.util.Tools;
 import lcmc.cluster.service.ssh.ExecCommandConfig;
 import lcmc.cluster.service.ssh.Ssh;
+import lcmc.common.domain.Application;
+import lcmc.common.domain.ExecCallback;
+import lcmc.common.domain.util.Tools;
+import lcmc.common.ui.SpringUtilities;
+import lcmc.common.ui.WizardDialog;
+import lcmc.drbd.domain.DrbdInstallation;
+import lcmc.drbd.service.DRBD;
+import lcmc.drbd.ui.resource.VolumeInfo;
+import lcmc.host.domain.Host;
+import lcmc.host.ui.DialogHost;
 
 /**
  * An implementation of a dialog where drbd proxy is installed.
@@ -113,21 +112,14 @@ final class ProxyInst extends DialogHost {
                          .execCallback(new ExecCallback() {
                              @Override
                              public void done(final String answer) {
-                                checkAnswer(answer, installMethod);
+                                 checkAnswer(answer, installMethod);
                              }
+
                              @Override
                              public void doneError(final String answer, final int errorCode) {
-                                 printErrorAndRetry(Tools.getString("Dialog.Host.ProxyInst.InstError"),
-                                                    answer,
-                                                    errorCode);
+                                 printErrorAndRetry(Tools.getString("Dialog.Host.ProxyInst.InstError"), answer, errorCode);
                              }
-                         })
-                         .convertCmdCallback(new ConvertCmdCallback() {
-                             @Override
-                             public String convert(final String command) {
-                                 return command.replaceAll("@ARCH@", archString);
-                             }
-                         })
+                         }).convertCmdCallback(command -> command.replaceAll("@ARCH@", archString))
                          .sshCommandTimeout(Ssh.DEFAULT_COMMAND_TIMEOUT_LONG));
     }
 

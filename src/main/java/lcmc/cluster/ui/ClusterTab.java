@@ -26,20 +26,20 @@ import java.awt.BorderLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
-import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
-import lcmc.cluster.ui.widget.WidgetFactory;
 import lcmc.cluster.domain.Cluster;
-import lcmc.common.ui.Browser;
+import lcmc.cluster.ui.widget.WidgetFactory;
 import lcmc.cluster.ui.wizard.ClusterPresenter;
-import lcmc.common.ui.utils.MyButton;
 import lcmc.common.domain.util.Tools;
+import lcmc.common.ui.Browser;
+import lcmc.common.ui.utils.MyButton;
 
 /**
  * An implementation of a cluster tab, that contains host views of the hosts,
@@ -61,7 +61,7 @@ public final class ClusterTab extends JPanel {
     private WidgetFactory widgetFactory;
 
     public void initWithCluster(final Cluster cluster0) {
-        this.cluster = cluster0;
+        cluster = cluster0;
         if (cluster != null) {
             cluster.setClusterTab(this);
             labelTitle = new JLabel(cluster.getName());
@@ -133,13 +133,7 @@ public final class ClusterTab extends JPanel {
         closeButton.setMargin(new Insets(0, 0, 0, 0));
         closeButton.setIconTextGap(0);
 
-        final ActionListener closeAction =
-                new ActionListener() {
-                    @Override
-                    public void actionPerformed(final ActionEvent e) {
-                        clusterPresenter.onCloseCluster(cluster);
-                    }
-                };
+        final ActionListener closeAction = e -> clusterPresenter.onCloseCluster(cluster);
         closeButton.addActionListener(closeAction);
         return closeButton;
     }

@@ -125,12 +125,8 @@ public class RscSetConnectionData {
                 || rscSet2.isSubsetOf(oRscSet1)
                 || oRscSet1.isSubsetOf(rscSet2))) {
 
-            if ((rscSet1 != null && rscSet1.isSubsetOf(oRscSet2))
-                || (oRscSet2 != null && oRscSet2.isSubsetOf(rscSet1))
-                || (rscSet2 != null && rscSet2.isSubsetOf(oRscSet1))
-                || (oRscSet1 != null && oRscSet1.isSubsetOf(rscSet2))) {
-                return true;
-            }
+            return (rscSet1 != null && rscSet1.isSubsetOf(oRscSet2)) || (oRscSet2 != null && oRscSet2.isSubsetOf(rscSet1)) || (
+                    rscSet2 != null && rscSet2.isSubsetOf(oRscSet1)) || (oRscSet1 != null && oRscSet1.isSubsetOf(rscSet2));
         }
         return false;
     }
@@ -167,13 +163,13 @@ public class RscSetConnectionData {
         if (rscSet1 == null) {
             s.append("null");
         } else {
-            s.append(rscSet1.toString());
+            s.append(rscSet1);
         }
         s.append(") \n   (rscset2: ");
         if (rscSet2 == null) {
             s.append("null");
         } else {
-            s.append(rscSet2.toString());
+            s.append(rscSet2);
         }
         s.append(") ");
         return s.toString();

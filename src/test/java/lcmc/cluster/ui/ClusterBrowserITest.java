@@ -48,7 +48,7 @@ class ClusterBrowserITest {
             cb.parseClusterOutput("a---reset---\r\nb", buffer, host, nolatch, Application.RunMode.LIVE);
             assertThat(buffer.toString()).isEqualTo("cdab");
 
-            buffer = new StringBuffer("");
+            buffer = new StringBuffer();
             cb.parseClusterOutput("a---reset---\r\nb", buffer, host, nolatch, Application.RunMode.LIVE);
             assertThat(buffer.toString()).isEqualTo("ab");
 
@@ -73,8 +73,7 @@ class ClusterBrowserITest {
             }
             for (final File f : dir.listFiles()) {
                 final String file = f.getAbsolutePath();
-                if (file.length() > 3
-                    && file.substring(file.length() - 4).equals(".xml")) {
+                if (file.endsWith(".xml")) {
                     files.add(file);
                 }
             }
@@ -137,7 +136,7 @@ class ClusterBrowserITest {
             for (final Host host : integrationTestLauncher.getHosts()) {
                 final ClusterBrowser cb = host.getBrowser().getClusterBrowser();
                 cb.setDisabledDuringLoad(true);
-                cb.parseClusterOutput(cib, new StringBuffer(""), host, firstTime, runMode);
+                cb.parseClusterOutput(cib, new StringBuffer(), host, firstTime, runMode);
                 swingUtils.waitForSwing();
                 cb.setDisabledDuringLoad(false);
                 cb.getCrmGraph().repaint();
@@ -146,7 +145,7 @@ class ClusterBrowserITest {
             for (final Host host : integrationTestLauncher.getHosts()) {
                 final ClusterBrowser cb = host.getBrowser().getClusterBrowser();
                 swingUtils.waitForSwing();
-                cb.parseClusterOutput(emptyCib, new StringBuffer(""), host, firstTime, runMode);
+                cb.parseClusterOutput(emptyCib, new StringBuffer(), host, firstTime, runMode);
                 swingUtils.waitForSwing();
             }
         }

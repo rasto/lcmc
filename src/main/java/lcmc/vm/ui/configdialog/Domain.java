@@ -24,6 +24,7 @@
 package lcmc.vm.ui.configdialog;
 
 import java.awt.Dimension;
+
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.swing.BoxLayout;
@@ -31,13 +32,13 @@ import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
+import lcmc.cluster.ui.widget.Widget;
 import lcmc.common.domain.Application;
+import lcmc.common.domain.util.Tools;
+import lcmc.common.ui.WizardDialog;
 import lcmc.common.ui.utils.SwingUtils;
 import lcmc.vm.domain.VMParams;
-import lcmc.common.ui.WizardDialog;
 import lcmc.vm.ui.resource.DomainInfo;
-import lcmc.cluster.ui.widget.Widget;
-import lcmc.common.domain.util.Tools;
 
 /**
  * An implementation of a dialog where user can enter a new domain.
@@ -109,18 +110,8 @@ public final class Domain extends VMConfig {
             /* don't enable */
             enableComponents(new JComponent[]{buttonClass(nextButton())});
         }
-        swingUtils.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                makeDefaultButton(buttonClass(nextButton()));
-            }
-        });
-        swingUtils.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                domainNameWidget.requestFocus();
-            }
-        });
+        swingUtils.invokeLater(() -> makeDefaultButton(buttonClass(nextButton())));
+        swingUtils.invokeLater(() -> domainNameWidget.requestFocus());
     }
 
     @Override

@@ -36,6 +36,7 @@ import java.util.EventObject;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
+
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.swing.Box;
@@ -52,16 +53,17 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
+
 import lcmc.common.domain.AccessMode;
 import lcmc.common.domain.Value;
+import lcmc.common.domain.util.Tools;
 import lcmc.common.ui.Access;
 import lcmc.common.ui.SpringUtilities;
+import lcmc.common.ui.utils.MyButton;
 import lcmc.common.ui.utils.SwingUtils;
+import lcmc.common.ui.utils.WidgetListener;
 import lcmc.logger.Logger;
 import lcmc.logger.LoggerFactory;
-import lcmc.common.ui.utils.MyButton;
-import lcmc.common.domain.util.Tools;
-import lcmc.common.ui.utils.WidgetListener;
 
 /**
  * An implementation of a field where user can enter new value. The
@@ -80,7 +82,9 @@ public abstract class GenericWidget<T extends JComponent> extends JPanel impleme
     private T componentPart = null;
     private JLabel label = null;
     private boolean enablePredicate = true;
-    /** Whether the extra text field button should be enabled. */
+    /**
+     * Whether the extra text field button should be enabled.
+     */
     private boolean tfButtonEnabled = true;
     private AccessMode enableAccessMode = new AccessMode(AccessMode.RO, AccessMode.NORMAL);
     private String toolTipText = null;
@@ -88,11 +92,15 @@ public abstract class GenericWidget<T extends JComponent> extends JPanel impleme
     private final ReadWriteLock mValueLock = new ReentrantReadWriteLock();
     private final Lock mValueReadLock = mValueLock.readLock();
     private final Lock mValueWriteLock = mValueLock.writeLock();
-    /** Regexp that this field must match. */
+    /**
+     * Regexp that this field must match.
+     */
     private String regexp;
     private String disabledReason = null;
-    private final Collection<WidgetListener> widgetListeners = new ArrayList<WidgetListener>();
-    /** Whether the combobox was never set. */
+    private final Collection<WidgetListener> widgetListeners = new ArrayList<>();
+    /**
+     * Whether the combobox was never set.
+     */
     private boolean newFlag = true;
     @Inject
     private SwingUtils swingUtils;
@@ -100,7 +108,7 @@ public abstract class GenericWidget<T extends JComponent> extends JPanel impleme
     private Access access;
 
     public void init(final String regexp, final AccessMode enableAccessMode) {
-        this.init(regexp, enableAccessMode, NO_BUTTON);
+        init(regexp, enableAccessMode, NO_BUTTON);
     }
 
     public void init(final String regexp, final AccessMode enableAccessMode, final MyButton fieldButton) {
@@ -125,7 +133,7 @@ public abstract class GenericWidget<T extends JComponent> extends JPanel impleme
 
             component.add(newComp);
             component.add(fieldButton);
-            /** add button */
+            /* add button */
             SpringUtilities.makeCompactGrid(component, 1, 2,
                                                        0, 0,
                                                        0, 0);
@@ -193,9 +201,9 @@ public abstract class GenericWidget<T extends JComponent> extends JPanel impleme
                 tt.append(disabledTooltip);
             }
             if (text.length() > 6 && "<html>".equals(text.substring(0, 6))) {
-                text = "<html>" + tt.toString() + "<br>" + "<br>" + text.substring(6);
+                text = "<html>" + tt + "<br>" + "<br>" + text.substring(6);
             } else {
-                text = Tools.html(text + "<br>" + tt.toString());
+                text = Tools.html(text + "<br>" + tt);
             }
         }
         label.setToolTipText(text);
@@ -271,20 +279,17 @@ public abstract class GenericWidget<T extends JComponent> extends JPanel impleme
         }
         final JComponent comp = c;
         super.setVisible(visible);
-        swingUtils.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                if (label != null) {
-                    label.setVisible(visible);
-                }
-                comp.setVisible(visible);
-                if (visible) {
-                    setHeight(WIDGET_COMPONENT_HEIGHT);
-                } else {
-                    setHeight(0);
-                }
-                repaint();
+        swingUtils.invokeLater(() -> {
+            if (label != null) {
+                label.setVisible(visible);
             }
+            comp.setVisible(visible);
+            if (visible) {
+                setHeight(WIDGET_COMPONENT_HEIGHT);
+            } else {
+                setHeight(0);
+            }
+            repaint();
         });
     }
 
@@ -369,15 +374,12 @@ public abstract class GenericWidget<T extends JComponent> extends JPanel impleme
         if (Tools.areEqual(item, getValue())) {
             return;
         }
-        swingUtils.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                mValueWriteLock.lock();
-                try {
-                    setValueAndWait0(item);
-                } finally {
-                    mValueWriteLock.unlock();
-                }
+        swingUtils.invokeLater(() -> {
+            mValueWriteLock.lock();
+            try {
+                setValueAndWait0(item);
+            } finally {
+                mValueWriteLock.unlock();
             }
         });
     }
@@ -404,12 +406,7 @@ public abstract class GenericWidget<T extends JComponent> extends JPanel impleme
                             try {
                                 final String text = e.getDocument().getText(0, doc.getLength());
 
-                                final Thread t = new Thread(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        wl.checkText(text);
-                                    }
-                                });
+                                final Thread t = new Thread(() -> wl.checkText(text));
                                 t.start();
                             } catch (final BadLocationException ble) {
                                 LOG.appWarning("check: document listener error");
@@ -436,25 +433,16 @@ public abstract class GenericWidget<T extends JComponent> extends JPanel impleme
     }
 
     protected ItemListener getItemListener(final WidgetListener wl) {
-        return new ItemListener() {
-            @Override
-            public void itemStateChanged(final ItemEvent e) {
-                if (e.getItem() instanceof String) {
-                    /* handled by document listener */
-                    return;
-                }
-                setEditable();
-                if (wl.isEnabled()
-                    && e.getStateChange() == ItemEvent.SELECTED) {
-                    final Value value = (Value) e.getItem();
-                    final Thread t = new Thread(new Runnable() {
-                        @Override
-                        public void run() {
-                            wl.check(value);
-                        }
-                    });
-                    t.start();
-                }
+        return e -> {
+            if (e.getItem() instanceof String) {
+                /* handled by document listener */
+                return;
+            }
+            setEditable();
+            if (wl.isEnabled() && e.getStateChange() == ItemEvent.SELECTED) {
+                final Value value = (Value) e.getItem();
+                final Thread t = new Thread(() -> wl.check(value));
+                t.start();
             }
         };
     }
@@ -606,12 +594,7 @@ public abstract class GenericWidget<T extends JComponent> extends JPanel impleme
 
     @Override
     public void setBackgroundColor(final Color bg) {
-        swingUtils.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                setBackground(bg);
-            }
-        });
+        swingUtils.invokeLater(() -> setBackground(bg));
     }
 
     @Override

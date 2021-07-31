@@ -21,14 +21,58 @@
  */
 package lcmc.vm.ui.resource;
 
-import com.google.common.base.Optional;
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.FlowLayout;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.Set;
+import java.util.TreeMap;
+import java.util.UUID;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReadWriteLock;
+import java.util.concurrent.locks.ReentrantLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
+import java.util.regex.Matcher;
+
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Provider;
+import javax.swing.Box;
+import javax.swing.BoxLayout;
+import javax.swing.ImageIcon;
+import javax.swing.JComponent;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTable;
+import javax.swing.SpringLayout;
+import javax.swing.SwingConstants;
+import javax.swing.tree.DefaultMutableTreeNode;
+
+import org.w3c.dom.Node;
+
 import lcmc.Exceptions;
 import lcmc.cluster.ui.ClusterBrowser;
 import lcmc.cluster.ui.resource.NetInfo;
 import lcmc.cluster.ui.widget.Check;
 import lcmc.cluster.ui.widget.Widget;
 import lcmc.cluster.ui.widget.WidgetFactory;
-import lcmc.common.domain.*;
+import lcmc.common.domain.AccessMode;
+import lcmc.common.domain.Application;
+import lcmc.common.domain.ResourceValue;
+import lcmc.common.domain.StringValue;
+import lcmc.common.domain.Unit;
+import lcmc.common.domain.Value;
 import lcmc.common.domain.util.Tools;
 import lcmc.common.ui.Browser;
 import lcmc.common.ui.EditableInfo;
@@ -48,25 +92,16 @@ import lcmc.logger.Logger;
 import lcmc.logger.LoggerFactory;
 import lcmc.vm.domain.VMParams;
 import lcmc.vm.domain.VmsXml;
-import lcmc.vm.domain.data.*;
+import lcmc.vm.domain.data.DiskData;
+import lcmc.vm.domain.data.FilesystemData;
+import lcmc.vm.domain.data.GraphicsData;
+import lcmc.vm.domain.data.InputDevData;
+import lcmc.vm.domain.data.InterfaceData;
+import lcmc.vm.domain.data.ParallelData;
+import lcmc.vm.domain.data.SerialData;
+import lcmc.vm.domain.data.SoundData;
+import lcmc.vm.domain.data.VideoData;
 import lcmc.vm.service.VIRSH;
-import org.w3c.dom.Node;
-
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Provider;
-import javax.swing.*;
-import javax.swing.tree.DefaultMutableTreeNode;
-import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.util.*;
-import java.util.List;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReadWriteLock;
-import java.util.concurrent.locks.ReentrantLock;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
-import java.util.regex.Matcher;
 
 /**
  * This class holds info about VirtualDomain service in the VMs category,
@@ -75,117 +110,102 @@ import java.util.regex.Matcher;
 @Named
 public class DomainInfo extends EditableInfo {
     private static final Logger LOG = LoggerFactory.getLogger(DomainInfo.class);
-    /** Timeout of starting, shutting down, etc. actions in seconds. */
+    /**
+     * Timeout of starting, shutting down, etc. actions in seconds.
+     */
     private static final int ACTION_TIMEOUT = 20;
 
     private static final Value VIRSH_OPTION_QEMU = new StringValue();
-    private static final Value VIRSH_OPTION_XEN    = new StringValue("-c 'xen:///'");
-    private static final Value VIRSH_OPTION_LXC    = new StringValue("-c 'lxc:///'");
-    private static final Value VIRSH_OPTION_VBOX   = new StringValue("-c 'vbox:///session'");
+    private static final Value VIRSH_OPTION_XEN = new StringValue("-c 'xen:///'");
+    private static final Value VIRSH_OPTION_LXC = new StringValue("-c 'lxc:///'");
+    private static final Value VIRSH_OPTION_VBOX = new StringValue("-c 'vbox:///session'");
     private static final Value VIRSH_OPTION_OPENVZ = new StringValue("-c 'openvz:///system'");
-    private static final Value VIRSH_OPTION_UML    = new StringValue("-c 'uml:///system'");
+    private static final Value VIRSH_OPTION_UML = new StringValue("-c 'uml:///system'");
 
     static final String DOMAIN_TYPE_QEMU = "qemu";
-    private static final String DOMAIN_TYPE_XEN    = "xen";
-    private static final String DOMAIN_TYPE_LXC    = "lxc";
-    private static final String DOMAIN_TYPE_VBOX   = "vbox";
+    private static final String DOMAIN_TYPE_XEN = "xen";
+    private static final String DOMAIN_TYPE_LXC = "lxc";
+    private static final String DOMAIN_TYPE_VBOX = "vbox";
     private static final String DOMAIN_TYPE_OPENVZ = "openvz";
-    private static final String DOMAIN_TYPE_UML    = "uml";
-    private static final String DOMAIN_TYPE_KVM    = "kvm";
+    private static final String DOMAIN_TYPE_UML = "uml";
+    private static final String DOMAIN_TYPE_KVM = "kvm";
 
 
+    private static final Value[] VIRSH_OPTIONS =
+            new Value[]{VIRSH_OPTION_QEMU, VIRSH_OPTION_XEN, VIRSH_OPTION_LXC, VIRSH_OPTION_VBOX, VIRSH_OPTION_OPENVZ,
+                    VIRSH_OPTION_UML};
 
-    private static final Value[] VIRSH_OPTIONS = new Value[]{VIRSH_OPTION_QEMU,
-                                                             VIRSH_OPTION_XEN,
-                                                             VIRSH_OPTION_LXC,
-                                                             VIRSH_OPTION_VBOX,
-                                                             VIRSH_OPTION_OPENVZ,
-                                                             VIRSH_OPTION_UML};
+    /**
+     * Whether it needs "display" section.
+     */
+    private static final Set<String> NEED_DISPLAY = Set.of(DOMAIN_TYPE_QEMU, DOMAIN_TYPE_XEN, DOMAIN_TYPE_VBOX, DOMAIN_TYPE_KVM);
+    /**
+     * Whether it needs "console" section.
+     */
+    private static final Set<String> NEED_CONSOLE = Set.of(DOMAIN_TYPE_LXC, DOMAIN_TYPE_OPENVZ, DOMAIN_TYPE_UML);
+    /**
+     * Whether it needs "filesystem" section.
+     */
+    private static final Set<String> NEED_FILESYSTEM = Set.of(DOMAIN_TYPE_LXC, DOMAIN_TYPE_OPENVZ, DOMAIN_TYPE_VBOX);
+    private static final String[] VM_PARAMETERS =
+            new String[]{VMParams.VM_PARAM_DOMAIN_TYPE, VMParams.VM_PARAM_NAME, VMParams.VM_PARAM_VIRSH_OPTIONS,
+                    VMParams.VM_PARAM_EMULATOR, VMParams.VM_PARAM_VCPU, VMParams.VM_PARAM_CURRENTMEMORY, VMParams.VM_PARAM_MEMORY,
+                    VMParams.VM_PARAM_BOOTLOADER, VMParams.VM_PARAM_BOOT, VMParams.VM_PARAM_BOOT_2, VMParams.VM_PARAM_LOADER,
+                    VMParams.VM_PARAM_AUTOSTART, VMParams.VM_PARAM_TYPE, VMParams.VM_PARAM_INIT, VMParams.VM_PARAM_TYPE_ARCH,
+                    VMParams.VM_PARAM_TYPE_MACHINE, VMParams.VM_PARAM_ACPI, VMParams.VM_PARAM_APIC, VMParams.VM_PARAM_PAE,
+                    VMParams.VM_PARAM_HAP, VMParams.VM_PARAM_CLOCK_OFFSET, VMParams.VM_PARAM_CPU_MATCH,
+                    VMParams.VM_PARAM_CPUMATCH_MODEL, VMParams.VM_PARAM_CPUMATCH_VENDOR,
+                    VMParams.VM_PARAM_CPUMATCH_TOPOLOGY_SOCKETS, VMParams.VM_PARAM_CPUMATCH_TOPOLOGY_CORES,
+                    VMParams.VM_PARAM_CPUMATCH_TOPOLOGY_THREADS, VMParams.VM_PARAM_CPUMATCH_FEATURE_POLICY,
+                    VMParams.VM_PARAM_CPUMATCH_FEATURES, VMParams.VM_PARAM_ON_POWEROFF, VMParams.VM_PARAM_ON_REBOOT,
+                    VMParams.VM_PARAM_ON_CRASH};
 
-    /** Whether it needs "display" section. */
-    private static final Set<String> NEED_DISPLAY =
-         Collections.unmodifiableSet(new HashSet<String>(Arrays.asList(DOMAIN_TYPE_QEMU,
-                                                                       DOMAIN_TYPE_XEN,
-                                                                       DOMAIN_TYPE_VBOX,
-                                                                       DOMAIN_TYPE_KVM)));
-    /** Whether it needs "console" section. */
-    private static final Set<String> NEED_CONSOLE =
-         Collections.unmodifiableSet(new HashSet<String>(Arrays.asList(DOMAIN_TYPE_LXC,
-                                                                       DOMAIN_TYPE_OPENVZ,
-                                                                       DOMAIN_TYPE_UML)));
-    /** Whether it needs "filesystem" section. */
-    private static final Set<String> NEED_FILESYSTEM =
-         Collections.unmodifiableSet(new HashSet<String>(Arrays.asList(DOMAIN_TYPE_LXC,
-                                                                       DOMAIN_TYPE_OPENVZ,
-                                                                       DOMAIN_TYPE_VBOX)));
-    private static final String[] VM_PARAMETERS = new String[]{VMParams.VM_PARAM_DOMAIN_TYPE,
-                                                               VMParams.VM_PARAM_NAME,
-                                                               VMParams.VM_PARAM_VIRSH_OPTIONS,
-                                                               VMParams.VM_PARAM_EMULATOR,
-                                                               VMParams.VM_PARAM_VCPU,
-                                                               VMParams.VM_PARAM_CURRENTMEMORY,
-                                                               VMParams.VM_PARAM_MEMORY,
-                                                               VMParams.VM_PARAM_BOOTLOADER,
-                                                               VMParams.VM_PARAM_BOOT,
-                                                               VMParams.VM_PARAM_BOOT_2,
-                                                               VMParams.VM_PARAM_LOADER,
-                                                               VMParams.VM_PARAM_AUTOSTART,
-                                                               VMParams.VM_PARAM_TYPE,
-                                                               VMParams.VM_PARAM_INIT,
-                                                               VMParams.VM_PARAM_TYPE_ARCH,
-                                                               VMParams.VM_PARAM_TYPE_MACHINE,
-                                                               VMParams.VM_PARAM_ACPI,
-                                                               VMParams.VM_PARAM_APIC,
-                                                               VMParams.VM_PARAM_PAE,
-                                                               VMParams.VM_PARAM_HAP,
-                                                               VMParams.VM_PARAM_CLOCK_OFFSET,
-                                                               VMParams.VM_PARAM_CPU_MATCH,
-                                                               VMParams.VM_PARAM_CPUMATCH_MODEL,
-                                                               VMParams.VM_PARAM_CPUMATCH_VENDOR,
-                                                               VMParams.VM_PARAM_CPUMATCH_TOPOLOGY_SOCKETS,
-                                                               VMParams.VM_PARAM_CPUMATCH_TOPOLOGY_CORES,
-                                                               VMParams.VM_PARAM_CPUMATCH_TOPOLOGY_THREADS,
-                                                               VMParams.VM_PARAM_CPUMATCH_FEATURE_POLICY,
-                                                               VMParams.VM_PARAM_CPUMATCH_FEATURES,
-                                                               VMParams.VM_PARAM_ON_POWEROFF,
-                                                               VMParams.VM_PARAM_ON_REBOOT,
-                                                               VMParams.VM_PARAM_ON_CRASH};
-
-    private static final Collection<String> IS_ADVANCED =
-        new HashSet<String>(Arrays.asList(new String[]{VMParams.VM_PARAM_ACPI,
-                                                       VMParams.VM_PARAM_APIC,
-                                                       VMParams.VM_PARAM_PAE,
-                                                       VMParams.VM_PARAM_HAP,
-                                                       VMParams.VM_PARAM_CPU_MATCH,
-                                                       VMParams.VM_PARAM_CPUMATCH_MODEL,
-                                                       VMParams.VM_PARAM_CPUMATCH_VENDOR,
-                                                       VMParams.VM_PARAM_CPUMATCH_TOPOLOGY_SOCKETS,
-                                                       VMParams.VM_PARAM_CPUMATCH_TOPOLOGY_CORES,
-                                                       VMParams.VM_PARAM_CPUMATCH_TOPOLOGY_THREADS,
-                                                       VMParams.VM_PARAM_CPUMATCH_FEATURE_POLICY,
-                                                       VMParams.VM_PARAM_CPUMATCH_FEATURES,
-                                                       VMParams.VM_PARAM_ON_POWEROFF,
-                                                       VMParams.VM_PARAM_ON_REBOOT,
-                                                       VMParams.VM_PARAM_ON_CRASH}));
-    /** Map of sections to which every param belongs. */
-    private static final Map<String, String> SECTION_MAP = new HashMap<String, String>();
-    /** Map of short param names with uppercased first character. */
-    private static final Map<String, String> SHORTNAME_MAP = new HashMap<String, String>();
-    /** Map of default values. */
-    private static final Map<String, Value> DEFAULTS_MAP = new HashMap<String, Value>();
-    /** Preferred values. */
-    private static final Map<String, Value> PREFERRED_MAP = new HashMap<String, Value>();
-    /** Types of some of the field. */
-    private static final Map<String, Widget.Type> FIELD_TYPES = new HashMap<String, Widget.Type>();
-    /** Possible values for some fields. */
-    private static final Map<String, Value[]> POSSIBLE_VALUES = new HashMap<String, Value[]>();
-    /** Whether parameter is an integer. */
-    private static final Collection<String> IS_INTEGER = new ArrayList<String>();
-    /** Required version for a parameter. */
-    private static final Map<String, String> REQUIRED_VERSION = new HashMap<String, String>();
-    /** Returns whether this parameter has a unit prefix. */
-    private static final Map<String, Boolean> HAS_UNIT_PREFIX = new HashMap<String, Boolean>();
-    /** Back to overview icon. */
+    private static final Collection<String> IS_ADVANCED = new HashSet<>(
+            Arrays.asList(VMParams.VM_PARAM_ACPI, VMParams.VM_PARAM_APIC, VMParams.VM_PARAM_PAE, VMParams.VM_PARAM_HAP,
+                    VMParams.VM_PARAM_CPU_MATCH, VMParams.VM_PARAM_CPUMATCH_MODEL, VMParams.VM_PARAM_CPUMATCH_VENDOR,
+                    VMParams.VM_PARAM_CPUMATCH_TOPOLOGY_SOCKETS, VMParams.VM_PARAM_CPUMATCH_TOPOLOGY_CORES,
+                    VMParams.VM_PARAM_CPUMATCH_TOPOLOGY_THREADS, VMParams.VM_PARAM_CPUMATCH_FEATURE_POLICY,
+                    VMParams.VM_PARAM_CPUMATCH_FEATURES, VMParams.VM_PARAM_ON_POWEROFF, VMParams.VM_PARAM_ON_REBOOT,
+                    VMParams.VM_PARAM_ON_CRASH));
+    /**
+     * Map of sections to which every param belongs.
+     */
+    private static final Map<String, String> SECTION_MAP = new HashMap<>();
+    /**
+     * Map of short param names with uppercased first character.
+     */
+    private static final Map<String, String> SHORTNAME_MAP = new HashMap<>();
+    /**
+     * Map of default values.
+     */
+    private static final Map<String, Value> DEFAULTS_MAP = new HashMap<>();
+    /**
+     * Preferred values.
+     */
+    private static final Map<String, Value> PREFERRED_MAP = new HashMap<>();
+    /**
+     * Types of some of the field.
+     */
+    private static final Map<String, Widget.Type> FIELD_TYPES = new HashMap<>();
+    /**
+     * Possible values for some fields.
+     */
+    private static final Map<String, Value[]> POSSIBLE_VALUES = new HashMap<>();
+    /**
+     * Whether parameter is an integer.
+     */
+    private static final Collection<String> IS_INTEGER = new ArrayList<>();
+    /**
+     * Required version for a parameter.
+     */
+    private static final Map<String, String> REQUIRED_VERSION = new HashMap<>();
+    /**
+     * Returns whether this parameter has a unit prefix.
+     */
+    private static final Map<String, Boolean> HAS_UNIT_PREFIX = new HashMap<>();
+    /**
+     * Back to overview icon.
+     */
     private static final ImageIcon BACK_ICON = Tools.createImageIcon(Tools.getDefault("BackIcon"));
 
     static final ImageIcon VNC_ICON = Tools.createImageIcon(Tools.getDefault("VMS.VNC.IconLarge"));
@@ -204,7 +224,7 @@ public class DomainInfo extends EditableInfo {
     
     private static final Value VM_TRUE = new StringValue("True");
     private static final Value VM_FALSE = new StringValue("False");
-    
+
     private static final Value DEFINED_ON_HOST_TRUE = VM_TRUE;
     private static final Value DEFINED_ON_HOST_FALSE = VM_FALSE;
 
@@ -214,61 +234,26 @@ public class DomainInfo extends EditableInfo {
     private static final String VIRTUAL_SYSTEM_FEATURES = Tools.getString("DomainInfo.Section.Features");
     private static final String VIRTUAL_SYSTEM_OPTIONS = Tools.getString("DomainInfo.Section.Options");
     private static final String CPU_MATCH_OPTIONS = Tools.getString("DomainInfo.Section.CPUMatch");
-    /** String that is displayed as a tool tip for not applied domain. */
+    /**
+     * String that is displayed as a tool tip for not applied domain.
+     */
     static final String NOT_APPLIED = "not applied yet";
-    /** String that is displayed as a tool tip for disabled menu item. */
+    /**
+     * String that is displayed as a tool tip for disabled menu item.
+     */
     static final String NO_VM_STATUS_STRING = "VM status is not available";
-    private static final Map<Integer, Integer> HEADER_DEFAULT_WIDTHS =
-            Collections.unmodifiableMap(new HashMap<Integer, Integer>() {
-                /* remove button column */
-            {
-                put(4, CONTROL_BUTTON_WIDTH);
-            }});
-    private static final Map<Integer, Integer> DISK_DEFAULT_WIDTHS =
-            Collections.unmodifiableMap(new HashMap<Integer, Integer>() {
-            {
-                put(2, CONTROL_BUTTON_WIDTH);
-            }});
-    private static final Map<Integer, Integer> FILESYSTEM_DEFAULT_WIDTHS =
-            Collections.unmodifiableMap(new HashMap<Integer, Integer>() {
-            {
-                put(2, CONTROL_BUTTON_WIDTH);
-            }});
-    private static final Map<Integer, Integer> INTERFACES_DEFAULT_WIDTHS =
-            Collections.unmodifiableMap(new HashMap<Integer, Integer>() {
-            {
-                put(2, CONTROL_BUTTON_WIDTH);
-            }});
-    private static final Map<Integer, Integer> INPUTDEVS_DEFAULT_WIDTHS =
-            Collections.unmodifiableMap(new HashMap<Integer, Integer>() {
-            {
-                put(1, CONTROL_BUTTON_WIDTH);
-            }});
-    private static final Map<Integer, Integer> GRAPHICS_DEFAULT_WIDTHS =
-            Collections.unmodifiableMap(new HashMap<Integer, Integer>() {
-            {
-                put(1, CONTROL_BUTTON_WIDTH);
-            }});
-    private static final Map<Integer, Integer> SOUND_DEFAULT_WIDTHS =
-            Collections.unmodifiableMap(new HashMap<Integer, Integer>() {
-            {
-                put(1, CONTROL_BUTTON_WIDTH);
-            }});
-    private static final Map<Integer, Integer> SERIAL_DEFAULT_WIDTHS =
-            Collections.unmodifiableMap(new HashMap<Integer, Integer>() {
-            {
-                put(1, CONTROL_BUTTON_WIDTH);
-            }});
-    private static final Map<Integer, Integer> PARALLEL_DEFAULT_WIDTHS =
-            Collections.unmodifiableMap(new HashMap<Integer, Integer>() {
-            {
-                put(1, CONTROL_BUTTON_WIDTH);
-            }});
-    private static final Map<Integer, Integer> VIDEO_DEFAULT_WIDTHS =
-            Collections.unmodifiableMap(new HashMap<Integer, Integer>() {
-            {
-                put(1, CONTROL_BUTTON_WIDTH);
-            }});
+    /* remove button column */
+    private static final int CONTROL_BUTTON_WIDTH = 80;
+    private static final Map<Integer, Integer> HEADER_DEFAULT_WIDTHS = Map.of(4, CONTROL_BUTTON_WIDTH);
+    private static final Map<Integer, Integer> DISK_DEFAULT_WIDTHS = Map.of(2, CONTROL_BUTTON_WIDTH);
+    private static final Map<Integer, Integer> FILESYSTEM_DEFAULT_WIDTHS = Map.of(2, CONTROL_BUTTON_WIDTH);
+    private static final Map<Integer, Integer> INTERFACES_DEFAULT_WIDTHS = Map.of(2, CONTROL_BUTTON_WIDTH);
+    private static final Map<Integer, Integer> INPUTDEVS_DEFAULT_WIDTHS = Map.of(1, CONTROL_BUTTON_WIDTH);
+    private static final Map<Integer, Integer> GRAPHICS_DEFAULT_WIDTHS = Map.of(1, CONTROL_BUTTON_WIDTH);
+    private static final Map<Integer, Integer> SOUND_DEFAULT_WIDTHS = Map.of(1, CONTROL_BUTTON_WIDTH);
+    private static final Map<Integer, Integer> SERIAL_DEFAULT_WIDTHS = Map.of(1, CONTROL_BUTTON_WIDTH);
+    private static final Map<Integer, Integer> PARALLEL_DEFAULT_WIDTHS = Map.of(1, CONTROL_BUTTON_WIDTH);
+    private static final Map<Integer, Integer> VIDEO_DEFAULT_WIDTHS = Map.of(1, CONTROL_BUTTON_WIDTH);
 
     private static final Value TYPE_HVM = new StringValue("hvm");
     private static final Value TYPE_LINUX = new StringValue("linux");
@@ -276,37 +261,33 @@ public class DomainInfo extends EditableInfo {
     private static final Value TYPE_UML = new StringValue("uml");
 
     private static final Value NO_SELECTION_VALUE = new StringValue();
-    
-    /** Width of the button field. */
-    private static final int CONTROL_BUTTON_WIDTH = 80;
-    /** String that is displayed as a tool tip if a menu item is used by CRM. */
+
     static final String IS_USED_BY_CRM_STRING = "it is used by cluster manager";
 
-    public static final Value BOOT_HD      = new StringValue("hd", "Hard Disk");
-    public static final Value BOOT_NETWORK =
-                                    new StringValue("network", "Network (PXE)");
-    public static final Value BOOT_CDROM   = new StringValue("cdrom", "CD-ROM");
-    public static final Value BOOT_FD      = new StringValue("fd", "Floppy");
+    public static final Value BOOT_HD = new StringValue("hd", "Hard Disk");
+    public static final Value BOOT_NETWORK = new StringValue("network", "Network (PXE)");
+    public static final Value BOOT_CDROM = new StringValue("cdrom", "CD-ROM");
+    public static final Value BOOT_FD = new StringValue("fd", "Floppy");
 
     static {
-        SECTION_MAP.put(VMParams.VM_PARAM_NAME,          VIRTUAL_SYSTEM_STRING);
-        SECTION_MAP.put(VMParams.VM_PARAM_DOMAIN_TYPE,   VIRTUAL_SYSTEM_STRING);
-        SECTION_MAP.put(VMParams.VM_PARAM_EMULATOR,      VIRTUAL_SYSTEM_STRING);
-        SECTION_MAP.put(VMParams.VM_PARAM_VCPU,          VIRTUAL_SYSTEM_STRING);
+        SECTION_MAP.put(VMParams.VM_PARAM_NAME, VIRTUAL_SYSTEM_STRING);
+        SECTION_MAP.put(VMParams.VM_PARAM_DOMAIN_TYPE, VIRTUAL_SYSTEM_STRING);
+        SECTION_MAP.put(VMParams.VM_PARAM_EMULATOR, VIRTUAL_SYSTEM_STRING);
+        SECTION_MAP.put(VMParams.VM_PARAM_VCPU, VIRTUAL_SYSTEM_STRING);
         SECTION_MAP.put(VMParams.VM_PARAM_CURRENTMEMORY, VIRTUAL_SYSTEM_STRING);
-        SECTION_MAP.put(VMParams.VM_PARAM_MEMORY,        VIRTUAL_SYSTEM_STRING);
-        SECTION_MAP.put(VMParams.VM_PARAM_BOOTLOADER,    VIRTUAL_SYSTEM_STRING);
-        SECTION_MAP.put(VMParams.VM_PARAM_BOOT,          VIRTUAL_SYSTEM_STRING);
-        SECTION_MAP.put(VMParams.VM_PARAM_BOOT_2,        VIRTUAL_SYSTEM_STRING);
-        SECTION_MAP.put(VMParams.VM_PARAM_LOADER,        VIRTUAL_SYSTEM_STRING);
-        SECTION_MAP.put(VMParams.VM_PARAM_AUTOSTART,     VIRTUAL_SYSTEM_STRING);
+        SECTION_MAP.put(VMParams.VM_PARAM_MEMORY, VIRTUAL_SYSTEM_STRING);
+        SECTION_MAP.put(VMParams.VM_PARAM_BOOTLOADER, VIRTUAL_SYSTEM_STRING);
+        SECTION_MAP.put(VMParams.VM_PARAM_BOOT, VIRTUAL_SYSTEM_STRING);
+        SECTION_MAP.put(VMParams.VM_PARAM_BOOT_2, VIRTUAL_SYSTEM_STRING);
+        SECTION_MAP.put(VMParams.VM_PARAM_LOADER, VIRTUAL_SYSTEM_STRING);
+        SECTION_MAP.put(VMParams.VM_PARAM_AUTOSTART, VIRTUAL_SYSTEM_STRING);
         SECTION_MAP.put(VMParams.VM_PARAM_VIRSH_OPTIONS, VIRTUAL_SYSTEM_STRING);
-        SECTION_MAP.put(VMParams.VM_PARAM_TYPE,          VIRTUAL_SYSTEM_STRING);
-        SECTION_MAP.put(VMParams.VM_PARAM_TYPE_ARCH,     VIRTUAL_SYSTEM_STRING);
-        SECTION_MAP.put(VMParams.VM_PARAM_TYPE_MACHINE,  VIRTUAL_SYSTEM_STRING);
-        SECTION_MAP.put(VMParams.VM_PARAM_INIT,          VIRTUAL_SYSTEM_STRING);
+        SECTION_MAP.put(VMParams.VM_PARAM_TYPE, VIRTUAL_SYSTEM_STRING);
+        SECTION_MAP.put(VMParams.VM_PARAM_TYPE_ARCH, VIRTUAL_SYSTEM_STRING);
+        SECTION_MAP.put(VMParams.VM_PARAM_TYPE_MACHINE, VIRTUAL_SYSTEM_STRING);
+        SECTION_MAP.put(VMParams.VM_PARAM_INIT, VIRTUAL_SYSTEM_STRING);
 
-        SECTION_MAP.put(VMParams.VM_PARAM_ON_POWEROFF,   VIRTUAL_SYSTEM_OPTIONS);
+        SECTION_MAP.put(VMParams.VM_PARAM_ON_POWEROFF, VIRTUAL_SYSTEM_OPTIONS);
         SECTION_MAP.put(VMParams.VM_PARAM_ON_REBOOT,     VIRTUAL_SYSTEM_OPTIONS);
         SECTION_MAP.put(VMParams.VM_PARAM_ON_CRASH,      VIRTUAL_SYSTEM_OPTIONS);
 
@@ -506,68 +487,87 @@ public class DomainInfo extends EditableInfo {
         REQUIRED_VERSION.put(VMParams.VM_PARAM_CPUMATCH_FEATURE_POLICY, "0.7.5");
         REQUIRED_VERSION.put(VMParams.VM_PARAM_CPUMATCH_FEATURES, "0.7.5");
     }
+
     private JComponent infoPanel = null;
     private String uuid;
-    /** HTML string on which hosts the vm is defined. */
+    /**
+     * HTML string on which hosts the vm is defined.
+     */
     private String definedOnString = "";
-    /** HTML string on which hosts the vm is running. */
+    /**
+     * HTML string on which hosts the vm is running.
+     */
     private String runningOnString = "";
-    /** Row color, that is color of host on which is it running or null. */
+    /**
+     * Row color, that is color of host on which is it running or null.
+     */
     private Color rowColor = Browser.PANEL_BACKGROUND;
     private final ReadWriteLock mTransitionLock = new ReentrantReadWriteLock();
     private final Lock mTransitionReadLock = mTransitionLock.readLock();
     private final Lock mTransitionWriteLock = mTransitionLock.writeLock();
-    private final Set<String> starting = new HashSet<String>();
-    private final Set<String> shuttingdown = new HashSet<String>();
-    private final Set<String> suspending = new HashSet<String>();
-    private final Set<String> resuming = new HashSet<String>();
-    /** Progress indicator when starting or stopping. */
+    private final Set<String> starting = new HashSet<>();
+    private final Set<String> shuttingdown = new HashSet<>();
+    private final Set<String> suspending = new HashSet<>();
+    private final Set<String> resuming = new HashSet<>();
+    /**
+     * Progress indicator when starting or stopping.
+     */
     private final StringBuilder progress = new StringBuilder("-");
     private final Lock mDiskToInfoLock = new ReentrantLock();
-    private final Map<String, DiskInfo> diskToInfo = new HashMap<String, DiskInfo>();
-    /** Map from target string in the table to vms disk info object.  */
-    private volatile Map<String, DiskInfo> diskKeyToInfo = new HashMap<String, DiskInfo>();
+    private final Map<String, DiskInfo> diskToInfo = new HashMap<>();
+    /**
+     * Map from target string in the table to vms disk info object.
+     */
+    private volatile Map<String, DiskInfo> diskKeyToInfo = new HashMap<>();
 
     private final Lock mFilesystemToInfoLock = new ReentrantLock();
-    private final Map<String, FilesystemInfo> filesystemToInfo = new HashMap<String, FilesystemInfo>();
-    private volatile Map<String, FilesystemInfo> filesystemKeyToInfo = new HashMap<String, FilesystemInfo>();
+    private final Map<String, FilesystemInfo> filesystemToInfo = new HashMap<>();
+    private volatile Map<String, FilesystemInfo> filesystemKeyToInfo = new HashMap<>();
 
     private final Lock mInterfaceToInfoLock = new ReentrantLock();
-    private final Map<String, InterfaceInfo> interfaceToInfo = new HashMap<String, InterfaceInfo>();
-    private volatile Map<String, InterfaceInfo> interfaceKeyToInfo = new HashMap<String, InterfaceInfo>();
+    private final Map<String, InterfaceInfo> interfaceToInfo = new HashMap<>();
+    private volatile Map<String, InterfaceInfo> interfaceKeyToInfo = new HashMap<>();
     private final Lock mInputDevToInfoLock = new ReentrantLock();
-    private final Map<String, InputDevInfo> inputDevToInfo = new HashMap<String, InputDevInfo>();
-    private volatile Map<String, InputDevInfo> inputDevKeyToInfo = new HashMap<String, InputDevInfo>();
+    private final Map<String, InputDevInfo> inputDevToInfo = new HashMap<>();
+    private volatile Map<String, InputDevInfo> inputDevKeyToInfo = new HashMap<>();
 
     private final Lock mGraphicsToInfoLock = new ReentrantLock();
-    private final Map<String, GraphicsInfo> graphicsToInfo = new HashMap<String, GraphicsInfo>();
-    private volatile Map<String, GraphicsInfo> graphicsKeyToInfo = new HashMap<String, GraphicsInfo>();
+    private final Map<String, GraphicsInfo> graphicsToInfo = new HashMap<>();
+    private volatile Map<String, GraphicsInfo> graphicsKeyToInfo = new HashMap<>();
 
     private final Lock mSoundToInfoLock = new ReentrantLock();
-    private final Map<String, SoundInfo> soundToInfo = new HashMap<String, SoundInfo>();
-    private volatile Map<String, SoundInfo> soundKeyToInfo = new HashMap<String, SoundInfo>();
+    private final Map<String, SoundInfo> soundToInfo = new HashMap<>();
+    private volatile Map<String, SoundInfo> soundKeyToInfo = new HashMap<>();
 
     private final Lock mSerialToInfoLock = new ReentrantLock();
-    private final Map<String, SerialInfo> serialToInfo = new HashMap<String, SerialInfo>();
-    private volatile Map<String, SerialInfo> serialKeyToInfo = new HashMap<String, SerialInfo>();
+    private final Map<String, SerialInfo> serialToInfo = new HashMap<>();
+    private volatile Map<String, SerialInfo> serialKeyToInfo = new HashMap<>();
 
     private final Lock mParallelToInfoLock = new ReentrantLock();
-    private final Map<String, ParallelInfo> parallelToInfo = new HashMap<String, ParallelInfo>();
-    /** Preferred emulator. It's distro dependent. */
+    private final Map<String, ParallelInfo> parallelToInfo = new HashMap<>();
+    /**
+     * Preferred emulator. It's distro dependent.
+     */
     private String preferredEmulator;
-    private volatile Map<String, ParallelInfo> parallelKeyToInfo = new HashMap<String, ParallelInfo>();
+    private volatile Map<String, ParallelInfo> parallelKeyToInfo = new HashMap<>();
 
     private final Lock mVideoToInfoLock = new ReentrantLock();
-    private final Map<String, VideoInfo> videoToInfo = new HashMap<String, VideoInfo>();
-    private final Map<String, MyButton> hostButtons = new HashMap<String, MyButton>();
-    /** Whether it is used by CRM. */
+    private final Map<String, VideoInfo> videoToInfo = new HashMap<>();
+    private final Map<String, MyButton> hostButtons = new HashMap<>();
+    /**
+     * Whether it is used by CRM.
+     */
     private boolean usedByCRM = false;
-    private volatile Map<String, VideoInfo> videoKeyToInfo = new HashMap<String, VideoInfo>();
-    /** Previous type. */
+    private volatile Map<String, VideoInfo> videoKeyToInfo = new HashMap<>();
+    /**
+     * Previous type.
+     */
     private volatile Value prevType = null;
     private Value[] autostartPossibleValues;
-    /** This is a map from host to the check box. */
-    private final Map<String, Widget> definedOnHostComboBoxHash = new HashMap<String, Widget>();
+    /**
+     * This is a map from host to the check box.
+     */
+    private final Map<String, Widget> definedOnHostComboBoxHash = new HashMap<>();
     @Inject
     private ProgressIndicator progressIndicator;
     @Inject
@@ -605,12 +605,12 @@ public class DomainInfo extends EditableInfo {
         super.einit(Optional.of(new ResourceValue(name)), name, browser);
         final Host firstHost = getBrowser().getClusterHosts()[0];
         preferredEmulator = firstHost.getHostParser().getDistString("KVM.emulator");
-        final List<Value> hostsList = new ArrayList<Value>();
+        final List<Value> hostsList = new ArrayList<>();
         hostsList.add(null);
         for (final Host h : getBrowser().getClusterHosts()) {
             hostsList.add(new StringValue(h.getName()));
         }
-        autostartPossibleValues = hostsList.toArray(new Value[hostsList.size()]);
+        autostartPossibleValues = hostsList.toArray(new Value[0]);
     }
 
     @Override
@@ -618,7 +618,9 @@ public class DomainInfo extends EditableInfo {
         return (ClusterBrowser) super.getBrowser();
     }
 
-    /** Returns a name of the service with virtual domain name. */
+    /**
+     * Returns a name of the service with virtual domain name.
+     */
     @Override
     public String toString() {
         if (getResource().isNew()) {
@@ -628,25 +630,27 @@ public class DomainInfo extends EditableInfo {
         }
     }
 
-    /** Returns domain name. */
+    /**
+     * Returns domain name.
+     */
     protected String getDomainName() {
         return getName();
     }
 
-    /** Updates disk nodes. Returns whether the node changed. */
+    /**
+     * Updates disk nodes. Returns whether the node changed.
+     */
     private boolean updateDiskNodes() {
         final DefaultMutableTreeNode thisNode = getNode();
         if (thisNode == null) {
             return false;
         }
         final Map<String, DiskData> disks = getDisks();
-        final Collection<String> diskNames  = new ArrayList<String>();
+        final Collection<String> diskNames = new ArrayList<>();
         if (disks != null) {
-            for (final String d : disks.keySet()) {
-                diskNames.add(d);
-            }
+            diskNames.addAll(disks.keySet());
         }
-        final Collection<DefaultMutableTreeNode> nodesToRemove = new ArrayList<DefaultMutableTreeNode>();
+        final Collection<DefaultMutableTreeNode> nodesToRemove = new ArrayList<>();
         boolean nodeChanged = false;
         for (final Object info : clusterTreeMenu.nodesToInfos(thisNode.children())) {
             if (!(info instanceof DiskInfo)) {
@@ -711,20 +715,20 @@ public class DomainInfo extends EditableInfo {
         return nodeChanged;
     }
 
-    /** Updates FS nodes. Returns whether the node changed. */
+    /**
+     * Updates FS nodes. Returns whether the node changed.
+     */
     private boolean updateFilesystemNodes() {
         final DefaultMutableTreeNode thisNode = getNode();
         if (thisNode == null) {
             return false;
         }
         final Map<String, FilesystemData> filesystems = getFilesystems();
-        final Collection<String> filesystemNames  = new ArrayList<String>();
+        final Collection<String> filesystemNames = new ArrayList<>();
         if (filesystems != null) {
-            for (final String d : filesystems.keySet()) {
-                filesystemNames.add(d);
-            }
+            filesystemNames.addAll(filesystems.keySet());
         }
-        final Collection<DefaultMutableTreeNode> nodesToRemove = new ArrayList<DefaultMutableTreeNode>();
+        final Collection<DefaultMutableTreeNode> nodesToRemove = new ArrayList<>();
         boolean nodeChanged = false;
         for (final Object info : clusterTreeMenu.nodesToInfos(thisNode.children())) {
             if (!(info instanceof FilesystemInfo)) {
@@ -789,20 +793,20 @@ public class DomainInfo extends EditableInfo {
         return nodeChanged;
     }
 
-    /** Updates interface nodes. Returns whether the node changed. */
+    /**
+     * Updates interface nodes. Returns whether the node changed.
+     */
     private boolean updateInterfaceNodes() {
         final DefaultMutableTreeNode thisNode = getNode();
         if (thisNode == null) {
             return false;
         }
         final Map<String, InterfaceData> interfaces = getInterfaces();
-        final Collection<String> interfaceNames  = new ArrayList<String>();
+        final Collection<String> interfaceNames = new ArrayList<>();
         if (interfaces != null) {
-            for (final String i : interfaces.keySet()) {
-                interfaceNames.add(i);
-            }
+            interfaceNames.addAll(interfaces.keySet());
         }
-        final Collection<DefaultMutableTreeNode> nodesToRemove = new ArrayList<DefaultMutableTreeNode>();
+        final Collection<DefaultMutableTreeNode> nodesToRemove = new ArrayList<>();
         boolean nodeChanged = false;
         InterfaceInfo emptySlot = null; /* for generated mac address. */
         for (final Object info : clusterTreeMenu.nodesToInfos(thisNode.children())) {
@@ -875,20 +879,20 @@ public class DomainInfo extends EditableInfo {
         return nodeChanged;
     }
 
-    /** Updates input devices nodes. Returns whether the node changed. */
+    /**
+     * Updates input devices nodes. Returns whether the node changed.
+     */
     private boolean updateInputDevNodes() {
         final DefaultMutableTreeNode thisNode = getNode();
         if (thisNode == null) {
             return false;
         }
         final Map<String, InputDevData> inputDevs = getInputDevs();
-        final Collection<String> inputDevNames  = new ArrayList<String>();
+        final Collection<String> inputDevNames = new ArrayList<>();
         if (inputDevs != null) {
-            for (final String d : inputDevs.keySet()) {
-                inputDevNames.add(d);
-            }
+            inputDevNames.addAll(inputDevs.keySet());
         }
-        final Collection<DefaultMutableTreeNode> nodesToRemove = new ArrayList<DefaultMutableTreeNode>();
+        final Collection<DefaultMutableTreeNode> nodesToRemove = new ArrayList<>();
         boolean nodeChanged = false;
         for (final Object info : clusterTreeMenu.nodesToInfos(thisNode.children())) {
             if (!(info instanceof InputDevInfo)) {
@@ -952,20 +956,20 @@ public class DomainInfo extends EditableInfo {
         return nodeChanged;
     }
 
-    /** Updates graphics devices nodes. Returns whether the node changed. */
+    /**
+     * Updates graphics devices nodes. Returns whether the node changed.
+     */
     private boolean updateGraphicsNodes() {
         final DefaultMutableTreeNode thisNode = getNode();
         if (thisNode == null) {
             return false;
         }
         final Map<String, GraphicsData> graphicDisplays = getGraphicDisplays();
-        final Collection<String> graphicsNames  = new ArrayList<String>();
+        final Collection<String> graphicsNames = new ArrayList<>();
         if (graphicDisplays != null) {
-            for (final String d : graphicDisplays.keySet()) {
-                graphicsNames.add(d);
-            }
+            graphicsNames.addAll(graphicDisplays.keySet());
         }
-        final Collection<DefaultMutableTreeNode> nodesToRemove = new ArrayList<DefaultMutableTreeNode>();
+        final Collection<DefaultMutableTreeNode> nodesToRemove = new ArrayList<>();
         boolean nodeChanged = false;
         for (final Object info : clusterTreeMenu.nodesToInfos(thisNode.children())) {
             if (!(info instanceof GraphicsInfo)) {
@@ -1043,13 +1047,11 @@ public class DomainInfo extends EditableInfo {
             return false;
         }
         final Map<String, SoundData> sounds = getSounds();
-        final Collection<String> soundNames  = new ArrayList<String>();
+        final Collection<String> soundNames = new ArrayList<>();
         if (sounds != null) {
-            for (final String d : sounds.keySet()) {
-                soundNames.add(d);
-            }
+            soundNames.addAll(sounds.keySet());
         }
-        final Collection<DefaultMutableTreeNode> nodesToRemove = new ArrayList<DefaultMutableTreeNode>();
+        final Collection<DefaultMutableTreeNode> nodesToRemove = new ArrayList<>();
         boolean nodeChanged = false;
         for (final Object info : clusterTreeMenu.nodesToInfos(thisNode.children())) {
             if (!(info instanceof SoundInfo)) {
@@ -1128,13 +1130,11 @@ public class DomainInfo extends EditableInfo {
             return false;
         }
         final Map<String, SerialData> serials = getSerials();
-        final Collection<String> serialNames  = new ArrayList<String>();
+        final Collection<String> serialNames = new ArrayList<>();
         if (serials != null) {
-            for (final String d : serials.keySet()) {
-                serialNames.add(d);
-            }
+            serialNames.addAll(serials.keySet());
         }
-        final Collection<DefaultMutableTreeNode> nodesToRemove = new ArrayList<DefaultMutableTreeNode>();
+        final Collection<DefaultMutableTreeNode> nodesToRemove = new ArrayList<>();
         boolean nodeChanged = false;
         SerialInfo emptySlot = null; /* for generated target port. */
         for (final Object info : clusterTreeMenu.nodesToInfos(thisNode.children())) {
@@ -1218,13 +1218,11 @@ public class DomainInfo extends EditableInfo {
             return false;
         }
         final Map<String, ParallelData> parallels = getParallels();
-        final Collection<String> parallelNames  = new ArrayList<String>();
+        final Collection<String> parallelNames = new ArrayList<>();
         if (parallels != null) {
-            for (final String d : parallels.keySet()) {
-                parallelNames.add(d);
-            }
+            parallelNames.addAll(parallels.keySet());
         }
-        final Collection<DefaultMutableTreeNode> nodesToRemove = new ArrayList<DefaultMutableTreeNode>();
+        final Collection<DefaultMutableTreeNode> nodesToRemove = new ArrayList<>();
         boolean nodeChanged = false;
         ParallelInfo emptySlot = null; /* for generated target port. */
         for (final Object info : clusterTreeMenu.nodesToInfos(thisNode.children())) {
@@ -1309,13 +1307,11 @@ public class DomainInfo extends EditableInfo {
             return false;
         }
         final Map<String, VideoData> videos = getVideos();
-        final Collection<String> videoNames  = new ArrayList<String>();
+        final Collection<String> videoNames = new ArrayList<>();
         if (videos != null) {
-            for (final String d : videos.keySet()) {
-                videoNames.add(d);
-            }
+            videoNames.addAll(videos.keySet());
         }
-        final Collection<DefaultMutableTreeNode> nodesToRemove = new ArrayList<DefaultMutableTreeNode>();
+        final Collection<DefaultMutableTreeNode> nodesToRemove = new ArrayList<>();
         boolean nodeChanged = false;
         for (final Object info : clusterTreeMenu.nodesToInfos(thisNode.children())) {
             if (!(info instanceof VideoInfo)) {
@@ -1390,43 +1386,28 @@ public class DomainInfo extends EditableInfo {
         return nodeChanged;
     }
 
-    /** Returns button for defined hosts. */
+    /**
+     * Returns button for defined hosts.
+     */
     private MyButton getHostButton(final Host host, final String prefix) {
         final MyButton hostBtn = widgetFactory.createButton("Start", null, "not defined on " + host.getName());
         application.makeMiniButton(hostBtn);
-        final MyButton hBtn = hostBtn;
-        swingUtils.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                hBtn.setBackgroundColor(Browser.PANEL_BACKGROUND);
-            }
-        });
-        hostBtn.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(final ActionEvent e) {
-                LOG.debug1("actionPerformed: BUTTON: host: " + host.getName());
-                final Thread t = new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        final VmsXml vxml = getBrowser().getVmsXml(host);
-                        if (vxml != null) {
-                            if (hBtn.getIcon() == VNC_ICON) {
-                                final int remotePort = vxml.getRemotePort(getDomainName());
-                                application.startTightVncViewer(host, remotePort);
-                            } else if (hBtn.getIcon() == HostBrowser.HOST_ON_ICON) {
-                                swingUtils.invokeLater(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        hBtn.setEnabled(false);
-                                    }
-                                });
-                                start(host);
-                            }
-                        }
+        swingUtils.invokeLater(() -> hostBtn.setBackgroundColor(Browser.PANEL_BACKGROUND));
+        hostBtn.addActionListener(e -> {
+            LOG.debug1("actionPerformed: BUTTON: host: " + host.getName());
+            final Thread t = new Thread(() -> {
+                final VmsXml vxml = getBrowser().getVmsXml(host);
+                if (vxml != null) {
+                    if (hostBtn.getIcon() == VNC_ICON) {
+                        final int remotePort = vxml.getRemotePort(getDomainName());
+                        application.startTightVncViewer(host, remotePort);
+                    } else if (hostBtn.getIcon() == HostBrowser.HOST_ON_ICON) {
+                        swingUtils.invokeLater(() -> hostBtn.setEnabled(false));
+                        start(host);
                     }
-                });
-                t.start();
-            }
+                }
+            });
+            t.start();
         });
         hostBtn.setPreferredSize(new Dimension(80, 20));
         hostBtn.setMinimumSize(hostBtn.getPreferredSize());
@@ -1438,20 +1419,21 @@ public class DomainInfo extends EditableInfo {
         return hostBtn;
     }
 
-    /** Sets service parameters with values from resourceNode hash. */
+    /**
+     * Sets service parameters with values from resourceNode hash.
+     */
     public void updateParameters() {
         final DefaultMutableTreeNode thisNode = getNode();
         if (thisNode == null) {
             return;
         }
-        final List<String> runningOnHosts = new ArrayList<String>();
-        final List<String> suspendedOnHosts = new ArrayList<String>();
-        final List<String> definedhosts = new ArrayList<String>();
+        final List<String> runningOnHosts = new ArrayList<>();
+        final List<String> suspendedOnHosts = new ArrayList<>();
+        final List<String> definedhosts = new ArrayList<>();
         for (final Host h : getBrowser().getClusterHosts()) {
             final VmsXml vmsXml = getBrowser().getVmsXml(h);
             final String hostName = h.getName();
-            if (vmsXml != null
-                && vmsXml.getDomainNames().contains(getDomainName())) {
+            if (vmsXml != null && vmsXml.getDomainNames().contains(getDomainName())) {
                 if (vmsXml.isRunning(getDomainName())) {
                     if (vmsXml.isSuspended(getDomainName())) {
                         suspendedOnHosts.add(hostName);
@@ -1482,9 +1464,7 @@ public class DomainInfo extends EditableInfo {
                 definedhosts.add("<font color=\"#A3A3A3\">" + hostName + "</font>");
             }
         }
-        definedOnString = "<html>"
-                          + Tools.join(", ", definedhosts.toArray(new String[definedhosts.size()]))
-                          + "</html>";
+        definedOnString = "<html>" + Tools.join(", ", definedhosts.toArray(new String[0])) + "</html>";
         final boolean running = !runningOnHosts.isEmpty();
         mTransitionWriteLock.lock();
         /* Set host buttons */
@@ -1509,34 +1489,21 @@ public class DomainInfo extends EditableInfo {
             mTransitionReadLock.lock();
             try {
                 if (!starting.isEmpty()) {
-                    runningOnString = "<html>Starting on: "
-                                      + Tools.join(", ", starting.toArray(new String[starting.size()]))
-                                      + progress.toString()
-                                      + "</html>";
+                    runningOnString =
+                            "<html>Starting on: " + Tools.join(", ", starting.toArray(new String[0])) + progress + "</html>";
                 } else if (!shuttingdown.isEmpty()) {
-                    runningOnString = "<html>Shutting down on: "
-                                      + Tools.join(", ", shuttingdown.toArray(new String[shuttingdown.size()]))
-                                      + progress.toString()
+                    runningOnString = "<html>Shutting down on: " + Tools.join(", ", shuttingdown.toArray(new String[0])) + progress
                                       + "</html>";
                 } else if (!suspending.isEmpty()) {
-                    runningOnString = "<html>Suspending on: "
-                                      + Tools.join(", ", suspending.toArray(new String[suspending.size()]))
-                                      + progress.toString()
-                                      + "</html>";
+                    runningOnString =
+                            "<html>Suspending on: " + Tools.join(", ", suspending.toArray(new String[0])) + progress + "</html>";
                 } else if (!resuming.isEmpty()) {
-                    runningOnString = "<html>Resuming on: "
-                                      + Tools.join(", ", resuming.toArray(new String[suspending.size()]))
-                                      + progress.toString()
-                                      + "</html>";
+                    runningOnString =
+                            "<html>Resuming on: " + Tools.join(", ", resuming.toArray(new String[0])) + progress + "</html>";
                 } else if (!suspendedOnHosts.isEmpty()) {
-                    runningOnString = "<html>Paused on: "
-                                      + Tools.join(", ", suspendedOnHosts.toArray(
-                                                                    new String[suspendedOnHosts.size()]))
-                                      + "</html>";
+                    runningOnString = "<html>Paused on: " + Tools.join(", ", suspendedOnHosts.toArray(new String[0])) + "</html>";
                 } else {
-                    runningOnString = "<html>Running on: "
-                                      + Tools.join(", ", runningOnHosts.toArray(new String[runningOnHosts.size()]))
-                                      + "</html>";
+                    runningOnString = "<html>Running on: " + Tools.join(", ", runningOnHosts.toArray(new String[0])) + "</html>";
                 }
             } finally {
                 mTransitionReadLock.unlock();
@@ -1568,7 +1535,7 @@ public class DomainInfo extends EditableInfo {
                     } else {
                         savedValue = new StringValue(vmsXml.getValue(getDomainName(), param));
                     }
-                    if (savedValue == null || savedValue.isNothingSelected()) {
+                    if (savedValue.isNothingSelected()) {
                         value = getParamDefault(param);
                     } else {
                         value = savedValue;
@@ -1589,29 +1556,19 @@ public class DomainInfo extends EditableInfo {
                 uuid = vmsXml.getValue(getDomainName(), VMParams.VM_PARAM_UUID);
             }
         }
-        swingUtils.invokeInEdt(new Runnable() {
-            @Override
-            public void run() {
-                final boolean interfaceNodeChanged = updateInterfaceNodes();
-                final boolean diskNodeChanged = updateDiskNodes();
-                final boolean filesystemNodeChanged = updateFilesystemNodes();
-                final boolean inputDevNodeChanged = updateInputDevNodes();
-                final boolean graphicsNodeChanged = updateGraphicsNodes();
-                final boolean soundNodeChanged = updateSoundNodes();
-                final boolean serialNodeChanged = updateSerialNodes();
-                final boolean parallelNodeChanged = updateParallelNodes();
-                final boolean videoNodeChanged = updateVideoNodes();
-                if (interfaceNodeChanged
-                    || diskNodeChanged
-                    || filesystemNodeChanged
-                    || inputDevNodeChanged
-                    || graphicsNodeChanged
-                    || soundNodeChanged
-                    || serialNodeChanged
-                    || parallelNodeChanged
-                    || videoNodeChanged) {
-                    clusterTreeMenu.reloadNodeDontSelect(thisNode);
-                }
+        swingUtils.invokeInEdt(() -> {
+            final boolean interfaceNodeChanged = updateInterfaceNodes();
+            final boolean diskNodeChanged = updateDiskNodes();
+            final boolean filesystemNodeChanged = updateFilesystemNodes();
+            final boolean inputDevNodeChanged = updateInputDevNodes();
+            final boolean graphicsNodeChanged = updateGraphicsNodes();
+            final boolean soundNodeChanged = updateSoundNodes();
+            final boolean serialNodeChanged = updateSerialNodes();
+            final boolean parallelNodeChanged = updateParallelNodes();
+            final boolean videoNodeChanged = updateVideoNodes();
+            if (interfaceNodeChanged || diskNodeChanged || filesystemNodeChanged || inputDevNodeChanged || graphicsNodeChanged
+                || soundNodeChanged || serialNodeChanged || parallelNodeChanged || videoNodeChanged) {
+                clusterTreeMenu.reloadNodeDontSelect(thisNode);
             }
         });
         updateTable(HEADER_TABLE);
@@ -1624,12 +1581,9 @@ public class DomainInfo extends EditableInfo {
         updateTable(SERIAL_TABLE);
         updateTable(PARALLEL_TABLE);
         updateTable(VIDEO_TABLE);
-        swingUtils.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                setApplyButtons(null, getParametersFromXML());
-                clusterTreeMenu.repaintMenuTree();
-            }
+        swingUtils.invokeLater(() -> {
+            setApplyButtons(null, getParametersFromXML());
+            clusterTreeMenu.repaintMenuTree();
         });
     }
 
@@ -1673,12 +1627,7 @@ public class DomainInfo extends EditableInfo {
             }
             final Widget realParamWi = rpwi;
             if (!host.isConnected()) {
-                swingUtils.invokeLater(new Runnable() {
-                    @Override
-                    public void run() {
-                        wi.setEnabled(false);
-                    }
-                });
+                swingUtils.invokeLater(() -> wi.setEnabled(false));
             }
             wi.addListeners(new WidgetListener() {
                                 @Override
@@ -1743,40 +1692,24 @@ public class DomainInfo extends EditableInfo {
         initApplyButton(null);
         /* add item listeners to the apply button. */
         if (!abExisted) {
-            getApplyButton().addActionListener(
-                new ActionListener() {
-                    @Override
-                    public void actionPerformed(final ActionEvent e) {
-                        LOG.debug1("actionPerformed: BUTTON: apply");
-                        final Thread thread = new Thread(new Runnable() {
-                            @Override
-                            public void run() {
-                                getBrowser().clStatusLock();
-                                apply(Application.RunMode.LIVE);
-                                getBrowser().clStatusUnlock();
-                            }
-                        });
-                        thread.start();
-                    }
-                }
-            );
-            getRevertButton().addActionListener(
-                new ActionListener() {
-                    @Override
-                    public void actionPerformed(final ActionEvent e) {
-                        LOG.debug1("actionPerformed: BUTTON: revert");
-                        final Thread thread = new Thread(new Runnable() {
-                            @Override
-                            public void run() {
-                                getBrowser().clStatusLock();
-                                revert();
-                                getBrowser().clStatusUnlock();
-                            }
-                        });
-                        thread.start();
-                    }
-                }
-            );
+            getApplyButton().addActionListener(e -> {
+                LOG.debug1("actionPerformed: BUTTON: apply");
+                final Thread thread = new Thread(() -> {
+                    getBrowser().clStatusLock();
+                    apply(Application.RunMode.LIVE);
+                    getBrowser().clStatusUnlock();
+                });
+                thread.start();
+            });
+            getRevertButton().addActionListener(e -> {
+                LOG.debug1("actionPerformed: BUTTON: revert");
+                final Thread thread = new Thread(() -> {
+                    getBrowser().clStatusLock();
+                    revert();
+                    getBrowser().clStatusUnlock();
+                });
+                thread.start();
+            });
         }
         final JPanel extraButtonPanel = new JPanel(new FlowLayout(FlowLayout.TRAILING, 0, 0));
         extraButtonPanel.setBackground(Browser.BUTTON_PANEL_BACKGROUND);
@@ -1786,21 +1719,14 @@ public class DomainInfo extends EditableInfo {
         final MyButton overviewButton = widgetFactory.createButton("VMs Overview", BACK_ICON);
         application.makeMiniButton(overviewButton);
         overviewButton.setPreferredSize(new Dimension(130, 50));
-        overviewButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(final ActionEvent e) {
-                LOG.debug1("actionPerformed: BUTTON: overview");
-                getBrowser().getVmsInfo().selectMyself();
-            }
+        overviewButton.addActionListener(e -> {
+            LOG.debug1("actionPerformed: BUTTON: overview");
+            getBrowser().getVmsInfo().selectMyself();
         });
         extraButtonPanel.add(overviewButton);
         /* define on hosts */
         optionsPanel.add(getDefinedOnHostsPanel(null, getApplyButton()));
-        addParams(optionsPanel,
-                  params,
-                  application.getServiceLabelWidth(),
-                  application.getServiceFieldWidth() * 2,
-                  null);
+        addParams(optionsPanel, params, application.getServiceLabelWidth(), application.getServiceFieldWidth() * 2, null);
         /* Actions */
         buttonPanel.add(getActionsButton(), BorderLayout.LINE_END);
         mainPanel.add(optionsPanel);
@@ -1839,12 +1765,7 @@ public class DomainInfo extends EditableInfo {
         newPanel.add(getMoreOptionsPanel(application.getServiceLabelWidth()
                                          + application.getServiceFieldWidth() * 2 + 4));
         newPanel.add(new JScrollPane(mainPanel));
-        swingUtils.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                setApplyButtons(null, params);
-            }
-        });
+        swingUtils.invokeLater(() -> setApplyButtons(null, params));
         infoPanel = newPanel;
         infoPanelDone();
         return infoPanel;
@@ -2329,9 +2250,7 @@ public class DomainInfo extends EditableInfo {
                 return false;
             }
             final long curMem = VmsXml.convertToKilobytes(getComboBoxValue(VMParams.VM_PARAM_CURRENTMEMORY));
-            if (mem < curMem) {
-                return false;
-            }
+            return mem >= curMem;
         } else if (VMParams.VM_PARAM_CURRENTMEMORY.equals(param)) {
             final long curMem = VmsXml.convertToKilobytes(newValue);
             if (curMem < 4096) {
@@ -2483,19 +2402,19 @@ public class DomainInfo extends EditableInfo {
         } else if (VMParams.VM_PARAM_VIRSH_OPTIONS.equals(param)) {
             return VIRSH_OPTIONS;
         } else if (VMParams.VM_PARAM_CPUMATCH_MODEL.equals(param)) {
-            final Set<Value> models = new LinkedHashSet<Value>();
+            final Set<Value> models = new LinkedHashSet<>();
             models.add(new StringValue());
             for (final Host host : getBrowser().getClusterHosts()) {
                 models.addAll(host.getHostParser().getCPUMapModels());
             }
-            return models.toArray(new Value[models.size()]);
+            return models.toArray(new Value[0]);
         } else if (VMParams.VM_PARAM_CPUMATCH_VENDOR.equals(param)) {
-            final Set<Value> vendors = new LinkedHashSet<Value>();
+            final Set<Value> vendors = new LinkedHashSet<>();
             vendors.add(new StringValue());
             for (final Host host : getBrowser().getClusterHosts()) {
                 vendors.addAll(host.getHostParser().getCPUMapVendors());
             }
-            return vendors.toArray(new Value[vendors.size()]);
+            return vendors.toArray(new Value[0]);
         }
         return POSSIBLE_VALUES.get(param);
     }
@@ -2544,17 +2463,14 @@ public class DomainInfo extends EditableInfo {
         if (Application.isTest(runMode)) {
             return;
         }
-        swingUtils.invokeAndWait(new Runnable() {
-            @Override
-            public void run() {
-                getApplyButton().setEnabled(false);
-                getRevertButton().setEnabled(false);
-                getInfoPanel();
-            }
+        swingUtils.invokeAndWait(() -> {
+            getApplyButton().setEnabled(false);
+            getRevertButton().setEnabled(false);
+            getInfoPanel();
         });
         waitForInfoPanel();
         final String[] params = getParametersFromXML();
-        final Map<String, String> parameters = new HashMap<String, String>();
+        final Map<String, String> parameters = new HashMap<>();
         setName(getComboBoxValue(VMParams.VM_PARAM_NAME).getValueForConfig());
         for (final String param : getParametersFromXML()) {
             final Value value = getComboBoxValue(param);
@@ -2564,30 +2480,23 @@ public class DomainInfo extends EditableInfo {
                 parameters.put(param, Long.toString(VmsXml.convertToKilobytes(value)));
             } else {
                 final String valueForConfig = value.getValueForConfig();
-                if (valueForConfig == null) {
-                    parameters.put(param, "");
-                } else {
-                    parameters.put(param, valueForConfig);
-                }
+                parameters.put(param, Objects.requireNonNullElse(valueForConfig, ""));
             }
             getResource().setValue(param, value);
         }
-        final List<Host> definedOnHosts = new ArrayList<Host>();
+        final List<Host> definedOnHosts = new ArrayList<>();
         final Map<HardwareInfo, Map<String, String>> allModifiedHWP = getAllHWParameters(false);
         final Map<HardwareInfo, Map<String, String>> allHWP = getAllHWParameters(true);
-        final Map<Node, VmsXml> domainNodesToSave = new HashMap<Node, VmsXml>();
+        final Map<Node, VmsXml> domainNodesToSave = new HashMap<>();
         final String clusterName = getBrowser().getCluster().getName();
         getBrowser().vmStatusLock();
         progressIndicator.startProgressIndicator(clusterName, "VM view update");
         for (final Host host : getBrowser().getClusterHosts()) {
             final Widget hostWi = definedOnHostComboBoxHash.get(host.getName());
-            swingUtils.invokeLater(new Runnable() {
-                @Override
-                public void run() {
-                    final Widget wizardHostWi = definedOnHostComboBoxHash.get(WIZARD_HOST_PREFIX + host.getName());
-                    if (wizardHostWi != null) {
-                        wizardHostWi.setEnabled(false);
-                    }
+            swingUtils.invokeLater(() -> {
+                final Widget wizardHostWi = definedOnHostComboBoxHash.get(WIZARD_HOST_PREFIX + host.getName());
+                if (wizardHostWi != null) {
+                    wizardHostWi.setEnabled(false);
                 }
             });
             final Value value = definedOnHostComboBoxHash.get(host.getName()).getValue();
@@ -2664,10 +2573,7 @@ public class DomainInfo extends EditableInfo {
                 }
             }
         }
-        VIRSH.setParameters(definedOnHosts.toArray(new Host[definedOnHosts.size()]),
-                            getDomainName(),
-                            parameters,
-                            getVirshOptions());
+        VIRSH.setParameters(definedOnHosts.toArray(new Host[0]), getDomainName(), parameters, getVirshOptions());
         getResource().setNew(false);
         if (Application.isLive(runMode)) {
             storeComboBoxValues(params);
@@ -2676,23 +2582,19 @@ public class DomainInfo extends EditableInfo {
         updateParameters();
         progressIndicator.stopProgressIndicator(clusterName, "VM view update");
         getBrowser().vmStatusUnlock();
-        swingUtils.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                for (final Host host : getBrowser().getClusterHosts()) {
-                    final Widget hostWi = definedOnHostComboBoxHash.get(host.getName());
-                    final Widget wizardHostWi = definedOnHostComboBoxHash.get(WIZARD_HOST_PREFIX + host.getName());
-                    if (wizardHostWi != null) {
-                        wizardHostWi.setEnabled(true);
-                    }
+        swingUtils.invokeLater(() -> {
+            for (final Host host : getBrowser().getClusterHosts()) {
+                final Widget hostWi = definedOnHostComboBoxHash.get(host.getName());
+                final Widget wizardHostWi = definedOnHostComboBoxHash.get(WIZARD_HOST_PREFIX + host.getName());
+                if (wizardHostWi != null) {
+                    wizardHostWi.setEnabled(true);
                 }
             }
         });
     }
 
     protected Map<HardwareInfo, Map<String, String>> getAllHWParameters(final boolean allParams) {
-        final Map<HardwareInfo, Map<String, String>> allParamaters =
-                                                         new TreeMap<HardwareInfo, Map<String, String>>();
+        final Map<HardwareInfo, Map<String, String>> allParamaters = new TreeMap<>();
         final DefaultMutableTreeNode thisNode = getNode();
         if (thisNode == null) {
             return allParamaters;
@@ -2782,7 +2684,7 @@ public class DomainInfo extends EditableInfo {
 
     /** Returns data for the main table. */
     protected Object[][] getMainTableData() {
-        final List<Object[]> rows = new ArrayList<Object[]>();
+        final List<Object[]> rows = new ArrayList<>();
         final String domainName = getDomainName();
         ImageIcon hostIcon = HostBrowser.HOST_OFF_ICON_LARGE;
         Color newColor = Browser.PANEL_BACKGROUND;
@@ -2877,7 +2779,7 @@ public class DomainInfo extends EditableInfo {
 
     /** Returns all hosts on which this domain is defined. */
     List<Host> getDefinedOnHosts() {
-        final List<Host> definedOn = new ArrayList<Host>();
+        final List<Host> definedOn = new ArrayList<>();
         for (final Host h : getBrowser().getClusterHosts()) {
             if (getResource().isNew()) {
                 final Value value =
@@ -2887,8 +2789,7 @@ public class DomainInfo extends EditableInfo {
                 }
             } else {
                 final VmsXml vmsXml = getBrowser().getVmsXml(h);
-                if (vmsXml != null
-                    && vmsXml.getDomainNames().contains(getDomainName())) {
+                if (vmsXml != null && vmsXml.getDomainNames().contains(getDomainName())) {
                     definedOn.add(h);
                 }
             }
@@ -2897,9 +2798,9 @@ public class DomainInfo extends EditableInfo {
     }
 
     private Object[][] getDiskTableData() {
-        final List<Object[]> rows = new ArrayList<Object[]>();
+        final List<Object[]> rows = new ArrayList<>();
         final Map<String, DiskData> disks = getDisks();
-        final Map<String, DiskInfo> dkti = new HashMap<String, DiskInfo>();
+        final Map<String, DiskInfo> dkti = new HashMap<>();
         if (disks != null && !disks.isEmpty()) {
             for (final String targetDev : disks.keySet()) {
                 final Object[] row = getDiskDataRow(targetDev, dkti, disks, false);
@@ -2970,9 +2871,9 @@ public class DomainInfo extends EditableInfo {
 
     /** Returns data for the fs table. */
     private Object[][] getFilesystemTableData() {
-        final List<Object[]> rows = new ArrayList<Object[]>();
+        final List<Object[]> rows = new ArrayList<>();
         final Map<String, FilesystemData> filesystems = getFilesystems();
-        final Map<String, FilesystemInfo> dkti = new HashMap<String, FilesystemInfo>();
+        final Map<String, FilesystemInfo> dkti = new HashMap<>();
         if (filesystems != null && !filesystems.isEmpty()) {
             for (final String targetDev : filesystems.keySet()) {
                 final Object[] row = getFilesystemDataRow(targetDev, dkti, filesystems, false);
@@ -3179,9 +3080,9 @@ public class DomainInfo extends EditableInfo {
     }
 
     private Object[][] getInputDevTableData() {
-        final List<Object[]> rows = new ArrayList<Object[]>();
+        final List<Object[]> rows = new ArrayList<>();
         final Map<String, InputDevData> inputDevs = getInputDevs();
-        final Map<String, InputDevInfo> iToInfo = new HashMap<String, InputDevInfo>();
+        final Map<String, InputDevInfo> iToInfo = new HashMap<>();
         if (inputDevs != null) {
             for (final String index : inputDevs.keySet()) {
                 final Object[] row = getInputDevDataRow(index, iToInfo, inputDevs, false);
@@ -3198,9 +3099,9 @@ public class DomainInfo extends EditableInfo {
     }
 
     private Object[][] getGraphicsTableData() {
-        final List<Object[]> rows = new ArrayList<Object[]>();
+        final List<Object[]> rows = new ArrayList<>();
         final Map<String, GraphicsData> graphicDisplays = getGraphicDisplays();
-        final Map<String, GraphicsInfo> iToInfo = new HashMap<String, GraphicsInfo>();
+        final Map<String, GraphicsInfo> iToInfo = new HashMap<>();
         if (graphicDisplays != null) {
             for (final String index : graphicDisplays.keySet()) {
                 final Object[] row = getGraphicsDataRow(index, iToInfo, graphicDisplays, false);
@@ -3218,9 +3119,9 @@ public class DomainInfo extends EditableInfo {
 
     /** Returns data for the sound devices table. */
     private Object[][] getSoundTableData() {
-        final List<Object[]> rows = new ArrayList<Object[]>();
+        final List<Object[]> rows = new ArrayList<>();
         final Map<String, SoundData> sounds = getSounds();
-        final Map<String, SoundInfo> iToInfo = new HashMap<String, SoundInfo>();
+        final Map<String, SoundInfo> iToInfo = new HashMap<>();
         if (sounds != null) {
             for (final String index : sounds.keySet()) {
                 final Object[] row = getSoundDataRow(index, iToInfo, sounds, false);
@@ -3238,9 +3139,9 @@ public class DomainInfo extends EditableInfo {
 
     /** Returns data for the serial devices table. */
     private Object[][] getSerialTableData() {
-        final List<Object[]> rows = new ArrayList<Object[]>();
+        final List<Object[]> rows = new ArrayList<>();
         final Map<String, SerialData> serials = getSerials();
-        final Map<String, SerialInfo> iToInfo = new HashMap<String, SerialInfo>();
+        final Map<String, SerialInfo> iToInfo = new HashMap<>();
         if (serials != null) {
             for (final String index : serials.keySet()) {
                 final Object[] row = getSerialDataRow(index, iToInfo, serials, false);
@@ -3258,9 +3159,9 @@ public class DomainInfo extends EditableInfo {
 
     /** Returns data for the parallel devices table. */
     private Object[][] getParallelTableData() {
-        final List<Object[]> rows = new ArrayList<Object[]>();
+        final List<Object[]> rows = new ArrayList<>();
         final Map<String, ParallelData> parallels = getParallels();
-        final Map<String, ParallelInfo> iToInfo = new HashMap<String, ParallelInfo>();
+        final Map<String, ParallelInfo> iToInfo = new HashMap<>();
         if (parallels != null) {
             for (final String index : parallels.keySet()) {
                 final Object[] row = getParallelDataRow(index, iToInfo, parallels, false);
@@ -3277,9 +3178,9 @@ public class DomainInfo extends EditableInfo {
     }
 
     private Object[][] getVideoTableData() {
-        final List<Object[]> rows = new ArrayList<Object[]>();
+        final List<Object[]> rows = new ArrayList<>();
         final Map<String, VideoData> videos = getVideos();
-        final Map<String, VideoInfo> iToInfo = new HashMap<String, VideoInfo>();
+        final Map<String, VideoInfo> iToInfo = new HashMap<>();
         if (videos != null) {
             for (final String index : videos.keySet()) {
                 final Object[] row = getVideoDataRow(index, iToInfo, videos, false);
@@ -3369,9 +3270,9 @@ public class DomainInfo extends EditableInfo {
     }
 
     private Object[][] getInterfaceTableData() {
-        final List<Object[]> rows = new ArrayList<Object[]>();
+        final List<Object[]> rows = new ArrayList<>();
         final Map<String, InterfaceData> interfaces = getInterfaces();
-        final Map<String, InterfaceInfo> iToInfo = new HashMap<String, InterfaceInfo>();
+        final Map<String, InterfaceInfo> iToInfo = new HashMap<>();
         if (interfaces != null) {
             for (final String mac : interfaces.keySet()) {
                 final Object[] row = getInterfaceDataRow(mac, iToInfo, interfaces, false);
@@ -3390,14 +3291,11 @@ public class DomainInfo extends EditableInfo {
     @Override
     protected void rowClicked(final String tableName, final String key, final int column) {
         if (HEADER_TABLE.equals(tableName)) {
-            final Thread thread = new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    if (HEADER_DEFAULT_WIDTHS.containsKey(column)) {
-                        removeMyself(Application.RunMode.LIVE);
-                    } else {
-                        getBrowser().getVmsInfo().selectMyself();
-                    }
+            final Thread thread = new Thread(() -> {
+                if (HEADER_DEFAULT_WIDTHS.containsKey(column)) {
+                    removeMyself(Application.RunMode.LIVE);
+                } else {
+                    getBrowser().getVmsInfo().selectMyself();
                 }
             });
             thread.start();
@@ -3410,14 +3308,11 @@ public class DomainInfo extends EditableInfo {
                 mDiskToInfoLock.unlock();
             }
             if (vdi != null) {
-                final Thread thread = new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        if (DISK_DEFAULT_WIDTHS.containsKey(column)) {
-                            vdi.removeMyself(Application.RunMode.LIVE);
-                        } else {
-                            vdi.selectMyself();
-                        }
+                final Thread thread = new Thread(() -> {
+                    if (DISK_DEFAULT_WIDTHS.containsKey(column)) {
+                        vdi.removeMyself(Application.RunMode.LIVE);
+                    } else {
+                        vdi.selectMyself();
                     }
                 });
                 thread.start();
@@ -3431,14 +3326,11 @@ public class DomainInfo extends EditableInfo {
                 mFilesystemToInfoLock.unlock();
             }
             if (vfi != null) {
-                final Thread thread = new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        if (FILESYSTEM_DEFAULT_WIDTHS.containsKey(column)) {
-                            vfi.removeMyself(Application.RunMode.LIVE);
-                        } else {
-                            vfi.selectMyself();
-                        }
+                final Thread thread = new Thread(() -> {
+                    if (FILESYSTEM_DEFAULT_WIDTHS.containsKey(column)) {
+                        vfi.removeMyself(Application.RunMode.LIVE);
+                    } else {
+                        vfi.selectMyself();
                     }
                 });
                 thread.start();
@@ -3452,14 +3344,11 @@ public class DomainInfo extends EditableInfo {
                 mInterfaceToInfoLock.unlock();
             }
             if (vii != null) {
-                final Thread thread = new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        if (INTERFACES_DEFAULT_WIDTHS.containsKey(column)) {
-                            vii.removeMyself(Application.RunMode.LIVE);
-                        } else {
-                            vii.selectMyself();
-                        }
+                final Thread thread = new Thread(() -> {
+                    if (INTERFACES_DEFAULT_WIDTHS.containsKey(column)) {
+                        vii.removeMyself(Application.RunMode.LIVE);
+                    } else {
+                        vii.selectMyself();
                     }
                 });
                 thread.start();
@@ -3473,14 +3362,11 @@ public class DomainInfo extends EditableInfo {
                 mInputDevToInfoLock.unlock();
             }
             if (vidi != null) {
-                final Thread thread = new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        if (INPUTDEVS_DEFAULT_WIDTHS.containsKey(column)) {
-                            vidi.removeMyself(Application.RunMode.LIVE);
-                        } else {
-                            vidi.selectMyself();
-                        }
+                final Thread thread = new Thread(() -> {
+                    if (INPUTDEVS_DEFAULT_WIDTHS.containsKey(column)) {
+                        vidi.removeMyself(Application.RunMode.LIVE);
+                    } else {
+                        vidi.selectMyself();
                     }
                 });
                 thread.start();
@@ -3494,14 +3380,11 @@ public class DomainInfo extends EditableInfo {
                 mGraphicsToInfoLock.unlock();
             }
             if (vgi != null) {
-                final Thread thread = new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        if (GRAPHICS_DEFAULT_WIDTHS.containsKey(column)) {
-                            vgi.removeMyself(Application.RunMode.LIVE);
-                        } else {
-                            vgi.selectMyself();
-                        }
+                final Thread thread = new Thread(() -> {
+                    if (GRAPHICS_DEFAULT_WIDTHS.containsKey(column)) {
+                        vgi.removeMyself(Application.RunMode.LIVE);
+                    } else {
+                        vgi.selectMyself();
                     }
                 });
                 thread.start();
@@ -3515,14 +3398,11 @@ public class DomainInfo extends EditableInfo {
                 mSoundToInfoLock.unlock();
             }
             if (vsi != null) {
-                final Thread thread = new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        if (SOUND_DEFAULT_WIDTHS.containsKey(column)) {
-                            vsi.removeMyself(Application.RunMode.LIVE);
-                        } else {
-                            vsi.selectMyself();
-                        }
+                final Thread thread = new Thread(() -> {
+                    if (SOUND_DEFAULT_WIDTHS.containsKey(column)) {
+                        vsi.removeMyself(Application.RunMode.LIVE);
+                    } else {
+                        vsi.selectMyself();
                     }
                 });
                 thread.start();
@@ -3536,14 +3416,11 @@ public class DomainInfo extends EditableInfo {
                 mSerialToInfoLock.unlock();
             }
             if (vsi != null) {
-                final Thread thread = new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        if (SERIAL_DEFAULT_WIDTHS.containsKey(column)) {
-                            vsi.removeMyself(Application.RunMode.LIVE);
-                        } else {
-                            vsi.selectMyself();
-                        }
+                final Thread thread = new Thread(() -> {
+                    if (SERIAL_DEFAULT_WIDTHS.containsKey(column)) {
+                        vsi.removeMyself(Application.RunMode.LIVE);
+                    } else {
+                        vsi.selectMyself();
                     }
                 });
                 thread.start();
@@ -3557,14 +3434,11 @@ public class DomainInfo extends EditableInfo {
                 mParallelToInfoLock.unlock();
             }
             if (vpi != null) {
-                final Thread thread = new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        if (PARALLEL_DEFAULT_WIDTHS.containsKey(column)) {
-                            vpi.removeMyself(Application.RunMode.LIVE);
-                        } else {
-                            vpi.selectMyself();
-                        }
+                final Thread thread = new Thread(() -> {
+                    if (PARALLEL_DEFAULT_WIDTHS.containsKey(column)) {
+                        vpi.removeMyself(Application.RunMode.LIVE);
+                    } else {
+                        vpi.selectMyself();
                     }
                 });
                 thread.start();
@@ -3578,14 +3452,11 @@ public class DomainInfo extends EditableInfo {
                 mVideoToInfoLock.unlock();
             }
             if (vvi != null) {
-                final Thread thread = new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        if (VIDEO_DEFAULT_WIDTHS.containsKey(column)) {
-                            vvi.removeMyself(Application.RunMode.LIVE);
-                        } else {
-                            vvi.selectMyself();
-                        }
+                final Thread thread = new Thread(() -> {
+                    if (VIDEO_DEFAULT_WIDTHS.containsKey(column)) {
+                        vvi.removeMyself(Application.RunMode.LIVE);
+                    } else {
+                        vvi.selectMyself();
                     }
                 });
                 thread.start();
@@ -3706,14 +3577,13 @@ public class DomainInfo extends EditableInfo {
     }
 
     /**
-     * Returns whether the specified parameter or any of the parameters
-     * have changed.
+     * Returns whether the specified parameter or any of the parameters have changed.
      */
     @Override
     public Check checkResourceFields(final String param, final String[] params) {
         final DefaultMutableTreeNode thisNode = getNode();
-        final List<String> changed = new ArrayList<String>();
-        final List<String> incorrect = new ArrayList<String>();
+        final List<String> changed = new ArrayList<>();
+        final List<String> incorrect = new ArrayList<>();
         if (thisNode == null) {
             incorrect.add("missing node");
             return new Check(incorrect, changed);
@@ -3758,7 +3628,6 @@ public class DomainInfo extends EditableInfo {
             }
             incorrect.add("no host");
         }
-        @SuppressWarnings("unchecked")
         final Check check = new Check(incorrect, changed);
         check.addCheck(super.checkResourceFields(param, params));
         for (final Object info : clusterTreeMenu.nodesToInfos(thisNode.children())) {
@@ -3919,51 +3788,45 @@ public class DomainInfo extends EditableInfo {
         return super.getTableToolTip(tableName, key, object, raw, column);
     }
 
-    /** Sets button next to host to the start button. */
-    private void setButtonToStart(final Host host,
-                                  final Widget hostWi,
-                                  final MyButton hostBtn,
-                                  final boolean stopped) {
+    /**
+     * Sets button next to host to the start button.
+     */
+    private void setButtonToStart(final Host host, final Widget hostWi, final MyButton hostBtn, final boolean stopped) {
         if (hostWi != null) {
             final boolean enable = host.isConnected();
-            swingUtils.invokeLater(new Runnable() {
-                @Override
-                public void run() {
-                    hostWi.setTFButtonEnabled(enable && stopped);
-                    hostBtn.setText("Start");
-                    hostBtn.setIcon(HostBrowser.HOST_ON_ICON);
-                    hostBtn.setToolTipText("Start on " + host.getName());
-                }
+            swingUtils.invokeLater(() -> {
+                hostWi.setTFButtonEnabled(enable && stopped);
+                hostBtn.setText("Start");
+                hostBtn.setIcon(HostBrowser.HOST_ON_ICON);
+                hostBtn.setToolTipText("Start on " + host.getName());
             });
         }
     }
 
-    /** Sets button next to host to the view button. */
+    /**
+     * Sets button next to host to the view button.
+     */
     private void setButtonToView(final Host host, final Widget hostWi, final MyButton hostBtn) {
         if (hostWi != null) {
             final boolean enable = host.isConnected();
-            swingUtils.invokeLater(new Runnable() {
-                @Override
-                public void run() {
-                    hostWi.setTFButtonEnabled(enable);
-                    hostBtn.setText("View");
-                    hostBtn.setIcon(VNC_ICON);
-                    hostBtn.setToolTipText("Graphical console on " + host.getName());
-                }
+            swingUtils.invokeLater(() -> {
+                hostWi.setTFButtonEnabled(enable);
+                hostBtn.setText("View");
+                hostBtn.setIcon(VNC_ICON);
+                hostBtn.setToolTipText("Graphical console on " + host.getName());
             });
         }
     }
 
-    /** Sets button next to host to the not defined button. */
+    /**
+     * Sets button next to host to the not defined button.
+     */
     private void setButtonToNotDefined(final Host host, final Widget hostWi, final MyButton hostBtn) {
         if (hostWi != null) {
-            swingUtils.invokeLater(new Runnable() {
-                @Override
-                public void run() {
-                    hostWi.setTFButtonEnabled(false);
-                    hostBtn.setIcon(null);
-                    hostBtn.setToolTipText("not defined on " + host.getName());
-                }
+            swingUtils.invokeLater(() -> {
+                hostWi.setTFButtonEnabled(false);
+                hostBtn.setIcon(null);
+                hostBtn.setToolTipText("not defined on " + host.getName());
             });
         }
     }
@@ -4046,7 +3909,9 @@ public class DomainInfo extends EditableInfo {
         return uuid;
     }
 
-    /** Return virsh options like -c xen:///. */
+    /**
+     * Return virsh options like -c xen:///.
+     */
     public String getVirshOptions() {
         final Value v = getResource().getValue(VMParams.VM_PARAM_VIRSH_OPTIONS);
         if (v == null) {
@@ -4055,170 +3920,104 @@ public class DomainInfo extends EditableInfo {
         return v.getValueForConfig();
     }
 
-    /** Return whether domain type needs "display" section. */
+    /**
+     * Return whether domain type needs "display" section.
+     */
     public boolean needDisplay() {
         return NEED_DISPLAY.contains(getWidget(VMParams.VM_PARAM_DOMAIN_TYPE, null).getStringValue());
     }
 
-    /** Return whether domain type needs "console" section. */
+    /**
+     * Return whether domain type needs "console" section.
+     */
     public boolean needConsole() {
         return NEED_CONSOLE.contains(getWidget(VMParams.VM_PARAM_DOMAIN_TYPE, null).getStringValue());
     }
 
-    /** Return whether domain type needs filesystem instead of disk device. */
+    /**
+     * Return whether domain type needs filesystem instead of disk device.
+     */
     public boolean needFilesystem() {
         return NEED_FILESYSTEM.contains(getWidget(VMParams.VM_PARAM_DOMAIN_TYPE, null).getStringValue());
     }
 
     MyButton getNewDiskBtn() {
         final MyButton newBtn = widgetFactory.createButton("Add Disk");
-        newBtn.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(final ActionEvent e) {
-                final Thread t = new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        addDiskPanel();
-                    }
-                });
-                t.start();
-            }
+        newBtn.addActionListener(e -> {
+            final Thread t = new Thread(this::addDiskPanel);
+            t.start();
         });
         return newBtn;
     }
 
     MyButton getNewFilesystemBtn() {
         final MyButton newBtn = widgetFactory.createButton("Add Filesystem");
-        newBtn.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(final ActionEvent e) {
-                final Thread t = new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        addFilesystemPanel();
-                    }
-                });
-                t.start();
-            }
+        newBtn.addActionListener(e -> {
+            final Thread t = new Thread(this::addFilesystemPanel);
+            t.start();
         });
         return newBtn;
     }
 
     MyButton getNewInterfaceBtn() {
         final MyButton newBtn = widgetFactory.createButton("Add Interface");
-        newBtn.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(final ActionEvent e) {
-                final Thread t = new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        addInterfacePanel();
-                    }
-                });
-                t.start();
-            }
+        newBtn.addActionListener(e -> {
+            final Thread t = new Thread(this::addInterfacePanel);
+            t.start();
         });
         return newBtn;
     }
 
     MyButton getNewGraphicsBtn() {
         final MyButton newBtn = widgetFactory.createButton("Add Graphics Display");
-        newBtn.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(final ActionEvent e) {
-                final Thread t = new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        addGraphicsPanel();
-                    }
-                });
-                t.start();
-            }
+        newBtn.addActionListener(e -> {
+            final Thread t = new Thread(this::addGraphicsPanel);
+            t.start();
         });
         return newBtn;
     }
 
     MyButton getNewSoundBtn() {
         final MyButton newBtn = widgetFactory.createButton("Add Sound Device");
-        newBtn.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(final ActionEvent e) {
-                final Thread t = new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        addSoundsPanel();
-                    }
-                });
-                t.start();
-            }
+        newBtn.addActionListener(e -> {
+            final Thread t = new Thread(this::addSoundsPanel);
+            t.start();
         });
         return newBtn;
     }
 
     MyButton getNewSerialBtn() {
         final MyButton newBtn = widgetFactory.createButton("Add Serial Device");
-        newBtn.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(final ActionEvent e) {
-                final Thread t = new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        addSerialsPanel();
-                    }
-                });
-                t.start();
-            }
+        newBtn.addActionListener(e -> {
+            final Thread t = new Thread(this::addSerialsPanel);
+            t.start();
         });
         return newBtn;
     }
 
     MyButton getNewParallelBtn() {
         final MyButton newBtn = widgetFactory.createButton("Add Parallel Device");
-        newBtn.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(final ActionEvent e) {
-                final Thread t = new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        addParallelsPanel();
-                    }
-                });
-                t.start();
-            }
+        newBtn.addActionListener(e -> {
+            final Thread t = new Thread(this::addParallelsPanel);
+            t.start();
         });
         return newBtn;
     }
 
     MyButton getNewVideoBtn() {
         final MyButton newBtn = widgetFactory.createButton("Add Video Device");
-        newBtn.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(final ActionEvent e) {
-                final Thread t = new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        addVideosPanel();
-                    }
-                });
-                t.start();
-            }
+        newBtn.addActionListener(e -> {
+            final Thread t = new Thread(this::addVideosPanel);
+            t.start();
         });
         return newBtn;
     }
 
     MyButton getNewInputDevBtn() {
         final MyButton newBtn = widgetFactory.createButton("Add Input Device");
-        newBtn.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(final ActionEvent e) {
-                final Thread t = new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        addInputDevPanel();
-                    }
-                });
-                t.start();
-            }
+        newBtn.addActionListener(e -> {
+            final Thread t = new Thread(this::addInputDevPanel);
+            t.start();
         });
         return newBtn;
     }

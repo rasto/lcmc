@@ -20,9 +20,16 @@
 
 package lcmc.crm.ui.resource.update;
 
-import com.google.common.base.Optional;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+
+import javax.inject.Provider;
+
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+
 import lcmc.cluster.ui.ClusterBrowser;
 import lcmc.common.domain.Application;
 import lcmc.crm.domain.CrmXml;
@@ -33,11 +40,6 @@ import lcmc.crm.ui.resource.PcmkRscSetsInfo;
 import lcmc.crm.ui.resource.ServiceInfo;
 import lombok.Getter;
 
-import javax.inject.Provider;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-
 public class RscSetUpdater {
     private final Application.RunMode runMode;
     private final ClusterBrowser browser;
@@ -45,20 +47,18 @@ public class RscSetUpdater {
     private final Provider<PcmkRscSetsInfo> pcmkRscSetsInfoProvider;
     private final CrmGraph crmGraph;
     @Getter
-    private List<ServiceInfo> serviceIsPresent = Lists.newArrayList();
-    private Map<RscSetConnectionData, ConstraintPHInfo> oldResourceSetToPlaceholder = Maps.newLinkedHashMap();
-    private List<ConstraintPHInfo> preNewCphis = Lists.newArrayList();
-    private Collection<ConstraintPHInfo> newCphis = Lists.newArrayList();
+    private final List<ServiceInfo> serviceIsPresent = Lists.newArrayList();
+    private final Map<RscSetConnectionData, ConstraintPHInfo> oldResourceSetToPlaceholder = Maps.newLinkedHashMap();
+    private final List<ConstraintPHInfo> preNewCphis = Lists.newArrayList();
+    private final Collection<ConstraintPHInfo> newCphis = Lists.newArrayList();
 
-    public RscSetUpdater(final Application.RunMode runMode,
-                         final ClusterBrowser browser,
-                         final Provider<ConstraintPHInfo> constraintPHInfoProvider,
-                         final Provider<PcmkRscSetsInfo> pcmkRscSetsInfoProvider) {
+    public RscSetUpdater(final Application.RunMode runMode, final ClusterBrowser browser,
+            final Provider<ConstraintPHInfo> constraintPHInfoProvider, final Provider<PcmkRscSetsInfo> pcmkRscSetsInfoProvider) {
         this.runMode = runMode;
         this.browser = browser;
         this.constraintPHInfoProvider = constraintPHInfoProvider;
         this.pcmkRscSetsInfoProvider = pcmkRscSetsInfoProvider;
-        this.crmGraph = browser.getCrmGraph();
+        crmGraph = browser.getCrmGraph();
     }
 
     public void update(final List<RscSetConnectionData> newRscSetConnections) {
@@ -73,7 +73,7 @@ public class RscSetUpdater {
     private void updateRscConnection(RscSetConnectionData newRscSetConnectionData) {
         Optional<ConstraintPHInfo> constraintPHInfo = updateExistingResourceSet(newRscSetConnectionData);
 
-        if (!constraintPHInfo.isPresent()) {
+        if (constraintPHInfo.isEmpty()) {
             constraintPHInfo = addConstraintsToExistingPlaceholder(newRscSetConnectionData);
         }
 
@@ -83,11 +83,11 @@ public class RscSetUpdater {
             rscSetsInfo = constraintPHInfo.get().getPcmkRscSetsInfo();
         }
 
-        if (!constraintPHInfo.isPresent() && !preNewCphis.isEmpty()) {
+        if (constraintPHInfo.isEmpty() && !preNewCphis.isEmpty()) {
             constraintPHInfo = Optional.of(setOldPlaceholder(newRscSetConnectionData));
         }
 
-        if (!constraintPHInfo.isPresent()) {
+        if (constraintPHInfo.isEmpty()) {
             constraintPHInfo = Optional.of(createNewPlaceholder(newRscSetConnectionData, rscSetsInfo));
         }
 
@@ -122,7 +122,7 @@ public class RscSetUpdater {
                 return Optional.of(placeholder);
             }
         }
-        return Optional.absent();
+        return Optional.empty();
     }
 
     private ConstraintPHInfo setOldPlaceholder(RscSetConnectionData newRscSetConnectionData) {
@@ -136,10 +136,10 @@ public class RscSetUpdater {
     private ConstraintPHInfo createNewPlaceholder(RscSetConnectionData newRscSetConnectionData, PcmkRscSetsInfo rscSetsInfo) {
         ConstraintPHInfo constraintPHInfo;
         constraintPHInfo = constraintPHInfoProvider.get();
-        constraintPHInfo.init(this.browser, newRscSetConnectionData, ConstraintPHInfo.Preference.AND);
+        constraintPHInfo.init(browser, newRscSetConnectionData, ConstraintPHInfo.Preference.AND);
         if (rscSetsInfo == null) {
             rscSetsInfo = pcmkRscSetsInfoProvider.get();
-            rscSetsInfo.init(this.browser);
+            rscSetsInfo.init(browser);
         }
         if (newRscSetConnectionData.isColocation()) {
             rscSetsInfo.addColocation(newRscSetConnectionData.getConstraintId(), constraintPHInfo);
@@ -147,7 +147,7 @@ public class RscSetUpdater {
             rscSetsInfo.addOrder(newRscSetConnectionData.getConstraintId(), constraintPHInfo);
         }
         constraintPHInfo.setPcmkRscSetsInfo(rscSetsInfo);
-        this.browser.addNameToServiceInfoHash(constraintPHInfo);
+        browser.addNameToServiceInfoHash(constraintPHInfo);
         newCphis.add(constraintPHInfo); /* have to add it later,
                            so that ids are correct. */
         oldResourceSetToPlaceholder.put(newRscSetConnectionData, constraintPHInfo);
@@ -166,7 +166,7 @@ public class RscSetUpdater {
                 return Optional.of(addContraintsToPlaceholder(newRscSetConnectionData, placeholder));
             }
         }
-        return Optional.absent();
+        return Optional.empty();
     }
 
     private ConstraintPHInfo addContraintsToPlaceholder(RscSetConnectionData newRscSetConnectionData, ConstraintPHInfo placeholder) {
@@ -208,7 +208,7 @@ public class RscSetUpdater {
                                              final ConstraintPHInfo constraintPHInfo,
                                              final CrmXml.RscSet rscSet2) {
         for (final String rscId : rscSet2.getRscIds()) {
-            final ServiceInfo si = this.browser.getServiceInfoFromCRMId(rscId);
+            final ServiceInfo si = browser.getServiceInfoFromCRMId(rscId);
             crmGraph.addColocation(newRscSetConnectionData.getConstraintId(), si, constraintPHInfo);
         }
     }
@@ -218,7 +218,7 @@ public class RscSetUpdater {
                                                final CrmXml.RscSet rscSet1) {
         for (final String rscId : rscSet1.getRscIds()) {
             final ServiceInfo si =
-                    this.browser.getServiceInfoFromCRMId(rscId);
+                    browser.getServiceInfoFromCRMId(rscId);
             crmGraph.addColocation(newRscSetConnectionData.getConstraintId(), constraintPHInfo, si);
         }
     }
@@ -236,14 +236,14 @@ public class RscSetUpdater {
 
     private void addRscSetOrdersToPlaceholder(RscSetConnectionData newRscSetConnectionData, CrmXml.RscSet rscSet1, ConstraintPHInfo constraintPHInfo) {
         for (final String rscId : rscSet1.getRscIds()) {
-            final ServiceInfo si = this.browser.getServiceInfoFromCRMId(rscId);
+            final ServiceInfo si = browser.getServiceInfoFromCRMId(rscId);
             crmGraph.addOrder(newRscSetConnectionData.getConstraintId(), si, constraintPHInfo);
         }
     }
 
     private void addRscSetOrdersFromPlaceholder(RscSetConnectionData newRscSetConnectionData, ConstraintPHInfo constraintPHInfo, CrmXml.RscSet rscSet2) {
         for (final String rscId : rscSet2.getRscIds()) {
-            final ServiceInfo si = this.browser.getServiceInfoFromCRMId(rscId);
+            final ServiceInfo si = browser.getServiceInfoFromCRMId(rscId);
             crmGraph.addOrder(newRscSetConnectionData.getConstraintId(), constraintPHInfo, si);
         }
     }

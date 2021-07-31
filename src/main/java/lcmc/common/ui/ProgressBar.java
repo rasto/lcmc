@@ -24,6 +24,7 @@ package lcmc.common.ui;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.swing.BorderFactory;
@@ -34,11 +35,11 @@ import javax.swing.border.TitledBorder;
 
 import lcmc.cluster.ui.widget.WidgetFactory;
 import lcmc.common.domain.CancelCallback;
+import lcmc.common.domain.util.Tools;
+import lcmc.common.ui.utils.MyButton;
 import lcmc.common.ui.utils.SwingUtils;
 import lcmc.logger.Logger;
 import lcmc.logger.LoggerFactory;
-import lcmc.common.ui.utils.MyButton;
-import lcmc.common.domain.util.Tools;
 
 /**
  * This class creates titled pane with progress bar and functions that update
@@ -106,21 +107,17 @@ public final class ProgressBar implements ActionListener {
     }
 
     void init(final CancelCallback cancelCallbackA, final int width, final int height) {
-        this.init(null, cancelCallbackA, width, height);
+        init(null, cancelCallbackA, width, height);
     }
 
     public void init(final String title, final CancelCallback cancelCallbackA) {
-        this.init(title,
-                cancelCallbackA,
-                Tools.getDefaultInt("ProgressBar.DefaultWidth"),
+        init(title, cancelCallbackA, Tools.getDefaultInt("ProgressBar.DefaultWidth"),
                 Tools.getDefaultInt("ProgressBar.DefaultHeight"));
     }
 
     public void init(final CancelCallback cancelCallbackA) {
-        this.init(null,
-                  cancelCallbackA,
-                  Tools.getDefaultInt("ProgressBar.DefaultWidth"),
-                  Tools.getDefaultInt("ProgressBar.DefaultHeight"));
+        init(null, cancelCallbackA, Tools.getDefaultInt("ProgressBar.DefaultWidth"),
+                Tools.getDefaultInt("ProgressBar.DefaultHeight"));
     }
 
     /** Enables or disables cancel button if it exists. */
@@ -138,67 +135,48 @@ public final class ProgressBar implements ActionListener {
             timeout = DEFAULT_TIMEOUT;
         }
         if (progressThread == null) {
-            final Runnable runnable = new Runnable() {
-                @Override
-                public void run() {
-                    LOG.debug2("start: running postgresbar timeout: " + timeout);
-                    final int sleepTime = Tools.getDefaultInt("ProgressBar.Sleep");
-                    final int progressBarDelay = Tools.getDefaultInt("ProgressBar.Delay");
-                    int threshold = DEBUG_THRESHOLD;
-                    boolean isVisible = false;
-                    while (!stopNow) {
-                        try {
-                            Thread.sleep(sleepTime);
-                        } catch (final InterruptedException ex) {
-                            Thread.currentThread().interrupt();
-                        }
-                        /* show progress bar after delay */
-                        if (time > progressBarDelay && !isVisible) {
-                            isVisible = true;
-                            swingUtils.invokeLater(new Runnable() {
-                                @Override
-                                public void run() {
-                                    progressBar.setVisible(true);
-                                    if (cancelButton != null) {
-                                        cancelButton.setVisible(true);
-                                    }
-                                }
-                            });
-                        }
-                        if (!holdIt) {
-                            swingUtils.invokeLater(new Runnable() {
-                                @Override
-                                public void run() {
-                                    progressBar.setValue(progress * MAX_PB_VALUE / timeout);
-                                }
-                            });
-                            progress += sleepTime;
-                        }
-
-                        time += sleepTime;
-                        if (time > threshold) {
-                            LOG.appWarning("start: thread with timeout: " + timeout + " is running way too long");
-                            threshold += DEBUG_THRESHOLD;
-                        }
-                        if (progress >= timeout) {
-                            /* premature end */
-                            swingUtils.invokeLater(new Runnable() {
-                                @Override
-                                public void run() {
-                                    progressBar.setIndeterminate(true);
-                                }
-                            });
-                        }
+            final Runnable runnable = () -> {
+                LOG.debug2("start: running postgresbar timeout: " + timeout);
+                final int sleepTime = Tools.getDefaultInt("ProgressBar.Sleep");
+                final int progressBarDelay = Tools.getDefaultInt("ProgressBar.Delay");
+                int threshold = DEBUG_THRESHOLD;
+                boolean isVisible = false;
+                while (!stopNow) {
+                    try {
+                        Thread.sleep(sleepTime);
+                    } catch (final InterruptedException ex) {
+                        Thread.currentThread().interrupt();
                     }
-                    swingUtils.invokeLater(new Runnable() {
-                        @Override
-                        public void run() {
-                            progressBar.setIndeterminate(false);
-                            progressBar.setValue(MAX_PB_VALUE);
-                        }
-                    });
-                    progressThread = null;
+                    /* show progress bar after delay */
+                    if (time > progressBarDelay && !isVisible) {
+                        isVisible = true;
+                        swingUtils.invokeLater(() -> {
+                            progressBar.setVisible(true);
+                            if (cancelButton != null) {
+                                cancelButton.setVisible(true);
+                            }
+                        });
+                    }
+                    if (!holdIt) {
+                        swingUtils.invokeLater(() -> progressBar.setValue(progress * MAX_PB_VALUE / timeout));
+                        progress += sleepTime;
+                    }
+
+                    time += sleepTime;
+                    if (time > threshold) {
+                        LOG.appWarning("start: thread with timeout: " + timeout + " is running way too long");
+                        threshold += DEBUG_THRESHOLD;
+                    }
+                    if (progress >= timeout) {
+                        /* premature end */
+                        swingUtils.invokeLater(() -> progressBar.setIndeterminate(true));
+                    }
                 }
+                swingUtils.invokeLater(() -> {
+                    progressBar.setIndeterminate(false);
+                    progressBar.setValue(MAX_PB_VALUE);
+                });
+                progressThread = null;
             };
             progressThread = new Thread(runnable);
             progressThread.start();
@@ -220,12 +198,9 @@ public final class ProgressBar implements ActionListener {
         }
         stopNow = true;
         progress = timeout;
-        swingUtils.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                progressBar.setIndeterminate(false);
-                progressBar.setValue(MAX_PB_VALUE);
-            }
+        swingUtils.invokeLater(() -> {
+            progressBar.setIndeterminate(false);
+            progressBar.setValue(MAX_PB_VALUE);
         });
     }
 
@@ -236,12 +211,9 @@ public final class ProgressBar implements ActionListener {
         }
         stopNow = true;
         progress = 0;
-        swingUtils.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                progressBar.setIndeterminate(false);
-                progressBar.setValue(0);
-            }
+        swingUtils.invokeLater(() -> {
+            progressBar.setIndeterminate(false);
+            progressBar.setValue(0);
         });
     }
 
@@ -250,15 +222,12 @@ public final class ProgressBar implements ActionListener {
      * state.
      */
     public void hold() {
-        swingUtils.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                progressBar.setVisible(true);
-                if (cancelButton != null) {
-                    cancelButton.setVisible(true);
-                }
-                progressBar.setIndeterminate(true);
+        swingUtils.invokeLater(() -> {
+            progressBar.setVisible(true);
+            if (cancelButton != null) {
+                cancelButton.setVisible(true);
             }
+            progressBar.setIndeterminate(true);
         });
         holdIt = true;
     }
@@ -268,12 +237,7 @@ public final class ProgressBar implements ActionListener {
      * hold().
      */
     public void cont() {
-        swingUtils.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                progressBar.setIndeterminate(false);
-            }
-        });
+        swingUtils.invokeLater(() -> progressBar.setIndeterminate(false));
         holdIt = false;
     }
 

@@ -36,6 +36,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.swing.JCheckBox;
@@ -45,18 +46,18 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.SpringLayout;
 
+import lcmc.cluster.domain.Cluster;
 import lcmc.cluster.ui.widget.WidgetFactory;
 import lcmc.common.domain.Application;
-import lcmc.cluster.domain.Cluster;
-import lcmc.common.ui.utils.SwingUtils;
-import lcmc.host.domain.Host;
-import lcmc.drbd.domain.BlockDevice;
+import lcmc.common.domain.util.Tools;
 import lcmc.common.ui.Browser;
 import lcmc.common.ui.SpringUtilities;
-import lcmc.drbd.ui.resource.BlockDevInfo;
-import lcmc.lvm.service.LVM;
 import lcmc.common.ui.utils.MyButton;
-import lcmc.common.domain.util.Tools;
+import lcmc.common.ui.utils.SwingUtils;
+import lcmc.drbd.domain.BlockDevice;
+import lcmc.drbd.ui.resource.BlockDevInfo;
+import lcmc.host.domain.Host;
+import lcmc.lvm.service.LVM;
 
 /**
  * This class implements VG Remove dialog.
@@ -68,7 +69,7 @@ public final class VGRemove extends LV {
     @Inject
     private WidgetFactory widgetFactory;
     private MyButton removeButton;
-    private final List<BlockDevInfo> blockDevInfos = new ArrayList<BlockDevInfo>();
+    private final List<BlockDevInfo> blockDevInfos = new ArrayList<>();
     private Map<Host, JCheckBox> hostCheckBoxes = null;
     private boolean multiSelection;
     @Inject
@@ -117,14 +118,10 @@ public final class VGRemove extends LV {
     }
 
     private Map<Host, Set<String>> getVGNames() {
-        final Map<Host, Set<String>> vgNames = new LinkedHashMap<Host, Set<String>>();
+        final Map<Host, Set<String>> vgNames = new LinkedHashMap<>();
         for (final BlockDevInfo bdi : blockDevInfos) {
             final Host h = bdi.getHost();
-            Set<String> vgs = vgNames.get(h);
-            if (vgs == null) {
-                vgs = new LinkedHashSet<String>();
-                vgNames.put(h, vgs);
-            }
+            Set<String> vgs = vgNames.computeIfAbsent(h, k -> new LinkedHashSet<>());
             vgs.add(getVGName(bdi));
         }
         return vgNames;
@@ -154,14 +151,14 @@ public final class VGRemove extends LV {
         removeButton.addActionListener(new RemoveActionListener());
         inputPane.add(removeButton);
         SpringUtilities.makeCompactGrid(inputPane, 1, 3,  /* rows, cols */
-                                                   1, 1,  /* initX, initY */
-                                                   1, 1); /* xPad, yPad */
+                1, 1,  /* initX, initY */
+                1, 1); /* xPad, yPad */
 
         pane.add(inputPane);
         final JPanel bdPane = new JPanel(new FlowLayout(FlowLayout.LEADING));
         bdPane.add(new JLabel("Block Devices: "));
-        final Collection<String> bds = new HashSet<String>();
-        final Collection<Host> selectedHosts = new HashSet<Host>();
+        final Collection<String> bds = new HashSet<>();
+        final Collection<Host> selectedHosts = new HashSet<>();
         for (final BlockDevInfo bdi : blockDevInfos) {
             for (final BlockDevice bd : bdi.getHost().getBlockDevices()) {
                 final String thisVG = bd.getVgOnPhysicalVolume();
@@ -226,61 +223,47 @@ public final class VGRemove extends LV {
     private class RemoveActionListener implements ActionListener {
         @Override
         public void actionPerformed(final ActionEvent e) {
-            final Thread thread = new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    swingUtils.invokeAndWait(new Runnable() {
-                        @Override
-                        public void run() {
-                            removeButton.setEnabled(false);
-                        }
-                    });
-                    disableComponents();
-                    getProgressBar().start(REMOVE_TIMEOUT * hostCheckBoxes.size());
-                    boolean oneFailed = false;
+            final Thread thread = new Thread(() -> {
+                swingUtils.invokeAndWait(() -> removeButton.setEnabled(false));
+                disableComponents();
+                getProgressBar().start(REMOVE_TIMEOUT * hostCheckBoxes.size());
+                boolean oneFailed = false;
 
-                    if (multiSelection) {
-                        final Map<Host, Set<String>> vgNames = getVGNames();
-                        for (final Map.Entry<Host, Set<String>> entry : vgNames.entrySet()) {
-                            final Host h = entry.getKey();
-                            for (final String vgName : entry.getValue()) {
-                                if (hostCheckBoxes.get(h).isSelected()) {
-                                    final boolean ret = vgRemove(h, vgName);
-                                    if (!ret) {
-                                        oneFailed = true;
-                                    }
-                                }
-                            }
-                        }
-                    } else {
-                        for (final Map.Entry<Host, JCheckBox> hostEntry : hostCheckBoxes.entrySet()) {
-                            if (hostEntry.getValue().isSelected()) {
-                                final boolean ret = vgRemove(hostEntry.getKey(), getVGName(blockDevInfos.get(0)));
+                if (multiSelection) {
+                    final Map<Host, Set<String>> vgNames = getVGNames();
+                    for (final Map.Entry<Host, Set<String>> entry : vgNames.entrySet()) {
+                        final Host h = entry.getKey();
+                        for (final String vgName : entry.getValue()) {
+                            if (hostCheckBoxes.get(h).isSelected()) {
+                                final boolean ret = vgRemove(h, vgName);
                                 if (!ret) {
                                     oneFailed = true;
                                 }
                             }
                         }
                     }
+                } else {
                     for (final Map.Entry<Host, JCheckBox> hostEntry : hostCheckBoxes.entrySet()) {
                         if (hostEntry.getValue().isSelected()) {
-                            hostEntry.getKey().getBrowser().getClusterBrowser().updateHWInfo(hostEntry.getKey(),
-                                                                                             Host.UPDATE_LVM);
+                            final boolean ret = vgRemove(hostEntry.getKey(), getVGName(blockDevInfos.get(0)));
+                            if (!ret) {
+                                oneFailed = true;
+                            }
                         }
                     }
-                    enableComponents();
-                    if (oneFailed) {
-                        swingUtils.invokeLater(new Runnable() {
-                            @Override
-                            public void run() {
-                                removeButton.setEnabled(true);
-                            }
-                        });
-                        progressBarDoneError();
-                    } else {
-                        progressBarDone();
-                        disposeDialog();
+                }
+                for (final Map.Entry<Host, JCheckBox> hostEntry : hostCheckBoxes.entrySet()) {
+                    if (hostEntry.getValue().isSelected()) {
+                        hostEntry.getKey().getBrowser().getClusterBrowser().updateHWInfo(hostEntry.getKey(), Host.UPDATE_LVM);
                     }
+                }
+                enableComponents();
+                if (oneFailed) {
+                    swingUtils.invokeLater(() -> removeButton.setEnabled(true));
+                    progressBarDoneError();
+                } else {
+                    progressBarDone();
+                    disposeDialog();
                 }
             });
             thread.start();

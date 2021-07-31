@@ -24,15 +24,12 @@ package lcmc.lvm.ui;
 
 import java.awt.Dimension;
 import java.awt.FlowLayout;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
+
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.swing.JCheckBox;
@@ -41,37 +38,38 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.SpringLayout;
-import lcmc.common.domain.AccessMode;
-import lcmc.common.domain.Application;
+
 import lcmc.cluster.domain.Cluster;
-import lcmc.common.ui.utils.SwingUtils;
-import lcmc.host.domain.Host;
-import lcmc.common.domain.StringValue;
-import lcmc.vm.domain.VmsXml;
-import lcmc.common.domain.Value;
-import lcmc.drbd.domain.BlockDevice;
-import lcmc.common.ui.Browser;
-import lcmc.common.ui.SpringUtilities;
-import lcmc.drbd.ui.resource.BlockDevInfo;
 import lcmc.cluster.ui.widget.Widget;
 import lcmc.cluster.ui.widget.WidgetFactory;
-import lcmc.lvm.service.LVM;
-import lcmc.common.ui.utils.MyButton;
+import lcmc.common.domain.AccessMode;
+import lcmc.common.domain.Application;
+import lcmc.common.domain.StringValue;
+import lcmc.common.domain.Value;
 import lcmc.common.domain.util.Tools;
+import lcmc.common.ui.Browser;
+import lcmc.common.ui.SpringUtilities;
+import lcmc.common.ui.utils.MyButton;
+import lcmc.common.ui.utils.SwingUtils;
 import lcmc.common.ui.utils.WidgetListener;
+import lcmc.drbd.domain.BlockDevice;
+import lcmc.drbd.ui.resource.BlockDevInfo;
+import lcmc.host.domain.Host;
+import lcmc.lvm.service.LVM;
+import lcmc.vm.domain.VmsXml;
 
 /** Create LV dialog. */
 @Named
 public final class LVCreate extends LV {
     private static final String LV_CREATE_DESCRIPTION = "Create a logical volume in an existing volume group.";
     private static final int LV_CREATE_TIMEOUT = 5000;
-    private final Collection<Host> selectedHosts = new LinkedHashSet<Host>();
+    private final Collection<Host> selectedHosts = new LinkedHashSet<>();
     private Widget lvNameWidget;
     private Widget lvSizeWidget;
     private Widget maxSizeWidget;
     private String volumeGroup;
     private Map<Host, JCheckBox> hostCheckBoxes = null;
-    private final Collection<BlockDevice> selectedBlockDevices = new LinkedHashSet<BlockDevice>();
+    private final Collection<BlockDevice> selectedBlockDevices = new LinkedHashSet<>();
     @Inject
     private SwingUtils swingUtils;
     @Inject
@@ -122,7 +120,7 @@ public final class LVCreate extends LV {
         makeDefaultButton(createButton);
     }
 
-    protected void checkButtons() {
+    private void checkButtons() {
         enableCreateButton(true);
     }
 
@@ -177,7 +175,7 @@ public final class LVCreate extends LV {
         inputPane.add(new JLabel(volumeGroup));
         inputPane.add(new JLabel());
         /* find next free logical volume name */
-        final Collection<String> logicalVolumes = new LinkedHashSet<String>();
+        final Collection<String> logicalVolumes = new LinkedHashSet<>();
         for (final Host h : selectedHosts) {
             final Set<String> hvgs = h.getHostParser().getLogicalVolumesFromVolumeGroup(volumeGroup);
             if (hvgs != null) {
@@ -217,73 +215,49 @@ public final class LVCreate extends LV {
         final String newBlockSize = Long.toString(Long.parseLong(maxBlockSize) / 2);
         final JLabel sizeLabel = new JLabel("New Size");
 
-        lvSizeWidget = widgetFactory.createInstance(
-                                       Widget.Type.TEXTFIELDWITHUNIT,
-                                       VmsXml.convertKilobytes(newBlockSize),
-                                       Widget.NO_ITEMS,
-                                       getUnits(),
-                                       Widget.NO_REGEXP,
-                                       250,
-                                       Widget.NO_ABBRV,
-                                       new AccessMode(AccessMode.OP, AccessMode.NORMAL),
-                                       Widget.NO_BUTTON);
+        lvSizeWidget =
+                widgetFactory.createInstance(Widget.Type.TEXTFIELDWITHUNIT, VmsXml.convertKilobytes(newBlockSize), Widget.NO_ITEMS,
+                        getUnits(), Widget.NO_REGEXP, 250, Widget.NO_ABBRV, new AccessMode(AccessMode.OP, AccessMode.NORMAL),
+                        Widget.NO_BUTTON);
         inputPane.add(sizeLabel);
         inputPane.add(lvSizeWidget.getComponent());
-        createButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(final ActionEvent e) {
-                final Thread thread = new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        swingUtils.invokeAndWait(new Runnable() {
-                            @Override
-                            public void run() {
-                                enableCreateButton(false);
-                            }
-                        });
-                        disableComponents();
-                        getProgressBar().start(LV_CREATE_TIMEOUT * hostCheckBoxes.size());
-                        boolean oneFailed = false;
-                        for (final Map.Entry<Host, JCheckBox> hostEntry : hostCheckBoxes.entrySet()) {
-                            if (hostEntry.getValue().isSelected()) {
-                                final boolean ret = lvCreate(hostEntry.getKey(),
-                                                             lvNameWidget.getStringValue(),
-                                                             lvSizeWidget.getStringValue());
-                                if (!ret) {
-                                    oneFailed = true;
-                                }
-                            }
-                        }
-                        for (final Host h : hostCheckBoxes.keySet()) {
-                            h.getBrowser().getClusterBrowser().updateHWInfo(h, Host.UPDATE_LVM);
-                        }
-                        final String maxBlockSize = getMaxBlockSize(getSelectedHostCbs());
-                        maxSizeWidget.setValue(VmsXml.convertKilobytes(maxBlockSize));
-                        enableComponents();
-                        if (oneFailed) {
-                            progressBarDoneError();
-                        } else {
-                            progressBarDone();
+        createButton.addActionListener(e -> {
+            final Thread thread = new Thread(() -> {
+                swingUtils.invokeAndWait(() -> enableCreateButton(false));
+                disableComponents();
+                getProgressBar().start(LV_CREATE_TIMEOUT * hostCheckBoxes.size());
+                boolean oneFailed = false;
+                for (final Map.Entry<Host, JCheckBox> hostEntry : hostCheckBoxes.entrySet()) {
+                    if (hostEntry.getValue().isSelected()) {
+                        final boolean ret =
+                                lvCreate(hostEntry.getKey(), lvNameWidget.getStringValue(), lvSizeWidget.getStringValue());
+                        if (!ret) {
+                            oneFailed = true;
                         }
                     }
-                });
-                thread.start();
-            }
+                }
+                for (final Host h : hostCheckBoxes.keySet()) {
+                    h.getBrowser().getClusterBrowser().updateHWInfo(h, Host.UPDATE_LVM);
+                }
+                final String maxBlockSize1 = getMaxBlockSize(getSelectedHostCbs());
+                maxSizeWidget.setValue(VmsXml.convertKilobytes(maxBlockSize1));
+                enableComponents();
+                if (oneFailed) {
+                    progressBarDoneError();
+                } else {
+                    progressBarDone();
+                }
+            });
+            thread.start();
         });
         inputPane.add(createButton);
         /* max size */
         final JLabel maxSizeLabel = new JLabel("Max Size");
         maxSizeLabel.setEnabled(false);
-        maxSizeWidget = widgetFactory.createInstance(
-                                      Widget.Type.TEXTFIELDWITHUNIT,
-                                      VmsXml.convertKilobytes(maxBlockSize),
-                                      Widget.NO_ITEMS,
-                                      getUnits(),
-                                      Widget.NO_REGEXP,
-                                      250,
-                                      Widget.NO_ABBRV,
-                                      new AccessMode(AccessMode.OP, AccessMode.NORMAL),
-                                      Widget.NO_BUTTON);
+        maxSizeWidget =
+                widgetFactory.createInstance(Widget.Type.TEXTFIELDWITHUNIT, VmsXml.convertKilobytes(maxBlockSize), Widget.NO_ITEMS,
+                        getUnits(), Widget.NO_REGEXP, 250, Widget.NO_ABBRV, new AccessMode(AccessMode.OP, AccessMode.NORMAL),
+                        Widget.NO_BUTTON);
         maxSizeWidget.setEnabled(false);
         inputPane.add(maxSizeLabel);
         inputPane.add(maxSizeWidget.getComponent());
@@ -305,13 +279,7 @@ public final class LVCreate extends LV {
         hostCheckBoxes = Tools.getHostCheckBoxes(cluster);
         hostsPane.add(new JLabel("Select Hosts: "));
         for (final Map.Entry<Host, JCheckBox> hostEntry : hostCheckBoxes.entrySet()) {
-            hostEntry.getValue().addItemListener(
-                    new ItemListener() {
-                        @Override
-                        public void itemStateChanged(final ItemEvent e) {
-                            checkButtons();
-                        }
-                    });
+            hostEntry.getValue().addItemListener(e -> checkButtons());
             if (selectedHosts.contains(hostEntry.getKey())) {
                 hostEntry.getValue().setEnabled(false);
                 hostEntry.getValue().setSelected(true);
@@ -364,7 +332,7 @@ public final class LVCreate extends LV {
         return Long.toString(free);
     }
 
-    protected boolean isOneBdDrbd(final Iterable<BlockDevice> bds) {
+    private boolean isOneBdDrbd(final Iterable<BlockDevice> bds) {
         for (final BlockDevice bd : bds) {
             if (bd.isDrbd()) {
                 return true;
@@ -374,7 +342,7 @@ public final class LVCreate extends LV {
     }
 
     private Iterable<Host> getSelectedHostCbs() {
-        final Collection<Host> hosts = new HashSet<Host>();
+        final Collection<Host> hosts = new HashSet<>();
         if (hostCheckBoxes == null) {
             return hosts;
         }

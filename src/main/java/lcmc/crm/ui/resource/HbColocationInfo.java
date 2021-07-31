@@ -22,13 +22,19 @@
 
 package lcmc.crm.ui.resource;
 
-import com.google.common.base.Optional;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.Optional;
+import java.util.regex.Matcher;
+
+import javax.inject.Named;
+
 import lcmc.cluster.ui.ClusterBrowser;
 import lcmc.cluster.ui.widget.Check;
 import lcmc.cluster.ui.widget.Widget;
 import lcmc.common.domain.AccessMode;
 import lcmc.common.domain.Application;
-import lcmc.common.domain.ResourceValue;
 import lcmc.common.domain.StringValue;
 import lcmc.common.domain.Value;
 import lcmc.common.domain.util.Tools;
@@ -39,12 +45,6 @@ import lcmc.crm.domain.CrmXml;
 import lcmc.crm.domain.Service;
 import lcmc.crm.service.CRM;
 import lcmc.host.domain.Host;
-
-import javax.inject.Named;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.regex.Matcher;
 
 /**
  * Object that holds a colocation constraint information.
@@ -59,7 +59,7 @@ final class HbColocationInfo extends EditableInfo implements HbConstraintInterfa
               final ServiceInfo serviceInfoRsc,
               final ServiceInfo serviceInfoWithRsc,
               final Browser browser) {
-        super.einit(Optional.<ResourceValue>of(new Service("Colocation")), "Colocation", browser);
+        super.einit(Optional.of(new Service("Colocation")), "Colocation", browser);
         this.connectionInfo = connectionInfo;
         this.serviceInfoRsc = serviceInfoRsc;
         this.serviceInfoWithRsc = serviceInfoWithRsc;
@@ -81,7 +81,7 @@ final class HbColocationInfo extends EditableInfo implements HbConstraintInterfa
     void setParameters() {
         final ClusterStatus clStatus = getBrowser().getClusterStatus();
         final String colId = getService().getCrmId();
-        final Map<String, Value> resourceNode = new HashMap<String, Value>();
+        final Map<String, Value> resourceNode = new HashMap<>();
 
         if (serviceInfoRsc == null || serviceInfoWithRsc == null) {
             /* rsc set placeholder */
@@ -269,10 +269,12 @@ final class HbColocationInfo extends EditableInfo implements HbConstraintInterfa
         return getBrowser().getCrmXml().isColocationRequired(param);
     }
 
-    /** Returns attributes of this colocation. */
-    protected Map<String, String> getAttributes() {
+    /**
+     * Returns attributes of this colocation.
+     */
+    public Map<String, String> getAttributes() {
         final String[] params = getParametersFromXML();
-        final Map<String, String> attrs = new LinkedHashMap<String, String>();
+        final Map<String, String> attrs = new LinkedHashMap<>();
         for (final String param : params) {
             final Value value = getComboBoxValue(param);
             if (value != null) {
@@ -286,7 +288,7 @@ final class HbColocationInfo extends EditableInfo implements HbConstraintInterfa
     @Override
     public void apply(final Host dcHost, final Application.RunMode runMode) {
         final String[] params = getParametersFromXML();
-        final Map<String, String> attrs = new LinkedHashMap<String, String>();
+        final Map<String, String> attrs = new LinkedHashMap<>();
         boolean changed = true;
         for (final String param : params) {
             final Value value = getComboBoxValue(param);

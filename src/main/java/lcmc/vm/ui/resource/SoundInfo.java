@@ -21,6 +21,19 @@
  */
 package lcmc.vm.ui.resource;
 
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.swing.JComponent;
+import javax.swing.JPanel;
+
+import org.w3c.dom.Node;
+
 import lcmc.cluster.ui.widget.Widget;
 import lcmc.common.domain.AccessMode;
 import lcmc.common.domain.Application;
@@ -33,44 +46,44 @@ import lcmc.common.ui.utils.SwingUtils;
 import lcmc.host.domain.Host;
 import lcmc.vm.domain.VmsXml;
 import lcmc.vm.domain.data.SoundData;
-import org.w3c.dom.Node;
-
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.swing.*;
-import java.util.*;
 
 /**
  * This class holds info about virtual sound device.
  */
 @Named
 final class SoundInfo extends HardwareInfo {
-    /** Parameters. */
+    /**
+     * Parameters.
+     */
     private static final String[] PARAMETERS = {SoundData.MODEL};
 
-    /** Field type. */
-    private static final Map<String, Widget.Type> FIELD_TYPES =
-                                       new HashMap<String, Widget.Type>();
-    /** Short name. */
-    private static final Map<String, String> SHORTNAME_MAP =
-                                                 new HashMap<String, String>();
+    /**
+     * Field type.
+     */
+    private static final Map<String, Widget.Type> FIELD_TYPES = new HashMap<>();
+    /**
+     * Short name.
+     */
+    private static final Map<String, String> SHORTNAME_MAP = new HashMap<>();
 
-    /** Whether the parameter is required. */
-    private static final Collection<String> IS_REQUIRED =
-        new HashSet<String>(Arrays.asList(new String[]{SoundData.MODEL}));
+    /**
+     * Whether the parameter is required.
+     */
+    private static final Collection<String> IS_REQUIRED = new HashSet<>(List.of(SoundData.MODEL));
 
-    /** Possible values. */
-    private static final Map<String, Value[]> POSSIBLE_VALUES =
-                                               new HashMap<String, Value[]>();
+    /**
+     * Possible values.
+     */
+    private static final Map<String, Value[]> POSSIBLE_VALUES = new HashMap<>();
+
     static {
         FIELD_TYPES.put(SoundData.MODEL, Widget.Type.RADIOGROUP);
         SHORTNAME_MAP.put(SoundData.MODEL, "Model");
     }
+
     static {
         POSSIBLE_VALUES.put(SoundData.MODEL,
-                            new Value[]{new StringValue("ac97"),
-                                        new StringValue("es1370"),
-                                        new StringValue("pcspk"),
+                new Value[]{new StringValue("ac97"), new StringValue("es1370"), new StringValue("pcspk"),
                                         new StringValue("sb16")});
     }
 
@@ -82,6 +95,7 @@ final class SoundInfo extends HardwareInfo {
     @Inject
     private ClusterTreeMenu clusterTreeMenu;
 
+    @Override
     void init(final String name, final Browser browser, final DomainInfo vmsVirtualDomainInfo) {
         super.init(name, browser, vmsVirtualDomainInfo);
     }
@@ -93,12 +107,7 @@ final class SoundInfo extends HardwareInfo {
                                    DomainInfo.SOUND_TABLE,
                                    getVMSVirtualDomainInfo().getNewSoundBtn());
         if (getResource().isNew()) {
-            swingUtils.invokeLater(new Runnable() {
-                @Override
-                public void run() {
-                    tablePanel.setVisible(false);
-                }
-            });
+            swingUtils.invokeLater(() -> tablePanel.setVisible(false));
         }
         mainPanel.add(tablePanel);
     }
@@ -203,17 +212,13 @@ final class SoundInfo extends HardwareInfo {
         if (Application.isTest(runMode)) {
             return;
         }
-        swingUtils.invokeAndWait(new Runnable() {
-            @Override
-            public void run() {
-                getApplyButton().setEnabled(false);
-                getRevertButton().setEnabled(false);
-                getInfoPanel();
-            }
+        swingUtils.invokeAndWait(() -> {
+            getApplyButton().setEnabled(false);
+            getRevertButton().setEnabled(false);
+            getInfoPanel();
         });
         waitForInfoPanel();
-        final Map<String, String> parameters =
-                                    getHWParameters(getResource().isNew());
+        final Map<String, String> parameters = getHWParameters(getResource().isNew());
         for (final Host h : getVMSVirtualDomainInfo().getDefinedOnHosts()) {
             final VmsXml vmsXml = getBrowser().getVmsXml(h);
             if (vmsXml != null) {
@@ -236,14 +241,8 @@ final class SoundInfo extends HardwareInfo {
         }
         getResource().setNew(false);
         clusterTreeMenu.reloadNodeDontSelect(getNode());
-        getBrowser().periodicalVmsUpdate(
-                getVMSVirtualDomainInfo().getDefinedOnHosts());
-        swingUtils.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                tablePanel.setVisible(true);
-            }
-        });
+        getBrowser().periodicalVmsUpdate(getVMSVirtualDomainInfo().getDefinedOnHosts());
+        swingUtils.invokeLater(() -> tablePanel.setVisible(true));
         final String[] params = getParametersFromXML();
         if (Application.isLive(runMode)) {
             storeComboBoxValues(params);
@@ -368,8 +367,7 @@ final class SoundInfo extends HardwareInfo {
         for (final Host h : getVMSVirtualDomainInfo().getDefinedOnHosts()) {
             final VmsXml vmsXml = getBrowser().getVmsXml(h);
             if (vmsXml != null) {
-                final Map<String, String> parameters =
-                                                new HashMap<String, String>();
+                final Map<String, String> parameters = new HashMap<>();
                 parameters.put(SoundData.SAVED_MODEL,
                                getParamSaved(SoundData.MODEL).getValueForConfig());
                 vmsXml.removeSoundXML(getVMSVirtualDomainInfo().getDomainName(),

@@ -21,6 +21,27 @@
  */
 package lcmc.vm.ui.resource;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
+import java.util.TreeSet;
+
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.swing.ImageIcon;
+import javax.swing.JComponent;
+import javax.swing.JPanel;
+
+import org.w3c.dom.Node;
+
 import lcmc.cluster.ui.widget.Widget;
 import lcmc.cluster.ui.widget.WidgetFactory;
 import lcmc.common.domain.AccessMode;
@@ -39,14 +60,6 @@ import lcmc.logger.LoggerFactory;
 import lcmc.vm.domain.VMParams;
 import lcmc.vm.domain.VmsXml;
 import lcmc.vm.domain.data.DiskData;
-import org.w3c.dom.Node;
-
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.swing.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.util.*;
 
 /**
  * This class holds info about Virtual Disks.
@@ -81,116 +94,103 @@ public final class DiskInfo extends HardwareInfo {
                                                       DiskData.TARGET_DEVICE,
                                                       DiskData.SOURCE_DEVICE,
                                                       DiskData.DRIVER_NAME,
-                                                      DiskData.DRIVER_TYPE,
-                                                      DiskData.DRIVER_CACHE,
-                                                      DiskData.READONLY,
-                                                      DiskData.SHAREABLE};
-    /** File parameters. */
-    private static final String[] FILE_PARAMETERS = {DiskData.TYPE,
-                                                     DiskData.TARGET_DEVICE,
-                                                     DiskData.SOURCE_FILE,
-                                                     DiskData.TARGET_BUS_TYPE,
-                                                     DiskData.DRIVER_NAME,
-                                                     DiskData.DRIVER_TYPE,
-                                                     DiskData.DRIVER_CACHE,
-                                                     DiskData.READONLY,
-                                                     DiskData.SHAREABLE};
+                                                      DiskData.DRIVER_TYPE, DiskData.DRIVER_CACHE, DiskData.READONLY,
+            DiskData.SHAREABLE};
+    /**
+     * File parameters.
+     */
+    private static final String[] FILE_PARAMETERS =
+            {DiskData.TYPE, DiskData.TARGET_DEVICE, DiskData.SOURCE_FILE, DiskData.TARGET_BUS_TYPE, DiskData.DRIVER_NAME,
+                    DiskData.DRIVER_TYPE, DiskData.DRIVER_CACHE, DiskData.READONLY, DiskData.SHAREABLE};
 
-    /** Network parameters. */
-    private static final String[] NETWORK_PARAMETERS = {
-                                                    DiskData.TYPE,
-                                                    DiskData.TARGET_BUS_TYPE,
-                                                    DiskData.TARGET_DEVICE,
+    /**
+     * Network parameters.
+     */
+    private static final String[] NETWORK_PARAMETERS = {DiskData.TYPE, DiskData.TARGET_BUS_TYPE, DiskData.TARGET_DEVICE,
 
-                                                    DiskData.SOURCE_PROTOCOL,
-                                                    DiskData.SOURCE_NAME,
-                                                    DiskData.SOURCE_HOST_NAME,
-                                                    DiskData.SOURCE_HOST_PORT,
+            DiskData.SOURCE_PROTOCOL, DiskData.SOURCE_NAME, DiskData.SOURCE_HOST_NAME, DiskData.SOURCE_HOST_PORT,
 
-                                                    DiskData.AUTH_USERNAME,
-                                                    DiskData.AUTH_SECRET_TYPE,
-                                                    DiskData.AUTH_SECRET_UUID,
+            DiskData.AUTH_USERNAME, DiskData.AUTH_SECRET_TYPE, DiskData.AUTH_SECRET_UUID,
 
-                                                    DiskData.DRIVER_NAME,
-                                                    DiskData.DRIVER_TYPE,
-                                                    DiskData.DRIVER_CACHE,
-                                                    DiskData.READONLY,
-                                                    DiskData.SHAREABLE};
-    /** Whether the parameter is enabled only in advanced mode. */
+            DiskData.DRIVER_NAME, DiskData.DRIVER_TYPE, DiskData.DRIVER_CACHE, DiskData.READONLY, DiskData.SHAREABLE};
+    /**
+     * Whether the parameter is enabled only in advanced mode.
+     */
     private static final Collection<String> IS_ENABLED_ONLY_IN_ADVANCED =
-        new HashSet<String>(Arrays.asList(new String[]{
-                                                DiskData.TARGET_DEVICE,
-                                                DiskData.DRIVER_NAME,
-                                                DiskData.DRIVER_TYPE,
-                                                DiskData.DRIVER_CACHE}));
-    /** Whether the parameter is required. */
-    private static final Collection<String> IS_REQUIRED =
-        new HashSet<String>(Arrays.asList(new String[]{DiskData.TYPE}));
-    /** Field type. */
-    private static final Map<String, Widget.Type> FIELD_TYPES =
-                                       new HashMap<String, Widget.Type>();
-    /** Target devices depending on the target type. */
-    private static final Map<Value, Value[]> TARGET_DEVICES_MAP =
-                                                new HashMap<Value, Value[]>();
-    /** Short name. */
-    private static final Map<String, String> SHORTNAME_MAP =
-                                                 new HashMap<String, String>();
-    /** Tool tips. */
-    private static final Map<String, String> TOOLTIP_MAP =
-                                                 new HashMap<String, String>();
+            new HashSet<>(Arrays.asList(DiskData.TARGET_DEVICE, DiskData.DRIVER_NAME, DiskData.DRIVER_TYPE, DiskData.DRIVER_CACHE));
+    /**
+     * Whether the parameter is required.
+     */
+    private static final Collection<String> IS_REQUIRED = new HashSet<>(List.of(DiskData.TYPE));
+    /**
+     * Field type.
+     */
+    private static final Map<String, Widget.Type> FIELD_TYPES = new HashMap<>();
+    /**
+     * Target devices depending on the target type.
+     */
+    private static final Map<Value, Value[]> TARGET_DEVICES_MAP = new HashMap<>();
+    /**
+     * Short name.
+     */
+    private static final Map<String, String> SHORTNAME_MAP = new HashMap<>();
+    /**
+     * Tool tips.
+     */
+    private static final Map<String, String> TOOLTIP_MAP = new HashMap<>();
 
-    /** Sections. */
-    private static final Map<String, String> SECTION_MAP =
-                                                 new HashMap<String, String>();
-    private static final String SECTION_DISK_OPTIONS =
-                         Tools.getString("DiskInfo.Section.DiskOptions");
-    private static final String SECTION_SOURCE =
-                         Tools.getString("DiskInfo.Section.Source");
-    private static final String SECTION_AUTHENTICATION =
-                         Tools.getString("DiskInfo.Section.Authentication");
+    /**
+     * Sections.
+     */
+    private static final Map<String, String> SECTION_MAP = new HashMap<>();
+    private static final String SECTION_DISK_OPTIONS = Tools.getString("DiskInfo.Section.DiskOptions");
+    private static final String SECTION_SOURCE = Tools.getString("DiskInfo.Section.Source");
+    private static final String SECTION_AUTHENTICATION = Tools.getString("DiskInfo.Section.Authentication");
 
-    /** Preferred values. */
-    private static final Map<String, Value> PREFERRED_MAP =
-                                                 new HashMap<String, Value>();
-    /** Defaults. */
-    private static final Map<String, Value> DEFAULTS_MAP =
-                                                 new HashMap<String, Value>();
-    /** Possible values. */
-    private static final Map<String, Value[]> POSSIBLE_VALUES =
-                                              new HashMap<String, Value[]>();
-    /** Default location for libvirt images. */
-    public static final String LIBVIRT_IMAGE_LOCATION =
-                                             "/var/lib/libvirt/images/";
-    /** A map from target bus and type as it is saved to the string
-     * representation that appears in the menus. */
-    private static final Map<String, String> TARGET_BUS_TYPES =
-                                                 new HashMap<String, String>();
-    /** Disk types. */
-    public static final Value FILE_TYPE =
-                                 new StringValue("file", "Image file");
-    public static final Value BLOCK_TYPE =
-                                 new StringValue("block", "Disk/block device");
-    public static final Value NETWORK_TYPE =
-                                 new StringValue("network", "Network");
+    /**
+     * Preferred values.
+     */
+    private static final Map<String, Value> PREFERRED_MAP = new HashMap<>();
+    /**
+     * Defaults.
+     */
+    private static final Map<String, Value> DEFAULTS_MAP = new HashMap<>();
+    /**
+     * Possible values.
+     */
+    private static final Map<String, Value[]> POSSIBLE_VALUES = new HashMap<>();
+    /**
+     * Default location for libvirt images.
+     */
+    public static final String LIBVIRT_IMAGE_LOCATION = "/var/lib/libvirt/images/";
+    /**
+     * A map from target bus and type as it is saved to the string representation that appears in the menus.
+     */
+    private static final Map<String, String> TARGET_BUS_TYPES = new HashMap<>();
+    /**
+     * Disk types.
+     */
+    public static final Value FILE_TYPE = new StringValue("file", "Image file");
+    public static final Value BLOCK_TYPE = new StringValue("block", "Disk/block device");
+    public static final Value NETWORK_TYPE = new StringValue("network", "Network");
 
-    /** Drivers. */
+    /**
+     * Drivers.
+     */
     private static final Value DRIVER_NAME_DEFUALT = new StringValue();
     private static final Value DRIVER_NAME_FILE = new StringValue("file");
     private static final Value DRIVER_NAME_QEMU = new StringValue("qemu");
     private static final Value DRIVER_NAME_PHY = new StringValue("phy");
 
-    /** Bus types. */
+    /**
+     * Bus types.
+     */
 
-    public static final Value BUS_TYPE_IDE =
-                                new StringValue("ide/disk", "IDE Disk");
-    public static final Value BUS_TYPE_CDROM =
-                                new StringValue("ide/cdrom", "IDE CDROM");
-    public static final Value BUS_TYPE_FLOPPY =
-                                new StringValue("fdc/floppy", "Floppy Disk");
-    public static final Value BUS_TYPE_SCSI =
-                                new StringValue("scsi/disk", "SCSI Disk");
-    public static final Value BUS_TYPE_USB =
-                                new StringValue("usb/disk", "USB Disk");
+    public static final Value BUS_TYPE_IDE = new StringValue("ide/disk", "IDE Disk");
+    public static final Value BUS_TYPE_CDROM = new StringValue("ide/cdrom", "IDE CDROM");
+    public static final Value BUS_TYPE_FLOPPY = new StringValue("fdc/floppy", "Floppy Disk");
+    public static final Value BUS_TYPE_SCSI = new StringValue("scsi/disk", "SCSI Disk");
+    public static final Value BUS_TYPE_USB = new StringValue("usb/disk", "USB Disk");
     public static final Value BUS_TYPE_VIRTIO =
                                 new StringValue("virtio/disk", "Virtio Disk");
     /** Default source port if none is specified (and it is needed). */
@@ -320,26 +320,14 @@ public final class DiskInfo extends HardwareInfo {
         TARGET_DEVICES_MAP.put(BUS_TYPE_CDROM,
                                new Value[]{new StringValue("hdc")});
         TARGET_DEVICES_MAP.put(BUS_TYPE_FLOPPY,
-                               new Value[]{new StringValue("fda"),
-                                           new StringValue("fdb"),
-                                           new StringValue("fdc"),
-                                           new StringValue("fdd")});
+                new Value[]{new StringValue("fda"), new StringValue("fdb"), new StringValue("fdc"), new StringValue("fdd")});
         TARGET_DEVICES_MAP.put(BUS_TYPE_SCSI,
-                               new Value[]{new StringValue("sda"),
-                                           new StringValue("sdb"),
-                                           new StringValue("sdc"),
-                                           new StringValue("sdd")});
+                new Value[]{new StringValue("sda"), new StringValue("sdb"), new StringValue("sdc"), new StringValue("sdd")});
         TARGET_DEVICES_MAP.put(BUS_TYPE_USB,
-                               new Value[]{new StringValue("sda"),
-                                           new StringValue("sdb"),
-                                           new StringValue("sdc"),
-                                           new StringValue("sdd")});
+                new Value[]{new StringValue("sda"), new StringValue("sdb"), new StringValue("sdc"), new StringValue("sdd")});
         TARGET_DEVICES_MAP.put(BUS_TYPE_VIRTIO,
-                               new Value[]{new StringValue("vda"),
-                                           new StringValue("vdb"),
-                                           new StringValue("vdc"),
-                                           new StringValue("vdd"),
-                                           new StringValue("vde")});
+                new Value[]{new StringValue("vda"), new StringValue("vdb"), new StringValue("vdc"), new StringValue("vdd"),
+                        new StringValue("vde")});
     }
 
     @Inject
@@ -349,56 +337,61 @@ public final class DiskInfo extends HardwareInfo {
     @Inject
     private WidgetFactory widgetFactory;
 
-    /** Source file combo box, so that it can be disabled, depending on type. */
-    private final Map<String, Widget> sourceFileWi =
-                                            new HashMap<String, Widget>();
-    /** Source block combo box, so that it can be disabled, depending on type.*/
-    private final Map<String, Widget> sourceDeviceWi =
-                                            new HashMap<String, Widget>();
+    /**
+     * Source file combo box, so that it can be disabled, depending on type.
+     */
+    private final Map<String, Widget> sourceFileWi = new HashMap<>();
+    /**
+     * Source block combo box, so that it can be disabled, depending on type.
+     */
+    private final Map<String, Widget> sourceDeviceWi = new HashMap<>();
 
-    private final Map<String, Widget> sourceNameWi =
-                                                 new HashMap<String, Widget>();
-    private final Map<String, Widget> sourceProtocolWi =
-                                                 new HashMap<String, Widget>();
-    private final Map<String, Widget> sourceHostNameWi =
-                                                 new HashMap<String, Widget>();
-    private final Map<String, Widget> sourceHostPortWi =
-                                                 new HashMap<String, Widget>();
-    private final Map<String, Widget> authUsernameWi =
-                                                 new HashMap<String, Widget>();
-    private final Map<String, Widget> authSecretTypeWi =
-                                                 new HashMap<String, Widget>();
-    private final Map<String, Widget> authSecretUuidWi =
-                                                 new HashMap<String, Widget>();
+    private final Map<String, Widget> sourceNameWi = new HashMap<>();
+    private final Map<String, Widget> sourceProtocolWi = new HashMap<>();
+    private final Map<String, Widget> sourceHostNameWi = new HashMap<>();
+    private final Map<String, Widget> sourceHostPortWi = new HashMap<>();
+    private final Map<String, Widget> authUsernameWi = new HashMap<>();
+    private final Map<String, Widget> authSecretTypeWi = new HashMap<>();
+    private final Map<String, Widget> authSecretUuidWi = new HashMap<>();
 
-    /** Target device combo box, that needs to be reloaded if target type has
-     * changed. */
-    private final Map<String, Widget> targetDeviceWi =
-                                            new HashMap<String, Widget>();
-    /** Driver name combo box. */
-    private final Map<String, Widget> driverNameWi =
-                                            new HashMap<String, Widget>();
-    /** Driver type combo box. */
-    private final Map<String, Widget> driverTypeWi =
-                                            new HashMap<String, Widget>();
-    /** Driver cache combo box. */
-    private final Map<String, Widget> driverCacheWi =
-                                            new HashMap<String, Widget>();
-    /** Readonly combo box. */
-    private final Map<String, Widget> readonlyWi =
-                                            new HashMap<String, Widget>();
-    /** Previous target device value. */
+    /**
+     * Target device combo box, that needs to be reloaded if target type has changed.
+     */
+    private final Map<String, Widget> targetDeviceWi = new HashMap<>();
+    /**
+     * Driver name combo box.
+     */
+    private final Map<String, Widget> driverNameWi = new HashMap<>();
+    /**
+     * Driver type combo box.
+     */
+    private final Map<String, Widget> driverTypeWi = new HashMap<>();
+    /**
+     * Driver cache combo box.
+     */
+    private final Map<String, Widget> driverCacheWi = new HashMap<>();
+    /**
+     * Readonly combo box.
+     */
+    private final Map<String, Widget> readonlyWi = new HashMap<>();
+    /**
+     * Previous target device value.
+     */
     private Value prevTargetBusType = null;
-    /** Previous target bus type (disk type) value. */
+    /**
+     * Previous target bus type (disk type) value.
+     */
     private Value previousTargetBusType = null;
-    private final Collection<Map<String, Widget>> checkFieldList =
-                                          new ArrayList<Map<String, Widget>>();
+    private final Collection<Map<String, Widget>> checkFieldList = new ArrayList<>();
 
-    /** Table panel. */
+    /**
+     * Table panel.
+     */
     private JComponent tablePanel = null;
     @Inject
     private ClusterTreeMenu clusterTreeMenu;
 
+    @Override
     public void init(final String name, final Browser browser, final DomainInfo vmsVirtualDomainInfo) {
         super.init(name, browser, vmsVirtualDomainInfo);
 
@@ -416,12 +409,7 @@ public final class DiskInfo extends HardwareInfo {
     protected void addHardwareTable(final JPanel mainPanel) {
         tablePanel = getTablePanel("Disk", DomainInfo.DISK_TABLE, getVMSVirtualDomainInfo().getNewDiskBtn());
         if (getResource().isNew()) {
-            swingUtils.invokeLater(new Runnable() {
-                @Override
-                public void run() {
-                    tablePanel.setVisible(false);
-                }
-            });
+            swingUtils.invokeLater(() -> tablePanel.setVisible(false));
         }
         mainPanel.add(tablePanel);
     }
@@ -489,7 +477,7 @@ public final class DiskInfo extends HardwareInfo {
     @Override
     protected Value[] getParamPossibleChoices(final String param) {
         if (DiskData.SOURCE_FILE.equals(param)) {
-            final Set<Value> sourceFileDirs = new TreeSet<Value>();
+            final Set<Value> sourceFileDirs = new TreeSet<>();
             sourceFileDirs.add(new StringValue(LIBVIRT_IMAGE_LOCATION));
             for (final Host h : getVMSVirtualDomainInfo().getDefinedOnHosts()) {
                 final VmsXml vmsXml = getBrowser().getVmsXml(h);
@@ -499,11 +487,11 @@ public final class DiskInfo extends HardwareInfo {
                     }
                 }
             }
-            return sourceFileDirs.toArray(new Value[sourceFileDirs.size()]);
+            return sourceFileDirs.toArray(new Value[0]);
         } else if (DiskData.SOURCE_DEVICE.equals(param)) {
             for (final Host h : getVMSVirtualDomainInfo().getDefinedOnHosts()) {
                 final VmsXml vmsXml = getBrowser().getVmsXml(h);
-                final List<Value> bds = new ArrayList<Value>();
+                final List<Value> bds = new ArrayList<>();
                 bds.add(null);
                 if (vmsXml != null) {
                     for (final BlockDevInfo bdi
@@ -514,7 +502,7 @@ public final class DiskInfo extends HardwareInfo {
                             bds.add(new StringValue(bdi.getName()));
                         }
                     }
-                    return bds.toArray(new Value[bds.size()]);
+                    return bds.toArray(new Value[0]);
                 }
             }
         }
@@ -586,15 +574,9 @@ public final class DiskInfo extends HardwareInfo {
     /** Returns device parameters. */
     @Override
     protected Map<String, String> getHWParameters(final boolean allParams) {
-        swingUtils.invokeAndWait(new Runnable() {
-            @Override
-            public void run() {
-                getInfoPanel();
-            }
-        });
+        swingUtils.invokeAndWait(this::getInfoPanel);
         final String[] params = getRealParametersFromXML();
-        final Map<String, String> parameters =
-                                           new LinkedHashMap<String, String>();
+        final Map<String, String> parameters = new LinkedHashMap<>();
         for (final String param : params) {
             final Value value = getComboBoxValue(param);
             if (DiskData.TYPE.equals(param)) {
@@ -689,23 +671,18 @@ public final class DiskInfo extends HardwareInfo {
         if (Application.isTest(runMode)) {
             return;
         }
-        swingUtils.invokeAndWait(new Runnable() {
-            @Override
-            public void run() {
-                getApplyButton().setEnabled(false);
-                getRevertButton().setEnabled(false);
-                getInfoPanel();
-            }
+        swingUtils.invokeAndWait(() -> {
+            getApplyButton().setEnabled(false);
+            getRevertButton().setEnabled(false);
+            getInfoPanel();
         });
         waitForInfoPanel();
-        final Map<String, String> parameters =
-                                    getHWParameters(getResource().isNew());
+        final Map<String, String> parameters = getHWParameters(getResource().isNew());
         final String[] params = getRealParametersFromXML();
         for (final Host h : getVMSVirtualDomainInfo().getDefinedOnHosts()) {
             final VmsXml vmsXml = getBrowser().getVmsXml(h);
             if (vmsXml != null) {
-                final String domainName =
-                                getVMSVirtualDomainInfo().getDomainName();
+                final String domainName = getVMSVirtualDomainInfo().getDomainName();
                 final Node domainNode = vmsXml.getDomainNode(domainName);
                 /* fix host ports */
 
@@ -722,21 +699,14 @@ public final class DiskInfo extends HardwareInfo {
                     entry.getValue().setValueAndWait(new StringValue(fixedPorts));
                 }
                 modifyXML(vmsXml, domainNode, domainName, parameters);
-                final String virshOptions =
-                                   getVMSVirtualDomainInfo().getVirshOptions();
+                final String virshOptions = getVMSVirtualDomainInfo().getVirshOptions();
                 vmsXml.saveAndDefine(domainNode, domainName, virshOptions);
             }
         }
         getResource().setNew(false);
         clusterTreeMenu.reloadNodeDontSelect(getNode());
-        getBrowser().periodicalVmsUpdate(
-                getVMSVirtualDomainInfo().getDefinedOnHosts());
-        swingUtils.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                tablePanel.setVisible(true);
-            }
-        });
+        getBrowser().periodicalVmsUpdate(getVMSVirtualDomainInfo().getDefinedOnHosts());
+        swingUtils.invokeLater(() -> tablePanel.setVisible(true));
         if (Application.isLive(runMode)) {
             storeComboBoxValues(params);
         }
@@ -787,29 +757,26 @@ public final class DiskInfo extends HardwareInfo {
     @Override
     protected boolean checkParam(final String param, final Value newValue) {
         if (DiskData.TYPE.equals(param)) {
-            swingUtils.invokeLater(new Runnable() {
-                @Override
-                public void run() {
-                    final boolean file = FILE_TYPE.equals(newValue);
-                    final boolean block = BLOCK_TYPE.equals(newValue);
-                    final boolean network = NETWORK_TYPE.equals(newValue);
-                    for (final Map.Entry<String, Widget> entry : sourceFileWi.entrySet()) {
-                        entry.getValue().setVisible(file);
-                    }
-                    for (final Map.Entry<String, Widget> entry : sourceDeviceWi.entrySet()) {
-                        entry.getValue().setVisible(block);
-                    }
-                    for (final Map<String, Widget> w : checkFieldList) {
-                        for (final Map.Entry<String, Widget> entry : w.entrySet()) {
-                            entry.getValue().setVisible(network);
-                        }
+            swingUtils.invokeLater(() -> {
+                final boolean file = FILE_TYPE.equals(newValue);
+                final boolean block = BLOCK_TYPE.equals(newValue);
+                final boolean network = NETWORK_TYPE.equals(newValue);
+                for (final Map.Entry<String, Widget> entry : sourceFileWi.entrySet()) {
+                    entry.getValue().setVisible(file);
+                }
+                for (final Map.Entry<String, Widget> entry : sourceDeviceWi.entrySet()) {
+                    entry.getValue().setVisible(block);
+                }
+                for (final Map<String, Widget> w : checkFieldList) {
+                    for (final Map.Entry<String, Widget> entry : w.entrySet()) {
+                        entry.getValue().setVisible(network);
                     }
                 }
             });
             checkOneParam(DiskData.SOURCE_FILE);
             checkOneParam(DiskData.SOURCE_DEVICE);
         } else if (DiskData.TARGET_BUS_TYPE.equals(param)) {
-            final Set<Value> devices = new LinkedHashSet<Value>();
+            final Set<Value> devices = new LinkedHashSet<>();
             devices.add(new StringValue());
             if (newValue != null) {
                 final Value[] targetDevices = TARGET_DEVICES_MAP.get(newValue);
@@ -826,7 +793,7 @@ public final class DiskInfo extends HardwareInfo {
             Value selected = null;
             if (saved == null || getResource().isNew()) {
                 if (devices.size() > 1) {
-                    selected = devices.toArray(new Value[devices.size()])[1];
+                    selected = devices.toArray(new Value[0])[1];
                 }
             } else {
                 selected = saved;
@@ -834,9 +801,7 @@ public final class DiskInfo extends HardwareInfo {
             if (prevTargetBusType == null
                 || !prevTargetBusType.equals(newValue)) {
                 for (final Map.Entry<String, Widget> entry : targetDeviceWi.entrySet()) {
-                    entry.getValue().reloadComboBox(
-                            selected,
-                            devices.toArray(new Value[devices.size()]));
+                    entry.getValue().reloadComboBox(selected, devices.toArray(new Value[0]));
                 }
                 prevTargetBusType = newValue;
             }
@@ -926,12 +891,9 @@ public final class DiskInfo extends HardwareInfo {
         updateTable(DomainInfo.HEADER_TABLE);
         updateTable(DomainInfo.DISK_TABLE);
         setApplyButtons(null, getRealParametersFromXML());
-        swingUtils.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                if (tablePanel != null) {
-                    tablePanel.setVisible(true);
-                }
+        swingUtils.invokeLater(() -> {
+            if (tablePanel != null) {
+                tablePanel.setVisible(true);
             }
         });
     }
@@ -942,26 +904,15 @@ public final class DiskInfo extends HardwareInfo {
                                   final String prefix,
                                   final int width) {
         final String prefixS;
-        if (prefix == null) {
-            prefixS = "";
-        } else {
-            prefixS = prefix;
-        }
+        prefixS = Objects.requireNonNullElse(prefix, "");
         if (DiskData.SOURCE_FILE.equals(param)) {
             final Value sourceFile = getParamSaved(DiskData.SOURCE_FILE);
             final MyButton fileChooserBtn = widgetFactory.createButton("Browse...");
             application.makeMiniButton(fileChooserBtn);
             final String regexp = ".*[^/]$";
-            final Widget paramWi = widgetFactory.createInstance(
-                                     getFieldType(param),
-                                     sourceFile,
-                                     getParamPossibleChoices(param),
-                                     regexp,
-                                     width,
-                                     Widget.NO_ABBRV,
-                                     new AccessMode(getAccessType(param),
-                                                    AccessMode.NORMAL),
-                                     fileChooserBtn);
+            final Widget paramWi =
+                    widgetFactory.createInstance(getFieldType(param), sourceFile, getParamPossibleChoices(param), regexp, width,
+                            Widget.NO_ABBRV, new AccessMode(getAccessType(param), AccessMode.NORMAL), fileChooserBtn);
             paramWi.setAlwaysEditable(true);
             sourceFileWi.put(prefixS, paramWi);
             if (Tools.isWindows()) {
@@ -972,26 +923,18 @@ public final class DiskInfo extends HardwareInfo {
                 */
                 paramWi.setTFButtonEnabled(false);
             }
-            fileChooserBtn.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(final ActionEvent e) {
-                    final Thread t = new Thread(new Runnable() {
-                        @Override
-                        public void run() {
-                            final String file;
-                            final String oldFile = paramWi.getStringValue();
-                            if (oldFile == null || oldFile.isEmpty()) {
-                                file = LIBVIRT_IMAGE_LOCATION;
-                            } else {
-                                file = oldFile;
-                            }
-                            startFileChooser(paramWi,
-                                             file,
-                                             FILECHOOSER_FILE_ONLY);
-                        }
-                    });
-                    t.start();
-                }
+            fileChooserBtn.addActionListener(e -> {
+                final Thread t = new Thread(() -> {
+                    final String file;
+                    final String oldFile = paramWi.getStringValue();
+                    if (oldFile == null || oldFile.isEmpty()) {
+                        file = LIBVIRT_IMAGE_LOCATION;
+                    } else {
+                        file = oldFile;
+                    }
+                    startFileChooser(paramWi, file, FILECHOOSER_FILE_ONLY);
+                });
+                t.start();
             });
             widgetAdd(param, prefix, paramWi);
             return paramWi;
@@ -1040,8 +983,7 @@ public final class DiskInfo extends HardwareInfo {
         for (final Host h : getVMSVirtualDomainInfo().getDefinedOnHosts()) {
             final VmsXml vmsXml = getBrowser().getVmsXml(h);
             if (vmsXml != null) {
-                final Map<String, String> parameters =
-                                                new HashMap<String, String>();
+                final Map<String, String> parameters = new HashMap<>();
                 parameters.put(DiskData.SAVED_TARGET_DEVICE, getName());
                 vmsXml.removeDiskXML(getVMSVirtualDomainInfo().getDomainName(),
                                      parameters,
@@ -1066,11 +1008,8 @@ public final class DiskInfo extends HardwareInfo {
         final String saved = getParamSaved(DiskData.TARGET_BUS_TYPE).getValueForConfig();
         if (saved == null) {
             s.append("new...");
-        } else if (TARGET_BUS_TYPES.containsKey(saved)) {
-            s.append(TARGET_BUS_TYPES.get(saved));
-        } else {
-            s.append(saved);
-        }
+        } else
+            s.append(TARGET_BUS_TYPES.getOrDefault(saved, saved));
         s.append(')');
         return s.toString();
     }

@@ -110,8 +110,10 @@ public class Host implements Comparable<Host>, Value {
     private String name;
     private String enteredHostOrIp = Tools.getDefault("SSH.Host");
     private String ipAddress;
-    /** Ips in the combo in Dialog.Host.Configuration. */
-    private final Map<Integer, String[]> allIps = new HashMap<Integer, String[]>();
+    /**
+     * Ips in the combo in Dialog.Host.Configuration.
+     */
+    private final Map<Integer, String[]> allIps = new HashMap<>();
     private Cluster cluster = null;
     private String hostname = DEFAULT_HOSTNAME;
     private String username = null;
@@ -122,17 +124,21 @@ public class Host implements Comparable<Host>, Value {
     private String sshPort = null;
     private Boolean useSudo = null;
     private String sudoPassword = "";
-    /** A gate that is used to synchronize the loading sequence. */
+    /**
+     * A gate that is used to synchronize the loading sequence.
+     */
     private CountDownLatch isLoadingGate;
-    private final Collection<JComponent> enableOnConnectElements = new ArrayList<JComponent>();
+    private final Collection<JComponent> enableOnConnectElements = new ArrayList<>();
     private String pacemakerInstallMethodIndex;
     private String heartbeatPacemakerInstallMethodIndex;
     private String vmInfoFromServerMD5 = null;
     private int positionInTheCluster = 0;
     private volatile boolean lastConnectionCheckPositive = false;
     private boolean savable = true;
-    /** Ping is set every 10s. */
-    private volatile AtomicBoolean ping = new AtomicBoolean(true);
+    /**
+     * Ping is set every 10s.
+     */
+    private final AtomicBoolean ping = new AtomicBoolean(true);
     private boolean inCluster = false;
 
     private boolean crmStatusOk = false;
@@ -220,7 +226,7 @@ public class Host implements Comparable<Host>, Value {
     }
 
     public void setColor(final Color defaultColor) {
-        this.defaultHostColorInGraph = defaultColor;
+        defaultHostColorInGraph = defaultColor;
         if (savedHostColorInGraphs == null) {
             savedHostColorInGraphs = defaultColor;
         }
@@ -341,12 +347,11 @@ public class Host implements Comparable<Host>, Value {
     }
 
     /**
-     * Executes command with bash -c. Command is executed in a new thread,
-     * after command * is finished callback.done function will be called.
-     * In case of error, callback.doneError is called.
+     * Executes command with bash -c. Command is executed in a new thread, after command * is finished callback.done function will
+     * be called. In case of error, callback.doneError is called.
      */
-    public ExecCommandThread execCommandInBash(ExecCommandConfig execCommandConfig) {
-        return ssh.execCommand(execCommandConfig.inBash(true).inSudo(true));
+    public void execCommandInBash(ExecCommandConfig execCommandConfig) {
+        ssh.execCommand(execCommandConfig.inBash(true).inSudo(true));
     }
 
     /**
@@ -647,12 +652,7 @@ public class Host implements Comparable<Host>, Value {
         if (!enableOnConnectElements.contains(c)) {
             enableOnConnectElements.add(c);
         }
-        swingUtils.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                c.setEnabled(isConnected());
-            }
-        });
+        swingUtils.invokeLater(() -> c.setEnabled(isConnected()));
     }
 
     /**
@@ -662,20 +662,17 @@ public class Host implements Comparable<Host>, Value {
      */
     public void setConnected() {
         final boolean con = isConnected();
-        swingUtils.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                for (final JComponent c : enableOnConnectElements) {
-                    c.setEnabled(con);
-                }
+        swingUtils.invokeLater(() -> {
+            for (final JComponent c : enableOnConnectElements) {
+                c.setEnabled(con);
             }
         });
         if (lastConnectionCheckPositive != con) {
             lastConnectionCheckPositive = con;
             if (con) {
-               LOG.info("setConnected: " + getName() + ": connection established");
+                LOG.info("setConnected: " + getName() + ": connection established");
             } else {
-               LOG.info("setConnected: " + getName() + ": connection lost");
+                LOG.info("setConnected: " + getName() + ": connection lost");
             }
             final ClusterBrowser cb = getBrowser().getClusterBrowser();
             if (cb != null) {
@@ -737,50 +734,36 @@ public class Host implements Comparable<Host>, Value {
     }
 
     public void startPing() {
-        ssh.execCommand(new ExecCommandConfig()
-                         .commandString("PingCommand")
-                         .inBash(true)
-                         .inSudo(false)
-                         .execCallback(new ExecCallback() {
-                             @Override
-                             public void done(final String ans) {
-                             }
+        ssh.execCommand(
+                        new ExecCommandConfig().commandString("PingCommand").inBash(true).inSudo(false).execCallback(new ExecCallback() {
+                            @Override
+                            public void done(final String ans) {
+                            }
 
-                             @Override
-                             public void doneError(final String ans, final int exitCode) {
-                             }
-                         })
-                         .newOutputCallback(new NewOutputCallback() {
-                             @Override
-                             public void output(final String output) {
-                                 ping.set(true);
-                             }
-                         })
-                         .silentCommand()
-                         .silentOutput()
-                         .sshCommandTimeout(PING_TIMEOUT)).block();
+                            @Override
+                            public void doneError(final String ans, final int exitCode) {
+                            }
+                        }).newOutputCallback(output -> ping.set(true)).silentCommand().silentOutput().sshCommandTimeout(PING_TIMEOUT))
+                .block();
     }
 
     public void startConnectionStatus() {
-        final Thread thread = new Thread(new Runnable() {
-            @Override
-            public void run() {
-                while (true) {
-                    if (ping.get()) {
-                       LOG.debug2("startConnectionStatus: connection ok on " + getName());
-                       setConnected();
-                       ping.set(false);
-                    } else {
-                       LOG.debug2("startConnectionStatus: connection lost on " + getName());
-                       getSSH().forceReconnect();
-                       setConnected();
-                    }
-                    Tools.sleep(PING_TIMEOUT);
-                    final ClusterBrowser cb = getBrowser().getClusterBrowser();
-                    /* cluster could be removed */
-                    if (cb == null || cb.isCancelServerStatus()) {
-                        break;
-                    }
+        final Thread thread = new Thread(() -> {
+            while (true) {
+                if (ping.get()) {
+                    LOG.debug2("startConnectionStatus: connection ok on " + getName());
+                    setConnected();
+                    ping.set(false);
+                } else {
+                    LOG.debug2("startConnectionStatus: connection lost on " + getName());
+                    getSSH().forceReconnect();
+                    setConnected();
+                }
+                Tools.sleep(PING_TIMEOUT);
+                final ClusterBrowser cb = getBrowser().getClusterBrowser();
+                /* cluster could be removed */
+                if (cb == null || cb.isCancelServerStatus()) {
+                    break;
                 }
             }
         });
@@ -860,7 +843,7 @@ public class Host implements Comparable<Host>, Value {
     }
 
     public int getSSHPortInt() {
-        return Integer.valueOf(sshPort);
+        return Integer.parseInt(sshPort);
     }
 
     /** Sets ssh port. */
@@ -910,7 +893,7 @@ public class Host implements Comparable<Host>, Value {
 
     /** Sets MD5 checksum of VM Info from server. */
     public void setVMInfoMD5(final String vmInfoMD5) {
-        this.vmInfoFromServerMD5 = vmInfoMD5;
+        vmInfoFromServerMD5 = vmInfoMD5;
     }
 
     public void setPositionInTheCluster(final int positionInTheCluster) {
@@ -921,12 +904,10 @@ public class Host implements Comparable<Host>, Value {
         return positionInTheCluster;
     }
 
-    /** This is part of testsuite. */
-    boolean checkTest(final String checkCommand,
-                      final String test,
-                      final double index,
-                      final String name,
-                      final int maxHosts) {
+    /**
+     * This is part of testsuite.
+     */
+    void checkTest(final String checkCommand, final String test, final double index, final String name, final int maxHosts) {
         Tools.sleep(1500);
         final StringBuilder command = new StringBuilder(50);
         command.append(DistResource.SUDO).append(hostParser.replaceVars("@GUI-HELPER@"));
@@ -971,16 +952,19 @@ public class Host implements Comparable<Host>, Value {
             roboTest.info(getName() + ' ' + test + ' ' + index + nameS + " tries: " + (i + 1));
         }
         roboTest.info(getName() + ' ' + test + ' ' + index + nameS + ' ' + out.getOutput());
-        return out.getExitCode() == 0;
     }
 
-    /** This is part of testsuite, it checks Pacemaker. */
-    public boolean checkPCMKTest(final String test, final double index) {
-        return checkTest("gui-test", test, index, null, 0);
+    /**
+     * This is part of testsuite, it checks Pacemaker.
+     */
+    public void checkPCMKTest(final String test, final double index) {
+        checkTest("gui-test", test, index, null, 0);
     }
 
-    /** This is part of testsuite, it checks DRBD. */
-    public boolean checkDRBDTest(final String test, final double index) {
+    /**
+     * This is part of testsuite, it checks DRBD.
+     */
+    public void checkDRBDTest(final String test, final double index) {
         final StringBuilder testName = new StringBuilder(20);
         if (application.getBigDRBDConf()) {
             testName.append("big-");
@@ -989,15 +973,19 @@ public class Host implements Comparable<Host>, Value {
             testName.append("novolumes-");
         }
         testName.append(test);
-        return checkTest("gui-drbd-test", testName.toString(), index, null, 2);
+        checkTest("gui-drbd-test", testName.toString(), index, null, 2);
     }
 
-    /** This is part of testsuite, it checks VMs. */
-    public boolean checkVMTest(final String test, final double index, final String name) {
-        return checkTest("gui-vm-test", test, index, name, 0);
+    /**
+     * This is part of testsuite, it checks VMs.
+     */
+    public void checkVMTest(final String test, final double index, final String name) {
+        checkTest("gui-vm-test", test, index, name, 0);
     }
 
-    /** Returns color of this host. Null if it is default color. */
+    /**
+     * Returns color of this host. Null if it is default color.
+     */
     public String getColor() {
         if (savedHostColorInGraphs == null || defaultHostColorInGraph == savedHostColorInGraphs) {
             return null;

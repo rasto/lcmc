@@ -23,6 +23,7 @@ package lcmc.robotest;
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 import java.util.Collection;
+
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
@@ -59,7 +60,7 @@ final class VMTest1 {
             name += "i";
         }
         name = "dmc";
-        final Collection<String> names = new ArrayList<String>();
+        final Collection<String> names = new ArrayList<>();
 
         final int count2 = 1;
         for (int j = 0; j < count; j++) {

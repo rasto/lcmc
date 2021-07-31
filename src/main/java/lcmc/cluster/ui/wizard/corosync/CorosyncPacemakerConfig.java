@@ -55,16 +55,26 @@ public class CorosyncPacemakerConfig {
 
     private String nodeList() {
         var nodeId = 1;
-        var config = "nodelist {\n";
+        StringBuilder config = new StringBuilder("nodelist {\n");
         for (final Host host : hosts) {
-            config += tab + "node {\n"
-             + tab + tab + "nodeid: " + nodeId + "\n"
-             + tab + tab + "ring0_addr: " + host.getName() + "\n"
-             + tab + "}\n";
+            config.append(tab)
+                    .append("node {\n")
+                    .append(tab)
+                    .append(tab)
+                    .append("nodeid: ")
+                    .append(nodeId)
+                    .append("\n")
+                    .append(tab)
+                    .append(tab)
+                    .append("ring0_addr: ")
+                    .append(host.getName())
+                    .append("\n")
+                    .append(tab)
+                    .append("}\n");
             nodeId++;
         }
-        config += "}\n";
-        return config;
+        config.append("}\n");
+        return config.toString();
     }
 
     private boolean isCorosyncVersion(String version2) {

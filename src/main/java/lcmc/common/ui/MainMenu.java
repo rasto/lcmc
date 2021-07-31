@@ -27,11 +27,13 @@ import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
 import java.awt.event.KeyEvent;
 import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
+
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Provider;
@@ -55,26 +57,24 @@ import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.border.Border;
 import javax.swing.border.LineBorder;
 import javax.swing.event.HyperlinkEvent;
-import javax.swing.event.HyperlinkListener;
 import javax.swing.filechooser.FileFilter;
 
-import com.google.common.base.Optional;
-import lcmc.cluster.ui.wizard.AddClusterDialog;
+import lcmc.Exceptions;
 import lcmc.cluster.ui.ClusterBrowser;
+import lcmc.cluster.ui.wizard.AddClusterDialog;
+import lcmc.common.domain.AccessMode;
+import lcmc.common.domain.Application;
+import lcmc.common.domain.UserConfig;
+import lcmc.common.domain.util.Tools;
 import lcmc.common.ui.main.MainData;
 import lcmc.common.ui.main.MainPresenter;
 import lcmc.common.ui.utils.Dialogs;
 import lcmc.common.ui.utils.SwingUtils;
-import lcmc.host.ui.AddHostDialog;
-import lcmc.Exceptions;
-import lcmc.common.domain.AccessMode;
-import lcmc.common.domain.Application;
 import lcmc.host.domain.Host;
 import lcmc.host.domain.HostFactory;
-import lcmc.common.domain.UserConfig;
+import lcmc.host.ui.AddHostDialog;
 import lcmc.logger.Logger;
 import lcmc.logger.LoggerFactory;
-import lcmc.common.domain.util.Tools;
 
 /**
  * An implementation of a menu panel.
@@ -83,22 +83,32 @@ import lcmc.common.domain.util.Tools;
 @Singleton
 public final class MainMenu extends JPanel implements ActionListener {
     private static final Logger LOG = LoggerFactory.getLogger(MainMenu.class);
-    /** Look and feel map. */
-    private static final Map<String, String> LOOK_AND_FEEL_MAP = new HashMap<String, String>();
+    /**
+     * Look and feel map.
+     */
+    private static final Map<String, String> LOOK_AND_FEEL_MAP = new HashMap<>();
     private static final ImageIcon HOST_ICON = Tools.createImageIcon(Tools.getDefault("MainMenu.HostIcon"));
     private JMenuBar menuBar;
     /**
-     * because glassPane does not capture key events in my version of java,
-     * the menu must turned off explicitly. */
+     * because glassPane does not capture key events in my version of java, the menu must turned off explicitly.
+     */
     private boolean turnOff = false;
-    /** Combo box with operating modes. */
+    /**
+     * Combo box with operating modes.
+     */
     private JComboBox<String> operatingModesCB;
-    /** Advanced mode button. */
+    /**
+     * Advanced mode button.
+     */
     private JCheckBox advancedModeCB;
-    /** Upgrade check text field. */
+    /**
+     * Upgrade check text field.
+     */
     private final JEditorPane upgradeTextField = new JEditorPane(MainData.MIME_TYPE_TEXT_HTML, "");
     private final JEditorPane infoTextField = new JEditorPane(MainData.MIME_TYPE_TEXT_HTML, "");
-    /** Upgrade check text. */
+    /**
+     * Upgrade check text.
+     */
     private String upgradeCheck = "";
     private String infoText = null;
     private final JPanel infoTextPanel = new JPanel();
@@ -280,57 +290,42 @@ public final class MainMenu extends JPanel implements ActionListener {
     }
 
     private ActionListener exitActionListener() {
-        return new ActionListener() {
-             @Override
-             public void actionPerformed(final ActionEvent e) {
-                 LOG.debug1("actionPerformed: MENU ACTION: exit");
-                 final Thread t = new Thread(new Runnable() {
-                     @Override
-                     public void run() {
-                         application.disconnectAllHosts();
-                         System.exit(0);
-                     }
-                 });
-                 t.start();
-             }
+        return e -> {
+            LOG.debug1("actionPerformed: MENU ACTION: exit");
+            final Thread t = new Thread(() -> {
+                application.disconnectAllHosts();
+                System.exit(0);
+            });
+            t.start();
         };
     }
 
     private ActionListener newHostActionListener() {
-        return new ActionListener() {
-             @Override
-             public void actionPerformed(final ActionEvent e) {
-                 if (turnOff) {
-                     return;
-                 }
-                 LOG.debug1("actionPerformed: MENU ACTION: new host");
-                 final Thread t = new Thread(new Runnable() {
-                     @Override
-                     public void run() {
-                         final Host host = hostFactory.createInstance();
-                         addHostDialogProvider.get().showDialogs(host);
-                     }
-                 });
-                 t.start();
-             }
+        return e -> {
+            if (turnOff) {
+                return;
+            }
+            LOG.debug1("actionPerformed: MENU ACTION: new host");
+            final Thread t = new Thread(() -> {
+                final Host host = hostFactory.createInstance();
+                addHostDialogProvider.get().showDialogs(host);
+            });
+            t.start();
         };
     }
 
     /** Load from file action listener. */
     private ActionListener loadActionListener() {
-        return new ActionListener() {
-             @Override
-             public void actionPerformed(final ActionEvent e) {
-                 if (turnOff) {
-                     return;
-                 }
-                 LOG.debug1("actionPerformed: MENU ACTION: load");
-                 final Optional<String> name = dialogs.getLcmcConfFilename();
-                 if (name.isPresent()) {
-                     application.setDefaultSaveFile(name.get());
-                     loadConfigData(name.get());
-                 }
-             }
+        return e -> {
+            if (turnOff) {
+                return;
+            }
+            LOG.debug1("actionPerformed: MENU ACTION: load");
+            final Optional<String> name = dialogs.getLcmcConfFilename();
+            if (name.isPresent()) {
+                application.setDefaultSaveFile(name.get());
+                loadConfigData(name.get());
+            }
         };
     }
 
@@ -345,198 +340,128 @@ public final class MainMenu extends JPanel implements ActionListener {
     }
 
     private ActionListener removeEverythingActionListener() {
-        return new ActionListener() {
-             @Override
-             public void actionPerformed(final ActionEvent e) {
-                 LOG.debug1("actionPerformed: MENU ACTION: remove everything");
-                 final Thread thread = new Thread(
-                    new Runnable() {
-                        @Override
-                        public void run() {
-                            mainPresenter.removeEverything();
-                        }
-                    }
-                 );
-                 thread.start();
-             }
+        return e -> {
+            LOG.debug1("actionPerformed: MENU ACTION: remove everything");
+            final Thread thread = new Thread(() -> mainPresenter.removeEverything());
+            thread.start();
         };
     }
 
     /** Save to file action listener. */
     private ActionListener saveActionListener() {
-        return new ActionListener() {
-             @Override
-             public void actionPerformed(final ActionEvent e) {
-                 if (turnOff) {
-                     return;
-                 }
-                 LOG.debug1("actionPerformed: MENU ACTION: save");
-                 final Thread thread = new Thread(new Runnable() {
-                     @Override
-                     public void run() {
-                         userConfig.saveConfig(application.getDefaultSaveFile(), true);
-                     }
-                 });
-                 thread.start();
-             }
+        return e -> {
+            if (turnOff) {
+                return;
+            }
+            LOG.debug1("actionPerformed: MENU ACTION: save");
+            final Thread thread = new Thread(() -> userConfig.saveConfig(application.getDefaultSaveFile(), true));
+            thread.start();
         };
     }
 
     private ActionListener saveAsActionListener() {
-        return new ActionListener() {
-             @Override
-             public void actionPerformed(final ActionEvent e) {
-                 if (turnOff) {
-                     return;
-                 }
-                 LOG.debug1("actionPerformed: MENU ACTION: save as");
-                 final JFileChooser fc = new JFileChooser();
-                 fc.setSelectedFile(new File(application.getDefaultSaveFile()));
-                 final FileFilter filter = new FileFilter() {
-                     @Override
-                     public boolean accept(final File f) {
-                         if (f.isDirectory()) {
-                            return true;
-                         }
-                         final String name = f.getName();
-                         final int i = name.lastIndexOf('.');
-                         if (i > 0 && i < name.length() - 1) {
-                             final String ext = name.substring(i + 1);
-                             if (ext.equals(Tools.getDefault("MainMenu.DrbdGuiFiles.Extension"))) {
-                                 return true;
-                             }
-                         }
-                         return false;
-                     }
+        return e -> {
+            if (turnOff) {
+                return;
+            }
+            LOG.debug1("actionPerformed: MENU ACTION: save as");
+            final JFileChooser fc = new JFileChooser();
+            fc.setSelectedFile(new File(application.getDefaultSaveFile()));
+            final FileFilter filter = new FileFilter() {
+                @Override
+                public boolean accept(final File f) {
+                    if (f.isDirectory()) {
+                        return true;
+                    }
+                    final String name = f.getName();
+                    final int i = name.lastIndexOf('.');
+                    if (i > 0 && i < name.length() - 1) {
+                        final String ext = name.substring(i + 1);
+                        return ext.equals(Tools.getDefault("MainMenu.DrbdGuiFiles.Extension"));
+                    }
+                    return false;
+                }
 
-                     @Override
-                     public String getDescription() {
-                         return "LCMC GUI Files";
-                     }
-                 };
-                 fc.setFileFilter(filter);
-                 final int ret = fc.showSaveDialog(mainData.getMainFrame());
-                 if (ret == JFileChooser.APPROVE_OPTION) {
-                     final String name = fc.getSelectedFile().getAbsolutePath();
-                     application.setDefaultSaveFile(name);
-                     userConfig.saveConfig(application.getDefaultSaveFile(), true);
-                 }
-             }
+                @Override
+                public String getDescription() {
+                    return "LCMC GUI Files";
+                }
+            };
+            fc.setFileFilter(filter);
+            final int ret = fc.showSaveDialog(mainData.getMainFrame());
+            if (ret == JFileChooser.APPROVE_OPTION) {
+                final String name = fc.getSelectedFile().getAbsolutePath();
+                application.setDefaultSaveFile(name);
+                userConfig.saveConfig(application.getDefaultSaveFile(), true);
+            }
         };
     }
 
     private ActionListener newClusterActionListener() {
-        return new ActionListener() {
-             @Override
-             public void actionPerformed(final ActionEvent e) {
-                 if (turnOff) {
-                     return;
-                 }
-                 LOG.debug1("actionPerformed: MENU ACTION: new cluster");
-                 final Thread t = new Thread(new Runnable() {
-                     @Override
-                     public void run() {
-                         addClusterDialogProvider.get().showDialogs();
-                     }
-                 });
-                 t.start();
-             }
+        return e -> {
+            if (turnOff) {
+                return;
+            }
+            LOG.debug1("actionPerformed: MENU ACTION: new cluster");
+            final Thread t = new Thread(() -> addClusterDialogProvider.get().showDialogs());
+            t.start();
         };
     }
 
     private ActionListener lookAndFeelActionListener() {
-        return new ActionListener() {
-            @Override
-            public void actionPerformed(final ActionEvent e) {
-                if (turnOff) {
-                     return;
-                }
-                LOG.debug1("actionPerformed: MENU ACTION: look and feel");
-                final String lookAndFeel = LOOK_AND_FEEL_MAP.get(((AbstractButton) e.getSource()).getText());
+        return e -> {
+            if (turnOff) {
+                return;
+            }
+            LOG.debug1("actionPerformed: MENU ACTION: look and feel");
+            final String lookAndFeel = LOOK_AND_FEEL_MAP.get(((AbstractButton) e.getSource()).getText());
 
-                try {
-                    UIManager.setLookAndFeel(lookAndFeel);
-                    final JComponent componentToSwitch = mainData.getMainFrameRootPane();
-                    SwingUtilities.updateComponentTreeUI(componentToSwitch);
-                    componentToSwitch.invalidate();
-                    componentToSwitch.validate();
-                    componentToSwitch.repaint();
-                } catch (final ClassNotFoundException ex) {
-                    throw new RuntimeException("cannot set look and feel: " + lookAndFeel, ex);
-                } catch (final InstantiationException ex) {
-                    throw new RuntimeException("cannot set look and feel: " + lookAndFeel, ex);
-                } catch (final IllegalAccessException ex) {
-                    throw new RuntimeException("cannot set look and feel: " + lookAndFeel, ex);
-                } catch (final UnsupportedLookAndFeelException ex) {
-                    throw new RuntimeException("cannot set look and feel: " + lookAndFeel, ex);
-                }
+            try {
+                UIManager.setLookAndFeel(lookAndFeel);
+                final JComponent componentToSwitch = mainData.getMainFrameRootPane();
+                SwingUtilities.updateComponentTreeUI(componentToSwitch);
+                componentToSwitch.invalidate();
+                componentToSwitch.validate();
+                componentToSwitch.repaint();
+            } catch (final ClassNotFoundException | InstantiationException | IllegalAccessException | UnsupportedLookAndFeelException ex) {
+                throw new RuntimeException("cannot set look and feel: " + lookAndFeel, ex);
             }
         };
     }
 
     private ActionListener copyActionListener() {
-        return new ActionListener() {
-            @Override
-            public void actionPerformed(final ActionEvent e) {
-                LOG.debug1("actionPerformed: MENU ACTION: copy");
-                final Thread t = new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        mainData.copy();
-                    }
-                });
-                t.start();
-            }
+        return e -> {
+            LOG.debug1("actionPerformed: MENU ACTION: copy");
+            final Thread t = new Thread(() -> mainData.copy());
+            t.start();
         };
     }
 
     private ActionListener pasteActionListener() {
-        return new ActionListener() {
-            @Override
-            public void actionPerformed(final ActionEvent e) {
-                LOG.debug1("actionPerformed: MENU ACTION: paste");
-                final Thread t = new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        mainData.paste();
-                    }
-                });
-                t.start();
-            }
+        return e -> {
+            LOG.debug1("actionPerformed: MENU ACTION: paste");
+            final Thread t = new Thread(() -> mainData.paste());
+            t.start();
         };
     }
 
     private ActionListener aboutActionListener() {
-        return new ActionListener() {
-            @Override
-            public void actionPerformed(final ActionEvent e) {
-                LOG.debug1("actionPerformed: MENU ACTION: about");
-                final Thread t = new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        aboutDialog.showDialog();
-                    }
-                });
-                t.start();
-            }
+        return e -> {
+            LOG.debug1("actionPerformed: MENU ACTION: about");
+            final Thread t = new Thread(() -> aboutDialog.showDialog());
+            t.start();
         };
     }
 
     /** Bug report action listener. */
     private ActionListener bugReportActionListener() {
-        return new ActionListener() {
-            @Override
-            public void actionPerformed(final ActionEvent e) {
-                LOG.debug1("actionPerformed: MENU ACTION: bug report");
-                final Thread t = new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        bugReport.init(BugReport.UNKNOWN_CLUSTER, BugReport.NO_ERROR_TEXT);
-                        bugReport.showDialog();
-                    }
-                });
-                t.start();
-            }
+        return e -> {
+            LOG.debug1("actionPerformed: MENU ACTION: bug report");
+            final Thread t = new Thread(() -> {
+                bugReport.init(BugReport.UNKNOWN_CLUSTER, BugReport.NO_ERROR_TEXT);
+                bugReport.showDialog();
+            });
+            t.start();
         };
     }
 
@@ -573,11 +498,7 @@ public final class MainMenu extends JPanel implements ActionListener {
         if (accelerator != 0) {
             item.setAccelerator(KeyStroke.getKeyStroke( accelerator, ActionEvent.CTRL_MASK));
         }
-        if (al == null) {
-            item.addActionListener(this);
-        } else {
-            item.addActionListener(al);
-        }
+        item.addActionListener(Objects.requireNonNullElse(al, this));
         if (icon != null) {
             item.setIcon(icon);
         }
@@ -589,20 +510,14 @@ public final class MainMenu extends JPanel implements ActionListener {
     private JCheckBox createAdvancedModeButton() {
         final JCheckBox emCb = new JCheckBox(Tools.getString("Browser.AdvancedMode"));
         emCb.setSelected(access.isAdvancedMode());
-        emCb.addItemListener(new ItemListener() {
-            @Override
-            public void itemStateChanged(final ItemEvent e) {
-                final boolean selected = e.getStateChange() == ItemEvent.SELECTED;
-                if (selected != access.isAdvancedMode()) {
-                    final Thread thread = new Thread(new Runnable() {
-                        @Override
-                        public void run() {
-                            access.setAdvancedMode(selected);
-                            access.checkAccessOfEverything();
-                        }
-                    });
-                    thread.start();
-                }
+        emCb.addItemListener(e -> {
+            final boolean selected = e.getStateChange() == ItemEvent.SELECTED;
+            if (selected != access.isAdvancedMode()) {
+                final Thread thread = new Thread(() -> {
+                    access.setAdvancedMode(selected);
+                    access.checkAccessOfEverything();
+                });
+                thread.start();
             }
         });
         emCb.setToolTipText(Tools.getString("MainMenu.OperatingMode.ToolTip"));
@@ -611,29 +526,23 @@ public final class MainMenu extends JPanel implements ActionListener {
 
     private JComboBox<String> createOperationModeCb() {
         final String[] modes = access.getOperatingModes();
-        final JComboBox<String> opModeCB = new JComboBox<String>(modes);
+        final JComboBox<String> opModeCB = new JComboBox<>(modes);
 
         final AccessMode.Type accessType = access.getAccessType();
         opModeCB.setSelectedItem(AccessMode.OP_MODES_MAP.get(accessType));
-        opModeCB.addItemListener(new ItemListener() {
-            @Override
-            public void itemStateChanged(final ItemEvent e) {
-                final String opMode = (String) e.getItem();
-                if (e.getStateChange() == ItemEvent.SELECTED) {
-                    final Thread thread = new Thread(new Runnable() {
-                        @Override
-                        public void run() {
-                            AccessMode.Type type = AccessMode.ACCESS_TYPE_MAP.get(opMode);
-                            if (type == null) {
-                                LOG.appError("run: unknown mode: " + opMode);
-                                type = AccessMode.RO;
-                            }
-                            access.setAccessType(type);
-                            access.checkAccessOfEverything();
-                        }
-                    });
-                    thread.start();
-                }
+        opModeCB.addItemListener(e -> {
+            final String opMode = (String) e.getItem();
+            if (e.getStateChange() == ItemEvent.SELECTED) {
+                final Thread thread = new Thread(() -> {
+                    AccessMode.Type type = AccessMode.ACCESS_TYPE_MAP.get(opMode);
+                    if (type == null) {
+                        LOG.appError("run: unknown mode: " + opMode);
+                        type = AccessMode.RO;
+                    }
+                    access.setAccessType(type);
+                    access.checkAccessOfEverything();
+                });
+                thread.start();
             }
         });
         opModeCB.setToolTipText(Tools.getString("MainMenu.OperatingMode.ToolTip"));
@@ -642,62 +551,47 @@ public final class MainMenu extends JPanel implements ActionListener {
 
     /** Modify the operating modes combo box according to the godmode. */
     public void resetOperatingModes(final boolean godMode) {
-        swingUtils.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                if (godMode) {
-                    operatingModesCB.addItem(AccessMode.OP_MODE_GOD);
-                    operatingModesCB.setSelectedItem(AccessMode.OP_MODE_GOD);
-                } else {
-                    operatingModesCB.removeItem(AccessMode.OP_MODE_GOD);
-                }
+        swingUtils.invokeLater(() -> {
+            if (godMode) {
+                operatingModesCB.addItem(AccessMode.OP_MODE_GOD);
+                operatingModesCB.setSelectedItem(AccessMode.OP_MODE_GOD);
+            } else {
+                operatingModesCB.removeItem(AccessMode.OP_MODE_GOD);
             }
         });
     }
 
     /** Sets operating mode. */
     public void setOperatingMode(final String opMode) {
-        swingUtils.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                operatingModesCB.setSelectedItem(opMode);
-            }
-        });
+        swingUtils.invokeLater(() -> operatingModesCB.setSelectedItem(opMode));
     }
 
     private void startUpgradeCheck() {
-        final Thread thread = new Thread(new Runnable() {
-            @Override
-            public void run() {
-                final String[] serverCheck = Tools.getLatestVersion();
-                final String latestVersion = serverCheck[0];
-                infoText = serverCheck[1];
-                if (latestVersion == null) {
-                    upgradeCheck = "";
-                } else {
-                    final String release = Tools.getRelease();
-                    try {
-                        if (Tools.compareVersions(release, latestVersion) < 0) {
-                            upgradeCheck =
-                                Tools.getString("MainPanel.UpgradeAvailable").replaceAll("@LATEST@", latestVersion);
-                        } else {
-                            upgradeCheck = Tools.getString("MainPanel.NoUpgradeAvailable");
-                        }
-                    } catch (final Exceptions.IllegalVersionException e) {
-                        upgradeCheck = Tools.getString("MainPanel.UpgradeCheckFailed");
+        final Thread thread = new Thread(() -> {
+            final String[] serverCheck = Tools.getLatestVersion();
+            final String latestVersion = serverCheck[0];
+            infoText = serverCheck[1];
+            if (latestVersion == null) {
+                upgradeCheck = "";
+            } else {
+                final String release = Tools.getRelease();
+                try {
+                    if (Tools.compareVersions(release, latestVersion) < 0) {
+                        upgradeCheck = Tools.getString("MainPanel.UpgradeAvailable").replaceAll("@LATEST@", latestVersion);
+                    } else {
+                        upgradeCheck = Tools.getString("MainPanel.NoUpgradeAvailable");
                     }
+                } catch (final Exceptions.IllegalVersionException e) {
+                    upgradeCheck = Tools.getString("MainPanel.UpgradeCheckFailed");
                 }
-                final String text = upgradeCheck;
-                swingUtils.invokeLater(new Runnable() {
-                    @Override
-                    public void run() {
-                        upgradeTextField.setText(text);
-                        upgradeTextField.setVisible(text != null && !text.isEmpty());
-                        infoTextField.setText(infoText);
-                        infoTextPanel.setVisible(infoText != null);
-                    }
-                });
             }
+            final String text = upgradeCheck;
+            swingUtils.invokeLater(() -> {
+                upgradeTextField.setText(text);
+                upgradeTextField.setVisible(text != null && !text.isEmpty());
+                infoTextField.setText(infoText);
+                infoTextPanel.setVisible(infoText != null);
+            });
         });
         thread.start();
     }
@@ -711,12 +605,9 @@ public final class MainMenu extends JPanel implements ActionListener {
         upgradeTextField.setBorder(border);
         Tools.setEditorFont(upgradeTextField);
         upgradeTextField.setEditable(false);
-        upgradeTextField.addHyperlinkListener(new HyperlinkListener() {
-            @Override
-            public void hyperlinkUpdate(final HyperlinkEvent e) {
-                if (e.getEventType().equals(HyperlinkEvent.EventType.ACTIVATED)) {
-                    Tools.openBrowser(e.getURL().toString());
-                }
+        upgradeTextField.addHyperlinkListener(e -> {
+            if (e.getEventType().equals(HyperlinkEvent.EventType.ACTIVATED)) {
+                Tools.openBrowser(e.getURL().toString());
             }
         });
         upgradeTextField.setBackground(Color.WHITE);
@@ -735,12 +626,9 @@ public final class MainMenu extends JPanel implements ActionListener {
         infoTextField.setBorder(border);
         Tools.setEditorFont(infoTextField);
         infoTextField.setEditable(false);
-        infoTextField.addHyperlinkListener(new HyperlinkListener() {
-            @Override
-            public void hyperlinkUpdate(final HyperlinkEvent e) {
-                if (e.getEventType().equals(HyperlinkEvent.EventType.ACTIVATED)) {
-                    Tools.openBrowser(e.getURL().toString());
-                }
+        infoTextField.addHyperlinkListener(e -> {
+            if (e.getEventType().equals(HyperlinkEvent.EventType.ACTIVATED)) {
+                Tools.openBrowser(e.getURL().toString());
             }
         });
         infoTextField.setBackground(Color.WHITE);

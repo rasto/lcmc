@@ -24,8 +24,6 @@ package lcmc.drbd.ui.resource;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.Font;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -38,21 +36,21 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.SpringLayout;
 
+import lcmc.cluster.service.ssh.ExecCommandConfig;
 import lcmc.cluster.ui.widget.WidgetFactory;
 import lcmc.common.domain.Application;
-import lcmc.host.domain.Host;
-import lcmc.common.ui.Browser;
-import lcmc.drbd.ui.DrbdGraph;
-import lcmc.host.ui.HostBrowser;
-import lcmc.common.ui.SpringUtilities;
-import lcmc.common.ui.Info;
 import lcmc.common.domain.ExecCallback;
+import lcmc.common.domain.util.Tools;
+import lcmc.common.ui.Browser;
+import lcmc.common.ui.Info;
+import lcmc.common.ui.SpringUtilities;
+import lcmc.common.ui.utils.MyButton;
+import lcmc.common.ui.utils.UpdatableItem;
+import lcmc.drbd.ui.DrbdGraph;
+import lcmc.host.domain.Host;
+import lcmc.host.ui.HostBrowser;
 import lcmc.logger.Logger;
 import lcmc.logger.LoggerFactory;
-import lcmc.common.ui.utils.MyButton;
-import lcmc.common.domain.util.Tools;
-import lcmc.common.ui.utils.UpdatableItem;
-import lcmc.cluster.service.ssh.ExecCommandConfig;
 
 /**
  * This class holds info data for a host.
@@ -118,13 +116,8 @@ public class ProxyHostInfo extends Info {
             };
         // TODO: disable buttons if disconnected?
         final MyButton procDrbdButton = widgetFactory.createButton("Show Proxy Info");
-        procDrbdButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(final ActionEvent e) {
-                host.execCommand(new ExecCommandConfig().commandString("DRBD.showProxyInfo")
-                                                        .execCallback(execCallback));
-            }
-        });
+        procDrbdButton.addActionListener(
+                e -> host.execCommand(new ExecCommandConfig().commandString("DRBD.showProxyInfo").execCallback(execCallback)));
         host.registerEnableOnConnect(procDrbdButton);
 
         final JPanel mainPanel = new JPanel();

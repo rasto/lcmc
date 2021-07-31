@@ -23,28 +23,28 @@
 
 package lcmc.drbd.ui;
 
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.util.Set;
+
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SpringLayout;
-import lcmc.common.domain.AccessMode;
-import lcmc.common.domain.Application;
-import lcmc.host.domain.Host;
-import lcmc.common.ui.SpringUtilities;
-import lcmc.common.ui.WizardDialog;
-import lcmc.drbd.ui.configdialog.DrbdConfig;
+
 import lcmc.cluster.ui.widget.Widget;
 import lcmc.cluster.ui.widget.WidgetFactory;
+import lcmc.common.domain.AccessMode;
+import lcmc.common.domain.Application;
+import lcmc.common.domain.util.Tools;
+import lcmc.common.ui.SpringUtilities;
+import lcmc.common.ui.WizardDialog;
+import lcmc.common.ui.utils.MyButton;
 import lcmc.drbd.service.DRBD;
+import lcmc.drbd.ui.configdialog.DrbdConfig;
+import lcmc.host.domain.Host;
 import lcmc.logger.Logger;
 import lcmc.logger.LoggerFactory;
-import lcmc.common.ui.utils.MyButton;
-import lcmc.common.domain.util.Tools;
 
 /**
  * An implementation of a dialog where drbd block devices are initialized.
@@ -60,37 +60,34 @@ public final class SplitBrain extends DrbdConfig {
     private WidgetFactory widgetFactory;
     private MyButton resolveButton;
 
-    protected void resolve() {
+    private void resolve() {
         final Host h1 = getDrbdVolumeInfo().getFirstBlockDevInfo().getHost();
         final Host h2 = getDrbdVolumeInfo().getSecondBlockDevInfo().getHost();
         final String h = hostWithBetterDataWidget.getStringValue();
 
-        final Runnable runnable = new Runnable() {
-            @Override
-            public void run() {
-                final Host hostPri;
-                final Host hostSec;
-                if (h.equals(h1.getName())) {
-                    hostPri = h1;
-                    hostSec = h2;
-                } else if (h.equals(h2.getName())) {
-                    hostPri = h2;
-                    hostSec = h1;
-                } else {
-                    LOG.appError("resolve: unknown host: " + h);
-                    return;
-                }
-                buttonClass(finishButton()).setEnabled(false);
-                resolveButton.setEnabled(false);
-                final Application.RunMode runMode = Application.RunMode.LIVE;
-                final String resName = getDrbdVolumeInfo().getDrbdResourceInfo().getName();
-                DRBD.setSecondary(hostSec, resName, getDrbdVolumeInfo().getName(), runMode);
-                DRBD.disconnect(hostSec, resName, getDrbdVolumeInfo().getName(), runMode);
-                DRBD.discardData(hostSec, resName, null, runMode);
-                getDrbdVolumeInfo().connect(hostPri, runMode);
-                buttonClass(finishButton()).setEnabled(true);
-                buttonClass(cancelButton()).setEnabled(false);
+        final Runnable runnable = () -> {
+            final Host hostPri;
+            final Host hostSec;
+            if (h.equals(h1.getName())) {
+                hostPri = h1;
+                hostSec = h2;
+            } else if (h.equals(h2.getName())) {
+                hostPri = h2;
+                hostSec = h1;
+            } else {
+                LOG.appError("resolve: unknown host: " + h);
+                return;
             }
+            buttonClass(finishButton()).setEnabled(false);
+            resolveButton.setEnabled(false);
+            final Application.RunMode runMode = Application.RunMode.LIVE;
+            final String resName = getDrbdVolumeInfo().getDrbdResourceInfo().getName();
+            DRBD.setSecondary(hostSec, resName, getDrbdVolumeInfo().getName(), runMode);
+            DRBD.disconnect(hostSec, resName, getDrbdVolumeInfo().getName(), runMode);
+            DRBD.discardData(hostSec, resName, null, runMode);
+            getDrbdVolumeInfo().connect(hostPri, runMode);
+            buttonClass(finishButton()).setEnabled(true);
+            buttonClass(cancelButton()).setEnabled(false);
         };
         final Thread thread = new Thread(runnable);
         thread.start();
@@ -128,7 +125,7 @@ public final class SplitBrain extends DrbdConfig {
         /* host */
         final Set<Host> hosts = getDrbdVolumeInfo().getHosts();
         final JLabel hostLabel = new JLabel(Tools.getString("Dialog.Drbd.SplitBrain.ChooseHost"));
-        final Host[] hostsArray = hosts.toArray(new Host[hosts.size()]);
+        final Host[] hostsArray = hosts.toArray(new Host[0]);
         hostWithBetterDataWidget = widgetFactory.createInstance(
                                     Widget.Type.COMBOBOX,
                                     hostsArray[0],
@@ -141,12 +138,7 @@ public final class SplitBrain extends DrbdConfig {
         inputPane.add(hostLabel);
         inputPane.add(hostWithBetterDataWidget.getComponent());
         resolveButton = widgetFactory.createButton(Tools.getString("Dialog.Drbd.SplitBrain.ResolveButton"));
-        resolveButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(final ActionEvent e) {
-                resolve();
-            }
-        });
+        resolveButton.addActionListener(e -> resolve());
         inputPane.add(resolveButton);
 
         SpringUtilities.makeCompactGrid(inputPane, 1, 3,  //rows, cols

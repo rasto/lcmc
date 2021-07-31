@@ -33,7 +33,6 @@ import java.awt.event.ActionListener;
 import java.awt.event.ItemListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -44,6 +43,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CountDownLatch;
+
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.swing.AbstractButton;
@@ -66,9 +66,9 @@ import javax.swing.event.DocumentListener;
 import lcmc.cluster.ui.widget.Widget;
 import lcmc.cluster.ui.widget.WidgetFactory;
 import lcmc.common.domain.Application;
+import lcmc.common.domain.util.Tools;
 import lcmc.common.ui.main.MainData;
 import lcmc.common.ui.utils.MyButton;
-import lcmc.common.domain.util.Tools;
 import lcmc.common.ui.utils.SwingUtils;
 
 /**
@@ -82,15 +82,15 @@ public abstract class ConfigDialog {
     private volatile JOptionPane optionPane;
     private JDialog dialogPanel;
     private String pressedButton = "";
-    private final Map<String, MyButton> buttonToObjectMap = new HashMap<String, MyButton>();
+    private final Map<String, MyButton> buttonToObjectMap = new HashMap<>();
     private final StringBuilder answerPaneText = new StringBuilder(100);
     private JEditorPane answerPane = null;
-    private final Collection<java.awt.Component> disabledComponents = new ArrayList<java.awt.Component>();
+    private final Collection<java.awt.Component> disabledComponents = new ArrayList<>();
     private CountDownLatch dialogGate;
     private JCheckBox skipButton = null;
     private volatile Object optionPaneAnswer;
     private boolean skipButtonShouldBeEnabled = true;
-    private final List<JComponent> additionalOptions = new ArrayList<JComponent>();
+    private final List<JComponent> additionalOptions = new ArrayList<>();
     @Inject
     private Application application;
     @Inject
@@ -136,54 +136,42 @@ public abstract class ConfigDialog {
     }
 
     protected final void answerPaneSetText(final String text) {
-        swingUtils.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                final int l = answerPaneText.length();
-                if (l > 1) {
-                    answerPaneText.delete(0, l);
-                }
-                answerPaneText.append(text);
-                answerPane.setText(answerPaneText.toString());
+        swingUtils.invokeLater(() -> {
+            final int l = answerPaneText.length();
+            if (l > 1) {
+                answerPaneText.delete(0, l);
             }
+            answerPaneText.append(text);
+            answerPane.setText(answerPaneText.toString());
         });
     }
 
     protected final void answerPaneAddText(final String text) {
-        swingUtils.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                answerPaneText.append('\n');
-                answerPaneText.append(text);
-                answerPaneSetText(answerPaneText.toString());
-            }
+        swingUtils.invokeLater(() -> {
+            answerPaneText.append('\n');
+            answerPaneText.append(text);
+            answerPaneSetText(answerPaneText.toString());
         });
     }
 
 
     protected final void answerPaneSetTextError(final String text) {
-        swingUtils.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                answerPane.setForeground(Tools.getDefaultColor("ConfigDialog.AnswerPane.Error"));
-                final int l = answerPaneText.length();
-                if (l > 1) {
-                    answerPaneText.delete(0, l);
-                }
-                answerPaneText.append(text);
-                answerPane.setText(answerPaneText.toString());
+        swingUtils.invokeLater(() -> {
+            answerPane.setForeground(Tools.getDefaultColor("ConfigDialog.AnswerPane.Error"));
+            final int l = answerPaneText.length();
+            if (l > 1) {
+                answerPaneText.delete(0, l);
             }
+            answerPaneText.append(text);
+            answerPane.setText(answerPaneText.toString());
         });
     }
 
     protected final void answerPaneAddTextError(final String text) {
-        swingUtils.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                answerPaneText.append('\n');
-                answerPaneText.append(text);
-                answerPaneSetTextError(answerPaneText.toString());
-            }
+        swingUtils.invokeLater(() -> {
+            answerPaneText.append('\n');
+            answerPaneText.append(text);
+            answerPaneSetTextError(answerPaneText.toString());
         });
     }
 
@@ -322,34 +310,19 @@ public abstract class ConfigDialog {
                 new DocumentListener() {
                     @Override
                     public void insertUpdate(final DocumentEvent e) {
-                        final Thread t = new Thread(new Runnable() {
-                            @Override
-                            public void run() {
-                                checkFields(field);
-                            }
-                        });
+                        final Thread t = new Thread(() -> checkFields(field));
                         t.start();
                     }
 
                     @Override
                     public void removeUpdate(final DocumentEvent e) {
-                        final Thread t = new Thread(new Runnable() {
-                            @Override
-                            public void run() {
-                                checkFields(field);
-                            }
-                        });
+                        final Thread t = new Thread(() -> checkFields(field));
                         t.start();
                     }
 
                     @Override
                     public void changedUpdate(final DocumentEvent e) {
-                        final Thread t = new Thread(new Runnable() {
-                            @Override
-                            public void run() {
-                                checkFields(field);
-                            }
-                        });
+                        final Thread t = new Thread(() -> checkFields(field));
                         t.start();
                     }
                 });
@@ -414,7 +387,7 @@ public abstract class ConfigDialog {
         initDialogBeforeCreated();
         if (dialogPanel == null) {
             final ImageIcon[] icons = getIcons();
-            final Collection<JComponent> allOptions = new ArrayList<JComponent>(additionalOptions);
+            final Collection<JComponent> allOptions = new ArrayList<>(additionalOptions);
             if (skipButtonEnabled()) {
                 skipButton = new JCheckBox(Tools.getString("Dialog.ConfigDialog.SkipButton"));
                 skipButton.setEnabled(false);
@@ -436,81 +409,62 @@ public abstract class ConfigDialog {
             }
             /* create option pane */
             final MyButton dbc = defaultButtonClass;
-            swingUtils.invokeAndWait(new Runnable() {
-                @Override
-                public void run() {
-                    optionPane = new JOptionPane(body(),
-                                                 getMessageType(),
-                                                 JOptionPane.DEFAULT_OPTION,
-                                                 icon(),
-                                                 allOptions.toArray(new JComponent[allOptions.size()]),
-                                                 dbc);
-                    optionPane.setPreferredSize(new Dimension(dialogWidth(), dialogHeight()));
-                    optionPane.setMaximumSize(new Dimension(dialogWidth(), dialogHeight()));
-                    optionPane.setMinimumSize(new Dimension(dialogWidth(), dialogHeight()));
+            swingUtils.invokeAndWait(() -> {
+                optionPane = new JOptionPane(body(), getMessageType(), JOptionPane.DEFAULT_OPTION, icon(),
+                        allOptions.toArray(new JComponent[0]), dbc);
+                optionPane.setPreferredSize(new Dimension(dialogWidth(), dialogHeight()));
+                optionPane.setMaximumSize(new Dimension(dialogWidth(), dialogHeight()));
+                optionPane.setMinimumSize(new Dimension(dialogWidth(), dialogHeight()));
 
-                    optionPane.setBackground(Tools.getDefaultColor( "ConfigDialog.Background.Dark"));
-                    final Container mainFrame = mainData.getMainFrame();
-                    if (mainFrame instanceof JApplet) {
-                        final JFrame noframe = new JFrame();
-                        dialogPanel = new JDialog(noframe);
-                        dialogPanel.setContentPane(optionPane);
-                    } else {
-                        dialogPanel = new JDialog((Frame) mainFrame);
-                        dialogPanel.setContentPane(optionPane);
-                    }
-                    dialogPanel.addWindowListener(new WindowAdapter() {
-                        @Override
-                        public void windowClosing(final WindowEvent e) {
-                            disposeDialog();
-                        }
-                    });
-                    dialogPanel.setModal(false);
-                    dialogPanel.setResizable(true);
+                optionPane.setBackground(Tools.getDefaultColor("ConfigDialog.Background.Dark"));
+                final Container mainFrame = mainData.getMainFrame();
+                if (mainFrame instanceof JApplet) {
+                    final JFrame noframe = new JFrame();
+                    dialogPanel = new JDialog(noframe);
+                    dialogPanel.setContentPane(optionPane);
+                } else {
+                    dialogPanel = new JDialog((Frame) mainFrame);
+                    dialogPanel.setContentPane(optionPane);
                 }
+                dialogPanel.addWindowListener(new WindowAdapter() {
+                    @Override
+                    public void windowClosing(final WindowEvent e) {
+                        disposeDialog();
+                    }
+                });
+                dialogPanel.setModal(false);
+                dialogPanel.setResizable(true);
             });
             /* set location like the previous dialog */
         }
         /* add action listeners */
-        final Map<MyButton, OptionPaneActionListener> optionPaneActionListeners =
-                                                                     new HashMap<MyButton, OptionPaneActionListener>();
+        final Map<MyButton, OptionPaneActionListener> optionPaneActionListeners = new HashMap<>();
         for (final MyButton o : options) {
             final OptionPaneActionListener ol = new OptionPaneActionListener();
             optionPaneActionListeners.put(o, ol);
             o.addActionListener(ol);
         }
 
-        final PropertyChangeListener propertyChangeListener =
-            new PropertyChangeListener() {
-                @Override
-                public void propertyChange(final PropertyChangeEvent evt) {
-                    if (JOptionPane.VALUE_PROPERTY.equals(evt.getPropertyName())
-                        && !"uninitializedValue".equals(evt.getNewValue())) {
-                        optionPaneAnswer = optionPane.getValue();
-                        dialogGate.countDown();
-                    }
-                }
-            };
+        final PropertyChangeListener propertyChangeListener = evt -> {
+            if (JOptionPane.VALUE_PROPERTY.equals(evt.getPropertyName()) && !"uninitializedValue".equals(evt.getNewValue())) {
+                optionPaneAnswer = optionPane.getValue();
+                dialogGate.countDown();
+            }
+        };
         optionPane.addPropertyChangeListener(propertyChangeListener);
         initDialogBeforeVisible();
-        swingUtils.invokeAndWait(new Runnable() {
-            @Override
-            public void run() {
-                dialogPanel.setPreferredSize(new Dimension(dialogWidth(), dialogHeight()));
-                dialogPanel.setMaximumSize(new Dimension(dialogWidth(), dialogHeight()));
-                dialogPanel.setMinimumSize(new Dimension(dialogWidth(), dialogHeight()));
-                dialogPanel.setLocationRelativeTo(mainData.getMainFrame());
-                dialogPanel.setVisible(true);
-            }
+        swingUtils.invokeAndWait(() -> {
+            dialogPanel.setPreferredSize(new Dimension(dialogWidth(), dialogHeight()));
+            dialogPanel.setMaximumSize(new Dimension(dialogWidth(), dialogHeight()));
+            dialogPanel.setMinimumSize(new Dimension(dialogWidth(), dialogHeight()));
+            dialogPanel.setLocationRelativeTo(mainData.getMainFrame());
+            dialogPanel.setVisible(true);
         });
-        swingUtils.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                dialogPanel.setLocationRelativeTo(mainData.getMainFrame());
-                /* although the location was set before, it is set again as a
-                 * workaround for gray dialogs with nothing in it, that appear
-                 * in some comination of Java and compiz. */
-            }
+        swingUtils.invokeLater(() -> {
+            dialogPanel.setLocationRelativeTo(mainData.getMainFrame());
+            /* although the location was set before, it is set again as a
+             * workaround for gray dialogs with nothing in it, that appear
+             * in some comination of Java and compiz. */
         });
         initDialogAfterVisible();
         try {
@@ -539,21 +493,18 @@ public abstract class ConfigDialog {
      * can be later enabled with call to enableComponents.
      */
     protected final void disableComponents(final java.awt.Component[] components) {
-        swingUtils.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                for (final String b : buttons()) {
-                    final JComponent option = buttonClass(b);
-                    if (option.isEnabled()) {
-                        disabledComponents.add(option);
-                        option.setEnabled(false);
-                    }
+        swingUtils.invokeLater(() -> {
+            for (final String b : buttons()) {
+                final JComponent option = buttonClass(b);
+                if (option.isEnabled()) {
+                    disabledComponents.add(option);
+                    option.setEnabled(false);
                 }
-                for (final java.awt.Component c : components) {
-                    if (c.isEnabled()) {
-                        disabledComponents.add(c);
-                        c.setEnabled(false);
-                    }
+            }
+            for (final java.awt.Component c : components) {
+                if (c.isEnabled()) {
+                    disabledComponents.add(c);
+                    c.setEnabled(false);
                 }
             }
         });
@@ -573,19 +524,16 @@ public abstract class ConfigDialog {
      * the ones that are in componentsToDisable array.
      */
     protected void enableComponents(final JComponent[] componentsToDisable) {
-        final Collection<java.awt.Component> ctdHash = new HashSet<java.awt.Component>(Arrays.asList(componentsToDisable));
-        swingUtils.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                for (final java.awt.Component dc : disabledComponents) {
-                    if (!ctdHash.contains(dc)) {
-                        dc.setEnabled(true);
-                    }
+        final Collection<java.awt.Component> ctdHash = new HashSet<>(Arrays.asList(componentsToDisable));
+        swingUtils.invokeLater(() -> {
+            for (final java.awt.Component dc : disabledComponents) {
+                if (!ctdHash.contains(dc)) {
+                    dc.setEnabled(true);
                 }
-                disabledComponents.clear();
-                if (skipButton != null) {
-                    skipButton.setEnabled(skipButtonShouldBeEnabled);
-                }
+            }
+            disabledComponents.clear();
+            if (skipButton != null) {
+                skipButton.setEnabled(skipButtonShouldBeEnabled);
             }
         });
     }
@@ -639,17 +587,8 @@ public abstract class ConfigDialog {
          */
         @Override
         public void actionPerformed(final ActionEvent e) {
-            final Thread t = new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    swingUtils.invokeLater(new Runnable() {
-                        @Override
-                        public void run() {
-                            optionPane.setValue(((AbstractButton) e.getSource()).getText());
-                        }
-                    });
-                }
-            });
+            final Thread t =
+                    new Thread(() -> swingUtils.invokeLater(() -> optionPane.setValue(((AbstractButton) e.getSource()).getText())));
             t.start();
         }
     }

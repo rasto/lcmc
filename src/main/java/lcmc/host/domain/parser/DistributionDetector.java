@@ -21,7 +21,6 @@
 package lcmc.host.domain.parser;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 import java.util.ResourceBundle;
@@ -71,7 +70,6 @@ public class DistributionDetector {
      * Sets distribution info for this host from array of strings.
      * Array consists of: kernel name, kernel version, arch, os, version
      * and distribution.
-     * @param lines
      */
     public void detect(final List<String> lines) {
         if (!distInfoAlreadyLogged) {
@@ -113,7 +111,7 @@ public class DistributionDetector {
             case 0:
                 break;
             default:
-                LOG.appError("setDistInfo: list: ", Arrays.asList(lines).toString());
+                LOG.appError("setDistInfo: list: ", List.of(lines).toString());
                 break;
         }
         distributionName = getDistFromDistVersion(detectedDist);
@@ -207,9 +205,9 @@ public class DistributionDetector {
         if (results.isEmpty()) {
             ret = text;
         } else {
-            ret = Tools.join(";;;", results.toArray(new String[results.size()]));
+            ret = Tools.join(";;;", results.toArray(new String[0]));
         }
-        if (convertCmdCallback != null && ret != null) {
+        if (convertCmdCallback != null) {
             ret = convertCmdCallback.convert(ret);
         }
         return ret;
@@ -234,9 +232,7 @@ public class DistributionDetector {
         }
         if (ret == null) {
             try {
-                if (ret == null) {
-                    ret = resourceString.getString(text);
-                }
+                ret = resourceString.getString(text);
                 LOG.debug2("getDistString: ret: " + ret);
                 return ret;
             } catch (final RuntimeException e) {
@@ -266,7 +262,7 @@ public class DistributionDetector {
             final StringBuilder buf = new StringBuilder(distributionVersion);
             for (int i = distributionVersion.length() - 1; i >= 0; i--) {
                 try {
-                    distVersion = resourceCommand.getString("version:" + buf.toString() + '*');
+                    distVersion = resourceCommand.getString("version:" + buf + '*');
                 } catch (final Exception e2) {
                     distVersion = null;
                 }

@@ -26,6 +26,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+
 import lcmc.common.ui.MainPanel;
 import lcmc.common.ui.WizardDialog;
 import lcmc.common.ui.utils.SwingUtils;
@@ -37,9 +40,6 @@ import lcmc.drbd.ui.resource.ResourceInfo;
 import lcmc.drbd.ui.resource.VolumeInfo;
 import lcmc.logger.Logger;
 import lcmc.logger.LoggerFactory;
-
-import javax.inject.Inject;
-import javax.inject.Named;
 
 /**
  * Show step by step dialogs that add and configure new host.
@@ -72,19 +72,13 @@ public final class AddDrbdConfigDialog {
             startDialog.init(null, blockDevInfo1, blockDevInfo2);
             dialog = startDialog;
         } else {
-            final List<BlockDevInfo> blockDevices = new ArrayList<BlockDevInfo>(Arrays.asList(blockDevInfo1,
-                                                                                              blockDevInfo2));
+            final List<BlockDevInfo> blockDevices = new ArrayList<>(Arrays.asList(blockDevInfo1, blockDevInfo2));
             final ResourceInfo resourceInfo = globalInfo.getNewDrbdResource(
                                                             VolumeInfo.getHostsFromBlockDevices(blockDevices));
             final VolumeInfo dvi = globalInfo.getNewDrbdVolume(resourceInfo, blockDevices);
             resourceInfo.addDrbdVolume(dvi);
             globalInfo.addDrbdResource(resourceInfo);
-            swingUtils.invokeAndWait(new Runnable() {
-                @Override
-                public void run() {
-                    globalInfo.addDrbdVolume(dvi);
-                }
-            });
+            swingUtils.invokeAndWait(() -> globalInfo.addDrbdVolume(dvi));
             resourceDialog.init(null, dvi);
             dialog = resourceDialog;
         }

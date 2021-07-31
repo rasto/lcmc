@@ -113,16 +113,13 @@ public final class Unit implements Value {
             return false;
         }
         final Unit other = (Unit) obj;
-        if ((this.name == null) ? (other.name != null) : !this.name.equals(other.name)) {
-            return false;
-        }
-        return true;
+        return (name == null) ? (other.name == null) : name.equals(other.name);
     }
 
     @Override
     public int hashCode() {
         int hash = 7;
-        hash = 97 * hash + (this.name != null ? this.name.hashCode() : 0);
+        hash = 97 * hash + (name != null ? name.hashCode() : 0);
         return hash;
     }
 }

@@ -22,11 +22,35 @@
 
 package lcmc.crm.ui.resource;
 
-import com.google.common.base.Optional;
+import java.awt.BorderLayout;
+import java.awt.Dimension;
+import java.awt.geom.Point2D;
+import java.awt.image.BufferedImage;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.concurrent.CountDownLatch;
+
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.swing.BoxLayout;
+import javax.swing.ImageIcon;
+import javax.swing.JComponent;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.tree.DefaultMutableTreeNode;
+
 import lcmc.cluster.ui.ClusterBrowser;
 import lcmc.cluster.ui.widget.Check;
 import lcmc.cluster.ui.widget.Widget;
-import lcmc.common.domain.*;
+import lcmc.common.domain.AccessMode;
+import lcmc.common.domain.Application;
+import lcmc.common.domain.ResourceValue;
+import lcmc.common.domain.StringValue;
+import lcmc.common.domain.Value;
 import lcmc.common.domain.util.Tools;
 import lcmc.common.ui.Browser;
 import lcmc.common.ui.EditableInfo;
@@ -34,7 +58,11 @@ import lcmc.common.ui.Info;
 import lcmc.common.ui.main.MainData;
 import lcmc.common.ui.main.ProgressIndicator;
 import lcmc.common.ui.treemenu.ClusterTreeMenu;
-import lcmc.common.ui.utils.*;
+import lcmc.common.ui.utils.ButtonCallback;
+import lcmc.common.ui.utils.ComponentWithTest;
+import lcmc.common.ui.utils.Dialogs;
+import lcmc.common.ui.utils.SwingUtils;
+import lcmc.common.ui.utils.UpdatableItem;
 import lcmc.crm.domain.ClusterStatus;
 import lcmc.crm.domain.CrmXml;
 import lcmc.crm.domain.PtestData;
@@ -44,19 +72,6 @@ import lcmc.crm.ui.CrmGraph;
 import lcmc.host.domain.Host;
 import lcmc.logger.Logger;
 import lcmc.logger.LoggerFactory;
-
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.swing.*;
-import javax.swing.tree.DefaultMutableTreeNode;
-import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.geom.Point2D;
-import java.awt.image.BufferedImage;
-import java.util.*;
-import java.util.List;
-import java.util.concurrent.CountDownLatch;
 
 /**
  * This class holds info data for services view and global heartbeat
@@ -208,20 +223,17 @@ public class ServicesInfo extends EditableInfo {
         LOG.debug1("apply: start: test: " + runMode);
         final String[] params = getParametersFromXML();
         if (Application.isLive(runMode)) {
-            swingUtils.invokeAndWait(new Runnable() {
-                @Override
-                public void run() {
-                    getApplyButton().setEnabled(false);
-                    getRevertButton().setEnabled(false);
-                    getApplyButton().setToolTipText("");
-                }
+            swingUtils.invokeAndWait(() -> {
+                getApplyButton().setEnabled(false);
+                getRevertButton().setEnabled(false);
+                getApplyButton().setToolTipText("");
             });
         }
         getInfoPanel();
         waitForInfoPanel();
 
         /* update pacemaker */
-        final Map<String, String> args = new HashMap<String, String>();
+        final Map<String, String> args = new HashMap<>();
         for (final String param : params) {
             final Value value = getComboBoxValue(param);
             if (Tools.areEqual(value, getParamDefault(param))) {
@@ -235,7 +247,7 @@ public class ServicesInfo extends EditableInfo {
         }
         final RscDefaultsInfo rdi = getBrowser().getRscDefaultsInfo();
         final String[] rdiParams = rdi.getParametersFromXML();
-        final Map<String, String> rdiMetaArgs = new LinkedHashMap<String, String>();
+        final Map<String, String> rdiMetaArgs = new LinkedHashMap<>();
         for (final String param : rdiParams) {
             final Value value = rdi.getComboBoxValue(param);
             if (Tools.areEqual(value, rdi.getParamDefault(param))) {
@@ -282,12 +294,7 @@ public class ServicesInfo extends EditableInfo {
             }
         }
         if (infoPanel == null) {
-            swingUtils.invokeLater(new Runnable() {
-                @Override
-                public void run() {
-                    getInfoPanel();
-                }
-            });
+            swingUtils.invokeLater(this::getInfoPanel);
         }
     }
 
@@ -416,61 +423,34 @@ public class ServicesInfo extends EditableInfo {
         newPanel.add(buttonPanel);
 
         final String[] params = getParametersFromXML();
-        addParams(optionsPanel,
-                  params,
-                  application.getDefaultSize("ClusterBrowser.DrbdResLabelWidth"),
-                  application.getDefaultSize("ClusterBrowser.DrbdResFieldWidth"),
-                  null);
+        addParams(optionsPanel, params, application.getDefaultSize("ClusterBrowser.DrbdResLabelWidth"),
+                application.getDefaultSize("ClusterBrowser.DrbdResFieldWidth"), null);
 
-        addRscDefaultsPanel(optionsPanel,
-                            application.getDefaultSize("ClusterBrowser.DrbdResLabelWidth"),
-                            application.getDefaultSize("ClusterBrowser.DrbdResFieldWidth"));
-        getApplyButton().addActionListener(
-            new ActionListener() {
-                @Override
-                public void actionPerformed(final ActionEvent e) {
-                    LOG.debug1("actionPerformed: BUTTON: apply");
-                    final Thread thread = new Thread(
-                        new Runnable() {
-                            @Override
-                            public void run() {
-                                getBrowser().clStatusLock();
-                                apply(getBrowser().getDCHost(), Application.RunMode.LIVE);
-                                getBrowser().clStatusUnlock();
-                            }
-                        }
-                    );
-                    thread.start();
-                }
-            }
-        );
-        getRevertButton().addActionListener(
-            new ActionListener() {
-                @Override
-                public void actionPerformed(final ActionEvent e) {
-                    LOG.debug1("actionPerformed: BUTTON: revert");
-                    final Thread thread = new Thread(new Runnable() {
-                        @Override
-                        public void run() {
-                            getBrowser().clStatusLock();
-                            revert();
-                            getBrowser().clStatusUnlock();
-                        }
-                    });
-                    thread.start();
-                }
-            }
-        );
+        addRscDefaultsPanel(optionsPanel, application.getDefaultSize("ClusterBrowser.DrbdResLabelWidth"),
+                application.getDefaultSize("ClusterBrowser.DrbdResFieldWidth"));
+        getApplyButton().addActionListener(e -> {
+            LOG.debug1("actionPerformed: BUTTON: apply");
+            final Thread thread = new Thread(() -> {
+                getBrowser().clStatusLock();
+                apply(getBrowser().getDCHost(), Application.RunMode.LIVE);
+                getBrowser().clStatusUnlock();
+            });
+            thread.start();
+        });
+        getRevertButton().addActionListener(e -> {
+            LOG.debug1("actionPerformed: BUTTON: revert");
+            final Thread thread = new Thread(() -> {
+                getBrowser().clStatusLock();
+                revert();
+                getBrowser().clStatusUnlock();
+            });
+            thread.start();
+        });
 
         /* apply button */
         addApplyButton(buttonPanel);
         addRevertButton(buttonPanel);
-        swingUtils.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                setApplyButtons(null, params);
-            }
-        });
+        swingUtils.invokeLater(() -> setApplyButtons(null, params));
 
         mainPanel.add(optionsPanel);
 
@@ -523,39 +503,32 @@ public class ServicesInfo extends EditableInfo {
                                 final boolean reloadNode,
                                 final boolean interactive,
                                 final Application.RunMode runMode) {
-        swingUtils.invokeAndWait(new Runnable() {
-            @Override
-            public void run() {
-                newServiceInfo.getService().setResourceClass(newServiceInfo.getResourceAgent().getResourceClass());
-                final CrmGraph hg = getBrowser().getCrmGraph();
-                getBrowser().addNameToServiceInfoHash(newServiceInfo);
-                if (!hg.addResource(newServiceInfo,
-                                    null,
-                                    pos,
-                                    false, /* colocation only */
-                                    false, /* order only */
-                                    runMode)) {
-                    final DefaultMutableTreeNode newServiceNode = clusterTreeMenu.createMenuItem(
-                            getBrowser().getServicesNode(),
-                            newServiceInfo);
-                    if (interactive) {
-                        if (newServiceInfo.getResourceAgent().isProbablyMasterSlave()) {
-                            /* only if it was added manually. */
-                            newServiceInfo.changeType(ServiceInfo.MASTER_SLAVE_TYPE_STRING);
-                        } else if (newServiceInfo.getResourceAgent().isProbablyClone()) {
-                            newServiceInfo.changeType(ServiceInfo.CLONE_TYPE_STRING);
-                        }
+        swingUtils.invokeAndWait(() -> {
+            newServiceInfo.getService().setResourceClass(newServiceInfo.getResourceAgent().getResourceClass());
+            final CrmGraph hg = getBrowser().getCrmGraph();
+            getBrowser().addNameToServiceInfoHash(newServiceInfo);
+            if (!hg.addResource(newServiceInfo, null, pos, false, /* colocation only */
+                    false, /* order only */
+                    runMode)) {
+                final DefaultMutableTreeNode newServiceNode =
+                        clusterTreeMenu.createMenuItem(getBrowser().getServicesNode(), newServiceInfo);
+                if (interactive) {
+                    if (newServiceInfo.getResourceAgent().isProbablyMasterSlave()) {
+                        /* only if it was added manually. */
+                        newServiceInfo.changeType(ServiceInfo.MASTER_SLAVE_TYPE_STRING);
+                    } else if (newServiceInfo.getResourceAgent().isProbablyClone()) {
+                        newServiceInfo.changeType(ServiceInfo.CLONE_TYPE_STRING);
                     }
-                    if (reloadNode) {
-                        /* show it */
-                        clusterTreeMenu.reloadNodeDontSelect(getBrowser().getServicesNode());
-                        clusterTreeMenu.reloadNode(newServiceNode);
-                    }
-                    getBrowser().reloadAllComboBoxes(newServiceInfo);
-                    hg.scale();
                 }
-                hg.reloadServiceMenus();
+                if (reloadNode) {
+                    /* show it */
+                    clusterTreeMenu.reloadNodeDontSelect(getBrowser().getServicesNode());
+                    clusterTreeMenu.reloadNode(newServiceNode);
+                }
+                getBrowser().reloadAllComboBoxes(newServiceInfo);
+                hg.scale();
             }
+            hg.reloadServiceMenus();
         });
     }
 
@@ -581,7 +554,7 @@ public class ServicesInfo extends EditableInfo {
     @Override
     public Check checkResourceFields(final String param, final String[] params) {
         final RscDefaultsInfo rdi = getBrowser().getRscDefaultsInfo();
-        final Check check = new Check(new ArrayList<String>(), new ArrayList<String>());
+        final Check check = new Check(new ArrayList<>(), new ArrayList<>());
         check.addCheck(rdi.checkResourceFields(param, rdi.getParametersFromXML(), true));
         check.addCheck(super.checkResourceFields(param, params));
         for (final ServiceInfo si : getBrowser().getExistingServiceList(null)) {
@@ -612,14 +585,11 @@ public class ServicesInfo extends EditableInfo {
             return;
         }
         final Value oldValue = oldWi.getValue();
-        swingUtils.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                if (oldValue == null || oldValue.isNothingSelected()) {
-                    newWi.setValueNoListeners(null);
-                } else {
-                    newWi.setValueNoListeners(oldValue);
-                }
+        swingUtils.invokeLater(() -> {
+            if (oldValue == null || oldValue.isNothingSelected()) {
+                newWi.setValueNoListeners(null);
+            } else {
+                newWi.setValueNoListeners(oldValue);
             }
         });
     }
@@ -671,36 +641,29 @@ public class ServicesInfo extends EditableInfo {
             final CloneInfo oldCi = oci;
             if (oldI instanceof ServiceInfo) {
                 final ServiceInfo oldSi = (ServiceInfo) oldI;
-                final ServiceInfo newSi =
-                    addServicePanel(oldSi.getResourceAgent(),
-                                    null, /* pos */
-                                    true,
-                                    null, /* clone id */
-                                    null,
-                                    Application.RunMode.LIVE);
-                swingUtils.invokeLater(new Runnable() {
-                    @Override
-                    public void run() {
-                        if (!(newSi instanceof CloneInfo)) {
-                            oldSi.getInfoPanel();
-                            newSi.getInfoPanel();
-                            oldSi.waitForInfoPanel();
-                            newSi.waitForInfoPanel();
-                        }
-                        if (oldCi != null) {
-                            final Value v = newSi.getTypeRadioGroup().getValue();
-                            if (oldCi.getService().isMaster()) {
-                                if (!ServiceInfo.MASTER_SLAVE_TYPE_STRING.equals(v)) {
-                                    newSi.getTypeRadioGroup().setValue(ServiceInfo.MASTER_SLAVE_TYPE_STRING);
-                                }
-                            } else {
-                                if (!ServiceInfo.CLONE_TYPE_STRING.equals(v)) {
-                                    newSi.getTypeRadioGroup().setValue(ServiceInfo.CLONE_TYPE_STRING);
-                                }
+                final ServiceInfo newSi = addServicePanel(oldSi.getResourceAgent(), null, /* pos */
+                        true, null, /* clone id */
+                        null, Application.RunMode.LIVE);
+                swingUtils.invokeLater(() -> {
+                    if (!(newSi instanceof CloneInfo)) {
+                        oldSi.getInfoPanel();
+                        newSi.getInfoPanel();
+                        oldSi.waitForInfoPanel();
+                        newSi.waitForInfoPanel();
+                    }
+                    if (oldCi != null) {
+                        final Value v = newSi.getTypeRadioGroup().getValue();
+                        if (oldCi.getService().isMaster()) {
+                            if (!ServiceInfo.MASTER_SLAVE_TYPE_STRING.equals(v)) {
+                                newSi.getTypeRadioGroup().setValue(ServiceInfo.MASTER_SLAVE_TYPE_STRING);
+                            }
+                        } else {
+                            if (!ServiceInfo.CLONE_TYPE_STRING.equals(v)) {
+                                newSi.getTypeRadioGroup().setValue(ServiceInfo.CLONE_TYPE_STRING);
                             }
                         }
-                        copyPasteFields(oldSi, newSi);
                     }
+                    copyPasteFields(oldSi, newSi);
                 });
 
                 /* clone parameters */
@@ -712,30 +675,21 @@ public class ServicesInfo extends EditableInfo {
                                 continue;
                             }
                         }
-                        swingUtils.invokeLater(new Runnable() {
-                            @Override
-                            public void run() {
-                                copyPasteField(oldCi.getWidget(param, null), newCi.getWidget(param, null));
-                            }
-                        });
+                        swingUtils.invokeLater(() -> copyPasteField(oldCi.getWidget(param, null), newCi.getWidget(param, null)));
                     }
                 }
                 if (oldI instanceof GroupInfo) {
                     final GroupInfo oldGi = (GroupInfo) oldI;
                     final GroupInfo newGi = (GroupInfo) newSi;
 
-                    swingUtils.invokeInEdt(new Runnable() {
-                        @Override
-                        public void run() {
-                            for (final ServiceInfo oldChild : oldGi.getSubServices()) {
-                                oldChild.getInfoPanel();
-                                final ServiceInfo newChild =
-                                        newGi.addGroupServicePanel(oldChild.getResourceAgent(), false);
-                                newChild.getInfoPanel();
-                                copyPasteFields(oldChild, newChild);
-                            }
-                            clusterTreeMenu.reloadNodeDontSelect(newGi.getNode());
+                    swingUtils.invokeInEdt(() -> {
+                        for (final ServiceInfo oldChild : oldGi.getSubServices()) {
+                            oldChild.getInfoPanel();
+                            final ServiceInfo newChild = newGi.addGroupServicePanel(oldChild.getResourceAgent(), false);
+                            newChild.getInfoPanel();
+                            copyPasteFields(oldChild, newChild);
                         }
+                        clusterTreeMenu.reloadNodeDontSelect(newGi.getNode());
                     });
                 }
             }
@@ -747,14 +701,10 @@ public class ServicesInfo extends EditableInfo {
 
     public void exportGraphAsPng() {
         final Optional<String> savePath = dialogs.getFileName("lcmc-pcmk");
-        if (savePath.isPresent()) {
-            new Thread() {
-                public void run() {
-                    BufferedImage image = getBrowser().getCrmGraph().createImage();
-                    Tools.writeImage(savePath.get(), image, "PNG");
-                }
-            }.start();
-        }
+        savePath.ifPresent(s -> new Thread(() -> {
+            BufferedImage image = getBrowser().getCrmGraph().createImage();
+            Tools.writeImage(s, image, "PNG");
+        }).start());
     }
 
     public void cleanupServiceMenu(final List<ServiceInfo> groupServiceIsPresent) {

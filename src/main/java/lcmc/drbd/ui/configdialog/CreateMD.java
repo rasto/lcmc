@@ -23,9 +23,8 @@
 
 package lcmc.drbd.ui.configdialog;
 
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.util.regex.Matcher;
+
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.swing.JComponent;
@@ -33,24 +32,24 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SpringLayout;
 
-import lcmc.common.domain.AccessMode;
-import lcmc.common.domain.Application;
-import lcmc.common.ui.main.ProgressIndicator;
-import lcmc.common.ui.utils.SwingUtils;
-import lcmc.host.domain.Host;
-import lcmc.common.domain.StringValue;
-import lcmc.common.domain.Value;
 import lcmc.cluster.ui.ClusterBrowser;
-import lcmc.common.ui.SpringUtilities;
-import lcmc.common.ui.WizardDialog;
-import lcmc.drbd.ui.resource.BlockDevInfo;
 import lcmc.cluster.ui.widget.Widget;
 import lcmc.cluster.ui.widget.WidgetFactory;
-import lcmc.drbd.service.DRBD;
+import lcmc.common.domain.AccessMode;
+import lcmc.common.domain.Application;
 import lcmc.common.domain.ExecCallback;
-import lcmc.common.ui.utils.MyButton;
+import lcmc.common.domain.StringValue;
+import lcmc.common.domain.Value;
 import lcmc.common.domain.util.Tools;
+import lcmc.common.ui.SpringUtilities;
+import lcmc.common.ui.WizardDialog;
+import lcmc.common.ui.main.ProgressIndicator;
+import lcmc.common.ui.utils.MyButton;
+import lcmc.common.ui.utils.SwingUtils;
 import lcmc.common.ui.utils.WidgetListener;
+import lcmc.drbd.service.DRBD;
+import lcmc.drbd.ui.resource.BlockDevInfo;
+import lcmc.host.domain.Host;
 
 /**
  * An implementation of a dialog where drbd block devices are initialized.
@@ -74,12 +73,7 @@ final class CreateMD extends DrbdConfig {
     private MyButton makeMetaDataButton;
 
     private void createMetadataAndCheckResult(final boolean destroyData) {
-        swingUtils.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                makeMetaDataButton.setEnabled(false);
-            }
-        });
+        swingUtils.invokeLater(() -> makeMetaDataButton.setEnabled(false));
         final Thread[] thread = new Thread[2];
         final String[] answerStore = new String[2];
         final Integer[] returnCode = new Integer[2];
@@ -88,51 +82,33 @@ final class CreateMD extends DrbdConfig {
         for (int i = 0; i < 2; i++) {
             final int index = i;
             returnCode[index] = -1;
-            thread[i] = new Thread(
-            new Runnable() {
-                @Override
-                public void run() {
-                    final ExecCallback execCallback =
-                        new ExecCallback() {
-                            @Override
-                            public void done(final String answer) {
-                                swingUtils.invokeLater(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        makeMetaDataButton.setEnabled(false);
-                                    }
-                                });
-                                answerStore[index] = answer;
-                                returnCode[index] = 0;
-                            }
-
-                            @Override
-                            public void doneError(final String answer, final int errorCode) {
-                                answerStore[index] = answer;
-                                returnCode[index] = errorCode;
-                            }
-
-                        };
-                    String drbdMetaDisk = getDrbdVolumeInfo().getMetaDiskForHost(bdis[index].getHost());
-                    if ("internal".equals(drbdMetaDisk)) {
-                        drbdMetaDisk = bdis[index].getName();
+            thread[i] = new Thread(() -> {
+                final ExecCallback execCallback = new ExecCallback() {
+                    @Override
+                    public void done(final String answer) {
+                        swingUtils.invokeLater(() -> makeMetaDataButton.setEnabled(false));
+                        answerStore[index] = answer;
+                        returnCode[index] = 0;
                     }
-                    final Application.RunMode runMode = Application.RunMode.LIVE;
-                    if (destroyData) {
-                        DRBD.createMDDestroyData(bdis[index].getHost(),
-                                                 getDrbdVolumeInfo().getDrbdResourceInfo().getName(),
-                                                 getDrbdVolumeInfo().getName(),
-                                                 drbdMetaDisk,
-                                                 execCallback,
-                                                 runMode);
-                    } else {
-                        DRBD.createMD(bdis[index].getHost(),
-                                      getDrbdVolumeInfo().getDrbdResourceInfo().getName(),
-                                      getDrbdVolumeInfo().getName(),
-                                      drbdMetaDisk,
-                                      execCallback,
-                                      runMode);
+
+                    @Override
+                    public void doneError(final String answer, final int errorCode) {
+                        answerStore[index] = answer;
+                        returnCode[index] = errorCode;
                     }
+
+                };
+                String drbdMetaDisk = getDrbdVolumeInfo().getMetaDiskForHost(bdis[index].getHost());
+                if ("internal".equals(drbdMetaDisk)) {
+                    drbdMetaDisk = bdis[index].getName();
+                }
+                final Application.RunMode runMode = Application.RunMode.LIVE;
+                if (destroyData) {
+                    DRBD.createMDDestroyData(bdis[index].getHost(), getDrbdVolumeInfo().getDrbdResourceInfo().getName(),
+                            getDrbdVolumeInfo().getName(), drbdMetaDisk, execCallback, runMode);
+                } else {
+                    DRBD.createMD(bdis[index].getHost(), getDrbdVolumeInfo().getDrbdResourceInfo().getName(),
+                            getDrbdVolumeInfo().getName(), drbdMetaDisk, execCallback, runMode);
                 }
             });
             thread[i].start();
@@ -158,14 +134,11 @@ final class CreateMD extends DrbdConfig {
         if (error) {
             answerPaneSetTextError(Tools.join("\n", answerStore));
         } else {
-            swingUtils.invokeLater(new Runnable() {
-                @Override
-                public void run() {
-                    makeMetaDataButton.setEnabled(false);
-                    buttonClass(nextButton()).setEnabled(true);
-                    if (application.getAutoOptionGlobal("autodrbd") != null) {
-                        pressNextButton();
-                    }
+            swingUtils.invokeLater(() -> {
+                makeMetaDataButton.setEnabled(false);
+                buttonClass(nextButton()).setEnabled(true);
+                if (application.getAutoOptionGlobal("autodrbd") != null) {
+                    pressNextButton();
                 }
             });
             answerPaneSetText(Tools.join("\n", answerStore));
@@ -234,12 +207,7 @@ final class CreateMD extends DrbdConfig {
     protected void initDialogAfterVisible() {
         enableComponents();
         if (application.getAutoOptionGlobal("autodrbd") != null) {
-            swingUtils.invokeLater(new Runnable() {
-                @Override
-                public void run() {
-                    makeMetaDataButton.pressButton();
-                }
-            });
+            swingUtils.invokeLater(() -> makeMetaDataButton.pressButton());
         }
     }
 
@@ -307,30 +275,20 @@ final class CreateMD extends DrbdConfig {
                     }
                 });
 
-        makeMetaDataButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(final ActionEvent e) {
-                final Thread thread = new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        getProgressBar().start(10000);
-                        if (metadataWidget.getStringValue().equals(createNewMetadataDestroyData)) {
-                            createMetadataAndCheckResult(true);
-                        } else {
-                            createMetadataAndCheckResult(false);
-                        }
-                        progressBarDone();
-                    }
-                });
-                thread.start();
-            }
+        makeMetaDataButton.addActionListener(e -> {
+            final Thread thread = new Thread(() -> {
+                getProgressBar().start(10000);
+                createMetadataAndCheckResult(metadataWidget.getStringValue().equals(createNewMetadataDestroyData));
+                progressBarDone();
+            });
+            thread.start();
         });
         inputPane.add(makeMetaDataButton);
 
 
         SpringUtilities.makeCompactGrid(inputPane, 1, 3,  // rows, cols
-                                                   1, 1,  // initX, initY
-                                                   1, 1); // xPad, yPad
+                1, 1,  // initX, initY
+                1, 1); // xPad, yPad
 
         pane.add(inputPane);
         pane.add(getProgressBarPane(null));

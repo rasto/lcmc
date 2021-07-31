@@ -23,6 +23,7 @@ package lcmc.drbd.ui.resource;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.swing.JMenuItem;
@@ -43,27 +44,19 @@ public class ResourceMenu {
 
     public List<UpdatableItem> getPulldownMenu(final ResourceInfo resourceInfo) {
         this.resourceInfo = resourceInfo;
-        final List<UpdatableItem> items = new ArrayList<UpdatableItem>();
+        final List<UpdatableItem> items = new ArrayList<>();
         for (final VolumeInfo dvi : resourceInfo.getDrbdVolumes()) {
-            final MyMenu volumesMenu = menuFactory.createMenu(
-                    dvi.toString(),
-                    new AccessMode(AccessMode.RO, AccessMode.NORMAL),
+            final MyMenu volumesMenu = menuFactory.createMenu(dvi.toString(), new AccessMode(AccessMode.RO, AccessMode.NORMAL),
                     new AccessMode(AccessMode.RO, AccessMode.NORMAL));
-            volumesMenu.onUpdate(new Runnable() {
-                @Override
-                public void run() {
-                    swingUtils.isSwingThread();
-                    volumesMenu.removeAll();
-                    final Collection<UpdatableItem> volumeMenus = new ArrayList<UpdatableItem>();
-                    for (final UpdatableItem u : dvi.createPopup()) {
-                        volumeMenus.add(u);
-                    }
-                    for (final UpdatableItem u : volumeMenus) {
-                        volumesMenu.add((JMenuItem) u);
-                    }
-                    volumesMenu.updateMenuComponents();
-                    volumesMenu.processAccessMode();
+            volumesMenu.onUpdate(() -> {
+                swingUtils.isSwingThread();
+                volumesMenu.removeAll();
+                final Collection<UpdatableItem> volumeMenus = new ArrayList<>(dvi.createPopup());
+                for (final UpdatableItem u : volumeMenus) {
+                    volumesMenu.add((JMenuItem) u);
                 }
+                volumesMenu.updateMenuComponents();
+                volumesMenu.processAccessMode();
             });
             items.add(volumesMenu);
         }

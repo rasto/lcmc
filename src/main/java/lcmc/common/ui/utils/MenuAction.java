@@ -21,5 +21,5 @@
 package lcmc.common.ui.utils;
 
 public interface MenuAction {
-    public void run(final String text);
+    void run(final String text);
 }

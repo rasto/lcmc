@@ -31,6 +31,7 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.util.ArrayList;
 import java.util.List;
+
 import javax.swing.BoxLayout;
 import javax.swing.JApplet;
 import javax.swing.JDialog;
@@ -42,11 +43,11 @@ import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
 import javax.swing.border.LineBorder;
 
+import lcmc.common.domain.util.Tools;
 import lcmc.common.ui.ProgressBar;
 import lcmc.host.domain.Host;
 import lcmc.logger.Logger;
 import lcmc.logger.LoggerFactory;
-import lcmc.common.domain.util.Tools;
 
 /**
  * An implementation of dialogs that are needed for establishing of a ssh
@@ -153,14 +154,14 @@ public final class SSHGui {
                           final String defaultValue,
                           final boolean isPassword) {
             this.isPassword = isPassword;
-            final List<String> strippedContent = new ArrayList<String>();
+            final List<String> strippedContent = new ArrayList<>();
             for (final String s : content) {
                 if (s != null && !s.isEmpty()) {
                     /* strip some html */
-                    strippedContent.add(s.replaceAll("\\<.*?\\>", "").replaceAll("&nbsp;", " "));
+                    strippedContent.add(s.replaceAll("<.*?>", "").replaceAll("&nbsp;", " "));
                 }
             }
-            host.getTerminalPanel().addCommandOutput(strippedContent.toArray(new String[strippedContent.size()]));
+            host.getTerminalPanel().addCommandOutput(strippedContent.toArray(new String[0]));
 
             if (progressBar != null) {
                 progressBar.hold();
@@ -170,7 +171,7 @@ public final class SSHGui {
             pan.setBorder(new LineBorder(Tools.getDefaultColor("ConfigDialog.Background.Light"), 5));
             pan.setBackground(Color.WHITE);
             pan.setLayout(new BoxLayout(pan, BoxLayout.PAGE_AXIS));
-            if (host != null && host.getName() != null) {
+            if (host.getName() != null) {
                 pan.add(new JLabel("host: " + host.getName()));
             }
 

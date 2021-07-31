@@ -22,17 +22,16 @@ package lcmc.crm.ui.resource;
 
 import java.util.ArrayList;
 import java.util.List;
-import lcmc.common.domain.AccessMode;
-import lcmc.common.domain.Application;
-import lcmc.cluster.ui.ClusterBrowser;
-import lcmc.common.domain.EnablePredicate;
-import lcmc.common.ui.utils.MenuAction;
-import lcmc.common.ui.utils.MenuFactory;
-import lcmc.common.domain.util.Tools;
-import lcmc.common.ui.utils.UpdatableItem;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+
+import lcmc.cluster.ui.ClusterBrowser;
+import lcmc.common.domain.AccessMode;
+import lcmc.common.domain.Application;
+import lcmc.common.domain.util.Tools;
+import lcmc.common.ui.utils.MenuFactory;
+import lcmc.common.ui.utils.UpdatableItem;
 
 @Named
 public class AvailableServiceMenu {
@@ -40,33 +39,22 @@ public class AvailableServiceMenu {
     private MenuFactory menuFactory;
 
     public List<UpdatableItem> getPulldownMenu(final AvailableServiceInfo availableServiceInfo) {
-        final List<UpdatableItem> items = new ArrayList<UpdatableItem>();
-        final UpdatableItem addServiceMenu = menuFactory.createMenuItem(
-                        Tools.getString("ClusterBrowser.AddServiceToCluster"),
-                        null,
-                        null,
-                        new AccessMode(AccessMode.ADMIN, AccessMode.NORMAL),
-                        new AccessMode(AccessMode.OP, AccessMode.NORMAL))
-            .enablePredicate(new EnablePredicate() {
-                        @Override
-                        public String check() {
+        final List<UpdatableItem> items = new ArrayList<>();
+        final UpdatableItem addServiceMenu =
+                menuFactory.createMenuItem(Tools.getString("ClusterBrowser.AddServiceToCluster"), null, null,
+                                new AccessMode(AccessMode.ADMIN, AccessMode.NORMAL), new AccessMode(AccessMode.OP, AccessMode.NORMAL))
+                        .enablePredicate(() -> {
                             if (availableServiceInfo.getBrowser().crmStatusFailed()) {
                                 return ClusterBrowser.UNKNOWN_CLUSTER_STATUS_STRING;
                             }
                             return null;
-                        }})
-            .addAction(new MenuAction() {
-                    @Override
-                    public void run(final String text) {
-                        availableServiceInfo.hidePopup();
-                        final ServicesInfo si = availableServiceInfo.getBrowser().getServicesInfo();
-                        si.addServicePanel(availableServiceInfo.getResourceAgent(),
-                                           null, /* pos */
-                                           true,
-                                           null,
-                                           null,
-                                           Application.RunMode.LIVE);
-                    }});
+                        })
+                        .addAction(text -> {
+                            availableServiceInfo.hidePopup();
+                            final ServicesInfo si = availableServiceInfo.getBrowser().getServicesInfo();
+                            si.addServicePanel(availableServiceInfo.getResourceAgent(), null, /* pos */
+                                    true, null, null, Application.RunMode.LIVE);
+                        });
         items.add(addServiceMenu);
         return items;
     }

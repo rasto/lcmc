@@ -22,29 +22,29 @@
 
 package lcmc.lvm.ui;
 
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.util.Set;
+
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SpringLayout;
+
+import lcmc.cluster.ui.widget.Widget;
+import lcmc.cluster.ui.widget.WidgetFactory;
 import lcmc.common.domain.AccessMode;
 import lcmc.common.domain.Application;
-import lcmc.common.ui.utils.SwingUtils;
-import lcmc.host.domain.Host;
 import lcmc.common.domain.StringValue;
-import lcmc.vm.domain.VmsXml;
 import lcmc.common.domain.Value;
 import lcmc.common.ui.Browser;
 import lcmc.common.ui.SpringUtilities;
-import lcmc.drbd.ui.resource.BlockDevInfo;
-import lcmc.cluster.ui.widget.Widget;
-import lcmc.cluster.ui.widget.WidgetFactory;
 import lcmc.common.ui.utils.MyButton;
+import lcmc.common.ui.utils.SwingUtils;
 import lcmc.common.ui.utils.WidgetListener;
+import lcmc.drbd.ui.resource.BlockDevInfo;
+import lcmc.host.domain.Host;
+import lcmc.vm.domain.VmsXml;
 
 /**
  * This class implements LVM snapshot dialog.
@@ -90,7 +90,7 @@ public final class LVSnapshot extends LV {
         makeDefaultAndRequestFocusLater(sizeWi.getComponent());
     }
 
-    protected void checkButtons() {
+    private void checkButtons() {
         swingUtils.invokeLater(new EnableSnapshotRunnable(true));
     }
 
@@ -148,51 +148,36 @@ public final class LVSnapshot extends LV {
         final JLabel sizeLabel = new JLabel("New Size");
 
         sizeWi =  widgetFactory.createInstance(
-                       Widget.Type.TEXTFIELDWITHUNIT,
-                       VmsXml.convertKilobytes(newBlockSize),
-                       Widget.NO_ITEMS,
-                       getUnits(),
-                       Widget.NO_REGEXP,
-                       250,
-                       Widget.NO_ABBRV,
-                       new AccessMode(AccessMode.OP, AccessMode.NORMAL),
-                       Widget.NO_BUTTON);
+                       Widget.Type.TEXTFIELDWITHUNIT, VmsXml.convertKilobytes(newBlockSize), Widget.NO_ITEMS, getUnits(),
+                Widget.NO_REGEXP, 250, Widget.NO_ABBRV, new AccessMode(AccessMode.OP, AccessMode.NORMAL), Widget.NO_BUTTON);
         inputPane.add(sizeLabel);
         inputPane.add(sizeWi.getComponent());
-        snapshotButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(final ActionEvent e) {
-                final Thread thread = new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        swingUtils.invokeAndWait(new EnableSnapshotRunnable(false));
-                        disableComponents();
-                        getProgressBar().start(SNAPSHOT_TIMEOUT);
-                        final boolean ret = lvSnapshot(lvNameWi.getStringValue(), sizeWi.getStringValue());
-                        final Host host = blockDevInfo.getHost();
-                        host.getBrowser().getClusterBrowser().updateHWInfo(host, Host.UPDATE_LVM);
-                        setComboBoxes();
-                        if (ret) {
-                            progressBarDone();
-                            disposeDialog();
-                        } else {
-                            progressBarDoneError();
-                        }
-                        enableComponents();
-                    }
-                });
-                thread.start();
-            }
+        snapshotButton.addActionListener(e -> {
+            final Thread thread = new Thread(() -> {
+                swingUtils.invokeAndWait(new EnableSnapshotRunnable(false));
+                disableComponents();
+                getProgressBar().start(SNAPSHOT_TIMEOUT);
+                final boolean ret = lvSnapshot(lvNameWi.getStringValue(), sizeWi.getStringValue());
+                final Host host = blockDevInfo.getHost();
+                host.getBrowser().getClusterBrowser().updateHWInfo(host, Host.UPDATE_LVM);
+                setComboBoxes();
+                if (ret) {
+                    progressBarDone();
+                    disposeDialog();
+                } else {
+                    progressBarDoneError();
+                }
+                enableComponents();
+            });
+            thread.start();
         });
 
         inputPane.add(snapshotButton);
         /* max size */
         final JLabel maxSizeLabel = new JLabel("Max Size");
         maxSizeLabel.setEnabled(false);
-        maxSizeWi =  widgetFactory.createInstance(
-                        Widget.Type.TEXTFIELDWITHUNIT,
-                        VmsXml.convertKilobytes(maxBlockSize),
-                        Widget.NO_ITEMS,
+        maxSizeWi =
+                widgetFactory.createInstance(Widget.Type.TEXTFIELDWITHUNIT, VmsXml.convertKilobytes(maxBlockSize), Widget.NO_ITEMS,
                         getUnits(),
                         Widget.NO_REGEXP,
                         250,

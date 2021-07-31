@@ -23,20 +23,7 @@
 
 package lcmc.common.domain;
 
-/**
- * Callbacks to the execCommand function implements this interface.
- */
 public interface ExecCallback {
-    /**
-     * this is callback, when command finished successfully.
-     *
-     * @param answer
-     *          answer of the command
-     */
     void done(String answer);
-
-    /**
-     * this is callback, when command failed.
-     */
     void doneError(String answer, int errorCode);
 }

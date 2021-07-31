@@ -19,6 +19,24 @@
  */
 package lcmc.vm.ui.resource;
 
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
+
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.swing.ImageIcon;
+import javax.swing.JComponent;
+import javax.swing.JPanel;
+
+import org.w3c.dom.Node;
+
 import lcmc.cluster.ui.widget.Widget;
 import lcmc.cluster.ui.widget.WidgetFactory;
 import lcmc.common.domain.AccessMode;
@@ -34,53 +52,55 @@ import lcmc.drbd.ui.resource.BlockDevInfo;
 import lcmc.host.domain.Host;
 import lcmc.vm.domain.VmsXml;
 import lcmc.vm.domain.data.FilesystemData;
-import org.w3c.dom.Node;
-
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.swing.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.util.*;
 
 /**
  * This class holds info about Virtual filesystem.
  */
 @Named
 public final class FilesystemInfo extends HardwareInfo {
-    /** Parameters. */
-    private static final String[] PARAMETERS = {FilesystemData.TYPE,
-                                                FilesystemData.SOURCE_DIR,
-                                                FilesystemData.SOURCE_NAME,
-                                                FilesystemData.TARGET_DIR};
-    /** Whether the parameter is enabled only in advanced mode. */
-    private static final Collection<String> IS_ENABLED_ONLY_IN_ADVANCED =
-                            new HashSet<String>(Arrays.asList(new String[]{}));
-    /** Whether the parameter is required. */
+    /**
+     * Parameters.
+     */
+    private static final String[] PARAMETERS =
+            {FilesystemData.TYPE, FilesystemData.SOURCE_DIR, FilesystemData.SOURCE_NAME, FilesystemData.TARGET_DIR};
+    /**
+     * Whether the parameter is enabled only in advanced mode.
+     */
+    private static final Collection<String> IS_ENABLED_ONLY_IN_ADVANCED = new HashSet<>(List.of());
+    /**
+     * Whether the parameter is required.
+     */
     private static final Collection<String> IS_REQUIRED =
-        new HashSet<String>(Arrays.asList(new String[]{
-                                                FilesystemData.TYPE,
-                                                FilesystemData.TARGET_DIR}));
-    /** Field type. */
-    private static final Map<String, Widget.Type> FIELD_TYPES =
-                                       new HashMap<String, Widget.Type>();
-    /** Short name. */
-    private static final Map<String, String> SHORTNAME_MAP =
-                                                 new HashMap<String, String>();
+            new HashSet<>(Arrays.asList(FilesystemData.TYPE, FilesystemData.TARGET_DIR));
+    /**
+     * Field type.
+     */
+    private static final Map<String, Widget.Type> FIELD_TYPES = new HashMap<>();
+    /**
+     * Short name.
+     */
+    private static final Map<String, String> SHORTNAME_MAP = new HashMap<>();
 
-    /** Preferred values. */
-    private static final Map<String, Value> PREFERRED_MAP =
-                                                 new HashMap<String, Value>();
-    /** Possible values. */
-    private static final Map<String, Value[]> POSSIBLE_VALUES =
-                                              new HashMap<String, Value[]>();
-    /** Filesystem types. */
+    /**
+     * Preferred values.
+     */
+    private static final Map<String, Value> PREFERRED_MAP = new HashMap<>();
+    /**
+     * Possible values.
+     */
+    private static final Map<String, Value[]> POSSIBLE_VALUES = new HashMap<>();
+    /**
+     * Filesystem types.
+     */
     public static final Value MOUNT_TYPE = new StringValue("mount", "Mount");
-    /** Filesystem types. */
-    public static final Value TEMPLATE_TYPE =
-                                      new StringValue("template", "Template");
+    /**
+     * Filesystem types.
+     */
+    public static final Value TEMPLATE_TYPE = new StringValue("template", "Template");
 
-    /** LXC source dir. */
+    /**
+     * LXC source dir.
+     */
     private static final String LXC_SOURCE_DIR = "/var/lib/lxc";
 
     static {
@@ -89,6 +109,7 @@ public final class FilesystemInfo extends HardwareInfo {
         FIELD_TYPES.put(FilesystemData.SOURCE_NAME, Widget.Type.TEXTFIELD);
         FIELD_TYPES.put(FilesystemData.TARGET_DIR, Widget.Type.COMBOBOX);
     }
+
     static {
         SHORTNAME_MAP.put(FilesystemData.TYPE, "Type");
         SHORTNAME_MAP.put(FilesystemData.SOURCE_DIR, "Source Dir");
@@ -110,30 +131,37 @@ public final class FilesystemInfo extends HardwareInfo {
     @Inject
     private WidgetFactory widgetFactory;
 
-    /** Source file combo box, so that it can be disabled, depending on type. */
-    private final Map<String, Widget> sourceDirWi =
-                                            new HashMap<String, Widget>();
-    /** Source block combo box, so that it can be disabled, depending on type.*/
-    private final Map<String, Widget> sourceNameWi =
-                                            new HashMap<String, Widget>();
-    /** Choices for source directories. */
+    /**
+     * Source file combo box, so that it can be disabled, depending on type.
+     */
+    private final Map<String, Widget> sourceDirWi = new HashMap<>();
+    /**
+     * Source block combo box, so that it can be disabled, depending on type.
+     */
+    private final Map<String, Widget> sourceNameWi = new HashMap<>();
+    /**
+     * Choices for source directories.
+     */
     private Value[] sourceDirs;
-    /** Table panel. */
+    /**
+     * Table panel.
+     */
     private JComponent tablePanel = null;
     @Inject
     private ClusterTreeMenu clusterTreeMenu;
 
+    @Override
     void init(final String name, final Browser browser, final DomainInfo domainInfo) {
         super.init(name, browser, domainInfo);
         final List<Host> hosts = getVMSVirtualDomainInfo().getDefinedOnHosts();
-        final Set<Value> sds = new LinkedHashSet<Value>();
+        final Set<Value> sds = new LinkedHashSet<>();
         sds.add(new StringValue());
         for (final Host h : hosts) {
             for (final String guiOps : h.getHostParser().getGuiOptions(Host.VM_FILESYSTEM_SOURCE_DIR_LXC)) {
                 sds.add(new StringValue(guiOps));
             }
         }
-        sourceDirs = sds.toArray(new Value[sds.size()]);
+        sourceDirs = sds.toArray(new Value[0]);
     }
 
     /** Adds fs table with only this fs to the main panel. */
@@ -143,12 +171,7 @@ public final class FilesystemInfo extends HardwareInfo {
                                    DomainInfo.FILESYSTEM_TABLE,
                                    getVMSVirtualDomainInfo().getNewFilesystemBtn());
         if (getResource().isNew()) {
-            swingUtils.invokeLater(new Runnable() {
-                @Override
-                public void run() {
-                    tablePanel.setVisible(false);
-                }
-            });
+            swingUtils.invokeLater(() -> tablePanel.setVisible(false));
         }
         mainPanel.add(tablePanel);
     }
@@ -266,14 +289,9 @@ public final class FilesystemInfo extends HardwareInfo {
     /** Returns device parameters. */
     @Override
     protected Map<String, String> getHWParameters(final boolean allParams) {
-        swingUtils.invokeAndWait(new Runnable() {
-            @Override
-            public void run() {
-                getInfoPanel();
-            }
-        });
+        swingUtils.invokeAndWait(this::getInfoPanel);
         final String[] params = getRealParametersFromXML();
-        final Map<String, String> parameters = new HashMap<String, String>();
+        final Map<String, String> parameters = new HashMap<>();
         for (final String param : params) {
             final Value value = getComboBoxValue(param);
             if (allParams) {
@@ -301,40 +319,28 @@ public final class FilesystemInfo extends HardwareInfo {
         if (Application.isTest(runMode)) {
             return;
         }
-        swingUtils.invokeAndWait(new Runnable() {
-            @Override
-            public void run() {
-                getApplyButton().setEnabled(false);
-                getRevertButton().setEnabled(false);
-                getInfoPanel();
-            }
+        swingUtils.invokeAndWait(() -> {
+            getApplyButton().setEnabled(false);
+            getRevertButton().setEnabled(false);
+            getInfoPanel();
         });
         waitForInfoPanel();
-        final Map<String, String> parameters =
-                                    getHWParameters(getResource().isNew());
+        final Map<String, String> parameters = getHWParameters(getResource().isNew());
         final String[] params = getRealParametersFromXML();
         for (final Host h : getVMSVirtualDomainInfo().getDefinedOnHosts()) {
             final VmsXml vmsXml = getBrowser().getVmsXml(h);
             if (vmsXml != null) {
-                final String domainName =
-                                getVMSVirtualDomainInfo().getDomainName();
+                final String domainName = getVMSVirtualDomainInfo().getDomainName();
                 final Node domainNode = vmsXml.getDomainNode(domainName);
                 modifyXML(vmsXml, domainNode, domainName, parameters);
-                final String virshOptions =
-                                   getVMSVirtualDomainInfo().getVirshOptions();
+                final String virshOptions = getVMSVirtualDomainInfo().getVirshOptions();
                 vmsXml.saveAndDefine(domainNode, domainName, virshOptions);
             }
         }
         getResource().setNew(false);
         clusterTreeMenu.reloadNodeDontSelect(getNode());
-        getBrowser().periodicalVmsUpdate(
-                getVMSVirtualDomainInfo().getDefinedOnHosts());
-        swingUtils.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                tablePanel.setVisible(true);
-            }
-        });
+        getBrowser().periodicalVmsUpdate(getVMSVirtualDomainInfo().getDefinedOnHosts());
+        swingUtils.invokeLater(() -> tablePanel.setVisible(true));
         if (Application.isLive(runMode)) {
             storeComboBoxValues(params);
         }
@@ -386,17 +392,12 @@ public final class FilesystemInfo extends HardwareInfo {
     @Override
     protected boolean checkParam(final String param, final Value newValue) {
         if (FilesystemData.TYPE.equals(param)) {
-            swingUtils.invokeLater(new Runnable() {
-                @Override
-                public void run() {
-                    for (final Map.Entry<String, Widget> entry : sourceDirWi.entrySet()) {
-                        entry.getValue().setVisible(
-                                MOUNT_TYPE.equals(newValue));
-                    }
-                    for (final Map.Entry<String, Widget> entry : sourceNameWi.entrySet()) {
-                        entry.getValue().setVisible(
-                                TEMPLATE_TYPE.equals(newValue));
-                    }
+            swingUtils.invokeLater(() -> {
+                for (final Map.Entry<String, Widget> entry : sourceDirWi.entrySet()) {
+                    entry.getValue().setVisible(MOUNT_TYPE.equals(newValue));
+                }
+                for (final Map.Entry<String, Widget> entry : sourceNameWi.entrySet()) {
+                    entry.getValue().setVisible(TEMPLATE_TYPE.equals(newValue));
                 }
             });
         }
@@ -461,8 +462,7 @@ public final class FilesystemInfo extends HardwareInfo {
         for (final Host h : getVMSVirtualDomainInfo().getDefinedOnHosts()) {
             final VmsXml vmsXml = getBrowser().getVmsXml(h);
             if (vmsXml != null) {
-                final Map<String, String> parameters =
-                                                new HashMap<String, String>();
+                final Map<String, String> parameters = new HashMap<>();
                 parameters.put(FilesystemData.SAVED_TARGET_DIR, getName());
                 vmsXml.removeFilesystemXML(
                                      getVMSVirtualDomainInfo().getDomainName(),
@@ -517,44 +517,26 @@ public final class FilesystemInfo extends HardwareInfo {
             final MyButton fileChooserBtn = widgetFactory.createButton("Browse...");
             application.makeMiniButton(fileChooserBtn);
             final String regexp = ".*[^/]?$";
-            final Widget paramWi = widgetFactory.createInstance(
-                                     getFieldType(param),
-                                     sourceDir,
-                                     getParamPossibleChoices(param),
-                                     regexp,
-                                     width,
-                                     Widget.NO_ABBRV,
-                                     new AccessMode(getAccessType(param), AccessMode.NORMAL),
-                                     fileChooserBtn);
+            final Widget paramWi =
+                    widgetFactory.createInstance(getFieldType(param), sourceDir, getParamPossibleChoices(param), regexp, width,
+                            Widget.NO_ABBRV, new AccessMode(getAccessType(param), AccessMode.NORMAL), fileChooserBtn);
             paramWi.setAlwaysEditable(true);
-            if (prefix == null) {
-                sourceDirWi.put("", paramWi);
-            } else {
-                sourceDirWi.put(prefix, paramWi);
-            }
+            sourceDirWi.put(Objects.requireNonNullElse(prefix, ""), paramWi);
             if (Tools.isWindows()) {
                 paramWi.setTFButtonEnabled(false);
             }
-            fileChooserBtn.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(final ActionEvent e) {
-                    final Thread t = new Thread(new Runnable() {
-                        @Override
-                        public void run() {
-                            final String file;
-                            final String oldFile = paramWi.getStringValue();
-                            if (oldFile == null || oldFile.isEmpty()) {
-                                file = LXC_SOURCE_DIR;
-                            } else {
-                                file = oldFile;
-                            }
-                            startFileChooser(paramWi,
-                                             file,
-                                             FILECHOOSER_DIR_ONLY);
-                        }
-                    });
-                    t.start();
-                }
+            fileChooserBtn.addActionListener(e -> {
+                final Thread t = new Thread(() -> {
+                    final String file;
+                    final String oldFile = paramWi.getStringValue();
+                    if (oldFile == null || oldFile.isEmpty()) {
+                        file = LXC_SOURCE_DIR;
+                    } else {
+                        file = oldFile;
+                    }
+                    startFileChooser(paramWi, file, FILECHOOSER_DIR_ONLY);
+                });
+                t.start();
             });
             widgetAdd(param, prefix, paramWi);
             return paramWi;
@@ -570,11 +552,7 @@ public final class FilesystemInfo extends HardwareInfo {
                                     new AccessMode(getAccessType(param), AccessMode.NORMAL),
                                     Widget.NO_BUTTON);
             paramWi.setAlwaysEditable(true);
-            if (prefix == null) {
-                sourceNameWi.put("", paramWi);
-            } else {
-                sourceNameWi.put(prefix, paramWi);
-            }
+            sourceNameWi.put(Objects.requireNonNullElse(prefix, ""), paramWi);
             widgetAdd(param, prefix, paramWi);
             return paramWi;
         } else {

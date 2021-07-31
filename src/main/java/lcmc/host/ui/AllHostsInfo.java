@@ -21,6 +21,40 @@
  */
 package lcmc.host.ui;
 
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.FlowLayout;
+import java.awt.Font;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
+import java.util.regex.Matcher;
+
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Provider;
+import javax.inject.Singleton;
+import javax.swing.BoxLayout;
+import javax.swing.ImageIcon;
+import javax.swing.JCheckBox;
+import javax.swing.JComponent;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTextField;
+import javax.swing.border.LineBorder;
+import javax.swing.border.TitledBorder;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
+
 import lcmc.cluster.domain.Cluster;
 import lcmc.cluster.domain.Clusters;
 import lcmc.cluster.ui.EmptyBrowser;
@@ -34,29 +68,15 @@ import lcmc.common.ui.Browser;
 import lcmc.common.ui.Info;
 import lcmc.common.ui.main.MainData;
 import lcmc.common.ui.main.MainPresenter;
-import lcmc.common.ui.utils.*;
+import lcmc.common.ui.utils.MenuFactory;
+import lcmc.common.ui.utils.MyButton;
+import lcmc.common.ui.utils.MyMenuItem;
+import lcmc.common.ui.utils.SwingUtils;
+import lcmc.common.ui.utils.UpdatableItem;
 import lcmc.host.domain.Host;
 import lcmc.host.domain.HostFactory;
 import lcmc.logger.Logger;
 import lcmc.logger.LoggerFactory;
-
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Provider;
-import javax.inject.Singleton;
-import javax.swing.*;
-import javax.swing.border.LineBorder;
-import javax.swing.border.TitledBorder;
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
-import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
-import java.util.*;
-import java.util.List;
-import java.util.regex.Matcher;
 
 /**
  * This class holds all hosts that are added to the GUI as opposite to all
@@ -72,17 +92,21 @@ public final class AllHostsInfo extends Info {
     private static final String DEFAULT_CLUSTER_NAME = "default";
     private static final ImageIcon HOST_ICON = Tools.createImageIcon(Tools.getDefault("EmptyBrowser.HostIcon"));
     private JPanel infoPanel = null;
-    private final Map<Cluster, JCheckBox> allClusterCheckboxes = new HashMap<Cluster, JCheckBox>();
-    private final Map<Cluster, MyButton> allLoadButtons = new HashMap<Cluster, MyButton>();
-    private final Map<Cluster, JPanel> clusterBoxBackgrounds = new HashMap<Cluster, JPanel>();
+    private final Map<Cluster, JCheckBox> allClusterCheckboxes = new HashMap<>();
+    private final Map<Cluster, MyButton> allLoadButtons = new HashMap<>();
+    private final Map<Cluster, JPanel> clusterBoxBackgrounds = new HashMap<>();
     private final JPanel mainPanel = new JPanel(new GridBagLayout());
     private final GridBagConstraints gridBagConstraints = new GridBagConstraints();
     @Inject
     private WidgetFactory widgetFactory;
     private MyButton loadMarkedClustersButton;
-    /** Stop marked clusters button. */
+    /**
+     * Stop marked clusters button.
+     */
     private MyButton unloadMarkedClustersButton;
-    /** Remove marked clusters button. */
+    /**
+     * Remove marked clusters button.
+     */
     private MyButton removeMarkedClustersButton;
     @Inject
     private UserConfig userConfig;
@@ -125,61 +149,52 @@ public final class AllHostsInfo extends Info {
 
     private void removeMarkedClusters() {
         LOG.debug1("removeMarkedClusters: start");
-        final Thread thread = new Thread(new Runnable() {
-            @Override
-            public void run() {
-                final Collection<Cluster> selectedRunningClusters = new ArrayList<Cluster>();
-                final Collection<Cluster> selectedClusters = new ArrayList<Cluster>();
-                final List<String> clusterNames = new ArrayList<String>();
-                final Set<Cluster> clusters = allClusters.getClusterSet();
-                for (final Cluster cluster : clusters) {
-                    final JCheckBox wi = allClusterCheckboxes.get(cluster);
-                    LOG.debug1("removeMarkedClusters: cluster: " + cluster.getName() + ": wi: " + (wi != null));
-                    if (wi.isSelected()) {
-                        selectedClusters.add(cluster);
-                        clusterNames.add(cluster.getName());
-                        if (cluster.getClusterTab() != null) {
-                            selectedRunningClusters.add(cluster);
-                        }
+        final Thread thread = new Thread(() -> {
+            final Collection<Cluster> selectedRunningClusters = new ArrayList<>();
+            final Collection<Cluster> selectedClusters = new ArrayList<>();
+            final List<String> clusterNames = new ArrayList<>();
+            final Set<Cluster> clusters = allClusters.getClusterSet();
+            for (final Cluster cluster : clusters) {
+                final JCheckBox wi = allClusterCheckboxes.get(cluster);
+                LOG.debug1("removeMarkedClusters: cluster: " + cluster.getName() + ": wi: " + (wi != null));
+                if (wi.isSelected()) {
+                    selectedClusters.add(cluster);
+                    clusterNames.add(cluster.getName());
+                    if (cluster.getClusterTab() != null) {
+                        selectedRunningClusters.add(cluster);
                     }
                 }
-                final String clustersString = Tools.join(", ", clusterNames.toArray(new String[clusterNames.size()]));
-                if (!application.confirmDialog(Tools.getString("EmptyBrowser.confirmRemoveMarkedClusters.Title"),
-                                         Tools.getString("EmptyBrowser.confirmRemoveMarkedClusters.Desc")
-                                              .replaceAll("@CLUSTERS@", Matcher.quoteReplacement(clustersString)),
-                                         Tools.getString("EmptyBrowser.confirmRemoveMarkedClusters.Yes"),
-                                         Tools.getString("EmptyBrowser.confirmRemoveMarkedClusters.No"))) {
-                    return;
-                }
-                swingUtils.invokeLater(new Runnable() {
-                    @Override
-                    public void run() {
-                        removeMarkedClustersButton.setEnabled(false);
-                        loadMarkedClustersButton.setEnabled(false);
-                        unloadMarkedClustersButton.setEnabled(false);
-                    }
-                });
-                Tools.stopClusters(selectedRunningClusters);
-                application.removeClusters(selectedClusters);
-                final String saveFile = application.getDefaultSaveFile();
-                userConfig.saveConfig(saveFile, false);
-                mainPanel.repaint();
-                swingUtils.invokeLater(new Runnable() {
-                    @Override
-                    public void run() {
-                        for (final Cluster cluster : selectedClusters) {
-                            final JPanel p = clusterBoxBackgrounds.get(cluster);
-                            if (p != null) {
-                                clusterBoxBackgrounds.remove(cluster);
-                                allClusterCheckboxes.remove(cluster);
-                                allLoadButtons.remove(cluster);
-                                mainPanel.remove(p);
-                                emptyBrowser.reloadTreeMenu(getNode());
-                            }
-                        }
-                    }
-                });
             }
+            final String clustersString = Tools.join(", ", clusterNames.toArray(new String[0]));
+            if (!application.confirmDialog(Tools.getString("EmptyBrowser.confirmRemoveMarkedClusters.Title"),
+                    Tools.getString("EmptyBrowser.confirmRemoveMarkedClusters.Desc")
+                            .replaceAll("@CLUSTERS@", Matcher.quoteReplacement(clustersString)),
+                    Tools.getString("EmptyBrowser.confirmRemoveMarkedClusters.Yes"),
+                    Tools.getString("EmptyBrowser.confirmRemoveMarkedClusters.No"))) {
+                return;
+            }
+            swingUtils.invokeLater(() -> {
+                removeMarkedClustersButton.setEnabled(false);
+                loadMarkedClustersButton.setEnabled(false);
+                unloadMarkedClustersButton.setEnabled(false);
+            });
+            Tools.stopClusters(selectedRunningClusters);
+            application.removeClusters(selectedClusters);
+            final String saveFile = application.getDefaultSaveFile();
+            userConfig.saveConfig(saveFile, false);
+            mainPanel.repaint();
+            swingUtils.invokeLater(() -> {
+                for (final Cluster cluster : selectedClusters) {
+                    final JPanel p = clusterBoxBackgrounds.get(cluster);
+                    if (p != null) {
+                        clusterBoxBackgrounds.remove(cluster);
+                        allClusterCheckboxes.remove(cluster);
+                        allLoadButtons.remove(cluster);
+                        mainPanel.remove(p);
+                        emptyBrowser.reloadTreeMenu(getNode());
+                    }
+                }
+            });
         });
         thread.start();
     }
@@ -205,103 +220,74 @@ public final class AllHostsInfo extends Info {
         mainPanel.setBackground(Color.WHITE);
 
         final Set<Cluster> clusters = allClusters.getClusterSet();
-        if (clusters != null) {
-            final JPanel bPanel = new JPanel(new BorderLayout());
-            bPanel.setMaximumSize(new Dimension(10000, 60));
-            final JPanel markedPanel = new JPanel(new FlowLayout(FlowLayout.LEADING));
-            markedPanel.setBackground(Browser.BUTTON_PANEL_BACKGROUND);
-            /* start marked clusters */
-            loadMarkedClustersButton.setEnabled(false);
-            markedPanel.add(loadMarkedClustersButton);
+        final JPanel bPanel = new JPanel(new BorderLayout());
+        bPanel.setMaximumSize(new Dimension(10000, 60));
+        final JPanel markedPanel = new JPanel(new FlowLayout(FlowLayout.LEADING));
+        markedPanel.setBackground(Browser.BUTTON_PANEL_BACKGROUND);
+        /* start marked clusters */
+        loadMarkedClustersButton.setEnabled(false);
+        markedPanel.add(loadMarkedClustersButton);
 
-            /* stop marked clusters */
-            unloadMarkedClustersButton.setEnabled(false);
-            markedPanel.add(unloadMarkedClustersButton);
-            /* remove marked clusters */
-            removeMarkedClustersButton.setEnabled(false);
-            markedPanel.add(removeMarkedClustersButton);
+        /* stop marked clusters */
+        unloadMarkedClustersButton.setEnabled(false);
+        markedPanel.add(unloadMarkedClustersButton);
+        /* remove marked clusters */
+        removeMarkedClustersButton.setEnabled(false);
+        markedPanel.add(removeMarkedClustersButton);
 
-            bPanel.add(markedPanel, BorderLayout.CENTER);
-            /* actions menu */
-            bPanel.add(getActionsButton(), BorderLayout.LINE_END);
-            infoPanel.add(bPanel);
-            for (final Cluster cluster : clusters) {
-                addClusterBox(cluster);
-            }
-            /* quick cluster box. */
-            addQuickClusterBox();
+        bPanel.add(markedPanel, BorderLayout.CENTER);
+        /* actions menu */
+        bPanel.add(getActionsButton(), BorderLayout.LINE_END);
+        infoPanel.add(bPanel);
+        for (final Cluster cluster : clusters) {
+            addClusterBox(cluster);
+        }
+        /* quick cluster box. */
+        addQuickClusterBox();
 
-            /* start marked clusters action listener */
-            loadMarkedClustersButton.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(final ActionEvent e) {
-                    LOG.debug1("getInfoPanel: BUTTON: load marked");
-                    final Thread thread = new Thread(new Runnable() {
-                        @Override
-                        public void run() {
-                            loadMarkedClusters();
-                        }
-                    });
-                    thread.start();
-                }
-            });
+        /* start marked clusters action listener */
+        loadMarkedClustersButton.addActionListener(e -> {
+            LOG.debug1("getInfoPanel: BUTTON: load marked");
+            final Thread thread = new Thread(this::loadMarkedClusters);
+            thread.start();
+        });
 
-            /* stop marked clusters action listener */
-            unloadMarkedClustersButton.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(final ActionEvent e) {
-                    LOG.debug1("getInfoPanel: BUTTON: unload marked");
-                    final Thread t = new Thread(new Runnable() {
-                        @Override
-                        public void run() {
-                            unloadMarkedClusters(clusters);
-                        }
-                    });
-                    t.start();
-                }
-            });
+        /* stop marked clusters action listener */
+        unloadMarkedClustersButton.addActionListener(e -> {
+            LOG.debug1("getInfoPanel: BUTTON: unload marked");
+            final Thread t = new Thread(() -> unloadMarkedClusters(clusters));
+            t.start();
+        });
 
-            /* remove marked clusters action listener */
-            removeMarkedClustersButton.addActionListener(
-                    new ActionListener() {
-                        @Override
-                        public void actionPerformed(final ActionEvent e) {
-                            LOG.debug1("getInfoPanel: BUTTON: remove marked");
-                            removeMarkedClusters();
-                        }
-                    });
+        /* remove marked clusters action listener */
+        removeMarkedClustersButton.addActionListener(e -> {
+            LOG.debug1("getInfoPanel: BUTTON: remove marked");
+            removeMarkedClusters();
+        });
 
-            /* mark checkbox item listeners */
-            for (final Cluster cluster : clusters) {
-                addCheckboxListener(cluster);
-            }
+        /* mark checkbox item listeners */
+        for (final Cluster cluster : clusters) {
+            addCheckboxListener(cluster);
         }
 
         final JPanel mPanel = new JPanel(new FlowLayout(FlowLayout.LEADING));
         mPanel.add(mainPanel);
         mPanel.setBackground(Color.WHITE);
-        final JScrollPane clustersPane = new JScrollPane(mPanel,
-                                                         JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
-                                                         JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+        final JScrollPane clustersPane =
+                new JScrollPane(mPanel, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 
         infoPanel.add(clustersPane);
-        final Thread t = new Thread(new Runnable() {
-            @Override
-            public void run() {
-                Tools.sleep(3000);
-                if (application.getAutoHosts().isEmpty() && !application.getAutoClusters().isEmpty()) {
-                    swingUtils.invokeLater(new Runnable() {
-                        @Override
-                        public void run() {
-                            for (final Map.Entry<Cluster, MyButton> clusterEntry : allLoadButtons.entrySet()) {
-                                if (clusterEntry.getKey().getClusterTab() == null
-                                    && application.getAutoClusters().contains(clusterEntry.getKey().getName())) {
-                                    clusterEntry.getValue().pressButton();
-                                }
-                            }
+        final Thread t = new Thread(() -> {
+            Tools.sleep(3000);
+            if (application.getAutoHosts().isEmpty() && !application.getAutoClusters().isEmpty()) {
+                swingUtils.invokeLater(() -> {
+                    for (final Map.Entry<Cluster, MyButton> clusterEntry : allLoadButtons.entrySet()) {
+                        if (clusterEntry.getKey().getClusterTab() == null && application.getAutoClusters()
+                                .contains(clusterEntry.getKey().getName())) {
+                            clusterEntry.getValue().pressButton();
                         }
-                    });
-                }
+                    }
+                });
             }
         });
         t.start();
@@ -360,38 +346,24 @@ public final class AllHostsInfo extends Info {
     private MyButton loadClusterButton(final Cluster cluster, final JCheckBox markWi) {
         final MyButton loadClusterBtn = widgetFactory.createButton(Tools.getString("EmptyBrowser.LoadClusterButton"));
         allLoadButtons.put(cluster, loadClusterBtn);
-        loadClusterBtn.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(final ActionEvent e) {
-                LOG.debug1("LoadClusterButton: BUTTON: load cluster: " + cluster.getName());
-                final Thread thread = new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        swingUtils.invokeAndWait(new Runnable() {
-                            @Override
-                            public void run() {
-                                loadClusterBtn.setEnabled(false);
-                            }
-                        });
-                        final Collection<Cluster> selectedClusters = new ArrayList<Cluster>();
-                        selectedClusters.add(cluster);
-                        userConfig.startClusters(selectedClusters);
+        loadClusterBtn.addActionListener(e -> {
+            LOG.debug1("LoadClusterButton: BUTTON: load cluster: " + cluster.getName());
+            final Thread thread = new Thread(() -> {
+                swingUtils.invokeAndWait(() -> loadClusterBtn.setEnabled(false));
+                final Collection<Cluster> selectedClusters = new ArrayList<>();
+                selectedClusters.add(cluster);
+                userConfig.startClusters(selectedClusters);
 
-                        if (cluster.getClusterTab() == null) {
-                            loadClusterBtn.setEnabled(true);
-                        } else {
-                            swingUtils.invokeLater(new Runnable() {
-                                @Override
-                                public void run() {
-                                    clusterBoxBackgrounds.get(cluster).setBackground(Color.GREEN);
-                                    markWi.setSelected(false);
-                                }
-                            });
-                        }
-                    }
-                });
-                thread.start();
-            }
+                if (cluster.getClusterTab() == null) {
+                    loadClusterBtn.setEnabled(true);
+                } else {
+                    swingUtils.invokeLater(() -> {
+                        clusterBoxBackgrounds.get(cluster).setBackground(Color.GREEN);
+                        markWi.setSelected(false);
+                    });
+                }
+            });
+            thread.start();
         });
         return loadClusterBtn;
     }
@@ -404,7 +376,7 @@ public final class AllHostsInfo extends Info {
         label.setLayout(new BoxLayout(label, BoxLayout.PAGE_AXIS));
         final JTextField clusterTF = new MTextField(CLUSTER_NAME_PLACE_HOLDER);
         label.add(clusterTF);
-        final Collection<JTextField> hostsTF = new ArrayList<JTextField>();
+        final Collection<JTextField> hostsTF = new ArrayList<>();
         for (int i = 1; i < 3; i++) {
             final JTextField nl = new MTextField("node" + i + "...", 15);
             nl.setToolTipText("<html><b>enter the node name or ip</b><br>node"
@@ -447,72 +419,62 @@ public final class AllHostsInfo extends Info {
         final MyButton quickClusterBtn = widgetFactory.createButton(Tools.getString("EmptyBrowser.LoadClusterButton"));
         quickClusterBtn.setEnabled(false);
 
-        quickClusterBtn.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(final ActionEvent e) {
-                LOG.debug1("quickClusterButton: BUTTON: quick cluster");
-                final Thread t = new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        final String clusterName = clusterTF.getText();
-                        final Cluster cluster = clusterProvider.get();
-                        final String newClusterName;
-                        if (CLUSTER_NAME_PLACE_HOLDER.equals(clusterName)) {
-                            newClusterName = DEFAULT_CLUSTER_NAME;
-                        } else {
-                            newClusterName = clusterName;
-                        }
-                        if (allClusters.isClusterName(newClusterName)) {
-                            cluster.setName(allClusters.getNextClusterName(newClusterName + ' '));
-                        } else {
-                            cluster.setName(newClusterName);
-                        }
-                        application.addClusterToClusters(cluster);
-                        addClusterBox(cluster);
-                        addCheckboxListener(cluster);
-                        for (final JTextField hostTF : hostsTF) {
-                            final String entered = hostTF.getText();
-                            String hostName;
-                            String username = null;
-                            final int a = entered.indexOf('@');
-                            if (a > 0) {
-                                username = entered.substring(0, a);
-                                hostName = entered.substring(a + 1, entered.length());
-                            } else {
-                                hostName = entered;
-                            }
-                            final int p = hostName.indexOf(':');
-                            String port = null;
-                            if (p > 0) {
-                                port = hostName.substring(p + 1, hostName.length());
-                                hostName = hostName.substring(0, p);
-                            }
-                            final Host host = hostFactory.createInstance(hostName);
-                            if (username == null) {
-                                host.setUsername(Host.ROOT_USER);
-                            } else {
-                                host.setUseSudo(true);
-                                host.setUsername(username);
-                            }
-                            if (port == null) {
-                                host.setSSHPort(Host.DEFAULT_SSH_PORT);
-                            } else {
-                                host.setSSHPort(port);
-                            }
-                            host.setCluster(cluster);
-                            host.setHostname(hostName);
-                            cluster.addHost(host);
-                            application.addHostToHosts(host);
-                            mainPresenter.allHostsUpdate();
-                        }
-                        application.addClusterToClusters(cluster);
-                        final Collection<Cluster> selectedClusters = new ArrayList<Cluster>();
-                        selectedClusters.add(cluster);
-                        userConfig.startClusters(selectedClusters);
+        quickClusterBtn.addActionListener(e -> {
+            LOG.debug1("quickClusterButton: BUTTON: quick cluster");
+            final Thread t = new Thread(() -> {
+                final String clusterName = clusterTF.getText();
+                final Cluster cluster = clusterProvider.get();
+                final String newClusterName;
+                if (CLUSTER_NAME_PLACE_HOLDER.equals(clusterName)) {
+                    newClusterName = DEFAULT_CLUSTER_NAME;
+                } else {
+                    newClusterName = clusterName;
+                }
+                if (allClusters.isClusterName(newClusterName)) {
+                    cluster.setName(allClusters.getNextClusterName(newClusterName + ' '));
+                } else {
+                    cluster.setName(newClusterName);
+                }
+                application.addClusterToClusters(cluster);
+                addClusterBox(cluster);
+                addCheckboxListener(cluster);
+                for (final JTextField hostTF : hostsTF) {
+                    final String entered = hostTF.getText();
+                    String hostName;
+                    String username = null;
+                    final int a = entered.indexOf('@');
+                    if (a > 0) {
+                        username = entered.substring(0, a);
+                        hostName = entered.substring(a + 1);
+                    } else {
+                        hostName = entered;
                     }
-                });
-                t.start();
-            }
+                    final int p = hostName.indexOf(':');
+                    String port = null;
+                    if (p > 0) {
+                        port = hostName.substring(p + 1);
+                        hostName = hostName.substring(0, p);
+                    }
+                    final Host host = hostFactory.createInstance(hostName);
+                    if (username == null) {
+                        host.setUsername(Host.ROOT_USER);
+                    } else {
+                        host.setUseSudo(true);
+                        host.setUsername(username);
+                    }
+                    host.setSSHPort(Objects.requireNonNullElse(port, Host.DEFAULT_SSH_PORT));
+                    host.setCluster(cluster);
+                    host.setHostname(hostName);
+                    cluster.addHost(host);
+                    application.addHostToHosts(host);
+                    mainPresenter.allHostsUpdate();
+                }
+                application.addClusterToClusters(cluster);
+                final Collection<Cluster> selectedClusters = new ArrayList<>();
+                selectedClusters.add(cluster);
+                userConfig.startClusters(selectedClusters);
+            });
+            t.start();
         });
 
         textfieldListener(clusterTF, quickClusterBtn);
@@ -526,12 +488,7 @@ public final class AllHostsInfo extends Info {
     private void textfieldListener(final JTextField textfield, final MyButton button) {
         textfield.getDocument().addDocumentListener(new DocumentListener() {
                     private void check() {
-                        swingUtils.invokeLater(new Runnable() {
-                            @Override
-                            public void run() {
-                                button.setEnabled(true);
-                            }
-                        });
+                        swingUtils.invokeLater(() -> button.setEnabled(true));
                     }
 
                     @Override
@@ -560,52 +517,31 @@ public final class AllHostsInfo extends Info {
         if (loadButton == null) {
             return;
         }
-        swingUtils.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                loadButton.setEnabled(false);
-                clusterBoxBackgrounds.get(cluster).setBackground(Color.GREEN);
-            }
+        swingUtils.invokeLater(() -> {
+            loadButton.setEnabled(false);
+            clusterBoxBackgrounds.get(cluster).setBackground(Color.GREEN);
         });
     }
 
     public void setDisconnected(final Cluster cluster) {
         final MyButton loadButton = allLoadButtons.get(cluster);
         if (loadButton != null) {
-            swingUtils.invokeLater(new Runnable() {
-                @Override
-                public void run() {
-                    loadButton.setEnabled(true);
-                }
-            });
+            swingUtils.invokeLater(() -> loadButton.setEnabled(true));
         }
     }
 
     /** Adds checkbox listener for this cluster's checkbox. */
     public void addCheckboxListener(final Cluster cluster) {
         final JCheckBox wi = allClusterCheckboxes.get(cluster);
-        wi.addItemListener(new ItemListener() {
-            @Override
-            public void itemStateChanged(final ItemEvent e) {
-                final Thread thread = new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        allCheckboxesListener(wi);
-                    }
-                });
-                thread.start();
-            }
+        wi.addItemListener(e -> {
+            final Thread thread = new Thread(() -> allCheckboxesListener(wi));
+            thread.start();
         });
     }
 
     private void loadMarkedClusters() {
-        swingUtils.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                loadMarkedClustersButton.setEnabled(false);
-            }
-        });
-        final Collection<Cluster> selectedClusters = new ArrayList<Cluster>();
+        swingUtils.invokeLater(() -> loadMarkedClustersButton.setEnabled(false));
+        final Collection<Cluster> selectedClusters = new ArrayList<>();
         for (final Map.Entry<Cluster, JCheckBox> checkBoxEntry : allClusterCheckboxes.entrySet()) {
             if (checkBoxEntry.getKey().getClusterTab() == null) {
                 final JCheckBox wi = checkBoxEntry.getValue();
@@ -615,47 +551,31 @@ public final class AllHostsInfo extends Info {
                 } else if (checkBoxEntry.getKey().getClusterTab() == null) {
                     final MyButton loadButton = allLoadButtons.get(checkBoxEntry.getKey());
                     if (loadButton != null) {
-                        swingUtils.invokeLater(new Runnable() {
-                            @Override
-                            public void run() {
-                                loadButton.setEnabled(true);
-                            }
-                        });
+                        swingUtils.invokeLater(() -> loadButton.setEnabled(true));
                     }
                 }
             }
         }
         userConfig.startClusters(selectedClusters);
-        swingUtils.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                for (final Map.Entry<Cluster, JCheckBox> checkBoxEntry : allClusterCheckboxes.entrySet()) {
-                    if (selectedClusters.contains(checkBoxEntry.getKey())) {
-                        checkBoxEntry.getValue().setSelected(false);
-                    }
+        swingUtils.invokeLater(() -> {
+            for (final Map.Entry<Cluster, JCheckBox> checkBoxEntry : allClusterCheckboxes.entrySet()) {
+                if (selectedClusters.contains(checkBoxEntry.getKey())) {
+                    checkBoxEntry.getValue().setSelected(false);
                 }
             }
         });
     }
 
     private void unloadMarkedClusters(final Iterable<Cluster> clusters) {
-        swingUtils.invokeAndWait(new Runnable() {
-            @Override
-            public void run() {
-                unloadMarkedClustersButton.setEnabled(false);
-            }
-        });
-        final Collection<Cluster> selectedClusters = new ArrayList<Cluster>();
+        swingUtils.invokeAndWait(() -> unloadMarkedClustersButton.setEnabled(false));
+        final Collection<Cluster> selectedClusters = new ArrayList<>();
         for (final Cluster cluster : clusters) {
             if (cluster.getClusterTab() != null) {
                 final JCheckBox wi = allClusterCheckboxes.get(cluster);
                 if (wi.isSelected()) {
-                    swingUtils.invokeLater(new Runnable() {
-                        @Override
-                        public void run() {
-                            clusterBoxBackgrounds.get(cluster).setBackground(Color.WHITE);
-                            allClusterCheckboxes.get(cluster).setSelected(false);
-                        }
+                    swingUtils.invokeLater(() -> {
+                        clusterBoxBackgrounds.get(cluster).setBackground(Color.WHITE);
+                        allClusterCheckboxes.get(cluster).setSelected(false);
                     });
                     selectedClusters.add(cluster);
                 }
@@ -682,52 +602,46 @@ public final class AllHostsInfo extends Info {
         final int notRunningCount = nrc;
         if (wi.isSelected()) {
             /* disable all start cluster buttons */
-            swingUtils.invokeLater(new Runnable() {
-                @Override
-                public void run() {
-                    if (notRunningCount >= 1) {
-                        for (final Cluster cluster : allClusterCheckboxes.keySet()) {
-                            final MyButton loadButton = allLoadButtons.get(cluster);
-                            if (loadButton != null) {
-                                loadButton.setEnabled(false);
-                            }
+            swingUtils.invokeLater(() -> {
+                if (notRunningCount >= 1) {
+                    for (final Cluster cluster : allClusterCheckboxes.keySet()) {
+                        final MyButton loadButton = allLoadButtons.get(cluster);
+                        if (loadButton != null) {
+                            loadButton.setEnabled(false);
                         }
-                        /* enable start etc marked clusters button */
-                        loadMarkedClustersButton.setEnabled(runningCount == 0);
                     }
-                    if (runningCount >= 1) {
-                        unloadMarkedClustersButton.setEnabled(notRunningCount == 0);
-                    }
-                    //TODO: still not working
-                    removeMarkedClustersButton.setEnabled(true);
+                    /* enable start etc marked clusters button */
+                    loadMarkedClustersButton.setEnabled(runningCount == 0);
                 }
+                if (runningCount >= 1) {
+                    unloadMarkedClustersButton.setEnabled(notRunningCount == 0);
+                }
+                //TODO: still not working
+                removeMarkedClustersButton.setEnabled(true);
             });
         } else {
             /* deselecting */
-            swingUtils.invokeLater(new Runnable() {
-                @Override
-                public void run() {
-                    if (notRunningCount == 0) {
-                        for (final Cluster cluster : allClusterCheckboxes.keySet()) {
-                            final MyButton loadButton = allLoadButtons.get(cluster);
-                            if (loadButton != null && cluster.getClusterTab() == null) {
-                                loadButton.setEnabled(true);
-                            }
-                        }
-                        loadMarkedClustersButton.setEnabled(false);
-                        if (runningCount > 0) {
-                            unloadMarkedClustersButton.setEnabled(true);
+            swingUtils.invokeLater(() -> {
+                if (notRunningCount == 0) {
+                    for (final Cluster cluster : allClusterCheckboxes.keySet()) {
+                        final MyButton loadButton = allLoadButtons.get(cluster);
+                        if (loadButton != null && cluster.getClusterTab() == null) {
+                            loadButton.setEnabled(true);
                         }
                     }
-                    if (runningCount == 0) {
-                        unloadMarkedClustersButton.setEnabled(false);
-                        if (notRunningCount > 0) {
-                            loadMarkedClustersButton.setEnabled(true);
-                        }
+                    loadMarkedClustersButton.setEnabled(false);
+                    if (runningCount > 0) {
+                        unloadMarkedClustersButton.setEnabled(true);
                     }
-                    if (runningCount + notRunningCount == 0) {
-                        removeMarkedClustersButton.setEnabled(false);
+                }
+                if (runningCount == 0) {
+                    unloadMarkedClustersButton.setEnabled(false);
+                    if (notRunningCount > 0) {
+                        loadMarkedClustersButton.setEnabled(true);
                     }
+                }
+                if (runningCount + notRunningCount == 0) {
+                    removeMarkedClustersButton.setEnabled(false);
                 }
             });
         }
@@ -735,22 +649,17 @@ public final class AllHostsInfo extends Info {
 
     @Override
     public List<UpdatableItem> createPopup() {
-        final List<UpdatableItem> items = new ArrayList<UpdatableItem>();
+        final List<UpdatableItem> items = new ArrayList<>();
 
         /* host wizard */
         final MyMenuItem newHostWizardItem =
-            menuFactory.createMenuItem(Tools.getString("EmptyBrowser.NewHostWizard"),
-                           HOST_ICON,
-                           null,
-                           new AccessMode(AccessMode.RO, AccessMode.NORMAL),
-                           new AccessMode(AccessMode.RO, AccessMode.NORMAL))
-                .addAction(new MenuAction() {
-                        @Override
-                        public void run(final String text) {
-                    final Host host = hostFactory.createInstance();
-                    final AddHostDialog addHostDialog = addHostDialogProvider.get();
-                    addHostDialog.showDialogs(host);
-                }});
+                menuFactory.createMenuItem(Tools.getString("EmptyBrowser.NewHostWizard"), HOST_ICON, null,
+                                new AccessMode(AccessMode.RO, AccessMode.NORMAL), new AccessMode(AccessMode.RO, AccessMode.NORMAL))
+                        .addAction(text -> {
+                            final Host host = hostFactory.createInstance();
+                            final AddHostDialog addHostDialog = addHostDialogProvider.get();
+                            addHostDialog.showDialogs(host);
+                        });
         items.add(newHostWizardItem);
         mainData.registerAddHostButton(newHostWizardItem);
         return items;

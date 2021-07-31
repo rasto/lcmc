@@ -26,8 +26,6 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
@@ -46,32 +44,32 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.text.Document;
 
-import lcmc.common.ui.SpringUtilities;
-import lcmc.common.ui.Browser;
+import lcmc.cluster.domain.Cluster;
+import lcmc.cluster.service.ssh.ExecCommandConfig;
+import lcmc.cluster.service.ssh.Ssh;
 import lcmc.cluster.ui.ClusterBrowser;
-import lcmc.common.ui.utils.SwingUtils;
-import lcmc.crm.ui.CrmGraph;
-import lcmc.host.ui.HostBrowser;
 import lcmc.cluster.ui.widget.WidgetFactory;
 import lcmc.common.domain.AccessMode;
 import lcmc.common.domain.Application;
-import lcmc.cluster.domain.Cluster;
 import lcmc.common.domain.ColorText;
-import lcmc.host.domain.Host;
+import lcmc.common.domain.ExecCallback;
+import lcmc.common.domain.util.Tools;
+import lcmc.common.ui.Browser;
+import lcmc.common.ui.Info;
+import lcmc.common.ui.SpringUtilities;
+import lcmc.common.ui.utils.ButtonCallback;
+import lcmc.common.ui.utils.ComponentWithTest;
+import lcmc.common.ui.utils.MyButton;
+import lcmc.common.ui.utils.SwingUtils;
+import lcmc.common.ui.utils.UpdatableItem;
 import lcmc.crm.domain.ClusterStatus;
 import lcmc.crm.domain.PtestData;
-import lcmc.common.ui.Info;
-import lcmc.common.ui.utils.ButtonCallback;
 import lcmc.crm.service.CRM;
-import lcmc.common.ui.utils.ComponentWithTest;
-import lcmc.common.domain.ExecCallback;
+import lcmc.crm.ui.CrmGraph;
+import lcmc.host.domain.Host;
+import lcmc.host.ui.HostBrowser;
 import lcmc.logger.Logger;
 import lcmc.logger.LoggerFactory;
-import lcmc.common.ui.utils.MyButton;
-import lcmc.common.domain.util.Tools;
-import lcmc.common.ui.utils.UpdatableItem;
-import lcmc.cluster.service.ssh.ExecCommandConfig;
-import lcmc.cluster.service.ssh.Ssh;
 
 /**
  * This class holds info data for a host.
@@ -172,13 +170,10 @@ public class HostInfo extends Info {
                 @Override
                 public void done(final String answer) {
                     ta.setText(answer);
-                    swingUtils.invokeLater(new Runnable() {
-                    @Override
-                        public void run() {
-                            crmConfigureShowButton.setEnabled(true);
-                            hostInfoButton.setEnabled(true);
-                            crmShowInProgress = false;
-                        }
+                    swingUtils.invokeLater(() -> {
+                        crmConfigureShowButton.setEnabled(true);
+                        hostInfoButton.setEnabled(true);
+                        crmShowInProgress = false;
                     });
                 }
 
@@ -186,48 +181,37 @@ public class HostInfo extends Info {
                 public void doneError(final String answer, final int errorCode) {
                     ta.setText(answer);
                     LOG.sshError(host, "", answer, "", errorCode);
-                    swingUtils.invokeLater(new Runnable() {
-                    @Override
-                        public void run() {
-                            crmConfigureCommitButton.setEnabled(false);
-                        }
-                    });
+                    swingUtils.invokeLater(() -> crmConfigureCommitButton.setEnabled(false));
                 }
 
             };
-        hostInfoButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(final ActionEvent e) {
-                registerComponentEditAccessMode(ta, new AccessMode(AccessMode.GOD, AccessMode.NORMAL));
-                crmInfoShowing = true;
-                hostInfoButton.setEnabled(false);
-                crmConfigureCommitButton.setEnabled(false);
-                String command = "HostBrowser.getHostInfo";
-                if (!host.getHostParser().hasCorosyncInitScript()) {
-                    command = "HostBrowser.getHostInfoHeartbeat";
-                }
-                host.execCommand(new ExecCommandConfig().commandString(command)
-                                                        .execCallback(execCallback)
-                                                        .silentCommand()
-                                                        .silentOutput()
-                                                        .sshCommandTimeout(Ssh.DEFAULT_COMMAND_TIMEOUT));
+        hostInfoButton.addActionListener(e -> {
+            registerComponentEditAccessMode(ta, new AccessMode(AccessMode.GOD, AccessMode.NORMAL));
+            crmInfoShowing = true;
+            hostInfoButton.setEnabled(false);
+            crmConfigureCommitButton.setEnabled(false);
+            String command = "HostBrowser.getHostInfo";
+            if (!host.getHostParser().hasCorosyncInitScript()) {
+                command = "HostBrowser.getHostInfoHeartbeat";
             }
+            host.execCommand(new ExecCommandConfig().commandString(command)
+                    .execCallback(execCallback)
+                    .silentCommand()
+                    .silentOutput()
+                    .sshCommandTimeout(Ssh.DEFAULT_COMMAND_TIMEOUT));
         });
         host.registerEnableOnConnect(hostInfoButton);
 
-        crmConfigureShowButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(final ActionEvent e) {
-                registerComponentEditAccessMode(ta, new AccessMode(AccessMode.ADMIN, AccessMode.NORMAL));
-                updateAdvancedPanels();
-                crmShowInProgress = true;
-                crmInfoShowing = false;
-                crmConfigureShowButton.setEnabled(false);
-                crmConfigureCommitButton.setEnabled(false);
-                host.execCommand(new ExecCommandConfig().commandString("HostBrowser.getCrmConfigureShow")
-                                                        .execCallback(execCallback)
-                                                        .sshCommandTimeout(Ssh.DEFAULT_COMMAND_TIMEOUT));
-            }
+        crmConfigureShowButton.addActionListener(e -> {
+            registerComponentEditAccessMode(ta, new AccessMode(AccessMode.ADMIN, AccessMode.NORMAL));
+            updateAdvancedPanels();
+            crmShowInProgress = true;
+            crmInfoShowing = false;
+            crmConfigureShowButton.setEnabled(false);
+            crmConfigureCommitButton.setEnabled(false);
+            host.execCommand(new ExecCommandConfig().commandString("HostBrowser.getCrmConfigureShow")
+                    .execCallback(execCallback)
+                    .sshCommandTimeout(Ssh.DEFAULT_COMMAND_TIMEOUT));
         });
         final CrmGraph crmg = getBrowser().getClusterBrowser().getCrmGraph();
         final Document taDocument = ta.getDocument();
@@ -303,25 +287,17 @@ public class HostInfo extends Info {
             }
         };
         addMouseOverListener(crmConfigureCommitButton, buttonCallback);
-        crmConfigureCommitButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(final ActionEvent e) {
-                crmConfigureCommitButton.setEnabled(false);
-                final Thread thread = new Thread(
-                    new Runnable() {
-                        @Override
-                        public void run() {
-                            getBrowser().getClusterBrowser().clStatusLock();
-                            try {
-                                CRM.crmConfigureCommit(host, ta.getText(), Application.RunMode.LIVE);
-                            } finally {
-                                getBrowser().getClusterBrowser().clStatusUnlock();
-                            }
-                        }
-                    }
-                );
-                thread.start();
-            }
+        crmConfigureCommitButton.addActionListener(e -> {
+            crmConfigureCommitButton.setEnabled(false);
+            final Thread thread = new Thread(() -> {
+                getBrowser().getClusterBrowser().clStatusLock();
+                try {
+                    CRM.crmConfigureCommit(host, ta.getText(), Application.RunMode.LIVE);
+                } finally {
+                    getBrowser().getClusterBrowser().clStatusUnlock();
+                }
+            });
+            thread.start();
         });
 
         final JPanel mainPanel = new JPanel();
@@ -402,7 +378,7 @@ public class HostInfo extends Info {
     }
 
     public ColorText[] getSubtextsForGraph(final Application.RunMode runMode) {
-        final List<ColorText> texts = new ArrayList<ColorText>();
+        final List<ColorText> texts = new ArrayList<>();
         if (getHost().isConnected()) {
             if (!getHost().isCrmStatusOk()) {
                texts.add(new ColorText("waiting for Pacemaker...", null, Color.BLACK));
@@ -410,7 +386,7 @@ public class HostInfo extends Info {
         } else {
             texts.add(new ColorText("connecting...", null, Color.BLACK));
         }
-        return texts.toArray(new ColorText[texts.size()]);
+        return texts.toArray(new ColorText[0]);
     }
 
     public String getIconTextForGraph(final Application.RunMode runMode) {

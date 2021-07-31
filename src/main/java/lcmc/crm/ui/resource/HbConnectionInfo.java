@@ -21,12 +21,33 @@
  */
 package lcmc.crm.ui.resource;
 
-import com.google.common.base.Optional;
+import java.awt.BorderLayout;
+import java.awt.Dimension;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReadWriteLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
+
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Provider;
+import javax.swing.BoxLayout;
+import javax.swing.JComponent;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.SpringLayout;
+import javax.swing.tree.DefaultMutableTreeNode;
+
 import lcmc.cluster.ui.ClusterBrowser;
 import lcmc.cluster.ui.widget.Check;
 import lcmc.common.domain.AccessMode;
 import lcmc.common.domain.Application;
-import lcmc.common.domain.ResourceValue;
 import lcmc.common.domain.Value;
 import lcmc.common.domain.util.Tools;
 import lcmc.common.ui.Browser;
@@ -43,30 +64,16 @@ import lcmc.crm.domain.PtestData;
 import lcmc.crm.service.CRM;
 import lcmc.host.domain.Host;
 
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Provider;
-import javax.swing.*;
-import javax.swing.tree.DefaultMutableTreeNode;
-import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.util.*;
-import java.util.List;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReadWriteLock;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
-
 /**
- * This class describes a connection between two heartbeat services.
- * It can be order, colocation or both.
+ * This class describes a connection between two heartbeat services. It can be order, colocation or both.
  */
 @Named("hbConnectionInfo")
 public class HbConnectionInfo extends EditableInfo {
     private JComponent infoPanel = null;
-    /** Constraints. */
-    private final Collection<HbConstraintInterface> constraints = new ArrayList<HbConstraintInterface>();
+    /**
+     * Constraints.
+     */
+    private final Collection<HbConstraintInterface> constraints = new ArrayList<>();
     private final ReadWriteLock mConstraintsLock = new ReentrantReadWriteLock();
     private final Lock mConstraintsReadLock = mConstraintsLock.readLock();
     private final Lock mConstraintsWriteLock = mConstraintsLock.writeLock();
@@ -74,8 +81,8 @@ public class HbConnectionInfo extends EditableInfo {
     private ServiceInfo lastServiceInfoWithRsc = null;
     private ServiceInfo lastServiceInfoParent = null;
     private ServiceInfo lastServiceInfoChild = null;
-    private final Map<String, HbColocationInfo> colocationIds = new LinkedHashMap<String, HbColocationInfo>();
-    private final Map<String, HbOrderInfo> orderIds = new LinkedHashMap<String, HbOrderInfo>();
+    private final Map<String, HbColocationInfo> colocationIds = new LinkedHashMap<>();
+    private final Map<String, HbOrderInfo> orderIds = new LinkedHashMap<>();
     @Inject
     private Provider<HbColocationInfo> colocationInfoProvider;
     @Inject
@@ -90,7 +97,7 @@ public class HbConnectionInfo extends EditableInfo {
     private ClusterTreeMenu clusterTreeMenu;
 
     public void init(final Browser browser) {
-        super.einit(Optional.<ResourceValue>absent(), "HbConnectionInfo", browser);
+        super.einit(Optional.empty(), "HbConnectionInfo", browser);
     }
 
     /** Returns browser object of this info. */
@@ -100,6 +107,7 @@ public class HbConnectionInfo extends EditableInfo {
     }
 
     /** Returns whether one of the services are newly added. */
+    @Override
     public final boolean isNew() {
         return (lastServiceInfoRsc != null && lastServiceInfoRsc.getService().isNew())
                 || (lastServiceInfoWithRsc != null && lastServiceInfoWithRsc.getService().isNew())
@@ -200,21 +208,16 @@ public class HbConnectionInfo extends EditableInfo {
 
     void apply(final Host dcHost, final Application.RunMode runMode) {
         if (Application.isLive(runMode)) {
-            swingUtils.invokeAndWait(new Runnable() {
-                @Override
-                public void run() {
-                    getApplyButton().setEnabled(false);
-                    getRevertButton().setEnabled(false);
-                    getApplyButton().setToolTipText("");
-                }
+            swingUtils.invokeAndWait(() -> {
+                getApplyButton().setEnabled(false);
+                getRevertButton().setEnabled(false);
+                getApplyButton().setToolTipText("");
             });
         }
-        final Collection<HbConstraintInterface> constraintsCopy = new ArrayList<HbConstraintInterface>();
+        final Collection<HbConstraintInterface> constraintsCopy = new ArrayList<>();
         mConstraintsReadLock.lock();
         try {
-            for (final HbConstraintInterface c : constraints) {
-                constraintsCopy.add(c);
-            }
+            constraintsCopy.addAll(constraints);
         } finally {
             mConstraintsReadLock.unlock();
         }
@@ -230,7 +233,7 @@ public class HbConnectionInfo extends EditableInfo {
     @Override
     public Check checkResourceFields(final String param, final String[] params) {
         mConstraintsReadLock.lock();
-        final Check check = new Check(new ArrayList<String>(), new ArrayList<String>());
+        final Check check = new Check(new ArrayList<>(), new ArrayList<>());
         try {
             for (final HbConstraintInterface c : constraints) {
                 check.addCheck(c.checkResourceFields(param, c.getParametersFromXML(), true));
@@ -372,57 +375,32 @@ public class HbConnectionInfo extends EditableInfo {
                 final JPanel panel = getLabels(c);
 
                 optionsPanel.add(panel);
-                c.addParams(optionsPanel,
-                            params,
-                            application.getServiceLabelWidth(),
-                            application.getServiceFieldWidth(),
-                            null);
+                c.addParams(optionsPanel, params, application.getServiceLabelWidth(), application.getServiceFieldWidth(), null);
             }
         } finally {
             mConstraintsReadLock.unlock();
         }
-        getApplyButton().addActionListener(
-            new ActionListener() {
-                @Override
-                public void actionPerformed(final ActionEvent e) {
-                    final Thread thread = new Thread(new Runnable() {
-                        @Override
-                        public void run() {
-                            getBrowser().clStatusLock();
-                            apply(getBrowser().getDCHost(), Application.RunMode.LIVE);
-                            getBrowser().clStatusUnlock();
-                        }
-                    });
-                    thread.start();
-                }
-            }
-        );
-        getRevertButton().addActionListener(
-            new ActionListener() {
-                @Override
-                public void actionPerformed(final ActionEvent e) {
-                    final Thread thread = new Thread(new Runnable() {
-                        @Override
-                        public void run() {
-                            getBrowser().clStatusLock();
-                            revert();
-                            getBrowser().clStatusUnlock();
-                        }
-                    });
-                    thread.start();
-                }
-            }
-        );
+        getApplyButton().addActionListener(e -> {
+            final Thread thread = new Thread(() -> {
+                getBrowser().clStatusLock();
+                apply(getBrowser().getDCHost(), Application.RunMode.LIVE);
+                getBrowser().clStatusUnlock();
+            });
+            thread.start();
+        });
+        getRevertButton().addActionListener(e -> {
+            final Thread thread = new Thread(() -> {
+                getBrowser().clStatusLock();
+                revert();
+                getBrowser().clStatusUnlock();
+            });
+            thread.start();
+        });
 
         /* apply button */
         addApplyButton(buttonPanel);
         addRevertButton(buttonPanel);
-        swingUtils.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                setApplyButtons(null, null);
-            }
-        });
+        swingUtils.invokeLater(() -> setApplyButtons(null, null));
         mainPanel.add(optionsPanel);
 
         final JPanel newPanel = new JPanel();
@@ -456,7 +434,7 @@ public class HbConnectionInfo extends EditableInfo {
 
     /** Removes colocations or orders. */
     private void removeOrdersOrColocations(final boolean isOrder) {
-        final Collection<HbConstraintInterface> constraintsToRemove = new ArrayList<HbConstraintInterface>();
+        final Collection<HbConstraintInterface> constraintsToRemove = new ArrayList<>();
         mConstraintsWriteLock.lock();
         boolean changed = false;
         try {
@@ -781,12 +759,10 @@ public class HbConnectionInfo extends EditableInfo {
     @Override
     public final void revert() {
         super.revert();
-        final Collection<HbConstraintInterface> constraintsCopy = new ArrayList<HbConstraintInterface>();
+        final Collection<HbConstraintInterface> constraintsCopy = new ArrayList<>();
         mConstraintsReadLock.lock();
         try {
-            for (final HbConstraintInterface c : constraints) {
-                constraintsCopy.add(c);
-            }
+            constraintsCopy.addAll(constraints);
         } finally {
             mConstraintsReadLock.unlock();
         }

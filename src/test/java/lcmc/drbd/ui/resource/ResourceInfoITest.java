@@ -2,8 +2,8 @@ package lcmc.drbd.ui.resource;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import java.util.Arrays;
 import java.util.LinkedHashSet;
+import java.util.List;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Tag;
@@ -61,7 +61,7 @@ final class ResourceInfoITest {
         final HostFactory hostFactory = AppContext.getBean(HostFactory.class);
 
         final ResourceInfo r1 = new ResourceInfo();
-        r1.init("name", new LinkedHashSet<>(Arrays.asList(hostFactory.createInstance())), clusterBrowser);
+        r1.init("name", new LinkedHashSet<>(List.of(hostFactory.createInstance())), clusterBrowser);
         final ResourceInfo r2 = new ResourceInfo();
         r2.init("name", null, clusterBrowser);
 
