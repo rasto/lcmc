@@ -34,6 +34,6 @@ public interface CommonDeviceInterface extends Value {
     void setUsedByCRM(ServiceInfo isUsedByCRM);
     boolean isUsedByCRM();
     String getLastCreatedFs();
-    /** Returns how much of the device is used. */
-    int getUsed();
+
+    int howMuchIsUsed();
 }

@@ -634,9 +634,11 @@ public class VolumeInfo extends EditableInfo implements CommonDeviceInterface {
         return null;
     }
 
-    /** Returns how much diskspace is used on the primary. */
+    /**
+     * Returns how much diskspace is used on the primary.
+     */
     @Override
-    public int getUsed() {
+    public int howMuchIsUsed() {
         for (final BlockDevInfo bdi : getBlockDevInfos()) {
             if (bdi.getBlockDevice().isPrimary()) {
                 return bdi.getBlockDevice().getUsed();

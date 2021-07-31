@@ -29,7 +29,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
-import javax.inject.Inject;
 import javax.inject.Named;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
@@ -52,28 +51,26 @@ import lcmc.common.ui.utils.SwingUtils;
 import lcmc.common.ui.utils.WidgetListener;
 
 /**
- * An implementation of a field where user can enter new value. The
- * field can be Textfield or combo box, depending if there are values
- * too choose from.
+ * An implementation of a field where user can enter new value. The field can be Textfield or combo box, depending if there are
+ * values too choose from.
  */
 @Named
 public final class TextfieldWithUnit extends GenericWidget<JComponent> {
-    @Inject
-    private SwingUtils swingUtils;
-    @Inject
-    private Access access;
+    private final SwingUtils swingUtils;
+    private final Access access;
     /** Text field in widget with units. */
     private JTextField textFieldPart;
     private MComboBox<Unit> unitComboBox;
     private boolean unitEnabled = true;
 
-    public void init(final Value selectedValue,
-                     final Unit[] units,
-                     final String regexp,
-                     final int width,
-                     final Map<String, String> abbreviations,
-                     final AccessMode enableAccessMode,
-                     final MyButton fieldButton) {
+    public TextfieldWithUnit(SwingUtils swingUtils, Access access) {
+        super(swingUtils, access);
+        this.swingUtils = swingUtils;
+        this.access = access;
+    }
+
+    public void init(final Value selectedValue, final Unit[] units, final String regexp, final int width,
+            final Map<String, String> abbreviations, final AccessMode enableAccessMode, final MyButton fieldButton) {
         super.init(regexp, enableAccessMode, fieldButton);
         final JPanel newComp = new JPanel();
         newComp.setLayout(new SpringLayout());

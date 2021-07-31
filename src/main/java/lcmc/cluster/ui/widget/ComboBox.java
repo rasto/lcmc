@@ -29,7 +29,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
-import javax.inject.Inject;
 import javax.inject.Named;
 import javax.swing.ComboBoxEditor;
 import javax.swing.JComboBox;
@@ -43,21 +42,25 @@ import lcmc.common.domain.AccessMode;
 import lcmc.common.domain.StringValue;
 import lcmc.common.domain.Value;
 import lcmc.common.domain.util.Tools;
+import lcmc.common.ui.Access;
 import lcmc.common.ui.utils.MyButton;
 import lcmc.common.ui.utils.PatternDocument;
 import lcmc.common.ui.utils.SwingUtils;
 import lcmc.common.ui.utils.WidgetListener;
 
 /**
- * An implementation of a field where user can enter new value. The
- * field can be Textfield or combo box, depending if there are values
- * too choose from.
+ * An implementation of a field where user can enter new value. The field can be Textfield or combo box, depending if there are
+ * values too choose from.
  */
 @Named
 public final class ComboBox extends GenericWidget<MComboBox<Value>> {
     private static final int CB_SCROLLBAR_MAX_ROWS = 10;
-    @Inject
-    private SwingUtils swingUtils;
+    private final SwingUtils swingUtils;
+
+    public ComboBox(SwingUtils swingUtils, Access access) {
+        super(swingUtils, access);
+        this.swingUtils = swingUtils;
+    }
 
     private static Value addItems(final Collection<Value> comboList, final Value selectedValue, final Value[] items) {
         Value selectedValueInfo = null;

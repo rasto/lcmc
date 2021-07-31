@@ -43,7 +43,9 @@ public class ConnectionThread extends Thread {
     private SSHGui sshGui;
     private Host host;
     private ProgressBar progressBar;
-    /** Callback when connection is failed or properly closed. */
+    /**
+     * Callback when connection is failed or properly closed.
+     */
     private ConnectionCallback connectionCallback;
     private Authentication authentication;
 
@@ -51,18 +53,20 @@ public class ConnectionThread extends Thread {
 
     private volatile boolean connectionFailed;
     private volatile boolean connectionEstablished = false;
-    @Inject
-    private Application application;
-    @Inject
-    private SwingUtils swingUtils;
-    @Inject
-    private Provider<PopupHostKeyVerifier> popupHostKeyVerifierProvider;
+    private final Application application;
+    private final SwingUtils swingUtils;
+    private final Provider<PopupHostKeyVerifier> popupHostKeyVerifierProvider;
 
-    void init(final Host host,
-              final SSHGui sshGui,
-              final ProgressBar progressBar,
-              final ConnectionCallback connectionCallback,
-              final Authentication authentication) {
+    @Inject
+    public ConnectionThread(Application application, SwingUtils swingUtils,
+            Provider<PopupHostKeyVerifier> popupHostKeyVerifierProvider) {
+        this.application = application;
+        this.swingUtils = swingUtils;
+        this.popupHostKeyVerifierProvider = popupHostKeyVerifierProvider;
+    }
+
+    void init(final Host host, final SSHGui sshGui, final ProgressBar progressBar, final ConnectionCallback connectionCallback,
+            final Authentication authentication) {
         this.host = host;
         this.sshGui = sshGui;
         this.progressBar = progressBar;
@@ -71,12 +75,16 @@ public class ConnectionThread extends Thread {
         this.authentication = authentication;
     }
 
-    /** Cancel the connecting. */
+    /**
+     * Cancel the connecting.
+     */
     void cancel() {
         sshConnection.cancel();
     }
 
-    /** Start connection in the thread. */
+    /**
+     * Start connection in the thread.
+     */
     @Override
     public void run() {
         LOG.debug2("run: start");
@@ -139,9 +147,9 @@ public class ConnectionThread extends Thread {
 
     private void connect(final SshConnection newSshConnection) throws IOException {
         LOG.debug2("run: verify host keys: " + hostname);
-        final String[] hostkeyAlgos = application.getKnownHosts().getPreferredServerHostkeyAlgorithmOrder(hostname);
-        if (hostkeyAlgos != null) {
-            newSshConnection.setServerHostKeyAlgorithms(hostkeyAlgos);
+        final String[] hostKeyAlgorithms = application.getKnownHosts().getPreferredServerHostkeyAlgorithmOrder(hostname);
+        if (hostKeyAlgorithms != null) {
+            newSshConnection.setServerHostKeyAlgorithms(hostKeyAlgorithms);
         }
         final int connectTimeout = Tools.getDefaultInt("SSH.ConnectTimeout");
         final int kexTimeout = Tools.getDefaultInt("SSH.KexTimeout");

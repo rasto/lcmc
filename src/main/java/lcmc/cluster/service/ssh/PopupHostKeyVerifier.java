@@ -35,30 +35,31 @@ import lcmc.logger.Logger;
 import lcmc.logger.LoggerFactory;
 
 /**
- * This ServerHostKeyVerifier asks the user on how to proceed if a key
- * cannot be found in the in-memory database.
+ * This ServerHostKeyVerifier asks the user on how to proceed if a key cannot be found in the in-memory database.
  */
 @Named
 public class PopupHostKeyVerifier implements ServerHostKeyVerifier {
     private static final Logger LOG = LoggerFactory.getLogger(PopupHostKeyVerifier.class);
 
     private SSHGui sshGui;
+    private final Application application;
+
     @Inject
-    private Application application;
+    public PopupHostKeyVerifier(Application application) {
+        this.application = application;
+    }
 
     public void init(final SSHGui sshGui) {
         this.sshGui = sshGui;
     }
 
-    /** Verifies the keys. */
+    /**
+     * Verifies the keys.
+     */
     @Override
-    public boolean verifyServerHostKey(final String hostname,
-                                       final int port,
-                                       final String serverHostKeyAlgorithm,
-                                       final byte[] serverHostKey) throws Exception {
-        final int hostKeyResult = application.getKnownHosts().verifyHostkey(hostname,
-                                                                            serverHostKeyAlgorithm,
-                                                                            serverHostKey);
+    public boolean verifyServerHostKey(final String hostname, final int port, final String serverHostKeyAlgorithm,
+            final byte[] serverHostKey) throws Exception {
+        final int hostKeyResult = application.getKnownHosts().verifyHostkey(hostname, serverHostKeyAlgorithm, serverHostKey);
         if (hostKeyResult == KnownHosts.HOSTKEY_IS_OK) {
             return true;
         }

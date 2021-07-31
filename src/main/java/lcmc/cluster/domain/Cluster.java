@@ -31,7 +31,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
-import javax.inject.Inject;
 import javax.inject.Named;
 
 import lcmc.Exceptions;
@@ -58,26 +57,26 @@ public class Cluster implements Comparable<Cluster> {
     private final Set<Host> hosts = new LinkedHashSet<>();
     private ClusterTab clusterTab = null;
     /** Default colors of the hosts. */
-    private static final Color[] DEFAULT_HOST_COLORS = {new Color(228, 228, 32),
-                                                   new Color(102, 204, 255), /* blue */
-                                                   Color.PINK,
-                                                   new Color(255, 100, 0), /* orange */
-                                                   Color.WHITE,
-                                                  };
+    private static final Color[] DEFAULT_HOST_COLORS = {new Color(228, 228, 32), new Color(102, 204, 255), /* blue */
+            Color.PINK, new Color(255, 100, 0), /* orange */
+            Color.WHITE,};
     private boolean savable = true;
     private boolean clusterTabClosable = true;
 
     private ClusterBrowser clusterBrowser;
-    @Inject
-    private MainData mainData;
-    @Inject
-    private SwingUtils swingUtils;
+    private final MainData mainData;
+    private final SwingUtils swingUtils;
     /**
      * Proxy hosts. More can be added in the DRBD config wizard.
      */
     private final Set<Host> proxyHosts = new LinkedHashSet<>();
-    @Inject
-    private BlockDeviceService blockDeviceService;
+    private final BlockDeviceService blockDeviceService;
+
+    public Cluster(MainData mainData, SwingUtils swingUtils, BlockDeviceService blockDeviceService) {
+        this.mainData = mainData;
+        this.swingUtils = swingUtils;
+        this.blockDeviceService = blockDeviceService;
+    }
 
     public void setName(final String name) {
         this.name = name;

@@ -31,7 +31,6 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
-import javax.inject.Inject;
 import javax.inject.Named;
 import javax.swing.AbstractButton;
 import javax.swing.ButtonGroup;
@@ -67,10 +66,14 @@ public final class RadioGroup extends GenericWidget<JComponent> {
     private final ReadWriteLock mComponentsLock = new ReentrantReadWriteLock();
     private final Lock mComponentsReadLock = mComponentsLock.readLock();
     private final Lock mComponentsWriteLock = mComponentsLock.writeLock();
-    @Inject
-    private SwingUtils swingUtils;
-    @Inject
-    private Access access;
+    private final SwingUtils swingUtils;
+    private final Access access;
+
+    public RadioGroup(SwingUtils swingUtils, Access access) {
+        super(swingUtils, access);
+        this.swingUtils = swingUtils;
+        this.access = access;
+    }
 
     public void init(final Value selectedValue, final Value[] items, final String regexp, final int width,
             final AccessMode enableAccessMode, final MyButton fieldButton) {

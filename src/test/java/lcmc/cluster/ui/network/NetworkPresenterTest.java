@@ -55,7 +55,7 @@ class NetworkPresenterTest {
 
     private final ClusterEventBus clusterEventBus = new ClusterEventBus();
 
-    final Cluster cluster = new Cluster();
+    final Cluster cluster = new Cluster(null, null, null);
 
     @BeforeEach
     void setupNetworkPresenter() {

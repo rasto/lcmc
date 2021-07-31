@@ -27,6 +27,8 @@ import java.nio.charset.StandardCharsets;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
+import javax.inject.Inject;
+
 import com.trilead.ssh2.ChannelCondition;
 import com.trilead.ssh2.Session;
 
@@ -59,7 +61,7 @@ public final class ExecCommandThread extends Thread {
 
     private volatile boolean cancelIt = false;
     private final Lock mSessionLock = new ReentrantLock();
-    private Session sess = null;
+    private Session session = null;
     private final int sshCommandTimeout;
 
     private static final int ERROR_EXIT_CODE = 255;
@@ -67,9 +69,8 @@ public final class ExecCommandThread extends Thread {
     private static final int DEFAULT_EXIT_CODE = 100;
     private static final String ENCODING = "UTF-8";
 
-    ExecCommandThread(final MainPanel mainPanel,
-                      final ProgressIndicator progressIndicator,
-                      final ExecCommandConfig execCommandConfig) {
+    @Inject
+    ExecCommandThread(final MainPanel mainPanel, final ProgressIndicator progressIndicator, final ExecCommandConfig execCommandConfig) {
         this.mainPanel = mainPanel;
         this.progressIndicator = progressIndicator;
 
@@ -85,8 +86,7 @@ public final class ExecCommandThread extends Thread {
         if (execCommandConfig.getCommand().length() > 9 && "NOOUTPUT:".equals(execCommandConfig.getCommand().substring(0, 9))) {
             outputVisible = false;
             command = execCommandConfig.getCommand().substring(9);
-        } else if (execCommandConfig.getCommand().length() > 7 && "OUTPUT:".equals(
-                execCommandConfig.getCommand().substring(0, 7))) {
+        } else if (execCommandConfig.getCommand().length() > 7 && "OUTPUT:".equals(execCommandConfig.getCommand().substring(0, 7))) {
             outputVisible = true;
             command = execCommandConfig.getCommand().substring(7);
         } else {
@@ -122,8 +122,8 @@ public final class ExecCommandThread extends Thread {
         mSessionLock.lock();
         final Session thisSession;
         try {
-            thisSession = sess;
-            sess = null;
+            thisSession = session;
+            session = null;
         } finally {
             mSessionLock.unlock();
         }
@@ -213,7 +213,7 @@ public final class ExecCommandThread extends Thread {
         final Session newSession = connectionThread.getConnection().openSession();
         mSessionLock.lock();
         try {
-            sess = newSession;
+            session = newSession;
         } finally {
             mSessionLock.unlock();
         }
@@ -259,7 +259,7 @@ public final class ExecCommandThread extends Thread {
             mSessionLock.lock();
             final Session thisSession;
             try {
-                thisSession = sess;
+                thisSession = session;
             } finally {
                 mSessionLock.unlock();
             }
@@ -293,7 +293,7 @@ public final class ExecCommandThread extends Thread {
                 exitCode = ec;
             }
             thisSession.close();
-            sess = null;
+            session = null;
         } catch (final IOException e) {
             LOG.appWarning("execOneCommand: " + host.getName() + ':' + e.getMessage() + ':' + oneCommand);
             exitCode = ERROR_EXIT_CODE;

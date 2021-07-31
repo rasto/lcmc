@@ -25,7 +25,6 @@ import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
-import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Provider;
 import javax.inject.Singleton;
@@ -39,23 +38,24 @@ import lcmc.drbd.domain.NetInterface;
 @Named
 @Singleton
 public class ClusterViewFactory {
-    @Inject
-    @Named("netInfo")
-    private Provider<NetInfo> netInfoProvider;
-    @Inject
-    private Provider<FSInfo> fsInfoProvider;
+    private final Provider<NetInfo> netInfoProvider;
+    private final Provider<FSInfo> fsInfoProvider;
 
     private final ConcurrentMap<ResourceValue, Info> viewByResource = new ConcurrentHashMap<>();
-    private final ConcurrentMap<String, Info> viewByFileSystemName = new ConcurrentHashMap<>();
 
     private final Lock viewLock = new ReentrantLock();
-    @Inject
-    private Provider<CommonBlockDevInfo> commonBlockDevInfoProvider;
+    private final Provider<CommonBlockDevInfo> commonBlockDevInfoProvider;
+
+    public ClusterViewFactory(@Named("netInfo") Provider<NetInfo> netInfoProvider, Provider<FSInfo> fsInfoProvider,
+            Provider<CommonBlockDevInfo> commonBlockDevInfoProvider) {
+        this.netInfoProvider = netInfoProvider;
+        this.fsInfoProvider = fsInfoProvider;
+        this.commonBlockDevInfoProvider = commonBlockDevInfoProvider;
+    }
 
     public FSInfo createFileSystemView(final String fileSystem, final Browser browser) {
         final FSInfo fsInfo = fsInfoProvider.get();
         fsInfo.init(fileSystem, browser);
-        viewByFileSystemName.put(fileSystem, fsInfo);
         return fsInfo;
     }
 

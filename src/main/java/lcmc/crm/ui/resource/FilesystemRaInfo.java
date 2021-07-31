@@ -420,7 +420,7 @@ public class FilesystemRaInfo extends ServiceInfo {
                 return -1;
             }
             final CommonDeviceInterface cdi = (CommonDeviceInterface) value;
-            return cdi.getUsed();
+            return cdi.howMuchIsUsed();
         }
         return -1;
     }

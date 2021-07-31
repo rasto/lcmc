@@ -37,7 +37,6 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
-import javax.inject.Inject;
 import javax.inject.Named;
 import javax.swing.Box;
 import javax.swing.JButton;
@@ -102,10 +101,13 @@ public abstract class GenericWidget<T extends JComponent> extends JPanel impleme
      * Whether the combobox was never set.
      */
     private boolean newFlag = true;
-    @Inject
-    private SwingUtils swingUtils;
-    @Inject
-    private Access access;
+    private final SwingUtils swingUtils;
+    private final Access access;
+
+    public GenericWidget(SwingUtils swingUtils, Access access) {
+        this.swingUtils = swingUtils;
+        this.access = access;
+    }
 
     public void init(final String regexp, final AccessMode enableAccessMode) {
         init(regexp, enableAccessMode, NO_BUTTON);

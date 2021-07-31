@@ -983,7 +983,7 @@ public class BlockDevInfo extends EditableInfo {
     public int getUsed() {
         final VolumeInfo dvi = volumeInfo;
         if (dvi != null) {
-            return dvi.getUsed();
+            return dvi.howMuchIsUsed();
         }
         return getBlockDevice().getUsed();
     }

@@ -23,7 +23,6 @@ import java.awt.Color;
 import java.awt.ItemSelectable;
 import java.awt.event.ItemListener;
 
-import javax.inject.Inject;
 import javax.inject.Named;
 import javax.swing.AbstractButton;
 import javax.swing.JCheckBox;
@@ -33,35 +32,39 @@ import javax.swing.text.Document;
 import lcmc.common.domain.AccessMode;
 import lcmc.common.domain.StringValue;
 import lcmc.common.domain.Value;
+import lcmc.common.ui.Access;
 import lcmc.common.ui.utils.MyButton;
 import lcmc.common.ui.utils.SwingUtils;
 import lcmc.common.ui.utils.WidgetListener;
 
 /**
- * An implementation of a field where user can enter new value. The
- * field can be Textfield or combo box, depending if there are values
- * too choose from.
+ * An implementation of a field where user can enter new value. The field can be Textfield or combo box, depending if there are
+ * values too choose from.
  */
 @Named
 public class Checkbox extends GenericWidget<JComponent> {
     static final String CHECKBOX_TRUE = "True";
     static final String CHECKBOX_FALSE = "False";
-    /** Name for the 'true' value. */
+    /**
+     * Name for the 'true' value.
+     */
     private Value checkBoxTrue = new StringValue(CHECKBOX_TRUE);
-    /** Name for the 'false' value. */
+    /**
+     * Name for the 'false' value.
+     */
     private Value checkBoxFalse = new StringValue(CHECKBOX_FALSE);
-    @Inject
-    private SwingUtils swingUtils;
+    private final SwingUtils swingUtils;
 
-    public void init(final Value selectedValue,
-                    final Value[] items,
-                    final String regexp,
-                    final int width,
-                    final AccessMode enableAccessMode,
-                    final MyButton fieldButton) {
+    public Checkbox(SwingUtils swingUtils, Access access) {
+        super(swingUtils, access);
+        this.swingUtils = swingUtils;
+    }
+
+    public void init(final Value selectedValue, final Value[] items, final String regexp, final int width,
+            final AccessMode enableAccessMode, final MyButton fieldButton) {
         super.init(regexp, enableAccessMode, fieldButton);
         if (items != null && items.length == 2) {
-            checkBoxTrue  = items[0];
+            checkBoxTrue = items[0];
             checkBoxFalse = items[1];
         }
         addComponent(getCheckBox(selectedValue), width);

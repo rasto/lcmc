@@ -565,7 +565,7 @@ public class Application {
         final int localPort = remotePort + getVncPortOffset();
         LOG.debug("prepareVncViewer: start port forwarding " + remotePort + " -> " + localPort);
         try {
-            host.getSSH().startVncPortForwarding(host.getIpAddress(), remotePort);
+            host.getSSH().startVncPortForwarding(remotePort);
         } catch (final IOException e) {
             LOG.error("prepareVncViewer: unable to create the tunnel "
                     + remotePort + " -> " + localPort
@@ -584,7 +584,7 @@ public class Application {
         final int remotePort = localPort - getVncPortOffset();
         LOG.debug("cleanupVncViewer: stop port forwarding " + remotePort);
         try {
-            host.getSSH().stopVncPortForwarding(remotePort);
+            host.getSSH().stopVncPortForwarding();
         } catch (final IOException e) {
             LOG.appError("cleanupVncViewer: unable to close tunnel", e);
         }

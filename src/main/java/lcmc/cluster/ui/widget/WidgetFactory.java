@@ -21,7 +21,6 @@ package lcmc.cluster.ui.widget;
 
 import java.util.Map;
 
-import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Provider;
 import javax.inject.Singleton;
@@ -38,30 +37,33 @@ import lcmc.logger.LoggerFactory;
 @Singleton
 public final class WidgetFactory {
     private final Logger LOG = LoggerFactory.getLogger(WidgetFactory.class);
-    @Inject
-    private Provider<Label> labelProvider;
-    @Inject
-    private Provider<ComboBox> comboBoxProvider;
-    @Inject @Named("passwdfield")
-    private Provider<Passwdfield> passwdFieldProvider;
-    @Inject @Named("textfield")
-    private Provider<Textfield> textfieldInstance;
-    @Inject
-    private Provider<TextfieldWithUnit> textFieldWithUnitProvider;
-    @Inject
-    private Provider<RadioGroup> radioGroupProvider;
-    @Inject
-    private Provider<Checkbox> checkboxProvider;
+    private final Provider<Label> labelProvider;
+    private final Provider<ComboBox> comboBoxProvider;
+    private final Provider<Passwdfield> passwdFieldProvider;
+    private final Provider<Textfield> textfieldInstance;
+    private final Provider<TextfieldWithUnit> textFieldWithUnitProvider;
+    private final Provider<RadioGroup> radioGroupProvider;
+    private final Provider<Checkbox> checkboxProvider;
 
-    /** Without units. */
-    public Widget createInstance(final Widget.Type type,
-                                 final Value selectedValue,
-                                 final Value[] items,
-                                 final String regexp,
-                                 final int width,
-                                 final Map<String, String> abbreviations,
-                                 final AccessMode enableAccessMode,
-                                 final MyButton fieldButton) {
+    public WidgetFactory(Provider<Label> labelProvider, Provider<ComboBox> comboBoxProvider,
+            @Named("passwdfield") Provider<Passwdfield> passwdFieldProvider,
+            @Named("textfield") Provider<Textfield> textfieldInstance, Provider<TextfieldWithUnit> textFieldWithUnitProvider,
+            Provider<RadioGroup> radioGroupProvider, Provider<Checkbox> checkboxProvider) {
+        this.labelProvider = labelProvider;
+        this.comboBoxProvider = comboBoxProvider;
+        this.passwdFieldProvider = passwdFieldProvider;
+        this.textfieldInstance = textfieldInstance;
+        this.textFieldWithUnitProvider = textFieldWithUnitProvider;
+        this.radioGroupProvider = radioGroupProvider;
+        this.checkboxProvider = checkboxProvider;
+    }
+
+    /**
+     * Without units.
+     */
+    public Widget createInstance(final Widget.Type type, final Value selectedValue, final Value[] items, final String regexp,
+            final int width, final Map<String, String> abbreviations, final AccessMode enableAccessMode,
+            final MyButton fieldButton) {
         return createInstance(type,
                               selectedValue,
                               items,

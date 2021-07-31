@@ -23,16 +23,16 @@ package lcmc.cluster.service.ssh;
 import java.io.File;
 import java.io.IOException;
 
-import lcmc.common.domain.Application;
-import lcmc.host.domain.Host;
-import lcmc.cluster.ui.SSHGui;
-import lcmc.logger.Logger;
-import lcmc.logger.LoggerFactory;
-import lcmc.common.domain.util.Tools;
-
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Provider;
+
+import lcmc.cluster.ui.SSHGui;
+import lcmc.common.domain.Application;
+import lcmc.common.domain.util.Tools;
+import lcmc.host.domain.Host;
+import lcmc.logger.Logger;
+import lcmc.logger.LoggerFactory;
 
 @Named
 public class Authentication {
@@ -50,10 +50,14 @@ public class Authentication {
     private boolean authenticated = false;
     private int passwdTry = 3;
     private boolean enableKeyboardInteractive = true;
+    private final Application application;
+    private final Provider<PopupHostKeyVerifier> popupHostKeyVerifierProvider;
+
     @Inject
-    private Application application;
-    @Inject
-    private Provider<PopupHostKeyVerifier> popupHostKeyVerifierProvider;
+    public Authentication(Application application, Provider<PopupHostKeyVerifier> popupHostKeyVerifierProvider) {
+        this.application = application;
+        this.popupHostKeyVerifierProvider = popupHostKeyVerifierProvider;
+    }
 
     public void init(final LastSuccessfulPassword lastSuccessfulPassword, final Host host, final SSHGui sshGui) {
         this.lastSuccessfulPassword = lastSuccessfulPassword;

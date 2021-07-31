@@ -23,24 +23,15 @@
 
 package lcmc.cluster.domain;
 
-import lcmc.common.domain.StringValue;
-import lcmc.common.domain.Value;
 import lcmc.common.domain.util.Tools;
-import lcmc.logger.Logger;
-import lcmc.logger.LoggerFactory;
 
-/**
- * This class holds data of one cluster network.
- */
 public final class Network {
-    private static final Logger LOG = LoggerFactory.getLogger(Network.class);
     private final String name;
     /** List of all ips in the network. */
     private final String[] allIPs;
     private final Integer cidr;
 
     public Network(final String name, final String[] allIPs, final Integer cidr) {
-//        super(name);
         this.name = name;
         this.allIPs = allIPs;
         this.cidr = cidr;
@@ -56,12 +47,6 @@ public final class Network {
 
     public Integer getCidr() {
         return cidr;
-    }
-
-//    @Override
-    public Value getValue(final String parameter) {
-        LOG.appError("getValue: wrong call to getValue");
-        return new StringValue("???");
     }
 
     @Override

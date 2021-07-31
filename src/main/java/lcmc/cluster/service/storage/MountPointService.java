@@ -27,7 +27,6 @@ import java.util.Set;
 import java.util.TreeSet;
 import java.util.concurrent.ConcurrentHashMap;
 
-import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
@@ -44,12 +43,15 @@ import lcmc.host.domain.Host;
 @Named
 @Singleton
 public class MountPointService {
-    @Inject
-    private HwEventBus hwEventBus;
-    @Inject
-    private ClusterEventBus clusterEventBus;
+    private final HwEventBus hwEventBus;
+    private final ClusterEventBus clusterEventBus;
     private final Map<Host, Set<String>> mountPointsByHost = new ConcurrentHashMap<>();
     private final Map<Cluster, Set<String>> commonMountPointsByCluster = new ConcurrentHashMap<>();
+
+    public MountPointService(HwEventBus hwEventBus, ClusterEventBus clusterEventBus) {
+        this.hwEventBus = hwEventBus;
+        this.clusterEventBus = clusterEventBus;
+    }
 
     public void init() {
         hwEventBus.register(this);

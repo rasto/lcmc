@@ -27,7 +27,6 @@ import java.nio.charset.StandardCharsets;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
-import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Provider;
 
@@ -68,8 +67,7 @@ public class Ssh {
     /** Callback when connection is failed or properly closed. */
     private ConnectionCallback connectionCallback;
     private Host host;
-    @Inject
-    private Provider<ConnectionThread> connectionThreadProvider;
+    private final Provider<ConnectionThread> connectionThreadProvider;
     private ConnectionThread connectionThread;
     private ProgressBar progressBar = null;
 
@@ -77,20 +75,26 @@ public class Ssh {
     private final Lock mConnectionLock = new ReentrantLock();
     private final Lock mConnectionThreadLock = new ReentrantLock();
     private LocalPortForwarder localPortForwarder = null;
-    @Inject
-    private MainData mainData;
-    @Inject
-    private MainPanel mainPanel;
-    @Inject
-    private ProgressIndicator progressIndicator;
-    @Inject
-    private Application application;
-    @Inject
-    private SwingUtils swingUtils;
-    @Inject
-    private Provider<Authentication> authenticationProvider;
-    @Inject
-    private GuiHelperFiles guiHelperFiles;
+    private final MainData mainData;
+    private final MainPanel mainPanel;
+    private final ProgressIndicator progressIndicator;
+    private final Application application;
+    private final SwingUtils swingUtils;
+    private final Provider<Authentication> authenticationProvider;
+    private final GuiHelperFiles guiHelperFiles;
+
+    public Ssh(Provider<ConnectionThread> connectionThreadProvider, MainData mainData, MainPanel mainPanel,
+            ProgressIndicator progressIndicator, Application application, SwingUtils swingUtils,
+            Provider<Authentication> authenticationProvider, GuiHelperFiles guiHelperFiles) {
+        this.connectionThreadProvider = connectionThreadProvider;
+        this.mainData = mainData;
+        this.mainPanel = mainPanel;
+        this.progressIndicator = progressIndicator;
+        this.application = application;
+        this.swingUtils = swingUtils;
+        this.authenticationProvider = authenticationProvider;
+        this.guiHelperFiles = guiHelperFiles;
+    }
 
     boolean reconnect() {
         swingUtils.isNotSwingThread();
@@ -479,24 +483,13 @@ public class Ssh {
                         .silentOutput()).block();
     }
 
-    public void startVncPortForwarding(final String remoteHost, final int remotePort) throws IOException {
+    public void startVncPortForwarding(final int remotePort) throws IOException {
         final int localPort = remotePort + application.getVncPortOffset();
-        try {
-            localPortForwarder = connectionThread.getConnection().createLocalPortForwarder(localPort,
-                                                                                           "127.0.0.1",
-                                                                                           remotePort);
-        } catch (final IOException e) {
-            throw e;
-        }
+        localPortForwarder = connectionThread.getConnection().createLocalPortForwarder(localPort, "127.0.0.1", remotePort);
     }
 
-    public void stopVncPortForwarding(final int remotePort)
-        throws IOException {
-        try {
-            localPortForwarder.close();
-        } catch (final IOException e) {
-            throw e;
-        }
+    public void stopVncPortForwarding() throws IOException {
+        localPortForwarder.close();
     }
 
     public boolean isConnectionCanceled() {

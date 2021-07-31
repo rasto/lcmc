@@ -30,7 +30,6 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
-import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
@@ -53,12 +52,15 @@ import lcmc.host.domain.HostNetworks;
 @Named
 @Singleton
 public class NetworkService {
-    @Inject
-    private HwEventBus hwEventBus;
-    @Inject
-    private ClusterEventBus clusterEventBus;
+    private final HwEventBus hwEventBus;
+    private final ClusterEventBus clusterEventBus;
     private final Map<Host, HostNetworks> hostNetInterfacesByHost = new ConcurrentHashMap<>();
     private final Map<Cluster, List<Network>> networksByCluster = new ConcurrentHashMap<>();
+
+    public NetworkService(HwEventBus hwEventBus, ClusterEventBus clusterEventBus) {
+        this.hwEventBus = hwEventBus;
+        this.clusterEventBus = clusterEventBus;
+    }
 
     public void init() {
         hwEventBus.register(this);
@@ -79,8 +81,8 @@ public class NetworkService {
         final HostNetworks hostNetworks = hostNetInterfacesByHost.get(event.getHost());
         if (hostNetworks != null) {
             hostNetworks.setBridges(event.getBridges());
+            clusterEventBus.post(new NetInterfacesChangedEvent(event.getHost(), hostNetworks.getNetInterfaces()));
         }
-        clusterEventBus.post(new NetInterfacesChangedEvent(event.getHost(), hostNetworks.getNetInterfaces()));
     }
 
     public Collection<Value> getBridges(final Host host) {

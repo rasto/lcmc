@@ -21,6 +21,9 @@
  */
 package lcmc.cluster.ui.resource;
 
+import javax.inject.Named;
+import javax.swing.ImageIcon;
+
 import lcmc.common.domain.Application;
 import lcmc.common.domain.util.Tools;
 import lcmc.common.ui.Browser;
@@ -29,9 +32,6 @@ import lcmc.crm.ui.resource.ServiceInfo;
 import lcmc.drbd.domain.BlockDevice;
 import lcmc.drbd.domain.CommonBlockDevice;
 import lcmc.drbd.ui.resource.BlockDevInfo;
-
-import javax.inject.Named;
-import javax.swing.*;
 
 /**
  * This class holds info data for a block device that is common
@@ -106,9 +106,11 @@ public class CommonBlockDevInfo extends HbCategoryInfo implements CommonDeviceIn
         return null;
     }
 
-    /** Returns how much of the filesystem is used. */
+    /**
+     * Returns how much of the filesystem is used.
+     */
     @Override
-    public int getUsed() {
+    public int howMuchIsUsed() {
         int used = -1;
         for (final BlockDevice bd : blockDevices) {
             if (bd.getUsed() > used) {

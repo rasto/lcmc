@@ -24,24 +24,27 @@ import javax.swing.JComponent;
 import javax.swing.JPasswordField;
 import javax.swing.text.Document;
 import javax.swing.text.JTextComponent;
+
 import lcmc.common.domain.AccessMode;
 import lcmc.common.domain.StringValue;
 import lcmc.common.domain.Value;
+import lcmc.common.ui.Access;
 import lcmc.common.ui.utils.MyButton;
 import lcmc.common.ui.utils.PatternDocument;
+import lcmc.common.ui.utils.SwingUtils;
 
 /**
- * An implementation of a field where user can enter new value. The
- * field can be Textfield or combo box, depending if there are values
- * too choose from.
+ * An implementation of a field where user can enter new value. The field can be Textfield or combo box, depending if there are
+ * values too choose from.
  */
 @Named
 public final class Passwdfield extends Textfield {
-    public void init(final Value selectedValue,
-                     final String regexp,
-                     final int width,
-                     final AccessMode enableAccessMode,
-                     final MyButton fieldButton) {
+    public Passwdfield(SwingUtils swingUtils, Access access) {
+        super(swingUtils, access);
+    }
+
+    public void init(final Value selectedValue, final String regexp, final int width, final AccessMode enableAccessMode,
+            final MyButton fieldButton) {
         super.init(selectedValue, regexp, width, NO_ABBRV, enableAccessMode, fieldButton);
         addComponent(getPasswdField(selectedValue, regexp), width);
     }

@@ -20,31 +20,28 @@
 
 package lcmc.cluster.ui.network;
 
+import javax.inject.Named;
+
 import lcmc.ClusterEventBus;
 import lcmc.cluster.domain.Cluster;
 import lcmc.cluster.domain.Network;
 import lcmc.cluster.service.NetworkService;
 import lcmc.cluster.ui.ClusterBrowser;
 
-import javax.inject.Inject;
-import javax.inject.Named;
-
 @Named
 public class NetworkFactory {
-    @Inject
-    private ClusterEventBus clusterEventBus;
-    @Inject
-    private NetworkService networkService;
+    private final ClusterEventBus clusterEventBus;
+    private final NetworkService networkService;
+
+    public NetworkFactory(ClusterEventBus clusterEventBus, NetworkService networkService) {
+        this.clusterEventBus = clusterEventBus;
+        this.networkService = networkService;
+    }
 
     public NetworkPresenter createPresenter(final Cluster cluster, final Network network, ClusterBrowser clusterBrowser) {
         final NetworkModel model = new NetworkModel();
         final NetworkView view = new NetworkView(model);
-        return new NetworkPresenter(
-                network,
-                model,
-                view,
-                clusterEventBus,
-                cluster,
+        return new NetworkPresenter(network, model, view, clusterEventBus, cluster,
                 networkService,
                 clusterBrowser);
     }

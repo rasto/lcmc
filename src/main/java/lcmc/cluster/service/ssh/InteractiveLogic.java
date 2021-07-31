@@ -23,8 +23,8 @@ import java.io.IOException;
 
 import com.trilead.ssh2.InteractiveCallback;
 
-import lcmc.host.domain.Host;
 import lcmc.cluster.ui.SSHGui;
+import lcmc.host.domain.Host;
 
 /**
  * The logic that one has to implement if "keyboard-interactive"
@@ -72,20 +72,15 @@ public class InteractiveLogic implements InteractiveCallback {
             }
             final String ans;
             if (lastSuccessfulPassword.getPassword() == null) {
-                ans = sshGui.enterSomethingDialog("Keyboard Interactive Authentication",
-                                                  content,
-                                                  null,
-                                                  null,
-                                                  !echo[i]);
+                ans = sshGui.enterSomethingDialog("Keyboard Interactive Authentication", content, null, null, !echo[i]);
                 if (ans == null) {
                     throw new IOException("cancelled");
                 }
                 lastSuccessfulPassword.setPassword(ans);
-                host.setSudoPassword(ans);
             } else {
                 ans = lastSuccessfulPassword.getPassword();
-                host.setSudoPassword(ans);
             }
+            host.setSudoPassword(ans);
             result[i] = ans;
             promptCount++;
         }

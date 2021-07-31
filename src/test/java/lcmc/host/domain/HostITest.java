@@ -126,7 +126,7 @@ final class HostITest {
         for (final Host host : integrationTestLauncher.getHosts()) {
             assertThat(host.isInCluster()).isTrue();
             assertThat(host.isInCluster(null)).isTrue();
-            assertThat(host.isInCluster(new Cluster())).isTrue();
+            assertThat(host.isInCluster(new Cluster(null, null, null))).isTrue();
         }
     }
 

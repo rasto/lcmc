@@ -106,7 +106,7 @@ public final class Clusters {
         int index = 0;
         try {
             for (final Cluster cluster : clusters) {
-                /* find the bigest index of cluster default name and
+                /* find the biggest index of cluster default name and
                  * increment it by one */
                 final String name = cluster.getName();
                 final Pattern p = Pattern.compile('^' + defaultName + "(\\d+)$");

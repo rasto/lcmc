@@ -29,7 +29,6 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
-import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
@@ -54,16 +53,19 @@ import lcmc.host.domain.HostBlockDevices;
 @Named
 @Singleton
 public class BlockDeviceService {
-    @Inject
-    private HwEventBus hwEventBus;
-    @Inject
-    private ClusterEventBus clusterEventBus;
+    private final HwEventBus hwEventBus;
+    private final ClusterEventBus clusterEventBus;
     private final Map<Host, HostBlockDevices> hostBlockDevicesByHost = new ConcurrentHashMap<>();
     private final Map<Cluster, List<String>> commonBlockDevicesByCluster = new ConcurrentHashMap<>();
-    @Inject
-    private ClusterViewFactory clusterViewFactory;
+    private final ClusterViewFactory clusterViewFactory;
 
     private Collection<CommonBlockDevInfo> commonBlockDevViews;
+
+    public BlockDeviceService(HwEventBus hwEventBus, ClusterEventBus clusterEventBus, ClusterViewFactory clusterViewFactory) {
+        this.hwEventBus = hwEventBus;
+        this.clusterEventBus = clusterEventBus;
+        this.clusterViewFactory = clusterViewFactory;
+    }
 
     public void init() {
         hwEventBus.register(this);
