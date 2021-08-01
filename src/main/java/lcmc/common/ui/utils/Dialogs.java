@@ -23,7 +23,6 @@ package lcmc.common.ui.utils;
 import java.io.File;
 import java.util.Optional;
 
-import javax.inject.Inject;
 import javax.inject.Named;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
@@ -35,10 +34,13 @@ import lcmc.common.ui.main.MainData;
 
 @Named
 public class Dialogs {
-    @Inject
-    private MainData mainData;
-    @Inject
-    private Application application;
+    private final MainData mainData;
+    private final Application application;
+
+    public Dialogs(MainData mainData, Application application) {
+        this.mainData = mainData;
+        this.application = application;
+    }
 
     public Optional<String> getFileName(final String filePrefix) {
         final File defaultFile = getNextAvailableFile(filePrefix);
@@ -47,7 +49,8 @@ public class Dialogs {
             public void approveSelection() {
                 File f = getSelectedFile();
                 if (f.exists() && getDialogType() == SAVE_DIALOG) {
-                    int result = JOptionPane.showConfirmDialog(this, "The file exists, overwrite?", "Existing file", JOptionPane.YES_NO_CANCEL_OPTION);
+                    int result = JOptionPane.showConfirmDialog(this, "The file exists, overwrite?", "Existing file",
+                            JOptionPane.YES_NO_CANCEL_OPTION);
                     switch (result) {
                         case JOptionPane.YES_OPTION:
                             super.approveSelection();

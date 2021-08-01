@@ -39,7 +39,6 @@ import java.awt.event.MouseEvent;
 import java.awt.geom.Point2D;
 import java.util.Objects;
 
-import javax.inject.Inject;
 import javax.inject.Named;
 import javax.swing.ImageIcon;
 import javax.swing.JMenuItem;
@@ -74,18 +73,20 @@ implements ActionListener, UpdatableItem, ComponentWithTest {
     /** Alternate short decription of the item for tool tip. */
     private String shortDesc2;
     private JToolTip toolTip = null;
-    /** Pos of the click that can be used in the overriden action method. */
+    /**
+     * Pos of the click that can be used in the overriden action method.
+     */
     private Point2D pos;
-    /** Robot to move a mouse a little if a tooltip has changed. */
+    /**
+     * Robot to move a mouse a little if a tooltip has changed.
+     */
     private Robot robot;
     private Color toolTipBackground = null;
     private AccessMode enableAccessMode;
     private AccessMode visibleAccessMode;
     private String origToolTipText = "";
-    @Inject
-    private SwingUtils swingUtils;
-    @Inject
-    private Access access;
+    private final SwingUtils swingUtils;
+    private final Access access;
 
     private MenuAction menuAction;
 
@@ -98,10 +99,13 @@ implements ActionListener, UpdatableItem, ComponentWithTest {
     private Runnable update = () -> {
     };
 
-    protected void init(final String text,
-                        final ImageIcon icon,
-                        final AccessMode enableAccessMode,
-                        final AccessMode visibleAccessMode) {
+    public MyMenuItem(SwingUtils swingUtils, Access access) {
+        this.swingUtils = swingUtils;
+        this.access = access;
+    }
+
+    protected void init(final String text, final ImageIcon icon, final AccessMode enableAccessMode,
+            final AccessMode visibleAccessMode) {
         super.setText(text);
         text1 = text;
         icon1 = icon;

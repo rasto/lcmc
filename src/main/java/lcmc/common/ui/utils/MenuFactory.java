@@ -20,25 +20,25 @@
 
 package lcmc.common.ui.utils;
 
-import lcmc.common.domain.AccessMode;
-
-import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Provider;
 import javax.inject.Singleton;
 import javax.swing.ImageIcon;
 
+import lcmc.common.domain.AccessMode;
+
 @Named
 @Singleton
 public class MenuFactory {
-    @Inject
-    private Provider<MyMenuItem> menuItemProvider;
-    @Inject
-    private Provider<MyMenu> menuProvider;
+    private final Provider<MyMenuItem> menuItemProvider;
+    private final Provider<MyMenu> menuProvider;
 
-    public MyMenu createMenu(final String text,
-                             final AccessMode enableAccessMode,
-                             final AccessMode visibleAccessMode) {
+    public MenuFactory(Provider<MyMenuItem> menuItemProvider, Provider<MyMenu> menuProvider) {
+        this.menuItemProvider = menuItemProvider;
+        this.menuProvider = menuProvider;
+    }
+
+    public MyMenu createMenu(final String text, final AccessMode enableAccessMode, final AccessMode visibleAccessMode) {
         final MyMenu menu = menuProvider.get();
         menu.init(text, enableAccessMode, visibleAccessMode);
         return menu;

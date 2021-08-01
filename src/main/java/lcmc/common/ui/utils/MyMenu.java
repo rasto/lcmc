@@ -27,7 +27,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 
-import javax.inject.Inject;
 import javax.inject.Named;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
@@ -47,8 +46,7 @@ public class MyMenu extends JMenu implements UpdatableItem {
      */
     private Point2D pos = null;
     private AccessMode enableAccessMode;
-    @Inject
-    private Access access;
+    private final Access access;
 
     private EnablePredicate enablePredicate = () -> null;
 
@@ -56,6 +54,10 @@ public class MyMenu extends JMenu implements UpdatableItem {
         updateMenuComponents();
         processAccessMode();
     };
+
+    public MyMenu(Access access) {
+        this.access = access;
+    }
 
     void init(final String text, final AccessMode enableAccessMode, final AccessMode visibleAccessMode) {
         super.setText(text);
