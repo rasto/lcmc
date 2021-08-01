@@ -35,6 +35,7 @@ import lcmc.cluster.ui.widget.WidgetFactory;
 import lcmc.common.domain.Application;
 import lcmc.common.domain.ExecCallback;
 import lcmc.common.domain.util.Tools;
+import lcmc.common.ui.ProgressBar;
 import lcmc.common.ui.SpringUtilities;
 import lcmc.common.ui.WizardDialog;
 import lcmc.common.ui.main.MainData;
@@ -55,8 +56,8 @@ final class DrbdCommandInst extends DialogHost {
     private final Application application;
 
     public DrbdCommandInst(Application application, SwingUtils swingUtils, WidgetFactory widgetFactory, MainData mainData,
-            Provider<CheckInstallation> checkInstallationProvider) {
-        super(application, swingUtils, widgetFactory, mainData);
+            Provider<CheckInstallation> checkInstallationProvider, Provider<ProgressBar> progressBarProvider) {
+        super(application, swingUtils, widgetFactory, mainData, progressBarProvider);
         this.checkInstallationProvider = checkInstallationProvider;
         this.application = application;
     }

@@ -24,6 +24,7 @@
 package lcmc.cluster.ui.wizard;
 
 import javax.inject.Named;
+import javax.inject.Provider;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.SpringLayout;
@@ -31,6 +32,7 @@ import javax.swing.SpringLayout;
 import lcmc.cluster.ui.widget.WidgetFactory;
 import lcmc.common.domain.Application;
 import lcmc.common.domain.util.Tools;
+import lcmc.common.ui.ProgressBar;
 import lcmc.common.ui.SpringUtilities;
 import lcmc.common.ui.WizardDialog;
 import lcmc.common.ui.main.MainData;
@@ -50,8 +52,8 @@ final class Connect extends DialogCluster {
     private final SwingUtils swingUtils;
 
     public Connect(Application application, SwingUtils swingUtils, WidgetFactory widgetFactory, MainData mainData,
-            CommStack commStackDialog) {
-        super(application, swingUtils, widgetFactory, mainData);
+            CommStack commStackDialog, Provider<ProgressBar> progressBarProvider) {
+        super(application, swingUtils, widgetFactory, mainData, progressBarProvider);
         this.commStackDialog = commStackDialog;
         this.swingUtils = swingUtils;
     }

@@ -40,6 +40,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import javax.inject.Named;
+import javax.inject.Provider;
 import javax.swing.BoxLayout;
 import javax.swing.JCheckBox;
 import javax.swing.JComponent;
@@ -64,6 +65,7 @@ import lcmc.common.domain.StringValue;
 import lcmc.common.domain.Value;
 import lcmc.common.domain.util.Tools;
 import lcmc.common.ui.Access;
+import lcmc.common.ui.ProgressBar;
 import lcmc.common.ui.SpringUtilities;
 import lcmc.common.ui.WizardDialog;
 import lcmc.common.ui.main.MainData;
@@ -194,8 +196,8 @@ final class HbConfig extends DialogCluster {
     private final Access access;
 
     public HbConfig(Application application, SwingUtils swingUtils, WidgetFactory widgetFactory, MainData mainData,
-            InitCluster initCluster, NetworkService networkService, Access access) {
-        super(application, swingUtils, widgetFactory, mainData);
+            InitCluster initCluster, NetworkService networkService, Access access, Provider<ProgressBar> progressBarProvider) {
+        super(application, swingUtils, widgetFactory, mainData, progressBarProvider);
         this.application = application;
         this.swingUtils = swingUtils;
         this.widgetFactory = widgetFactory;

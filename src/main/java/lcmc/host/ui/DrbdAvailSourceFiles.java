@@ -26,6 +26,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.inject.Named;
+import javax.inject.Provider;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.SpringLayout;
@@ -39,6 +40,7 @@ import lcmc.common.domain.AccessMode;
 import lcmc.common.domain.Application;
 import lcmc.common.domain.Value;
 import lcmc.common.domain.util.Tools;
+import lcmc.common.ui.ProgressBar;
 import lcmc.common.ui.SpringUtilities;
 import lcmc.common.ui.WizardDialog;
 import lcmc.common.ui.main.MainData;
@@ -63,8 +65,8 @@ final class DrbdAvailSourceFiles extends DialogHost {
     private static final Logger drbdVersions = LoggerFactory.getLogger(DrbdAvailSourceFiles.class);
 
     public DrbdAvailSourceFiles(Application application, SwingUtils swingUtils, WidgetFactory widgetFactory, MainData mainData,
-            DrbdCommandInst drbdCommandInst) {
-        super(application, swingUtils, widgetFactory, mainData);
+            DrbdCommandInst drbdCommandInst, Provider<ProgressBar> progressBarProvider) {
+        super(application, swingUtils, widgetFactory, mainData, progressBarProvider);
         this.drbdCommandInst = drbdCommandInst;
         this.application = application;
         this.swingUtils = swingUtils;

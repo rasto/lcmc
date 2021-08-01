@@ -26,6 +26,7 @@ package lcmc.vm.ui.configdialog;
 import java.awt.Dimension;
 
 import javax.inject.Named;
+import javax.inject.Provider;
 import javax.swing.BoxLayout;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
@@ -35,6 +36,7 @@ import lcmc.cluster.ui.widget.Widget;
 import lcmc.cluster.ui.widget.WidgetFactory;
 import lcmc.common.domain.Application;
 import lcmc.common.domain.util.Tools;
+import lcmc.common.ui.ProgressBar;
 import lcmc.common.ui.WizardDialog;
 import lcmc.common.ui.main.MainData;
 import lcmc.common.ui.utils.SwingUtils;
@@ -63,8 +65,8 @@ public final class Domain extends VMConfig {
     private final SwingUtils swingUtils;
 
     public Domain(Application application, SwingUtils swingUtils, WidgetFactory widgetFactory, MainData mainData,
-            InstallationDisk installationDiskDialog, Filesystem filesystemDialog) {
-        super(application, swingUtils, widgetFactory, mainData);
+            InstallationDisk installationDiskDialog, Filesystem filesystemDialog, Provider<ProgressBar> progressBarProvider) {
+        super(application, swingUtils, widgetFactory, mainData, progressBarProvider);
         this.installationDiskDialog = installationDiskDialog;
         this.filesystemDialog = filesystemDialog;
         this.application = application;

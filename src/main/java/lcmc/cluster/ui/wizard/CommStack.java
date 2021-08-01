@@ -25,6 +25,7 @@ package lcmc.cluster.ui.wizard;
 import java.awt.Color;
 
 import javax.inject.Named;
+import javax.inject.Provider;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JComponent;
@@ -41,6 +42,7 @@ import lcmc.common.domain.ExecCallback;
 import lcmc.common.domain.StringValue;
 import lcmc.common.domain.Value;
 import lcmc.common.domain.util.Tools;
+import lcmc.common.ui.ProgressBar;
 import lcmc.common.ui.SpringUtilities;
 import lcmc.common.ui.WizardDialog;
 import lcmc.common.ui.main.MainData;
@@ -65,8 +67,8 @@ final class CommStack extends DialogCluster {
     private final WidgetFactory widgetFactory;
 
     public CommStack(MainData mainData, HbConfig hbConfigDialog, CoroConfig coroConfigDialog, Application application,
-            SwingUtils swingUtils, WidgetFactory widgetFactory) {
-        super(application, swingUtils, widgetFactory, mainData);
+            SwingUtils swingUtils, WidgetFactory widgetFactory, Provider<ProgressBar> progressBarProvider) {
+        super(application, swingUtils, widgetFactory, mainData, progressBarProvider);
         this.hbConfigDialog = hbConfigDialog;
         this.coroConfigDialog = coroConfigDialog;
         this.application = application;

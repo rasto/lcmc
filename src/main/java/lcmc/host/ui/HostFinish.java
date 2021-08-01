@@ -36,6 +36,7 @@ import lcmc.cluster.ui.wizard.AddClusterDialog;
 import lcmc.common.domain.Application;
 import lcmc.common.domain.UserConfig;
 import lcmc.common.domain.util.Tools;
+import lcmc.common.ui.ProgressBar;
 import lcmc.common.ui.WizardDialog;
 import lcmc.common.ui.main.MainData;
 import lcmc.common.ui.main.MainPresenter;
@@ -71,8 +72,9 @@ final class HostFinish extends DialogHost {
 
     public HostFinish(Application application, SwingUtils swingUtils, WidgetFactory widgetFactory, MainData mainData,
             HostFactory hostFactory, AddClusterDialog addClusterDialog, MainPresenter mainPresenter,
-            @Named("newHostDialog") Provider<NewHostDialog> newHostDialogFactory, UserConfig userConfig) {
-        super(application, swingUtils, widgetFactory, mainData);
+            @Named("newHostDialog") Provider<NewHostDialog> newHostDialogFactory, UserConfig userConfig,
+            Provider<ProgressBar> progressBarProvider) {
+        super(application, swingUtils, widgetFactory, mainData, progressBarProvider);
         this.hostFactory = hostFactory;
         this.addClusterDialog = addClusterDialog;
         this.mainPresenter = mainPresenter;

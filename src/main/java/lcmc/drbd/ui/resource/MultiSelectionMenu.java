@@ -30,7 +30,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Provider;
 import javax.swing.JColorChooser;
@@ -57,30 +56,34 @@ import lcmc.lvm.ui.VGRemove;
 @Named
 public class MultiSelectionMenu {
     private static final String LV_CREATE_MENU_ITEM = Tools.getString("MultiSelectionInfo.LVCreate");
-    
+
     private MultiSelectionInfo multiSelectionInfo;
 
     private List<Info> selectedInfos;
 
-    @Inject
-    private MainData mainData;
-    @Inject
-    private ProgressIndicator progressIndicator;
-    @Inject
-    private MenuFactory menuFactory;
-    @Inject
-    private Application application;
-    @Inject
-    private Access access;
-    @Inject
-    private Provider<VGCreate> vgCreateProvider;
-    @Inject
-    private Provider<VGRemove> vgRemoveProvider;
-    @Inject
-    private Provider<LVCreate> lvCreateProvider;
+    private final MainData mainData;
+    private final ProgressIndicator progressIndicator;
+    private final MenuFactory menuFactory;
+    private final Application application;
+    private final Access access;
+    private final Provider<VGCreate> vgCreateProvider;
+    private final Provider<VGRemove> vgRemoveProvider;
+    private final Provider<LVCreate> lvCreateProvider;
 
-    public List<UpdatableItem> getPulldownMenu(final MultiSelectionInfo multiSelectionInfo,
-                                               final List<Info> selectedInfos) {
+    public MultiSelectionMenu(MainData mainData, ProgressIndicator progressIndicator, MenuFactory menuFactory,
+            Application application, Access access, Provider<VGCreate> vgCreateProvider, Provider<VGRemove> vgRemoveProvider,
+            Provider<LVCreate> lvCreateProvider) {
+        this.mainData = mainData;
+        this.progressIndicator = progressIndicator;
+        this.menuFactory = menuFactory;
+        this.application = application;
+        this.access = access;
+        this.vgCreateProvider = vgCreateProvider;
+        this.vgRemoveProvider = vgRemoveProvider;
+        this.lvCreateProvider = lvCreateProvider;
+    }
+
+    public List<UpdatableItem> getPulldownMenu(final MultiSelectionInfo multiSelectionInfo, final List<Info> selectedInfos) {
         this.multiSelectionInfo = multiSelectionInfo;
         this.selectedInfos = selectedInfos;
         final List<UpdatableItem> items = new ArrayList<>();

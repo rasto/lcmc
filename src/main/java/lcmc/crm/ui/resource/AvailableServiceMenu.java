@@ -23,7 +23,6 @@ package lcmc.crm.ui.resource;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.inject.Inject;
 import javax.inject.Named;
 
 import lcmc.cluster.ui.ClusterBrowser;
@@ -35,18 +34,22 @@ import lcmc.common.ui.utils.UpdatableItem;
 
 @Named
 public class AvailableServiceMenu {
-    @Inject
-    private MenuFactory menuFactory;
+    private final MenuFactory menuFactory;
+
+    public AvailableServiceMenu(MenuFactory menuFactory) {
+        this.menuFactory = menuFactory;
+    }
 
     public List<UpdatableItem> getPulldownMenu(final AvailableServiceInfo availableServiceInfo) {
         final List<UpdatableItem> items = new ArrayList<>();
         final UpdatableItem addServiceMenu =
                 menuFactory.createMenuItem(Tools.getString("ClusterBrowser.AddServiceToCluster"), null, null,
-                                new AccessMode(AccessMode.ADMIN, AccessMode.NORMAL), new AccessMode(AccessMode.OP, AccessMode.NORMAL))
-                        .enablePredicate(() -> {
-                            if (availableServiceInfo.getBrowser().crmStatusFailed()) {
-                                return ClusterBrowser.UNKNOWN_CLUSTER_STATUS_STRING;
-                            }
+                                   new AccessMode(AccessMode.ADMIN, AccessMode.NORMAL), new AccessMode(AccessMode.OP, AccessMode.NORMAL))
+                           .enablePredicate(() -> {
+                               if (availableServiceInfo.getBrowser()
+                                                       .crmStatusFailed()) {
+                                   return ClusterBrowser.UNKNOWN_CLUSTER_STATUS_STRING;
+                               }
                             return null;
                         })
                         .addAction(text -> {

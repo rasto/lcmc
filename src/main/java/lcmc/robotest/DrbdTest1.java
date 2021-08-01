@@ -21,13 +21,13 @@
 package lcmc.robotest;
 
 import java.awt.event.KeyEvent;
+
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import lcmc.cluster.domain.Cluster;
 import lcmc.cluster.ui.widget.MComboBox;
 import lcmc.common.domain.util.Tools;
-
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Singleton;
 
 /**
  * This class is used to test the GUI.
@@ -35,8 +35,11 @@ import javax.inject.Singleton;
 @Named
 @Singleton
 final class DrbdTest1 {
-    @Inject
-    private RoboTest roboTest;
+    private final RoboTest roboTest;
+
+    public DrbdTest1(RoboTest roboTest) {
+        this.roboTest = roboTest;
+    }
 
     void start(final Cluster cluster, final int blockDevY) {
         roboTest.setSlowFactor(0.2f);

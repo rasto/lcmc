@@ -25,6 +25,7 @@ package lcmc.drbd.ui.configdialog;
 import java.net.UnknownHostException;
 
 import javax.inject.Named;
+import javax.inject.Provider;
 import javax.swing.BoxLayout;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
@@ -38,6 +39,7 @@ import lcmc.cluster.ui.widget.WidgetFactory;
 import lcmc.common.domain.Application;
 import lcmc.common.domain.util.Tools;
 import lcmc.common.ui.MainPanel;
+import lcmc.common.ui.ProgressBar;
 import lcmc.common.ui.SpringUtilities;
 import lcmc.common.ui.WizardDialog;
 import lcmc.common.ui.main.MainData;
@@ -65,8 +67,8 @@ final class BlockDev extends DrbdConfig {
     private final SwingUtils swingUtils;
 
     public BlockDev(Application application, SwingUtils swingUtils, WidgetFactory widgetFactory, MainData mainData,
-            MainPanel mainPanel, CreateMD createMDDialog) {
-        super(application, swingUtils, widgetFactory, mainData);
+            MainPanel mainPanel, CreateMD createMDDialog, Provider<ProgressBar> progressBarProvider) {
+        super(application, swingUtils, widgetFactory, mainData, progressBarProvider);
         this.mainData = mainData;
         this.mainPanel = mainPanel;
         this.createMDDialog = createMDDialog;

@@ -23,7 +23,6 @@ package lcmc.robotest;
 import static lcmc.robotest.RoboTest.CLONE_RADIO_Y;
 import static lcmc.robotest.RoboTest.CONFIRM_REMOVE;
 
-import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
@@ -33,10 +32,15 @@ import javax.inject.Singleton;
 @Named
 @Singleton
 final class PcmkTestD {
-    @Inject
-    private RoboTest roboTest;
+    private final RoboTest roboTest;
 
-    /** Pacemaker Leak tests. */
+    public PcmkTestD(RoboTest roboTest) {
+        this.roboTest = roboTest;
+    }
+
+    /**
+     * Pacemaker Leak tests.
+     */
     void start(final int count) {
         roboTest.setSlowFactor(0.2f);
         roboTest.setAborted(false);

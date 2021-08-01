@@ -43,7 +43,6 @@ import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
-import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Provider;
 import javax.swing.ImageIcon;
@@ -63,6 +62,8 @@ import lcmc.common.domain.util.Tools;
 import lcmc.common.ui.Info;
 import lcmc.common.ui.MainPanel;
 import lcmc.common.ui.ResourceGraph;
+import lcmc.common.ui.main.MainData;
+import lcmc.common.ui.main.ProgressIndicator;
 import lcmc.common.ui.utils.MenuFactory;
 import lcmc.common.ui.utils.MyMenuItem;
 import lcmc.common.ui.utils.SwingUtils;
@@ -187,14 +188,19 @@ public class CrmGraph extends ResourceGraph {
 
     private int hostDefaultXPos = 10;
     private PcmkMultiSelectionInfo multiSelectionInfo = null;
-    @Inject
-    private MainPanel mainPanel;
-    @Inject
-    private Provider<PcmkMultiSelectionInfo> pcmkMultiSelectionInfoProvider;
-    @Inject
-    private SwingUtils swingUtils;
-    @Inject
-    private MenuFactory menuFactory;
+    private final MainPanel mainPanel;
+    private final Provider<PcmkMultiSelectionInfo> pcmkMultiSelectionInfoProvider;
+    private final SwingUtils swingUtils;
+    private final MenuFactory menuFactory;
+
+    public CrmGraph(SwingUtils swingUtils, MainData mainData, ProgressIndicator progressIndicator, MainPanel mainPanel,
+            Provider<PcmkMultiSelectionInfo> pcmkMultiSelectionInfoProvider, MenuFactory menuFactory) {
+        super(swingUtils, mainData, progressIndicator);
+        this.mainPanel = mainPanel;
+        this.pcmkMultiSelectionInfoProvider = pcmkMultiSelectionInfoProvider;
+        this.swingUtils = swingUtils;
+        this.menuFactory = menuFactory;
+    }
 
     @Override
     public void initGraph(final ClusterBrowser clusterBrowser) {

@@ -20,13 +20,14 @@
 
 package lcmc.robotest;
 
-import java.awt.event.KeyEvent;
 import static lcmc.robotest.RoboTest.CONFIRM_REMOVE;
-import lcmc.common.domain.util.Tools;
 
-import javax.inject.Inject;
+import java.awt.event.KeyEvent;
+
 import javax.inject.Named;
 import javax.inject.Singleton;
+
+import lcmc.common.domain.util.Tools;
 
 /**
  * This class is used to test the GUI.
@@ -34,8 +35,11 @@ import javax.inject.Singleton;
 @Named
 @Singleton
 final class PcmkTest7 {
-    @Inject
-    private RoboTest roboTest;
+    private final RoboTest roboTest;
+
+    public PcmkTest7(RoboTest roboTest) {
+        this.roboTest = roboTest;
+    }
 
     void start(final int count) {
         roboTest.setSlowFactor(0.5f);

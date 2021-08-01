@@ -25,6 +25,7 @@ package lcmc.cluster.ui.wizard;
 import java.awt.Color;
 
 import javax.inject.Named;
+import javax.inject.Provider;
 import javax.swing.JCheckBox;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
@@ -34,6 +35,7 @@ import lcmc.cluster.ui.widget.WidgetFactory;
 import lcmc.common.domain.Application;
 import lcmc.common.domain.UserConfig;
 import lcmc.common.domain.util.Tools;
+import lcmc.common.ui.ProgressBar;
 import lcmc.common.ui.WizardDialog;
 import lcmc.common.ui.main.MainData;
 import lcmc.common.ui.utils.SwingUtils;
@@ -49,8 +51,8 @@ final class Finish extends DialogCluster {
     private final UserConfig userConfig;
 
     public Finish(Application application, SwingUtils swingUtils, WidgetFactory widgetFactory, MainData mainData,
-            EmptyBrowser emptyBrowser, UserConfig userConfig) {
-        super(application, swingUtils, widgetFactory, mainData);
+            EmptyBrowser emptyBrowser, UserConfig userConfig, Provider<ProgressBar> progressBarProvider) {
+        super(application, swingUtils, widgetFactory, mainData, progressBarProvider);
         this.emptyBrowser = emptyBrowser;
         this.application = application;
         this.userConfig = userConfig;

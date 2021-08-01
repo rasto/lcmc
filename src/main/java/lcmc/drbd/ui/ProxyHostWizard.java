@@ -20,17 +20,16 @@
 
 package lcmc.drbd.ui;
 
+import javax.inject.Named;
+
 import lcmc.common.ui.MainPanel;
-import lcmc.host.domain.Host;
-import lcmc.drbd.domain.DrbdInstallation;
 import lcmc.common.ui.WizardDialog;
+import lcmc.drbd.domain.DrbdInstallation;
 import lcmc.drbd.ui.configdialog.NewProxyHostDialog;
 import lcmc.drbd.ui.resource.VolumeInfo;
+import lcmc.host.domain.Host;
 import lcmc.logger.Logger;
 import lcmc.logger.LoggerFactory;
-
-import javax.inject.Inject;
-import javax.inject.Named;
 
 /**
  * Show step by step dialogs that add and configure new proxy host.
@@ -40,10 +39,13 @@ public final class ProxyHostWizard {
     private static final Logger LOG = LoggerFactory.getLogger(ProxyHostWizard.class);
     private VolumeInfo volumeInfo;
     private Host host;
-    @Inject
-    private MainPanel mainPanel;
-    @Inject
-    private NewProxyHostDialog newProxyHostDialog;
+    private final MainPanel mainPanel;
+    private final NewProxyHostDialog newProxyHostDialog;
+
+    public ProxyHostWizard(MainPanel mainPanel, NewProxyHostDialog newProxyHostDialog) {
+        this.mainPanel = mainPanel;
+        this.newProxyHostDialog = newProxyHostDialog;
+    }
 
     public void init(final Host host, final VolumeInfo volumeInfo) {
         this.host = host;

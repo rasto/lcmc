@@ -25,7 +25,6 @@ import static lcmc.robotest.RoboTest.CONFIRM_REMOVE;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 
-import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
@@ -43,16 +42,20 @@ import lcmc.logger.LoggerFactory;
 @Named
 @Singleton
 final class PcmkTest1 {
-    @Inject
-    private RoboTest roboTest;
+    private final RoboTest roboTest;
     private static final Logger LOG = LoggerFactory.getLogger(PcmkTest1.class);
+
+    public PcmkTest1(RoboTest roboTest) {
+        this.roboTest = roboTest;
+    }
 
     void start(final Cluster cluster) {
         roboTest.setSlowFactor(0.4f);
         roboTest.setAborted(false);
         /* create IPaddr2 with 192.168.100.100 ip */
         String testName = "test1";
-        final String pmV = cluster.getHostsArray()[0].getHostParser().getPacemakerVersion();
+        final String pmV = cluster.getHostsArray()[0].getHostParser()
+                                                     .getPacemakerVersion();
         try {
             if (pmV != null && Tools.compareVersions(pmV, "1.1.6") < 0) {
                 testName = "test1-1.0";

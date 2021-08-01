@@ -33,7 +33,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Provider;
 import javax.swing.ImageIcon;
@@ -48,6 +47,8 @@ import lcmc.common.domain.util.Tools;
 import lcmc.common.ui.Info;
 import lcmc.common.ui.MainPanel;
 import lcmc.common.ui.ResourceGraph;
+import lcmc.common.ui.main.MainData;
+import lcmc.common.ui.main.ProgressIndicator;
 import lcmc.common.ui.utils.SwingUtils;
 import lcmc.drbd.domain.BlockDevice;
 import lcmc.drbd.ui.resource.BlockDevInfo;
@@ -131,18 +132,23 @@ public class DrbdGraph extends ResourceGraph {
      */
     private final Map<VolumeInfo, Edge> drbdVolumeToEdgeMap = new LinkedHashMap<>();
 
-    @Inject
-    private Provider<MultiSelectionInfo> multiSelectionInfoProvider;
+    private final Provider<MultiSelectionInfo> multiSelectionInfoProvider;
     private MultiSelectionInfo multiSelectionInfo;
 
     /**
      * The first X position of the host.
      */
     private int hostDefaultXPos = 10;
-    @Inject
-    private MainPanel mainPanel;
-    @Inject
-    private SwingUtils swingUtils;
+    private final MainPanel mainPanel;
+    private final SwingUtils swingUtils;
+
+    public DrbdGraph(SwingUtils swingUtils, MainData mainData, ProgressIndicator progressIndicator,
+            Provider<MultiSelectionInfo> multiSelectionInfoProvider, MainPanel mainPanel) {
+        super(swingUtils, mainData, progressIndicator);
+        this.multiSelectionInfoProvider = multiSelectionInfoProvider;
+        this.mainPanel = mainPanel;
+        this.swingUtils = swingUtils;
+    }
 
     @Override
     public void initGraph(final ClusterBrowser clusterBrowser) {

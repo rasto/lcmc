@@ -20,38 +20,42 @@
 
 package lcmc.crm.ui.resource;
 
+import java.util.Map;
+
+import javax.inject.Named;
+import javax.inject.Provider;
+
 import lcmc.cluster.ui.ClusterBrowser;
 import lcmc.common.domain.Application;
 import lcmc.common.ui.Browser;
 import lcmc.crm.domain.ResourceAgent;
 
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Provider;
-import java.util.Map;
-
 @Named
 public class CrmServiceFactory {
-    @Inject
-    private Provider<FilesystemRaInfo> filesystemRaInfoProvider;
-    @Inject
-    private Provider<LinbitDrbdInfo> linbitDrbdInfoProvider;
-    @Inject
-    private Provider<DrbddiskInfo> drbddiskInfoProvider;
-    @Inject
-    private Provider<IPaddrInfo> ipaddrInfoProvider;
-    @Inject
-    private Provider<VirtualDomainInfo> virtualDomainInfoProvider;
-    @Inject
-    private Provider<GroupInfo> groupInfoProvider;
-    @Inject
-    private Provider<CloneInfo> cloneInfoProvider;
-    @Inject @Named("serviceInfo")
-    private Provider<ServiceInfo> serviceInfoProvider;
+    private final Provider<FilesystemRaInfo> filesystemRaInfoProvider;
+    private final Provider<LinbitDrbdInfo> linbitDrbdInfoProvider;
+    private final Provider<DrbddiskInfo> drbddiskInfoProvider;
+    private final Provider<IPaddrInfo> ipaddrInfoProvider;
+    private final Provider<VirtualDomainInfo> virtualDomainInfoProvider;
+    private final Provider<GroupInfo> groupInfoProvider;
+    private final Provider<CloneInfo> cloneInfoProvider;
+    private final Provider<ServiceInfo> serviceInfoProvider;
 
-    public ServiceInfo createFromResourceAgent(
-            final ResourceAgent newResourceAgent,
-            final boolean master,
+    public CrmServiceFactory(Provider<FilesystemRaInfo> filesystemRaInfoProvider, Provider<LinbitDrbdInfo> linbitDrbdInfoProvider,
+            Provider<DrbddiskInfo> drbddiskInfoProvider, Provider<IPaddrInfo> ipaddrInfoProvider,
+            Provider<VirtualDomainInfo> virtualDomainInfoProvider, Provider<GroupInfo> groupInfoProvider,
+            Provider<CloneInfo> cloneInfoProvider, @Named("serviceInfo") Provider<ServiceInfo> serviceInfoProvider) {
+        this.filesystemRaInfoProvider = filesystemRaInfoProvider;
+        this.linbitDrbdInfoProvider = linbitDrbdInfoProvider;
+        this.drbddiskInfoProvider = drbddiskInfoProvider;
+        this.ipaddrInfoProvider = ipaddrInfoProvider;
+        this.virtualDomainInfoProvider = virtualDomainInfoProvider;
+        this.groupInfoProvider = groupInfoProvider;
+        this.cloneInfoProvider = cloneInfoProvider;
+        this.serviceInfoProvider = serviceInfoProvider;
+    }
+
+    public ServiceInfo createFromResourceAgent(final ResourceAgent newResourceAgent, final boolean master,
             final ClusterBrowser browser) {
         final ServiceInfo newServiceInfo;
 

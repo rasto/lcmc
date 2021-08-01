@@ -32,7 +32,6 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 
-import javax.inject.Inject;
 import javax.inject.Named;
 
 import com.google.common.collect.Table;
@@ -58,15 +57,20 @@ public class ClusterStatus {
     private volatile CibQuery cibQuery = new CibQuery();
     private volatile CibQuery shadowCibQuery = new CibQuery();
     private CrmXml crmXML;
-    /** On which node the resource is running or is a slave. */
+    /**
+     * On which node the resource is running or is a slave.
+     */
     private volatile Map<String, CrmXml.ResourceStatus> resStateMap = null;
     private volatile PtestData ptestResult = null;
     private String oldStatus = null;
     private String oldCib = null;
     private boolean oldAdvancedMode = false;
     private Host host;
-    @Inject
-    private Access access;
+    private final Access access;
+
+    public ClusterStatus(Access access) {
+        this.access = access;
+    }
 
     /**
      * Gets and parses metadata from pengine and crmd.
@@ -74,8 +78,8 @@ public class ClusterStatus {
     public void init(final Host host, final CrmXml crmXML) {
         this.host = host;
         this.crmXML = crmXML;
-        final String command = host.getHostParser().getDistCommand("Heartbeat.getClusterMetadata",
-                                                   (ConvertCmdCallback) null);
+        final String command = host.getHostParser()
+                                   .getDistCommand("Heartbeat.getClusterMetadata", (ConvertCmdCallback) null);
         final SshOutput ret = host.captureCommandProgressIndicator(Tools.getString("Heartbeat.getClusterMetadata"),
                                                                    new ExecCommandConfig().command(command)
                                                                                           .silentCommand()

@@ -21,11 +21,13 @@
 package lcmc.drbd.ui.configdialog;
 
 import javax.inject.Named;
+import javax.inject.Provider;
 
 import lcmc.cluster.ui.widget.WidgetFactory;
 import lcmc.common.domain.Application;
 import lcmc.common.domain.util.Tools;
 import lcmc.common.ui.MainPanel;
+import lcmc.common.ui.ProgressBar;
 import lcmc.common.ui.WizardDialog;
 import lcmc.common.ui.main.MainData;
 import lcmc.common.ui.utils.MyButton;
@@ -46,8 +48,8 @@ public final class NewProxyHostDialog extends NewHostDialog {
     private final ConfigurationProxy configurationProxy;
 
     public NewProxyHostDialog(Application application, SwingUtils swingUtils, WidgetFactory widgetFactory, MainData mainData,
-            MainPanel mainPanel, ConfigurationProxy configurationProxy) {
-        super(application, swingUtils, widgetFactory, mainData, mainPanel);
+            MainPanel mainPanel, ConfigurationProxy configurationProxy, Provider<ProgressBar> progressBarProvider) {
+        super(application, swingUtils, widgetFactory, mainData, mainPanel, progressBarProvider);
         this.configurationProxy = configurationProxy;
     }
 

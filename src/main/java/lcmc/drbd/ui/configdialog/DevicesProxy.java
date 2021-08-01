@@ -21,9 +21,11 @@
 package lcmc.drbd.ui.configdialog;
 
 import javax.inject.Named;
+import javax.inject.Provider;
 
 import lcmc.cluster.ui.widget.WidgetFactory;
 import lcmc.common.domain.Application;
+import lcmc.common.ui.ProgressBar;
 import lcmc.common.ui.WizardDialog;
 import lcmc.common.ui.main.MainData;
 import lcmc.common.ui.utils.MyButton;
@@ -45,8 +47,9 @@ final class DevicesProxy extends Devices {
     private final ProxyCheckInstallation proxyCheckInstallationDialog;
 
     public DevicesProxy(Application application, SwingUtils swingUtils, WidgetFactory widgetFactory, MainData mainData,
-            DistDetection distDetection, ProxyCheckInstallation proxyCheckInstallationDialog) {
-        super(application, swingUtils, widgetFactory, mainData, distDetection);
+            DistDetection distDetection, ProxyCheckInstallation proxyCheckInstallationDialog,
+            Provider<ProgressBar> progressBarProvider) {
+        super(application, swingUtils, widgetFactory, mainData, distDetection, progressBarProvider);
         this.proxyCheckInstallationDialog = proxyCheckInstallationDialog;
     }
 

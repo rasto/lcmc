@@ -32,6 +32,7 @@ import lcmc.cluster.ui.widget.WidgetFactory;
 import lcmc.common.domain.Application;
 import lcmc.common.domain.ExecCallback;
 import lcmc.common.domain.util.Tools;
+import lcmc.common.ui.ProgressBar;
 import lcmc.common.ui.SpringUtilities;
 import lcmc.common.ui.WizardDialog;
 import lcmc.common.ui.main.MainData;
@@ -54,8 +55,8 @@ final class ProxyInst extends DialogHost {
     private final Application application;
 
     public ProxyInst(Application application, SwingUtils swingUtils, WidgetFactory widgetFactory, MainData mainData,
-            Provider<ProxyCheckInstallation> proxyCheckInstallationProvider) {
-        super(application, swingUtils, widgetFactory, mainData);
+            Provider<ProxyCheckInstallation> proxyCheckInstallationProvider, Provider<ProgressBar> progressBarProvider) {
+        super(application, swingUtils, widgetFactory, mainData, progressBarProvider);
         this.proxyCheckInstallationProvider = proxyCheckInstallationProvider;
         this.application = application;
     }

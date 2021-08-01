@@ -38,6 +38,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
 
+import javax.inject.Named;
 import javax.inject.Singleton;
 import javax.swing.AbstractButton;
 import javax.swing.JCheckBox;
@@ -46,21 +47,19 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JTree;
 
-import lcmc.configs.AppDefaults;
-import lcmc.common.ui.main.MainData;
-import lcmc.common.domain.Application;
 import lcmc.cluster.domain.Cluster;
-import lcmc.host.domain.Host;
-import lcmc.crm.ui.CrmGraph;
-import lcmc.drbd.ui.DrbdGraph;
-import lcmc.common.ui.Info;
 import lcmc.cluster.ui.widget.GenericWidget.MTextField;
 import lcmc.cluster.ui.widget.MComboBox;
+import lcmc.common.domain.Application;
+import lcmc.common.domain.util.Tools;
+import lcmc.common.ui.Info;
+import lcmc.common.ui.main.MainData;
+import lcmc.configs.AppDefaults;
+import lcmc.crm.ui.CrmGraph;
+import lcmc.drbd.ui.DrbdGraph;
+import lcmc.host.domain.Host;
 import lcmc.logger.Logger;
 import lcmc.logger.LoggerFactory;
-import lcmc.common.domain.util.Tools;
-import javax.inject.Inject;
-import javax.inject.Named;
 
 /**
  * This class is used to test the GUI.
@@ -81,17 +80,26 @@ public class RoboTest {
     static final int HOST_Y = 100;
     /** Previous position of the mouse. */
     private volatile Point2D prevP = null;
-    /** Whether the test was aborted. */
+    /**
+     * Whether the test was aborted.
+     */
     private boolean aborted = false;
-    /** Slow down the animation. */
+    /**
+     * Slow down the animation.
+     */
     private float slowFactor = 1f;
     private Robot robot;
-    /** Cluster. */
+    /**
+     * Cluster.
+     */
     private Cluster cluster;
 
     static final boolean PROXY = true;
-    @Inject
-    private MainData mainData;
+    private final MainData mainData;
+
+    public RoboTest(MainData mainData) {
+        this.mainData = mainData;
+    }
 
     public void initRobot(final Cluster cluster) {
         this.cluster = cluster;
@@ -1250,7 +1258,7 @@ public class RoboTest {
     }
 
     private java.awt.Component findInside(final java.awt.Component component, final Class<?> clazz, final int position) {
-        final List<java.awt.Component> res = new ArrayList<java.awt.Component>();
+        final List<java.awt.Component> res = new ArrayList<>();
         findInside(component, clazz, res);
         if (res.size() > position) {
             return res.get(position);

@@ -23,7 +23,6 @@ package lcmc.crm.ui.resource;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.inject.Inject;
 import javax.inject.Named;
 
 import lcmc.cluster.ui.ClusterBrowser;
@@ -39,8 +38,11 @@ import lcmc.common.ui.utils.UpdatableItem;
 public class HbConnectionMenu {
 
     private HbConnectionInfo hbConnectionInfo;
-    @Inject
-    private MenuFactory menuFactory;
+    private final MenuFactory menuFactory;
+
+    public HbConnectionMenu(MenuFactory menuFactory) {
+        this.menuFactory = menuFactory;
+    }
 
     public List<UpdatableItem> getPulldownMenu(final HbConnectionInfo hbConnectionInfo) {
         this.hbConnectionInfo = hbConnectionInfo;
@@ -50,7 +52,7 @@ public class HbConnectionMenu {
 
         final MyMenuItem removeEdgeItem =
                 menuFactory.createMenuItem(Tools.getString("ClusterBrowser.Hb.RemoveEdge"), ClusterBrowser.REMOVE_ICON,
-                                Tools.getString("ClusterBrowser.Hb.RemoveEdge.ToolTip"),
+                                   Tools.getString("ClusterBrowser.Hb.RemoveEdge.ToolTip"),
                                 new AccessMode(AccessMode.ADMIN, AccessMode.NORMAL), new AccessMode(AccessMode.OP, AccessMode.NORMAL))
                         .enablePredicate(() -> {
                             if (getBrowser().crmStatusFailed()) {

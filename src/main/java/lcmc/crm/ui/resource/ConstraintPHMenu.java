@@ -23,24 +23,35 @@ package lcmc.crm.ui.resource;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Provider;
 
 import lcmc.cluster.ui.ClusterBrowser;
 import lcmc.common.domain.AccessMode;
 import lcmc.common.domain.Application;
 import lcmc.common.domain.util.Tools;
+import lcmc.common.ui.Access;
+import lcmc.common.ui.EditConfig;
+import lcmc.common.ui.main.MainData;
+import lcmc.common.ui.treemenu.ClusterTreeMenu;
 import lcmc.common.ui.utils.ButtonCallback;
 import lcmc.common.ui.utils.MenuFactory;
 import lcmc.common.ui.utils.MyMenuItem;
+import lcmc.common.ui.utils.SwingUtils;
 import lcmc.common.ui.utils.UpdatableItem;
+import lcmc.crm.ui.ServiceLogs;
 
 @Named
 public class ConstraintPHMenu extends ServiceMenu {
 
     private ConstraintPHInfo constraintPHInfo;
-    @Inject
-    private MenuFactory menuFactory;
+    private final MenuFactory menuFactory;
+
+    public ConstraintPHMenu(MainData drbdGui, EditConfig editDialog, MenuFactory menuFactory, SwingUtils swingUtils,
+            Provider<ServiceLogs> serviceLogsProvider, ClusterTreeMenu clusterTreeMenu, Access access) {
+        super(drbdGui, editDialog, menuFactory, swingUtils, serviceLogsProvider, clusterTreeMenu, access);
+        this.menuFactory = menuFactory;
+    }
 
     @Override
     public List<UpdatableItem> getPulldownMenu(final ServiceInfo serviceInfo) {

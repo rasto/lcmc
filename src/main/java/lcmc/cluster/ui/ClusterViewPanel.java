@@ -30,6 +30,7 @@ import lcmc.cluster.domain.Cluster;
 import lcmc.common.domain.AllHostsUpdatable;
 import lcmc.common.ui.ViewPanel;
 import lcmc.common.ui.main.MainData;
+import lcmc.common.ui.utils.SwingUtils;
 import lombok.val;
 
 /**
@@ -42,7 +43,8 @@ public class ClusterViewPanel extends ViewPanel implements AllHostsUpdatable {
     private final ClusterBrowser clusterBrowser;
     private final MainData mainData;
 
-    public ClusterViewPanel(ClusterBrowser clusterBrowser, MainData mainData) {
+    public ClusterViewPanel(SwingUtils swingUtils, ClusterBrowser clusterBrowser, MainData mainData) {
+        super(swingUtils);
         this.clusterBrowser = clusterBrowser;
         this.mainData = mainData;
     }

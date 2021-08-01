@@ -27,6 +27,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.inject.Named;
+import javax.inject.Provider;
 import javax.swing.ImageIcon;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
@@ -39,6 +40,7 @@ import lcmc.cluster.ui.widget.WidgetFactory;
 import lcmc.common.domain.Application;
 import lcmc.common.domain.ExecCallback;
 import lcmc.common.domain.util.Tools;
+import lcmc.common.ui.ProgressBar;
 import lcmc.common.ui.SpringUtilities;
 import lcmc.common.ui.WizardDialog;
 import lcmc.common.ui.main.MainData;
@@ -111,8 +113,8 @@ final class CheckInstallation extends DialogHost {
 
     public CheckInstallation(Application application, SwingUtils swingUtils, WidgetFactory widgetFactory, MainData mainData,
             HostFinish hostFinishDialog, DrbdAvailSourceFiles drbdAvailSourceFilesDialog, DrbdCommandInst drbdCommandInstDialog,
-            HeartbeatInst heartbeatInstDialog, PacemakerInst pacemakerInstDialog) {
-        super(application, swingUtils, widgetFactory, mainData);
+            HeartbeatInst heartbeatInstDialog, PacemakerInst pacemakerInstDialog, Provider<ProgressBar> progressBarProvider) {
+        super(application, swingUtils, widgetFactory, mainData, progressBarProvider);
         this.widgetFactory = widgetFactory;
         this.hostFinishDialog = hostFinishDialog;
         this.drbdAvailSourceFilesDialog = drbdAvailSourceFilesDialog;

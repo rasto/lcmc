@@ -26,6 +26,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.inject.Named;
+import javax.inject.Provider;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.SpringLayout;
@@ -36,6 +37,7 @@ import lcmc.cluster.ui.widget.WidgetFactory;
 import lcmc.common.domain.Application;
 import lcmc.common.domain.ExecCallback;
 import lcmc.common.domain.util.Tools;
+import lcmc.common.ui.ProgressBar;
 import lcmc.common.ui.SpringUtilities;
 import lcmc.common.ui.WizardDialog;
 import lcmc.common.ui.main.MainData;
@@ -50,8 +52,8 @@ public class Devices extends DialogHost {
     private final Application application;
 
     public Devices(Application application, SwingUtils swingUtils, WidgetFactory widgetFactory, MainData mainData,
-            DistDetection distDetection) {
-        super(application, swingUtils, widgetFactory, mainData);
+            DistDetection distDetection, Provider<ProgressBar> progressBarProvider) {
+        super(application, swingUtils, widgetFactory, mainData, progressBarProvider);
         this.distDetection = distDetection;
         this.application = application;
     }

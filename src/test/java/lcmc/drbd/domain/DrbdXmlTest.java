@@ -60,7 +60,7 @@ class DrbdXmlTest {
 
     @BeforeEach
     void setUp() {
-        drbdXml = new DrbdXml();
+        drbdXml = new DrbdXml(null, null);
         val output = readFile("DrbdCommands.txt");
 
         given(host1.getName()).willReturn("HOST1");

@@ -21,11 +21,11 @@
 package lcmc.robotest;
 
 import static lcmc.robotest.RoboTest.HOST_Y;
-import lcmc.common.domain.util.Tools;
 
-import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
+
+import lcmc.common.domain.util.Tools;
 
 /**
  * This class is used to test the GUI.
@@ -33,10 +33,15 @@ import javax.inject.Singleton;
 @Named
 @Singleton
 final class PcmkTestE {
-    @Inject
-    private RoboTest roboTest;
+    private final RoboTest roboTest;
 
-    /** Host wizard deadlock. */
+    public PcmkTestE(RoboTest roboTest) {
+        this.roboTest = roboTest;
+    }
+
+    /**
+     * Host wizard deadlock.
+     */
     void start(final int count) {
         roboTest.setSlowFactor(0.2f);
         roboTest.setAborted(false);
@@ -44,7 +49,7 @@ final class PcmkTestE {
             if (i % 10 == 0) {
                 roboTest.info("testE I: " + i);
             }
-            roboTest.moveTo(300 , HOST_Y); /* host */
+            roboTest.moveTo(300, HOST_Y); /* host */
             roboTest.rightClick();
             roboTest.moveTo(Tools.getString("HostBrowser.HostWizard"));
             roboTest.leftClick();

@@ -20,13 +20,12 @@
 
 package lcmc.robotest;
 
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import lcmc.cluster.domain.Cluster;
 import lcmc.logger.Logger;
 import lcmc.logger.LoggerFactory;
-
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Singleton;
 
 /**
  * This class is used to test the GUI.
@@ -34,12 +33,15 @@ import javax.inject.Singleton;
 @Named
 @Singleton
 final class DrbdTest5 {
-    @Inject
-    private RoboTest roboTest;
-    @Inject
-    private DrbdTest1 drbdTest1;
+    private final RoboTest roboTest;
+    private final DrbdTest1 drbdTest1;
 
     private static final Logger LOG = LoggerFactory.getLogger(DrbdTest5.class);
+
+    public DrbdTest5(RoboTest roboTest, DrbdTest1 drbdTest1) {
+        this.roboTest = roboTest;
+        this.drbdTest1 = drbdTest1;
+    }
 
     void start(final Cluster cluster, final int blockDevY) {
         /* Two bds. */

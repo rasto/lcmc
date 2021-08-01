@@ -25,7 +25,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Provider;
 import javax.swing.JColorChooser;
@@ -59,24 +58,29 @@ public class HostDrbdMenu {
     private static final String VG_CREATE_MENU_DESCRIPTION = "Create a volume group.";
     private static final String LV_CREATE_MENU_ITEM = "Create LV in VG ";
     private static final String LV_CREATE_MENU_DESCRIPTION = "Create a logical volume.";
-    @Inject
-    private EditHostDialog editHostDialog;
-    @Inject
-    private MainData mainData;
-    @Inject
-    private MainPresenter mainPresenter;
-    @Inject
-    private ProxyHostWizard proxyHostWizard;
-    @Inject
-    private MenuFactory menuFactory;
-    @Inject
-    private Application application;
-    @Inject
-    private Provider<VGCreate> vgCreateProvider;
-    @Inject
-    private Provider<LVCreate> lvCreateProvider;
-    @Inject
-    private Provider<DrbdsLog> drbdsLogProvider;
+    private final EditHostDialog editHostDialog;
+    private final MainData mainData;
+    private final MainPresenter mainPresenter;
+    private final ProxyHostWizard proxyHostWizard;
+    private final MenuFactory menuFactory;
+    private final Application application;
+    private final Provider<VGCreate> vgCreateProvider;
+    private final Provider<LVCreate> lvCreateProvider;
+    private final Provider<DrbdsLog> drbdsLogProvider;
+
+    public HostDrbdMenu(EditHostDialog editHostDialog, MainData mainData, MainPresenter mainPresenter,
+            ProxyHostWizard proxyHostWizard, MenuFactory menuFactory, Application application, Provider<VGCreate> vgCreateProvider,
+            Provider<LVCreate> lvCreateProvider, Provider<DrbdsLog> drbdsLogProvider) {
+        this.editHostDialog = editHostDialog;
+        this.mainData = mainData;
+        this.mainPresenter = mainPresenter;
+        this.proxyHostWizard = proxyHostWizard;
+        this.menuFactory = menuFactory;
+        this.application = application;
+        this.vgCreateProvider = vgCreateProvider;
+        this.lvCreateProvider = lvCreateProvider;
+        this.drbdsLogProvider = drbdsLogProvider;
+    }
 
     public List<UpdatableItem> getPulldownMenu(final Host host, final HostDrbdInfo hostDrbdInfo) {
         final List<UpdatableItem> items = new ArrayList<>();
@@ -84,8 +88,9 @@ public class HostDrbdMenu {
         /* host wizard */
         final MyMenuItem hostWizardItem =
                 menuFactory.createMenuItem(Tools.getString("HostBrowser.HostWizard"), HostBrowser.HOST_ICON_LARGE,
-                        Tools.getString("HostBrowser.HostWizard"), new AccessMode(AccessMode.RO, AccessMode.NORMAL),
-                        new AccessMode(AccessMode.RO, AccessMode.NORMAL)).addAction(text -> editHostDialog.showDialogs(host));
+                                   Tools.getString("HostBrowser.HostWizard"), new AccessMode(AccessMode.RO, AccessMode.NORMAL),
+                                   new AccessMode(AccessMode.RO, AccessMode.NORMAL))
+                           .addAction(text -> editHostDialog.showDialogs(host));
         items.add(hostWizardItem);
         mainData.registerAddHostButton(hostWizardItem);
 

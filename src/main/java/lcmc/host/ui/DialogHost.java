@@ -27,6 +27,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.inject.Named;
+import javax.inject.Provider;
 import javax.swing.JPanel;
 
 import lcmc.cluster.service.ssh.ExecCommandThread;
@@ -40,6 +41,7 @@ import lcmc.common.domain.ConvertCmdCallback;
 import lcmc.common.domain.Unit;
 import lcmc.common.domain.Value;
 import lcmc.common.domain.util.Tools;
+import lcmc.common.ui.ProgressBar;
 import lcmc.common.ui.WizardDialog;
 import lcmc.common.ui.main.MainData;
 import lcmc.common.ui.utils.ComponentWithTest;
@@ -59,8 +61,9 @@ public abstract class DialogHost extends WizardDialog {
     private final SwingUtils swingUtils;
     private final WidgetFactory widgetFactory;
 
-    public DialogHost(Application application, SwingUtils swingUtils, WidgetFactory widgetFactory, MainData mainData) {
-        super(application, swingUtils, widgetFactory, mainData);
+    public DialogHost(Application application, SwingUtils swingUtils, WidgetFactory widgetFactory, MainData mainData,
+            Provider<ProgressBar> progressBarProvider) {
+        super(application, swingUtils, widgetFactory, mainData, progressBarProvider);
         this.application = application;
         this.swingUtils = swingUtils;
         this.widgetFactory = widgetFactory;

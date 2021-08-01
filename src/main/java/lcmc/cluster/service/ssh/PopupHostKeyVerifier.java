@@ -22,7 +22,6 @@ package lcmc.cluster.service.ssh;
 import java.io.File;
 import java.io.IOException;
 
-import javax.inject.Inject;
 import javax.inject.Named;
 
 import com.trilead.ssh2.KnownHosts;
@@ -44,7 +43,6 @@ public class PopupHostKeyVerifier implements ServerHostKeyVerifier {
     private SSHGui sshGui;
     private final Application application;
 
-    @Inject
     public PopupHostKeyVerifier(Application application) {
         this.application = application;
     }

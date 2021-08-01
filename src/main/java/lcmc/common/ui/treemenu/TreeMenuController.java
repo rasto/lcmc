@@ -29,7 +29,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.BiConsumer;
 
-import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 import javax.swing.JTree;
@@ -64,7 +63,6 @@ public class TreeMenuController {
     private volatile boolean disableListeners = true;
     private BiConsumer<InfoPresenter, Boolean> onSelect;
 
-    @Inject
     public TreeMenuController(final SwingUtils swingUtils) {
         this.swingUtils = swingUtils;
     }

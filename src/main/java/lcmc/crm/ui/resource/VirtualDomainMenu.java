@@ -23,27 +23,38 @@ package lcmc.crm.ui.resource;
 import java.util.Collection;
 import java.util.List;
 
-import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Provider;
 
 import lcmc.common.domain.AccessMode;
 import lcmc.common.domain.Application;
+import lcmc.common.ui.Access;
+import lcmc.common.ui.EditConfig;
+import lcmc.common.ui.main.MainData;
+import lcmc.common.ui.treemenu.ClusterTreeMenu;
 import lcmc.common.ui.utils.MenuFactory;
+import lcmc.common.ui.utils.SwingUtils;
 import lcmc.common.ui.utils.UpdatableItem;
+import lcmc.crm.ui.ServiceLogs;
 import lcmc.host.domain.Host;
 import lcmc.vm.domain.VmsXml;
 import lcmc.vm.ui.resource.DomainInfo;
 
 @Named
 public class VirtualDomainMenu extends ServiceMenu {
-    
+
     private VirtualDomainInfo virtualDomainInfo;
 
     private DomainInfo domainInfo;
-    @Inject
-    private Application application;
-    @Inject
-    private MenuFactory menuFactory;
+    private final Application application;
+    private final MenuFactory menuFactory;
+
+    public VirtualDomainMenu(MainData drbdGui, EditConfig editDialog, MenuFactory menuFactory, SwingUtils swingUtils,
+            Provider<ServiceLogs> serviceLogsProvider, ClusterTreeMenu clusterTreeMenu, Access access, Application application) {
+        super(drbdGui, editDialog, menuFactory, swingUtils, serviceLogsProvider, clusterTreeMenu, access);
+        this.application = application;
+        this.menuFactory = menuFactory;
+    }
 
     @Override
     public List<UpdatableItem> getPulldownMenu(final ServiceInfo serviceInfo) {

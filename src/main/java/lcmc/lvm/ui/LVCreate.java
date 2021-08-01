@@ -31,6 +31,7 @@ import java.util.Map;
 import java.util.Set;
 
 import javax.inject.Named;
+import javax.inject.Provider;
 import javax.swing.JCheckBox;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
@@ -47,6 +48,7 @@ import lcmc.common.domain.StringValue;
 import lcmc.common.domain.Value;
 import lcmc.common.domain.util.Tools;
 import lcmc.common.ui.Browser;
+import lcmc.common.ui.ProgressBar;
 import lcmc.common.ui.SpringUtilities;
 import lcmc.common.ui.main.MainData;
 import lcmc.common.ui.utils.MyButton;
@@ -74,8 +76,9 @@ public final class LVCreate extends LV {
     private final WidgetFactory widgetFactory;
     private MyButton createButton;
 
-    public LVCreate(Application application, SwingUtils swingUtils, WidgetFactory widgetFactory, MainData mainData) {
-        super(application, swingUtils, widgetFactory, mainData);
+    public LVCreate(Application application, SwingUtils swingUtils, WidgetFactory widgetFactory, MainData mainData,
+            Provider<ProgressBar> progressBarProvider) {
+        super(application, swingUtils, widgetFactory, mainData, progressBarProvider);
         this.swingUtils = swingUtils;
         this.widgetFactory = widgetFactory;
     }

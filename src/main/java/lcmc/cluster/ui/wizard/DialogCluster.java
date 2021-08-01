@@ -23,9 +23,12 @@
 
 package lcmc.cluster.ui.wizard;
 
+import javax.inject.Provider;
+
 import lcmc.cluster.domain.Cluster;
 import lcmc.cluster.ui.widget.WidgetFactory;
 import lcmc.common.domain.Application;
+import lcmc.common.ui.ProgressBar;
 import lcmc.common.ui.WizardDialog;
 import lcmc.common.ui.main.MainData;
 import lcmc.common.ui.utils.SwingUtils;
@@ -33,8 +36,9 @@ import lcmc.common.ui.utils.SwingUtils;
 public abstract class DialogCluster extends WizardDialog {
     private Cluster cluster;
 
-    public DialogCluster(Application application, SwingUtils swingUtils, WidgetFactory widgetFactory, MainData mainData) {
-        super(application, swingUtils, widgetFactory, mainData);
+    public DialogCluster(Application application, SwingUtils swingUtils, WidgetFactory widgetFactory, MainData mainData,
+            Provider<ProgressBar> progressBarProvider) {
+        super(application, swingUtils, widgetFactory, mainData, progressBarProvider);
     }
 
     public void init(final WizardDialog previousDialog, final Cluster cluster0) {

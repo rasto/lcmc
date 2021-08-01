@@ -29,6 +29,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.inject.Named;
+import javax.inject.Provider;
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.JComponent;
@@ -51,6 +52,7 @@ import lcmc.common.domain.StringValue;
 import lcmc.common.domain.Value;
 import lcmc.common.domain.util.Tools;
 import lcmc.common.ui.Access;
+import lcmc.common.ui.ProgressBar;
 import lcmc.common.ui.SpringUtilities;
 import lcmc.common.ui.WizardDialog;
 import lcmc.common.ui.main.MainData;
@@ -114,8 +116,8 @@ public class InitCluster extends DialogCluster {
     private final Access access;
 
     public InitCluster(MainData mainData, WidgetFactory widgetFactory, Finish finishDialog, Application application,
-            SwingUtils swingUtils, Access access) {
-        super(application, swingUtils, widgetFactory, mainData);
+            SwingUtils swingUtils, Access access, Provider<ProgressBar> progressBarProvider) {
+        super(application, swingUtils, widgetFactory, mainData, progressBarProvider);
         this.widgetFactory = widgetFactory;
         this.finishDialog = finishDialog;
         this.application = application;

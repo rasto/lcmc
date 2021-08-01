@@ -22,15 +22,14 @@
 
 package lcmc.host.ui;
 
+import javax.annotation.Resource;
+import javax.inject.Named;
+
 import lcmc.common.ui.MainPanel;
-import lcmc.host.domain.Host;
 import lcmc.drbd.domain.DrbdInstallation;
+import lcmc.host.domain.Host;
 import lcmc.logger.Logger;
 import lcmc.logger.LoggerFactory;
-
-import javax.annotation.Resource;
-import javax.inject.Inject;
-import javax.inject.Named;
 
 /**
  * Show step by step dialogs that configure a host.
@@ -39,10 +38,13 @@ import javax.inject.Named;
 public final class EditHostDialog {
     private static final Logger LOG = LoggerFactory.getLogger(EditHostDialog.class);
     private Host host;
-    @Resource(name="SSH")
+    @Resource(name = "SSH")
     private SSH sshDialog;
-    @Inject
-    private MainPanel mainPanel;
+    private final MainPanel mainPanel;
+
+    public EditHostDialog(MainPanel mainPanel) {
+        this.mainPanel = mainPanel;
+    }
 
     public void showDialogs(final Host host) {
         DialogHost dialog = sshDialog;
@@ -50,7 +52,8 @@ public final class EditHostDialog {
         final boolean expanded = mainPanel.isTerminalPanelExpanded();
         mainPanel.expandTerminalSplitPane(MainPanel.TerminalSize.EXPAND);
         while (true) {
-            LOG.debug1("showDialogs: dialog: " + dialog.getClass().getName());
+            LOG.debug1("showDialogs: dialog: " + dialog.getClass()
+                                                       .getName());
             final DialogHost newdialog = (DialogHost) dialog.showDialog();
             if (dialog.isPressedCancelButton()) {
                 if (!expanded) {

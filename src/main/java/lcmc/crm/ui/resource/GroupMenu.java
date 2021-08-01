@@ -25,7 +25,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
-import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Provider;
 import javax.swing.JCheckBox;
@@ -36,7 +35,10 @@ import lcmc.cluster.ui.ClusterBrowser;
 import lcmc.common.domain.AccessMode;
 import lcmc.common.domain.Application;
 import lcmc.common.domain.util.Tools;
+import lcmc.common.ui.Access;
+import lcmc.common.ui.EditConfig;
 import lcmc.common.ui.main.MainData;
+import lcmc.common.ui.treemenu.ClusterTreeMenu;
 import lcmc.common.ui.utils.ButtonCallback;
 import lcmc.common.ui.utils.MenuFactory;
 import lcmc.common.ui.utils.MyList;
@@ -46,19 +48,25 @@ import lcmc.common.ui.utils.MyMenuItem;
 import lcmc.common.ui.utils.SwingUtils;
 import lcmc.common.ui.utils.UpdatableItem;
 import lcmc.crm.domain.ResourceAgent;
+import lcmc.crm.ui.ServiceLogs;
 
 @Named
 public class GroupMenu extends ServiceMenu {
 
-    @Inject
-    @Named("serviceMenu")
-    private Provider<ServiceMenu> serviceMenuProvider;
-    @Inject
-    private MenuFactory menuFactory;
-    @Inject
-    private SwingUtils swingUtils;
-    @Inject
-    private MainData mainData;
+    private final Provider<ServiceMenu> serviceMenuProvider;
+    private final MenuFactory menuFactory;
+    private final SwingUtils swingUtils;
+    private final MainData mainData;
+
+    public GroupMenu(MainData drbdGui, EditConfig editDialog, MenuFactory menuFactory, SwingUtils swingUtils,
+            Provider<ServiceLogs> serviceLogsProvider, ClusterTreeMenu clusterTreeMenu, Access access,
+            @Named("serviceMenu") Provider<ServiceMenu> serviceMenuProvider, MainData mainData) {
+        super(drbdGui, editDialog, menuFactory, swingUtils, serviceLogsProvider, clusterTreeMenu, access);
+        this.serviceMenuProvider = serviceMenuProvider;
+        this.menuFactory = menuFactory;
+        this.swingUtils = swingUtils;
+        this.mainData = mainData;
+    }
 
     @Override
     public List<UpdatableItem> getPulldownMenu(final ServiceInfo serviceInfo) {
@@ -66,9 +74,10 @@ public class GroupMenu extends ServiceMenu {
 
         /* add group service */
         final MyMenu addGroupServiceMenuItem = menuFactory.createMenu(Tools.getString("ClusterBrowser.Hb.AddGroupService"),
-                        new AccessMode(AccessMode.ADMIN, AccessMode.NORMAL), new AccessMode(AccessMode.OP, AccessMode.NORMAL))
-                .enablePredicate(() -> {
-                    if (groupInfo.getBrowser().crmStatusFailed()) {
+                                                                  new AccessMode(AccessMode.ADMIN, AccessMode.NORMAL), new AccessMode(AccessMode.OP, AccessMode.NORMAL))
+                                                          .enablePredicate(() -> {
+                                                              if (groupInfo.getBrowser()
+                                                                           .crmStatusFailed()) {
                         return ClusterBrowser.UNKNOWN_CLUSTER_STATUS_STRING;
                     } else {
                         return null;

@@ -26,7 +26,6 @@ import java.awt.Dimension;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
-import javax.inject.Inject;
 import javax.inject.Named;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
@@ -63,12 +62,12 @@ public class ViewPanel extends JPanel {
      * Last selected info object in the right pane.
      */
     private InfoPresenter lastSelectedInfo = null;
-    @Inject
-    private SwingUtils swingUtils;
+    private final SwingUtils swingUtils;
 
-    public ViewPanel() {
+    public ViewPanel(SwingUtils swingUtils) {
         super(new BorderLayout());
         setBackground(Tools.getDefaultColor("ViewPanel.Status.Background"));
+        this.swingUtils = swingUtils;
     }
 
     public final void createPanels(final JTree tree) {

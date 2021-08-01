@@ -31,7 +31,6 @@ import java.util.Enumeration;
 import java.util.List;
 import java.util.Set;
 
-import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Provider;
 import javax.inject.Singleton;
@@ -69,6 +68,12 @@ public class Application {
     public static final String PM_CLONE_SET_NAME = "Clone Set";
     public static final String PM_MASTER_SLAVE_SET_NAME = "Master/Slave Set";
     public static final String PACEMAKER_GROUP_NAME = "Group";
+
+    public Application(Hosts allHosts, Clusters allClusters, Provider<ConfirmDialog> confirmDialogProvider) {
+        this.allHosts = allHosts;
+        this.allClusters = allClusters;
+        this.confirmDialogProvider = confirmDialogProvider;
+    }
 
     public static boolean isLive(final RunMode runMode) {
         return RunMode.LIVE == runMode;
@@ -122,12 +127,9 @@ public class Application {
     private boolean cmdLog = false;
     private Test autoTest = null;
 
-    @Inject
-    private Hosts allHosts;
-    @Inject
-    private Clusters allClusters;
-    @Inject
-    private Provider<ConfirmDialog> confirmDialogProvider;
+    private final Hosts allHosts;
+    private final Clusters allClusters;
+    private final Provider<ConfirmDialog> confirmDialogProvider;
 
     public int danglingHostsCount() {
         int c = 0;

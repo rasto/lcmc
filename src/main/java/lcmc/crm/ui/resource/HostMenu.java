@@ -24,7 +24,6 @@ import java.awt.Color;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Provider;
 import javax.swing.JColorChooser;
@@ -55,26 +54,30 @@ import lombok.val;
 public class HostMenu {
     private static final String NOT_IN_CLUSTER = "not in cluster";
 
-    @Inject
-    private EditHostDialog editHostDialog;
-    @Inject
-    private MainData mainData;
-    @Inject
-    private MainPresenter mainPresenter;
-    @Inject
-    private MenuFactory menuFactory;
-    @Inject
-    private Application application;
-    @Inject @Named("hostLogs")
-    private Provider<HostLogs> hostLogsProvider;
+    private final EditHostDialog editHostDialog;
+    private final MainData mainData;
+    private final MainPresenter mainPresenter;
+    private final MenuFactory menuFactory;
+    private final Application application;
+    private final Provider<HostLogs> hostLogsProvider;
+
+    public HostMenu(EditHostDialog editHostDialog, MainData mainData, MainPresenter mainPresenter, MenuFactory menuFactory,
+            Application application, @Named("hostLogs") Provider<HostLogs> hostLogsProvider) {
+        this.editHostDialog = editHostDialog;
+        this.mainData = mainData;
+        this.mainPresenter = mainPresenter;
+        this.menuFactory = menuFactory;
+        this.application = application;
+        this.hostLogsProvider = hostLogsProvider;
+    }
 
     public List<UpdatableItem> getPulldownMenu(final HostInfo hostInfo) {
         final List<UpdatableItem> items = new ArrayList<>();
         /* host wizard */
         final MyMenuItem hostWizardItem =
                 menuFactory.createMenuItem(Tools.getString("HostBrowser.HostWizard"), HostBrowser.HOST_ICON_LARGE, "",
-                                new AccessMode(AccessMode.RO, AccessMode.NORMAL), new AccessMode(AccessMode.RO, AccessMode.NORMAL))
-                        .addAction(text -> editHostDialog.showDialogs(hostInfo.getHost()));
+                                   new AccessMode(AccessMode.RO, AccessMode.NORMAL), new AccessMode(AccessMode.RO, AccessMode.NORMAL))
+                           .addAction(text -> editHostDialog.showDialogs(hostInfo.getHost()));
         items.add(hostWizardItem);
         mainData.registerAddHostButton(hostWizardItem);
         /* cluster manager standby on/off */

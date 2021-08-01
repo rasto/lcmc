@@ -22,7 +22,6 @@ package lcmc.robotest;
 
 import java.awt.event.KeyEvent;
 
-import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
@@ -41,15 +40,20 @@ import lcmc.logger.LoggerFactory;
 @Named
 @Singleton
 final class DrbdTest8 {
-    @Inject
-    private RoboTest roboTest;
-    @Inject
-    private DrbdTest1 drbdTest1;
+    private final RoboTest roboTest;
+    private final DrbdTest1 drbdTest1;
     private static final Logger LOG = LoggerFactory.getLogger(DrbdTest8.class);
-    @Inject
-    private MainPanel mainPanel;
+    private final MainPanel mainPanel;
 
-    /** DRBD Test 8 / proxy. */
+    public DrbdTest8(RoboTest roboTest, DrbdTest1 drbdTest1, MainPanel mainPanel) {
+        this.roboTest = roboTest;
+        this.drbdTest1 = drbdTest1;
+        this.mainPanel = mainPanel;
+    }
+
+    /**
+     * DRBD Test 8 / proxy.
+     */
     void start(final Cluster cluster, final int blockDevY) {
         /* Two drbds. */
         roboTest.setSlowFactor(0.2f);

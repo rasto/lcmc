@@ -35,7 +35,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.logging.Level;
 
-import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 import javax.swing.JComponent;
@@ -79,34 +78,40 @@ public final class LCMC extends JPanel {
     private static final int TOOLTIP_INITIAL_DELAY_MILLIS = 200;
     private static final int TOOLTIP_DISMISS_DELAY_MILLIS = 100000;
 
-    @Inject
-    private Application application;
-    @Inject
-    private ArgumentParser argumentParser;
-    @Inject
-    private MainPanel mainPanel;
-    @Inject
-    private MainMenu menu;
-    @Inject
-    private ProgressIndicator progressIndicator;
-    @Inject
-    private MainData mainData;
-    @Inject
-    private MainPresenter mainPresenter;
-    @Inject
-    private BlockDeviceService blockDeviceService;
-    @Inject
-    private MountPointService mountPointService;
-    @Inject
-    private FileSystemService fileSystemService;
-    @Inject
-    private NetworkService networkService;
-    @Inject
-    private SwingUtils swingUtils;
+    private final Application application;
+    private final ArgumentParser argumentParser;
+    private final MainPanel mainPanel;
+    private final MainMenu menu;
+    private final ProgressIndicator progressIndicator;
+    private final MainData mainData;
+    private final MainPresenter mainPresenter;
+    private final BlockDeviceService blockDeviceService;
+    private final MountPointService mountPointService;
+    private final FileSystemService fileSystemService;
+    private final NetworkService networkService;
+    private final SwingUtils swingUtils;
     @Getter
     private JComponent mainGlassPane;
-    @Inject
-    private ProgressIndicator progressInidicator;
+    private final ProgressIndicator progressInidicator;
+
+    public LCMC(Application application, ArgumentParser argumentParser, MainPanel mainPanel, ProgressIndicator progressInidicator,
+            MainMenu menu, ProgressIndicator progressIndicator, MainData mainData, MainPresenter mainPresenter,
+            BlockDeviceService blockDeviceService, MountPointService mountPointService, SwingUtils swingUtils,
+            FileSystemService fileSystemService, NetworkService networkService) {
+        this.application = application;
+        this.argumentParser = argumentParser;
+        this.mainPanel = mainPanel;
+        this.progressInidicator = progressInidicator;
+        this.menu = menu;
+        this.progressIndicator = progressIndicator;
+        this.mainData = mainData;
+        this.mainPresenter = mainPresenter;
+        this.blockDeviceService = blockDeviceService;
+        this.mountPointService = mountPointService;
+        this.swingUtils = swingUtils;
+        this.fileSystemService = fileSystemService;
+        this.networkService = networkService;
+    }
 
     void createAndShowGUI(final Container mainFrame) {
         setupUiManager();

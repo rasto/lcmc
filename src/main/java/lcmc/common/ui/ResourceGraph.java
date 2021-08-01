@@ -50,7 +50,6 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
-import javax.inject.Inject;
 import javax.inject.Named;
 import javax.swing.ImageIcon;
 import javax.swing.JComponent;
@@ -176,23 +175,28 @@ public abstract class ResourceGraph {
      * List of edges that are made only during test.
      */
     private volatile Edge testEdge = null;
-    /** List of edges that are being tested during test. */
+    /**
+     * List of edges that are being tested during test.
+     */
     private volatile Edge existingTestEdge = null;
     private final Lock mTestEdgeLock = new ReentrantLock();
-    @Inject
-    private Application application;
-    @Inject
-    private SwingUtils swingUtils;
+    private final SwingUtils swingUtils;
     private final Map<String, TextLayout> textLayoutCache = new HashMap<>();
     private double scaledSoFar = 1.0;
 
     private ClusterBrowser clusterBrowser;
-    @Inject
-    private MainData mainData;
-    @Inject
-    private ProgressIndicator progressIndicator;
+    private final MainData mainData;
+    private final ProgressIndicator progressIndicator;
 
-    /** Starts the animation if vertex is being updated. */
+    public ResourceGraph(SwingUtils swingUtils, MainData mainData, ProgressIndicator progressIndicator) {
+        this.swingUtils = swingUtils;
+        this.mainData = mainData;
+        this.progressIndicator = progressIndicator;
+    }
+
+    /**
+     * Starts the animation if vertex is being updated.
+     */
     public final void startAnimation(final Info info) {
         final int animInterval = (int) (1000 / mainData.getAnimFPS());
         mAnimationListLock.lock();

@@ -25,6 +25,7 @@ package lcmc.cluster.ui.wizard;
 import java.awt.BorderLayout;
 
 import javax.inject.Named;
+import javax.inject.Provider;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -39,6 +40,7 @@ import lcmc.common.domain.AccessMode;
 import lcmc.common.domain.Application;
 import lcmc.common.domain.StringValue;
 import lcmc.common.domain.util.Tools;
+import lcmc.common.ui.ProgressBar;
 import lcmc.common.ui.SpringUtilities;
 import lcmc.common.ui.WizardDialog;
 import lcmc.common.ui.main.MainData;
@@ -63,8 +65,8 @@ public final class Name extends DialogCluster {
 
     public Name(MainData mainData, ClusterHosts clusterHostsDialog, ClusterTabFactory clusterTabFactory,
             MainPresenter mainPresenter, Application application, SwingUtils swingUtils, Clusters allClusters,
-            WidgetFactory widgetFactory) {
-        super(application, swingUtils, widgetFactory, mainData);
+            WidgetFactory widgetFactory, Provider<ProgressBar> progressBarProvider) {
+        super(application, swingUtils, widgetFactory, mainData, progressBarProvider);
         this.clusterHostsDialog = clusterHostsDialog;
         this.clusterTabFactory = clusterTabFactory;
         this.mainPresenter = mainPresenter;

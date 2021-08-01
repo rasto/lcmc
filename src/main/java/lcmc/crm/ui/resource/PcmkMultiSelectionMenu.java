@@ -25,7 +25,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import javax.inject.Inject;
 import javax.inject.Named;
 import javax.swing.JColorChooser;
 
@@ -53,14 +52,17 @@ import lombok.val;
 @Named
 public class PcmkMultiSelectionMenu {
     private PcmkMultiSelectionInfo pcmkMultiSelectionInfo;
-    @Inject
-    private MenuFactory menuFactory;
-    @Inject
-    private Application application;
-    @Inject
-    private MainData mainData;
-    @Inject
-    private Access access;
+    private final MenuFactory menuFactory;
+    private final Application application;
+    private final MainData mainData;
+    private final Access access;
+
+    public PcmkMultiSelectionMenu(MenuFactory menuFactory, Application application, MainData mainData, Access access) {
+        this.menuFactory = menuFactory;
+        this.application = application;
+        this.mainData = mainData;
+        this.access = access;
+    }
 
     public List<UpdatableItem> getPulldownMenu(final PcmkMultiSelectionInfo pcmkMultiSelectionInfo) {
         this.pcmkMultiSelectionInfo = pcmkMultiSelectionInfo;

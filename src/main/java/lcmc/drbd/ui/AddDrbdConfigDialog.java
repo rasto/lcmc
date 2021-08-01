@@ -26,7 +26,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import javax.inject.Inject;
 import javax.inject.Named;
 
 import lcmc.common.ui.MainPanel;
@@ -51,14 +50,17 @@ public final class AddDrbdConfigDialog {
     private GlobalInfo globalInfo;
     private BlockDevInfo blockDevInfo1;
     private BlockDevInfo blockDevInfo2;
-    @Inject
-    private MainPanel mainPanel;
-    @Inject
-    private Start startDialog;
-    @Inject
-    private Resource resourceDialog;
-    @Inject
-    private SwingUtils swingUtils;
+    private final MainPanel mainPanel;
+    private final Start startDialog;
+    private final Resource resourceDialog;
+    private final SwingUtils swingUtils;
+
+    public AddDrbdConfigDialog(MainPanel mainPanel, Start startDialog, Resource resourceDialog, SwingUtils swingUtils) {
+        this.mainPanel = mainPanel;
+        this.startDialog = startDialog;
+        this.resourceDialog = resourceDialog;
+        this.swingUtils = swingUtils;
+    }
 
     public void init(final GlobalInfo globalInfo, final BlockDevInfo blockDevInfo1, final BlockDevInfo blockDevInfo2) {
         this.globalInfo = globalInfo;
@@ -68,7 +70,8 @@ public final class AddDrbdConfigDialog {
 
     public void showDialogs() {
         WizardDialog dialog;
-        if (!globalInfo.getDrbdResources().isEmpty() && globalInfo.atLeastVersion("8.4")) {
+        if (!globalInfo.getDrbdResources()
+                       .isEmpty() && globalInfo.atLeastVersion("8.4")) {
             startDialog.init(null, blockDevInfo1, blockDevInfo2);
             dialog = startDialog;
         } else {

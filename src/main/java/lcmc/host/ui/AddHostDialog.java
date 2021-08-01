@@ -23,7 +23,6 @@
 package lcmc.host.ui;
 
 import javax.annotation.Resource;
-import javax.inject.Inject;
 import javax.inject.Named;
 
 import lcmc.common.domain.Application;
@@ -42,16 +41,19 @@ import lcmc.logger.LoggerFactory;
 public final class AddHostDialog {
     private static final Logger LOG = LoggerFactory.getLogger(AddHostDialog.class);
     private Host host;
-    @Resource(name="newHostDialog")
+    @Resource(name = "newHostDialog")
     private NewHostDialog newHostDialog;
-    @Inject
-    private MainPresenter mainPresenter;
-    @Inject
-    private MainPanel mainPanel;
-    @Inject
-    private Application application;
-    @Inject
-    private SwingUtils swingUtils;
+    private final MainPresenter mainPresenter;
+    private final MainPanel mainPanel;
+    private final Application application;
+    private final SwingUtils swingUtils;
+
+    public AddHostDialog(MainPresenter mainPresenter, MainPanel mainPanel, Application application, SwingUtils swingUtils) {
+        this.mainPresenter = mainPresenter;
+        this.mainPanel = mainPanel;
+        this.application = application;
+        this.swingUtils = swingUtils;
+    }
 
     public void showDialogs(final Host host) {
         mainPresenter.enableAddHostButtons(false);
@@ -59,7 +61,8 @@ public final class AddHostDialog {
         dialog.init(null, host, new DrbdInstallation());
         mainPanel.expandTerminalSplitPane(MainPanel.TerminalSize.EXPAND);
         while (true) {
-            LOG.debug1("showDialogs: dialog: " + dialog.getClass().getName());
+            LOG.debug1("showDialogs: dialog: " + dialog.getClass()
+                                                       .getName());
             final DialogHost newdialog = (DialogHost) dialog.showDialog();
             if (dialog.isPressedCancelButton()) {
                 /* remove host tab from main window */

@@ -30,7 +30,6 @@ import java.awt.event.ItemListener;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.inject.Inject;
 import javax.inject.Provider;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -62,13 +61,14 @@ public abstract class WizardDialog extends ConfigDialog {
      */
     private WizardDialog previousDialog;
     private ProgressBar progressBar = null;
-    @Inject
-    private SwingUtils swingUtils;
-    @Inject
-    private Provider<ProgressBar> progressBarProvider;
+    private final SwingUtils swingUtils;
+    private final Provider<ProgressBar> progressBarProvider;
 
-    public WizardDialog(Application application, SwingUtils swingUtils, WidgetFactory widgetFactory, MainData mainData) {
+    public WizardDialog(Application application, SwingUtils swingUtils, WidgetFactory widgetFactory, MainData mainData,
+            Provider<ProgressBar> progressBarProvider) {
         super(application, swingUtils, widgetFactory, mainData);
+        this.swingUtils = swingUtils;
+        this.progressBarProvider = progressBarProvider;
     }
 
     /**

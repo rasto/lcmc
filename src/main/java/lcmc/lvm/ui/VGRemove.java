@@ -38,6 +38,7 @@ import java.util.Map;
 import java.util.Set;
 
 import javax.inject.Named;
+import javax.inject.Provider;
 import javax.swing.JCheckBox;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
@@ -50,6 +51,7 @@ import lcmc.cluster.ui.widget.WidgetFactory;
 import lcmc.common.domain.Application;
 import lcmc.common.domain.util.Tools;
 import lcmc.common.ui.Browser;
+import lcmc.common.ui.ProgressBar;
 import lcmc.common.ui.SpringUtilities;
 import lcmc.common.ui.main.MainData;
 import lcmc.common.ui.utils.MyButton;
@@ -73,8 +75,9 @@ public final class VGRemove extends LV {
     private boolean multiSelection;
     private final SwingUtils swingUtils;
 
-    public VGRemove(Application application, SwingUtils swingUtils, WidgetFactory widgetFactory, MainData mainData) {
-        super(application, swingUtils, widgetFactory, mainData);
+    public VGRemove(Application application, SwingUtils swingUtils, WidgetFactory widgetFactory, MainData mainData,
+            Provider<ProgressBar> progressBarProvider) {
+        super(application, swingUtils, widgetFactory, mainData, progressBarProvider);
         this.widgetFactory = widgetFactory;
         this.swingUtils = swingUtils;
     }

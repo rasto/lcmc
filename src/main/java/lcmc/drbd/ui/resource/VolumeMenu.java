@@ -23,7 +23,6 @@ package lcmc.drbd.ui.resource;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.inject.Inject;
 import javax.inject.Named;
 
 import lcmc.cluster.ui.ClusterBrowser;
@@ -40,10 +39,13 @@ import lcmc.drbd.domain.DrbdXml;
 @Named
 public class VolumeMenu {
     private VolumeInfo volumeInfo;
-    @Inject
-    private MenuFactory menuFactory;
-    @Inject
-    private Access access;
+    private final MenuFactory menuFactory;
+    private final Access access;
+
+    public VolumeMenu(MenuFactory menuFactory, Access access) {
+        this.menuFactory = menuFactory;
+        this.access = access;
+    }
 
     public List<UpdatableItem> getPulldownMenu(final VolumeInfo volumeInfo) {
         this.volumeInfo = volumeInfo;
@@ -51,10 +53,10 @@ public class VolumeMenu {
         final List<UpdatableItem> items = new ArrayList<>();
 
         final MyMenuItem connectMenu = menuFactory.createMenuItem(
-                        Tools.getString("ClusterBrowser.Drbd.ResourceConnect") + ' ' + getResourceInfo().getName(), null,
-                        Tools.getString("ClusterBrowser.Drbd.ResourceConnect.ToolTip"),
+                                                          Tools.getString("ClusterBrowser.Drbd.ResourceConnect") + ' ' + getResourceInfo().getName(), null,
+                                                          Tools.getString("ClusterBrowser.Drbd.ResourceConnect.ToolTip"),
 
-                        Tools.getString("ClusterBrowser.Drbd.ResourceDisconnect") + ' ' + getResourceInfo().getName(), null,
+                                                          Tools.getString("ClusterBrowser.Drbd.ResourceDisconnect") + ' ' + getResourceInfo().getName(), null,
                         Tools.getString("ClusterBrowser.Drbd.ResourceDisconnect.ToolTip"),
                         new AccessMode(AccessMode.OP, AccessMode.ADVANCED), new AccessMode(AccessMode.OP, AccessMode.NORMAL))
                 .predicate(() -> !volumeInfo.isConnectedOrWF(runMode))

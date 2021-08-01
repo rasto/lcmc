@@ -24,7 +24,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import javax.inject.Inject;
 import javax.inject.Named;
 import javax.swing.JMenuItem;
 
@@ -36,14 +35,15 @@ import lcmc.common.ui.utils.UpdatableItem;
 
 @Named
 public class ResourceMenu {
-    private ResourceInfo resourceInfo;
-    @Inject
-    private MenuFactory menuFactory;
-    @Inject
-    private SwingUtils swingUtils;
+    private final MenuFactory menuFactory;
+    private final SwingUtils swingUtils;
+
+    public ResourceMenu(MenuFactory menuFactory, SwingUtils swingUtils) {
+        this.menuFactory = menuFactory;
+        this.swingUtils = swingUtils;
+    }
 
     public List<UpdatableItem> getPulldownMenu(final ResourceInfo resourceInfo) {
-        this.resourceInfo = resourceInfo;
         final List<UpdatableItem> items = new ArrayList<>();
         for (final VolumeInfo dvi : resourceInfo.getDrbdVolumes()) {
             final MyMenu volumesMenu = menuFactory.createMenu(dvi.toString(), new AccessMode(AccessMode.RO, AccessMode.NORMAL),

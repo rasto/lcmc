@@ -38,6 +38,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import javax.inject.Named;
+import javax.inject.Provider;
 import javax.swing.BoxLayout;
 import javax.swing.JCheckBox;
 import javax.swing.JComponent;
@@ -63,6 +64,7 @@ import lcmc.common.domain.StringValue;
 import lcmc.common.domain.Value;
 import lcmc.common.domain.util.Tools;
 import lcmc.common.ui.Access;
+import lcmc.common.ui.ProgressBar;
 import lcmc.common.ui.SpringUtilities;
 import lcmc.common.ui.WizardDialog;
 import lcmc.common.ui.main.MainData;
@@ -130,8 +132,8 @@ final class CoroConfig extends DialogCluster {
     private final Access access;
 
     public CoroConfig(MainData mainData, InitCluster initClusterDialog, Application application, SwingUtils swingUtils,
-            WidgetFactory widgetFactory, NetworkService networkService, Access access) {
-        super(application, swingUtils, widgetFactory, mainData);
+            WidgetFactory widgetFactory, NetworkService networkService, Access access, Provider<ProgressBar> progressBarProvider) {
+        super(application, swingUtils, widgetFactory, mainData, progressBarProvider);
         this.initClusterDialog = initClusterDialog;
         this.application = application;
         this.swingUtils = swingUtils;

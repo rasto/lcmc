@@ -23,11 +23,13 @@
 
 package lcmc.lvm.ui;
 
+import javax.inject.Provider;
 import javax.swing.JComponent;
 
 import lcmc.cluster.ui.widget.WidgetFactory;
 import lcmc.common.domain.Application;
 import lcmc.common.domain.Unit;
+import lcmc.common.ui.ProgressBar;
 import lcmc.common.ui.WizardDialog;
 import lcmc.common.ui.main.MainData;
 import lcmc.common.ui.utils.SwingUtils;
@@ -37,8 +39,9 @@ import lcmc.drbd.ui.resource.BlockDevInfo;
  * LVM dialogs.
  */
 class LV extends WizardDialog {
-    public LV(Application application, SwingUtils swingUtils, WidgetFactory widgetFactory, MainData mainData) {
-        super(application, swingUtils, widgetFactory, mainData);
+    public LV(Application application, SwingUtils swingUtils, WidgetFactory widgetFactory, MainData mainData,
+            Provider<ProgressBar> progressBarProvider) {
+        super(application, swingUtils, widgetFactory, mainData, progressBarProvider);
     }
 
     protected static Unit[] getUnits() {

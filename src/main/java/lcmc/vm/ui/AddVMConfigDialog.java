@@ -22,17 +22,16 @@
 
 package lcmc.vm.ui;
 
-import lcmc.common.ui.main.MainData;
+import javax.inject.Named;
+
 import lcmc.common.domain.Application;
 import lcmc.common.ui.MainPanel;
+import lcmc.common.ui.main.MainData;
+import lcmc.logger.Logger;
+import lcmc.logger.LoggerFactory;
 import lcmc.vm.ui.configdialog.Domain;
 import lcmc.vm.ui.configdialog.VMConfig;
 import lcmc.vm.ui.resource.DomainInfo;
-import lcmc.logger.Logger;
-import lcmc.logger.LoggerFactory;
-
-import javax.inject.Inject;
-import javax.inject.Named;
 
 /**
  * Show step by step dialogs that add and configure new virtual domain.
@@ -41,12 +40,15 @@ import javax.inject.Named;
 public final class AddVMConfigDialog {
     private static final Logger LOG = LoggerFactory.getLogger(AddVMConfigDialog.class);
     private DomainInfo vmsVirtualDomainInfo;
-    @Inject
-    private MainData mainData;
-    @Inject
-    private MainPanel mainPanel;
-    @Inject
-    private Domain domainDialog;
+    private final MainData mainData;
+    private final MainPanel mainPanel;
+    private final Domain domainDialog;
+
+    public AddVMConfigDialog(MainData mainData, MainPanel mainPanel, Domain domainDialog) {
+        this.mainData = mainData;
+        this.mainPanel = mainPanel;
+        this.domainDialog = domainDialog;
+    }
 
     public void init(final DomainInfo vmsVirtualDomainInfo) {
         this.vmsVirtualDomainInfo = vmsVirtualDomainInfo;

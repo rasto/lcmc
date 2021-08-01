@@ -30,7 +30,6 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 
-import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Provider;
 import javax.swing.JCheckBox;
@@ -67,22 +66,24 @@ import lombok.val;
 
 @Named
 public class ServiceMenu {
-    @Inject
-    private MainData drbdGui;
-    @Inject
-    private EditConfig editDialog;
-    @Inject
-    private MenuFactory menuFactory;
-    @Inject
-    private Application application;
-    @Inject
-    private SwingUtils swingUtils;
-    @Inject
-    private Provider<ServiceLogs> serviceLogsProvider;
-    @Inject
-    private ClusterTreeMenu clusterTreeMenu;
-    @Inject
-    private Access access;
+    private final MainData drbdGui;
+    private final EditConfig editDialog;
+    private final MenuFactory menuFactory;
+    private final SwingUtils swingUtils;
+    private final Provider<ServiceLogs> serviceLogsProvider;
+    private final ClusterTreeMenu clusterTreeMenu;
+    private final Access access;
+
+    public ServiceMenu(MainData drbdGui, EditConfig editDialog, MenuFactory menuFactory, SwingUtils swingUtils,
+            Provider<ServiceLogs> serviceLogsProvider, ClusterTreeMenu clusterTreeMenu, Access access) {
+        this.drbdGui = drbdGui;
+        this.editDialog = editDialog;
+        this.menuFactory = menuFactory;
+        this.swingUtils = swingUtils;
+        this.serviceLogsProvider = serviceLogsProvider;
+        this.clusterTreeMenu = clusterTreeMenu;
+        this.access = access;
+    }
 
     public List<UpdatableItem> getPulldownMenu(final ServiceInfo serviceInfo) {
         final List<UpdatableItem> items = new ArrayList<>();

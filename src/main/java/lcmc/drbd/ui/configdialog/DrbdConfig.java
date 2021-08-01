@@ -22,8 +22,11 @@
 
 package lcmc.drbd.ui.configdialog;
 
+import javax.inject.Provider;
+
 import lcmc.cluster.ui.widget.WidgetFactory;
 import lcmc.common.domain.Application;
+import lcmc.common.ui.ProgressBar;
 import lcmc.common.ui.WizardDialog;
 import lcmc.common.ui.main.MainData;
 import lcmc.common.ui.utils.SwingUtils;
@@ -35,8 +38,9 @@ import lcmc.drbd.ui.resource.VolumeInfo;
 public abstract class DrbdConfig extends WizardDialog {
     private VolumeInfo volumeInfo;
 
-    public DrbdConfig(Application application, SwingUtils swingUtils, WidgetFactory widgetFactory, MainData mainData) {
-        super(application, swingUtils, widgetFactory, mainData);
+    public DrbdConfig(Application application, SwingUtils swingUtils, WidgetFactory widgetFactory, MainData mainData,
+            Provider<ProgressBar> progressBarProvider) {
+        super(application, swingUtils, widgetFactory, mainData, progressBarProvider);
     }
 
     public void init(final WizardDialog previousDialog, final VolumeInfo volumeInfo) {

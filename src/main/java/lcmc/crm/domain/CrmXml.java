@@ -39,7 +39,6 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Provider;
 
@@ -335,7 +334,7 @@ public class CrmXml {
         RSC_DEFAULTS_META_ATTR_ACCESS_TYPE.put(GROUP_ORDERED_META_ATTR, AccessMode.ADMIN);
 
         /* ignore defaults for this RAs. It means that default values will be
-        * saved in the cib. */
+         * saved in the cib. */
         IGNORE_RA_DEFAULTS_FOR.add("iSCSITarget");
 
         RA_NON_ADVANCED_PARAM.put("IPaddr2", "cidr_netmask", Tools.getString("CRMXML.OtherOptions"));
@@ -343,14 +342,18 @@ public class CrmXml {
     }
 
     private static final AccessMode.Type DEFAULT_ACCESS_TYPE = AccessMode.ADMIN;
-    @Inject
-    private ProgressIndicator progressIndicator;
-    @Inject
-    private Application application;
-    @Inject
-    private StartTests startTests;
-    @Inject
-    private Provider<ResourceUpdater> resourceUpdaterProvider;
+    private final ProgressIndicator progressIndicator;
+    private final Application application;
+    private final StartTests startTests;
+    private final Provider<ResourceUpdater> resourceUpdaterProvider;
+
+    public CrmXml(ProgressIndicator progressIndicator, Application application, StartTests startTests,
+            Provider<ResourceUpdater> resourceUpdaterProvider) {
+        this.progressIndicator = progressIndicator;
+        this.application = application;
+        this.startTests = startTests;
+        this.resourceUpdaterProvider = resourceUpdaterProvider;
+    }
 
     public static Unit getUnitMilliSec() {
         return new Unit("ms", "ms", "Millisecond", "Milliseconds");

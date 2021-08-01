@@ -41,6 +41,7 @@ import lcmc.common.domain.Application;
 import lcmc.common.domain.StringValue;
 import lcmc.common.domain.Value;
 import lcmc.common.domain.util.Tools;
+import lcmc.common.ui.ProgressBar;
 import lcmc.common.ui.WizardDialog;
 import lcmc.common.ui.main.MainData;
 import lcmc.common.ui.utils.MyButton;
@@ -97,8 +98,9 @@ public final class Resource extends DrbdConfig {
     private final WidgetFactory widgetFactory;
 
     public Resource(Application application, SwingUtils swingUtils, WidgetFactory widgetFactory, MainData mainData,
-            HostFactory hostFactory, Provider<NewProxyHostDialog> newProxyHostDialogProvider, Volume volumeDialog) {
-        super(application, swingUtils, widgetFactory, mainData);
+            HostFactory hostFactory, Provider<NewProxyHostDialog> newProxyHostDialogProvider, Volume volumeDialog,
+            Provider<ProgressBar> progressBarProvider) {
+        super(application, swingUtils, widgetFactory, mainData, progressBarProvider);
         this.hostFactory = hostFactory;
         this.newProxyHostDialogProvider = newProxyHostDialogProvider;
         this.volumeDialog = volumeDialog;

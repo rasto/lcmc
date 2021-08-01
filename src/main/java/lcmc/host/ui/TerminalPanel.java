@@ -35,7 +35,6 @@ import java.util.concurrent.locks.ReentrantLock;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import javax.inject.Inject;
 import javax.inject.Named;
 import javax.swing.JScrollPane;
 import javax.swing.JTextPane;
@@ -137,10 +136,8 @@ public class TerminalPanel extends JScrollPane {
      * List of cheats, with positions while typing them.
      */
     private static final Map<String, Integer> CHEATS_MAP = new LinkedHashMap<>();
-    @Inject
-    private RoboTest roboTest;
-    @Inject
-    private MainMenu mainMenu;
+    private final RoboTest roboTest;
+    private final MainMenu mainMenu;
     private static final Map<String, Test> TEST_CHEATS = new HashMap<>();
 
     static {
@@ -207,18 +204,24 @@ public class TerminalPanel extends JScrollPane {
      */
     private final Map<String, Color> terminalColor = new HashMap<>();
     private Color defaultOutputColor;
-    @Inject
-    private MainData mainData;
-    @Inject
-    private ProgressIndicator progressIndicator;
-    @Inject
-    private Application application;
-    @Inject
-    private SwingUtils swingUtils;
-    @Inject
-    private StartTests srartTests;
-    @Inject
-    private Access access;
+    private final MainData mainData;
+    private final ProgressIndicator progressIndicator;
+    private final Application application;
+    private final SwingUtils swingUtils;
+    private final StartTests srartTests;
+    private final Access access;
+
+    public TerminalPanel(RoboTest roboTest, MainMenu mainMenu, MainData mainData, ProgressIndicator progressIndicator,
+            Application application, SwingUtils swingUtils, StartTests srartTests, Access access) {
+        this.roboTest = roboTest;
+        this.mainMenu = mainMenu;
+        this.mainData = mainData;
+        this.progressIndicator = progressIndicator;
+        this.application = application;
+        this.swingUtils = swingUtils;
+        this.srartTests = srartTests;
+        this.access = access;
+    }
 
     public void initWithHost(final Host host0) {
         host = host0;

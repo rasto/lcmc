@@ -23,11 +23,11 @@ package lcmc.robotest;
 import java.awt.Color;
 import java.awt.event.KeyEvent;
 import java.awt.geom.Point2D;
-import lcmc.cluster.ui.widget.GenericWidget.MTextField;
 
-import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
+
+import lcmc.cluster.ui.widget.GenericWidget.MTextField;
 
 /**
  * This class is used to test the GUI.
@@ -35,10 +35,15 @@ import javax.inject.Singleton;
 @Named
 @Singleton
 final class VMTest4 {
-    @Inject
-    private RoboTest roboTest;
+    private final RoboTest roboTest;
 
-    /** Cluster wizard locked until focus is lost. */
+    public VMTest4(RoboTest roboTest) {
+        this.roboTest = roboTest;
+    }
+
+    /**
+     * Cluster wizard locked until focus is lost.
+     */
     void start(final String vmTest, final int count) {
         roboTest.setSlowFactor(0.1f);
         roboTest.setAborted(false);

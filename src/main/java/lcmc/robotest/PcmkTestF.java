@@ -24,7 +24,6 @@ import static lcmc.robotest.RoboTest.CONFIRM_REMOVE;
 
 import java.awt.event.KeyEvent;
 
-import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
@@ -38,10 +37,15 @@ import lcmc.common.domain.util.Tools;
 @Named
 @Singleton
 final class PcmkTestF {
-    @Inject
-    private RoboTest roboTest;
+    private final RoboTest roboTest;
 
-    /** Cloned group. */
+    public PcmkTestF(RoboTest roboTest) {
+        this.roboTest = roboTest;
+    }
+
+    /**
+     * Cloned group.
+     */
     void start(final Cluster cluster, final int count) {
         roboTest.setSlowFactor(0.2f);
         roboTest.setAborted(false);

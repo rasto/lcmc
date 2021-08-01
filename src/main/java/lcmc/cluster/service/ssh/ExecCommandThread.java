@@ -27,8 +27,6 @@ import java.nio.charset.StandardCharsets;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
-import javax.inject.Inject;
-
 import com.trilead.ssh2.ChannelCondition;
 import com.trilead.ssh2.Session;
 
@@ -69,7 +67,6 @@ public final class ExecCommandThread extends Thread {
     private static final int DEFAULT_EXIT_CODE = 100;
     private static final String ENCODING = "UTF-8";
 
-    @Inject
     ExecCommandThread(final MainPanel mainPanel, final ProgressIndicator progressIndicator, final ExecCommandConfig execCommandConfig) {
         this.mainPanel = mainPanel;
         this.progressIndicator = progressIndicator;

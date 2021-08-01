@@ -22,29 +22,39 @@ package lcmc.crm.ui.resource;
 
 import java.util.List;
 
-import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Provider;
 import javax.swing.JMenuItem;
 
 import lcmc.cluster.ui.ClusterBrowser;
 import lcmc.common.domain.AccessMode;
 import lcmc.common.domain.Application;
 import lcmc.common.domain.util.Tools;
+import lcmc.common.ui.Access;
+import lcmc.common.ui.EditConfig;
+import lcmc.common.ui.main.MainData;
+import lcmc.common.ui.treemenu.ClusterTreeMenu;
 import lcmc.common.ui.utils.ButtonCallback;
 import lcmc.common.ui.utils.MenuFactory;
 import lcmc.common.ui.utils.MyMenu;
 import lcmc.common.ui.utils.MyMenuItem;
 import lcmc.common.ui.utils.SwingUtils;
 import lcmc.common.ui.utils.UpdatableItem;
+import lcmc.crm.ui.ServiceLogs;
 import lcmc.host.domain.Host;
 
 @Named
 public class CloneMenu extends ServiceMenu {
     private CloneInfo cloneInfo;
-    @Inject
-    private MenuFactory menuFactory;
-    @Inject
-    private SwingUtils swingUtils;
+    private final MenuFactory menuFactory;
+    private final SwingUtils swingUtils;
+
+    public CloneMenu(MainData drbdGui, EditConfig editDialog, MenuFactory menuFactory, SwingUtils swingUtils,
+            Provider<ServiceLogs> serviceLogsProvider, ClusterTreeMenu clusterTreeMenu, Access access) {
+        super(drbdGui, editDialog, menuFactory, swingUtils, serviceLogsProvider, clusterTreeMenu, access);
+        this.menuFactory = menuFactory;
+        this.swingUtils = swingUtils;
+    }
 
     @Override
     public List<UpdatableItem> getPulldownMenu(final ServiceInfo serviceInfo) {

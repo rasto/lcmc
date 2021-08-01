@@ -25,7 +25,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Provider;
 import javax.swing.JDialog;
@@ -60,22 +59,27 @@ public class ServicesMenu {
 
     private static final Logger LOG = LoggerFactory.getLogger(ServicesInfo.class);
 
-    @Inject
-    private EditClusterDialog editClusterDialog;
-    @Inject
-    private MainData mainData;
-    @Inject
-    private Provider<ConstraintPHInfo> constraintPHInfoProvider;
-    @Inject
-    private Provider<PcmkRscSetsInfo> rscSetsInfoProvider;
-    @Inject
-    private MenuFactory menuFactory;
-    @Inject
-    private Application application;
-    @Inject
-    private SwingUtils swingUtils;
-    @Inject @Named("clusterLogs")
-    private Provider<ClusterLogs> clusterLogsProvider;
+    private final EditClusterDialog editClusterDialog;
+    private final MainData mainData;
+    private final Provider<ConstraintPHInfo> constraintPHInfoProvider;
+    private final Provider<PcmkRscSetsInfo> rscSetsInfoProvider;
+    private final MenuFactory menuFactory;
+    private final Application application;
+    private final SwingUtils swingUtils;
+    private final Provider<ClusterLogs> clusterLogsProvider;
+
+    public ServicesMenu(EditClusterDialog editClusterDialog, MainData mainData, Provider<ConstraintPHInfo> constraintPHInfoProvider,
+            Provider<PcmkRscSetsInfo> rscSetsInfoProvider, MenuFactory menuFactory, Application application, SwingUtils swingUtils,
+            @Named("clusterLogs") Provider<ClusterLogs> clusterLogsProvider) {
+        this.editClusterDialog = editClusterDialog;
+        this.mainData = mainData;
+        this.constraintPHInfoProvider = constraintPHInfoProvider;
+        this.rscSetsInfoProvider = rscSetsInfoProvider;
+        this.menuFactory = menuFactory;
+        this.application = application;
+        this.swingUtils = swingUtils;
+        this.clusterLogsProvider = clusterLogsProvider;
+    }
 
     public List<UpdatableItem> getPulldownMenu(final ServicesInfo servicesInfo) {
         final List<UpdatableItem> items = new ArrayList<>();
@@ -83,9 +87,10 @@ public class ServicesMenu {
 
         /* add group */
         final MyMenuItem addGroupMenuItem = menuFactory.createMenuItem(Tools.getString("ClusterBrowser.Hb.AddGroup"), null, null,
-                        new AccessMode(AccessMode.ADMIN, AccessMode.NORMAL), new AccessMode(AccessMode.OP, AccessMode.NORMAL))
-                .enablePredicate(() -> {
-                    if (servicesInfo.getBrowser().crmStatusFailed()) {
+                                                               new AccessMode(AccessMode.ADMIN, AccessMode.NORMAL), new AccessMode(AccessMode.OP, AccessMode.NORMAL))
+                                                       .enablePredicate(() -> {
+                                                           if (servicesInfo.getBrowser()
+                                                                           .crmStatusFailed()) {
                         return ClusterBrowser.UNKNOWN_CLUSTER_STATUS_STRING;
                     }
                     return null;

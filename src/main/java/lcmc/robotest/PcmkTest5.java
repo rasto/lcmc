@@ -21,11 +21,11 @@
 package lcmc.robotest;
 
 import static lcmc.robotest.RoboTest.CONFIRM_REMOVE;
-import lcmc.common.domain.util.Tools;
 
-import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
+
+import lcmc.common.domain.util.Tools;
 
 /**
  * This class is used to test the GUI.
@@ -33,9 +33,12 @@ import javax.inject.Singleton;
 @Named
 @Singleton
 final class PcmkTest5 {
-    @Inject
-    private RoboTest roboTest;
-    @SuppressWarnings("TooBroadScope")
+    private final RoboTest roboTest;
+
+    public PcmkTest5(RoboTest roboTest) {
+        this.roboTest = roboTest;
+    }
+
     void start(final int count) {
         roboTest.setSlowFactor(0.2f);
         roboTest.setAborted(false);

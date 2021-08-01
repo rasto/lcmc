@@ -23,7 +23,6 @@ package lcmc.cluster.service.ssh;
 import java.io.File;
 import java.io.IOException;
 
-import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Provider;
 
@@ -53,7 +52,6 @@ public class Authentication {
     private final Application application;
     private final Provider<PopupHostKeyVerifier> popupHostKeyVerifierProvider;
 
-    @Inject
     public Authentication(Application application, Provider<PopupHostKeyVerifier> popupHostKeyVerifierProvider) {
         this.application = application;
         this.popupHostKeyVerifierProvider = popupHostKeyVerifierProvider;

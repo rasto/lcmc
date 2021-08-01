@@ -24,7 +24,6 @@ import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 import java.util.Collection;
 
-import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 import javax.swing.JCheckBox;
@@ -41,16 +40,21 @@ import lcmc.common.ui.MainPanel;
 @Named
 @Singleton
 final class VMTest1 {
-    @Inject
-    private RoboTest roboTest;
-    @Inject
-    private MainPanel mainPanel;
+    private final RoboTest roboTest;
+    private final MainPanel mainPanel;
+
+    public VMTest1(RoboTest roboTest, MainPanel mainPanel) {
+        this.roboTest = roboTest;
+        this.mainPanel = mainPanel;
+    }
 
     void start(final Cluster cluster, final String vmTest, final int count) {
         startVMTest(cluster, vmTest, "qemu", count);
     }
 
-    /** VM Test 1. */
+    /**
+     * VM Test 1.
+     */
     void startVMTest(final Cluster cluster, final String vmTest, final String type, final int count) {
         roboTest.setSlowFactor(0.1f);
         roboTest.setAborted(false);

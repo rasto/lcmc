@@ -26,6 +26,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.inject.Named;
+import javax.inject.Provider;
 import javax.swing.BoxLayout;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
@@ -35,6 +36,7 @@ import lcmc.cluster.ui.widget.WidgetFactory;
 import lcmc.common.domain.Application;
 import lcmc.common.domain.ConnectionCallback;
 import lcmc.common.domain.util.Tools;
+import lcmc.common.ui.ProgressBar;
 import lcmc.common.ui.WizardDialog;
 import lcmc.common.ui.main.MainData;
 import lcmc.common.ui.utils.SwingUtils;
@@ -50,8 +52,9 @@ public class SSH extends DialogHost {
     private final Devices devices;
     private final SwingUtils swingUtils;
 
-    public SSH(Application application, SwingUtils swingUtils, WidgetFactory widgetFactory, MainData mainData, Devices devices) {
-        super(application, swingUtils, widgetFactory, mainData);
+    public SSH(Application application, SwingUtils swingUtils, WidgetFactory widgetFactory, MainData mainData, Devices devices,
+            Provider<ProgressBar> progressBarProvider) {
+        super(application, swingUtils, widgetFactory, mainData, progressBarProvider);
         this.devices = devices;
         this.swingUtils = swingUtils;
     }

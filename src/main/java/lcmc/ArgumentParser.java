@@ -31,7 +31,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Provider;
 import javax.inject.Singleton;
@@ -120,7 +119,6 @@ public class ArgumentParser {
     private final Access access;
     private final MainData mainData;
 
-    @Inject
     public ArgumentParser(UserConfig userConfig, RoboTest roboTest, Provider<Cluster> clusterProvider, Application application,
             SwingUtils swingUtils, Access access, MainData mainData) {
         this.userConfig = userConfig;

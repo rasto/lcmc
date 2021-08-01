@@ -22,7 +22,6 @@ package lcmc.robotest;
 
 import static lcmc.robotest.RoboTest.CONFIRM_REMOVE;
 
-import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
@@ -34,8 +33,11 @@ import lcmc.common.domain.util.Tools;
 @Named
 @Singleton
 final class PcmkTest2 {
-    @Inject
-    private RoboTest roboTest;
+    private final RoboTest roboTest;
+
+    public PcmkTest2(RoboTest roboTest) {
+        this.roboTest = roboTest;
+    }
 
     void start() {
         roboTest.setSlowFactor(0.6f);

@@ -30,6 +30,7 @@ import java.util.List;
 
 import javax.annotation.Resource;
 import javax.inject.Named;
+import javax.inject.Provider;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -42,6 +43,7 @@ import lcmc.common.domain.Application;
 import lcmc.common.domain.StringValue;
 import lcmc.common.domain.Value;
 import lcmc.common.domain.util.Tools;
+import lcmc.common.ui.ProgressBar;
 import lcmc.common.ui.SpringUtilities;
 import lcmc.common.ui.WizardDialog;
 import lcmc.common.ui.main.MainData;
@@ -71,8 +73,8 @@ public class Configuration extends DialogHost {
     private final WidgetFactory widgetFactory;
 
     public Configuration(Application application, SwingUtils swingUtils, WidgetFactory widgetFactory, MainData mainData,
-            Devices devices) {
-        super(application, swingUtils, widgetFactory, mainData);
+            Devices devices, Provider<ProgressBar> progressBarProvider) {
+        super(application, swingUtils, widgetFactory, mainData, progressBarProvider);
         this.devices = devices;
         this.application = application;
         this.swingUtils = swingUtils;

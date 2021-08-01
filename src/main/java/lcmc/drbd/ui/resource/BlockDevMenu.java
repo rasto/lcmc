@@ -26,7 +26,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 
-import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Provider;
 
@@ -77,36 +76,42 @@ public class BlockDevMenu {
     private static final String LV_SNAPSHOT_MENU_DESCRIPTION = "Create a snapshot of the logical volume.";
 
     private BlockDevInfo blockDevInfo;
-    @Inject
-    private ProgressIndicator progressIndicator;
-    @Inject
-    private MenuFactory menuFactory;
-    @Inject
-    private Application application;
-    @Inject
-    private Provider<VGCreate> vgCreateProvide;
-    @Inject
-    private Provider<VGRemove> vgRemoveProvider;
-    @Inject
-    private Provider<LVCreate> lvCreateProvider;
-    @Inject
-    private Provider<LVResize> lvResizeProvder;
-    @Inject
-    private Provider<LVSnapshot> lvSnapshotProvider;
-    @Inject
-    private Provider<DrbdLog> drbdLogProvider;
-    @Inject
-    private Access access;
+    private final ProgressIndicator progressIndicator;
+    private final MenuFactory menuFactory;
+    private final Application application;
+    private final Provider<VGCreate> vgCreateProvide;
+    private final Provider<VGRemove> vgRemoveProvider;
+    private final Provider<LVCreate> lvCreateProvider;
+    private final Provider<LVResize> lvResizeProvder;
+    private final Provider<LVSnapshot> lvSnapshotProvider;
+    private final Provider<DrbdLog> drbdLogProvider;
+    private final Access access;
+
+    public BlockDevMenu(ProgressIndicator progressIndicator, MenuFactory menuFactory, Application application,
+            Provider<VGCreate> vgCreateProvide, Provider<VGRemove> vgRemoveProvider, Provider<LVCreate> lvCreateProvider,
+            Provider<LVResize> lvResizeProvder, Provider<LVSnapshot> lvSnapshotProvider, Provider<DrbdLog> drbdLogProvider,
+            Access access) {
+        this.progressIndicator = progressIndicator;
+        this.menuFactory = menuFactory;
+        this.application = application;
+        this.vgCreateProvide = vgCreateProvide;
+        this.vgRemoveProvider = vgRemoveProvider;
+        this.lvCreateProvider = lvCreateProvider;
+        this.lvResizeProvder = lvResizeProvder;
+        this.lvSnapshotProvider = lvSnapshotProvider;
+        this.drbdLogProvider = drbdLogProvider;
+        this.access = access;
+    }
 
     public List<UpdatableItem> getPulldownMenu(final BlockDevInfo blockDevInfo) {
         this.blockDevInfo = blockDevInfo;
         final List<UpdatableItem> items = new ArrayList<>();
         final Application.RunMode runMode = Application.RunMode.LIVE;
         final MyMenu repMenuItem = menuFactory.createMenu(Tools.getString("HostBrowser.Drbd.AddDrbdResource"),
-                        new AccessMode(AccessMode.ADMIN, AccessMode.NORMAL), new AccessMode(AccessMode.OP, AccessMode.NORMAL))
-                .enablePredicate(() -> {
-                    final DrbdXml dxml = getClusterBrowser().getDrbdXml();
-                    if (getDrbdVolumeInfo() != null) {
+                                                      new AccessMode(AccessMode.ADMIN, AccessMode.NORMAL), new AccessMode(AccessMode.OP, AccessMode.NORMAL))
+                                              .enablePredicate(() -> {
+                                                  final DrbdXml dxml = getClusterBrowser().getDrbdXml();
+                                                  if (getDrbdVolumeInfo() != null) {
                         return "it is already a drbd resouce";
                     } else if (!getHost().isConnected()) {
                         return Host.NOT_CONNECTED_MENU_TOOLTIP_TEXT;

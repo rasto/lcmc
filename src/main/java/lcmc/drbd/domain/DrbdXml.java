@@ -22,10 +22,31 @@
 
 package lcmc.drbd.domain;
 
+import static java.util.Arrays.asList;
+
+import java.math.BigInteger;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import javax.inject.Named;
+
+import org.w3c.dom.Document;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
 import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Table;
 import com.google.common.collect.TreeBasedTable;
+
 import lcmc.Exceptions;
 import lcmc.cluster.service.ssh.ExecCommandConfig;
 import lcmc.cluster.service.ssh.SshOutput;
@@ -47,25 +68,6 @@ import lcmc.logger.LoggerFactory;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.val;
-import org.w3c.dom.Document;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
-import javax.inject.Inject;
-import javax.inject.Named;
-import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
-import static java.util.Arrays.asList;
 
 /**
  * This class parses xml from drbdsetup and drbdadm, stores the
@@ -88,50 +90,44 @@ public class DrbdXml {
 
     private static final BigInteger KILO = new BigInteger("1024");
     private static final Value[] PROTOCOLS = {PROTOCOL_A, PROTOCOL_B, PROTOCOL_C};
-    private static final Collection<String> NOT_ADVANCED_PARAMS = asList("rate",
-                                                                         PROTOCOL_PARAM,
-                                                                         PING_TIMEOUT_PARAM,
-                                                                         "fence-peer",
-                                                                         "wfc-timeout",
-                                                                         "degr-wfc-timeout",
-                                                                         "become-primary-on",
-                                                                         "timeout",
-                                                                         "allow-two-primaries",
-                                                                         "fencing",
-                                                                         "after",
-                                                                         "resync-after",
-                                                                         "usage-count",
-                                                                         "memlimit",
-                                                                         "plugin-zlib",
-                                                                         "plugin-lzma");
+    private static final Collection<String> NOT_ADVANCED_PARAMS =
+            asList("rate", PROTOCOL_PARAM, PING_TIMEOUT_PARAM, "fence-peer", "wfc-timeout", "degr-wfc-timeout", "become-primary-on",
+                    "timeout", "allow-two-primaries", "fencing", "after", "resync-after", "usage-count", "memlimit", "plugin-zlib",
+                    "plugin-lzma");
 
-    private static final Collection<String> IGNORE_CONFIG_ERRORS = asList(
-            "no resources defined!",
-            "Can not open '/etc/drbd.conf': No such file or directory");
-    private static final Map<String, AccessMode.Type> PARAM_ACCESS_TYPE = new HashMap<String, AccessMode.Type>();
+    private static final Collection<String> IGNORE_CONFIG_ERRORS =
+            asList("no resources defined!", "Can not open '/etc/drbd.conf': No such file or directory");
+    private static final Map<String, AccessMode.Type> PARAM_ACCESS_TYPE = new HashMap<>();
 
-    private static final Map<String, Value> PREFERRED_VALUES_MAP = new HashMap<String, Value>();
+    private static final Map<String, Value> PREFERRED_VALUES_MAP = new HashMap<>();
 
-    /** Yes / true drbd config value. */
+    /**
+     * Yes / true drbd config value.
+     */
     public static final Value CONFIG_YES = new StringValue("yes");
-    /** No / false drbd config value. */
+    /**
+     * No / false drbd config value.
+     */
     private static final Value CONFIG_NO = new StringValue("no");
-    /** Hardcoded defaults, for options that have it but we don't get
-        it from the drbdsetup. */
-    static final Map<String, Value> HARDCODED_DEFAULTS = new HashMap<String, Value>();
+    /**
+     * Hardcoded defaults, for options that have it but we don't get it from the drbdsetup.
+     */
+    static final Map<String, Value> HARDCODED_DEFAULTS = new HashMap<>();
 
-    @Inject
-    private Access access;
+    private final Access access;
+
     static {
         PARAM_ACCESS_TYPE.put("rate", AccessMode.OP);
     }
+
     static {
         PREFERRED_VALUES_MAP.put(PROTOCOL_PARAM, PROTOCOL_C);
     }
+
     static {
         HARDCODED_DEFAULTS.put("usage-count", new StringValue());
         HARDCODED_DEFAULTS.put("disable-ip-verification", CONFIG_NO);
-        
+
         HARDCODED_DEFAULTS.put(PROTOCOL_PARAM, PROTOCOL_C);
         HARDCODED_DEFAULTS.put("after-sb-0pri", new StringValue("disconnect"));
         HARDCODED_DEFAULTS.put("after-sb-1pri", new StringValue("disconnect"));
@@ -141,6 +137,11 @@ public class DrbdXml {
         HARDCODED_DEFAULTS.put("fencing", new StringValue("dont-care"));
         HARDCODED_DEFAULTS.put("on-no-data-accessible", new StringValue("io-error"));
         HARDCODED_DEFAULTS.put("on-congestion", new StringValue("block"));
+    }
+
+    public DrbdXml(Access access, ProgressIndicator progressIndicator) {
+        this.access = access;
+        this.progressIndicator = progressIndicator;
     }
 
     public static Unit getUnitBytes(final String unitPart) {
@@ -173,7 +174,7 @@ public class DrbdXml {
 
     /** Returns units. */
     public Unit[] getUnits(final String param, final String unitPart) {
-        final List<Unit> units = new ArrayList<Unit>();
+        final List<Unit> units = new ArrayList<>();
         if ("k".equalsIgnoreCase(getDefaultUnit(param))) {
             units.add(getUnitKi(unitPart));
             units.add(getUnitMi(unitPart));
@@ -193,7 +194,7 @@ public class DrbdXml {
     }
 
     public Unit[] getByteUnits(final String param, final String unitPart) {
-        final List<Unit> units = new ArrayList<Unit>();
+        final List<Unit> units = new ArrayList<>();
         if ("1".equalsIgnoreCase(getDefaultUnit(param))) {
             units.add(getUnitBytes(unitPart));
             units.add(getUnitKiBytes(unitPart));
@@ -304,52 +305,89 @@ public class DrbdXml {
     }
 
 
-    /** Map from section to this section's parameters. */
-    private final Map<String, List<String>> sectionParamsMap = new LinkedHashMap<String, List<String>>();
+    /**
+     * Map from section to this section's parameters.
+     */
+    private final Map<String, List<String>> sectionParamsMap = new LinkedHashMap<>();
 
-    /** Map from parameter name to its correct value. */
-    private final Map<String, Boolean> paramCorrectValueMap = new HashMap<String, Boolean>();
+    /**
+     * Map from parameter name to its correct value.
+     */
+    private final Map<String, Boolean> paramCorrectValueMap = new HashMap<>();
 
-    /** List of all parameters. */
-    private final Collection<String> parametersList = new ArrayList<String>();
-    /** List of all global parameters. */
-    private final Collection<String> globalParametersList = new ArrayList<String>();
-    /** List of all required parameters. */
-    private final Collection<String> requiredParametersList = new ArrayList<String>();
-    /** Map from resource option to the value. */
-    private final Map<String, Map<String, Value>> optionsMap = new HashMap<String, Map<String, Value>>();
+    /**
+     * List of all parameters.
+     */
+    private final Collection<String> parametersList = new ArrayList<>();
+    /**
+     * List of all global parameters.
+     */
+    private final Collection<String> globalParametersList = new ArrayList<>();
+    /**
+     * List of all required parameters.
+     */
+    private final Collection<String> requiredParametersList = new ArrayList<>();
+    /**
+     * Map from resource option to the value.
+     */
+    private final Map<String, Map<String, Value>> optionsMap = new HashMap<>();
 
-    /** List with drbd resources. */
-    private final List<String> resourceList = new ArrayList<String>();
-    /** Map from drbd resource name to the drbd device. */
+    /**
+     * List with drbd resources.
+     */
+    private final List<String> resourceList = new ArrayList<>();
+    /**
+     * Map from drbd resource name to the drbd device.
+     */
     private final Table<String, String, String> resourceDeviceMap = TreeBasedTable.create();
-    /** Map from drbd device to the drbd resource name. */
-    private final Map<String, String> deviceResourceMap = new HashMap<String, String>();
-    /** Map from drbd device to the drbd volume. */
-    private final Map<String, String> deviceVolumeMap = new HashMap<String, String>();
+    /**
+     * Map from drbd device to the drbd resource name.
+     */
+    private final Map<String, String> deviceResourceMap = new HashMap<>();
+    /**
+     * Map from drbd device to the drbd volume.
+     */
+    private final Map<String, String> deviceVolumeMap = new HashMap<>();
 
-    /** Map from drbd resource name and the host to the block device. */
+    /**
+     * Map from drbd resource name and the host to the block device.
+     */
     private final Table<String, String, Map<String, String>> resourceHostDiskMap = HashBasedTable.create();
-    /** Map from drbd resource name and the host to the ip. */
-    private final Map<String, Map<String, String>> resourceHostIpMap = new HashMap<String, Map<String, String>>();
-    /** Map from drbd resource name and the host to the port. */
-    private final Map<String, Map<String, String>> resourceHostPortMap = new HashMap<String, Map<String, String>>();
-    /** Map from drbd resource name and the host to the family. */
-    private final Map<String, Map<String, String>> resourceHostFamilyMap = new HashMap<String, Map<String, String>>();
-    /** Map from drbd resource name and the host to the meta disk. */
+    /**
+     * Map from drbd resource name and the host to the ip.
+     */
+    private final Map<String, Map<String, String>> resourceHostIpMap = new HashMap<>();
+    /**
+     * Map from drbd resource name and the host to the port.
+     */
+    private final Map<String, Map<String, String>> resourceHostPortMap = new HashMap<>();
+    /**
+     * Map from drbd resource name and the host to the family.
+     */
+    private final Map<String, Map<String, String>> resourceHostFamilyMap = new HashMap<>();
+    /**
+     * Map from drbd resource name and the host to the meta disk.
+     */
     private final Table<String, String, Map<String, String>> resourceHostMetaDiskMap = HashBasedTable.create();
-    /** Map from drbd resource name and the host to the meta disk index. */
+    /**
+     * Map from drbd resource name and the host to the meta disk index.
+     */
     private final Table<String, String, Map<String, String>> resourceHostMetaDiskIndexMap = HashBasedTable.create();
-    /** Map from resource and host to the proxy information. */
+    /**
+     * Map from resource and host to the proxy information.
+     */
     private final Table<String, String, HostProxy> resourceHostProxyMap = HashBasedTable.create();
-    /** Set of all proxy hosts. */
-    private final Collection<String> proxyHostNames = new LinkedHashSet<String>();
-    /** Map from host to the boolean value if drbd is loaded on this host. */
-    private final Map<String, Boolean> hostDrbdLoadedMap = new HashMap<String, Boolean>();
+    /**
+     * Set of all proxy hosts.
+     */
+    private final Collection<String> proxyHostNames = new LinkedHashSet<>();
+    /**
+     * Map from host to the boolean value if drbd is loaded on this host.
+     */
+    private final Map<String, Boolean> hostDrbdLoadedMap = new HashMap<>();
     private boolean unknownSections = false;
     private String oldConfig = null;
-    @Inject
-    private ProgressIndicator progressIndicator;
+    private final ProgressIndicator progressIndicator;
 
     public void init(final Host[] hosts, final Map<Host, String> drbdParameters) {
         addSpecialParameter("resource", "name", true);
@@ -450,7 +488,7 @@ public class DrbdXml {
     }
 
     public String getParamShortDesc(final String param) {
-        final StringBuilder name = new StringBuilder(param.replaceAll("\\-", " "));
+        final StringBuilder name = new StringBuilder(param.replaceAll("-", " "));
         name.replace(0, 1, name.substring(0, 1).toUpperCase());
         if (getDrbdParam(param).unitLong() != null) {
             name.append(" (").append(getDrbdParam(param).unitLong()).append(')');
@@ -572,14 +610,13 @@ public class DrbdXml {
         }
     }
 
-    /** Add parameter with choice combo box. */
-    private void addParameter(final String section,
-                              final String param,
-                              final Value defaultValue,
-                              final Value[] items,
-                              final boolean required) {
+    /**
+     * Add parameter with choice combo box.
+     */
+    private void addParameter(final String section, final String param, final Value defaultValue, final Value[] items,
+            final boolean required) {
         addParameter(section, param, defaultValue, required);
-        final List<Value> l = new ArrayList<Value>();
+        final List<Value> l = new ArrayList<>();
         for (final Value item : items) {
             if (!l.contains(item)) {
                 l.add(item);
@@ -591,8 +628,9 @@ public class DrbdXml {
 
     private void addParameter(final String section, final String param, final boolean required) {
         addSpecialParameter(section, param, required);
-        sectionParamsMap.put(section, new ArrayList<String>());
-        sectionParamsMap.get(section).add(param);
+        sectionParamsMap.put(section, new ArrayList<>());
+        sectionParamsMap.get(section)
+                        .add(param);
     }
 
     private void addParameter(final String section,
@@ -690,19 +728,19 @@ public class DrbdXml {
                     continue;
                 }
                 if ("handler".equals(type)) {
-                    final List<Value> items = new ArrayList<Value>();
+                    final List<Value> items = new ArrayList<>();
                     items.add(new StringValue());
                     getDrbdParam(param).items(items);
                     getDrbdParam(param).defaultValue(HARDCODED_DEFAULTS.get(param));
                 } else if ("boolean".equals(type)) {
-                    final List<Value> items = new ArrayList<Value>();
+                    final List<Value> items = new ArrayList<>();
                     items.add(CONFIG_YES);
                     items.add(CONFIG_NO);
                     getDrbdParam(param).items(items);
                     getDrbdParam(param).defaultValue(CONFIG_NO);
                 }
                 if ("fence-peer".equals(param)) {
-                    final List<Value> items = new ArrayList<Value>();
+                    final List<Value> items = new ArrayList<>();
                     items.add(new StringValue());
                     if (host.getArch() != null && !host.getArch().isEmpty()) {
                         items.add(new StringValue(host.getHeartbeatLibPath() + "/drbd-peer-outdater -t 5"));
@@ -710,28 +748,26 @@ public class DrbdXml {
                     items.add(new StringValue("/usr/lib/drbd/crm-fence-peer.sh"));
                     getDrbdParam(param).items(items);
                 } else if ("after-resync-target".equals(param)) {
-                    final List<Value> items = new ArrayList<Value>();
+                    final List<Value> items = new ArrayList<>();
                     items.add(new StringValue());
                     items.add(new StringValue("/usr/lib/drbd/crm-unfence-peer.sh"));
                     getDrbdParam(param).items(items);
                 } else if ("split-brain".equals(param)) {
-                    final List<Value> items = new ArrayList<Value>();
+                    final List<Value> items = new ArrayList<>();
                     items.add(new StringValue());
                     items.add(new StringValue("/usr/lib/drbd/notify-split-brain.sh root"));
                     getDrbdParam(param).items(items);
                 } else if ("become-primary-on".equals(param)) {
-                    final List<Value> items = new ArrayList<Value>();
+                    final List<Value> items = new ArrayList<>();
                     items.add(new StringValue());
                     items.add(new StringValue("both"));
                     for (final Host h : hosts) {
                         items.add(new StringValue(h.getName()));
                     }
                     getDrbdParam(param).items(items);
-                } else if ("verify-alg".equals(param)
-                           || "csums-alg".equals(param)
-                           || "data-integrity-alg".equals(param)
+                } else if ("verify-alg".equals(param) || "csums-alg".equals(param) || "data-integrity-alg".equals(param)
                            || "cram-hmac-alg".equals(param)) {
-                    final List<Value> items = new ArrayList<Value>();
+                    final List<Value> items = new ArrayList<>();
                     items.add(new StringValue());
                     for (final String cr : host.getAvailableCryptoModules()) {
                         items.add(new StringValue(cr));
@@ -789,7 +825,7 @@ public class DrbdXml {
 
                 getDrbdParam(param).section(section);
                 if (!sectionParamsMap.containsKey(section)) {
-                    sectionParamsMap.put(section, new ArrayList<String>());
+                    sectionParamsMap.put(section, new ArrayList<>());
                 }
                 if (!sectionParamsMap.get(section).contains(param)) {
                     sectionParamsMap.get(section).add(param);
@@ -836,7 +872,7 @@ public class DrbdXml {
                 final String value;
                 if (spacePos > 0) {
                     name = DrbdProxy.PLUGIN_PARAM_PREFIX + nameValues.substring(0, spacePos);
-                    value = nameValues.substring(spacePos + 1, nameValues.length());
+                    value = nameValues.substring(spacePos + 1);
                 } else {
                     /* boolean */
                     name = DrbdProxy.PLUGIN_PARAM_PREFIX + nameValues;
@@ -868,26 +904,14 @@ public class DrbdXml {
         final String ip = XMLTools.getText(option);
         final String port = XMLTools.getAttribute(option, "port");
         final String family = XMLTools.getAttribute(option, "family");
-                /* ip */
-        Map<String, String> hostIpMap = resourceHostIpMap.get(resName);
-        if (hostIpMap == null) {
-            hostIpMap = new HashMap<String, String>();
-            resourceHostIpMap.put(resName, hostIpMap);
-        }
+        /* ip */
+        Map<String, String> hostIpMap = resourceHostIpMap.computeIfAbsent(resName, k -> new HashMap<>());
         hostIpMap.put(hostName, ip);
-                /* port */
-        Map<String, String> hostPortMap = resourceHostPortMap.get(resName);
-        if (hostPortMap == null) {
-            hostPortMap = new HashMap<String, String>();
-            resourceHostPortMap.put(resName, hostPortMap);
-        }
+        /* port */
+        Map<String, String> hostPortMap = resourceHostPortMap.computeIfAbsent(resName, k -> new HashMap<>());
         hostPortMap.put(hostName, port);
-                /* family */
-        Map<String, String> hostFamilyMap = resourceHostFamilyMap.get(resName);
-        if (hostFamilyMap == null) {
-            hostFamilyMap = new HashMap<String, String>();
-            resourceHostFamilyMap.put(resName, hostFamilyMap);
-        }
+        /* family */
+        Map<String, String> hostFamilyMap = resourceHostFamilyMap.computeIfAbsent(resName, k -> new HashMap<>());
         hostFamilyMap.put(hostName, family);
     }
 
@@ -913,7 +937,7 @@ public class DrbdXml {
                 final String disk = XMLTools.getText(option);
                 Map<String, String> hostDiskMap = resourceHostDiskMap.get(resName, volumeNr);
                 if (hostDiskMap == null) {
-                    hostDiskMap = new HashMap<String, String>();
+                    hostDiskMap = new HashMap<>();
                     resourceHostDiskMap.put(resName, volumeNr, hostDiskMap);
                 }
                 hostDiskMap.put(hostName, disk);
@@ -933,7 +957,7 @@ public class DrbdXml {
                 /* meta-disk */
                 Map<String, String> hostMetaDiskMap = resourceHostMetaDiskMap.get(resName, volumeNr);
                 if (hostMetaDiskMap == null) {
-                    hostMetaDiskMap = new HashMap<String, String>();
+                    hostMetaDiskMap = new HashMap<>();
                     resourceHostMetaDiskMap.put(resName, volumeNr, hostMetaDiskMap);
                 }
                 hostMetaDiskMap.put(hostName, metaDisk);
@@ -941,7 +965,7 @@ public class DrbdXml {
                 /* meta-disk index */
                 Map<String, String> hostMetaDiskIndexMap = resourceHostMetaDiskIndexMap.get(resName, volumeNr);
                 if (hostMetaDiskIndexMap == null) {
-                    hostMetaDiskIndexMap = new HashMap<String, String>();
+                    hostMetaDiskIndexMap = new HashMap<>();
                     resourceHostMetaDiskIndexMap.put(resName, volumeNr, hostMetaDiskIndexMap);
                 }
                 hostMetaDiskIndexMap.put(hostName, metaDiskIndex);
@@ -971,11 +995,9 @@ public class DrbdXml {
                 outsidePort = XMLTools.getAttribute(option, "port");
             }
         }
-        resourceHostProxyMap.put(resName, hostName, new HostProxy(proxyHostName,
-                                                                  new StringValue(insideIp),
-                                                                  new StringValue(insidePort),
-                                                                  new StringValue(outsideIp),
-                                                                  new StringValue(outsidePort)));
+        resourceHostProxyMap.put(resName, hostName,
+                new HostProxy(proxyHostName, new StringValue(insideIp), new StringValue(insidePort), new StringValue(outsideIp),
+                        new StringValue(outsidePort)));
         proxyHostNames.add(proxyHostName);
     }
 
@@ -1045,7 +1067,7 @@ public class DrbdXml {
         if (resProtocol != null) {
             Map<String, Value> nameValueMap = optionsMap.get(resName + '.' + "resource");
             if (nameValueMap == null) {
-                nameValueMap = new HashMap<String, Value>();
+                nameValueMap = new HashMap<>();
             } else {
                 optionsMap.remove(resName + '.' + "resource");
             }
@@ -1068,7 +1090,7 @@ public class DrbdXml {
                        at least till drbd 8.4.2 */
                     Map<String, Value> nameValueMap = optionsMap.get(resName + '.' + secName);
                     if (nameValueMap == null) {
-                        nameValueMap = new HashMap<String, Value>();
+                        nameValueMap = new HashMap<>();
                     } else {
                         optionsMap.remove(resName + '.' + secName);
                     }
@@ -1089,7 +1111,7 @@ public class DrbdXml {
 
                     Map<String, Value> nameValueMap = optionsMap.get(resName + '.' + secName);
                     if (nameValueMap == null) {
-                        nameValueMap = new HashMap<String, Value>();
+                        nameValueMap = new HashMap<>();
                     } else {
                         optionsMap.remove(resName + '.' + secName);
                     }
@@ -1133,11 +1155,7 @@ public class DrbdXml {
         /* config file=".." TODO: */
 
         final NodeList resources = configNode.getChildNodes();
-        Map<String, Value> globalNameValueMap = optionsMap.get(GLOBAL_SECTION);
-        if (globalNameValueMap == null) {
-            globalNameValueMap = new HashMap<String, Value>();
-            optionsMap.put(GLOBAL_SECTION, globalNameValueMap);
-        }
+        Map<String, Value> globalNameValueMap = optionsMap.computeIfAbsent(GLOBAL_SECTION, k -> new HashMap<>());
         globalNameValueMap.put("usage-count", CONFIG_YES);
         globalNameValueMap.put("disable-ip-verification", CONFIG_NO);
 
@@ -1248,11 +1266,10 @@ public class DrbdXml {
         }
 
         final String output = rawOutput.trim();
-        if (output != null && output.isEmpty()) {
+        if (output.isEmpty()) {
             return false;
         }
-        if ("No response from the DRBD driver! Is the module loaded?".equals(
-                output)) {
+        if ("No response from the DRBD driver! Is the module loaded?".equals(output)) {
             if (hostDrbdLoadedMap.get(hostName)) {
                 hostDrbdLoadedMap.put(hostName, false);
                 return true;
@@ -1267,7 +1284,7 @@ public class DrbdXml {
         Pattern p = Pattern.compile("^(\\d+)\\s+ST\\s+(\\S+)\\s+\\{\\s+cs:(\\S+)\\s+"
                                     + "(?:st|ro):(\\S+)/(\\S+)\\s+ds:(\\S+)/(\\S+)\\s+(\\S+).*?");
         Matcher m = p.matcher(output);
-        final Pattern pDev = Pattern.compile("^(\\d+),(\\S+)\\[(\\d+)\\]$");
+        final Pattern pDev = Pattern.compile("^(\\d+),(\\S+)\\[(\\d+)]$");
         if (m.matches()) {
             /* String counter      = m.group(1); // not used */
             final String devNrString  = m.group(2);
@@ -1450,18 +1467,15 @@ public class DrbdXml {
         return null;
     }
 
-    public class HostProxy {
+    public static class HostProxy {
         private final String proxyHostName;
         private final Value insideIp;
         private final Value insidePort;
         private final Value outsideIp;
         private final Value outsidePort;
 
-        public HostProxy(final String proxyHostName,
-                         final Value insideIp,
-                         final Value insidePort,
-                         final Value outsideIp,
-                         final Value outsidePort) {
+        public HostProxy(final String proxyHostName, final Value insideIp, final Value insidePort, final Value outsideIp,
+                final Value outsidePort) {
             this.proxyHostName = proxyHostName;
             this.insideIp = insideIp;
             this.insidePort = insidePort;

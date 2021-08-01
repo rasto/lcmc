@@ -22,15 +22,14 @@
 
 package lcmc.drbd.ui;
 
-import lcmc.common.ui.main.MainData;
+import javax.inject.Named;
+
 import lcmc.common.ui.MainPanel;
+import lcmc.common.ui.main.MainData;
 import lcmc.drbd.ui.configdialog.DrbdConfig;
 import lcmc.drbd.ui.resource.VolumeInfo;
 import lcmc.logger.Logger;
 import lcmc.logger.LoggerFactory;
-
-import javax.inject.Inject;
-import javax.inject.Named;
 
 /**
  * Show step by step dialogs that resolve a drbd split-brain.
@@ -39,12 +38,15 @@ import javax.inject.Named;
 public final class AddDrbdSplitBrainDialog {
     private static final Logger LOG = LoggerFactory.getLogger(AddDrbdSplitBrainDialog.class);
     private VolumeInfo volumeInfo;
-    @Inject
-    private MainData mainData;
-    @Inject
-    private MainPanel mainPanel;
-    @Inject
-    private SplitBrain splitBrainDialog;
+    private final MainData mainData;
+    private final MainPanel mainPanel;
+    private final SplitBrain splitBrainDialog;
+
+    public AddDrbdSplitBrainDialog(MainData mainData, MainPanel mainPanel, SplitBrain splitBrainDialog) {
+        this.mainData = mainData;
+        this.mainPanel = mainPanel;
+        this.splitBrainDialog = splitBrainDialog;
+    }
 
     public void init(final VolumeInfo volumeInfo) {
         this.volumeInfo = volumeInfo;

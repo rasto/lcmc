@@ -20,11 +20,10 @@
 
 package lcmc.robotest;
 
-import lcmc.cluster.domain.Cluster;
-
-import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
+
+import lcmc.cluster.domain.Cluster;
 
 /**
  * This class is used to test the GUI.
@@ -32,8 +31,11 @@ import javax.inject.Singleton;
 @Named
 @Singleton
 final class VMTest5 {
-    @Inject
-    private VMTest1 vmTest1;
+    private final VMTest1 vmTest1;
+
+    public VMTest5(VMTest1 vmTest1) {
+        this.vmTest1 = vmTest1;
+    }
 
     void start(final Cluster cluster, final String vmTest, final int count) {
         vmTest1.startVMTest(cluster, vmTest, "lxc", count);

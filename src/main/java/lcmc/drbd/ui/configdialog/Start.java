@@ -28,6 +28,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import javax.inject.Named;
+import javax.inject.Provider;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -40,6 +41,7 @@ import lcmc.common.domain.Application;
 import lcmc.common.domain.StringValue;
 import lcmc.common.domain.Value;
 import lcmc.common.domain.util.Tools;
+import lcmc.common.ui.ProgressBar;
 import lcmc.common.ui.SpringUtilities;
 import lcmc.common.ui.WizardDialog;
 import lcmc.common.ui.main.MainData;
@@ -68,8 +70,8 @@ public final class Start extends WizardDialog {
     private final WidgetFactory widgetFactory;
 
     public Start(Application application, SwingUtils swingUtils, WidgetFactory widgetFactory, MainData mainData,
-            Resource resourceDialog, Volume volumeDialog) {
-        super(application, swingUtils, widgetFactory, mainData);
+            Resource resourceDialog, Volume volumeDialog, Provider<ProgressBar> progressBarProvider) {
+        super(application, swingUtils, widgetFactory, mainData, progressBarProvider);
         this.resourceDialog = resourceDialog;
         this.volumeDialog = volumeDialog;
         this.application = application;

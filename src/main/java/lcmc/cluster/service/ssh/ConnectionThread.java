@@ -22,7 +22,6 @@ package lcmc.cluster.service.ssh;
 
 import java.io.IOException;
 
-import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Provider;
 
@@ -57,7 +56,6 @@ public class ConnectionThread extends Thread {
     private final SwingUtils swingUtils;
     private final Provider<PopupHostKeyVerifier> popupHostKeyVerifierProvider;
 
-    @Inject
     public ConnectionThread(Application application, SwingUtils swingUtils,
             Provider<PopupHostKeyVerifier> popupHostKeyVerifierProvider) {
         this.application = application;

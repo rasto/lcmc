@@ -25,7 +25,6 @@ import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-import javax.inject.Inject;
 import javax.inject.Named;
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
@@ -56,26 +55,39 @@ public final class ProgressBar implements ActionListener {
     private static final int MAX_PB_VALUE = 100;
     private static final ImageIcon CANCEL_ICON = Tools.createImageIcon(Tools.getDefault("ProgressBar.CancelIcon"));
     private JProgressBar progressBar;
-    /** Progress bar panel. */
+    /**
+     * Progress bar panel.
+     */
     private JPanel pbPanel;
-    @Inject
-    private SwingUtils swingUtils;
+    private final SwingUtils swingUtils;
     private volatile boolean stopNow = false;
     /** Whether to hold the progress bar. */
     private boolean holdIt = false;
     /** Progress of the progress bar. */
     private int progress = 0;
-    /** Timethat passed in the progress bar. */
+    /**
+     * Timethat passed in the progress bar.
+     */
     private int time = 0;
-    /** Timeout for the progress bar in milliseconds. */
+    /**
+     * Timeout for the progress bar in milliseconds.
+     */
     private int timeout;
-    /** Thread with progress bar. */
+    /**
+     * Thread with progress bar.
+     */
     private Thread progressThread = null;
     private MyButton cancelButton = null;
-    /** Cancel callback function that will be called, when cancel was pressed.  */
+    /**
+     * Cancel callback function that will be called, when cancel was pressed.
+     */
     private CancelCallback cancelCallback;
-    @Inject
-    private WidgetFactory widgetFactory;
+    private final WidgetFactory widgetFactory;
+
+    public ProgressBar(SwingUtils swingUtils, WidgetFactory widgetFactory) {
+        this.swingUtils = swingUtils;
+        this.widgetFactory = widgetFactory;
+    }
 
     void init(final String title, final CancelCallback cancelCallback, final int width, final int height) {
         this.cancelCallback = cancelCallback;

@@ -25,6 +25,7 @@ package lcmc.vm.ui.configdialog;
 import java.awt.Dimension;
 
 import javax.inject.Named;
+import javax.inject.Provider;
 import javax.swing.BoxLayout;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
@@ -33,6 +34,7 @@ import javax.swing.JScrollPane;
 import lcmc.cluster.ui.widget.WidgetFactory;
 import lcmc.common.domain.Application;
 import lcmc.common.domain.util.Tools;
+import lcmc.common.ui.ProgressBar;
 import lcmc.common.ui.WizardDialog;
 import lcmc.common.ui.main.MainData;
 import lcmc.common.ui.utils.SwingUtils;
@@ -57,8 +59,8 @@ final class Filesystem extends VMConfig {
     private final SwingUtils swingUtils;
 
     public Filesystem(Application application, SwingUtils swingUtils, WidgetFactory widgetFactory, MainData mainData,
-            Network networkDialog) {
-        super(application, swingUtils, widgetFactory, mainData);
+            Network networkDialog, Provider<ProgressBar> progressBarProvider) {
+        super(application, swingUtils, widgetFactory, mainData, progressBarProvider);
         this.networkDialog = networkDialog;
         this.application = application;
         this.swingUtils = swingUtils;

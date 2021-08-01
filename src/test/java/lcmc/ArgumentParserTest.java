@@ -11,7 +11,7 @@ import lcmc.common.ui.main.MainData;
 class ArgumentParserTest {
     @Test
     void shouldSetSkipNetInterfaceOption() {
-        Application application = new Application();
+        Application application = new Application(null, null, null);
         ArgumentParser argumentParser =
                 new ArgumentParser(null, null, null, application, null, new Access(null), new MainData(null));
 

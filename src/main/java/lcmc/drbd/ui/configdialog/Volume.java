@@ -26,6 +26,7 @@ package lcmc.drbd.ui.configdialog;
 import java.awt.Dimension;
 
 import javax.inject.Named;
+import javax.inject.Provider;
 import javax.swing.BoxLayout;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
@@ -34,6 +35,7 @@ import javax.swing.JScrollPane;
 import lcmc.cluster.ui.widget.WidgetFactory;
 import lcmc.common.domain.Application;
 import lcmc.common.domain.util.Tools;
+import lcmc.common.ui.ProgressBar;
 import lcmc.common.ui.WizardDialog;
 import lcmc.common.ui.main.MainData;
 import lcmc.common.ui.utils.SwingUtils;
@@ -51,8 +53,8 @@ public final class Volume extends DrbdConfig {
     private final SwingUtils swingUtils;
 
     public Volume(Application application, SwingUtils swingUtils, WidgetFactory widgetFactory, MainData mainData,
-            BlockDev blockDevDialog) {
-        super(application, swingUtils, widgetFactory, mainData);
+            BlockDev blockDevDialog, Provider<ProgressBar> progressBarProvider) {
+        super(application, swingUtils, widgetFactory, mainData, progressBarProvider);
         this.blockDevDialog = blockDevDialog;
         this.application = application;
         this.swingUtils = swingUtils;

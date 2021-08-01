@@ -20,7 +20,6 @@
 
 package lcmc.robotest;
 
-import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
@@ -30,8 +29,11 @@ import javax.inject.Singleton;
 @Named
 @Singleton
 final class PcmkTest8 {
-    @Inject
-    private RoboTest roboTest;
+    private final RoboTest roboTest;
+
+    public PcmkTest8(RoboTest roboTest) {
+        this.roboTest = roboTest;
+    }
 
     void start(final int count) {
         roboTest.setSlowFactor(0.2f);

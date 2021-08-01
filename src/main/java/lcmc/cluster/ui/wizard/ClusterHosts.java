@@ -35,6 +35,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 import javax.inject.Named;
+import javax.inject.Provider;
 import javax.swing.ImageIcon;
 import javax.swing.JCheckBox;
 import javax.swing.JComponent;
@@ -46,6 +47,7 @@ import javax.swing.SwingConstants;
 import lcmc.cluster.ui.widget.WidgetFactory;
 import lcmc.common.domain.Application;
 import lcmc.common.domain.util.Tools;
+import lcmc.common.ui.ProgressBar;
 import lcmc.common.ui.WizardDialog;
 import lcmc.common.ui.main.MainData;
 import lcmc.common.ui.main.MainPresenter;
@@ -75,8 +77,9 @@ final class ClusterHosts extends DialogCluster {
     private final Hosts allHosts;
 
     public ClusterHosts(Application application, SwingUtils swingUtils, WidgetFactory widgetFactory, MainData mainData,
-            CommStack commStackDialog, Connect connectDialog, MainPresenter mainPresenter, Hosts allHosts) {
-        super(application, swingUtils, widgetFactory, mainData);
+            CommStack commStackDialog, Connect connectDialog, MainPresenter mainPresenter, Hosts allHosts,
+            Provider<ProgressBar> progressBarProvider) {
+        super(application, swingUtils, widgetFactory, mainData, progressBarProvider);
         this.commStackDialog = commStackDialog;
         this.connectDialog = connectDialog;
         this.mainPresenter = mainPresenter;

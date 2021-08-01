@@ -23,7 +23,6 @@ package lcmc.drbd.ui.resource;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Provider;
 
@@ -50,20 +49,21 @@ public class ProxyHostMenu {
     private static final String NOT_CONNECTABLE_STRING = Tools.getString("ProxyHostInfo.NotConnectable");
 
     private ProxyHostInfo proxyHostInfo;
-    @Inject
-    private MainData mainData;
-    @Inject
-    private MainPresenter mainPresenter;
-    @Inject
-    private ProxyHostWizard proxyHostWizard;
-    @Inject
-    private MenuFactory menuFactory;
-    @Inject
-    private Application application;
-    @Inject
-    private Provider<DrbdsLog> drbdsLogProvider;
+    private final MainData mainData;
+    private final MainPresenter mainPresenter;
+    private final ProxyHostWizard proxyHostWizard;
+    private final MenuFactory menuFactory;
+    private final Application application;
+    private final Provider<DrbdsLog> drbdsLogProvider;
 
-    public ProxyHostMenu() {
+    public ProxyHostMenu(MainData mainData, MainPresenter mainPresenter, ProxyHostWizard proxyHostWizard, MenuFactory menuFactory,
+            Application application, Provider<DrbdsLog> drbdsLogProvider) {
+        this.mainData = mainData;
+        this.mainPresenter = mainPresenter;
+        this.proxyHostWizard = proxyHostWizard;
+        this.menuFactory = menuFactory;
+        this.application = application;
+        this.drbdsLogProvider = drbdsLogProvider;
     }
 
     public List<UpdatableItem> getPulldownMenu(final ProxyHostInfo proxyHostInfo) {
@@ -73,7 +73,7 @@ public class ProxyHostMenu {
         /* connect */
         final UpdatableItem connectItem =
                 menuFactory.createMenuItem(Tools.getString("HostDrbdInfo.Connect"), null, Tools.getString("HostDrbdInfo.Connect"),
-                                Tools.getString("HostDrbdInfo.Disconnect"), null, Tools.getString("HostDrbdInfo.Disconnect"),
+                                   Tools.getString("HostDrbdInfo.Disconnect"), null, Tools.getString("HostDrbdInfo.Disconnect"),
                                 new AccessMode(AccessMode.RO, AccessMode.NORMAL), new AccessMode(AccessMode.RO, AccessMode.NORMAL))
                         .predicate(() -> !getHost().isConnected())
                         .enablePredicate(() -> {

@@ -26,6 +26,7 @@ package lcmc.drbd.ui.configdialog;
 import java.util.Set;
 
 import javax.inject.Named;
+import javax.inject.Provider;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -40,6 +41,7 @@ import lcmc.common.domain.Application;
 import lcmc.common.domain.StringValue;
 import lcmc.common.domain.Value;
 import lcmc.common.domain.util.Tools;
+import lcmc.common.ui.ProgressBar;
 import lcmc.common.ui.SpringUtilities;
 import lcmc.common.ui.WizardDialog;
 import lcmc.common.ui.main.MainData;
@@ -87,8 +89,8 @@ final class CreateFS extends DrbdConfig {
     private MyButton makeFileSystemButton;
 
     public CreateFS(Application application, SwingUtils swingUtils, WidgetFactory widgetFactory, MainData mainData,
-            FileSystemService fileSystemService) {
-        super(application, swingUtils, widgetFactory, mainData);
+            FileSystemService fileSystemService, Provider<ProgressBar> progressBarProvider) {
+        super(application, swingUtils, widgetFactory, mainData, progressBarProvider);
         this.application = application;
         this.swingUtils = swingUtils;
         this.widgetFactory = widgetFactory;

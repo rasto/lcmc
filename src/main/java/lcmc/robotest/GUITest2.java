@@ -21,11 +21,11 @@
 package lcmc.robotest;
 
 import java.awt.Color;
-import lcmc.common.domain.util.Tools;
 
-import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
+
+import lcmc.common.domain.util.Tools;
 
 /**
  * This class is used to test the GUI.
@@ -33,10 +33,15 @@ import javax.inject.Singleton;
 @Named
 @Singleton
 final class GUITest2 {
-    @Inject
-    private RoboTest roboTest;
+    private final RoboTest roboTest;
 
-    /** Cluster wizard locked until focus is lost. */
+    public GUITest2(RoboTest roboTest) {
+        this.roboTest = roboTest;
+    }
+
+    /**
+     * Cluster wizard locked until focus is lost.
+     */
     void start(final int count) {
         roboTest.setSlowFactor(0.2f);
         roboTest.setAborted(false);

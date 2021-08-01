@@ -21,9 +21,11 @@
 package lcmc.drbd.ui.configdialog;
 
 import javax.inject.Named;
+import javax.inject.Provider;
 
 import lcmc.cluster.ui.widget.WidgetFactory;
 import lcmc.common.domain.Application;
+import lcmc.common.ui.ProgressBar;
 import lcmc.common.ui.WizardDialog;
 import lcmc.common.ui.main.MainData;
 import lcmc.common.ui.utils.MyButton;
@@ -45,8 +47,8 @@ public final class SSHProxy extends SSH {
     private final DevicesProxy devicesProxyDialog;
 
     public SSHProxy(Application application, SwingUtils swingUtils, WidgetFactory widgetFactory, MainData mainData, Devices devices,
-            DevicesProxy devicesProxyDialog) {
-        super(application, swingUtils, widgetFactory, mainData, devices);
+            DevicesProxy devicesProxyDialog, Provider<ProgressBar> progressBarProvider) {
+        super(application, swingUtils, widgetFactory, mainData, devices, progressBarProvider);
         this.devicesProxyDialog = devicesProxyDialog;
     }
 

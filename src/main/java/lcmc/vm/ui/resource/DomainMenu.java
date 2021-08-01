@@ -26,7 +26,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.regex.Matcher;
 
-import javax.inject.Inject;
 import javax.inject.Named;
 import javax.swing.ImageIcon;
 
@@ -53,12 +52,15 @@ public class DomainMenu {
     private static final ImageIcon REBOOT_ICON = Tools.createImageIcon(Tools.getDefault("VMS.Reboot.IconLarge"));
     private static final ImageIcon DESTROY_ICON = Tools.createImageIcon(Tools.getDefault("VMS.Destroy.IconLarge"));
     private DomainInfo domainInfo;
-    @Inject
-    private MenuFactory menuFactory;
-    @Inject
-    private Application application;
-    @Inject
-    private Access access;
+    private final MenuFactory menuFactory;
+    private final Application application;
+    private final Access access;
+
+    public DomainMenu(MenuFactory menuFactory, Application application, Access access) {
+        this.menuFactory = menuFactory;
+        this.application = application;
+        this.access = access;
+    }
 
     public List<UpdatableItem> getPulldownMenu(final DomainInfo domainInfo) {
         this.domainInfo = domainInfo;

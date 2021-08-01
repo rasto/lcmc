@@ -76,6 +76,7 @@ public final class EmptyViewPanel extends ViewPanel implements AllHostsUpdatable
     public EmptyViewPanel(EmptyBrowser emptyBrowser, Provider<AddClusterDialog> addClusterDialogProvider,
             Provider<AddHostDialog> addHostDialogProvider, HostFactory hostFactory, MainData mainData, MainPresenter mainPresenter,
             Application application, SwingUtils swingUtils, WidgetFactory widgetFactory) {
+        super(swingUtils);
         this.emptyBrowser = emptyBrowser;
         this.addClusterDialogProvider = addClusterDialogProvider;
         this.addHostDialogProvider = addHostDialogProvider;

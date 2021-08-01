@@ -23,7 +23,6 @@ package lcmc.drbd.ui.resource;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Provider;
 
@@ -39,23 +38,28 @@ import lcmc.host.domain.HostFactory;
 
 @Named
 public class GlobalMenu {
-    @Inject
-    private Provider<EditClusterDialog> editClusterDialogProvider;
-    @Inject
-    private HostFactory hostFactory;
-    @Inject
-    private Provider<ProxyHostWizard> proxyHostWizardProvider;
-    @Inject
-    private MenuFactory menuFactory;
-    @Inject
-    private Provider<DrbdLogs> drbdLogsProvider;
+    private final Provider<EditClusterDialog> editClusterDialogProvider;
+    private final HostFactory hostFactory;
+    private final Provider<ProxyHostWizard> proxyHostWizardProvider;
+    private final MenuFactory menuFactory;
+    private final Provider<DrbdLogs> drbdLogsProvider;
+
+    public GlobalMenu(Provider<EditClusterDialog> editClusterDialogProvider, HostFactory hostFactory,
+            Provider<ProxyHostWizard> proxyHostWizardProvider, MenuFactory menuFactory, Provider<DrbdLogs> drbdLogsProvider) {
+        this.editClusterDialogProvider = editClusterDialogProvider;
+        this.hostFactory = hostFactory;
+        this.proxyHostWizardProvider = proxyHostWizardProvider;
+        this.menuFactory = menuFactory;
+        this.drbdLogsProvider = drbdLogsProvider;
+    }
 
     public List<UpdatableItem> getPulldownMenu(final GlobalInfo globalInfo) {
         final List<UpdatableItem> items = new ArrayList<>();
 
         final UpdatableItem addProxyHostMenu = menuFactory.createMenuItem(Tools.getString("GlobalInfo.AddProxyHost"), null,
-                Tools.getString("GlobalInfo.AddProxyHost"), new AccessMode(AccessMode.OP, AccessMode.NORMAL),
-                new AccessMode(AccessMode.OP, AccessMode.NORMAL)).addAction(text -> addProxyHostWizard(globalInfo));
+                                                                  Tools.getString("GlobalInfo.AddProxyHost"), new AccessMode(AccessMode.OP, AccessMode.NORMAL),
+                                                                  new AccessMode(AccessMode.OP, AccessMode.NORMAL))
+                                                          .addAction(text -> addProxyHostWizard(globalInfo));
         items.add(addProxyHostMenu);
 
         /* cluster wizard */

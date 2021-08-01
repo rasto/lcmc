@@ -20,7 +20,6 @@
 
 package lcmc.robotest;
 
-import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
@@ -30,8 +29,11 @@ import javax.inject.Singleton;
 @Named
 @Singleton
 final class PcmkTest6 {
-    @Inject
-    private RoboTest roboTest;
+    private final RoboTest roboTest;
+
+    public PcmkTest6(RoboTest roboTest) {
+        this.roboTest = roboTest;
+    }
 
     void start(final int count) {
         roboTest.setSlowFactor(0.2f);
@@ -39,7 +41,7 @@ final class PcmkTest6 {
 
         final int ph1X = 315;
         final int ph1Y = 346;
-        
+
         /* placeholders */
         roboTest.moveTo(ph1X, ph1Y);
         roboTest.rightClick();

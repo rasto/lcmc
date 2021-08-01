@@ -21,6 +21,7 @@
 package lcmc.drbd.ui.configdialog;
 
 import javax.inject.Named;
+import javax.inject.Provider;
 import javax.swing.ImageIcon;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
@@ -33,6 +34,7 @@ import lcmc.cluster.ui.widget.WidgetFactory;
 import lcmc.common.domain.Application;
 import lcmc.common.domain.ExecCallback;
 import lcmc.common.domain.util.Tools;
+import lcmc.common.ui.ProgressBar;
 import lcmc.common.ui.SpringUtilities;
 import lcmc.common.ui.WizardDialog;
 import lcmc.common.ui.main.MainData;
@@ -72,8 +74,8 @@ final class ProxyCheckInstallation extends DialogHost {
     private final SwingUtils swingUtils;
 
     public ProxyCheckInstallation(Application application, SwingUtils swingUtils, WidgetFactory widgetFactory, MainData mainData,
-            ProxyInst proxyInstDialog) {
-        super(application, swingUtils, widgetFactory, mainData);
+            ProxyInst proxyInstDialog, Provider<ProgressBar> progressBarProvider) {
+        super(application, swingUtils, widgetFactory, mainData, progressBarProvider);
         this.widgetFactory = widgetFactory;
         this.proxyInstDialog = proxyInstDialog;
         this.application = application;

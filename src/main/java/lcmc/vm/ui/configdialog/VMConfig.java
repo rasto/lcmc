@@ -23,9 +23,11 @@
 package lcmc.vm.ui.configdialog;
 
 import javax.inject.Named;
+import javax.inject.Provider;
 
 import lcmc.cluster.ui.widget.WidgetFactory;
 import lcmc.common.domain.Application;
+import lcmc.common.ui.ProgressBar;
 import lcmc.common.ui.WizardDialog;
 import lcmc.common.ui.main.MainData;
 import lcmc.common.ui.utils.SwingUtils;
@@ -38,8 +40,9 @@ import lcmc.vm.ui.resource.DomainInfo;
 public abstract class VMConfig extends WizardDialog {
     private DomainInfo domainInfo;
 
-    public VMConfig(Application application, SwingUtils swingUtils, WidgetFactory widgetFactory, MainData mainData) {
-        super(application, swingUtils, widgetFactory, mainData);
+    public VMConfig(Application application, SwingUtils swingUtils, WidgetFactory widgetFactory, MainData mainData,
+            Provider<ProgressBar> progressBarProvider) {
+        super(application, swingUtils, widgetFactory, mainData, progressBarProvider);
     }
 
     public void init(final WizardDialog previousDialog, final DomainInfo domainInfo) {
