@@ -41,7 +41,6 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
-import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 import javax.swing.BoxLayout;
@@ -103,8 +102,7 @@ public class MainData {
 
     private Container mainFrame;
 
-    @Inject
-    private SwingUtils swingUtils;
+    private final SwingUtils swingUtils;
 
     public static final String MIME_TYPE_TEXT_HTML = "text/html";
     public static final String MIME_TYPE_TEXT_PLAIN = "text/plain";
@@ -113,6 +111,10 @@ public class MainData {
     @Getter
     @Setter
     private float animFPS;
+
+    public MainData(SwingUtils swingUtils) {
+        this.swingUtils = swingUtils;
+    }
 
     public Container getMainFrameContentPane() {
         return ((RootPaneContainer) mainFrame).getContentPane();

@@ -20,26 +20,29 @@
 
 package lcmc.common.ui.treemenu;
 
-import lcmc.cluster.ui.network.InfoPresenter;
-import lcmc.common.ui.Info;
-
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Singleton;
-import javax.swing.*;
-import javax.swing.tree.DefaultMutableTreeNode;
-import javax.swing.tree.MutableTreeNode;
-import javax.swing.tree.TreeNode;
 import java.util.Collection;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.function.BiConsumer;
 
+import javax.inject.Named;
+import javax.inject.Singleton;
+import javax.swing.JTree;
+import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.MutableTreeNode;
+import javax.swing.tree.TreeNode;
+
+import lcmc.cluster.ui.network.InfoPresenter;
+import lcmc.common.ui.Info;
+
 @Named
 @Singleton
 public class ClusterTreeMenu {
-    @Inject
-    private TreeMenuController treeMenuController;
+    private final TreeMenuController treeMenuController;
+
+    public ClusterTreeMenu(TreeMenuController treeMenuController) {
+        this.treeMenuController = treeMenuController;
+    }
 
     public void addChild(final DefaultMutableTreeNode parent, final MutableTreeNode child) {
         treeMenuController.addChild(parent, child);

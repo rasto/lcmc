@@ -50,7 +50,6 @@ import java.util.Map;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
-import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 import javax.swing.ImageIcon;
@@ -141,8 +140,7 @@ class ProgressIndicatorPanel extends JComponent implements MouseListener, KeyLis
     private RenderingHints hints = null;
     private final Lock mAnimatorLock = new ReentrantLock();
     private final Lock mTextsLock = new ReentrantLock();
-    @Inject
-    private WidgetFactory widgetFactory;
+    private final WidgetFactory widgetFactory;
     /**
      * Cancel button. TODO: not used.
      */
@@ -164,10 +162,14 @@ class ProgressIndicatorPanel extends JComponent implements MouseListener, KeyLis
      * Beginning position of the bar.
      */
     private double barPos = -1;
-    @Inject
-    private MainPanel mainPanel;
-    @Inject
-    private MainData mainData;
+    private final MainPanel mainPanel;
+    private final MainData mainData;
+
+    public ProgressIndicatorPanel(WidgetFactory widgetFactory, MainPanel mainPanel, MainData mainData) {
+        this.widgetFactory = widgetFactory;
+        this.mainPanel = mainPanel;
+        this.mainData = mainData;
+    }
 
     public void init() {
         rampDelay = 300;
