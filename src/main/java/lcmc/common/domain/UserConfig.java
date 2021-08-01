@@ -33,7 +33,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Provider;
 import javax.inject.Singleton;
@@ -88,22 +87,28 @@ public final class UserConfig extends XMLTools {
     private static final String ENCODING = "UTF-8";
     public static final boolean PROXY_HOST = true;
 
-    @Inject
-    private ClusterTabFactory clusterTabFactory;
-    @Inject
-    private HostFactory hostFactory;
-    @Inject
-    private ClustersPanel clustersPanel;
-    @Inject
-    private Provider<Cluster> clusterProvider;
-    @Inject
-    private Application application;
-    @Inject
-    private SwingUtils swingUtils;
-    @Inject
-    private Hosts allHosts;
-    @Inject
-    private Clusters allClusters;
+    private final ClusterTabFactory clusterTabFactory;
+    private final HostFactory hostFactory;
+    private final ClustersPanel clustersPanel;
+    private final Provider<Cluster> clusterProvider;
+    private final Application application;
+    private final SwingUtils swingUtils;
+    private final Hosts allHosts;
+    private final Clusters allClusters;
+
+    public UserConfig(ClusterTabFactory clusterTabFactory, HostFactory hostFactory, ClustersPanel clustersPanel,
+            Provider<Cluster> clusterProvider, Application application, SwingUtils swingUtils, Hosts allHosts,
+            Clusters allClusters) {
+        this.clusterTabFactory = clusterTabFactory;
+        this.hostFactory = hostFactory;
+        this.clustersPanel = clustersPanel;
+        this.clusterProvider = clusterProvider;
+        this.application = application;
+        this.swingUtils = swingUtils;
+        this.allHosts = allHosts;
+        this.allClusters = allClusters;
+    }
+
     /**
      * @param saveAll whether to save clusters specified from the command line
      */
