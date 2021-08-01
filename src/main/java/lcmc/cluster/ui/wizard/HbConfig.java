@@ -26,12 +26,9 @@ package lcmc.cluster.ui.wizard;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
 import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -42,7 +39,6 @@ import java.util.concurrent.CountDownLatch;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import javax.inject.Inject;
 import javax.inject.Named;
 import javax.swing.BoxLayout;
 import javax.swing.JCheckBox;
@@ -54,33 +50,32 @@ import javax.swing.JTextArea;
 import javax.swing.SpringLayout;
 
 import lcmc.Exceptions;
-import lcmc.common.ui.Access;
-import lcmc.common.ui.main.MainData;
-import lcmc.common.domain.AccessMode;
-import lcmc.common.domain.Application;
-import lcmc.common.ui.utils.SwingUtils;
-import lcmc.crm.domain.CastAddress;
 import lcmc.cluster.domain.Cluster;
-import lcmc.host.domain.Host;
-import lcmc.common.domain.StringValue;
-import lcmc.common.domain.Value;
-import lcmc.drbd.domain.NetInterface;
-import lcmc.crm.domain.UcastLink;
-import lcmc.common.ui.SpringUtilities;
-import lcmc.common.ui.WizardDialog;
+import lcmc.cluster.service.NetworkService;
+import lcmc.cluster.service.ssh.ExecCommandConfig;
+import lcmc.cluster.service.ssh.ExecCommandThread;
 import lcmc.cluster.ui.widget.Check;
 import lcmc.cluster.ui.widget.Widget;
 import lcmc.cluster.ui.widget.WidgetFactory;
+import lcmc.common.domain.AccessMode;
+import lcmc.common.domain.Application;
 import lcmc.common.domain.ExecCallback;
+import lcmc.common.domain.StringValue;
+import lcmc.common.domain.Value;
+import lcmc.common.domain.util.Tools;
+import lcmc.common.ui.Access;
+import lcmc.common.ui.SpringUtilities;
+import lcmc.common.ui.WizardDialog;
+import lcmc.common.ui.utils.MyButton;
+import lcmc.common.ui.utils.SwingUtils;
+import lcmc.common.ui.utils.WidgetListener;
+import lcmc.crm.domain.CastAddress;
+import lcmc.crm.domain.UcastLink;
 import lcmc.crm.service.Heartbeat;
-import lcmc.cluster.service.NetworkService;
+import lcmc.drbd.domain.NetInterface;
+import lcmc.host.domain.Host;
 import lcmc.logger.Logger;
 import lcmc.logger.LoggerFactory;
-import lcmc.common.ui.utils.MyButton;
-import lcmc.cluster.service.ssh.ExecCommandConfig;
-import lcmc.cluster.service.ssh.ExecCommandThread;
-import lcmc.common.domain.util.Tools;
-import lcmc.common.ui.utils.WidgetListener;
 
 /**
  * An implementation of a dialog where heartbeat is initialized on all hosts.
@@ -100,22 +95,14 @@ final class HbConfig extends DialogCluster {
     private static final String USE_LOGD_OPTION = "use_logd";
     private static final String AUTOJOIN_OPTION = "autojoin";
     private static final String NODE_OPTION = "node";
-    private static final String[] OPTIONS = {KEEPALIVE_OPTION,
-                                             WARNTIME_OPTION,
-                                             DEADTIME_OPTION,
-                                             INITDEAD_OPTION,
-                                             CRM_OPTION,
-                                             COMPRESSION_OPTION,
-                                             COMPRESSION_THRESHOLD_OPTION,
-                                             TRADITIONAL_COMPRESSION_OPTION,
-                                             LOGFACILITY_OPTION,
-                                             USE_LOGD_OPTION,
-                                             AUTOJOIN_OPTION,
-                                             NODE_OPTION};
-    private static final Map<String, Widget.Type> OPTION_WIDGET_TYPES = new HashMap<String, Widget.Type>();
-    private static final Map<String, String> OPTION_REGEXPS = new HashMap<String, String>();
-    private static final Map<String, Value> OPTION_DEFAULTS = new HashMap<String, Value>();
-    private static final Map<String, Integer> OPTION_SIZES = new HashMap<String, Integer>();
+    private static final String[] OPTIONS =
+            {KEEPALIVE_OPTION, WARNTIME_OPTION, DEADTIME_OPTION, INITDEAD_OPTION, CRM_OPTION, COMPRESSION_OPTION,
+                    COMPRESSION_THRESHOLD_OPTION, TRADITIONAL_COMPRESSION_OPTION, LOGFACILITY_OPTION, USE_LOGD_OPTION,
+                    AUTOJOIN_OPTION, NODE_OPTION};
+    private static final Map<String, Widget.Type> OPTION_WIDGET_TYPES = new HashMap<>();
+    private static final Map<String, String> OPTION_REGEXPS = new HashMap<>();
+    private static final Map<String, Value> OPTION_DEFAULTS = new HashMap<>();
+    private static final Map<String, Integer> OPTION_SIZES = new HashMap<>();
     private static final Value MCAST_TYPE = new StringValue("mcast");
     private static final Value BCAST_TYPE = new StringValue("bcast");
     private static final Value UCAST_TYPE = new StringValue("ucast");
@@ -124,7 +111,7 @@ final class HbConfig extends DialogCluster {
     private static final int LINK_COMBOBOX_WIDTH = 130;
     private static final int TYPE_COMBOBOX_WIDTH = 80;
     private static final int INTERFACE_COMBOBOX_WIDTH = 80;
-    private static final int REMOVE_BUTTON_WIDTH  = 100;
+    private static final int REMOVE_BUTTON_WIDTH = 100;
     private static final int REMOVE_BUTTON_HEIGHT = 14;
     private static final String EDIT_CONFIG_STRING = Tools.getString("Dialog.Cluster.HbConfig.Checkbox.EditConfig");
     private static final String SEE_EXISTING_STRING = Tools.getString("Dialog.Cluster.HbConfig.Checkbox.SeeExisting");
@@ -161,17 +148,22 @@ final class HbConfig extends DialogCluster {
         OPTION_SIZES.put(AUTOJOIN_OPTION, 80);
         OPTION_SIZES.put(NODE_OPTION, 300);
     }
-    private final Map<String, Value> optionDefaults = new HashMap<String, Value>(OPTION_DEFAULTS);
-    private final Map<String, Value[]> optionValues = new HashMap<String, Value[]>();
-    private final Map<String, Widget> optionsWidgets = new HashMap<String, Widget>();
+
+    private final Map<String, Value> optionDefaults = new HashMap<>(OPTION_DEFAULTS);
+    private final Map<String, Value[]> optionValues = new HashMap<>();
+    private final Map<String, Widget> optionsWidgets = new HashMap<>();
 
     private JCheckBox dopdWidget = null;
     private JCheckBox mgmtdWidget = null;
     private JPanel mcastPanel;
-    /** Set of ucast, bcast, mcast etc. addresses. */
-    private final Collection<CastAddress> castAddresses = new LinkedHashSet<CastAddress>();
+    /**
+     * Set of ucast, bcast, mcast etc. addresses.
+     */
+    private final Collection<CastAddress> castAddresses = new LinkedHashSet<>();
     private final JLabel configStatus = new JLabel("");
-    /** Connection type pulldown menu: ucast, bcast, mcast ... */
+    /**
+     * Connection type pulldown menu: ucast, bcast, mcast ...
+     */
     private Widget typeWidget;
     private Widget ifaceWidget;
     private Widget serialWidget;
@@ -179,32 +171,37 @@ final class HbConfig extends DialogCluster {
     private Widget ucastLink2Widget;
     private Widget addrWidget;
     private MyButton addAddressButton;
-    /** Array with /etc/ha.d/ha.cf configs from all hosts. */
+    /**
+     * Array with /etc/ha.d/ha.cf configs from all hosts.
+     */
     private String[] configs;
     private JPanel statusPanel;
-    /** Check box that allows to edit a new config are see the existing
-     * configs. */
+    /**
+     * Check box that allows to edit a new config are see the existing configs.
+     */
     private JCheckBox configCheckbox;
     private final JPanel configPanel = new JPanel();
     private boolean configChangedByUser = false;
     private volatile JScrollPane configScrollPane = null;
     private volatile boolean configAlreadyScrolled = false;
     private CountDownLatch fieldCheckLatch = new CountDownLatch(1);
-    @Inject
-    private MainData mainData;
-    @Inject
-    private Application application;
-    @Inject
-    private SwingUtils swingUtils;
-    @Inject
-    private WidgetFactory widgetFactory;
+    private final Application application;
+    private final SwingUtils swingUtils;
+    private final WidgetFactory widgetFactory;
     private MyButton makeConfigButton;
-    @Inject
-    private InitCluster initCluster;
-    @Inject
-    private NetworkService networkService;
-    @Inject
-    private Access access;
+    private final InitCluster initCluster;
+    private final NetworkService networkService;
+    private final Access access;
+
+    public HbConfig(Application application, SwingUtils swingUtils, WidgetFactory widgetFactory, InitCluster initCluster,
+            NetworkService networkService, Access access) {
+        this.application = application;
+        this.swingUtils = swingUtils;
+        this.widgetFactory = widgetFactory;
+        this.initCluster = initCluster;
+        this.networkService = networkService;
+        this.access = access;
+    }
 
     @Override
     public void init(final WizardDialog previousDialog, final Cluster cluster) {
@@ -240,77 +237,60 @@ final class HbConfig extends DialogCluster {
                                                          new StringValue("local6"),
                                                          new StringValue("local7"),
                                                          new StringValue("none")});
-        optionValues.put(USE_LOGD_OPTION, new Value[]{new StringValue(),
-                                                      new StringValue("on"),
-                                                      new StringValue("off")});
-        optionValues.put(AUTOJOIN_OPTION, new Value[]{new StringValue(),
-                                                      new StringValue("any"),
-                                                      new StringValue("other"),
-                                                      new StringValue("none")});
+        optionValues.put(USE_LOGD_OPTION, new Value[]{new StringValue(), new StringValue("on"), new StringValue("off")});
+        optionValues.put(AUTOJOIN_OPTION,
+                new Value[]{new StringValue(), new StringValue("any"), new StringValue("other"), new StringValue("none")});
         configs = new String[hosts.length];
         makeConfigButton.setBackgroundColor(Tools.getDefaultColor("ConfigDialog.Button"));
         makeConfigButton.setEnabled(false);
-        makeConfigButton.addActionListener(
-            new ActionListener() {
-                @Override
-                public void actionPerformed(final ActionEvent e) {
-                    final Thread thread = new Thread(
-                        new Runnable() {
-                            @Override
-                            public void run() {
-                                fieldCheckLatch = new CountDownLatch(1);
-                                swingUtils.invokeLater(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        makeConfigButton.setEnabled(false);
-                                    }
-                                });
-                                disableComponents();
-                                final StringBuilder config = hbConfigHead(false);
-                                config.append(hbConfigOptions());
-                                config.append('\n');
-                                config.append(hbConfigAddr());
-                                config.append(hbConfigDopd(dopdWidget.isSelected()));
-                                config.append(hbConfigMgmtd(mgmtdWidget.isSelected()));
+        makeConfigButton.addActionListener(e -> {
+            final Thread thread = new Thread(() -> {
+                fieldCheckLatch = new CountDownLatch(1);
+                swingUtils.invokeLater(() -> makeConfigButton.setEnabled(false));
+                disableComponents();
+                final StringBuilder config1 = hbConfigHead(false);
+                config1.append(hbConfigOptions());
+                config1.append('\n');
+                config1.append(hbConfigAddr());
+                config1.append(hbConfigDopd(dopdWidget.isSelected()));
+                config1.append(hbConfigMgmtd(mgmtdWidget.isSelected()));
 
-                                Heartbeat.createHBConfig(hosts, config);
-                                final boolean configOk = updateOldHbConfig();
-                                if (dopdWidget.isSelected()) {
-                                    for (final Host h : hosts) {
-                                        final String hbV = h.getHostParser().getHeartbeatVersion();
-                                        boolean wa = false;
-                                        try {
-                                            if (hbV != null && Tools.compareVersions(hbV, "3.0.2") <= 0) {
-                                                wa = true;
-                                            }
-                                        } catch (
-                                         final Exceptions.IllegalVersionException e) {
-                                            LOG.appWarning("run: " + e.getMessage(), e);
-                                        }
-                                        Heartbeat.enableDopd(h, wa);
-                                    }
-                                }
-                                Heartbeat.reloadHeartbeats(hosts);
-                                enableComponents();
-                                final List<String> incorrect = new ArrayList<String>();
-                                final List<String> changed = new ArrayList<String>();
-                                if (configOk) {
-                                    hideRetryButton();
-                                } else {
-                                    incorrect.add("config failed");
-                                }
-                                nextButtonSetEnabled(new Check(incorrect, changed));
-
-                                if (configOk && !application.getAutoClusters().isEmpty()) {
-                                    Tools.sleep(1000);
-                                    pressNextButton();
-                                }
+                Heartbeat.createHBConfig(hosts, config1);
+                final boolean configOk = updateOldHbConfig();
+                if (dopdWidget.isSelected()) {
+                    for (final Host h : hosts) {
+                        final String hbV = h.getHostParser()
+                                            .getHeartbeatVersion();
+                        boolean wa = false;
+                        try {
+                            if (hbV != null && Tools.compareVersions(hbV, "3.0.2") <= 0) {
+                                wa = true;
                             }
+                        } catch (final Exceptions.IllegalVersionException e1) {
+                            LOG.appWarning("run: " + e1.getMessage(), e1);
                         }
-                    );
-                    thread.start();
+                        Heartbeat.enableDopd(h, wa);
+                    }
+                }
+                Heartbeat.reloadHeartbeats(hosts);
+                enableComponents();
+                final List<String> incorrect = new ArrayList<>();
+                final List<String> changed = new ArrayList<>();
+                if (configOk) {
+                    hideRetryButton();
+                } else {
+                    incorrect.add("config failed");
+                }
+                nextButtonSetEnabled(new Check(incorrect, changed));
+
+                if (configOk && !application.getAutoClusters()
+                                            .isEmpty()) {
+                    Tools.sleep(1000);
+                    pressNextButton();
                 }
             });
+            thread.start();
+        });
     }
 
     @Override
@@ -345,30 +325,22 @@ final class HbConfig extends DialogCluster {
 
     @Override
     protected void initDialogAfterVisible() {
-        final Thread thread = new Thread(
-            new Runnable() {
-                @Override
-                public void run() {
-                    final boolean configOk = updateOldHbConfig();
-                    swingUtils.invokeLater(new Runnable() {
-                        @Override
-                        public void run() {
-                            makeConfigButton.setEnabled(false);
-                        }
-                    });
-                    enableComponents();
-                    final List<String> incorrect = new ArrayList<String>();
-                    final List<String> changed = new ArrayList<String>();
-                    if (!configOk) {
-                        incorrect.add("config failed");
-                    }
-                    nextButtonSetEnabled(new Check(incorrect, changed));
-                    if (configOk && !application.getAutoClusters().isEmpty()) {
-                        Tools.sleep(1000);
-                        pressNextButton();
-                    }
-                }
-            });
+        final Thread thread = new Thread(() -> {
+            final boolean configOk = updateOldHbConfig();
+            swingUtils.invokeLater(() -> makeConfigButton.setEnabled(false));
+            enableComponents();
+            final List<String> incorrect = new ArrayList<>();
+            final List<String> changed = new ArrayList<>();
+            if (!configOk) {
+                incorrect.add("config failed");
+            }
+            nextButtonSetEnabled(new Check(incorrect, changed));
+            if (configOk && !application.getAutoClusters()
+                                        .isEmpty()) {
+                Tools.sleep(1000);
+                pressNextButton();
+            }
+        });
         thread.start();
     }
 
@@ -381,7 +353,7 @@ final class HbConfig extends DialogCluster {
         final Pattern mcastP = Pattern.compile("(mcast) (\\w+) (.*)");
         final Pattern serialP = Pattern.compile("(serial) (.*)");
         final Pattern ucastP = Pattern.compile("(ucast) (\\w+) (.*)");
-        final Map<String, Pattern> optionPatterns = new HashMap<String, Pattern>();
+        final Map<String, Pattern> optionPatterns = new HashMap<>();
         for (final String option : OPTIONS) {
             optionPatterns.put(option,
                                Pattern.compile("^\\s*" + option + "\\s+(" + OPTION_REGEXPS.get(option) + ")\\s*$"));
@@ -389,7 +361,7 @@ final class HbConfig extends DialogCluster {
         final Pattern dopdP = Pattern.compile("^\\s*respawn hacluster .*/dopd$");
         final Pattern mgmtdP = Pattern.compile("^\\s*respawn root .*/mgmtd -v$");
         castAddresses.clear();
-        final Map<String, String> opValues = new HashMap<String, String>();
+        final Map<String, String> opValues = new HashMap<>();
         for (final String line : config) {
             final Matcher bcastM  = bcastP.matcher(line);
             final Matcher mcastM  = mcastP.matcher(line);
@@ -483,14 +455,11 @@ final class HbConfig extends DialogCluster {
         boolean configOk = false;
         boolean noConfigs = true;
         if (configs[0].equals(HA_CF_ERROR_STRING)) {
-            swingUtils.invokeLater(new Runnable() {
-                @Override
-                public void run() {
-                    configStatus.setText(hosts[0] + ": " + Tools.getString("Dialog.Cluster.HbConfig.NoConfigFound"));
-                }
-            });
+            swingUtils.invokeLater(
+                    () -> configStatus.setText(hosts[0] + ": " + Tools.getString("Dialog.Cluster.HbConfig.NoConfigFound")));
             retry();
-            if (!application.getAutoClusters().isEmpty()) {
+            if (!application.getAutoClusters()
+                            .isEmpty()) {
                 Tools.sleep(1000);
                 addAddressButton.pressButton();
             }
@@ -500,22 +469,12 @@ final class HbConfig extends DialogCluster {
             for (j = 1; j < configs.length; j++) {
                 final Host host = hosts[j];
                 if (configs[j].equals(HA_CF_ERROR_STRING)) {
-                    swingUtils.invokeLater(new Runnable() {
-                        @Override
-                        public void run() {
-                            configStatus.setText(host
-                                                 + ": "
-                                                 + Tools.getString("Dialog.Cluster.HbConfig.NoConfigFound"));
-                        }
-                    });
+                    swingUtils.invokeLater(
+                            () -> configStatus.setText(host + ": " + Tools.getString("Dialog.Cluster.HbConfig.NoConfigFound")));
                     break;
                 } else if (!configs[0].equals(configs[j])) {
-                    swingUtils.invokeLater(new Runnable() {
-                        @Override
-                        public void run() {
-                            configStatus.setText(Tools.getString("Dialog.Cluster.HbConfig.ConfigsNotTheSame"));
-                        }
-                    });
+                    swingUtils.invokeLater(
+                            () -> configStatus.setText(Tools.getString("Dialog.Cluster.HbConfig.ConfigsNotTheSame")));
                     break;
                 }
             }
@@ -529,18 +488,15 @@ final class HbConfig extends DialogCluster {
                     generated = true;
                 }
                 final boolean editableConfig = generated;
-                swingUtils.invokeLater(new Runnable() {
-                    @Override
-                    public void run() {
-                        configStatus.setText(Tools.getString("Dialog.Cluster.HbConfig.ha.cf.ok"));
-                        configCheckbox.setSelected(false);
-                        if (editableConfig) {
-                            configCheckbox.setText(SEE_EXISTING_STRING);
-                        } else {
-                            configCheckbox.setText(EDIT_CONFIG_STRING);
-                        }
-                        statusPanel.setMaximumSize(statusPanel.getPreferredSize());
+                swingUtils.invokeLater(() -> {
+                    configStatus.setText(Tools.getString("Dialog.Cluster.HbConfig.ha.cf.ok"));
+                    configCheckbox.setSelected(false);
+                    if (editableConfig) {
+                        configCheckbox.setText(SEE_EXISTING_STRING);
+                    } else {
+                        configCheckbox.setText(EDIT_CONFIG_STRING);
                     }
+                    statusPanel.setMaximumSize(statusPanel.getPreferredSize());
                 });
                 setNewConfig(configs[0]);
                 if (editableConfig) {
@@ -554,18 +510,15 @@ final class HbConfig extends DialogCluster {
         }
         if (!configOk) {
             final boolean noConfigsF = noConfigs;
-            swingUtils.invokeLater(new Runnable() {
-                @Override
-                public void run() {
-                    if (noConfigsF) {
-                        configCheckbox.setText(SEE_EXISTING_STRING);
-                        configCheckbox.setSelected(false);
-                        statusPanel.setMaximumSize(statusPanel.getPreferredSize());
-                    } else {
-                        configCheckbox.setText(EDIT_CONFIG_STRING);
-                        configCheckbox.setSelected(false);
-                        statusPanel.setMaximumSize(statusPanel.getPreferredSize());
-                    }
+            swingUtils.invokeLater(() -> {
+                if (noConfigsF) {
+                    configCheckbox.setText(SEE_EXISTING_STRING);
+                    configCheckbox.setSelected(false);
+                    statusPanel.setMaximumSize(statusPanel.getPreferredSize());
+                } else {
+                    configCheckbox.setText(EDIT_CONFIG_STRING);
+                    configCheckbox.setSelected(false);
+                    statusPanel.setMaximumSize(statusPanel.getPreferredSize());
                 }
             });
             if (noConfigs) {
@@ -574,52 +527,41 @@ final class HbConfig extends DialogCluster {
                 updateConfigPanelExisting();
             }
         }
-        swingUtils.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                fieldCheckLatch.countDown();
-            }
-        });
+        swingUtils.invokeLater(() -> fieldCheckLatch.countDown());
         return configOk;
     }
 
     /** Shows all ha.cf config files. */
     private void updateConfigPanelExisting() {
         final Host[] hosts = getCluster().getHostsArray();
-        swingUtils.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                makeConfigButton.setEnabled(false);
-                configPanel.removeAll();
-                final JPanel insideConfigPanel = new JPanel(new SpringLayout());
-                int cols = 0;
-                for (int i = 0; i < hosts.length; i++) {
-                    if (HA_CF_ERROR_STRING.equals(configs[i])) {
-                        configs[i] = Tools.getString("Dialog.Cluster.HbConfig.NoConfigFound");
-                    }
-                    final JLabel l = new JLabel(hosts[i].getName() + ':');
-                    l.setBackground(Color.WHITE);
-                    final JPanel labelP = new JPanel();
-                    labelP.setBackground(Tools.getDefaultColor("ConfigDialog.Background"));
-                    labelP.setLayout(new BoxLayout(labelP, BoxLayout.PAGE_AXIS));
-                    labelP.setAlignmentX(java.awt.Component.TOP_ALIGNMENT);
-                    labelP.add(l);
-                    insideConfigPanel.add(labelP);
-                    final JTextArea ta = new JTextArea(configs[i]);
-                    ta.setEditable(false);
-                    insideConfigPanel.add(ta);
-                    cols += 2;
+        swingUtils.invokeLater(() -> {
+            makeConfigButton.setEnabled(false);
+            configPanel.removeAll();
+            final JPanel insideConfigPanel = new JPanel(new SpringLayout());
+            int cols = 0;
+            for (int i = 0; i < hosts.length; i++) {
+                if (HA_CF_ERROR_STRING.equals(configs[i])) {
+                    configs[i] = Tools.getString("Dialog.Cluster.HbConfig.NoConfigFound");
                 }
-                if (cols > 0) {
-                    SpringUtilities.makeCompactGrid(insideConfigPanel,
-                                                    1, cols,
-                                                    1, 1,
-                                                    1, 1);
-                    configPanel.add(insideConfigPanel);
-                }
-                configPanel.revalidate();
-                configPanel.repaint();
+                final JLabel l = new JLabel(hosts[i].getName() + ':');
+                l.setBackground(Color.WHITE);
+                final JPanel labelP = new JPanel();
+                labelP.setBackground(Tools.getDefaultColor("ConfigDialog.Background"));
+                labelP.setLayout(new BoxLayout(labelP, BoxLayout.PAGE_AXIS));
+                labelP.setAlignmentX(java.awt.Component.TOP_ALIGNMENT);
+                labelP.add(l);
+                insideConfigPanel.add(labelP);
+                final JTextArea ta = new JTextArea(configs[i]);
+                ta.setEditable(false);
+                insideConfigPanel.add(ta);
+                cols += 2;
             }
+            if (cols > 0) {
+                SpringUtilities.makeCompactGrid(insideConfigPanel, 1, cols, 1, 1, 1, 1);
+                configPanel.add(insideConfigPanel);
+            }
+            configPanel.revalidate();
+            configPanel.repaint();
         });
     }
 
@@ -628,101 +570,105 @@ final class HbConfig extends DialogCluster {
         if (configChanged && fieldCheckLatch.getCount() > 0) {
             return;
         }
-        this.configChangedByUser = configChanged;
-        swingUtils.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                if (!configChanged) {
-                    makeConfigButton.setEnabled(false);
+        configChangedByUser = configChanged;
+        swingUtils.invokeLater(() -> {
+            if (!configChanged) {
+                makeConfigButton.setEnabled(false);
+            }
+            configPanel.removeAll();
+            /* head */
+            final String[] head = hbConfigHead(true).toString()
+                                                    .split(NEWLINE);
+            for (final String line : head) {
+                configPanel.add(new JLabel(line));
+            }
+            /* timeouts */
+            for (final String option : OPTIONS) {
+                configPanel.add(getComponentPanel(option, optionsWidgets.get(option)
+                                                                        .getComponent()));
+            }
+            configPanel.add(new JLabel(" "));
+            if (castAddresses.size() < 2) {
+                final JLabel l;
+                if (castAddresses.isEmpty()) {
+                    l = new JLabel(Tools.getString("Dialog.Cluster.HbConfig.WarningAtLeastTwoInt"));
+                } else {
+                    l = new JLabel(Tools.getString("Dialog.Cluster.HbConfig.WarningAtLeastTwoInt.OneMore"));
                 }
-                configPanel.removeAll();
-                /* head */
-                final String[] head = hbConfigHead(true).toString().split(NEWLINE);
-                for (final String line : head) {
+                l.setForeground(Color.RED);
+                configPanel.add(l);
+                l.addComponentListener(new ComponentListener() {
+                    @Override
+                    public void componentHidden(final ComponentEvent e) {
+                        /* do nothing */
+                    }
+
+                    @Override
+                    public void componentMoved(final ComponentEvent e) {
+                        if (configAlreadyScrolled) {
+                            return;
+                        }
+                        configAlreadyScrolled = true;
+                        configScrollPane.getViewport()
+                                        .setViewPosition(l.getBounds()
+                                                          .getLocation());
+                    }
+
+                    @Override
+                    public void componentResized(final ComponentEvent e) {
+                        /* do nothing */
+                    }
+
+                    @Override
+                    public void componentShown(final ComponentEvent e) {
+                        /* do nothing */
+                    }
+                });
+            }
+            /* addresses */
+            for (final CastAddress c : castAddresses) {
+                configPanel.add(getComponentPanel(c.getConfigString(), getRemoveButton(c)));
+            }
+            configPanel.add(new JLabel(" "));
+            /* mcast etc combo boxes */
+            configPanel.add(mcastPanel);
+            /* dopd */
+            final String[] dopdLines = hbConfigDopd(dopdWidget.isSelected()).toString()
+                                                                            .split(NEWLINE);
+            boolean checkboxDone = false;
+            for (final String line : dopdLines) {
+                if (checkboxDone) {
                     configPanel.add(new JLabel(line));
+                } else {
+                    configPanel.add(getComponentPanel(line, dopdWidget));
+                    checkboxDone = true;
                 }
-                /* timeouts */
-                for (final String option : OPTIONS) {
-                    configPanel.add(getComponentPanel(option, optionsWidgets.get(option).getComponent()));
-                }
-                configPanel.add(new JLabel(" "));
-                if (castAddresses.size() < 2) {
-                    final JLabel l;
-                    if (castAddresses.isEmpty()) {
-                        l = new JLabel(Tools.getString("Dialog.Cluster.HbConfig.WarningAtLeastTwoInt"));
-                    } else {
-                        l = new JLabel(Tools.getString("Dialog.Cluster.HbConfig.WarningAtLeastTwoInt.OneMore"));
-                    }
-                    l.setForeground(Color.RED);
-                    configPanel.add(l);
-                    l.addComponentListener(new ComponentListener() {
-                        @Override
-                        public void componentHidden(final ComponentEvent e) {
-                            /* do nothing */
-                        }
+            }
 
-                        @Override
-                        public void componentMoved(final ComponentEvent e) {
-                            if (configAlreadyScrolled) {
-                                return;
-                            }
-                            configAlreadyScrolled = true;
-                            configScrollPane.getViewport().setViewPosition(l.getBounds().getLocation());
-                        }
-
-                        @Override
-                        public void componentResized(final ComponentEvent e) {
-                            /* do nothing */
-                        }
-
-                        @Override
-                        public void componentShown(final ComponentEvent e) {
-                            /* do nothing */
-                        }
-                    });
+            /* mgmtd */
+            final String[] mgmtdLines = hbConfigMgmtd(mgmtdWidget.isSelected()).toString()
+                                                                               .split(NEWLINE);
+            checkboxDone = false;
+            for (final String line : mgmtdLines) {
+                if (checkboxDone) {
+                    configPanel.add(new JLabel(line));
+                } else {
+                    configPanel.add(getComponentPanel(line, mgmtdWidget));
+                    checkboxDone = true;
                 }
-                /* addresses */
-                for (final CastAddress c : castAddresses) {
-                    configPanel.add(getComponentPanel(c.getConfigString(), getRemoveButton(c)));
+            }
+            configPanel.revalidate();
+            configPanel.repaint();
+            if (configChanged) {
+                if (castAddresses.isEmpty()) {
+                    makeConfigButton.setEnabled(false);
+                } else {
+                    access.setAccessible(makeConfigButton, AccessMode.ADMIN);
                 }
-                configPanel.add(new JLabel(" "));
-                /* mcast etc combo boxes */
-                configPanel.add(mcastPanel);
-                /* dopd */
-                final String[] dopdLines = hbConfigDopd(dopdWidget.isSelected()).toString().split(NEWLINE);
-                boolean checkboxDone = false;
-                for (final String line : dopdLines) {
-                    if (checkboxDone) {
-                        configPanel.add(new JLabel(line));
-                    } else {
-                        configPanel.add(getComponentPanel(line, dopdWidget));
-                        checkboxDone = true;
-                    }
-                }
-
-                /* mgmtd */
-                final String[] mgmtdLines = hbConfigMgmtd(mgmtdWidget.isSelected()).toString().split(NEWLINE);
-                checkboxDone = false;
-                for (final String line : mgmtdLines) {
-                    if (checkboxDone) {
-                        configPanel.add(new JLabel(line));
-                    } else {
-                        configPanel.add(getComponentPanel(line, mgmtdWidget));
-                        checkboxDone = true;
-                    }
-                }
-                configPanel.revalidate();
-                configPanel.repaint();
-                if (configChanged) {
-                    if (castAddresses.isEmpty()) {
-                        makeConfigButton.setEnabled(false);
-                    } else {
-                        access.setAccessible(makeConfigButton, AccessMode.ADMIN);
-                    }
-                    if (!application.getAutoClusters().isEmpty() && !castAddresses.isEmpty()) {
-                        Tools.sleep(1000);
-                        makeConfigButton.pressButton();
-                    }
+                if (!application.getAutoClusters()
+                                .isEmpty() && !castAddresses.isEmpty()) {
+                    Tools.sleep(1000);
+                    makeConfigButton.pressButton();
                 }
             }
         });
@@ -733,21 +679,14 @@ final class HbConfig extends DialogCluster {
         removeButton.setBackgroundColor(Tools.getDefaultColor("ConfigDialog.Button"));
         removeButton.setMaximumSize(new Dimension(REMOVE_BUTTON_WIDTH, REMOVE_BUTTON_HEIGHT));
         removeButton.setPreferredSize(new Dimension(REMOVE_BUTTON_WIDTH, REMOVE_BUTTON_HEIGHT));
-        removeButton.addActionListener(
-            new ActionListener() {
-                @Override
-                public void actionPerformed(final ActionEvent e) {
-                    final Thread t = new Thread(new Runnable() {
-                        @Override
-                        public void run() {
-                            castAddresses.remove(c);
-                            updateConfigPanelEditable(true);
-                            checkInterface();
-                        }
-                    });
-                    t.start();
-                }
+        removeButton.addActionListener(e -> {
+            final Thread t = new Thread(() -> {
+                castAddresses.remove(c);
+                updateConfigPanelEditable(true);
+                checkInterface();
             });
+            t.start();
+        });
         return removeButton;
     }
 
@@ -772,12 +711,7 @@ final class HbConfig extends DialogCluster {
             final UcastLink ucastLink1 = (UcastLink) ucastLink1Widget.getValue();
             final UcastLink ucastLink2 = (UcastLink) ucastLink2Widget.getValue();
             if (ucastLink1 == null || ucastLink2 == null || ucastLink1.getHost() == ucastLink2.getHost()) {
-                swingUtils.invokeLater(new Runnable() {
-                    @Override
-                    public void run() {
-                        addAddressButton.setEnabled(false);
-                    }
-                });
+                swingUtils.invokeLater(() -> addAddressButton.setEnabled(false));
                 return;
             }
             iface = ucastLink1.getInterface();
@@ -786,21 +720,11 @@ final class HbConfig extends DialogCluster {
 
         for (final CastAddress c : castAddresses) {
             if (c.equals(type.getValueForConfig(), iface, addr, serial)) {
-                swingUtils.invokeLater(new Runnable() {
-                    @Override
-                    public void run() {
-                        addAddressButton.setEnabled(false);
-                    }
-                });
+                swingUtils.invokeLater(() -> addAddressButton.setEnabled(false));
                 return;
             }
         }
-        swingUtils.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                addAddressButton.setEnabled(true);
-            }
-        });
+        swingUtils.invokeLater(() -> addAddressButton.setEnabled(true));
     }
 
     private StringBuilder hbConfigHead(final boolean fake) {
@@ -940,7 +864,7 @@ final class HbConfig extends DialogCluster {
                                                    Widget.NO_BUTTON);
 
         /* ucast links */
-        final List<UcastLink> ulList = new ArrayList<UcastLink>();
+        final List<UcastLink> ulList = new ArrayList<>();
         for (final Host host : hosts) {
             final NetInterface[] netInterfaces = networkService.getNetInterfacesWithBridges(host);
             for (final NetInterface n : netInterfaces) {
@@ -1031,12 +955,7 @@ final class HbConfig extends DialogCluster {
                                 ucastLink1Widget.setVisible(false);
                                 ucastLink2Widget.setVisible(false);
                             }
-                            swingUtils.invokeLater(new Runnable() {
-                                @Override
-                                public void run() {
-                                    mcastPanel.setMaximumSize(mcastPanel.getPreferredSize());
-                                }
-                            });
+                            swingUtils.invokeLater(() -> mcastPanel.setMaximumSize(mcastPanel.getPreferredSize()));
                             checkInterface();
                         }
                     }
@@ -1082,63 +1001,41 @@ final class HbConfig extends DialogCluster {
 
         addAddressButton = widgetFactory.createButton(Tools.getString("Dialog.Cluster.HbConfig.AddIntButton"));
         addAddressButton.setBackgroundColor(Tools.getDefaultColor("ConfigDialog.Button"));
-        addAddressButton.addActionListener(
-                new ActionListener() {
-                    @Override
-                    public void actionPerformed(final ActionEvent e) {
-                        final Value type = typeWidget.getValue();
-                        final Thread thread = new Thread(new Runnable() {
-                            @Override
-                            public void run() {
-                                addInterface(type);
-                            }
-                        });
-                        thread.start();
-                    }
-                });
+        addAddressButton.addActionListener(e -> {
+            final Value type = typeWidget.getValue();
+            final Thread thread = new Thread(() -> addInterface(type));
+            thread.start();
+        });
 
-        configScrollPane = new JScrollPane(configPanel,
-                                           JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,
-                                           JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+        configScrollPane =
+                new JScrollPane(configPanel, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
         configScrollPane.setPreferredSize(new Dimension(Short.MAX_VALUE, 150));
         statusPanel = new JPanel();
         statusPanel.add(configStatus);
         configCheckbox = new JCheckBox("-----", true);
         configCheckbox.setBackground(Tools.getDefaultColor("ConfigDialog.Background.Light"));
         access.setAccessible(configCheckbox, AccessMode.ADMIN);
-        configCheckbox.addItemListener(new ItemListener() {
-            @Override
-            public void itemStateChanged(final ItemEvent e) {
-                final String text = configCheckbox.getText();
-                if (e.getStateChange() == ItemEvent.SELECTED) {
-                    final Thread thread = new Thread(new Runnable() {
-                        @Override
-                        public void run() {
-                            if (EDIT_CONFIG_STRING.equals(text)) {
-                                updateConfigPanelEditable(configChangedByUser);
-                                swingUtils.invokeLater(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        configCheckbox.setText(SEE_EXISTING_STRING);
-                                        configCheckbox.setSelected(false);
-                                        statusPanel.setMaximumSize(statusPanel.getPreferredSize());
-                                    }
-                                });
-                            } else if (SEE_EXISTING_STRING.equals(text)) {
-                                updateConfigPanelExisting();
-                                swingUtils.invokeLater(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        configCheckbox.setText(EDIT_CONFIG_STRING);
-                                        configCheckbox.setSelected(false);
-                                        statusPanel.setMaximumSize(statusPanel.getPreferredSize());
-                                    }
-                                });
-                            }
-                        }
-                    });
-                    thread.start();
-                }
+        configCheckbox.addItemListener(e -> {
+            final String text = configCheckbox.getText();
+            if (e.getStateChange() == ItemEvent.SELECTED) {
+                final Thread thread = new Thread(() -> {
+                    if (EDIT_CONFIG_STRING.equals(text)) {
+                        updateConfigPanelEditable(configChangedByUser);
+                        swingUtils.invokeLater(() -> {
+                            configCheckbox.setText(SEE_EXISTING_STRING);
+                            configCheckbox.setSelected(false);
+                            statusPanel.setMaximumSize(statusPanel.getPreferredSize());
+                        });
+                    } else if (SEE_EXISTING_STRING.equals(text)) {
+                        updateConfigPanelExisting();
+                        swingUtils.invokeLater(() -> {
+                            configCheckbox.setText(EDIT_CONFIG_STRING);
+                            configCheckbox.setSelected(false);
+                            statusPanel.setMaximumSize(statusPanel.getPreferredSize());
+                        });
+                    }
+                });
+                thread.start();
             }
         });
         statusPanel.add(configCheckbox);
@@ -1172,8 +1069,7 @@ final class HbConfig extends DialogCluster {
                     '^' + OPTION_REGEXPS.get(option) + "\\s*$",
                     size,
                     Widget.NO_ABBRV,
-                    new AccessMode(AccessMode.ADMIN, AccessMode.NORMAL),
-                    Widget.NO_BUTTON);
+                    new AccessMode(AccessMode.ADMIN, AccessMode.NORMAL), Widget.NO_BUTTON);
             optionsWidgets.put(option, w);
             w.setAlwaysEditable(true);
             w.addListeners(getOptionListener());
@@ -1183,37 +1079,19 @@ final class HbConfig extends DialogCluster {
         dopdWidget = new JCheckBox(Tools.getString("Dialog.Cluster.HbConfig.UseDopdCheckBox"), null, false);
         dopdWidget.setBackground(Tools.getDefaultColor("ConfigDialog.Background"));
         dopdWidget.setToolTipText(Tools.getString("Dialog.Cluster.HbConfig.UseDopdCheckBox.ToolTip"));
-        dopdWidget.addItemListener(
-                new ItemListener() {
-                    @Override
-                    public void itemStateChanged(final ItemEvent e) {
-                        final Thread thread = new Thread(new Runnable() {
-                            @Override
-                            public void run() {
-                                updateConfigPanelEditable(true);
-                            }
-                        });
-                        thread.start();
-                    }
-                });
+        dopdWidget.addItemListener(e -> {
+            final Thread thread = new Thread(() -> updateConfigPanelEditable(true));
+            thread.start();
+        });
 
         /* mgmtd */
         mgmtdWidget = new JCheckBox(Tools.getString("Dialog.Cluster.HbConfig.UseMgmtdCheckBox"), null, false);
         mgmtdWidget.setBackground(Tools.getDefaultColor("ConfigDialog.Background"));
         mgmtdWidget.setToolTipText(Tools.getString("Dialog.Cluster.HbConfig.UseMgmtdCheckBox.ToolTip"));
-        mgmtdWidget.addItemListener(
-                new ItemListener() {
-                    @Override
-                    public void itemStateChanged(final ItemEvent e) {
-                        final Thread thread = new Thread(new Runnable() {
-                            @Override
-                            public void run() {
-                                updateConfigPanelEditable(true);
-                            }
-                        });
-                        thread.start();
-                    }
-                });
+        mgmtdWidget.addItemListener(e -> {
+            final Thread thread = new Thread(() -> updateConfigPanelEditable(true));
+            thread.start();
+        });
         makeConfigButton.setAlignmentX(java.awt.Component.LEFT_ALIGNMENT);
         pane.add(makeConfigButton);
         return pane;

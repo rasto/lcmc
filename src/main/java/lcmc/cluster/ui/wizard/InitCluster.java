@@ -25,12 +25,9 @@ package lcmc.cluster.ui.wizard;
 
 import java.awt.Color;
 import java.awt.GridLayout;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.inject.Inject;
 import javax.inject.Named;
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
@@ -41,31 +38,30 @@ import javax.swing.JScrollPane;
 import javax.swing.SpringLayout;
 import javax.swing.border.TitledBorder;
 
-import lcmc.common.ui.Access;
-import lcmc.common.ui.main.MainData;
-import lcmc.common.domain.AccessMode;
-import lcmc.common.domain.Application;
 import lcmc.cluster.domain.Cluster;
-import lcmc.common.ui.utils.SwingUtils;
-import lcmc.host.domain.Host;
-import lcmc.common.domain.StringValue;
-import lcmc.common.domain.Value;
-import lcmc.common.ui.SpringUtilities;
-import lcmc.common.ui.WizardDialog;
+import lcmc.cluster.service.ssh.ExecCommandConfig;
+import lcmc.cluster.service.ssh.ExecCommandThread;
 import lcmc.cluster.ui.widget.Check;
 import lcmc.cluster.ui.widget.Widget;
 import lcmc.cluster.ui.widget.WidgetFactory;
-import lcmc.crm.service.Corosync;
-import lcmc.drbd.service.DRBD;
+import lcmc.common.domain.AccessMode;
+import lcmc.common.domain.Application;
 import lcmc.common.domain.ExecCallback;
+import lcmc.common.domain.StringValue;
+import lcmc.common.domain.Value;
+import lcmc.common.domain.util.Tools;
+import lcmc.common.ui.Access;
+import lcmc.common.ui.SpringUtilities;
+import lcmc.common.ui.WizardDialog;
+import lcmc.common.ui.utils.MyButton;
+import lcmc.common.ui.utils.SwingUtils;
+import lcmc.crm.service.Corosync;
 import lcmc.crm.service.Heartbeat;
+import lcmc.crm.service.Openais;
+import lcmc.drbd.service.DRBD;
+import lcmc.host.domain.Host;
 import lcmc.logger.Logger;
 import lcmc.logger.LoggerFactory;
-import lcmc.common.ui.utils.MyButton;
-import lcmc.crm.service.Openais;
-import lcmc.cluster.service.ssh.ExecCommandConfig;
-import lcmc.cluster.service.ssh.ExecCommandThread;
-import lcmc.common.domain.util.Tools;
 import lombok.val;
 
 /**
@@ -102,37 +98,35 @@ public class InitCluster extends DialogCluster {
     private Boolean[] lastHeartbeatConfigured;
 
     private Thread checkClusterThread = null;
-    /** Button that acts as a finish button. This is used by methods that
-     * override this one and use different finish/next button.
+    /**
+     * Button that acts as a finish button. This is used by methods that override this one and use different finish/next button.
      */
     private String otherFinishButton = null;
-    @Inject
-    private WidgetFactory widgetFactory;
-    /** Whether to use openais init script instead of corosync. It applies only
-     * if both of them are present. */
+    private final WidgetFactory widgetFactory;
+    /**
+     * Whether to use openais init script instead of corosync. It applies only if both of them are present.
+     */
     private Widget useOpenaisButton;
-    @Inject
-    private Finish finishDialog;
-    @Inject
-    private MainData mainData;
-    @Inject
-    private Application application;
-    @Inject
-    private SwingUtils swingUtils;
-    @Inject
-    private Access access;
+    private final Finish finishDialog;
+    private final Application application;
+    private final SwingUtils swingUtils;
+    private final Access access;
 
+    public InitCluster(WidgetFactory widgetFactory, Finish finishDialog, Application application, SwingUtils swingUtils,
+            Access access) {
+        this.widgetFactory = widgetFactory;
+        this.finishDialog = finishDialog;
+        this.application = application;
+        this.swingUtils = swingUtils;
+        this.access = access;
+    }
+
+    @Override
     public void init(final WizardDialog previousDialog, final Cluster cluster) {
         super.init(previousDialog, cluster);
-        useOpenaisButton = widgetFactory.createInstance(
-                Widget.Type.RADIOGROUP,
-                Widget.NO_DEFAULT,
-                new Value[]{new StringValue(COROSYNC_INIT_SCRIPT), new StringValue(OPENAIS_INIT_SCRIPT)},
-                Widget.NO_REGEXP,
-                0,
-                Widget.NO_ABBRV,
-                new AccessMode(AccessMode.ADMIN, AccessMode.NORMAL),
-                Widget.NO_BUTTON);
+        useOpenaisButton = widgetFactory.createInstance(Widget.Type.RADIOGROUP, Widget.NO_DEFAULT,
+                new Value[]{new StringValue(COROSYNC_INIT_SCRIPT), new StringValue(OPENAIS_INIT_SCRIPT)}, Widget.NO_REGEXP, 0,
+                Widget.NO_ABBRV, new AccessMode(AccessMode.ADMIN, AccessMode.NORMAL), Widget.NO_BUTTON);
         setOtherFinishButton(finishButton());
         finishDialog.init(this, getCluster());
     }
@@ -191,23 +185,20 @@ public class InitCluster extends DialogCluster {
         lastHeartbeatStarted = null;
         lastHeartbeatInRc = null;
         checkClusterStopped = false;
-        checkClusterThread = new Thread(
-            new Runnable() {
-                @Override
-                public void run() {
-                    while (!checkClusterStopped) {
-                        checkCluster(true);
-                        if (!checkClusterStopped) {
-                            try {
-                                Thread.sleep(CHECK_INTERVAL);
-                            } catch (final InterruptedException ex) {
-                                Thread.currentThread().interrupt();
-                            }
-                        }
+        checkClusterThread = new Thread(() -> {
+            while (!checkClusterStopped) {
+                checkCluster(true);
+                if (!checkClusterStopped) {
+                    try {
+                        Thread.sleep(CHECK_INTERVAL);
+                    } catch (final InterruptedException ex) {
+                        Thread.currentThread()
+                              .interrupt();
                     }
-                    checkClusterThread = null;
                 }
-            });
+            }
+            checkClusterThread = null;
+        });
         checkClusterThread.start();
     }
 
@@ -289,25 +280,19 @@ public class InitCluster extends DialogCluster {
             boolean drbdFailed = false;
             if (drbdLoaded) {
                 if (drbdLoadedChanged) {
-                    swingUtils.invokeLater(new Runnable() {
-                        @Override
-                        public void run() {
-                            drbdLoadedInfo.setText(Tools.getString("Dialog.Cluster.Init.DrbdIsLoaded"));
-                            drbdLoadedInfo.setForeground(Color.BLACK);
-                        }
+                    swingUtils.invokeLater(() -> {
+                        drbdLoadedInfo.setText(Tools.getString("Dialog.Cluster.Init.DrbdIsLoaded"));
+                        drbdLoadedInfo.setForeground(Color.BLACK);
                     });
                 }
             } else {
                 drbdFailed = true;
                 if (drbdLoadedChanged) {
                     final MyButton drbdLoadButton = drbdLoadButtons.get(i);
-                    swingUtils.invokeLater(new Runnable() {
-                        @Override
-                        public void run() {
-                            drbdLoadedInfo.setText(Tools.getString("Dialog.Cluster.Init.DrbdIsNotLoaded"));
-                            drbdLoadedInfo.setForeground(Color.RED);
-                            drbdLoadButton.setVisible(true);
-                        }
+                    swingUtils.invokeLater(() -> {
+                        drbdLoadedInfo.setText(Tools.getString("Dialog.Cluster.Init.DrbdIsNotLoaded"));
+                        drbdLoadedInfo.setForeground(Color.RED);
+                        drbdLoadButton.setVisible(true);
                     });
                 }
             }
@@ -396,57 +381,46 @@ public class InitCluster extends DialogCluster {
             boolean csAisFailed = false;
             if (csAisRunning) {
                 if (csAisChanged || hbChanged) {
-                    swingUtils.invokeLater(new Runnable() {
-                        @Override
-                        public void run() {
-                            pmStartedInfo.setText(
-                                initScript + Tools.getString("Dialog.Cluster.Init.CsAisIsRunning"));
-                            pmStartedInfo.setForeground(Color.BLACK);
-                            if (csAisIsRc) {
-                                csAisStartButton.setVisible(false);
-                                pmStartedInfo.setText(
-                                    initScript + Tools.getString("Dialog.Cluster.Init.CsAisIsRc"));
-                            } else if (heartbeatIsRunning || heartbeatIsRc) {
-                                csAisStartButton.setText(COROSYNC_AIS_BUTTON_SWITCH_TEXT);
-                                csAisStartButton.setVisible(true);
-                            } else {
-                                csAisStartButton.setText(Tools.getString("Dialog.Cluster.Init.CsAisButtonRc"));
-                                csAisStartButton.setVisible(true);
-                            }
+                    swingUtils.invokeLater(() -> {
+                        pmStartedInfo.setText(initScript + Tools.getString("Dialog.Cluster.Init.CsAisIsRunning"));
+                        pmStartedInfo.setForeground(Color.BLACK);
+                        if (csAisIsRc) {
+                            csAisStartButton.setVisible(false);
+                            pmStartedInfo.setText(initScript + Tools.getString("Dialog.Cluster.Init.CsAisIsRc"));
+                        } else if (heartbeatIsRunning || heartbeatIsRc) {
+                            csAisStartButton.setText(COROSYNC_AIS_BUTTON_SWITCH_TEXT);
+                            csAisStartButton.setVisible(true);
+                        } else {
+                            csAisStartButton.setText(Tools.getString("Dialog.Cluster.Init.CsAisButtonRc"));
+                            csAisStartButton.setVisible(true);
                         }
                     });
                 }
             } else {
                 csAisFailed = true;
                 if (csAisChanged || hbChanged) {
-                    swingUtils.invokeLater(new Runnable() {
-                        @Override
-                        public void run() {
-                            if (heartbeatIsRunning || heartbeatIsRc) {
-                                csAisStartButton.setText(COROSYNC_AIS_BUTTON_SWITCH_TEXT);
-                            } else {
-                                csAisStartButton.setText(Tools.getString("Dialog.Cluster.Init.StartCsAisButton"));
-                            }
-                            if (!csAisIsInstalled) {
-                                pmStartedInfo.setText(initScript
-                                                      + Tools.getString("Dialog.Cluster.Init.CsAisIsNotInstalled"));
-                                csAisStartButton.setEnabled(false);
-                            } else if (!csAisIsConf) {
-                                pmStartedInfo.setText(initScript
-                                                      + Tools.getString("Dialog.Cluster.Init.CsAisIsNotConfigured"));
-                                csAisStartButton.setEnabled(false);
-                            } else {
-                                pmStartedInfo.setText(
-                                   initScript + Tools.getString("Dialog.Cluster.Init.CsAisIsStopped"));
-                                if (heartbeatIsRunning) {
-                                    csAisStartButton.setEnabled(false);
-                                } else {
-                                    access.setAccessible(csAisStartButton, AccessMode.OP);
-                                }
-                            }
-                            csAisStartButton.setVisible(true);
-                            pmStartedInfo.setForeground(Color.RED);
+                    swingUtils.invokeLater(() -> {
+                        if (heartbeatIsRunning || heartbeatIsRc) {
+                            csAisStartButton.setText(COROSYNC_AIS_BUTTON_SWITCH_TEXT);
+                        } else {
+                            csAisStartButton.setText(Tools.getString("Dialog.Cluster.Init.StartCsAisButton"));
                         }
+                        if (!csAisIsInstalled) {
+                            pmStartedInfo.setText(initScript + Tools.getString("Dialog.Cluster.Init.CsAisIsNotInstalled"));
+                            csAisStartButton.setEnabled(false);
+                        } else if (!csAisIsConf) {
+                            pmStartedInfo.setText(initScript + Tools.getString("Dialog.Cluster.Init.CsAisIsNotConfigured"));
+                            csAisStartButton.setEnabled(false);
+                        } else {
+                            pmStartedInfo.setText(initScript + Tools.getString("Dialog.Cluster.Init.CsAisIsStopped"));
+                            if (heartbeatIsRunning) {
+                                csAisStartButton.setEnabled(false);
+                            } else {
+                                access.setAccessible(csAisStartButton, AccessMode.OP);
+                            }
+                        }
+                        csAisStartButton.setVisible(true);
+                        pmStartedInfo.setForeground(Color.RED);
                     });
                 }
             }
@@ -457,52 +431,46 @@ public class InitCluster extends DialogCluster {
             boolean hbFailed = false;
             if (heartbeatIsRunning) {
                 if (hbChanged || csAisChanged) {
-                    swingUtils.invokeLater(new Runnable() {
-                        @Override
-                        public void run() {
-                            hbStartedInfo.setText(Tools.getString("Dialog.Cluster.Init.HbIsRunning"));
-                            hbStartedInfo.setForeground(Color.BLACK);
-                            if (heartbeatIsRc) {
-                                hbStartButton.setVisible(false);
-                                hbStartedInfo.setText(Tools.getString("Dialog.Cluster.Init.HbIsRc"));
-                            } else if (csAisRunning || csAisIsRc) {
-                                hbStartButton.setText(HEARTBEAT_BUTTON_SWITCH_TEXT);
-                                hbStartButton.setVisible(true);
-                            } else {
-                                hbStartButton.setText(Tools.getString("Dialog.Cluster.Init.HbButtonRc"));
-                                hbStartButton.setVisible(true);
-                            }
+                    swingUtils.invokeLater(() -> {
+                        hbStartedInfo.setText(Tools.getString("Dialog.Cluster.Init.HbIsRunning"));
+                        hbStartedInfo.setForeground(Color.BLACK);
+                        if (heartbeatIsRc) {
+                            hbStartButton.setVisible(false);
+                            hbStartedInfo.setText(Tools.getString("Dialog.Cluster.Init.HbIsRc"));
+                        } else if (csAisRunning || csAisIsRc) {
+                            hbStartButton.setText(HEARTBEAT_BUTTON_SWITCH_TEXT);
+                            hbStartButton.setVisible(true);
+                        } else {
+                            hbStartButton.setText(Tools.getString("Dialog.Cluster.Init.HbButtonRc"));
+                            hbStartButton.setVisible(true);
                         }
                     });
                 }
             } else {
                 hbFailed = true;
                 if (hbChanged || csAisChanged) {
-                    swingUtils.invokeLater(new Runnable() {
-                        @Override
-                        public void run() {
-                            if (csAisRunning || csAisIsRc) {
-                                hbStartButton.setText(HEARTBEAT_BUTTON_SWITCH_TEXT);
-                            } else {
-                                hbStartButton.setText(Tools.getString("Dialog.Cluster.Init.StartHbButton"));
-                            }
-                            if (!heartbeatIsInstalled) {
-                                hbStartedInfo.setText(Tools.getString("Dialog.Cluster.Init.HbIsNotInstalled"));
-                                hbStartButton.setEnabled(false);
-                            } else if (!heartbeatIsConf) {
-                                hbStartedInfo.setText(Tools.getString("Dialog.Cluster.Init.HbIsNotConfigured"));
-                                hbStartButton.setEnabled(false);
-                            } else {
-                                hbStartedInfo.setText(Tools.getString("Dialog.Cluster.Init.HbIsStopped"));
-                                if (csAisRunning) {
-                                    hbStartButton.setEnabled(false);
-                                } else {
-                                    access.setAccessible(hbStartButton, AccessMode.OP);
-                                }
-                            }
-                            hbStartButton.setVisible(true);
-                            hbStartedInfo.setForeground(Color.RED);
+                    swingUtils.invokeLater(() -> {
+                        if (csAisRunning || csAisIsRc) {
+                            hbStartButton.setText(HEARTBEAT_BUTTON_SWITCH_TEXT);
+                        } else {
+                            hbStartButton.setText(Tools.getString("Dialog.Cluster.Init.StartHbButton"));
                         }
+                        if (!heartbeatIsInstalled) {
+                            hbStartedInfo.setText(Tools.getString("Dialog.Cluster.Init.HbIsNotInstalled"));
+                            hbStartButton.setEnabled(false);
+                        } else if (!heartbeatIsConf) {
+                            hbStartedInfo.setText(Tools.getString("Dialog.Cluster.Init.HbIsNotConfigured"));
+                            hbStartButton.setEnabled(false);
+                        } else {
+                            hbStartedInfo.setText(Tools.getString("Dialog.Cluster.Init.HbIsStopped"));
+                            if (csAisRunning) {
+                                hbStartButton.setEnabled(false);
+                            } else {
+                                access.setAccessible(hbStartButton, AccessMode.OP);
+                            }
+                        }
+                        hbStartButton.setVisible(true);
+                        hbStartedInfo.setForeground(Color.RED);
                     });
                 }
             }
@@ -512,37 +480,25 @@ public class InitCluster extends DialogCluster {
             i++;
         }
         final boolean nob = needOpenaisButton;
-        swingUtils.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                useOpenaisButton.setEnabled(nob);
-            }
-        });
+        swingUtils.invokeLater(() -> useOpenaisButton.setEnabled(nob));
 
         if (oneChanged || !periodic) {
-            swingUtils.invokeLater(new Runnable() {
-                @Override
-                public void run() {
-                    mainPanel.invalidate();
-                    mainPanel.validate();
-                    mainPanel.repaint();
-                }
+            swingUtils.invokeLater(() -> {
+                mainPanel.invalidate();
+                mainPanel.validate();
+                mainPanel.repaint();
             });
 
-        final List<String> incorrect = new ArrayList<String>();
-        if (oneFailed) {
-            incorrect.add("one component failed");
-                swingUtils.invokeLater(new Runnable() {
-                    @Override
-                    public void run() {
-                        buttonClass(otherFinishButton).setEnabled(false);
-                    }
-                });
+            final List<String> incorrect = new ArrayList<>();
+            if (oneFailed) {
+                incorrect.add("one component failed");
+                swingUtils.invokeLater(() -> buttonClass(otherFinishButton).setEnabled(false));
             }
-        final List<String> changed = new ArrayList<String>();
+            final List<String> changed = new ArrayList<>();
             enableComponents();
             nextButtonSetEnabled(new Check(incorrect, changed));
-            if (!application.getAutoClusters().isEmpty()) {
+            if (!application.getAutoClusters()
+                            .isEmpty()) {
                 Tools.sleep(1000);
                 pressNextButton();
             }
@@ -562,17 +518,18 @@ public class InitCluster extends DialogCluster {
             try {
                 t.join();
             } catch (final InterruptedException e) {
-                Thread.currentThread().interrupt();
+                Thread.currentThread()
+                      .interrupt();
             }
         }
-        drbdLoadedLabels = new ArrayList<JLabel>();
-        drbdLoadButtons = new ArrayList<MyButton>();
+        drbdLoadedLabels = new ArrayList<>();
+        drbdLoadButtons = new ArrayList<>();
 
-        pacemakerStartedLabels = new ArrayList<JLabel>();
-        startPacemakerButtons = new ArrayList<MyButton>();
+        pacemakerStartedLabels = new ArrayList<>();
+        startPacemakerButtons = new ArrayList<>();
 
-        heartbeatStartedLabels = new ArrayList<JLabel>();
-        startHeartbeatButtons = new ArrayList<MyButton>();
+        heartbeatStartedLabels = new ArrayList<>();
+        startHeartbeatButtons = new ArrayList<>();
 
         mainPanel = new JPanel(new GridLayout(1, 0));
 
@@ -596,31 +553,20 @@ public class InitCluster extends DialogCluster {
             final MyButton drbdb = widgetFactory.createButton(Tools.getString("Dialog.Cluster.Init.LoadDrbdButton"));
             drbdb.setBackgroundColor(Tools.getDefaultColor("ConfigDialog.Button"));
             drbdLoadButtons.add(drbdb);
-            drbdLoadButtons.get(i).setVisible(false);
+            drbdLoadButtons.get(i)
+                           .setVisible(false);
 
-            drbdLoadButtons.get(i).addActionListener(
-                new ActionListener() {
-                    @Override
-                    public void actionPerformed(final ActionEvent e) {
-                        final Thread thread = new Thread(
-                            new Runnable() {
-                                @Override
-                                public void run() {
-                                    swingUtils.invokeLater(new Runnable() {
-                                        @Override
-                                        public void run() {
-                                            drbdLoadButtons.get(index).setVisible(false);
-                                        }
-                                    });
-                                    final Application.RunMode runMode = Application.RunMode.LIVE;
-                                    DRBD.load(host, runMode);
-                                    checkCluster(false);
-                                }
-                            }
-                        );
-                        thread.start();
-                    }
-                });
+            drbdLoadButtons.get(i)
+                           .addActionListener(e -> {
+                               final Thread thread = new Thread(() -> {
+                                   swingUtils.invokeLater(() -> drbdLoadButtons.get(index)
+                                                                               .setVisible(false));
+                                   final Application.RunMode runMode = Application.RunMode.LIVE;
+                                   DRBD.load(host, runMode);
+                                   checkCluster(false);
+                               });
+                               thread.start();
+                           });
 
             pane.add(drbdLoadedLabels.get(i));
             pane.add(drbdLoadButtons.get(i));
@@ -628,54 +574,45 @@ public class InitCluster extends DialogCluster {
             /* Heartbeat */
             heartbeatStartedLabels.add(new JLabel(Tools.getString("Dialog.Cluster.Init.CheckingHb")));
             final MyButton btn;
-            final val hostParser = host.getHostParser();
-            if (hostParser.isCorosyncRunning() || hostParser.isOpenaisRunning() || hostParser.isCorosyncInRc() || hostParser.isOpenaisInRc()) {
+            val hostParser = host.getHostParser();
+            if (hostParser.isCorosyncRunning() || hostParser.isOpenaisRunning() || hostParser.isCorosyncInRc()
+                || hostParser.isOpenaisInRc()) {
                 btn = widgetFactory.createButton(HEARTBEAT_BUTTON_SWITCH_TEXT);
             } else {
                 btn = widgetFactory.createButton(Tools.getString("Dialog.Cluster.Init.StartHbButton"));
             }
             btn.setBackgroundColor(Tools.getDefaultColor("ConfigDialog.Button"));
             startHeartbeatButtons.add(btn);
-            startHeartbeatButtons.get(i).setVisible(false);
+            startHeartbeatButtons.get(i)
+                                 .setVisible(false);
 
-            startHeartbeatButtons.get(i).addActionListener(
-                new ActionListener() {
-                    @Override
-                    public void actionPerformed(final ActionEvent e) {
-                        final Thread thread = new Thread(
-                            new Runnable() {
-                                @Override
-                                public void run() {
-                                    disableComponents();
-                                    swingUtils.invokeLater(new Runnable() {
-                                        @Override
-                                        public void run() {
-                                            startHeartbeatButtons.get(index).setVisible(false);
-                                        }
-                                    });
-                                    if (Tools.getString("Dialog.Cluster.Init.HbButtonRc").equals(
-                                                                                            e.getActionCommand())) {
-                                        Heartbeat.addHeartbeatToRc(host);
-                                    } else if (useCorosync(host)
-                                               && HEARTBEAT_BUTTON_SWITCH_TEXT.equals(e.getActionCommand())) {
-                                        Heartbeat.switchFromCorosyncToHeartbeat(host);
-                                    } else if (!useCorosync(host)
-                                               && HEARTBEAT_BUTTON_SWITCH_TEXT.equals(e.getActionCommand())) {
-                                        Heartbeat.switchFromOpenaisToHeartbeat(host);
-                                    } else {
-                                        if (host.getHostParser().isHeartbeatInRc()) {
-                                            Heartbeat.startHeartbeat(host);
-                                        } else {
-                                            Heartbeat.startHeartbeatRc(host);
-                                        }
-                                    }
-                                    checkCluster(false);
-                                }
-                            }
-                        );
-                        thread.start();
-                    }
-                });
+            startHeartbeatButtons.get(i)
+                                 .addActionListener(e -> {
+                                     final Thread thread = new Thread(() -> {
+                                         disableComponents();
+                                         swingUtils.invokeLater(() -> startHeartbeatButtons.get(index)
+                                                                                           .setVisible(false));
+                                         if (Tools.getString("Dialog.Cluster.Init.HbButtonRc")
+                                                  .equals(e.getActionCommand())) {
+                                             Heartbeat.addHeartbeatToRc(host);
+                                         } else if (useCorosync(host) && HEARTBEAT_BUTTON_SWITCH_TEXT.equals(
+                                                 e.getActionCommand())) {
+                                             Heartbeat.switchFromCorosyncToHeartbeat(host);
+                                         } else if (!useCorosync(host) && HEARTBEAT_BUTTON_SWITCH_TEXT.equals(
+                                                 e.getActionCommand())) {
+                                             Heartbeat.switchFromOpenaisToHeartbeat(host);
+                                         } else {
+                                             if (host.getHostParser()
+                                                     .isHeartbeatInRc()) {
+                                                 Heartbeat.startHeartbeat(host);
+                                             } else {
+                                                 Heartbeat.startHeartbeatRc(host);
+                                             }
+                                         }
+                                         checkCluster(false);
+                                     });
+                                     thread.start();
+                                 });
 
             pane.add(heartbeatStartedLabels.get(i));
             pane.add(startHeartbeatButtons.get(i));
@@ -685,54 +622,47 @@ public class InitCluster extends DialogCluster {
             final MyButton pmsb = widgetFactory.createButton(Tools.getString("Dialog.Cluster.Init.StartCsAisButton"));
             pmsb.setBackgroundColor(Tools.getDefaultColor("ConfigDialog.Button"));
             startPacemakerButtons.add(pmsb);
-            startPacemakerButtons.get(i).setVisible(false);
+            startPacemakerButtons.get(i)
+                                 .setVisible(false);
 
-            startPacemakerButtons.get(i).addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(final ActionEvent e) {
-                    final Thread thread = new Thread(new Runnable() {
-                        @Override
-                        public void run() {
-                            disableComponents();
-                            swingUtils.invokeLater(new Runnable() {
-                                @Override
-                                public void run() {
-                                    startPacemakerButtons.get(index).setVisible(false);
-                                }
-                            });
-                            if (Tools.getString("Dialog.Cluster.Init.CsAisButtonRc").equals(e.getActionCommand())) {
-                                if (useCorosync(host)) {
-                                    Corosync.addCorosyncToRc(host);
-                                } else {
-                                    Openais.addOpenaisToRc(host);
-                                }
-                            } else if (COROSYNC_AIS_BUTTON_SWITCH_TEXT.equals(e.getActionCommand())) {
-                                if (useCorosync(host)) {
-                                    Corosync.switchToCorosync(host);
-                                } else {
-                                    Openais.switchToOpenais(host);
-                                }
-                            } else {
-                                if (hostParser.isCorosyncInRc() || hostParser.isOpenaisInRc()) {
-                                    if (useCorosync(host)) {
-                                        Corosync.startCorosync(host);
-                                    } else {
-                                        Openais.startOpenais(host);
-                                    }
-                                } else {
-                                    if (useCorosync(host)) {
-                                        Corosync.startCorosyncRc(host);
-                                    } else {
-                                        Openais.startOpenaisRc(host);
-                                    }
-                                }
-                            }
-                            checkCluster(false);
-                        }
-                    });
-                    thread.start();
-                }
-            });
+            startPacemakerButtons.get(i)
+                                 .addActionListener(e -> {
+                                     final Thread thread = new Thread(() -> {
+                                         disableComponents();
+                                         swingUtils.invokeLater(() -> startPacemakerButtons.get(index)
+                                                                                           .setVisible(false));
+                                         if (Tools.getString("Dialog.Cluster.Init.CsAisButtonRc")
+                                                  .equals(e.getActionCommand())) {
+                                             if (useCorosync(host)) {
+                                                 Corosync.addCorosyncToRc(host);
+                                             } else {
+                                                 Openais.addOpenaisToRc(host);
+                                             }
+                                         } else if (COROSYNC_AIS_BUTTON_SWITCH_TEXT.equals(e.getActionCommand())) {
+                                             if (useCorosync(host)) {
+                                                 Corosync.switchToCorosync(host);
+                                             } else {
+                                                 Openais.switchToOpenais(host);
+                                             }
+                                         } else {
+                                             if (hostParser.isCorosyncInRc() || hostParser.isOpenaisInRc()) {
+                                                 if (useCorosync(host)) {
+                                                     Corosync.startCorosync(host);
+                                                 } else {
+                                                     Openais.startOpenais(host);
+                                                 }
+                                             } else {
+                                                 if (useCorosync(host)) {
+                                                     Corosync.startCorosyncRc(host);
+                                                 } else {
+                                                     Openais.startOpenaisRc(host);
+                                                 }
+                                             }
+                                         }
+                                         checkCluster(false);
+                                     });
+                                     thread.start();
+                                 });
             if (hostParser.isCorosyncRunning() && hostParser.isOpenaisRunning()) {
                 /* started with openais init script. */
                 oneStartedAsOpenais = true;

@@ -22,14 +22,13 @@
 
 package lcmc.cluster.ui.wizard;
 
+import javax.inject.Named;
+
 import lcmc.cluster.domain.Cluster;
+import lcmc.common.domain.util.Tools;
 import lcmc.common.ui.MainPanel;
 import lcmc.logger.Logger;
 import lcmc.logger.LoggerFactory;
-import lcmc.common.domain.util.Tools;
-
-import javax.inject.Inject;
-import javax.inject.Named;
 
 /**
  * Show step by step dialogs that configure a cluster.
@@ -39,10 +38,13 @@ public final class EditClusterDialog {
     private static final Logger LOG = LoggerFactory.getLogger(EditClusterDialog.class);
     private static final String CANCEL_BTN = Tools.getString("Dialog.Dialog.Cancel");
     private static final String FINISH_BTN = Tools.getString("Dialog.Dialog.Finish");
-    @Inject
-    private Name nameDialog;
-    @Inject
-    private MainPanel mainPanel;
+    private final Name nameDialog;
+    private final MainPanel mainPanel;
+
+    public EditClusterDialog(Name nameDialog, MainPanel mainPanel) {
+        this.nameDialog = nameDialog;
+        this.mainPanel = mainPanel;
+    }
 
     public void showDialogs(final Cluster cluster) {
         cluster.setClusterTabClosable(false);
@@ -50,7 +52,8 @@ public final class EditClusterDialog {
         dialog.init(null, cluster);
         mainPanel.expandTerminalSplitPane(MainPanel.TerminalSize.EXPAND);
         while (true) {
-            LOG.debug1("showDialogs: dialog: " + dialog.getClass().getName());
+            LOG.debug1("showDialogs: dialog: " + dialog.getClass()
+                                                       .getName());
             final DialogCluster newdialog = (DialogCluster) dialog.showDialog();
             if (dialog.isPressedButton(CANCEL_BTN)) {
                 mainPanel.expandTerminalSplitPane(MainPanel.TerminalSize.COLLAPSE);

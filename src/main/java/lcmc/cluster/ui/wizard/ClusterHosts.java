@@ -34,7 +34,6 @@ import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import javax.inject.Inject;
 import javax.inject.Named;
 import javax.swing.ImageIcon;
 import javax.swing.JCheckBox;
@@ -66,25 +65,32 @@ final class ClusterHosts extends DialogCluster {
      */
     private final Map<JCheckBox, Host> checkBoxToHost = new LinkedHashMap<>();
 
-    @Inject
-    private CommStack commStackDialog;
-    @Inject
-    private Connect connectDialog;
-    @Inject
-    private MainPresenter mainPresenter;
-    @Inject
-    private Application application;
-    @Inject
-    private SwingUtils swingUtils;
-    @Inject
-    private Hosts allHosts;
+    private final CommStack commStackDialog;
+    private final Connect connectDialog;
+    private final MainPresenter mainPresenter;
+    private final Application application;
+    private final SwingUtils swingUtils;
+    private final Hosts allHosts;
 
-    /** It is executed after the dialog is applied. */
+    public ClusterHosts(CommStack commStackDialog, Connect connectDialog, MainPresenter mainPresenter, Application application,
+            SwingUtils swingUtils, Hosts allHosts) {
+        this.commStackDialog = commStackDialog;
+        this.connectDialog = connectDialog;
+        this.mainPresenter = mainPresenter;
+        this.application = application;
+        this.swingUtils = swingUtils;
+        this.allHosts = allHosts;
+    }
+
+    /**
+     * It is executed after the dialog is applied.
+     */
     @Override
     protected void finishDialog() {
         getCluster().removeAllHosts();
         for (final Map.Entry<JCheckBox, Host> checkBoxEntry : checkBoxToHost.entrySet()) {
-            if (checkBoxEntry.getKey().isSelected()) {
+            if (checkBoxEntry.getKey()
+                             .isSelected()) {
                 final Host host = checkBoxEntry.getValue();
                 host.setCluster(getCluster());
                 getCluster().addHost(host);

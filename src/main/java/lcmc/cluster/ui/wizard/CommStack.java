@@ -24,7 +24,6 @@ package lcmc.cluster.ui.wizard;
 
 import java.awt.Color;
 
-import javax.inject.Inject;
 import javax.inject.Named;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
@@ -51,29 +50,33 @@ import lcmc.logger.LoggerFactory;
 import lombok.val;
 
 /**
- * An implementation of a dialog where user can choose cluster stack, that can
- * be Corosync or Heartbeat.
+ * An implementation of a dialog where user can choose cluster stack, that can be Corosync or Heartbeat.
  */
 @Named
 final class CommStack extends DialogCluster {
     private static final Logger LOG = LoggerFactory.getLogger(CommStack.class);
     private Widget chooseStackCombo;
 
-    @Inject
-    private HbConfig hbConfigDialog;
-    @Inject
-    private CoroConfig coroConfigDialog;
-    @Inject
-    private Application application;
-    @Inject
-    private SwingUtils swingUtils;
-    @Inject
-    private WidgetFactory widgetFactory;
+    private final HbConfig hbConfigDialog;
+    private final CoroConfig coroConfigDialog;
+    private final Application application;
+    private final SwingUtils swingUtils;
+    private final WidgetFactory widgetFactory;
+
+    public CommStack(HbConfig hbConfigDialog, CoroConfig coroConfigDialog, Application application, SwingUtils swingUtils,
+            WidgetFactory widgetFactory) {
+        this.hbConfigDialog = hbConfigDialog;
+        this.coroConfigDialog = coroConfigDialog;
+        this.application = application;
+        this.swingUtils = swingUtils;
+        this.widgetFactory = widgetFactory;
+    }
 
     @Override
     public WizardDialog nextDialog() {
         DialogCluster configDialog;
-        final String chosenStack = chooseStackCombo.getValue().getValueForConfig();
+        final String chosenStack = chooseStackCombo.getValue()
+                                                   .getValueForConfig();
         if (Application.HEARTBEAT_NAME.equals(chosenStack)) {
             configDialog = hbConfigDialog;
         } else {

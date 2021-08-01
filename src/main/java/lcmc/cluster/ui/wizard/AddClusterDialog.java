@@ -22,7 +22,6 @@
 
 package lcmc.cluster.ui.wizard;
 
-import javax.inject.Inject;
 import javax.inject.Named;
 
 import lcmc.cluster.domain.Cluster;
@@ -41,20 +40,24 @@ import lcmc.logger.LoggerFactory;
 public final class AddClusterDialog {
     private static final Logger LOG = LoggerFactory.getLogger(AddClusterDialog.class);
 
-    @Inject
-    Name nameDialog;
-    @Inject
-    private MainPresenter mainPresenter;
-    @Inject
-    private MainPanel mainPanel;
-    @Inject
-    private Cluster cluster;
-    @Inject
-    private Application application;
-    @Inject
-    private SwingUtils swingUtils;
-    @Inject
-    private Hosts allHosts;
+    final Name nameDialog;
+    private final MainPresenter mainPresenter;
+    private final MainPanel mainPanel;
+    private final Cluster cluster;
+    private final Application application;
+    private final SwingUtils swingUtils;
+    private final Hosts allHosts;
+
+    public AddClusterDialog(Name nameDialog, MainPresenter mainPresenter, MainPanel mainPanel, Cluster cluster,
+            Application application, SwingUtils swingUtils, Hosts allHosts) {
+        this.nameDialog = nameDialog;
+        this.mainPresenter = mainPresenter;
+        this.mainPanel = mainPanel;
+        this.cluster = cluster;
+        this.application = application;
+        this.swingUtils = swingUtils;
+        this.allHosts = allHosts;
+    }
 
     /**
      * Must always be called from new thread.
@@ -73,7 +76,7 @@ public final class AddClusterDialog {
                 allHosts.removeHostsFromCluster(cluster);
                 application.removeClusterFromClusters(cluster);
                 dialog.cancelDialog();
-                swingUtils.invokeLater(() -> mainPresenter.checkAddClusterButtons());
+                swingUtils.invokeLater(mainPresenter::checkAddClusterButtons);
                 mainPanel.expandTerminalSplitPane(MainPanel.TerminalSize.COLLAPSE);
                 if (newDialog == null) {
                     LOG.debug1("showDialogs: dialog: " + dialog.getClass().getName() + " canceled");
@@ -90,10 +93,12 @@ public final class AddClusterDialog {
         }
         mainPanel.expandTerminalSplitPane(MainPanel.TerminalSize.COLLAPSE);
         swingUtils.invokeLater(() -> {
-            cluster.getClusterTab().addClusterView();
-            cluster.getClusterTab().requestFocus();
+            cluster.getClusterTab()
+                   .addClusterView();
+            cluster.getClusterTab()
+                   .requestFocus();
         });
-        swingUtils.invokeLater(() -> mainPresenter.checkAddClusterButtons());
+        swingUtils.invokeLater(mainPresenter::checkAddClusterButtons);
         cluster.setClusterTabClosable(true);
     }
 }

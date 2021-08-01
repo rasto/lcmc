@@ -23,31 +23,33 @@
 package lcmc.cluster.ui.wizard;
 
 import java.awt.Color;
-import javax.inject.Inject;
+
 import javax.inject.Named;
 import javax.swing.JCheckBox;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 
 import lcmc.cluster.ui.EmptyBrowser;
-import lcmc.common.domain.UserConfig;
-import lcmc.common.ui.WizardDialog;
 import lcmc.common.domain.Application;
+import lcmc.common.domain.UserConfig;
 import lcmc.common.domain.util.Tools;
+import lcmc.common.ui.WizardDialog;
 
 /**
- * Cluster finish dialog. Shows some text and let's the user press the finish
- * button.
+ * Cluster finish dialog. Shows some text and let's the user press the finish button.
  */
 @Named
 final class Finish extends DialogCluster {
     private final JCheckBox saveCheckBox = new JCheckBox(Tools.getString("Dialog.Cluster.Finish.Save"), true);
-    @Inject
-    private EmptyBrowser emptyBrowser;
-    @Inject
-    private Application application;
-    @Inject
-    private UserConfig userConfig;
+    private final EmptyBrowser emptyBrowser;
+    private final Application application;
+    private final UserConfig userConfig;
+
+    public Finish(EmptyBrowser emptyBrowser, Application application, UserConfig userConfig) {
+        this.emptyBrowser = emptyBrowser;
+        this.application = application;
+        this.userConfig = userConfig;
+    }
 
     @Override
     public WizardDialog nextDialog() {

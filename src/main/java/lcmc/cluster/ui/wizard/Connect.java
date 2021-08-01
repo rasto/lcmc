@@ -23,7 +23,6 @@
 
 package lcmc.cluster.ui.wizard;
 
-import javax.inject.Inject;
 import javax.inject.Named;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
@@ -38,17 +37,19 @@ import lcmc.logger.Logger;
 import lcmc.logger.LoggerFactory;
 
 /**
- * An implementation of a dialog where connection to every host will be checked
- * and established if there isn't one.
+ * An implementation of a dialog where connection to every host will be checked and established if there isn't one.
  */
 @Named
 final class Connect extends DialogCluster {
     private static final Logger LOG = LoggerFactory.getLogger(Connect.class);
 
-    @Inject
-    private CommStack commStackDialog;
-    @Inject
-    private SwingUtils swingUtils;
+    private final CommStack commStackDialog;
+    private final SwingUtils swingUtils;
+
+    public Connect(CommStack commStackDialog, SwingUtils swingUtils) {
+        this.commStackDialog = commStackDialog;
+        this.swingUtils = swingUtils;
+    }
 
     @Override
     public WizardDialog nextDialog() {

@@ -36,7 +36,6 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import javax.inject.Inject;
 import javax.inject.Named;
 import javax.swing.BoxLayout;
 import javax.swing.JCheckBox;
@@ -65,7 +64,6 @@ import lcmc.common.domain.util.Tools;
 import lcmc.common.ui.Access;
 import lcmc.common.ui.SpringUtilities;
 import lcmc.common.ui.WizardDialog;
-import lcmc.common.ui.main.MainData;
 import lcmc.common.ui.utils.MyButton;
 import lcmc.common.ui.utils.SwingUtils;
 import lcmc.common.ui.utils.WidgetListener;
@@ -102,7 +100,9 @@ final class CoroConfig extends DialogCluster {
     /** Set of mcast etc. addresses. */
     private final Collection<AisCastAddress> aisCastAddresses = new LinkedHashSet<>();
     private final JLabel configStatus = new JLabel("");
-    /** Connection type pulldown menu: mcast ... */
+    /**
+     * Connection type pulldown menu: mcast ...
+     */
     private Widget typeWidget;
     private Widget ifaceWidget;
     private Widget addrWidget;
@@ -110,29 +110,32 @@ final class CoroConfig extends DialogCluster {
     private MyButton addAddressButton;
     private String[] configs;
     private JPanel statusPanel;
-    /** Check box that allows to edit a new config are see the existing
-     * configs. */
+    /**
+     * Check box that allows to edit a new config are see the existing configs.
+     */
     private JCheckBox configCheckbox;
     private final JPanel configPanel = new JPanel();
     private boolean configChangedByUser = false;
     private volatile JScrollPane configScrollPane = null;
     private volatile boolean configAlreadyScrolled = false;
 
-    @Inject
-    private InitCluster initClusterDialog;
-    @Inject
-    private MainData mainData;
-    @Inject
-    private Application application;
-    @Inject
-    private SwingUtils swingUtils;
-    @Inject
-    private WidgetFactory widgetFactory;
+    private final InitCluster initClusterDialog;
+    private final Application application;
+    private final SwingUtils swingUtils;
+    private final WidgetFactory widgetFactory;
     private MyButton makeConfigButton;
-    @Inject
-    private NetworkService networkService;
-    @Inject
-    private Access access;
+    private final NetworkService networkService;
+    private final Access access;
+
+    public CoroConfig(InitCluster initClusterDialog, Application application, SwingUtils swingUtils, WidgetFactory widgetFactory,
+            NetworkService networkService, Access access) {
+        this.initClusterDialog = initClusterDialog;
+        this.application = application;
+        this.swingUtils = swingUtils;
+        this.widgetFactory = widgetFactory;
+        this.networkService = networkService;
+        this.access = access;
+    }
 
     @Override
     public void init(final WizardDialog previousDialog, final Cluster cluster) {

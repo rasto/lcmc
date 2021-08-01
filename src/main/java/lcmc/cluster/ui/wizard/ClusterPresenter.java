@@ -20,7 +20,6 @@
 
 package lcmc.cluster.ui.wizard;
 
-import javax.inject.Inject;
 import javax.inject.Named;
 
 import lcmc.cluster.domain.Cluster;
@@ -28,8 +27,11 @@ import lcmc.cluster.ui.EmptyBrowser;
 
 @Named
 public class ClusterPresenter {
-    @Inject
-    private EmptyBrowser emptyBrowser;
+    private final EmptyBrowser emptyBrowser;
+
+    public ClusterPresenter(EmptyBrowser emptyBrowser) {
+        this.emptyBrowser = emptyBrowser;
+    }
 
     public void onCloseCluster(final Cluster cluster) {
         disconnectCluster(cluster);
