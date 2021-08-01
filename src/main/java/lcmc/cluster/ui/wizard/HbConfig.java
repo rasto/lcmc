@@ -100,7 +100,6 @@ final class HbConfig extends DialogCluster {
             {KEEPALIVE_OPTION, WARNTIME_OPTION, DEADTIME_OPTION, INITDEAD_OPTION, CRM_OPTION, COMPRESSION_OPTION,
                     COMPRESSION_THRESHOLD_OPTION, TRADITIONAL_COMPRESSION_OPTION, LOGFACILITY_OPTION, USE_LOGD_OPTION,
                     AUTOJOIN_OPTION, NODE_OPTION};
-    private static final Map<String, Widget.Type> OPTION_WIDGET_TYPES = new HashMap<>();
     private static final Map<String, String> OPTION_REGEXPS = new HashMap<>();
     private static final Map<String, Value> OPTION_DEFAULTS = new HashMap<>();
     private static final Map<String, Integer> OPTION_SIZES = new HashMap<>();
@@ -513,15 +512,9 @@ final class HbConfig extends DialogCluster {
         if (!configOk) {
             final boolean noConfigsF = noConfigs;
             swingUtils.invokeLater(() -> {
-                if (noConfigsF) {
-                    configCheckbox.setText(SEE_EXISTING_STRING);
-                    configCheckbox.setSelected(false);
-                    statusPanel.setMaximumSize(statusPanel.getPreferredSize());
-                } else {
-                    configCheckbox.setText(EDIT_CONFIG_STRING);
-                    configCheckbox.setSelected(false);
-                    statusPanel.setMaximumSize(statusPanel.getPreferredSize());
-                }
+                configCheckbox.setText(noConfigsF ? SEE_EXISTING_STRING : EDIT_CONFIG_STRING);
+                configCheckbox.setSelected(false);
+                statusPanel.setMaximumSize(statusPanel.getPreferredSize());
             });
             if (noConfigs) {
                 updateConfigPanelEditable(false);
@@ -873,7 +866,7 @@ final class HbConfig extends DialogCluster {
                 ulList.add(new UcastLink(host, n));
             }
         }
-        final UcastLink[] ucastLinks = ulList.toArray(new UcastLink[ulList.size()]);
+        final UcastLink[] ucastLinks = ulList.toArray(new UcastLink[0]);
 
         ucastLink1Widget = widgetFactory.createInstance(
                                              Widget.GUESS_TYPE,
@@ -934,22 +927,10 @@ final class HbConfig extends DialogCluster {
                     public void check(final Value value) {
                         final Value type = typeWidget.getValue();
                         if (type != null) {
-                            if (MCAST_TYPE.equals(type) || BCAST_TYPE.equals(type)) {
-                                ifaceWidget.setVisible(true);
-                            } else {
-                                ifaceWidget.setVisible(false);
-                            }
+                            ifaceWidget.setVisible(MCAST_TYPE.equals(type) || BCAST_TYPE.equals(type));
 
-                            if (MCAST_TYPE.equals(type)) {
-                                addrWidget.setVisible(true);
-                            } else {
-                                addrWidget.setVisible(false);
-                            }
-                            if (SERIAL_TYPE.equals(type)) {
-                                serialWidget.setVisible(true);
-                            } else {
-                                serialWidget.setVisible(false);
-                            }
+                            addrWidget.setVisible(MCAST_TYPE.equals(type));
+                            serialWidget.setVisible(SERIAL_TYPE.equals(type));
                             if (UCAST_TYPE.equals(type)) {
                                 ucastLink1Widget.setVisible(true);
                                 ucastLink2Widget.setVisible(true);
@@ -1059,18 +1040,9 @@ final class HbConfig extends DialogCluster {
         mcastPanel.setAlignmentX(java.awt.Component.LEFT_ALIGNMENT);
         for (final String option : OPTIONS) {
             final int size;
-            if (OPTION_SIZES.containsKey(option)) {
-                size = OPTION_SIZES.get(option);
-            } else {
-                size = 40;
-            }
-            final Widget w = widgetFactory.createInstance(
-                    OPTION_WIDGET_TYPES.get(option),
-                    optionDefaults.get(option),
-                    optionValues.get(option),
-                    '^' + OPTION_REGEXPS.get(option) + "\\s*$",
-                    size,
-                    Widget.NO_ABBRV,
+            size = OPTION_SIZES.getOrDefault(option, 40);
+            final Widget w = widgetFactory.createInstance(null, optionDefaults.get(option), optionValues.get(option),
+                    '^' + OPTION_REGEXPS.get(option) + "\\s*$", size, Widget.NO_ABBRV,
                     new AccessMode(AccessMode.ADMIN, AccessMode.NORMAL), Widget.NO_BUTTON);
             optionsWidgets.put(option, w);
             w.setAlwaysEditable(true);

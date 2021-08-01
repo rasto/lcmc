@@ -24,6 +24,7 @@
 package lcmc.cluster.ui.wizard;
 
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.event.ComponentEvent;
@@ -462,7 +463,7 @@ final class CoroConfig extends DialogCluster {
                 final JPanel labelP = new JPanel();
                 labelP.setBackground(Tools.getDefaultColor("ConfigDialog.Background"));
                 labelP.setLayout(new BoxLayout(labelP, BoxLayout.PAGE_AXIS));
-                labelP.setAlignmentX(java.awt.Component.TOP_ALIGNMENT);
+                labelP.setAlignmentX(Component.TOP_ALIGNMENT);
                 labelP.add(l);
                 insideConfigPanel.add(labelP);
                 final JTextArea ta = new JTextArea(configs[i]);

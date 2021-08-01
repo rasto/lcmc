@@ -192,18 +192,18 @@ public final class ComboBox extends GenericWidget<MComboBox<Value>> {
     @Override
     public void setEditable(final boolean editable) {
         super.setEditable(editable);
-        final JComponent comp = getInternalComponent();
+        final JComboBox comp = getInternalComponent();
         swingUtils.invokeInEdt(() -> {
             final Value v = getValue();
             if (isAlwaysEditable()) {
-                ((JComboBox) comp).setEditable(true);
+                comp.setEditable(true);
                 final JTextComponent editor = getTextComponent();
                 if (v == null || v.isNothingSelected()) {
                     editor.selectAll();
                 }
             } else {
                 if (v != null && !v.isNothingSelected()) {
-                    ((JComboBox) comp).setEditable(editable);
+                    comp.setEditable(editable);
                 }
             }
         });

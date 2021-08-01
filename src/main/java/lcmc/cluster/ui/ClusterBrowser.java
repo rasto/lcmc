@@ -51,7 +51,6 @@ import javax.swing.ImageIcon;
 import javax.swing.JComponent;
 import javax.swing.JTree;
 import javax.swing.tree.DefaultMutableTreeNode;
-import javax.swing.tree.TreeNode;
 
 import org.apache.commons.collections15.map.LinkedMap;
 import org.apache.commons.collections15.map.MultiKeyMap;
@@ -76,7 +75,6 @@ import lcmc.common.ui.CallbackAction;
 import lcmc.common.ui.CategoryInfo;
 import lcmc.common.ui.Info;
 import lcmc.common.ui.ResourceGraph;
-import lcmc.common.ui.main.MainData;
 import lcmc.common.ui.main.ProgressIndicator;
 import lcmc.common.ui.treemenu.ClusterTreeMenu;
 import lcmc.common.ui.utils.ButtonCallback;
@@ -88,7 +86,6 @@ import lcmc.crm.domain.PtestData;
 import lcmc.crm.domain.ResourceAgent;
 import lcmc.crm.domain.Service;
 import lcmc.crm.service.CRM;
-import lcmc.crm.service.Heartbeat;
 import lcmc.crm.ui.CrmGraph;
 import lcmc.crm.ui.resource.AvailableServiceInfo;
 import lcmc.crm.ui.resource.AvailableServicesInfo;
@@ -236,8 +233,8 @@ public class ClusterBrowser extends Browser {
             ClusterHostsInfo clusterHostsInfo, Provider<DrbdXml> drbdXmlProvider, Provider<ClusterStatus> clusterStatusProvider,
             Provider<ResourceAgentClassInfo> resourceAgentClassInfoProvider, NetworkService networkService, CrmXml crmXml,
             Provider<RscDefaultsInfo> rscDefaultsInfoProvider, Access access, AvailableServicesInfo availableServicesInfo,
-            Provider<ResourceUpdater> resourceUpdaterProvider, MainData mainData, Provider<CRMInfo> crmInfoProvider,
-            ServicesInfo servicesInfo, Provider<VmsXml> vmsXmlProvider) {
+            Provider<ResourceUpdater> resourceUpdaterProvider, Provider<CRMInfo> crmInfoProvider, ServicesInfo servicesInfo,
+            Provider<VmsXml> vmsXmlProvider) {
         super(application);
         this.swingUtils = swingUtils;
         this.application = application;
@@ -262,7 +259,6 @@ public class ClusterBrowser extends Browser {
         this.access = access;
         this.availableServicesInfo = availableServicesInfo;
         this.resourceUpdaterProvider = resourceUpdaterProvider;
-        this.mainData = mainData;
         this.crmInfoProvider = crmInfoProvider;
         this.servicesInfo = servicesInfo;
         this.vmsXmlProvider = vmsXmlProvider;
@@ -348,7 +344,6 @@ public class ClusterBrowser extends Browser {
     private final MultiKeyMap<String, Integer> notAdvancedOperations = MultiKeyMap.decorate(new LinkedMap<>());
     private final Map<Host, String> hostDrbdParameters = new HashMap<>();
     private DefaultMutableTreeNode treeTop;
-    private final MainData mainData;
     private final ProgressIndicator progressIndicator;
     private final GlobalInfo globalInfo;
     @Resource(name = "categoryInfo")
@@ -568,7 +563,7 @@ public class ClusterBrowser extends Browser {
 
         clusterTreeMenu.reloadNodeDontSelect(clusterHostsNode);
 
-        swingUtils.invokeLater(() -> crmGraph.scale());
+        swingUtils.invokeLater(crmGraph::scale);
         updateHeartbeatDrbdThread();
         LOG.debug1("end: update cluster resources");
     }
@@ -674,13 +669,10 @@ public class ClusterBrowser extends Browser {
     }
 
     private void startPing(final Host host) {
-        while (true) {
+        do {
             host.startPing();
             Tools.sleep(10000);
-            if (serverStatusCanceled) {
-                break;
-            }
-        }
+        } while (!serverStatusCanceled);
     }
 
     /** Start polling of the server status on one host. */
@@ -705,12 +697,15 @@ public class ClusterBrowser extends Browser {
     }
 
     public void updateServerStatus(final Host host) {
-        swingUtils.invokeAndWait(() -> drbdGraph.addHost(host.getBrowser().getHostDrbdInfo()));
-        swingUtils.invokeLater(() -> drbdGraph.scale());
-        if (host.getHostParser().getWaitForServerStatusLatch()) {
+        swingUtils.invokeAndWait(() -> drbdGraph.addHost(host.getBrowser()
+                                                             .getHostDrbdInfo()));
+        swingUtils.invokeLater(drbdGraph::scale);
+        if (host.getHostParser()
+                .getWaitForServerStatusLatch()) {
             LOG.debug("updateServerStatus: " + host.getName() + " loading done");
         }
-        host.getHostParser().serverStatusLatchDone();
+        host.getHostParser()
+            .serverStatusLatchDone();
         clusterHostsInfo.updateTable(CategoryInfo.MAIN_TABLE);
         for (final ResourceGraph graph : new ResourceGraph[]{drbdGraph, crmGraph}) {
             if (graph != null) {
@@ -805,13 +800,13 @@ public class ClusterBrowser extends Browser {
             } catch (final InterruptedException ignored) {
                 Thread.currentThread().interrupt();
             }
-            swingUtils.invokeLater(() -> drbdGraph.scale());
+            swingUtils.invokeLater(drbdGraph::scale);
             progressIndicator.stopProgressIndicator(hostName, Tools.getString("ClusterBrowser.UpdatingDrbdStatus"));
         });
         thread.start();
 
         drbdStatusCanceledByUser = false;
-        while (true) {
+        do {
             host.execDrbdStatusCommand(new ExecCallback() {
                                            @Override
                                            public void done(final String ans) {
@@ -851,76 +846,76 @@ public class ClusterBrowser extends Browser {
                                            }
                                        },
 
-                   new NewOutputCallback() {
-                       private final StringBuffer outputBuffer = new StringBuffer(300);
-                       @Override
-                       public void output(final String output) {
-                           if ("--nm--".equals(output.trim())) {
-                               if (host.isDrbdStatusOk()) {
-                                   LOG.debug1("startDrbdStatus: host: " + host.getName());
-                                   host.setDrbdStatusOk(false);
-                                   drbdGraph.repaint();
-                                   clusterHostsInfo.updateTable(ClusterHostsInfo.MAIN_TABLE);
-                               }
-                               firstTime.countDown();
-                               return;
-                           }
-                           firstTime.countDown();
-                           if (!host.isDrbdStatusOk()) {
-                               LOG.debug1("startDrbdStatus: host: " + host.getName());
-                               host.setDrbdStatusOk(true);
-                               drbdGraph.repaint();
-                               clusterHostsInfo.updateTable(ClusterHostsInfo.MAIN_TABLE);
-                           }
-                           outputBuffer.append(output);
-                           String drbdConfig, event;
-                           boolean drbdUpdate = false;
-                           boolean eventUpdate = false;
-                           do {
-                               host.drbdStatusLock();
-                               drbdConfig = host.getHostParser().getOutput("drbd", outputBuffer);
-                               if (drbdConfig != null) {
-                                   final DrbdXml newDrbdXml = drbdXmlProvider.get();
-                                   newDrbdXml.init(cluster.getHostsArray(), hostDrbdParameters);
-                                   newDrbdXml.update(drbdConfig);
-                                   drbdXml = newDrbdXml;
-                                   drbdUpdate = true;
-                                   firstTime.countDown();
-                               }
-                               host.drbdStatusUnlock();
-                               event = host.getHostParser().getOutput("event", outputBuffer);
-                               if (event != null && drbdXml.parseDrbdEvent(host.getName(), drbdGraph, event)) {
-                                   host.setDrbdStatusOk(true);
-                                   eventUpdate = true;
-                               }
-                           } while (event != null || drbdConfig != null);
-                           Tools.chomp(outputBuffer);
-                           if (drbdUpdate) {
-                               swingUtils.invokeLater(() -> {
-                                   globalInfo.setParameters();
-                                   updateDrbdResources();
-                               });
-                           }
-                           if (eventUpdate) {
-                               drbdGraph.repaint();
-                               LOG.debug1("drbd status update: " + host.getName());
-                               clusterHostsInfo.updateTable(ClusterHostsInfo.MAIN_TABLE);
-                               firstTime.countDown();
-                               final Thread thread = new Thread(() -> {
-                                   repaintSplitPane();
-                                   drbdGraph.updatePopupMenus();
-                                   clusterTreeMenu.repaintMenuTree();
-                               });
-                               thread.start();
-                           }
-                       }
-                   });
+                    new NewOutputCallback() {
+                        private final StringBuffer outputBuffer = new StringBuffer(300);
+
+                        @Override
+                        public void output(final String output) {
+                            if ("--nm--".equals(output.trim())) {
+                                if (host.isDrbdStatusOk()) {
+                                    LOG.debug1("startDrbdStatus: host: " + host.getName());
+                                    host.setDrbdStatusOk(false);
+                                    drbdGraph.repaint();
+                                    clusterHostsInfo.updateTable(ClusterHostsInfo.MAIN_TABLE);
+                                }
+                                firstTime.countDown();
+                                return;
+                            }
+                            firstTime.countDown();
+                            if (!host.isDrbdStatusOk()) {
+                                LOG.debug1("startDrbdStatus: host: " + host.getName());
+                                host.setDrbdStatusOk(true);
+                                drbdGraph.repaint();
+                                clusterHostsInfo.updateTable(ClusterHostsInfo.MAIN_TABLE);
+                            }
+                            outputBuffer.append(output);
+                            String drbdConfig, event;
+                            boolean drbdUpdate = false;
+                            boolean eventUpdate = false;
+                            do {
+                                host.drbdStatusLock();
+                                drbdConfig = host.getHostParser()
+                                                 .getOutput("drbd", outputBuffer);
+                                if (drbdConfig != null) {
+                                    final DrbdXml newDrbdXml = drbdXmlProvider.get();
+                                    newDrbdXml.init(cluster.getHostsArray(), hostDrbdParameters);
+                                    newDrbdXml.update(drbdConfig);
+                                    drbdXml = newDrbdXml;
+                                    drbdUpdate = true;
+                                    firstTime.countDown();
+                                }
+                                host.drbdStatusUnlock();
+                                event = host.getHostParser()
+                                            .getOutput("event", outputBuffer);
+                                if (event != null && drbdXml.parseDrbdEvent(host.getName(), drbdGraph, event)) {
+                                    host.setDrbdStatusOk(true);
+                                    eventUpdate = true;
+                                }
+                            } while (event != null || drbdConfig != null);
+                            Tools.chomp(outputBuffer);
+                            if (drbdUpdate) {
+                                swingUtils.invokeLater(() -> {
+                                    globalInfo.setParameters();
+                                    updateDrbdResources();
+                                });
+                            }
+                            if (eventUpdate) {
+                                drbdGraph.repaint();
+                                LOG.debug1("drbd status update: " + host.getName());
+                                clusterHostsInfo.updateTable(ClusterHostsInfo.MAIN_TABLE);
+                                firstTime.countDown();
+                                final Thread thread = new Thread(() -> {
+                                    repaintSplitPane();
+                                    drbdGraph.updatePopupMenus();
+                                    clusterTreeMenu.repaintMenuTree();
+                                });
+                                thread.start();
+                            }
+                        }
+                    });
             host.waitForHostAndDrbd();
             host.waitForDrbdStatusFinish();
-            if (drbdStatusCanceledByUser) {
-                break;
-            }
-        }
+        } while (!drbdStatusCanceledByUser);
     }
 
     public void stopCrmStatus() {
@@ -1061,7 +1056,7 @@ public class ClusterBrowser extends Browser {
             if (crmStatusFailed()) {
                 progressIndicator.progressIndicatorFailed(clusterName, Tools.getString("ClusterBrowser.ClusterStatusFailed"));
             } else {
-                swingUtils.invokeLater(() -> crmGraph.scale());
+                swingUtils.invokeLater(crmGraph::scale);
             }
             stopClStatusProgressIndicator(clusterName);
         });
@@ -1448,11 +1443,6 @@ public class ClusterBrowser extends Browser {
         }
     }
 
-
-    void highlightDrbd() {
-        clusterTreeMenu.reloadNode(drbdNode);
-    }
-
     public void highlightServices() {
         clusterTreeMenu.expandAndSelect(new Object[]{treeTop, crmNode, servicesNode});
     }
@@ -1739,20 +1729,9 @@ public class ClusterBrowser extends Browser {
         return true;
     }
 
-    void startHeartbeatsOnAllNodes() {
-        final Host[] hosts = cluster.getHostsArray();
-        for (final Host host : hosts) {
-            Heartbeat.startHeartbeat(host);
-        }
-    }
-
-    /**
-     * This is called from crm graph.
-     */
     public HbConnectionInfo getNewHbConnectionInfo() {
         final HbConnectionInfo connectionInfo = connectionInfoProvider.get();
         connectionInfo.init(this);
-        //connectionInfo.getInfoPanel();
         return connectionInfo;
     }
 
@@ -1789,7 +1768,6 @@ public class ClusterBrowser extends Browser {
         mDrbdTestDataLock.unlock();
     }
 
-    /** Returns xml from cluster manager. */
     public CrmXml getCrmXml() {
         return crmXml;
     }
@@ -1806,16 +1784,8 @@ public class ClusterBrowser extends Browser {
         return drbdNode;
     }
 
-    public TreeNode getClusterHostsNode() {
-        return clusterHostsNode;
-    }
-
     public DefaultMutableTreeNode getServicesNode() {
         return servicesNode;
-    }
-
-    public TreeNode getNetworksNode() {
-        return networksNode;
     }
 
     /**

@@ -590,10 +590,6 @@ public abstract class GenericWidget<T extends JComponent> extends JPanel impleme
         }
     }
 
-    final JComponent getJComponent() {
-        return component;
-    }
-
     @Override
     public void setBackgroundColor(final Color bg) {
         swingUtils.invokeLater(() -> setBackground(bg));
