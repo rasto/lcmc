@@ -25,17 +25,18 @@ package lcmc.vm.ui.configdialog;
 
 import java.awt.Dimension;
 
-import javax.inject.Inject;
 import javax.inject.Named;
 import javax.swing.BoxLayout;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
+import lcmc.cluster.ui.widget.WidgetFactory;
 import lcmc.common.domain.Application;
 import lcmc.common.domain.StringValue;
 import lcmc.common.domain.util.Tools;
 import lcmc.common.ui.WizardDialog;
+import lcmc.common.ui.main.MainData;
 import lcmc.common.ui.utils.SwingUtils;
 import lcmc.vm.domain.VMParams;
 import lcmc.vm.domain.data.DiskData;
@@ -56,22 +57,23 @@ final class Storage extends VMConfig {
                                             DiskData.SOURCE_HOST_NAME,
                                             DiskData.SOURCE_HOST_PORT,
 
-                                            DiskData.AUTH_USERNAME,
-                                            DiskData.AUTH_SECRET_TYPE,
-                                            DiskData.AUTH_SECRET_UUID,
+            DiskData.AUTH_USERNAME, DiskData.AUTH_SECRET_TYPE, DiskData.AUTH_SECRET_UUID,
 
-                                            DiskData.DRIVER_NAME,
-                                            DiskData.DRIVER_TYPE,
-                                            DiskData.DRIVER_CACHE};
+            DiskData.DRIVER_NAME, DiskData.DRIVER_TYPE, DiskData.DRIVER_CACHE};
     private JComponent inputPane = null;
     private DiskInfo diskInfo = null;
     private WizardDialog nextDialogObject = null;
-    @Inject
-    private Network networkDialog;
-    @Inject
-    private Application application;
-    @Inject
-    private SwingUtils swingUtils;
+    private final Network networkDialog;
+    private final Application application;
+    private final SwingUtils swingUtils;
+
+    public Storage(Application application, SwingUtils swingUtils, WidgetFactory widgetFactory, MainData mainData,
+            Network networkDialog) {
+        super(application, swingUtils, widgetFactory, mainData);
+        this.networkDialog = networkDialog;
+        this.application = application;
+        this.swingUtils = swingUtils;
+    }
 
     @Override
     public WizardDialog nextDialog() {

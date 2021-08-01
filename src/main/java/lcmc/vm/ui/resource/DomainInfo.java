@@ -44,7 +44,6 @@ import java.util.concurrent.locks.ReentrantLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.regex.Matcher;
 
-import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Provider;
 import javax.swing.Box;
@@ -74,10 +73,12 @@ import lcmc.common.domain.StringValue;
 import lcmc.common.domain.Unit;
 import lcmc.common.domain.Value;
 import lcmc.common.domain.util.Tools;
+import lcmc.common.ui.Access;
 import lcmc.common.ui.Browser;
 import lcmc.common.ui.EditableInfo;
 import lcmc.common.ui.Info;
 import lcmc.common.ui.SpringUtilities;
+import lcmc.common.ui.main.MainData;
 import lcmc.common.ui.main.ProgressIndicator;
 import lcmc.common.ui.treemenu.ClusterTreeMenu;
 import lcmc.common.ui.utils.MyButton;
@@ -568,43 +569,53 @@ public class DomainInfo extends EditableInfo {
      * This is a map from host to the check box.
      */
     private final Map<String, Widget> definedOnHostComboBoxHash = new HashMap<>();
-    @Inject
-    private ProgressIndicator progressIndicator;
-    @Inject
-    private Application application;
-    @Inject
-    private SwingUtils swingUtils;
-    @Inject
-    private DomainMenu domainMenu;
-    @Inject
-    private Provider<DiskInfo> diskInfoProvider;
-    @Inject
-    private Provider<FilesystemInfo> filesystemInfoProvider;
-    @Inject
-    private Provider<InterfaceInfo> interfaceInfoProvider;
-    @Inject
-    private Provider<InputDevInfo> inputDevInfoProvider;
-    @Inject
-    private Provider<GraphicsInfo> graphicsInfoProvider;
-    @Inject
-    private Provider<SoundInfo> soundInfoProvider;
-    @Inject
-    private Provider<SerialInfo> serialInfoProvider;
-    @Inject
-    private Provider<ParallelInfo> parallelInfoProvider;
-    @Inject
-    private Provider<VideoInfo> videoInfoProvider;
-    @Inject
-    private Provider<VmsXml> vmsXmlProvider;
-    @Inject
-    private WidgetFactory widgetFactory;
-    @Inject
-    private ClusterTreeMenu clusterTreeMenu;
+    private final ProgressIndicator progressIndicator;
+    private final Application application;
+    private final SwingUtils swingUtils;
+    private final DomainMenu domainMenu;
+    private final Provider<DiskInfo> diskInfoProvider;
+    private final Provider<FilesystemInfo> filesystemInfoProvider;
+    private final Provider<InterfaceInfo> interfaceInfoProvider;
+    private final Provider<InputDevInfo> inputDevInfoProvider;
+    private final Provider<GraphicsInfo> graphicsInfoProvider;
+    private final Provider<SoundInfo> soundInfoProvider;
+    private final Provider<SerialInfo> serialInfoProvider;
+    private final Provider<ParallelInfo> parallelInfoProvider;
+    private final Provider<VideoInfo> videoInfoProvider;
+    private final Provider<VmsXml> vmsXmlProvider;
+    private final WidgetFactory widgetFactory;
+    private final ClusterTreeMenu clusterTreeMenu;
+
+    public DomainInfo(Application application, SwingUtils swingUtils, Access access, MainData mainData, WidgetFactory widgetFactory,
+            ProgressIndicator progressIndicator, DomainMenu domainMenu, Provider<DiskInfo> diskInfoProvider,
+            Provider<ParallelInfo> parallelInfoProvider, Provider<FilesystemInfo> filesystemInfoProvider,
+            Provider<InterfaceInfo> interfaceInfoProvider, Provider<InputDevInfo> inputDevInfoProvider,
+            Provider<GraphicsInfo> graphicsInfoProvider, Provider<VideoInfo> videoInfoProvider, Provider<VmsXml> vmsXmlProvider,
+            Provider<SoundInfo> soundInfoProvider, ClusterTreeMenu clusterTreeMenu, Provider<SerialInfo> serialInfoProvider) {
+        super(application, swingUtils, access, mainData, widgetFactory);
+        this.swingUtils = swingUtils;
+        this.progressIndicator = progressIndicator;
+        this.application = application;
+        this.domainMenu = domainMenu;
+        this.diskInfoProvider = diskInfoProvider;
+        this.parallelInfoProvider = parallelInfoProvider;
+        this.filesystemInfoProvider = filesystemInfoProvider;
+        this.widgetFactory = widgetFactory;
+        this.interfaceInfoProvider = interfaceInfoProvider;
+        this.inputDevInfoProvider = inputDevInfoProvider;
+        this.graphicsInfoProvider = graphicsInfoProvider;
+        this.videoInfoProvider = videoInfoProvider;
+        this.vmsXmlProvider = vmsXmlProvider;
+        this.soundInfoProvider = soundInfoProvider;
+        this.clusterTreeMenu = clusterTreeMenu;
+        this.serialInfoProvider = serialInfoProvider;
+    }
 
     public void einit(final String name, final Browser browser) {
         super.einit(Optional.of(new ResourceValue(name)), name, browser);
         final Host firstHost = getBrowser().getClusterHosts()[0];
-        preferredEmulator = firstHost.getHostParser().getDistString("KVM.emulator");
+        preferredEmulator = firstHost.getHostParser()
+                                     .getDistString("KVM.emulator");
         final List<Value> hostsList = new ArrayList<>();
         hostsList.add(null);
         for (final Host h : getBrowser().getClusterHosts()) {

@@ -34,7 +34,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 
-import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Provider;
 import javax.inject.Singleton;
@@ -112,30 +111,36 @@ public final class MainMenu extends JPanel implements ActionListener {
     private String upgradeCheck = "";
     private String infoText = null;
     private final JPanel infoTextPanel = new JPanel();
-    @Inject
-    private Provider<AddClusterDialog> addClusterDialogProvider;
-    @Inject
-    private UserConfig userConfig;
-    @Inject
-    private Provider<AddHostDialog> addHostDialogProvider;
-    @Inject
-    private HostFactory hostFactory;
-    @Inject
-    private MainData mainData;
-    @Inject
-    private MainPresenter mainPresenter;
-    @Inject
-    private Application application;
-    @Inject
-    private SwingUtils swingUtils;
-    @Inject
-    private BugReport bugReport;
-    @Inject
-    private About aboutDialog;
-    @Inject
-    private Dialogs dialogs;
-    @Inject
-    private Access access;
+    private final Provider<AddClusterDialog> addClusterDialogProvider;
+    private final UserConfig userConfig;
+    private final Provider<AddHostDialog> addHostDialogProvider;
+    private final HostFactory hostFactory;
+    private final MainData mainData;
+    private final MainPresenter mainPresenter;
+    private final Application application;
+    private final SwingUtils swingUtils;
+    private final BugReport bugReport;
+    private final About aboutDialog;
+    private final Dialogs dialogs;
+    private final Access access;
+
+    public MainMenu(UserConfig userConfig, Provider<AddClusterDialog> addClusterDialogProvider,
+            Provider<AddHostDialog> addHostDialogProvider, HostFactory hostFactory, MainData mainData, MainPresenter mainPresenter,
+            Application application, SwingUtils swingUtils, Access access, BugReport bugReport, About aboutDialog,
+            Dialogs dialogs) {
+        this.userConfig = userConfig;
+        this.addClusterDialogProvider = addClusterDialogProvider;
+        this.addHostDialogProvider = addHostDialogProvider;
+        this.hostFactory = hostFactory;
+        this.mainData = mainData;
+        this.mainPresenter = mainPresenter;
+        this.application = application;
+        this.swingUtils = swingUtils;
+        this.access = access;
+        this.bugReport = bugReport;
+        this.aboutDialog = aboutDialog;
+        this.dialogs = dialogs;
+    }
 
     public void init() {
         if (application.isUpgradeCheckEnabled()) {

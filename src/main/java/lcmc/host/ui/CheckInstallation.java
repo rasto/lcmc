@@ -26,7 +26,6 @@ import java.awt.Color;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.inject.Inject;
 import javax.inject.Named;
 import javax.swing.ImageIcon;
 import javax.swing.JComponent;
@@ -42,6 +41,7 @@ import lcmc.common.domain.ExecCallback;
 import lcmc.common.domain.util.Tools;
 import lcmc.common.ui.SpringUtilities;
 import lcmc.common.ui.WizardDialog;
+import lcmc.common.ui.main.MainData;
 import lcmc.common.ui.utils.MyButton;
 import lcmc.common.ui.utils.SwingUtils;
 import lcmc.drbd.domain.DrbdInstallation;
@@ -82,9 +82,8 @@ final class CheckInstallation extends DialogHost {
     private final JLabel checkingPacemakerLabel =
                                   new JLabel(": " + Tools.getString("Dialog.Host.CheckInstallation.CheckingPm"));
     private final JLabel checkingHeartbeatPacemakerLabel =
-                                  new JLabel(": " + Tools.getString("Dialog.Host.CheckInstallation.CheckingHbPm"));
-    @Inject
-    private WidgetFactory widgetFactory;
+            new JLabel(": " + Tools.getString("Dialog.Host.CheckInstallation.CheckingHbPm"));
+    private final WidgetFactory widgetFactory;
     private MyButton installDrbdButton;
     private MyButton installPacemakerButton;
     private MyButton installHeartbeatPacemakerButton;
@@ -102,28 +101,33 @@ final class CheckInstallation extends DialogHost {
     private final JLabel heartbeatPacemakerLabel = new JLabel("Pcmk/Heartbeat");
 
     private final JLabel pacemakerLabel = new JLabel("Pcmk/Corosync");
-    @Inject
-    private HostFinish hostFinishDialog;
-    @Inject
-    private DrbdAvailSourceFiles drbdAvailSourceFilesDialog;
-    @Inject
-    private DrbdCommandInst drbdCommandInstDialog;
-    @Inject
-    private HeartbeatInst heartbeatInstDialog;
-    @Inject
-    private PacemakerInst pacemakerInstDialog;
-    @Inject
-    private Application application;
-    @Inject
-    private SwingUtils swingUtils;
+    private final HostFinish hostFinishDialog;
+    private final DrbdAvailSourceFiles drbdAvailSourceFilesDialog;
+    private final DrbdCommandInst drbdCommandInstDialog;
+    private final HeartbeatInst heartbeatInstDialog;
+    private final PacemakerInst pacemakerInstDialog;
+    private final Application application;
+    private final SwingUtils swingUtils;
+
+    public CheckInstallation(Application application, SwingUtils swingUtils, WidgetFactory widgetFactory, MainData mainData,
+            HostFinish hostFinishDialog, DrbdAvailSourceFiles drbdAvailSourceFilesDialog, DrbdCommandInst drbdCommandInstDialog,
+            HeartbeatInst heartbeatInstDialog, PacemakerInst pacemakerInstDialog) {
+        super(application, swingUtils, widgetFactory, mainData);
+        this.widgetFactory = widgetFactory;
+        this.hostFinishDialog = hostFinishDialog;
+        this.drbdAvailSourceFilesDialog = drbdAvailSourceFilesDialog;
+        this.drbdCommandInstDialog = drbdCommandInstDialog;
+        this.heartbeatInstDialog = heartbeatInstDialog;
+        this.pacemakerInstDialog = pacemakerInstDialog;
+        this.application = application;
+        this.swingUtils = swingUtils;
+    }
 
     @Override
     public void init(final WizardDialog previousDialog, final Host host, final DrbdInstallation drbdInstallation) {
         super.init(previousDialog, host, drbdInstallation);
-        installDrbdButton =
-                widgetFactory.createButton(Tools.getString("Dialog.Host.CheckInstallation.DrbdInstallButton"));
-        installPacemakerButton =
-                widgetFactory.createButton(Tools.getString("Dialog.Host.CheckInstallation.PmInstallButton"));
+        installDrbdButton = widgetFactory.createButton(Tools.getString("Dialog.Host.CheckInstallation.DrbdInstallButton"));
+        installPacemakerButton = widgetFactory.createButton(Tools.getString("Dialog.Host.CheckInstallation.PmInstallButton"));
         installHeartbeatPacemakerButton =
                 widgetFactory.createButton(Tools.getString("Dialog.Host.CheckInstallation.HbPmInstallButton"));
     }

@@ -41,6 +41,7 @@ import lcmc.common.domain.StringValue;
 import lcmc.common.domain.util.Tools;
 import lcmc.common.ui.SpringUtilities;
 import lcmc.common.ui.WizardDialog;
+import lcmc.common.ui.main.MainData;
 import lcmc.common.ui.main.MainPresenter;
 import lcmc.common.ui.utils.SwingUtils;
 
@@ -60,8 +61,10 @@ public final class Name extends DialogCluster {
     private final Clusters allClusters;
     private final WidgetFactory widgetFactory;
 
-    public Name(ClusterHosts clusterHostsDialog, ClusterTabFactory clusterTabFactory, MainPresenter mainPresenter,
-            Application application, SwingUtils swingUtils, Clusters allClusters, WidgetFactory widgetFactory) {
+    public Name(MainData mainData, ClusterHosts clusterHostsDialog, ClusterTabFactory clusterTabFactory,
+            MainPresenter mainPresenter, Application application, SwingUtils swingUtils, Clusters allClusters,
+            WidgetFactory widgetFactory) {
+        super(application, swingUtils, widgetFactory, mainData);
         this.clusterHostsDialog = clusterHostsDialog;
         this.clusterTabFactory = clusterTabFactory;
         this.mainPresenter = mainPresenter;

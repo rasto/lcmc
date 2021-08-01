@@ -24,16 +24,17 @@ package lcmc.vm.ui.configdialog;
 
 import java.awt.Dimension;
 
-import javax.inject.Inject;
 import javax.inject.Named;
 import javax.swing.BoxLayout;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
+import lcmc.cluster.ui.widget.WidgetFactory;
 import lcmc.common.domain.Application;
 import lcmc.common.domain.util.Tools;
 import lcmc.common.ui.WizardDialog;
+import lcmc.common.ui.main.MainData;
 import lcmc.common.ui.utils.SwingUtils;
 import lcmc.vm.domain.data.FilesystemData;
 import lcmc.vm.ui.resource.FilesystemInfo;
@@ -43,20 +44,25 @@ import lcmc.vm.ui.resource.FilesystemInfo;
  */
 @Named
 final class Filesystem extends VMConfig {
-    /** Configuration options of the new domain. */
-    private static final String[] PARAMS = {FilesystemData.TYPE,
-                                            FilesystemData.SOURCE_DIR,
-                                            FilesystemData.SOURCE_NAME,
-                                            FilesystemData.TARGET_DIR};
+    /**
+     * Configuration options of the new domain.
+     */
+    private static final String[] PARAMS =
+            {FilesystemData.TYPE, FilesystemData.SOURCE_DIR, FilesystemData.SOURCE_NAME, FilesystemData.TARGET_DIR};
     private JComponent inputPane = null;
     private FilesystemInfo filesystemInfo = null;
     private WizardDialog nextDialogObject = null;
-    @Inject
-    private Network networkDialog;
-    @Inject
-    private Application application;
-    @Inject
-    private SwingUtils swingUtils;
+    private final Network networkDialog;
+    private final Application application;
+    private final SwingUtils swingUtils;
+
+    public Filesystem(Application application, SwingUtils swingUtils, WidgetFactory widgetFactory, MainData mainData,
+            Network networkDialog) {
+        super(application, swingUtils, widgetFactory, mainData);
+        this.networkDialog = networkDialog;
+        this.application = application;
+        this.swingUtils = swingUtils;
+    }
 
     @Override
     public WizardDialog nextDialog() {

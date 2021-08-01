@@ -27,7 +27,6 @@ import java.awt.FlowLayout;
 import java.util.Map;
 import java.util.Set;
 
-import javax.inject.Inject;
 import javax.inject.Named;
 import javax.swing.JCheckBox;
 import javax.swing.JComponent;
@@ -46,6 +45,7 @@ import lcmc.common.domain.Value;
 import lcmc.common.domain.util.Tools;
 import lcmc.common.ui.Browser;
 import lcmc.common.ui.SpringUtilities;
+import lcmc.common.ui.main.MainData;
 import lcmc.common.ui.utils.MyButton;
 import lcmc.common.ui.utils.SwingUtils;
 import lcmc.common.ui.utils.WidgetListener;
@@ -65,23 +65,25 @@ import lcmc.vm.domain.VmsXml;
 public final class LVResize extends LV {
     private static final Logger LOG = LoggerFactory.getLogger(LVResize.class);
     private static final String DESCRIPTION =
-                   "Resize the LVM volume. You can make it bigger, but not"
-                   + " smaller for now. If this volume is replicated by"
-                   + " DRBD, volumes on both nodes will be resized and"
-                   + " drbdadm resize will be called. If you have something"
-                   + " like filesystem on the DRBD, you have to resize the"
-                   + " filesystem yourself.";
+            "Resize the LVM volume. You can make it bigger, but not"
+            + " smaller for now. If this volume is replicated by" + " DRBD, volumes on both nodes will be resized and"
+            + " drbdadm resize will be called. If you have something" + " like filesystem on the DRBD, you have to resize the"
+            + " filesystem yourself.";
     private static final int RESIZE_LV_TIMEOUT = 5000;
     private BlockDevInfo blockDevInfo;
     private Widget sizeWidget;
     private Widget oldSizeWidget;
     private Widget maxSizeWidget;
     private Map<Host, JCheckBox> hostCheckBoxes = null;
-    @Inject
-    private SwingUtils swingUtils;
-    @Inject
-    private WidgetFactory widgetFactory;
+    private final SwingUtils swingUtils;
+    private final WidgetFactory widgetFactory;
     private MyButton resizeButton;
+
+    public LVResize(Application application, SwingUtils swingUtils, WidgetFactory widgetFactory, MainData mainData) {
+        super(application, swingUtils, widgetFactory, mainData);
+        this.swingUtils = swingUtils;
+        this.widgetFactory = widgetFactory;
+    }
 
     public void init(final BlockDevInfo blockDevInfo) {
         super.init(null);

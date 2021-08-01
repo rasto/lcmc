@@ -25,7 +25,6 @@ package lcmc.drbd.ui.configdialog;
 
 import java.util.regex.Matcher;
 
-import javax.inject.Inject;
 import javax.inject.Named;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
@@ -43,6 +42,7 @@ import lcmc.common.domain.Value;
 import lcmc.common.domain.util.Tools;
 import lcmc.common.ui.SpringUtilities;
 import lcmc.common.ui.WizardDialog;
+import lcmc.common.ui.main.MainData;
 import lcmc.common.ui.main.ProgressIndicator;
 import lcmc.common.ui.utils.MyButton;
 import lcmc.common.ui.utils.SwingUtils;
@@ -52,33 +52,36 @@ import lcmc.drbd.ui.resource.BlockDevInfo;
 import lcmc.host.domain.Host;
 
 /**
- * An implementation of a dialog where drbd block devices are initialized.
- * information.
+ * An implementation of a dialog where drbd block devices are initialized. information.
  */
 @Named
 final class CreateMD extends DrbdConfig {
     private static final int COMBOBOX_WIDTH = 250;
     private static final int CREATE_MD_FS_ALREADY_THERE_RC = 40;
     private Widget metadataWidget;
-    @Inject
-    private ProgressIndicator progressIndicator;
-    @Inject
-    private CreateFS createFSDialog;
-    @Inject
-    private Application application;
-    @Inject
-    private SwingUtils swingUtils;
-    @Inject
-    private WidgetFactory widgetFactory;
+    private final ProgressIndicator progressIndicator;
+    private final CreateFS createFSDialog;
+    private final Application application;
+    private final SwingUtils swingUtils;
+    private final WidgetFactory widgetFactory;
     private MyButton makeMetaDataButton;
+
+    public CreateMD(Application application, SwingUtils swingUtils, WidgetFactory widgetFactory, MainData mainData,
+            ProgressIndicator progressIndicator, CreateFS createFSDialog) {
+        super(application, swingUtils, widgetFactory, mainData);
+        this.progressIndicator = progressIndicator;
+        this.createFSDialog = createFSDialog;
+        this.application = application;
+        this.swingUtils = swingUtils;
+        this.widgetFactory = widgetFactory;
+    }
 
     private void createMetadataAndCheckResult(final boolean destroyData) {
         swingUtils.invokeLater(() -> makeMetaDataButton.setEnabled(false));
         final Thread[] thread = new Thread[2];
         final String[] answerStore = new String[2];
         final Integer[] returnCode = new Integer[2];
-        final BlockDevInfo[] bdis = {getDrbdVolumeInfo().getFirstBlockDevInfo(),
-                                     getDrbdVolumeInfo().getSecondBlockDevInfo()};
+        final BlockDevInfo[] bdis = {getDrbdVolumeInfo().getFirstBlockDevInfo(), getDrbdVolumeInfo().getSecondBlockDevInfo()};
         for (int i = 0; i < 2; i++) {
             final int index = i;
             returnCode[index] = -1;

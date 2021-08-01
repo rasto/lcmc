@@ -66,6 +66,7 @@ import lcmc.common.domain.util.Tools;
 import lcmc.common.ui.Access;
 import lcmc.common.ui.SpringUtilities;
 import lcmc.common.ui.WizardDialog;
+import lcmc.common.ui.main.MainData;
 import lcmc.common.ui.utils.MyButton;
 import lcmc.common.ui.utils.SwingUtils;
 import lcmc.common.ui.utils.WidgetListener;
@@ -193,8 +194,9 @@ final class HbConfig extends DialogCluster {
     private final NetworkService networkService;
     private final Access access;
 
-    public HbConfig(Application application, SwingUtils swingUtils, WidgetFactory widgetFactory, InitCluster initCluster,
-            NetworkService networkService, Access access) {
+    public HbConfig(Application application, SwingUtils swingUtils, WidgetFactory widgetFactory, MainData mainData,
+            InitCluster initCluster, NetworkService networkService, Access access) {
+        super(application, swingUtils, widgetFactory, mainData);
         this.application = application;
         this.swingUtils = swingUtils;
         this.widgetFactory = widgetFactory;

@@ -23,7 +23,6 @@ package lcmc.common.ui;
 
 import java.awt.BorderLayout;
 
-import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 import javax.swing.JButton;
@@ -44,16 +43,19 @@ import lcmc.host.domain.HostFactory;
 @Singleton
 public final class MainPanel extends JPanel {
 
-    @Inject
-    private ClustersPanel clustersPanel;
-    @Inject
-    private HostFactory hostFactory;
-    @Inject
-    private SwingUtils swingUtils;
+    private final ClustersPanel clustersPanel;
+    private final HostFactory hostFactory;
+    private final SwingUtils swingUtils;
 
     private JSplitPane terminalSplitPane;
     private boolean terminalAreaExpanded = true;
     private int lastDividerLocation = -1;
+
+    public MainPanel(ClustersPanel clustersPanel, HostFactory hostFactory, SwingUtils swingUtils) {
+        this.clustersPanel = clustersPanel;
+        this.hostFactory = hostFactory;
+        this.swingUtils = swingUtils;
+    }
 
     public void init() {
         setLayout(new BorderLayout());

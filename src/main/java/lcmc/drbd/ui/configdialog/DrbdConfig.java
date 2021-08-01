@@ -22,15 +22,22 @@
 
 package lcmc.drbd.ui.configdialog;
 
+import lcmc.cluster.ui.widget.WidgetFactory;
+import lcmc.common.domain.Application;
 import lcmc.common.ui.WizardDialog;
+import lcmc.common.ui.main.MainData;
+import lcmc.common.ui.utils.SwingUtils;
 import lcmc.drbd.ui.resource.VolumeInfo;
 
 /**
- * DrbdConfig super class from which all the drbd config wizards can be
- * extended. It just adds VolumeInfo field.
+ * DrbdConfig super class from which all the drbd config wizards can be extended. It just adds VolumeInfo field.
  */
 public abstract class DrbdConfig extends WizardDialog {
     private VolumeInfo volumeInfo;
+
+    public DrbdConfig(Application application, SwingUtils swingUtils, WidgetFactory widgetFactory, MainData mainData) {
+        super(application, swingUtils, widgetFactory, mainData);
+    }
 
     public void init(final WizardDialog previousDialog, final VolumeInfo volumeInfo) {
         setPreviousDialog(previousDialog);

@@ -29,7 +29,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 
-import javax.inject.Inject;
 import javax.inject.Named;
 import javax.swing.ImageIcon;
 import javax.swing.JComponent;
@@ -44,8 +43,11 @@ import lcmc.common.domain.Application;
 import lcmc.common.domain.StringValue;
 import lcmc.common.domain.Value;
 import lcmc.common.domain.util.Tools;
+import lcmc.common.ui.Access;
 import lcmc.common.ui.Browser;
+import lcmc.common.ui.main.MainData;
 import lcmc.common.ui.treemenu.ClusterTreeMenu;
+import lcmc.common.ui.utils.MenuFactory;
 import lcmc.common.ui.utils.MyButton;
 import lcmc.common.ui.utils.SwingUtils;
 import lcmc.drbd.ui.resource.BlockDevInfo;
@@ -116,20 +118,17 @@ public final class FilesystemInfo extends HardwareInfo {
         SHORTNAME_MAP.put(FilesystemData.SOURCE_NAME, "Source Name");
         SHORTNAME_MAP.put(FilesystemData.TARGET_DIR, "Target Dir");
     }
+
     static {
-        POSSIBLE_VALUES.put(FilesystemData.TYPE,
-                            new Value[]{MOUNT_TYPE, TEMPLATE_TYPE});
+        POSSIBLE_VALUES.put(FilesystemData.TYPE, new Value[]{MOUNT_TYPE, TEMPLATE_TYPE});
         POSSIBLE_VALUES.put(FilesystemData.TARGET_DIR, new Value[]{new StringValue("/")});
         PREFERRED_MAP.put(FilesystemData.TYPE, new StringValue("mount"));
         PREFERRED_MAP.put(FilesystemData.TARGET_DIR, new StringValue("/"));
     }
 
-    @Inject
-    private Application application;
-    @Inject
-    private SwingUtils swingUtils;
-    @Inject
-    private WidgetFactory widgetFactory;
+    private final Application application;
+    private final SwingUtils swingUtils;
+    private final WidgetFactory widgetFactory;
 
     /**
      * Source file combo box, so that it can be disabled, depending on type.
@@ -147,8 +146,16 @@ public final class FilesystemInfo extends HardwareInfo {
      * Table panel.
      */
     private JComponent tablePanel = null;
-    @Inject
-    private ClusterTreeMenu clusterTreeMenu;
+    private final ClusterTreeMenu clusterTreeMenu;
+
+    public FilesystemInfo(Application application, SwingUtils swingUtils, Access access, MainData mainData,
+            WidgetFactory widgetFactory, MenuFactory menuFactory, ClusterTreeMenu clusterTreeMenu) {
+        super(application, swingUtils, access, mainData, widgetFactory, menuFactory, clusterTreeMenu);
+        this.application = application;
+        this.swingUtils = swingUtils;
+        this.widgetFactory = widgetFactory;
+        this.clusterTreeMenu = clusterTreeMenu;
+    }
 
     @Override
     void init(final String name, final Browser browser, final DomainInfo domainInfo) {
@@ -157,7 +164,8 @@ public final class FilesystemInfo extends HardwareInfo {
         final Set<Value> sds = new LinkedHashSet<>();
         sds.add(new StringValue());
         for (final Host h : hosts) {
-            for (final String guiOps : h.getHostParser().getGuiOptions(Host.VM_FILESYSTEM_SOURCE_DIR_LXC)) {
+            for (final String guiOps : h.getHostParser()
+                                        .getGuiOptions(Host.VM_FILESYSTEM_SOURCE_DIR_LXC)) {
                 sds.add(new StringValue(guiOps));
             }
         }

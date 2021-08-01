@@ -35,7 +35,6 @@ import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import javax.inject.Inject;
 import javax.inject.Named;
 import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
@@ -62,6 +61,7 @@ import lcmc.common.domain.StringValue;
 import lcmc.common.domain.Unit;
 import lcmc.common.domain.Value;
 import lcmc.common.domain.util.Tools;
+import lcmc.common.ui.Access;
 import lcmc.common.ui.Browser;
 import lcmc.common.ui.EditableInfo;
 import lcmc.common.ui.Info;
@@ -100,18 +100,23 @@ public abstract class HardwareInfo extends EditableInfo {
     private JComponent infoPanel = null;
     private DomainInfo vmsVirtualDomainInfo;
     private final Map<String, LinuxFile> linuxFileCache = new HashMap<>();
-    @Inject
-    private Application application;
-    @Inject
-    private SwingUtils swingUtils;
-    @Inject
-    private MenuFactory menuFactory;
-    @Inject
-    private WidgetFactory widgetFactory;
-    @Inject
-    private MainData mainData;
-    @Inject
-    private ClusterTreeMenu clusterTreeMenu;
+    private final Application application;
+    private final SwingUtils swingUtils;
+    private final MenuFactory menuFactory;
+    private final WidgetFactory widgetFactory;
+    private final MainData mainData;
+    private final ClusterTreeMenu clusterTreeMenu;
+
+    public HardwareInfo(Application application, SwingUtils swingUtils, Access access, MainData mainData,
+            WidgetFactory widgetFactory, MenuFactory menuFactory, ClusterTreeMenu clusterTreeMenu) {
+        super(application, swingUtils, access, mainData, widgetFactory);
+        this.application = application;
+        this.swingUtils = swingUtils;
+        this.menuFactory = menuFactory;
+        this.widgetFactory = widgetFactory;
+        this.mainData = mainData;
+        this.clusterTreeMenu = clusterTreeMenu;
+    }
 
     void init(final String name, final Browser browser, final DomainInfo vmsVirtualDomainInfo) {
         super.einit(Optional.of(new ResourceValue(name)), name, browser);

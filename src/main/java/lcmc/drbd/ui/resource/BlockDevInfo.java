@@ -37,7 +37,6 @@ import java.util.concurrent.CountDownLatch;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import javax.inject.Inject;
 import javax.inject.Named;
 import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
@@ -49,16 +48,19 @@ import lcmc.Exceptions;
 import lcmc.cluster.ui.ClusterBrowser;
 import lcmc.cluster.ui.widget.Check;
 import lcmc.cluster.ui.widget.Widget;
+import lcmc.cluster.ui.widget.WidgetFactory;
 import lcmc.common.domain.AccessMode;
 import lcmc.common.domain.Application;
 import lcmc.common.domain.ColorText;
 import lcmc.common.domain.StringValue;
 import lcmc.common.domain.Value;
 import lcmc.common.domain.util.Tools;
+import lcmc.common.ui.Access;
 import lcmc.common.ui.Browser;
 import lcmc.common.ui.EditableInfo;
 import lcmc.common.ui.Info;
 import lcmc.common.ui.MainPanel;
+import lcmc.common.ui.main.MainData;
 import lcmc.common.ui.treemenu.ClusterTreeMenu;
 import lcmc.common.ui.utils.ButtonCallback;
 import lcmc.common.ui.utils.ComponentWithTest;
@@ -104,16 +106,21 @@ public class BlockDevInfo extends EditableInfo {
     private static final String PROXY_DOWN = "Proxy Down";
 
     private static final String BY_UUID_PATH = "/dev/disk/by-uuid/";
-    @Inject
-    private MainPanel mainPanel;
-    @Inject
-    private BlockDevMenu blockDevMenu;
-    @Inject
-    private Application application;
-    @Inject
-    private SwingUtils swingUtils;
-    @Inject
-    private ClusterTreeMenu clusterTreeMenu;
+    private final MainPanel mainPanel;
+    private final BlockDevMenu blockDevMenu;
+    private final Application application;
+    private final SwingUtils swingUtils;
+    private final ClusterTreeMenu clusterTreeMenu;
+
+    public BlockDevInfo(Application application, SwingUtils swingUtils, Access access, MainData mainData,
+            WidgetFactory widgetFactory, MainPanel mainPanel, BlockDevMenu blockDevMenu, ClusterTreeMenu clusterTreeMenu) {
+        super(application, swingUtils, access, mainData, widgetFactory);
+        this.mainPanel = mainPanel;
+        this.blockDevMenu = blockDevMenu;
+        this.application = application;
+        this.swingUtils = swingUtils;
+        this.clusterTreeMenu = clusterTreeMenu;
+    }
 
     public void init(final String name, final BlockDevice blockDevice, final Browser browser) {
         super.einit(Optional.of(blockDevice), name, browser);

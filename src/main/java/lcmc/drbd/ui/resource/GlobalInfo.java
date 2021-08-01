@@ -39,7 +39,6 @@ import java.util.concurrent.CountDownLatch;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Provider;
 import javax.swing.BoxLayout;
@@ -55,13 +54,16 @@ import lcmc.cluster.domain.Cluster;
 import lcmc.cluster.ui.ClusterBrowser;
 import lcmc.cluster.ui.widget.Check;
 import lcmc.cluster.ui.widget.Widget;
+import lcmc.cluster.ui.widget.WidgetFactory;
 import lcmc.common.domain.Application;
 import lcmc.common.domain.Application.RunMode;
 import lcmc.common.domain.ResourceValue;
 import lcmc.common.domain.StringValue;
 import lcmc.common.domain.Value;
 import lcmc.common.domain.util.Tools;
+import lcmc.common.ui.Access;
 import lcmc.common.ui.Browser;
+import lcmc.common.ui.main.MainData;
 import lcmc.common.ui.treemenu.ClusterTreeMenu;
 import lcmc.common.ui.utils.ButtonCallback;
 import lcmc.common.ui.utils.ComponentWithTest;
@@ -93,29 +95,37 @@ public class GlobalInfo extends AbstractDrbdInfo {
     static final ImageIcon CLUSTER_ICON = Tools.createImageIcon(Tools.getDefault("ClustersPanel.ClusterIcon"));
     private BlockDevInfo selectedBlockDevice = null;
     private JComponent infoPanel = null;
-    @Inject
-    private GlobalMenu globalMenu;
-    @Inject
-    private HostFactory hostFactory;
-    @Inject
-    private Provider<VolumeInfo> volumeInfoProvider;
-    @Inject
-    private Provider<AddDrbdConfigDialog> addDrbdConfigDialogProvider;
+    private final GlobalMenu globalMenu;
+    private final HostFactory hostFactory;
+    private final Provider<VolumeInfo> volumeInfoProvider;
+    private final Provider<AddDrbdConfigDialog> addDrbdConfigDialogProvider;
     private ProxyHostInfo proxyHostInfo = null;
-    @Inject
-    private Provider<ProxyHostInfo> proxyHostInfoProvider;
-    @Inject
-    private Provider<ResourceInfo> resourceInfoProvider;
-    @Inject
-    private Provider<DrbdXml> drbdXmlProvider;
-    @Inject
-    private Application application;
-    @Inject
-    private SwingUtils swingUtils;
-    @Inject
-    private ClusterTreeMenu clusterTreeMenu;
-    @Inject
-    private Dialogs dialogs;
+    private final Provider<ProxyHostInfo> proxyHostInfoProvider;
+    private final Provider<ResourceInfo> resourceInfoProvider;
+    private final Provider<DrbdXml> drbdXmlProvider;
+    private final Application application;
+    private final SwingUtils swingUtils;
+    private final ClusterTreeMenu clusterTreeMenu;
+    private final Dialogs dialogs;
+
+    public GlobalInfo(Application application, SwingUtils swingUtils, Access access, MainData mainData, WidgetFactory widgetFactory,
+            GlobalMenu globalMenu, HostFactory hostFactory, Provider<VolumeInfo> volumeInfoProvider,
+            Provider<AddDrbdConfigDialog> addDrbdConfigDialogProvider, Provider<ProxyHostInfo> proxyHostInfoProvider,
+            Provider<ResourceInfo> resourceInfoProvider, Provider<DrbdXml> drbdXmlProvider, ClusterTreeMenu clusterTreeMenu,
+            Dialogs dialogs) {
+        super(application, swingUtils, access, mainData, widgetFactory);
+        this.application = application;
+        this.globalMenu = globalMenu;
+        this.hostFactory = hostFactory;
+        this.volumeInfoProvider = volumeInfoProvider;
+        this.addDrbdConfigDialogProvider = addDrbdConfigDialogProvider;
+        this.proxyHostInfoProvider = proxyHostInfoProvider;
+        this.resourceInfoProvider = resourceInfoProvider;
+        this.drbdXmlProvider = drbdXmlProvider;
+        this.swingUtils = swingUtils;
+        this.clusterTreeMenu = clusterTreeMenu;
+        this.dialogs = dialogs;
+    }
 
     public void einit(final String name, final Browser browser) {
         super.einit(Optional.of(new ResourceValue(name)), name, browser);

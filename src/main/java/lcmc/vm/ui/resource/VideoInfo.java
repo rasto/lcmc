@@ -28,7 +28,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
-import javax.inject.Inject;
 import javax.inject.Named;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
@@ -36,13 +35,17 @@ import javax.swing.JPanel;
 import org.w3c.dom.Node;
 
 import lcmc.cluster.ui.widget.Widget;
+import lcmc.cluster.ui.widget.WidgetFactory;
 import lcmc.common.domain.AccessMode;
 import lcmc.common.domain.Application;
 import lcmc.common.domain.StringValue;
 import lcmc.common.domain.Value;
 import lcmc.common.domain.util.Tools;
+import lcmc.common.ui.Access;
 import lcmc.common.ui.Browser;
+import lcmc.common.ui.main.MainData;
 import lcmc.common.ui.treemenu.ClusterTreeMenu;
+import lcmc.common.ui.utils.MenuFactory;
 import lcmc.common.ui.utils.SwingUtils;
 import lcmc.host.domain.Host;
 import lcmc.vm.domain.VmsXml;
@@ -97,25 +100,31 @@ public class VideoInfo extends HardwareInfo {
     }
     static {
         POSSIBLE_VALUES.put(VideoData.MODEL_TYPE,
-                            new Value[]{new StringValue("cirrus"),
-                                        new StringValue("vga"),
-                                        new StringValue("vmvga"),
-                                        new StringValue("xen")});
+                new Value[]{new StringValue("cirrus"), new StringValue("vga"), new StringValue("vmvga"), new StringValue("xen")});
     }
 
-    @Inject
-    private SwingUtils swingUtils;
-    /** Table panel. */
+    private final SwingUtils swingUtils;
+    /**
+     * Table panel.
+     */
     private JComponent tablePanel = null;
-    @Inject
-    private ClusterTreeMenu clusterTreeMenu;
+    private final ClusterTreeMenu clusterTreeMenu;
+
+    public VideoInfo(Application application, SwingUtils swingUtils, Access access, MainData mainData, WidgetFactory widgetFactory,
+            MenuFactory menuFactory, ClusterTreeMenu clusterTreeMenu) {
+        super(application, swingUtils, access, mainData, widgetFactory, menuFactory, clusterTreeMenu);
+        this.swingUtils = swingUtils;
+        this.clusterTreeMenu = clusterTreeMenu;
+    }
 
     @Override
     void init(final String name, final Browser browser, final DomainInfo vmsVirtualDomainInfo) {
         super.init(name, browser, vmsVirtualDomainInfo);
     }
 
-    /** Adds disk table with only this disk to the main panel. */
+    /**
+     * Adds disk table with only this disk to the main panel.
+     */
     @Override
     protected void addHardwareTable(final JPanel mainPanel) {
         tablePanel = getTablePanel("Video Devices",

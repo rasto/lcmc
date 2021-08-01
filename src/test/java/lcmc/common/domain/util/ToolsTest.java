@@ -36,7 +36,6 @@ import lcmc.common.ui.main.MainData;
 import lcmc.common.ui.main.ProgressIndicator;
 import lcmc.common.ui.utils.SwingUtils;
 import lcmc.drbd.domain.DrbdXml;
-import lcmc.drbd.ui.resource.GlobalInfo;
 import lcmc.host.domain.Host;
 import lcmc.host.domain.HostFactory;
 import lcmc.host.domain.Hosts;
@@ -475,7 +474,6 @@ final class ToolsTest {
         when(terminalPanelProvider.get()).thenReturn(terminalPanel);
         when(sshProvider.get()).thenReturn(ssh);
         when(hostBrowserProvider.get()).thenReturn(hostBrowser);
-        final GlobalInfo globalInfo = new GlobalInfo();
         final Host host = hostFactory.createInstance();
 
         host.getHostParser().setPacemakerVersion(pcmkVersion);

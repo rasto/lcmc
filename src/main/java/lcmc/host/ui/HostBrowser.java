@@ -33,7 +33,6 @@ import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import javax.annotation.Resource;
-import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Provider;
 import javax.swing.ImageIcon;
@@ -48,6 +47,7 @@ import lcmc.cluster.ui.ClusterBrowser;
 import lcmc.cluster.ui.resource.ClusterViewFactory;
 import lcmc.cluster.ui.resource.FSInfo;
 import lcmc.common.domain.AccessMode;
+import lcmc.common.domain.Application;
 import lcmc.common.domain.util.Tools;
 import lcmc.common.ui.Browser;
 import lcmc.common.ui.CategoryInfo;
@@ -103,13 +103,11 @@ public class HostBrowser extends Browser {
     private final Collection<String> usedPorts = new HashSet<>();
     private final Collection<String> usedProxyPorts = new HashSet<>();
     private Host host;
-    @Inject
-    private HostInfo hostInfo;
+    private final HostInfo hostInfo;
     /**
      * Host info object of the host in drbd view of this browser.
      */
-    @Inject
-    private HostDrbdInfo hostDrbdInfo;
+    private final HostDrbdInfo hostDrbdInfo;
     /**
      * Map of block devices and their info objects.
      */
@@ -118,28 +116,37 @@ public class HostBrowser extends Browser {
     private final Lock mBlockDevInfosReadLock = mBlockDevInfosLock.readLock();
     private final Lock mBlockDevInfosWriteLock = mBlockDevInfosLock.writeLock();
     private DefaultMutableTreeNode treeTop;
-    @Inject
-    private ProgressIndicator progressIndicator;
-    @Inject
-    private Provider<BlockDevInfo> blockDevInfoFactory;
-    @Inject
-    private SwingUtils swingUtils;
-    @Inject
-    private MenuFactory menuFactory;
-    @Inject
-    private Provider<CmdLog> cmdLogProvider;
-    @Resource(name="categoryInfo")
+    private final ProgressIndicator progressIndicator;
+    private final Provider<BlockDevInfo> blockDevInfoFactory;
+    private final SwingUtils swingUtils;
+    private final MenuFactory menuFactory;
+    private final Provider<CmdLog> cmdLogProvider;
+    @Resource(name = "categoryInfo")
     private CategoryInfo netInterfacesCategory;
-    @Resource(name="categoryInfo")
+    @Resource(name = "categoryInfo")
     private CategoryInfo blockDevicesCategory;
-    @Resource(name="categoryInfo")
+    @Resource(name = "categoryInfo")
     private CategoryInfo fileSystemsCategory;
-    @Inject
-    private TreeMenuController treeMenuController;
-    @Inject
-    private ClusterEventBus clusterEventBus;
-    @Inject
-    private ClusterViewFactory clusterViewFactory;
+    private final TreeMenuController treeMenuController;
+    private final ClusterEventBus clusterEventBus;
+    private final ClusterViewFactory clusterViewFactory;
+
+    public HostBrowser(Application application, HostInfo hostInfo, HostDrbdInfo hostDrbdInfo, ProgressIndicator progressIndicator,
+            Provider<BlockDevInfo> blockDevInfoFactory, SwingUtils swingUtils, MenuFactory menuFactory,
+            Provider<CmdLog> cmdLogProvider, TreeMenuController treeMenuController, ClusterEventBus clusterEventBus,
+            ClusterViewFactory clusterViewFactory) {
+        super(application);
+        this.hostInfo = hostInfo;
+        this.hostDrbdInfo = hostDrbdInfo;
+        this.progressIndicator = progressIndicator;
+        this.blockDevInfoFactory = blockDevInfoFactory;
+        this.swingUtils = swingUtils;
+        this.menuFactory = menuFactory;
+        this.cmdLogProvider = cmdLogProvider;
+        this.treeMenuController = treeMenuController;
+        this.clusterEventBus = clusterEventBus;
+        this.clusterViewFactory = clusterViewFactory;
+    }
 
     public void init(final Host host) {
         this.host = host;

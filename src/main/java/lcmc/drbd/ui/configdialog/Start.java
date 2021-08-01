@@ -27,7 +27,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import javax.inject.Inject;
 import javax.inject.Named;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
@@ -43,6 +42,7 @@ import lcmc.common.domain.Value;
 import lcmc.common.domain.util.Tools;
 import lcmc.common.ui.SpringUtilities;
 import lcmc.common.ui.WizardDialog;
+import lcmc.common.ui.main.MainData;
 import lcmc.common.ui.utils.SwingUtils;
 import lcmc.drbd.ui.resource.BlockDevInfo;
 import lcmc.drbd.ui.resource.GlobalInfo;
@@ -60,28 +60,35 @@ public final class Start extends WizardDialog {
     private BlockDevInfo blockDevInfo1;
     private BlockDevInfo blockDevInfo2;
     private ResourceInfo resourceInfo;
-    @Inject
-    private Resource resourceDialog;
-    @Inject
-    private Volume volumeDialog;
+    private final Resource resourceDialog;
+    private final Volume volumeDialog;
     private GlobalInfo globalInfo;
-    @Inject
-    private Application application;
-    @Inject
-    private SwingUtils swingUtils;
-    @Inject
-    private WidgetFactory widgetFactory;
+    private final Application application;
+    private final SwingUtils swingUtils;
+    private final WidgetFactory widgetFactory;
 
-    public void init(final WizardDialog previousDialog,
-                     final BlockDevInfo blockDevInfo1,
-                     final BlockDevInfo blockDevInfo2) {
+    public Start(Application application, SwingUtils swingUtils, WidgetFactory widgetFactory, MainData mainData,
+            Resource resourceDialog, Volume volumeDialog) {
+        super(application, swingUtils, widgetFactory, mainData);
+        this.resourceDialog = resourceDialog;
+        this.volumeDialog = volumeDialog;
+        this.application = application;
+        this.swingUtils = swingUtils;
+        this.widgetFactory = widgetFactory;
+    }
+
+    public void init(final WizardDialog previousDialog, final BlockDevInfo blockDevInfo1, final BlockDevInfo blockDevInfo2) {
         setPreviousDialog(previousDialog);
         this.blockDevInfo1 = blockDevInfo1;
         this.blockDevInfo2 = blockDevInfo2;
-        globalInfo = blockDevInfo1.getBrowser().getClusterBrowser().getGlobalInfo();
+        globalInfo = blockDevInfo1.getBrowser()
+                                  .getClusterBrowser()
+                                  .getGlobalInfo();
     }
 
-    /** Applies the changes and returns next dialog (BlockDev). */
+    /**
+     * Applies the changes and returns next dialog (BlockDev).
+     */
     @Override
     public WizardDialog nextDialog() {
         boolean newResource = false;

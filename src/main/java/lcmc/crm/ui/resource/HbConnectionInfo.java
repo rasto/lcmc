@@ -34,7 +34,6 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
-import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Provider;
 import javax.swing.BoxLayout;
@@ -46,14 +45,17 @@ import javax.swing.tree.DefaultMutableTreeNode;
 
 import lcmc.cluster.ui.ClusterBrowser;
 import lcmc.cluster.ui.widget.Check;
+import lcmc.cluster.ui.widget.WidgetFactory;
 import lcmc.common.domain.AccessMode;
 import lcmc.common.domain.Application;
 import lcmc.common.domain.Value;
 import lcmc.common.domain.util.Tools;
+import lcmc.common.ui.Access;
 import lcmc.common.ui.Browser;
 import lcmc.common.ui.EditableInfo;
 import lcmc.common.ui.Info;
 import lcmc.common.ui.SpringUtilities;
+import lcmc.common.ui.main.MainData;
 import lcmc.common.ui.treemenu.ClusterTreeMenu;
 import lcmc.common.ui.utils.ButtonCallback;
 import lcmc.common.ui.utils.ComponentWithTest;
@@ -83,36 +85,50 @@ public class HbConnectionInfo extends EditableInfo {
     private ServiceInfo lastServiceInfoChild = null;
     private final Map<String, HbColocationInfo> colocationIds = new LinkedHashMap<>();
     private final Map<String, HbOrderInfo> orderIds = new LinkedHashMap<>();
-    @Inject
-    private Provider<HbColocationInfo> colocationInfoProvider;
-    @Inject
-    private Provider<HbOrderInfo> orderInfoProvider;
-    @Inject
-    private Application application;
-    @Inject
-    private SwingUtils swingUtils;
-    @Inject
-    private HbConnectionMenu hbConnectionMenu;
-    @Inject
-    private ClusterTreeMenu clusterTreeMenu;
+    private final Provider<HbColocationInfo> colocationInfoProvider;
+    private final Provider<HbOrderInfo> orderInfoProvider;
+    private final Application application;
+    private final SwingUtils swingUtils;
+    private final HbConnectionMenu hbConnectionMenu;
+    private final ClusterTreeMenu clusterTreeMenu;
+
+    public HbConnectionInfo(Application application, SwingUtils swingUtils, Access access, MainData mainData,
+            WidgetFactory widgetFactory, Provider<HbColocationInfo> colocationInfoProvider, Provider<HbOrderInfo> orderInfoProvider,
+            HbConnectionMenu hbConnectionMenu, ClusterTreeMenu clusterTreeMenu) {
+        super(application, swingUtils, access, mainData, widgetFactory);
+        this.colocationInfoProvider = colocationInfoProvider;
+        this.orderInfoProvider = orderInfoProvider;
+        this.application = application;
+        this.swingUtils = swingUtils;
+        this.hbConnectionMenu = hbConnectionMenu;
+        this.clusterTreeMenu = clusterTreeMenu;
+    }
 
     public void init(final Browser browser) {
         super.einit(Optional.empty(), "HbConnectionInfo", browser);
     }
 
-    /** Returns browser object of this info. */
+    /**
+     * Returns browser object of this info.
+     */
     @Override
     public ClusterBrowser getBrowser() {
         return (ClusterBrowser) super.getBrowser();
     }
 
-    /** Returns whether one of the services are newly added. */
+    /**
+     * Returns whether one of the services are newly added.
+     */
     @Override
     public final boolean isNew() {
-        return (lastServiceInfoRsc != null && lastServiceInfoRsc.getService().isNew())
-                || (lastServiceInfoWithRsc != null && lastServiceInfoWithRsc.getService().isNew())
-                || (lastServiceInfoParent != null && lastServiceInfoParent.getService().isNew())
-                || (lastServiceInfoChild != null && lastServiceInfoChild.getService().isNew());
+        return (lastServiceInfoRsc != null && lastServiceInfoRsc.getService()
+                                                                .isNew()) || (lastServiceInfoWithRsc != null
+                                                                              && lastServiceInfoWithRsc.getService()
+                                                                                                       .isNew()) || (
+                       lastServiceInfoParent != null && lastServiceInfoParent.getService()
+                                                                             .isNew()) || (lastServiceInfoChild != null
+                                                                                           && lastServiceInfoChild.getService()
+                                                                                                                  .isNew());
     }
 
     @Override

@@ -25,16 +25,17 @@ package lcmc.vm.ui.configdialog;
 
 import java.awt.Dimension;
 
-import javax.inject.Inject;
 import javax.inject.Named;
 import javax.swing.BoxLayout;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
+import lcmc.cluster.ui.widget.WidgetFactory;
 import lcmc.common.domain.Application;
 import lcmc.common.domain.util.Tools;
 import lcmc.common.ui.WizardDialog;
+import lcmc.common.ui.main.MainData;
 import lcmc.common.ui.utils.SwingUtils;
 import lcmc.vm.domain.data.GraphicsData;
 import lcmc.vm.ui.resource.GraphicsInfo;
@@ -44,22 +45,23 @@ import lcmc.vm.ui.resource.GraphicsInfo;
  */
 @Named
 final class Display extends VMConfig {
-    private static final String[] PARAMS = {GraphicsData.TYPE,
-                                            GraphicsData.PORT,
-                                            GraphicsData.LISTEN,
-                                            GraphicsData.PASSWD,
-                                            GraphicsData.KEYMAP,
-                                            GraphicsData.DISPLAY,
-                                            GraphicsData.XAUTH};
+    private static final String[] PARAMS =
+            {GraphicsData.TYPE, GraphicsData.PORT, GraphicsData.LISTEN, GraphicsData.PASSWD, GraphicsData.KEYMAP,
+                    GraphicsData.DISPLAY, GraphicsData.XAUTH};
     private JComponent inputPane = null;
     private GraphicsInfo graphicsInfo = null;
     private WizardDialog nextDialogObject = null;
-    @Inject
-    private VMFinish vmFinishDialog;
-    @Inject
-    private Application application;
-    @Inject
-    private SwingUtils swingUtils;
+    private final VMFinish vmFinishDialog;
+    private final Application application;
+    private final SwingUtils swingUtils;
+
+    public Display(Application application, SwingUtils swingUtils, WidgetFactory widgetFactory, MainData mainData,
+            VMFinish vmFinishDialog) {
+        super(application, swingUtils, widgetFactory, mainData);
+        this.vmFinishDialog = vmFinishDialog;
+        this.application = application;
+        this.swingUtils = swingUtils;
+    }
 
     @Override
     public WizardDialog nextDialog() {

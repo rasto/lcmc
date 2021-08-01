@@ -33,6 +33,7 @@ import javax.swing.tree.MutableTreeNode;
 
 import lcmc.cluster.domain.Cluster;
 import lcmc.cluster.ui.network.InfoPresenter;
+import lcmc.common.domain.Application;
 import lcmc.common.domain.util.Tools;
 import lcmc.common.ui.Browser;
 import lcmc.common.ui.CategoryInfo;
@@ -61,7 +62,8 @@ public final class EmptyBrowser extends Browser {
     @Resource(name = "categoryInfo")
     private CategoryInfo resourcesCategory;
 
-    public EmptyBrowser(AllHostsInfo allHostsInfo, Hosts allHosts, TreeMenuController treeMenuController) {
+    public EmptyBrowser(Application application, AllHostsInfo allHostsInfo, Hosts allHosts, TreeMenuController treeMenuController) {
+        super(application);
         this.allHostsInfo = allHostsInfo;
         this.allHosts = allHosts;
         this.treeMenuController = treeMenuController;

@@ -24,7 +24,6 @@ package lcmc.drbd.ui.configdialog;
 
 import java.net.UnknownHostException;
 
-import javax.inject.Inject;
 import javax.inject.Named;
 import javax.swing.BoxLayout;
 import javax.swing.JComponent;
@@ -35,6 +34,7 @@ import javax.swing.SpringLayout;
 import lcmc.AppContext;
 import lcmc.Exceptions;
 import lcmc.cluster.ui.ClusterBrowser;
+import lcmc.cluster.ui.widget.WidgetFactory;
 import lcmc.common.domain.Application;
 import lcmc.common.domain.util.Tools;
 import lcmc.common.ui.MainPanel;
@@ -51,29 +51,35 @@ import lcmc.logger.Logger;
 import lcmc.logger.LoggerFactory;
 
 /**
- * An implementation of a dialog where user can enter drbd block device
- * information.
+ * An implementation of a dialog where user can enter drbd block device information.
  */
 @Named
 final class BlockDev extends DrbdConfig {
     private static final Logger LOG = LoggerFactory.getLogger(BlockDev.class);
     private BlockDevInfo blockDevInfo;
-    @Inject
-    private MainData mainData;
-    @Inject
-    private MainPanel mainPanel;
-    @Inject
-    private CreateMD createMDDialog;
+    private final MainData mainData;
+    private final MainPanel mainPanel;
+    private final CreateMD createMDDialog;
     private GlobalInfo globalInfo;
-    @Inject
-    private Application application;
-    @Inject
-    private SwingUtils swingUtils;
+    private final Application application;
+    private final SwingUtils swingUtils;
+
+    public BlockDev(Application application, SwingUtils swingUtils, WidgetFactory widgetFactory, MainData mainData,
+            MainPanel mainPanel, CreateMD createMDDialog) {
+        super(application, swingUtils, widgetFactory, mainData);
+        this.mainData = mainData;
+        this.mainPanel = mainPanel;
+        this.createMDDialog = createMDDialog;
+        this.application = application;
+        this.swingUtils = swingUtils;
+    }
 
     void init(final WizardDialog previousDialog, final VolumeInfo dli, final BlockDevInfo blockDevInfo) {
         init(previousDialog, dli);
         this.blockDevInfo = blockDevInfo;
-        globalInfo = blockDevInfo.getBrowser().getClusterBrowser().getGlobalInfo();
+        globalInfo = blockDevInfo.getBrowser()
+                                 .getClusterBrowser()
+                                 .getGlobalInfo();
         globalInfo.setSelectedNode(blockDevInfo);
         globalInfo.selectMyself();
     }

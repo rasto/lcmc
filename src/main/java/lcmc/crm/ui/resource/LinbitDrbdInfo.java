@@ -22,27 +22,39 @@
 package lcmc.crm.ui.resource;
 
 import java.util.Map;
-import lcmc.common.domain.Application;
-import lcmc.host.domain.Host;
-import lcmc.crm.domain.ResourceAgent;
-import lcmc.drbd.ui.resource.ResourceInfo;
 
 import javax.inject.Named;
+import javax.inject.Provider;
+
+import lcmc.cluster.ui.widget.WidgetFactory;
+import lcmc.common.domain.Application;
+import lcmc.common.ui.Access;
+import lcmc.common.ui.main.MainData;
+import lcmc.common.ui.main.ProgressIndicator;
+import lcmc.common.ui.treemenu.ClusterTreeMenu;
+import lcmc.common.ui.utils.SwingUtils;
+import lcmc.crm.domain.ResourceAgent;
+import lcmc.drbd.ui.resource.ResourceInfo;
+import lcmc.host.domain.Host;
 
 /**
- * linbit::drbd info class is used for drbd pacemaker service that is
- * treated in special way.
+ * linbit::drbd info class is used for drbd pacemaker service that is treated in special way.
  */
 @Named
 public class LinbitDrbdInfo extends ServiceInfo {
+    public LinbitDrbdInfo(Application application, SwingUtils swingUtils, Access access, MainData mainData,
+            WidgetFactory widgetFactory, ProgressIndicator progressIndicator, ServiceMenu serviceMenu,
+            Provider<CloneInfo> cloneInfoProvider, ClusterTreeMenu clusterTreeMenu, CrmServiceFactory crmServiceFactory) {
+        super(application, swingUtils, access, mainData, widgetFactory, progressIndicator, serviceMenu, cloneInfoProvider,
+                clusterTreeMenu, crmServiceFactory);
+    }
+
     /** Returns string representation of the linbit::drbd service. */
     @Override
     public String toString() {
         final StringBuilder s = new StringBuilder(30);
         final String provider = getResourceAgent().getProvider();
-        if (provider != null
-            && !ResourceAgent.HEARTBEAT_PROVIDER.equals(provider)
-            && !provider.isEmpty()) {
+        if (provider != null && !ResourceAgent.HEARTBEAT_PROVIDER.equals(provider) && !provider.isEmpty()) {
             s.append(provider);
             s.append(':');
         }

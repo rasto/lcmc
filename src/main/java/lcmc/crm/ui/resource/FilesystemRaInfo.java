@@ -28,8 +28,8 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
-import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Provider;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreeNode;
 
@@ -50,8 +50,11 @@ import lcmc.common.domain.Application;
 import lcmc.common.domain.StringValue;
 import lcmc.common.domain.Value;
 import lcmc.common.domain.util.Tools;
+import lcmc.common.ui.Access;
 import lcmc.common.ui.Browser;
 import lcmc.common.ui.Info;
+import lcmc.common.ui.main.MainData;
+import lcmc.common.ui.main.ProgressIndicator;
 import lcmc.common.ui.treemenu.ClusterTreeMenu;
 import lcmc.common.ui.utils.SwingUtils;
 import lcmc.common.ui.utils.WidgetListener;
@@ -64,13 +67,14 @@ import lcmc.event.CommonMountPointsEvent;
 import lcmc.host.domain.Host;
 
 /**
- * This class holds info about Filesystem service. It is treated in special
- * way, so that it can use block device information and drbd devices. If
- * drbd device is selected, the drbddisk service will be added too.
+ * This class holds info about Filesystem service. It is treated in special way, so that it can use block device information and
+ * drbd devices. If drbd device is selected, the drbddisk service will be added too.
  */
 @Named
 public class FilesystemRaInfo extends ServiceInfo {
-    /** Name of the device parameter in the file system. */
+    /**
+     * Name of the device parameter in the file system.
+     */
     private static final String FS_RES_PARAM_DEV = "device";
     private static final String FS_RES_PARAM_DIRECTORY = "directory";
     private static final String FS_RES_PARAM_FS_TYPE = "fstype";
@@ -80,22 +84,31 @@ public class FilesystemRaInfo extends ServiceInfo {
     private Widget fstypeParamWidget = null;
     private Optional<Widget> directoryParamWidget = Optional.empty();
     private boolean drbddiskIsPreferred = false;
-    @Inject
-    private Application application;
-    @Inject
-    private SwingUtils swingUtils;
-    @Inject
-    private WidgetFactory widgetFactory;
-    @Inject
-    private BlockDeviceService blockDeviceService;
-    @Inject
-    private MountPointService mountPointService;
-    @Inject
-    private ClusterEventBus clusterEventBus;
-    @Inject
-    private ClusterTreeMenu clusterTreeMenu;
-    @Inject
-    private FileSystemService fileSystemService;
+    private final Application application;
+    private final SwingUtils swingUtils;
+    private final WidgetFactory widgetFactory;
+    private final BlockDeviceService blockDeviceService;
+    private final MountPointService mountPointService;
+    private final ClusterEventBus clusterEventBus;
+    private final ClusterTreeMenu clusterTreeMenu;
+    private final FileSystemService fileSystemService;
+
+    public FilesystemRaInfo(Application application, SwingUtils swingUtils, Access access, MainData mainData,
+            WidgetFactory widgetFactory, ProgressIndicator progressIndicator, ServiceMenu serviceMenu,
+            Provider<CloneInfo> cloneInfoProvider, ClusterTreeMenu clusterTreeMenu, CrmServiceFactory crmServiceFactory,
+            BlockDeviceService blockDeviceService, MountPointService mountPointService, ClusterEventBus clusterEventBus,
+            FileSystemService fileSystemService) {
+        super(application, swingUtils, access, mainData, widgetFactory, progressIndicator, serviceMenu, cloneInfoProvider,
+                clusterTreeMenu, crmServiceFactory);
+        this.application = application;
+        this.swingUtils = swingUtils;
+        this.widgetFactory = widgetFactory;
+        this.blockDeviceService = blockDeviceService;
+        this.mountPointService = mountPointService;
+        this.clusterEventBus = clusterEventBus;
+        this.clusterTreeMenu = clusterTreeMenu;
+        this.fileSystemService = fileSystemService;
+    }
 
     @Override
     public void init(final String name, final ResourceAgent resourceAgent, final Browser browser) {
@@ -104,15 +117,12 @@ public class FilesystemRaInfo extends ServiceInfo {
     }
 
     @Override
-    public void init(
-            final String name,
-            final ResourceAgent resourceAgent,
-            final String heartbeatId,
-            final Map<String, String> resourceNode,
-            final Browser browser) {
+    public void init(final String name, final ResourceAgent resourceAgent, final String heartbeatId,
+            final Map<String, String> resourceNode, final Browser browser) {
         super.init(name, resourceAgent, heartbeatId, resourceNode, browser);
         clusterEventBus.register(this);
     }
+
     /**
      * Sets Linbit::drbd info object for this Filesystem service if it uses
      * drbd block device.

@@ -31,7 +31,11 @@ import java.util.Set;
 import javax.inject.Named;
 
 import lcmc.cluster.domain.Cluster;
+import lcmc.cluster.ui.widget.WidgetFactory;
+import lcmc.common.domain.Application;
 import lcmc.common.ui.Logs;
+import lcmc.common.ui.main.MainData;
+import lcmc.common.ui.utils.SwingUtils;
 import lcmc.host.domain.Host;
 
 /**
@@ -40,6 +44,10 @@ import lcmc.host.domain.Host;
 @Named
 public class ClusterLogs extends Logs {
     private Cluster cluster;
+
+    public ClusterLogs(Application application, SwingUtils swingUtils, WidgetFactory widgetFactory, MainData mainData) {
+        super(application, swingUtils, widgetFactory, mainData);
+    }
 
     public void init(final Cluster cluster) {
         this.cluster = cluster;

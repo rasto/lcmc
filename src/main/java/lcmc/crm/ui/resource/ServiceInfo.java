@@ -44,7 +44,6 @@ import java.util.concurrent.locks.ReentrantLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.regex.Matcher;
 
-import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Provider;
 import javax.swing.AbstractButton;
@@ -77,6 +76,7 @@ import lcmc.common.ui.Browser;
 import lcmc.common.ui.EditableInfo;
 import lcmc.common.ui.Info;
 import lcmc.common.ui.SpringUtilities;
+import lcmc.common.ui.main.MainData;
 import lcmc.common.ui.main.ProgressIndicator;
 import lcmc.common.ui.treemenu.ClusterTreeMenu;
 import lcmc.common.ui.utils.ButtonCallback;
@@ -232,24 +232,30 @@ public class ServiceInfo extends EditableInfo {
      * Radio buttons for clone/master/slave primitive resources.
      */
     private Widget typeRadioGroup;
-    @Inject
-    private ProgressIndicator progressIndicator;
-    @Inject
-    private ServiceMenu serviceMenu;
-    @Inject
-    private Provider<CloneInfo> cloneInfoProvider;
-    @Inject
-    private Application application;
-    @Inject
-    private SwingUtils swingUtils;
-    @Inject
-    private WidgetFactory widgetFactory;
-    @Inject
-    private ClusterTreeMenu clusterTreeMenu;
-    @Inject
-    private CrmServiceFactory crmServiceFactory;
-    @Inject
-    private Access access;
+    private final ProgressIndicator progressIndicator;
+    private final ServiceMenu serviceMenu;
+    private final Provider<CloneInfo> cloneInfoProvider;
+    private final Application application;
+    private final SwingUtils swingUtils;
+    private final WidgetFactory widgetFactory;
+    private final ClusterTreeMenu clusterTreeMenu;
+    private final CrmServiceFactory crmServiceFactory;
+    private final Access access;
+
+    public ServiceInfo(Application application, SwingUtils swingUtils, Access access, MainData mainData,
+            WidgetFactory widgetFactory, ProgressIndicator progressIndicator, ServiceMenu serviceMenu,
+            Provider<CloneInfo> cloneInfoProvider, ClusterTreeMenu clusterTreeMenu, CrmServiceFactory crmServiceFactory) {
+        super(application, swingUtils, access, mainData, widgetFactory);
+        this.progressIndicator = progressIndicator;
+        this.serviceMenu = serviceMenu;
+        this.cloneInfoProvider = cloneInfoProvider;
+        this.application = application;
+        this.swingUtils = swingUtils;
+        this.widgetFactory = widgetFactory;
+        this.clusterTreeMenu = clusterTreeMenu;
+        this.crmServiceFactory = crmServiceFactory;
+        this.access = access;
+    }
 
     public void init(final String name, final ResourceAgent resourceAgent, final Browser browser) {
         final boolean isStonith = resourceAgent != null && resourceAgent.isStonith();

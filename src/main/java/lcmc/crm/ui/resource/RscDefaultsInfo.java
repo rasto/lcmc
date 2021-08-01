@@ -31,14 +31,18 @@ import javax.swing.JPanel;
 import lcmc.cluster.ui.ClusterBrowser;
 import lcmc.cluster.ui.widget.Check;
 import lcmc.cluster.ui.widget.Widget;
+import lcmc.cluster.ui.widget.WidgetFactory;
 import lcmc.common.domain.AccessMode;
 import lcmc.common.domain.Application;
 import lcmc.common.domain.ResourceValue;
 import lcmc.common.domain.StringValue;
 import lcmc.common.domain.Value;
 import lcmc.common.domain.util.Tools;
+import lcmc.common.ui.Access;
 import lcmc.common.ui.Browser;
 import lcmc.common.ui.EditableInfo;
+import lcmc.common.ui.main.MainData;
+import lcmc.common.ui.utils.SwingUtils;
 import lcmc.crm.domain.ClusterStatus;
 import lcmc.crm.domain.CrmXml;
 import lcmc.logger.Logger;
@@ -50,6 +54,12 @@ import lcmc.logger.LoggerFactory;
 @Named
 public final class RscDefaultsInfo extends EditableInfo {
     private static final Logger LOG = LoggerFactory.getLogger(RscDefaultsInfo.class);
+
+    public RscDefaultsInfo(Application application, SwingUtils swingUtils, Access access, MainData mainData,
+            WidgetFactory widgetFactory) {
+        super(application, swingUtils, access, mainData, widgetFactory);
+    }
+
     public void einit(final String name, final Browser browser) {
         super.einit(Optional.of(new ResourceValue(name)), name, browser);
     }

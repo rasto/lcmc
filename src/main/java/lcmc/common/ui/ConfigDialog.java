@@ -44,7 +44,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CountDownLatch;
 
-import javax.inject.Inject;
 import javax.inject.Named;
 import javax.swing.AbstractButton;
 import javax.swing.BoxLayout;
@@ -91,15 +90,18 @@ public abstract class ConfigDialog {
     private volatile Object optionPaneAnswer;
     private boolean skipButtonShouldBeEnabled = true;
     private final List<JComponent> additionalOptions = new ArrayList<>();
-    @Inject
-    private Application application;
-    @Inject
-    private SwingUtils swingUtils;
-    @Inject
-    private WidgetFactory widgetFactory;
+    private final Application application;
+    private final SwingUtils swingUtils;
+    private final WidgetFactory widgetFactory;
     private final MyButton[] options = new MyButton[buttons().length];
-    @Inject
-    private MainData mainData;
+    private final MainData mainData;
+
+    public ConfigDialog(Application application, SwingUtils swingUtils, WidgetFactory widgetFactory, MainData mainData) {
+        this.application = application;
+        this.swingUtils = swingUtils;
+        this.widgetFactory = widgetFactory;
+        this.mainData = mainData;
+    }
 
     protected final JDialog getDialogPanel() {
         return dialogPanel;

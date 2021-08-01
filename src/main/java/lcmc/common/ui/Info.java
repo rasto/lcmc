@@ -41,7 +41,6 @@ import java.util.Map;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
-import javax.inject.Inject;
 import javax.inject.Named;
 import javax.swing.AbstractButton;
 import javax.swing.BoxLayout;
@@ -141,14 +140,17 @@ public class Info implements Comparable<Info>, Value, InfoPresenter {
      * Hash from component to the enable access mode.
      */
     private final Map<JComponent, AccessMode> componentToEnableAccessMode = new HashMap<>();
-    @Inject
-    private Application application;
-    @Inject
-    private SwingUtils swingUtils;
-    @Inject
-    private Access access;
-    @Inject
-    private MainData mainData;
+    private final Application application;
+    private final SwingUtils swingUtils;
+    private final Access access;
+    private final MainData mainData;
+
+    public Info(Application application, SwingUtils swingUtils, Access access, MainData mainData) {
+        this.application = application;
+        this.swingUtils = swingUtils;
+        this.access = access;
+        this.mainData = mainData;
+    }
 
     public void init(final String name, final Browser browser) {
         this.name = name;
@@ -156,8 +158,7 @@ public class Info implements Comparable<Info>, Value, InfoPresenter {
     }
 
     /**
-     * @param name
-     *      name that will be shown in the tree
+     * @param name name that will be shown in the tree
      */
     public final void setName(final String name) {
         this.name = name;
@@ -571,7 +572,7 @@ public class Info implements Comparable<Info>, Value, InfoPresenter {
             });
             for (final UpdatableItem i : menuListCopy) {
                 if (i instanceof MyMenu) {
-                    swingUtils.invokeAndWait(() -> i.updateAndWait());
+                    swingUtils.invokeAndWait(i::updateAndWait);
                 }
             }
             final int size = menuListCopy.size();
@@ -924,15 +925,12 @@ public class Info implements Comparable<Info>, Value, InfoPresenter {
         if (tableModel != null) {
             final String[] colNames = getColumnNames(tableName);
             if (colNames != null && colNames.length > 0) {
-                swingUtils.invokeLater(new Runnable() {
-                    @Override
-                    public void run() {
-                        final Object[][] data = getTableData(tableName);
-                        LOG.debug2("updateTable: in: " + getName());
-                        tableModel.setDataVector(data, colNames);
-                        tableModel.fireTableDataChanged();
-                        Tools.resizeTable(table, getDefaultWidths(tableName));
-                    }
+                swingUtils.invokeLater(() -> {
+                    final Object[][] data = getTableData(tableName);
+                    LOG.debug2("updateTable: in: " + getName());
+                    tableModel.setDataVector(data, colNames);
+                    tableModel.fireTableDataChanged();
+                    Tools.resizeTable(table, getDefaultWidths(tableName));
                 });
             }
         }

@@ -24,14 +24,22 @@
 package lcmc.cluster.ui.wizard;
 
 import lcmc.cluster.domain.Cluster;
+import lcmc.cluster.ui.widget.WidgetFactory;
+import lcmc.common.domain.Application;
 import lcmc.common.ui.WizardDialog;
+import lcmc.common.ui.main.MainData;
+import lcmc.common.ui.utils.SwingUtils;
 
 public abstract class DialogCluster extends WizardDialog {
     private Cluster cluster;
 
+    public DialogCluster(Application application, SwingUtils swingUtils, WidgetFactory widgetFactory, MainData mainData) {
+        super(application, swingUtils, widgetFactory, mainData);
+    }
+
     public void init(final WizardDialog previousDialog, final Cluster cluster0) {
         setPreviousDialog(previousDialog);
-        this.cluster = cluster0;
+        cluster = cluster0;
     }
 
     protected final Cluster getCluster() {

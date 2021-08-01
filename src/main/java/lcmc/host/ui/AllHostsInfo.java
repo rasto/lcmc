@@ -38,7 +38,6 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.regex.Matcher;
 
-import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Provider;
 import javax.inject.Singleton;
@@ -64,6 +63,7 @@ import lcmc.common.domain.AccessMode;
 import lcmc.common.domain.Application;
 import lcmc.common.domain.UserConfig;
 import lcmc.common.domain.util.Tools;
+import lcmc.common.ui.Access;
 import lcmc.common.ui.Browser;
 import lcmc.common.ui.Info;
 import lcmc.common.ui.main.MainData;
@@ -97,8 +97,7 @@ public final class AllHostsInfo extends Info {
     private final Map<Cluster, JPanel> clusterBoxBackgrounds = new HashMap<>();
     private final JPanel mainPanel = new JPanel(new GridBagLayout());
     private final GridBagConstraints gridBagConstraints = new GridBagConstraints();
-    @Inject
-    private WidgetFactory widgetFactory;
+    private final WidgetFactory widgetFactory;
     private MyButton loadMarkedClustersButton;
     /**
      * Stop marked clusters button.
@@ -108,41 +107,43 @@ public final class AllHostsInfo extends Info {
      * Remove marked clusters button.
      */
     private MyButton removeMarkedClustersButton;
-    @Inject
-    private UserConfig userConfig;
-    @Inject
-    private Provider<AddHostDialog> addHostDialogProvider;
-    @Inject
-    private HostFactory hostFactory;
-    @Inject
-    private MainData mainData;
-    @Inject
-    private MainPresenter mainPresenter;
-    @Inject
-    private Provider<Cluster> clusterProvider;
-    @Inject
-    private Clusters allClusters;
-    @Inject
-    private Application application;
-    @Inject
-    private SwingUtils swingUtils;
-    @Inject
-    private MenuFactory menuFactory;
+    private final UserConfig userConfig;
+    private final Provider<AddHostDialog> addHostDialogProvider;
+    private final HostFactory hostFactory;
+    private final MainData mainData;
+    private final MainPresenter mainPresenter;
+    private final Provider<Cluster> clusterProvider;
+    private final Clusters allClusters;
+    private final Application application;
+    private final SwingUtils swingUtils;
+    private final MenuFactory menuFactory;
     private EmptyBrowser emptyBrowser;
+
+    public AllHostsInfo(Application application, SwingUtils swingUtils, Access access, MainData mainData, UserConfig userConfig,
+            WidgetFactory widgetFactory, Provider<AddHostDialog> addHostDialogProvider, HostFactory hostFactory,
+            MainPresenter mainPresenter, Provider<Cluster> clusterProvider, Clusters allClusters, MenuFactory menuFactory) {
+        super(application, swingUtils, access, mainData);
+        this.userConfig = userConfig;
+        this.widgetFactory = widgetFactory;
+        this.addHostDialogProvider = addHostDialogProvider;
+        this.hostFactory = hostFactory;
+        this.mainData = mainData;
+        this.mainPresenter = mainPresenter;
+        this.clusterProvider = clusterProvider;
+        this.allClusters = allClusters;
+        this.application = application;
+        this.swingUtils = swingUtils;
+        this.menuFactory = menuFactory;
+    }
 
     public void init(final EmptyBrowser emptyBrowser) {
         this.emptyBrowser = emptyBrowser;
         super.init(Tools.getString("ClusterBrowser.AllHosts"), this.emptyBrowser);
-        loadMarkedClustersButton = widgetFactory.createButton(
-                Tools.getString("EmptyBrowser.LoadMarkedClusters"),
-                CLUSTER_ICON,
+        loadMarkedClustersButton = widgetFactory.createButton(Tools.getString("EmptyBrowser.LoadMarkedClusters"), CLUSTER_ICON,
                 Tools.getString("EmptyBrowser.LoadMarkedClusters.ToolTip"));
-        unloadMarkedClustersButton = widgetFactory.createButton(
-                Tools.getString("EmptyBrowser.UnloadMarkedClusters"),
-                CLUSTER_ICON,
+        unloadMarkedClustersButton = widgetFactory.createButton(Tools.getString("EmptyBrowser.UnloadMarkedClusters"), CLUSTER_ICON,
                 Tools.getString("EmptyBrowser.UnloadMarkedClusters.ToolTip"));
-        removeMarkedClustersButton = widgetFactory.createButton(
-                Tools.getString("EmptyBrowser.RemoveMarkedClusters"),
+        removeMarkedClustersButton = widgetFactory.createButton(Tools.getString("EmptyBrowser.RemoveMarkedClusters"),
                 CLUSTER_ICON,
                 Tools.getString("EmptyBrowser.RemoveMarkedClusters.ToolTip"));
     }

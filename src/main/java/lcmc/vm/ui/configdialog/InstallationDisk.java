@@ -25,17 +25,18 @@ package lcmc.vm.ui.configdialog;
 
 import java.awt.Dimension;
 
-import javax.inject.Inject;
 import javax.inject.Named;
 import javax.swing.BoxLayout;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
+import lcmc.cluster.ui.widget.WidgetFactory;
 import lcmc.common.domain.Application;
 import lcmc.common.domain.StringValue;
 import lcmc.common.domain.util.Tools;
 import lcmc.common.ui.WizardDialog;
+import lcmc.common.ui.main.MainData;
 import lcmc.common.ui.utils.SwingUtils;
 import lcmc.vm.domain.data.DiskData;
 import lcmc.vm.ui.resource.DiskInfo;
@@ -55,22 +56,22 @@ final class InstallationDisk extends VMConfig {
                                             DiskData.SOURCE_HOST_NAME,
                                             DiskData.SOURCE_HOST_PORT,
 
-                                            DiskData.AUTH_USERNAME,
-                                            DiskData.AUTH_SECRET_TYPE,
-                                            DiskData.AUTH_SECRET_UUID,
-                                            DiskData.DRIVER_NAME,
-                                            DiskData.DRIVER_TYPE,
-                                            DiskData.DRIVER_CACHE,
-                                            DiskData.READONLY};
+            DiskData.AUTH_USERNAME, DiskData.AUTH_SECRET_TYPE, DiskData.AUTH_SECRET_UUID, DiskData.DRIVER_NAME,
+            DiskData.DRIVER_TYPE, DiskData.DRIVER_CACHE, DiskData.READONLY};
     private JComponent inputPane = null;
     private DiskInfo diskInfo = null;
     private WizardDialog nextDialogObject = null;
-    @Inject
-    private Storage storageDialog;
-    @Inject
-    private Application application;
-    @Inject
-    private SwingUtils swingUtils;
+    private final Storage storageDialog;
+    private final Application application;
+    private final SwingUtils swingUtils;
+
+    public InstallationDisk(Application application, SwingUtils swingUtils, WidgetFactory widgetFactory, MainData mainData,
+            Storage storageDialog) {
+        super(application, swingUtils, widgetFactory, mainData);
+        this.storageDialog = storageDialog;
+        this.application = application;
+        this.swingUtils = swingUtils;
+    }
 
     @Override
     public WizardDialog nextDialog() {

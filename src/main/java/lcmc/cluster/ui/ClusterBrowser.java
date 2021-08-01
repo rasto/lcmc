@@ -45,7 +45,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import javax.annotation.Resource;
-import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Provider;
 import javax.swing.ImageIcon;
@@ -131,13 +130,10 @@ import lcmc.vm.ui.resource.VMListInfo;
 public class ClusterBrowser extends Browser {
     private static final Logger LOG = LoggerFactory.getLogger(ClusterBrowser.class);
     public static final ImageIcon REMOVE_ICON = Tools.createImageIcon(Tools.getDefault("ClusterBrowser.RemoveIcon"));
-    public static final ImageIcon REMOVE_ICON_SMALL = Tools.createImageIcon(
-                                                                Tools.getDefault("ClusterBrowser.RemoveIconSmall"));
+    public static final ImageIcon REMOVE_ICON_SMALL = Tools.createImageIcon(Tools.getDefault("ClusterBrowser.RemoveIconSmall"));
 
-    @Inject
-    private Application application;
-    @Inject
-    private SwingUtils swingUtils;
+    private final Application application;
+    private final SwingUtils swingUtils;
     public static final Color SERVICE_STOPPED_FILL_PAINT = Tools.getDefaultColor("CRMGraph.FillPaintStopped");
     public static final String IDENT_4 = "    ";
     public static final String DRBD_RESOURCE_BOOL_TYPE_NAME = "boolean";
@@ -208,42 +204,69 @@ public class ClusterBrowser extends Browser {
         CRM_CLASSES.addAll(ResourceAgent.SERVICE_CLASSES);
         CRM_CLASSES.add(ResourceAgent.STONITH_CLASS_NAME);
     }
+
     static {
         CRM_OPERATIONS_WITH_IGNORED_DEFAULT.add(CRM_STATUS_OPERATOR);
         CRM_OPERATIONS_WITH_IGNORED_DEFAULT.add(CRM_META_DATA_OPERATOR);
         CRM_OPERATIONS_WITH_IGNORED_DEFAULT.add(CRM_VALIDATE_ALL_OPERATOR);
     }
 
-    @Inject
-    private Provider<DomainInfo> domainInfoProvider;
-    @Inject @Named("hbConnectionInfo")
-    private Provider<HbConnectionInfo> connectionInfoProvider;
-    @Inject
-    private Provider<AvailableServiceInfo> availableServiceInfoProvider;
-    @Inject
-    private Provider<DrbdXml> drbdXmlProvider;
-    @Inject
-    private Provider<ClusterStatus> clusterStatusProvider;
-    @Resource(name="categoryInfo")
+    private final Provider<DomainInfo> domainInfoProvider;
+    private final Provider<HbConnectionInfo> connectionInfoProvider;
+    private final Provider<AvailableServiceInfo> availableServiceInfoProvider;
+    private final Provider<DrbdXml> drbdXmlProvider;
+    private final Provider<ClusterStatus> clusterStatusProvider;
+    @Resource(name = "categoryInfo")
     private CategoryInfo networksCategory;
-    @Inject
-    private Provider<ResourceAgentClassInfo> resourceAgentClassInfoProvider;
-    @Inject
-    private AvailableServicesInfo availableServicesInfo;
-    @Inject
-    private Provider<CRMInfo> crmInfoProvider;
-    @Inject
-    private Provider<VmsXml> vmsXmlProvider;
-    @Inject
-    private ClusterTreeMenu clusterTreeMenu;
-    @Inject
-    private ClusterEventBus clusterEventBus;
-    @Inject
-    private NetworkService networkService;
-    @Inject
-    private NetworkFactory networkFactory;
-    @Inject
-    private Provider<ResourceUpdater> resourceUpdaterProvider;
+    private final Provider<ResourceAgentClassInfo> resourceAgentClassInfoProvider;
+    private final AvailableServicesInfo availableServicesInfo;
+    private final Provider<CRMInfo> crmInfoProvider;
+    private final Provider<VmsXml> vmsXmlProvider;
+    private final ClusterTreeMenu clusterTreeMenu;
+    private final ClusterEventBus clusterEventBus;
+    private final NetworkService networkService;
+    private final NetworkFactory networkFactory;
+    private final Provider<ResourceUpdater> resourceUpdaterProvider;
+
+    public ClusterBrowser(Application application, SwingUtils swingUtils, CrmGraph crmGraph, ClusterEventBus clusterEventBus,
+            GlobalInfo globalInfo, VMListInfo vmListInfo, NetworkFactory networkFactory, Provider<DomainInfo> domainInfoProvider,
+            ProgressIndicator progressIndicator, DrbdGraph drbdGraph,
+            @Named("hbConnectionInfo") Provider<HbConnectionInfo> connectionInfoProvider,
+            Provider<AvailableServiceInfo> availableServiceInfoProvider, ClusterTreeMenu clusterTreeMenu,
+            ClusterHostsInfo clusterHostsInfo, Provider<DrbdXml> drbdXmlProvider, Provider<ClusterStatus> clusterStatusProvider,
+            Provider<ResourceAgentClassInfo> resourceAgentClassInfoProvider, NetworkService networkService, CrmXml crmXml,
+            Provider<RscDefaultsInfo> rscDefaultsInfoProvider, Access access, AvailableServicesInfo availableServicesInfo,
+            Provider<ResourceUpdater> resourceUpdaterProvider, MainData mainData, Provider<CRMInfo> crmInfoProvider,
+            ServicesInfo servicesInfo, Provider<VmsXml> vmsXmlProvider) {
+        super(application);
+        this.swingUtils = swingUtils;
+        this.application = application;
+        this.crmGraph = crmGraph;
+        this.clusterEventBus = clusterEventBus;
+        this.globalInfo = globalInfo;
+        this.vmListInfo = vmListInfo;
+        this.networkFactory = networkFactory;
+        this.domainInfoProvider = domainInfoProvider;
+        this.progressIndicator = progressIndicator;
+        this.drbdGraph = drbdGraph;
+        this.connectionInfoProvider = connectionInfoProvider;
+        this.availableServiceInfoProvider = availableServiceInfoProvider;
+        this.clusterTreeMenu = clusterTreeMenu;
+        this.clusterHostsInfo = clusterHostsInfo;
+        this.drbdXmlProvider = drbdXmlProvider;
+        this.clusterStatusProvider = clusterStatusProvider;
+        this.resourceAgentClassInfoProvider = resourceAgentClassInfoProvider;
+        this.networkService = networkService;
+        this.crmXml = crmXml;
+        this.rscDefaultsInfoProvider = rscDefaultsInfoProvider;
+        this.access = access;
+        this.availableServicesInfo = availableServicesInfo;
+        this.resourceUpdaterProvider = resourceUpdaterProvider;
+        this.mainData = mainData;
+        this.crmInfoProvider = crmInfoProvider;
+        this.servicesInfo = servicesInfo;
+        this.vmsXmlProvider = vmsXmlProvider;
+    }
 
     public static String getClassMenuName(final String cl) {
         final String name = CRM_CLASS_MENU.get(cl);
@@ -279,15 +302,11 @@ public class ClusterBrowser extends Browser {
      * Heartbeat id to service info hash.
      */
     private final Map<String, ServiceInfo> heartbeatIdToServiceInfo = new HashMap<>();
-    @Inject
-    private CrmGraph crmGraph;
-    @Inject
-    private DrbdGraph drbdGraph;
+    private final CrmGraph crmGraph;
+    private final DrbdGraph drbdGraph;
     private ClusterStatus clusterStatus;
-    @Inject
-    private CrmXml crmXml;
-    @Inject
-    private Access access;
+    private final CrmXml crmXml;
+    private final Access access;
     private DrbdXml drbdXml;
     private final ReadWriteLock mVmsLock = new ReentrantReadWriteLock();
     private final Lock mVmsReadLock = mVmsLock.readLock();
@@ -317,13 +336,10 @@ public class ClusterBrowser extends Browser {
      * Map from ResourceAgent to AvailableServicesInfo.
      */
     private final Map<ResourceAgent, AvailableServiceInfo> availableServiceMap = new HashMap<>();
-    @Inject
-    private ClusterHostsInfo clusterHostsInfo;
-    @Inject
-    private ServicesInfo servicesInfo;
+    private final ClusterHostsInfo clusterHostsInfo;
+    private final ServicesInfo servicesInfo;
     private RscDefaultsInfo rscDefaultsInfo = null;
-    @Inject
-    private Provider<RscDefaultsInfo> rscDefaultsInfoProvider;
+    private final Provider<RscDefaultsInfo> rscDefaultsInfoProvider;
     private final Lock mCrmStatusLock = new ReentrantLock();
     private final Map<String, List<String>> crmOperationParams = new LinkedHashMap<>();
     /**
@@ -332,18 +348,14 @@ public class ClusterBrowser extends Browser {
     private final MultiKeyMap<String, Integer> notAdvancedOperations = MultiKeyMap.decorate(new LinkedMap<>());
     private final Map<Host, String> hostDrbdParameters = new HashMap<>();
     private DefaultMutableTreeNode treeTop;
-    @Inject
-    private MainData mainData;
-    @Inject
-    private ProgressIndicator progressIndicator;
-    @Inject
-    private GlobalInfo globalInfo;
+    private final MainData mainData;
+    private final ProgressIndicator progressIndicator;
+    private final GlobalInfo globalInfo;
     @Resource(name = "categoryInfo")
     private CategoryInfo resourcesCategory;
 
 
-    @Inject
-    private VMListInfo vmListInfo;
+    private final VMListInfo vmListInfo;
 
     public void init(final Cluster cluster) {
         this.cluster = cluster;

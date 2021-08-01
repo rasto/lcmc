@@ -28,9 +28,12 @@ import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.SpringLayout;
 
+import lcmc.cluster.ui.widget.WidgetFactory;
+import lcmc.common.domain.Application;
 import lcmc.common.domain.util.Tools;
 import lcmc.common.ui.SpringUtilities;
 import lcmc.common.ui.WizardDialog;
+import lcmc.common.ui.main.MainData;
 import lcmc.common.ui.utils.SwingUtils;
 import lcmc.host.domain.Host;
 import lcmc.logger.Logger;
@@ -46,7 +49,9 @@ final class Connect extends DialogCluster {
     private final CommStack commStackDialog;
     private final SwingUtils swingUtils;
 
-    public Connect(CommStack commStackDialog, SwingUtils swingUtils) {
+    public Connect(Application application, SwingUtils swingUtils, WidgetFactory widgetFactory, MainData mainData,
+            CommStack commStackDialog) {
+        super(application, swingUtils, widgetFactory, mainData);
         this.commStackDialog = commStackDialog;
         this.swingUtils = swingUtils;
     }

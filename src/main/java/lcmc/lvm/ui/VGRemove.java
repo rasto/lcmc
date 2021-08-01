@@ -37,7 +37,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import javax.inject.Inject;
 import javax.inject.Named;
 import javax.swing.JCheckBox;
 import javax.swing.JComponent;
@@ -52,6 +51,7 @@ import lcmc.common.domain.Application;
 import lcmc.common.domain.util.Tools;
 import lcmc.common.ui.Browser;
 import lcmc.common.ui.SpringUtilities;
+import lcmc.common.ui.main.MainData;
 import lcmc.common.ui.utils.MyButton;
 import lcmc.common.ui.utils.SwingUtils;
 import lcmc.drbd.domain.BlockDevice;
@@ -66,14 +66,18 @@ import lcmc.lvm.service.LVM;
 public final class VGRemove extends LV {
     private static final int REMOVE_TIMEOUT = 5000;
     private static final String VG_REMOVE_DESCRIPTION = "Remove a volume group.";
-    @Inject
-    private WidgetFactory widgetFactory;
+    private final WidgetFactory widgetFactory;
     private MyButton removeButton;
     private final List<BlockDevInfo> blockDevInfos = new ArrayList<>();
     private Map<Host, JCheckBox> hostCheckBoxes = null;
     private boolean multiSelection;
-    @Inject
-    private SwingUtils swingUtils;
+    private final SwingUtils swingUtils;
+
+    public VGRemove(Application application, SwingUtils swingUtils, WidgetFactory widgetFactory, MainData mainData) {
+        super(application, swingUtils, widgetFactory, mainData);
+        this.widgetFactory = widgetFactory;
+        this.swingUtils = swingUtils;
+    }
 
     public void init(final BlockDevInfo bdi) {
         super.init(null);

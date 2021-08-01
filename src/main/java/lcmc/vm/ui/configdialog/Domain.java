@@ -25,7 +25,6 @@ package lcmc.vm.ui.configdialog;
 
 import java.awt.Dimension;
 
-import javax.inject.Inject;
 import javax.inject.Named;
 import javax.swing.BoxLayout;
 import javax.swing.JComponent;
@@ -33,9 +32,11 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
 import lcmc.cluster.ui.widget.Widget;
+import lcmc.cluster.ui.widget.WidgetFactory;
 import lcmc.common.domain.Application;
 import lcmc.common.domain.util.Tools;
 import lcmc.common.ui.WizardDialog;
+import lcmc.common.ui.main.MainData;
 import lcmc.common.ui.utils.SwingUtils;
 import lcmc.vm.domain.VMParams;
 import lcmc.vm.ui.resource.DomainInfo;
@@ -50,25 +51,25 @@ public final class Domain extends VMConfig {
                                             VMParams.VM_PARAM_VIRSH_OPTIONS,
                                             VMParams.VM_PARAM_EMULATOR,
                                             VMParams.VM_PARAM_VCPU,
-                                            VMParams.VM_PARAM_CURRENTMEMORY,
-                                            VMParams.VM_PARAM_BOOT,
-                                            VMParams.VM_PARAM_BOOT_2,
-                                            VMParams.VM_PARAM_LOADER,
-                                            VMParams.VM_PARAM_TYPE,
-                                            VMParams.VM_PARAM_INIT,
-                                            VMParams.VM_PARAM_TYPE_ARCH,
-                                            VMParams.VM_PARAM_TYPE_MACHINE};
+                                            VMParams.VM_PARAM_CURRENTMEMORY, VMParams.VM_PARAM_BOOT, VMParams.VM_PARAM_BOOT_2,
+            VMParams.VM_PARAM_LOADER, VMParams.VM_PARAM_TYPE, VMParams.VM_PARAM_INIT, VMParams.VM_PARAM_TYPE_ARCH,
+            VMParams.VM_PARAM_TYPE_MACHINE};
     private JComponent inputPane = null;
     private Widget domainNameWidget;
     private VMConfig nextDialogObject = null;
-    @Inject
-    private InstallationDisk installationDiskDialog;
-    @Inject
-    private Filesystem filesystemDialog;
-    @Inject
-    private Application application;
-    @Inject
-    private SwingUtils swingUtils;
+    private final InstallationDisk installationDiskDialog;
+    private final Filesystem filesystemDialog;
+    private final Application application;
+    private final SwingUtils swingUtils;
+
+    public Domain(Application application, SwingUtils swingUtils, WidgetFactory widgetFactory, MainData mainData,
+            InstallationDisk installationDiskDialog, Filesystem filesystemDialog) {
+        super(application, swingUtils, widgetFactory, mainData);
+        this.installationDiskDialog = installationDiskDialog;
+        this.filesystemDialog = filesystemDialog;
+        this.application = application;
+        this.swingUtils = swingUtils;
+    }
 
     @Override
     public WizardDialog nextDialog() {

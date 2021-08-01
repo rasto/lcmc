@@ -25,7 +25,6 @@ package lcmc.vm.ui.configdialog;
 
 import java.awt.Dimension;
 
-import javax.inject.Inject;
 import javax.inject.Named;
 import javax.swing.BoxLayout;
 import javax.swing.JComponent;
@@ -37,6 +36,7 @@ import lcmc.cluster.ui.widget.WidgetFactory;
 import lcmc.common.domain.Application;
 import lcmc.common.domain.util.Tools;
 import lcmc.common.ui.WizardDialog;
+import lcmc.common.ui.main.MainData;
 import lcmc.common.ui.utils.MyButton;
 import lcmc.common.ui.utils.SwingUtils;
 import lcmc.vm.ui.resource.DomainInfo;
@@ -47,10 +47,14 @@ import lcmc.vm.ui.resource.DomainInfo;
 @Named
 final class VMFinish extends VMConfig {
     private JComponent inputPane = null;
-    @Inject
-    private SwingUtils swingUtils;
-    @Inject
-    private WidgetFactory widgetFactory;
+    private final SwingUtils swingUtils;
+    private final WidgetFactory widgetFactory;
+
+    public VMFinish(Application application, SwingUtils swingUtils, WidgetFactory widgetFactory, MainData mainData) {
+        super(application, swingUtils, widgetFactory, mainData);
+        this.swingUtils = swingUtils;
+        this.widgetFactory = widgetFactory;
+    }
 
     @Override
     public WizardDialog nextDialog() {

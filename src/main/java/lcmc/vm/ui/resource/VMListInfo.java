@@ -33,7 +33,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeSet;
 
-import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Provider;
 import javax.swing.AbstractButton;
@@ -48,9 +47,11 @@ import lcmc.common.domain.AccessMode;
 import lcmc.common.domain.Application;
 import lcmc.common.domain.Value;
 import lcmc.common.domain.util.Tools;
+import lcmc.common.ui.Access;
 import lcmc.common.ui.Browser;
 import lcmc.common.ui.CategoryInfo;
 import lcmc.common.ui.Info;
+import lcmc.common.ui.main.MainData;
 import lcmc.common.ui.treemenu.ClusterTreeMenu;
 import lcmc.common.ui.utils.MenuFactory;
 import lcmc.common.ui.utils.MyButton;
@@ -84,20 +85,26 @@ public final class VMListInfo extends CategoryInfo {
      * Colors for some rows.
      */
     private volatile Map<String, Color> domainToColor = new HashMap<>();
-    @Inject
-    private Provider<AddVMConfigDialog> addVMConfigDialogProvider;
-    @Inject
-    private Provider<DomainInfo> domainInfoProvider;
-    @Inject
-    private MenuFactory menuFactory;
-    @Inject
-    private Application application;
-    @Inject
-    private SwingUtils swingUtils;
-    @Inject
-    private WidgetFactory widgetFactory;
-    @Inject
-    private ClusterTreeMenu clusterTreeMenu;
+    private final Provider<AddVMConfigDialog> addVMConfigDialogProvider;
+    private final Provider<DomainInfo> domainInfoProvider;
+    private final MenuFactory menuFactory;
+    private final Application application;
+    private final SwingUtils swingUtils;
+    private final WidgetFactory widgetFactory;
+    private final ClusterTreeMenu clusterTreeMenu;
+
+    public VMListInfo(Application application, SwingUtils swingUtils, Access access, MainData mainData,
+            Provider<AddVMConfigDialog> addVMConfigDialogProvider, Provider<DomainInfo> domainInfoProvider, MenuFactory menuFactory,
+            WidgetFactory widgetFactory, ClusterTreeMenu clusterTreeMenu) {
+        super(application, swingUtils, access, mainData);
+        this.addVMConfigDialogProvider = addVMConfigDialogProvider;
+        this.domainInfoProvider = domainInfoProvider;
+        this.menuFactory = menuFactory;
+        this.application = application;
+        this.swingUtils = swingUtils;
+        this.widgetFactory = widgetFactory;
+        this.clusterTreeMenu = clusterTreeMenu;
+    }
 
     /**
      * Returns browser object of this info.

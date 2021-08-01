@@ -43,6 +43,7 @@ import lcmc.common.domain.Value;
 import lcmc.common.domain.util.Tools;
 import lcmc.common.ui.SpringUtilities;
 import lcmc.common.ui.WizardDialog;
+import lcmc.common.ui.main.MainData;
 import lcmc.common.ui.utils.SwingUtils;
 import lcmc.host.domain.Host;
 import lcmc.logger.Logger;
@@ -63,8 +64,9 @@ final class CommStack extends DialogCluster {
     private final SwingUtils swingUtils;
     private final WidgetFactory widgetFactory;
 
-    public CommStack(HbConfig hbConfigDialog, CoroConfig coroConfigDialog, Application application, SwingUtils swingUtils,
-            WidgetFactory widgetFactory) {
+    public CommStack(MainData mainData, HbConfig hbConfigDialog, CoroConfig coroConfigDialog, Application application,
+            SwingUtils swingUtils, WidgetFactory widgetFactory) {
+        super(application, swingUtils, widgetFactory, mainData);
         this.hbConfigDialog = hbConfigDialog;
         this.coroConfigDialog = coroConfigDialog;
         this.application = application;

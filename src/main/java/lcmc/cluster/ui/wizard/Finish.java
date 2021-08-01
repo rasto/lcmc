@@ -30,10 +30,13 @@ import javax.swing.JComponent;
 import javax.swing.JPanel;
 
 import lcmc.cluster.ui.EmptyBrowser;
+import lcmc.cluster.ui.widget.WidgetFactory;
 import lcmc.common.domain.Application;
 import lcmc.common.domain.UserConfig;
 import lcmc.common.domain.util.Tools;
 import lcmc.common.ui.WizardDialog;
+import lcmc.common.ui.main.MainData;
+import lcmc.common.ui.utils.SwingUtils;
 
 /**
  * Cluster finish dialog. Shows some text and let's the user press the finish button.
@@ -45,7 +48,9 @@ final class Finish extends DialogCluster {
     private final Application application;
     private final UserConfig userConfig;
 
-    public Finish(EmptyBrowser emptyBrowser, Application application, UserConfig userConfig) {
+    public Finish(Application application, SwingUtils swingUtils, WidgetFactory widgetFactory, MainData mainData,
+            EmptyBrowser emptyBrowser, UserConfig userConfig) {
+        super(application, swingUtils, widgetFactory, mainData);
         this.emptyBrowser = emptyBrowser;
         this.application = application;
         this.userConfig = userConfig;

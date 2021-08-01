@@ -36,7 +36,6 @@ import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.regex.Matcher;
 
-import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Provider;
 import javax.swing.ImageIcon;
@@ -44,12 +43,15 @@ import javax.swing.tree.DefaultMutableTreeNode;
 
 import lcmc.cluster.ui.widget.Check;
 import lcmc.cluster.ui.widget.Widget;
+import lcmc.cluster.ui.widget.WidgetFactory;
 import lcmc.common.domain.Application;
 import lcmc.common.domain.ColorText;
 import lcmc.common.domain.Value;
 import lcmc.common.domain.util.Tools;
+import lcmc.common.ui.Access;
 import lcmc.common.ui.Browser;
 import lcmc.common.ui.main.MainData;
+import lcmc.common.ui.main.ProgressIndicator;
 import lcmc.common.ui.treemenu.ClusterTreeMenu;
 import lcmc.common.ui.utils.MyButton;
 import lcmc.common.ui.utils.SwingUtils;
@@ -74,39 +76,49 @@ public class GroupInfo extends ServiceInfo {
     private final ReadWriteLock mGroupServiceLock = new ReentrantReadWriteLock();
     private final Lock mGroupServiceReadLock = mGroupServiceLock.readLock();
     private final Lock mGroupServiceWriteLock = mGroupServiceLock.writeLock();
-    @Inject
-    private GroupMenu groupMenu;
-    @Inject
-    @Named("serviceInfo")
-    private Provider<ServiceInfo> serviceInfoProvider;
-    @Inject
-    private Provider<FilesystemRaInfo> filesystemInfoProvider;
-    @Inject
-    private Provider<LinbitDrbdInfo> linbitDrbdInfoProvider;
-    @Inject
-    private Provider<DrbddiskInfo> drbddiskInfoProvider;
-    @Inject
-    private Provider<IPaddrInfo> ipaddrInfoProvider;
-    @Inject
-    private Provider<VirtualDomainInfo> virtualDomainInfoProvider;
-    @Inject
-    private Application application;
-    @Inject
-    private SwingUtils swingUtils;
-    @Inject
-    private ClusterTreeMenu clusterTreeMenu;
-    @Inject
-    private MainData mainData;
+    private final GroupMenu groupMenu;
+    private final Provider<ServiceInfo> serviceInfoProvider;
+    private final Provider<FilesystemRaInfo> filesystemInfoProvider;
+    private final Provider<LinbitDrbdInfo> linbitDrbdInfoProvider;
+    private final Provider<DrbddiskInfo> drbddiskInfoProvider;
+    private final Provider<IPaddrInfo> ipaddrInfoProvider;
+    private final Provider<VirtualDomainInfo> virtualDomainInfoProvider;
+    private final Application application;
+    private final SwingUtils swingUtils;
+    private final ClusterTreeMenu clusterTreeMenu;
+    private final MainData mainData;
+
+    public GroupInfo(Application application, SwingUtils swingUtils, Access access, MainData mainData, WidgetFactory widgetFactory,
+            ProgressIndicator progressIndicator, ServiceMenu serviceMenu, Provider<CloneInfo> cloneInfoProvider,
+            ClusterTreeMenu clusterTreeMenu, CrmServiceFactory crmServiceFactory,
+            @Named("serviceInfo") Provider<ServiceInfo> serviceInfoProvider, GroupMenu groupMenu,
+            Provider<FilesystemRaInfo> filesystemInfoProvider, Provider<LinbitDrbdInfo> linbitDrbdInfoProvider,
+            Provider<DrbddiskInfo> drbddiskInfoProvider, Provider<IPaddrInfo> ipaddrInfoProvider,
+            Provider<VirtualDomainInfo> virtualDomainInfoProvider) {
+        super(application, swingUtils, access, mainData, widgetFactory, progressIndicator, serviceMenu, cloneInfoProvider,
+                clusterTreeMenu, crmServiceFactory);
+        this.serviceInfoProvider = serviceInfoProvider;
+        this.groupMenu = groupMenu;
+        this.filesystemInfoProvider = filesystemInfoProvider;
+        this.linbitDrbdInfoProvider = linbitDrbdInfoProvider;
+        this.drbddiskInfoProvider = drbddiskInfoProvider;
+        this.ipaddrInfoProvider = ipaddrInfoProvider;
+        this.virtualDomainInfoProvider = virtualDomainInfoProvider;
+        this.application = application;
+        this.swingUtils = swingUtils;
+        this.clusterTreeMenu = clusterTreeMenu;
+        this.mainData = mainData;
+    }
 
     void init(final ResourceAgent ra, final Browser browser) {
         super.init(Application.PACEMAKER_GROUP_NAME, ra, browser);
     }
 
-    /** Applies the the whole group if for example an order has changed. */
-    void applyWhole(final Host dcHost,
-                    final boolean createGroup,
-                    final List<ServiceInfo> servicesInNewOrder,
-                    final Application.RunMode runMode) {
+    /**
+     * Applies the the whole group if for example an order has changed.
+     */
+    void applyWhole(final Host dcHost, final boolean createGroup, final List<ServiceInfo> servicesInNewOrder,
+            final Application.RunMode runMode) {
         final String[] params = getParametersFromXML();
         if (Application.isLive(runMode)) {
             swingUtils.invokeAndWait(() -> {

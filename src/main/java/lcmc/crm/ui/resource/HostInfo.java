@@ -30,7 +30,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 
-import javax.inject.Inject;
 import javax.inject.Named;
 import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
@@ -54,9 +53,11 @@ import lcmc.common.domain.Application;
 import lcmc.common.domain.ColorText;
 import lcmc.common.domain.ExecCallback;
 import lcmc.common.domain.util.Tools;
+import lcmc.common.ui.Access;
 import lcmc.common.ui.Browser;
 import lcmc.common.ui.Info;
 import lcmc.common.ui.SpringUtilities;
+import lcmc.common.ui.main.MainData;
 import lcmc.common.ui.utils.ButtonCallback;
 import lcmc.common.ui.utils.ComponentWithTest;
 import lcmc.common.ui.utils.MyButton;
@@ -100,14 +101,19 @@ public class HostInfo extends Info {
     private Host host;
     private volatile boolean crmInfoShowing = false;
     private volatile boolean crmShowInProgress = true;
-    @Inject
-    private HostMenu hostMenu;
-    @Inject
-    private Application application;
-    @Inject
-    private SwingUtils swingUtils;
-    @Inject
-    private WidgetFactory widgetFactory;
+    private final HostMenu hostMenu;
+    private final Application application;
+    private final SwingUtils swingUtils;
+    private final WidgetFactory widgetFactory;
+
+    public HostInfo(Application application, SwingUtils swingUtils, Access access, MainData mainData, HostMenu hostMenu,
+            WidgetFactory widgetFactory) {
+        super(application, swingUtils, access, mainData);
+        this.hostMenu = hostMenu;
+        this.application = application;
+        this.swingUtils = swingUtils;
+        this.widgetFactory = widgetFactory;
+    }
 
     public void init(final Host host, final Browser browser) {
         super.init(host.getName(), browser);

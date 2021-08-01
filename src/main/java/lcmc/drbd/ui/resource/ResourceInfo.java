@@ -40,7 +40,6 @@ import java.util.concurrent.CountDownLatch;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Provider;
 import javax.swing.BoxLayout;
@@ -63,9 +62,11 @@ import lcmc.common.domain.Application;
 import lcmc.common.domain.StringValue;
 import lcmc.common.domain.Value;
 import lcmc.common.domain.util.Tools;
+import lcmc.common.ui.Access;
 import lcmc.common.ui.Browser;
 import lcmc.common.ui.Info;
 import lcmc.common.ui.SpringUtilities;
+import lcmc.common.ui.main.MainData;
 import lcmc.common.ui.treemenu.ClusterTreeMenu;
 import lcmc.common.ui.utils.ButtonCallback;
 import lcmc.common.ui.utils.ComponentWithTest;
@@ -170,22 +171,28 @@ public class ResourceInfo extends AbstractDrbdInfo {
     private Set<Host> hosts;
     private final Collection<Host> selectedProxyHosts = new HashSet<>();
     private GlobalInfo globalInfo;
-    @Inject
-    private Application application;
-    @Inject
-    private SwingUtils swingUtils;
-    @Inject
-    private ResourceMenu resourceMenu;
-    @Inject
-    private WidgetFactory widgetFactory;
-    @Inject
-    private Provider<ProxyNetInfo> proxyNetInfoProvider;
-    @Inject
-    private ClusterTreeMenu clusterTreeMenu;
-    @Inject
-    private NetworkService networkService;
-    @Inject
-    private ClusterViewFactory clusterViewFactory;
+    private final Application application;
+    private final SwingUtils swingUtils;
+    private final ResourceMenu resourceMenu;
+    private final WidgetFactory widgetFactory;
+    private final Provider<ProxyNetInfo> proxyNetInfoProvider;
+    private final ClusterTreeMenu clusterTreeMenu;
+    private final NetworkService networkService;
+    private final ClusterViewFactory clusterViewFactory;
+
+    public ResourceInfo(Application application, SwingUtils swingUtils, Access access, MainData mainData,
+            WidgetFactory widgetFactory, ResourceMenu resourceMenu, Provider<ProxyNetInfo> proxyNetInfoProvider,
+            ClusterTreeMenu clusterTreeMenu, NetworkService networkService, ClusterViewFactory clusterViewFactory) {
+        super(application, swingUtils, access, mainData, widgetFactory);
+        this.application = application;
+        this.swingUtils = swingUtils;
+        this.resourceMenu = resourceMenu;
+        this.widgetFactory = widgetFactory;
+        this.proxyNetInfoProvider = proxyNetInfoProvider;
+        this.clusterTreeMenu = clusterTreeMenu;
+        this.networkService = networkService;
+        this.clusterViewFactory = clusterViewFactory;
+    }
 
     public void init(final String name, final Set<Host> hosts, final Browser browser) {
         super.einit(Optional.of(new DrbdResource(name)), name, browser);

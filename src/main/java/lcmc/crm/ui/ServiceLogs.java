@@ -31,15 +31,25 @@ import java.util.Set;
 import javax.inject.Named;
 
 import lcmc.cluster.domain.Cluster;
+import lcmc.cluster.ui.widget.WidgetFactory;
+import lcmc.common.domain.Application;
+import lcmc.common.ui.main.MainData;
+import lcmc.common.ui.utils.SwingUtils;
 
 /**
  * An implementation of an dialog with log files from many hosts.
  */
 @Named
 public final class ServiceLogs extends ClusterLogs {
-    /** Service type. e.g. Filesystem. */
+    /**
+     * Service type. e.g. Filesystem.
+     */
     private String serviceType;
     private String serviceCrmId;
+
+    public ServiceLogs(Application application, SwingUtils swingUtils, WidgetFactory widgetFactory, MainData mainData) {
+        super(application, swingUtils, widgetFactory, mainData);
+    }
 
     public void init(final Cluster cluster, final String serviceType, final String serviceCrmId) {
         super.init(cluster);

@@ -24,19 +24,26 @@
 package lcmc.lvm.ui;
 
 import javax.swing.JComponent;
-import lcmc.common.ui.WizardDialog;
-import lcmc.drbd.ui.resource.BlockDevInfo;
-import lcmc.common.domain.Unit;
 
-/** LVM dialogs. */
+import lcmc.cluster.ui.widget.WidgetFactory;
+import lcmc.common.domain.Application;
+import lcmc.common.domain.Unit;
+import lcmc.common.ui.WizardDialog;
+import lcmc.common.ui.main.MainData;
+import lcmc.common.ui.utils.SwingUtils;
+import lcmc.drbd.ui.resource.BlockDevInfo;
+
+/**
+ * LVM dialogs.
+ */
 class LV extends WizardDialog {
+    public LV(Application application, SwingUtils swingUtils, WidgetFactory widgetFactory, MainData mainData) {
+        super(application, swingUtils, widgetFactory, mainData);
+    }
+
     protected static Unit[] getUnits() {
-        return new Unit[]{
-            new Unit("K", "K", "KiByte", "KiBytes"),
-                     new Unit("M", "M", "MiByte", "MiBytes"),
-                     new Unit("G",  "G",  "GiByte",      "GiBytes"),
-                     new Unit("T",  "T",  "TiByte",      "TiBytes")
-        };
+        return new Unit[]{new Unit("K", "K", "KiByte", "KiBytes"), new Unit("M", "M", "MiByte", "MiBytes"),
+                new Unit("G", "G", "GiByte", "GiBytes"), new Unit("T", "T", "TiByte", "TiBytes")};
     }
 
     protected void init(final WizardDialog previousDialog) {

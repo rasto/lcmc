@@ -22,18 +22,23 @@
 
 package lcmc.common.ui;
 
+import java.awt.Color;
+import java.awt.Dimension;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
+
+import javax.inject.Named;
+import javax.swing.BoxLayout;
+import javax.swing.ImageIcon;
+import javax.swing.JComponent;
+import javax.swing.JPanel;
+import javax.swing.JSplitPane;
+import javax.swing.tree.DefaultMutableTreeNode;
+
 import lcmc.cluster.ui.ClusterBrowser;
 import lcmc.cluster.ui.network.InfoPresenter;
 import lcmc.common.domain.Application;
 import lcmc.common.domain.util.Tools;
-
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.swing.*;
-import javax.swing.tree.DefaultMutableTreeNode;
-import java.awt.*;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * This class holds host and cluster resource data in a tree. It shows
@@ -49,17 +54,18 @@ public class Browser {
     public static final Color PANEL_BACKGROUND = Tools.getDefaultColor("ViewPanel.Background");
     public static final Color BUTTON_PANEL_BACKGROUND = Tools.getDefaultColor("ViewPanel.ButtonPanel.Background");
     public static final Color STATUS_BACKGROUND = Tools.getDefaultColor("ViewPanel.Status.Background");
-    @Inject
-    private Application application;
+    private final Application application;
 
     private JSplitPane infoPanelSplitPane;
     private final Lock mDRBDtestLock = new ReentrantLock();
 
+    public Browser(Application application) {
+        this.application = application;
+    }
+
     /**
-     * Returns panel with info of some resource from Info object. The info is
-     * specified in getInfoPanel method in the Info object. If a resource has a
-     * graphical view, it returns a split pane with this view and the info
-     * underneath.
+     * Returns panel with info of some resource from Info object. The info is specified in getInfoPanel method in the Info object.
+     * If a resource has a graphical view, it returns a split pane with this view and the info underneath.
      */
     final JComponent getInfoPanel(final Object infoPresenter, final boolean disabledDuringLoad) {
         if (infoPresenter == null) {

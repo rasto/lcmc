@@ -31,8 +31,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
-import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Provider;
 import javax.swing.ImageIcon;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
@@ -40,10 +40,16 @@ import javax.swing.tree.DefaultMutableTreeNode;
 
 import lcmc.cluster.ui.ClusterBrowser;
 import lcmc.cluster.ui.widget.Check;
+import lcmc.cluster.ui.widget.WidgetFactory;
 import lcmc.common.domain.Application;
 import lcmc.common.domain.ColorText;
 import lcmc.common.domain.Value;
 import lcmc.common.domain.util.Tools;
+import lcmc.common.ui.Access;
+import lcmc.common.ui.main.MainData;
+import lcmc.common.ui.main.ProgressIndicator;
+import lcmc.common.ui.treemenu.ClusterTreeMenu;
+import lcmc.common.ui.utils.SwingUtils;
 import lcmc.common.ui.utils.UpdatableItem;
 import lcmc.crm.domain.ClusterStatus;
 import lcmc.crm.domain.CrmXml;
@@ -59,9 +65,16 @@ import lombok.val;
 @Named
 public class CloneInfo extends ServiceInfo {
     private ServiceInfo containedService = null;
-    @Inject
-    private CloneMenu cloneMenu;
+    private final CloneMenu cloneMenu;
     private ClusterBrowser clusterBrowser;
+
+    public CloneInfo(Application application, SwingUtils swingUtils, Access access, MainData mainData, WidgetFactory widgetFactory,
+            ProgressIndicator progressIndicator, ServiceMenu serviceMenu, Provider<CloneInfo> cloneInfoProvider,
+            ClusterTreeMenu clusterTreeMenu, CrmServiceFactory crmServiceFactory, CloneMenu cloneMenu) {
+        super(application, swingUtils, access, mainData, widgetFactory, progressIndicator, serviceMenu, cloneInfoProvider,
+                clusterTreeMenu, crmServiceFactory);
+        this.cloneMenu = cloneMenu;
+    }
 
     void init(final ResourceAgent ra, final String name, final boolean master, final ClusterBrowser clusterBrowser) {
         this.clusterBrowser = clusterBrowser;

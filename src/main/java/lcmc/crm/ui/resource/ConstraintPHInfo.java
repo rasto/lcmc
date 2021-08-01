@@ -28,17 +28,22 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Provider;
 import javax.swing.JComponent;
 
+import lcmc.cluster.ui.widget.WidgetFactory;
 import lcmc.common.domain.AccessMode;
 import lcmc.common.domain.Application;
 import lcmc.common.domain.ColorText;
 import lcmc.common.domain.StringValue;
 import lcmc.common.domain.Value;
 import lcmc.common.domain.util.Tools;
+import lcmc.common.ui.Access;
 import lcmc.common.ui.Browser;
+import lcmc.common.ui.main.MainData;
+import lcmc.common.ui.main.ProgressIndicator;
+import lcmc.common.ui.treemenu.ClusterTreeMenu;
 import lcmc.common.ui.utils.SwingUtils;
 import lcmc.common.ui.utils.UpdatableItem;
 import lcmc.crm.domain.ClusterStatus;
@@ -60,32 +65,47 @@ public class ConstraintPHInfo extends ServiceInfo {
     private static final String CONSTRAINT_PLACEHOLDER_OR = Tools.getString("ConstraintPHInfo.Or");
     private RscSetConnectionData rscSetConnectionDataColocation = null;
     private RscSetConnectionData rscSetConnectionDataOrder = null;
-    /** Whether the direction of colocation should be reversed, meaning it is
-     * from this placeholder, when it was new. */
+    /**
+     * Whether the direction of colocation should be reversed, meaning it is from this placeholder, when it was new.
+     */
     private boolean reverseCol = false;
-    /** Whether the direction of order should be reversed, meaning it is from
-     * this placeholder, when it was new. */
+    /**
+     * Whether the direction of order should be reversed, meaning it is from this placeholder, when it was new.
+     */
     private boolean reverseOrd = false;
-    /** Whether the colocation was reversed. */
+    /**
+     * Whether the colocation was reversed.
+     */
     private boolean reversedCol = false;
-    /** Whether the order was reversed. */
+    /**
+     * Whether the order was reversed.
+     */
     private boolean reversedOrd = false;
-    /** Resource set info object for this placeholder. More placeholders can
-     * have on resource set info object. */
+    /**
+     * Resource set info object for this placeholder. More placeholders can have on resource set info object.
+     */
     private volatile PcmkRscSetsInfo pcmkRscSetsInfo = null;
-    /** Whether the all resources are required to be started. */
+    /**
+     * Whether the all resources are required to be started.
+     */
     private Preference preference;
-    @Inject
-    private ConstraintPHMenu constraintPHMenu;
-    @Inject
-    private Application application;
-    @Inject
-    private SwingUtils swingUtils;
+    private final ConstraintPHMenu constraintPHMenu;
+    private final Application application;
+    private final SwingUtils swingUtils;
+
+    public ConstraintPHInfo(Application application, SwingUtils swingUtils, Access access, MainData mainData,
+            WidgetFactory widgetFactory, ProgressIndicator progressIndicator, ServiceMenu serviceMenu,
+            Provider<CloneInfo> cloneInfoProvider, ClusterTreeMenu clusterTreeMenu, CrmServiceFactory crmServiceFactory,
+            ConstraintPHMenu constraintPHMenu) {
+        super(application, swingUtils, access, mainData, widgetFactory, progressIndicator, serviceMenu, cloneInfoProvider,
+                clusterTreeMenu, crmServiceFactory);
+        this.constraintPHMenu = constraintPHMenu;
+        this.application = application;
+        this.swingUtils = swingUtils;
+    }
 
 
-    public void init(final Browser browser,
-                     final RscSetConnectionData rscSetConnectionData,
-                     final Preference preference) {
+    public void init(final Browser browser, final RscSetConnectionData rscSetConnectionData, final Preference preference) {
         super.init(NAME, null, browser);
         this.preference = preference;
         if (rscSetConnectionData != null) {

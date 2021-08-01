@@ -22,7 +22,6 @@
 
 package lcmc.host.ui;
 
-import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Provider;
 import javax.swing.JComponent;
@@ -31,11 +30,14 @@ import javax.swing.SpringLayout;
 
 import lcmc.cluster.service.ssh.ExecCommandConfig;
 import lcmc.cluster.service.ssh.Ssh;
+import lcmc.cluster.ui.widget.WidgetFactory;
 import lcmc.common.domain.Application;
 import lcmc.common.domain.ExecCallback;
 import lcmc.common.domain.util.Tools;
 import lcmc.common.ui.SpringUtilities;
 import lcmc.common.ui.WizardDialog;
+import lcmc.common.ui.main.MainData;
+import lcmc.common.ui.utils.SwingUtils;
 
 /**
  * An implementation of a dialog where heartbeat is installed.
@@ -43,14 +45,18 @@ import lcmc.common.ui.WizardDialog;
 @Named
 final class HeartbeatInst extends DialogHost {
     private CheckInstallation checkInstallationDialog;
-    @Inject
-    private Provider<CheckInstallation> checkInstallationFactory;
-    @Inject
-    private Application application;
+    private final Provider<CheckInstallation> checkInstallationFactory;
+    private final Application application;
+
+    public HeartbeatInst(Application application, SwingUtils swingUtils, WidgetFactory widgetFactory, MainData mainData,
+            Provider<CheckInstallation> checkInstallationFactory) {
+        super(application, swingUtils, widgetFactory, mainData);
+        this.checkInstallationFactory = checkInstallationFactory;
+        this.application = application;
+    }
 
     /**
-     * Checks the answer of the installation and enables/disables the
-     * components accordingly.
+     * Checks the answer of the installation and enables/disables the components accordingly.
      */
     void checkAnswer(final String ans, final String installMethod) {
         // TODO: check if it really failes

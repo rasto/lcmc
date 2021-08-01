@@ -27,7 +27,6 @@ import java.awt.Dimension;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Provider;
 import javax.swing.BoxLayout;
@@ -43,6 +42,7 @@ import lcmc.common.domain.StringValue;
 import lcmc.common.domain.Value;
 import lcmc.common.domain.util.Tools;
 import lcmc.common.ui.WizardDialog;
+import lcmc.common.ui.main.MainData;
 import lcmc.common.ui.utils.MyButton;
 import lcmc.common.ui.utils.SwingUtils;
 import lcmc.configs.AppDefaults;
@@ -85,35 +85,35 @@ public final class Resource extends DrbdConfig {
     private static final String[] PARAMS = {"name",
                                             DrbdXml.PROTOCOL_PARAM,
                                             DrbdXml.PING_TIMEOUT_PARAM,
-                                            ALLOW_TWO_PRIMARIES_PARAM,
-                                            CRAM_HMAC_ALG_PARAM,
-                                            SHARED_SECRET_PARAM,
-                                            WFC_TIMEOUT_PARAM,
-                                            DEGR_WFC_TIMEOUT_PARAM,
-                                            ON_IO_ERROR_PARAM,
-                                            PROXY_MEMLIMIT_PARAM,
-                                            PROXY_PLUGIN_ZLIB_PARAM,
-                                            PROXY_PLUGIN_LZMA_PARAM};
+                                            ALLOW_TWO_PRIMARIES_PARAM, CRAM_HMAC_ALG_PARAM, SHARED_SECRET_PARAM, WFC_TIMEOUT_PARAM,
+            DEGR_WFC_TIMEOUT_PARAM, ON_IO_ERROR_PARAM, PROXY_MEMLIMIT_PARAM, PROXY_PLUGIN_ZLIB_PARAM, PROXY_PLUGIN_LZMA_PARAM};
     private static final int SECRET_STRING_LENGTH = 32;
     private boolean proxyHostNextDialog = false;
-    @Inject
-    private HostFactory hostFactory;
-    @Inject
-    private Provider<NewProxyHostDialog> newProxyHostDialogProvider;
-    @Inject
-    private Volume volumeDialog;
-    @Inject
-    private Application application;
-    @Inject
-    private SwingUtils swingUtils;
-    @Inject
-    private WidgetFactory widgetFactory;
+    private final HostFactory hostFactory;
+    private final Provider<NewProxyHostDialog> newProxyHostDialogProvider;
+    private final Volume volumeDialog;
+    private final Application application;
+    private final SwingUtils swingUtils;
+    private final WidgetFactory widgetFactory;
+
+    public Resource(Application application, SwingUtils swingUtils, WidgetFactory widgetFactory, MainData mainData,
+            HostFactory hostFactory, Provider<NewProxyHostDialog> newProxyHostDialogProvider, Volume volumeDialog) {
+        super(application, swingUtils, widgetFactory, mainData);
+        this.hostFactory = hostFactory;
+        this.newProxyHostDialogProvider = newProxyHostDialogProvider;
+        this.volumeDialog = volumeDialog;
+        this.application = application;
+        this.swingUtils = swingUtils;
+        this.widgetFactory = widgetFactory;
+    }
 
     private String getRandomSecret() {
         return Tools.getRandomSecret(SECRET_STRING_LENGTH);
     }
 
-    /** Applies the changes and returns next dialog (BlockDev). */
+    /**
+     * Applies the changes and returns next dialog (BlockDev).
+     */
     @Override
     public WizardDialog nextDialog() {
         final ResourceInfo dri = getDrbdVolumeInfo().getDrbdResourceInfo();

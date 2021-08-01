@@ -64,6 +64,7 @@ import lcmc.common.domain.util.Tools;
 import lcmc.common.ui.Access;
 import lcmc.common.ui.SpringUtilities;
 import lcmc.common.ui.WizardDialog;
+import lcmc.common.ui.main.MainData;
 import lcmc.common.ui.utils.MyButton;
 import lcmc.common.ui.utils.SwingUtils;
 import lcmc.common.ui.utils.WidgetListener;
@@ -127,8 +128,9 @@ final class CoroConfig extends DialogCluster {
     private final NetworkService networkService;
     private final Access access;
 
-    public CoroConfig(InitCluster initClusterDialog, Application application, SwingUtils swingUtils, WidgetFactory widgetFactory,
-            NetworkService networkService, Access access) {
+    public CoroConfig(MainData mainData, InitCluster initClusterDialog, Application application, SwingUtils swingUtils,
+            WidgetFactory widgetFactory, NetworkService networkService, Access access) {
+        super(application, swingUtils, widgetFactory, mainData);
         this.initClusterDialog = initClusterDialog;
         this.application = application;
         this.swingUtils = swingUtils;

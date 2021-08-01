@@ -30,7 +30,6 @@ import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
 
-import javax.inject.Inject;
 import javax.inject.Named;
 import javax.swing.JCheckBox;
 import javax.swing.JComponent;
@@ -49,6 +48,7 @@ import lcmc.common.domain.Value;
 import lcmc.common.domain.util.Tools;
 import lcmc.common.ui.Browser;
 import lcmc.common.ui.SpringUtilities;
+import lcmc.common.ui.main.MainData;
 import lcmc.common.ui.utils.MyButton;
 import lcmc.common.ui.utils.SwingUtils;
 import lcmc.common.ui.utils.WidgetListener;
@@ -70,11 +70,15 @@ public final class LVCreate extends LV {
     private String volumeGroup;
     private Map<Host, JCheckBox> hostCheckBoxes = null;
     private final Collection<BlockDevice> selectedBlockDevices = new LinkedHashSet<>();
-    @Inject
-    private SwingUtils swingUtils;
-    @Inject
-    private WidgetFactory widgetFactory;
+    private final SwingUtils swingUtils;
+    private final WidgetFactory widgetFactory;
     private MyButton createButton;
+
+    public LVCreate(Application application, SwingUtils swingUtils, WidgetFactory widgetFactory, MainData mainData) {
+        super(application, swingUtils, widgetFactory, mainData);
+        this.swingUtils = swingUtils;
+        this.widgetFactory = widgetFactory;
+    }
 
     public void init(final Host host, final String volumeGroup, final BlockDevice selectedBlockDevice) {
         super.init(null);

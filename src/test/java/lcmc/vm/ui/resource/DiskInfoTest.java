@@ -17,7 +17,7 @@ class DiskInfoTest {
     @BeforeEach
     void setUp() {
         Tools.init();
-        diskInfo = new DiskInfo();
+        diskInfo = new DiskInfo(null, null, null, null, null, null, null);
         diskInfo.init("", null, null);
     }
 

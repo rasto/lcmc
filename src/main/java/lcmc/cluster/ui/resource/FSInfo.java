@@ -29,8 +29,10 @@ import lcmc.cluster.service.ssh.ExecCommandConfig;
 import lcmc.cluster.service.ssh.SshOutput;
 import lcmc.common.domain.Application;
 import lcmc.common.domain.util.Tools;
+import lcmc.common.ui.Access;
 import lcmc.common.ui.Info;
 import lcmc.common.ui.main.MainData;
+import lcmc.common.ui.utils.SwingUtils;
 import lcmc.host.domain.Host;
 import lcmc.host.ui.HostBrowser;
 
@@ -41,6 +43,10 @@ import lcmc.host.ui.HostBrowser;
 public final class FSInfo extends Info {
     private static final ImageIcon FS_ICON = Tools.createImageIcon(Tools.getDefault("HostBrowser.FileSystemIcon"));
     private String cachedModinfoOutput = null;
+
+    public FSInfo(Application application, SwingUtils swingUtils, Access access, MainData mainData) {
+        super(application, swingUtils, access, mainData);
+    }
 
     @Override
     public HostBrowser getBrowser() {

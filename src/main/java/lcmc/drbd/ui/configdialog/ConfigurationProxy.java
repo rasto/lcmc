@@ -21,33 +21,38 @@
 
 package lcmc.drbd.ui.configdialog;
 
-import lcmc.host.domain.Host;
-import lcmc.drbd.domain.DrbdInstallation;
-import lcmc.common.ui.WizardDialog;
-import lcmc.host.ui.Configuration;
-import lcmc.drbd.ui.resource.VolumeInfo;
-import lcmc.common.ui.utils.MyButton;
-
-import javax.inject.Inject;
 import javax.inject.Named;
 
+import lcmc.cluster.ui.widget.WidgetFactory;
+import lcmc.common.domain.Application;
+import lcmc.common.ui.WizardDialog;
+import lcmc.common.ui.main.MainData;
+import lcmc.common.ui.utils.MyButton;
+import lcmc.common.ui.utils.SwingUtils;
+import lcmc.drbd.domain.DrbdInstallation;
+import lcmc.drbd.ui.resource.VolumeInfo;
+import lcmc.host.domain.Host;
+import lcmc.host.ui.Configuration;
+import lcmc.host.ui.Devices;
+
 /**
- * An implementation of a dialog where entered ip or the host is looked up
- * with dns.
+ * An implementation of a dialog where entered ip or the host is looked up with dns.
  */
 @Named
 final class ConfigurationProxy extends Configuration {
     private VolumeInfo volumeInfo;
     private WizardDialog origDialog;
     private WizardDialog nextDialogObject = null;
-    @Inject
-    private SSHProxy sshProxyDialog;
+    private final SSHProxy sshProxyDialog;
 
-    void init(final WizardDialog previousDialog,
-              final Host host,
-              final VolumeInfo volumeInfo,
-              final WizardDialog origDialog,
-              final DrbdInstallation drbdInstallation) {
+    public ConfigurationProxy(Application application, SwingUtils swingUtils, WidgetFactory widgetFactory, MainData mainData,
+            Devices devices, SSHProxy sshProxyDialog) {
+        super(application, swingUtils, widgetFactory, mainData, devices);
+        this.sshProxyDialog = sshProxyDialog;
+    }
+
+    void init(final WizardDialog previousDialog, final Host host, final VolumeInfo volumeInfo, final WizardDialog origDialog,
+            final DrbdInstallation drbdInstallation) {
         super.init(previousDialog, host, drbdInstallation);
         this.volumeInfo = volumeInfo;
         this.origDialog = origDialog;

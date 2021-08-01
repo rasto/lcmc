@@ -20,15 +20,19 @@
 
 package lcmc.drbd.ui.configdialog;
 
-import lcmc.host.domain.Host;
-import lcmc.drbd.domain.DrbdInstallation;
-import lcmc.common.ui.WizardDialog;
-import lcmc.host.ui.Devices;
-import lcmc.drbd.ui.resource.VolumeInfo;
-import lcmc.common.ui.utils.MyButton;
-
-import javax.inject.Inject;
 import javax.inject.Named;
+
+import lcmc.cluster.ui.widget.WidgetFactory;
+import lcmc.common.domain.Application;
+import lcmc.common.ui.WizardDialog;
+import lcmc.common.ui.main.MainData;
+import lcmc.common.ui.utils.MyButton;
+import lcmc.common.ui.utils.SwingUtils;
+import lcmc.drbd.domain.DrbdInstallation;
+import lcmc.drbd.ui.resource.VolumeInfo;
+import lcmc.host.domain.Host;
+import lcmc.host.ui.Devices;
+import lcmc.host.ui.DistDetection;
 
 /**
  * An implementation of a dialog where hardware information is collected.
@@ -38,14 +42,16 @@ final class DevicesProxy extends Devices {
     private VolumeInfo volumeInfo;
     private WizardDialog origDialog;
     private WizardDialog nextDialogObject = null;
-    @Inject
-    private ProxyCheckInstallation proxyCheckInstallationDialog;
+    private final ProxyCheckInstallation proxyCheckInstallationDialog;
 
-    void init(final WizardDialog previousDialog,
-              final Host host,
-              final VolumeInfo volumeInfo,
-              final WizardDialog origDialog,
-              final DrbdInstallation drbdInstallation) {
+    public DevicesProxy(Application application, SwingUtils swingUtils, WidgetFactory widgetFactory, MainData mainData,
+            DistDetection distDetection, ProxyCheckInstallation proxyCheckInstallationDialog) {
+        super(application, swingUtils, widgetFactory, mainData, distDetection);
+        this.proxyCheckInstallationDialog = proxyCheckInstallationDialog;
+    }
+
+    void init(final WizardDialog previousDialog, final Host host, final VolumeInfo volumeInfo, final WizardDialog origDialog,
+            final DrbdInstallation drbdInstallation) {
         super.init(previousDialog, host, drbdInstallation);
         this.volumeInfo = volumeInfo;
         this.origDialog = origDialog;

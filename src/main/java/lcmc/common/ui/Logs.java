@@ -39,7 +39,6 @@ import java.util.concurrent.locks.ReentrantLock;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import javax.inject.Inject;
 import javax.inject.Named;
 import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
@@ -55,8 +54,10 @@ import javax.swing.text.StyleConstants;
 
 import lcmc.cluster.service.ssh.ExecCommandConfig;
 import lcmc.cluster.ui.widget.WidgetFactory;
+import lcmc.common.domain.Application;
 import lcmc.common.domain.ExecCallback;
 import lcmc.common.domain.util.Tools;
+import lcmc.common.ui.main.MainData;
 import lcmc.common.ui.utils.MyButton;
 import lcmc.common.ui.utils.SwingUtils;
 import lcmc.host.domain.Host;
@@ -73,14 +74,17 @@ public class Logs extends ConfigDialog {
     private final Map<String, JCheckBox> patternToCheckBoxMap = new HashMap<>();
     private final Lock mRefreshLock = new ReentrantLock();
     private final Collection<JComponent> additionalComponents = new ArrayList<>();
-    @Inject
-    private SwingUtils swingUtils;
-    @Inject
-    private WidgetFactory widgetFactory;
+    private final SwingUtils swingUtils;
+    private final WidgetFactory widgetFactory;
+
+    public Logs(Application application, SwingUtils swingUtils, WidgetFactory widgetFactory, MainData mainData) {
+        super(application, swingUtils, widgetFactory, mainData);
+        this.swingUtils = swingUtils;
+        this.widgetFactory = widgetFactory;
+    }
 
     /**
-     * Command that gets the log. The command must be specified in the
-     * DistResource or some such.
+     * Command that gets the log. The command must be specified in the DistResource or some such.
      */
     protected String logFileCommand() {
         return "Logs.hbLog";

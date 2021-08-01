@@ -24,18 +24,22 @@ package lcmc.vm.ui.resource;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.inject.Inject;
 import javax.inject.Named;
 
 import org.w3c.dom.Node;
 
 import lcmc.cluster.ui.widget.Widget;
+import lcmc.cluster.ui.widget.WidgetFactory;
 import lcmc.common.domain.Application;
 import lcmc.common.domain.Value;
 import lcmc.common.domain.util.Tools;
+import lcmc.common.ui.Access;
 import lcmc.common.ui.Browser;
+import lcmc.common.ui.main.MainData;
 import lcmc.common.ui.treemenu.ClusterTreeMenu;
+import lcmc.common.ui.utils.MenuFactory;
 import lcmc.common.ui.utils.MyButton;
+import lcmc.common.ui.utils.SwingUtils;
 import lcmc.host.domain.Host;
 import lcmc.vm.domain.VmsXml;
 import lcmc.vm.domain.data.SerialData;
@@ -45,15 +49,22 @@ import lcmc.vm.domain.data.SerialData;
  */
 @Named
 final class SerialInfo extends ParallelSerialInfo {
-    @Inject
-    private ClusterTreeMenu clusterTreeMenu;
+    private final ClusterTreeMenu clusterTreeMenu;
+
+    public SerialInfo(Application application, SwingUtils swingUtils, Access access, MainData mainData, WidgetFactory widgetFactory,
+            MenuFactory menuFactory, ClusterTreeMenu clusterTreeMenu) {
+        super(application, swingUtils, access, mainData, widgetFactory, menuFactory, clusterTreeMenu);
+        this.clusterTreeMenu = clusterTreeMenu;
+    }
 
     @Override
     void init(final String name, final Browser browser, final DomainInfo vmsVirtualDomainInfo) {
         super.init(name, browser, vmsVirtualDomainInfo);
     }
 
-    /** Returns data for the table. */
+    /**
+     * Returns data for the table.
+     */
     @Override
     protected Object[][] getTableData(final String tableName) {
         if (DomainInfo.HEADER_TABLE.equals(tableName)) {

@@ -25,7 +25,6 @@ package lcmc.drbd.ui.configdialog;
 
 import java.util.Set;
 
-import javax.inject.Inject;
 import javax.inject.Named;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
@@ -43,6 +42,7 @@ import lcmc.common.domain.Value;
 import lcmc.common.domain.util.Tools;
 import lcmc.common.ui.SpringUtilities;
 import lcmc.common.ui.WizardDialog;
+import lcmc.common.ui.main.MainData;
 import lcmc.common.ui.utils.MyButton;
 import lcmc.common.ui.utils.SwingUtils;
 import lcmc.common.ui.utils.WidgetListener;
@@ -58,34 +58,45 @@ import lcmc.logger.LoggerFactory;
 @Named
 final class CreateFS extends DrbdConfig {
     private static final Logger LOG = LoggerFactory.getLogger(CreateFS.class);
-    /** No host string. (none) */
-    private static final Value NO_HOST_STRING =
-                                     new StringValue(Tools.getString("Dialog.DrbdConfig.CreateFS.NoHostString"));
-    /** No file system (use existing data). */
+    /**
+     * No host string. (none)
+     */
+    private static final Value NO_HOST_STRING = new StringValue(Tools.getString("Dialog.DrbdConfig.CreateFS.NoHostString"));
+    /**
+     * No file system (use existing data).
+     */
     private static final Value NO_FILESYSTEM_STRING =
-                                     new StringValue(Tools.getString("Dialog.DrbdConfig.CreateFS.SelectFilesystem"));
+            new StringValue(Tools.getString("Dialog.DrbdConfig.CreateFS.SelectFilesystem"));
     private static final int COMBOBOX_WIDTH = 250;
     private static final Value SKIP_SYNC_FALSE = new StringValue("false");
     private static final Value SKIP_SYNC_TRUE = new StringValue("true");
-    /** Pull down menu with hosts (or no host). */
+    /**
+     * Pull down menu with hosts (or no host).
+     */
     private Widget hostChoiceWidget;
-    /** Pull down menu with file systems. */
+    /**
+     * Pull down menu with file systems.
+     */
     private Widget filesystemWidget;
     private Widget skipInitialSyncWidget;
     private JLabel skipInitialSyncLabel;
-    @Inject
-    private Application application;
-    @Inject
-    private SwingUtils swingUtils;
-    @Inject
-    private WidgetFactory widgetFactory;
-    @Inject
-    private FileSystemService fileSystemService;
+    private final Application application;
+    private final SwingUtils swingUtils;
+    private final WidgetFactory widgetFactory;
+    private final FileSystemService fileSystemService;
     private MyButton makeFileSystemButton;
 
+    public CreateFS(Application application, SwingUtils swingUtils, WidgetFactory widgetFactory, MainData mainData,
+            FileSystemService fileSystemService) {
+        super(application, swingUtils, widgetFactory, mainData);
+        this.application = application;
+        this.swingUtils = swingUtils;
+        this.widgetFactory = widgetFactory;
+        this.fileSystemService = fileSystemService;
+    }
+
     /**
-     * Finishes the dialog. If primary bd was choosen it is forced to be a
-     * primary.
+     * Finishes the dialog. If primary bd was choosen it is forced to be a primary.
      */
     @Override
     protected void finishDialog() {

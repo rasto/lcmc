@@ -31,6 +31,10 @@ import java.util.Set;
 import javax.inject.Named;
 
 import lcmc.cluster.domain.Cluster;
+import lcmc.cluster.ui.widget.WidgetFactory;
+import lcmc.common.domain.Application;
+import lcmc.common.ui.main.MainData;
+import lcmc.common.ui.utils.SwingUtils;
 import lcmc.crm.ui.ClusterLogs;
 
 /**
@@ -38,8 +42,14 @@ import lcmc.crm.ui.ClusterLogs;
  */
 @Named
 public final class DrbdLogs extends ClusterLogs {
-    /** Name of the drbd device. */
+    /**
+     * Name of the drbd device.
+     */
     private String drbdDeviceName;
+
+    public DrbdLogs(Application application, SwingUtils swingUtils, WidgetFactory widgetFactory, MainData mainData) {
+        super(application, swingUtils, widgetFactory, mainData);
+    }
 
     public void init(final Cluster cluster, final String device) {
         super.init(cluster);
@@ -47,8 +57,7 @@ public final class DrbdLogs extends ClusterLogs {
     }
 
     /**
-     * Returns command string (defined in Distresource...) that prints the drbd
-     * log.
+     * Returns command string (defined in Distresource...) that prints the drbd log.
      */
     @Override
     protected String logFileCommand() {

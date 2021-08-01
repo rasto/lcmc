@@ -20,34 +20,39 @@
 
 package lcmc.drbd.ui.configdialog;
 
-import lcmc.host.domain.Host;
-import lcmc.drbd.domain.DrbdInstallation;
-import lcmc.common.ui.WizardDialog;
-import lcmc.host.ui.NewHostDialog;
-import lcmc.drbd.ui.resource.VolumeInfo;
-import lcmc.common.ui.utils.MyButton;
-import lcmc.common.domain.util.Tools;
-
-import javax.inject.Inject;
 import javax.inject.Named;
 
+import lcmc.cluster.ui.widget.WidgetFactory;
+import lcmc.common.domain.Application;
+import lcmc.common.domain.util.Tools;
+import lcmc.common.ui.MainPanel;
+import lcmc.common.ui.WizardDialog;
+import lcmc.common.ui.main.MainData;
+import lcmc.common.ui.utils.MyButton;
+import lcmc.common.ui.utils.SwingUtils;
+import lcmc.drbd.domain.DrbdInstallation;
+import lcmc.drbd.ui.resource.VolumeInfo;
+import lcmc.host.domain.Host;
+import lcmc.host.ui.NewHostDialog;
+
 /**
- * An implementation of a dialog where user can enter either ip or hostname of
- * the host and user name.
+ * An implementation of a dialog where user can enter either ip or hostname of the host and user name.
  */
 @Named
 public final class NewProxyHostDialog extends NewHostDialog {
     private VolumeInfo volumeInfo;
     private WizardDialog origDialog;
     private WizardDialog nextDialogObject = null;
-    @Inject
-    private ConfigurationProxy configurationProxy;
+    private final ConfigurationProxy configurationProxy;
 
-    public void init(final WizardDialog previousDialog,
-                     final Host host,
-                     final VolumeInfo volumeInfo,
-                     final WizardDialog origDialog,
-                     final DrbdInstallation drbdInstallation) {
+    public NewProxyHostDialog(Application application, SwingUtils swingUtils, WidgetFactory widgetFactory, MainData mainData,
+            MainPanel mainPanel, ConfigurationProxy configurationProxy) {
+        super(application, swingUtils, widgetFactory, mainData, mainPanel);
+        this.configurationProxy = configurationProxy;
+    }
+
+    public void init(final WizardDialog previousDialog, final Host host, final VolumeInfo volumeInfo, final WizardDialog origDialog,
+            final DrbdInstallation drbdInstallation) {
         super.init(previousDialog, host, drbdInstallation);
         this.volumeInfo = volumeInfo;
         this.origDialog = origDialog;

@@ -53,6 +53,7 @@ import lcmc.common.domain.util.Tools;
 import lcmc.common.ui.Access;
 import lcmc.common.ui.SpringUtilities;
 import lcmc.common.ui.WizardDialog;
+import lcmc.common.ui.main.MainData;
 import lcmc.common.ui.utils.MyButton;
 import lcmc.common.ui.utils.SwingUtils;
 import lcmc.crm.service.Corosync;
@@ -112,8 +113,9 @@ public class InitCluster extends DialogCluster {
     private final SwingUtils swingUtils;
     private final Access access;
 
-    public InitCluster(WidgetFactory widgetFactory, Finish finishDialog, Application application, SwingUtils swingUtils,
-            Access access) {
+    public InitCluster(MainData mainData, WidgetFactory widgetFactory, Finish finishDialog, Application application,
+            SwingUtils swingUtils, Access access) {
+        super(application, swingUtils, widgetFactory, mainData);
         this.widgetFactory = widgetFactory;
         this.finishDialog = finishDialog;
         this.application = application;

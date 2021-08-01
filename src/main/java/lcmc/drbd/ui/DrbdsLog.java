@@ -29,7 +29,11 @@ import java.util.Set;
 
 import javax.inject.Named;
 
+import lcmc.cluster.ui.widget.WidgetFactory;
+import lcmc.common.domain.Application;
 import lcmc.common.ui.HostLogs;
+import lcmc.common.ui.main.MainData;
+import lcmc.common.ui.utils.SwingUtils;
 import lcmc.host.domain.Host;
 
 /**
@@ -37,6 +41,10 @@ import lcmc.host.domain.Host;
  */
 @Named
 public final class DrbdsLog extends HostLogs {
+
+    public DrbdsLog(Application application, SwingUtils swingUtils, WidgetFactory widgetFactory, MainData mainData) {
+        super(application, swingUtils, widgetFactory, mainData);
+    }
 
     @Override
     public void init(final Host host) {

@@ -27,7 +27,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.annotation.Resource;
-import javax.inject.Inject;
 import javax.inject.Named;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
@@ -44,6 +43,7 @@ import lcmc.common.domain.util.Tools;
 import lcmc.common.ui.MainPanel;
 import lcmc.common.ui.SpringUtilities;
 import lcmc.common.ui.WizardDialog;
+import lcmc.common.ui.main.MainData;
 import lcmc.common.ui.utils.SwingUtils;
 import lcmc.host.domain.Host;
 
@@ -62,30 +62,44 @@ public class NewHostDialog extends DialogHost {
     private Widget usernameField;
     private Widget sshPortField;
     private Widget useSudoField;
-    /** Whether the fields are big (if more hops are being used). */
+    /**
+     * Whether the fields are big (if more hops are being used).
+     */
     private boolean bigFields = false;
-    /** Enable hostname after it was enabled at least once. */
+    /**
+     * Enable hostname after it was enabled at least once.
+     */
     private boolean enableHostname = false;
-    @Resource(name="configuration")
+    @Resource(name = "configuration")
     private Configuration configuration;
-    @Inject
-    private MainPanel mainPanel;
-    @Inject
-    private Application application;
-    @Inject
-    private SwingUtils swingUtils;
-    @Inject
-    private WidgetFactory widgetFactory;
+    private final MainPanel mainPanel;
+    private final Application application;
+    private final SwingUtils swingUtils;
+    private final WidgetFactory widgetFactory;
 
-    /** Finishes the dialog, stores the values and adds the host tab. */
+    public NewHostDialog(Application application, SwingUtils swingUtils, WidgetFactory widgetFactory, MainData mainData,
+            MainPanel mainPanel) {
+        super(application, swingUtils, widgetFactory, mainData);
+        this.mainPanel = mainPanel;
+        this.application = application;
+        this.swingUtils = swingUtils;
+        this.widgetFactory = widgetFactory;
+    }
+
+    /**
+     * Finishes the dialog, stores the values and adds the host tab.
+     */
     @Override
     protected void finishDialog() {
-        final String hostnameEntered = hostField.getStringValue().trim();
+        final String hostnameEntered = hostField.getStringValue()
+                                                .trim();
         getHost().setEnteredHostOrIp(hostnameEntered);
-        final String username = usernameField.getStringValue().trim();
+        final String username = usernameField.getStringValue()
+                                             .trim();
         getHost().setUsername(username);
         application.setLastEnteredUser(username);
-        final String sshPort = sshPortField.getStringValue().trim();
+        final String sshPort = sshPortField.getStringValue()
+                                           .trim();
         getHost().setSSHPort(sshPort);
         application.setLastEnteredSSHPort(sshPort);
         final String useSudoString = useSudoField.getStringValue().trim();

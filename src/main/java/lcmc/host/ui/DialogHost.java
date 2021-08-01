@@ -26,7 +26,6 @@ package lcmc.host.ui;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.inject.Inject;
 import javax.inject.Named;
 import javax.swing.JPanel;
 
@@ -42,6 +41,7 @@ import lcmc.common.domain.Unit;
 import lcmc.common.domain.Value;
 import lcmc.common.domain.util.Tools;
 import lcmc.common.ui.WizardDialog;
+import lcmc.common.ui.main.MainData;
 import lcmc.common.ui.utils.ComponentWithTest;
 import lcmc.common.ui.utils.MyButton;
 import lcmc.common.ui.utils.SwingUtils;
@@ -55,12 +55,16 @@ public abstract class DialogHost extends WizardDialog {
     private ExecCommandThread commandThread = null;
 
     private DrbdInstallation drbdInstallation;
-    @Inject
-    private Application application;
-    @Inject
-    private SwingUtils swingUtils;
-    @Inject
-    private WidgetFactory widgetFactory;
+    private final Application application;
+    private final SwingUtils swingUtils;
+    private final WidgetFactory widgetFactory;
+
+    public DialogHost(Application application, SwingUtils swingUtils, WidgetFactory widgetFactory, MainData mainData) {
+        super(application, swingUtils, widgetFactory, mainData);
+        this.application = application;
+        this.swingUtils = swingUtils;
+        this.widgetFactory = widgetFactory;
+    }
 
     public void init(final WizardDialog previousDialog, final Host host, final DrbdInstallation drbdInstallation) {
         setPreviousDialog(previousDialog);

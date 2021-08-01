@@ -29,7 +29,11 @@ import java.util.Set;
 
 import javax.inject.Named;
 
+import lcmc.cluster.ui.widget.WidgetFactory;
+import lcmc.common.domain.Application;
 import lcmc.common.ui.HostLogs;
+import lcmc.common.ui.main.MainData;
+import lcmc.common.ui.utils.SwingUtils;
 import lcmc.host.domain.Host;
 
 /**
@@ -39,14 +43,17 @@ import lcmc.host.domain.Host;
 public final class DrbdLog extends HostLogs {
     private String drbdDeviceName;
 
+    public DrbdLog(Application application, SwingUtils swingUtils, WidgetFactory widgetFactory, MainData mainData) {
+        super(application, swingUtils, widgetFactory, mainData);
+    }
+
     public void init(final Host host, final String device) {
         super.init(host);
         drbdDeviceName = device.substring(device.lastIndexOf('/') + 1);
     }
 
     /**
-     * Returns a command name from the DistResource that gets the drbd log file.
-     * "DrbdLog.log"
+     * Returns a command name from the DistResource that gets the drbd log file. "DrbdLog.log"
      */
     @Override
     protected String logFileCommand() {

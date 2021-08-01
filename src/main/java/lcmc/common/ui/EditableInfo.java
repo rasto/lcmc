@@ -39,7 +39,6 @@ import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import javax.inject.Inject;
 import javax.inject.Named;
 import javax.swing.BoxLayout;
 import javax.swing.JLabel;
@@ -62,6 +61,7 @@ import lcmc.common.domain.ResourceValue;
 import lcmc.common.domain.Unit;
 import lcmc.common.domain.Value;
 import lcmc.common.domain.util.Tools;
+import lcmc.common.ui.main.MainData;
 import lcmc.common.ui.utils.ButtonCallback;
 import lcmc.common.ui.utils.MyButton;
 import lcmc.common.ui.utils.SwingUtils;
@@ -106,16 +106,21 @@ public abstract class EditableInfo extends Info {
      * Disabled section, not visible.
      */
     private final Collection<String> disabledSections = new HashSet<>();
-    @Inject
-    private Application application;
-    @Inject
-    private SwingUtils swingUtils;
-    @Inject
-    private WidgetFactory widgetFactory;
-    @Inject
-    private Access access;
+    private final Application application;
+    private final SwingUtils swingUtils;
+    private final WidgetFactory widgetFactory;
+    private final Access access;
 
     private Optional<ResourceValue> resource;
+
+    public EditableInfo(Application application, SwingUtils swingUtils, Access access, MainData mainData,
+            WidgetFactory widgetFactory) {
+        super(application, swingUtils, access, mainData);
+        this.application = application;
+        this.swingUtils = swingUtils;
+        this.widgetFactory = widgetFactory;
+        this.access = access;
+    }
 
     public void einit(final Optional<ResourceValue> resource, final String name, final Browser browser) {
         super.init(name, browser);

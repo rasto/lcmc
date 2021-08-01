@@ -23,7 +23,6 @@ package lcmc.common.ui;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.inject.Inject;
 import javax.inject.Named;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
@@ -31,11 +30,14 @@ import javax.swing.JLabel;
 import lcmc.cluster.ui.widget.Widget;
 import lcmc.cluster.ui.widget.WidgetFactory;
 import lcmc.common.domain.AccessMode;
+import lcmc.common.domain.Application;
 import lcmc.common.domain.StringValue;
 import lcmc.common.domain.Unit;
 import lcmc.common.domain.Value;
 import lcmc.common.domain.util.Tools;
+import lcmc.common.ui.main.MainData;
 import lcmc.common.ui.utils.MyButton;
+import lcmc.common.ui.utils.SwingUtils;
 import lcmc.host.domain.Host;
 
 /**
@@ -44,8 +46,12 @@ import lcmc.host.domain.Host;
 @Named
 public final class CmdLog extends HostLogs {
     private static final Value DEFAULT_TIME = new StringValue("5m");
-    @Inject
-    private WidgetFactory widgetFactory;
+    private final WidgetFactory widgetFactory;
+
+    public CmdLog(Application application, SwingUtils swingUtils, WidgetFactory widgetFactory, MainData mainData) {
+        super(application, swingUtils, widgetFactory, mainData);
+        this.widgetFactory = widgetFactory;
+    }
 
     private static Unit[] getUnits() {
         return new Unit[]{new Unit("s", "s", "second", "seconds"), new Unit("m", "m", "minute", "minutes"),

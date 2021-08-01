@@ -28,7 +28,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
-import javax.inject.Inject;
 import javax.inject.Named;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
@@ -42,8 +41,11 @@ import lcmc.common.domain.Application;
 import lcmc.common.domain.StringValue;
 import lcmc.common.domain.Value;
 import lcmc.common.domain.util.Tools;
+import lcmc.common.ui.Access;
 import lcmc.common.ui.Browser;
+import lcmc.common.ui.main.MainData;
 import lcmc.common.ui.treemenu.ClusterTreeMenu;
+import lcmc.common.ui.utils.MenuFactory;
 import lcmc.common.ui.utils.MyButton;
 import lcmc.common.ui.utils.SwingUtils;
 import lcmc.host.domain.Host;
@@ -158,14 +160,9 @@ public abstract class ParallelSerialInfo extends HardwareInfo {
                         new StringValue("udp", "UDP Console"),
                         new StringValue("unix", "Unix Socket"),
                         new StringValue("vc", "Virtual Console")});
-        POSSIBLE_VALUES.put(
-            ParallelSerialData.SOURCE_MODE,
-            new Value[]{new StringValue("bind", "Server (bind)"),
-                        new StringValue("connect", "Client (connect)")});
-        POSSIBLE_VALUES.put(
-            ParallelSerialData.PROTOCOL_TYPE,
-            new Value[]{new StringValue("telnet"),
-                        new StringValue("raw")});
+        POSSIBLE_VALUES.put(ParallelSerialData.SOURCE_MODE,
+                new Value[]{new StringValue("bind", "Server (bind)"), new StringValue("connect", "Client (connect)")});
+        POSSIBLE_VALUES.put(ParallelSerialData.PROTOCOL_TYPE, new Value[]{new StringValue("telnet"), new StringValue("raw")});
         DEFAULTS_MAP.put(ParallelSerialData.TARGET_PORT, new StringValue("generate"));
         PREFERRED_MAP.put(ParallelSerialData.BIND_SOURCE_HOST, new StringValue("127.0.0.1"));
         PREFERRED_MAP.put(ParallelSerialData.BIND_SOURCE_SERVICE, new StringValue("4555"));
@@ -173,26 +170,34 @@ public abstract class ParallelSerialInfo extends HardwareInfo {
         PREFERRED_MAP.put(ParallelSerialData.CONNECT_SOURCE_SERVICE, new StringValue("4556"));
         PREFERRED_MAP.put(ParallelSerialData.PROTOCOL_TYPE, new StringValue("telnet"));
     }
-    /** Table panel. */
+
+    /**
+     * Table panel.
+     */
     private JComponent tablePanel = null;
-    @Inject
-    private SwingUtils swingUtils;
-    @Inject
-    private WidgetFactory widgetFactory;
-    @Inject
-    private ClusterTreeMenu clusterTreeMenu;
+    private final SwingUtils swingUtils;
+    private final WidgetFactory widgetFactory;
+    private final ClusterTreeMenu clusterTreeMenu;
+
+    public ParallelSerialInfo(Application application, SwingUtils swingUtils, Access access, MainData mainData,
+            WidgetFactory widgetFactory, MenuFactory menuFactory, ClusterTreeMenu clusterTreeMenu) {
+        super(application, swingUtils, access, mainData, widgetFactory, menuFactory, clusterTreeMenu);
+        this.swingUtils = swingUtils;
+        this.widgetFactory = widgetFactory;
+        this.clusterTreeMenu = clusterTreeMenu;
+    }
 
     @Override
     void init(final String name, final Browser browser, final DomainInfo vmsVirtualDomainInfo) {
         super.init(name, browser, vmsVirtualDomainInfo);
     }
 
-    /** Adds disk table with only this disk to the main panel. */
+    /**
+     * Adds disk table with only this disk to the main panel.
+     */
     @Override
     protected final void addHardwareTable(final JPanel mainPanel) {
-        tablePanel = getTablePanel(getTableScreenName(),
-                                   getTableName(),
-                                   getNewBtn0(getVMSVirtualDomainInfo()));
+        tablePanel = getTablePanel(getTableScreenName(), getTableName(), getNewBtn0(getVMSVirtualDomainInfo()));
         if (getResource().isNew()) {
             swingUtils.invokeLater(() -> tablePanel.setVisible(false));
         }

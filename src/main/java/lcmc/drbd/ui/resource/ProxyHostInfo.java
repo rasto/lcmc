@@ -26,7 +26,6 @@ import java.awt.Dimension;
 import java.awt.Font;
 import java.util.List;
 
-import javax.inject.Inject;
 import javax.inject.Named;
 import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
@@ -41,10 +40,13 @@ import lcmc.cluster.ui.widget.WidgetFactory;
 import lcmc.common.domain.Application;
 import lcmc.common.domain.ExecCallback;
 import lcmc.common.domain.util.Tools;
+import lcmc.common.ui.Access;
 import lcmc.common.ui.Browser;
 import lcmc.common.ui.Info;
 import lcmc.common.ui.SpringUtilities;
+import lcmc.common.ui.main.MainData;
 import lcmc.common.ui.utils.MyButton;
+import lcmc.common.ui.utils.SwingUtils;
 import lcmc.common.ui.utils.UpdatableItem;
 import lcmc.drbd.ui.DrbdGraph;
 import lcmc.host.domain.Host;
@@ -60,12 +62,17 @@ public class ProxyHostInfo extends Info {
     private static final Logger LOG = LoggerFactory.getLogger(ProxyHostInfo.class);
     private static final String NAME_PREFIX = Tools.getString("ProxyHostInfo.NameInfo");
     private Host host;
-    @Inject
-    private Application application;
-    @Inject
-    private WidgetFactory widgetFactory;
-    @Inject
-    private ProxyHostMenu proxyHostMenu;
+    private final Application application;
+    private final WidgetFactory widgetFactory;
+    private final ProxyHostMenu proxyHostMenu;
+
+    public ProxyHostInfo(Application application, SwingUtils swingUtils, Access access, MainData mainData,
+            WidgetFactory widgetFactory, ProxyHostMenu proxyHostMenu) {
+        super(application, swingUtils, access, mainData);
+        this.application = application;
+        this.widgetFactory = widgetFactory;
+        this.proxyHostMenu = proxyHostMenu;
+    }
 
     public void init(final Host host, final Browser browser) {
         super.init(host.getName(), browser);

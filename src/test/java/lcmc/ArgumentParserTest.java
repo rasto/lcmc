@@ -12,7 +12,8 @@ class ArgumentParserTest {
     @Test
     void shouldSetSkipNetInterfaceOption() {
         Application application = new Application();
-        ArgumentParser argumentParser = new ArgumentParser(null, null, null, application, null, new Access(), new MainData(null));
+        ArgumentParser argumentParser =
+                new ArgumentParser(null, null, null, application, null, new Access(null), new MainData(null));
 
         argumentParser.parseOptionsAndReturnAutoArguments(
                 new String[]{"--skip-net-interface=skipped", "--skip-net-interface=skipped2"});

@@ -29,7 +29,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.annotation.Resource;
-import javax.inject.Inject;
 import javax.inject.Named;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
@@ -45,6 +44,7 @@ import lcmc.common.domain.Value;
 import lcmc.common.domain.util.Tools;
 import lcmc.common.ui.SpringUtilities;
 import lcmc.common.ui.WizardDialog;
+import lcmc.common.ui.main.MainData;
 import lcmc.common.ui.utils.SwingUtils;
 import lcmc.logger.Logger;
 import lcmc.logger.LoggerFactory;
@@ -63,18 +63,25 @@ public class Configuration extends DialogHost {
     private final Widget[] ipCombo = new Widget[MAX_HOPS];
     private String[] hostnames = new String[MAX_HOPS];
     private volatile boolean hostnameOk = false;
-    @Inject
-    private Devices devices;
-    @Resource(name="SSH")
+    private final Devices devices;
+    @Resource(name = "SSH")
     private SSH sshDialog;
-    @Inject
-    private Application application;
-    @Inject
-    private SwingUtils swingUtils;
-    @Inject
-    private WidgetFactory widgetFactory;
+    private final Application application;
+    private final SwingUtils swingUtils;
+    private final WidgetFactory widgetFactory;
 
-    /** Finishes the dialog and stores the values. */
+    public Configuration(Application application, SwingUtils swingUtils, WidgetFactory widgetFactory, MainData mainData,
+            Devices devices) {
+        super(application, swingUtils, widgetFactory, mainData);
+        this.devices = devices;
+        this.application = application;
+        this.swingUtils = swingUtils;
+        this.widgetFactory = widgetFactory;
+    }
+
+    /**
+     * Finishes the dialog and stores the values.
+     */
     @Override
     protected void finishDialog() {
         getHost().setHostname(Tools.join(",", hostnames, getHops()));

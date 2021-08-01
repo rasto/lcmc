@@ -26,7 +26,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CountDownLatch;
 
-import javax.inject.Inject;
 import javax.inject.Named;
 import javax.swing.AbstractButton;
 import javax.swing.BoxLayout;
@@ -36,10 +35,12 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
 import lcmc.cluster.ui.ClusterBrowser;
+import lcmc.cluster.ui.widget.WidgetFactory;
 import lcmc.common.domain.AccessMode;
 import lcmc.common.domain.Application;
 import lcmc.common.domain.Value;
 import lcmc.common.domain.util.Tools;
+import lcmc.common.ui.Access;
 import lcmc.common.ui.Browser;
 import lcmc.common.ui.EditableInfo;
 import lcmc.common.ui.Info;
@@ -62,12 +63,17 @@ import lcmc.logger.LoggerFactory;
 public class PcmkMultiSelectionInfo extends EditableInfo {
     private static final Logger LOG = LoggerFactory.getLogger(PcmkMultiSelectionInfo.class);
     private List<Info> selectedInfos;
-    @Inject
-    private PcmkMultiSelectionMenu pcmkMultiSelectionMenu;
-    @Inject
-    private Application application;
-    @Inject
-    private SwingUtils swingUtils;
+    private final PcmkMultiSelectionMenu pcmkMultiSelectionMenu;
+    private final Application application;
+    private final SwingUtils swingUtils;
+
+    public PcmkMultiSelectionInfo(Application application, SwingUtils swingUtils, Access access, MainData mainData,
+            WidgetFactory widgetFactory, PcmkMultiSelectionMenu pcmkMultiSelectionMenu) {
+        super(application, swingUtils, access, mainData, widgetFactory);
+        this.pcmkMultiSelectionMenu = pcmkMultiSelectionMenu;
+        this.application = application;
+        this.swingUtils = swingUtils;
+    }
 
     public void init(final List<Info> selectedInfos, final Browser browser) {
         super.einit(Optional.empty(), "selection", browser);

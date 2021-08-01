@@ -38,8 +38,11 @@ import javax.swing.JComponent;
 import javax.swing.JPanel;
 
 import lcmc.cluster.ui.widget.Check;
+import lcmc.cluster.ui.widget.WidgetFactory;
+import lcmc.common.domain.Application;
 import lcmc.common.domain.CancelCallback;
 import lcmc.common.domain.util.Tools;
+import lcmc.common.ui.main.MainData;
 import lcmc.common.ui.utils.MyButton;
 import lcmc.common.ui.utils.SwingUtils;
 
@@ -54,7 +57,9 @@ public abstract class WizardDialog extends ConfigDialog {
     static final ImageIcon FINISH_ICON = Tools.createImageIcon(Tools.getDefault("Dialog.Dialog.FinishIcon"));
     private static final ImageIcon NEXT_ICON = Tools.createImageIcon(Tools.getDefault("Dialog.Dialog.NextIcon"));
     private static final ImageIcon BACK_ICON = Tools.createImageIcon(Tools.getDefault("Dialog.Dialog.BackIcon"));
-    /** Previous dialog object. A dialog that will be displayed after clicking on the back button */
+    /**
+     * Previous dialog object. A dialog that will be displayed after clicking on the back button
+     */
     private WizardDialog previousDialog;
     private ProgressBar progressBar = null;
     @Inject
@@ -62,9 +67,12 @@ public abstract class WizardDialog extends ConfigDialog {
     @Inject
     private Provider<ProgressBar> progressBarProvider;
 
+    public WizardDialog(Application application, SwingUtils swingUtils, WidgetFactory widgetFactory, MainData mainData) {
+        super(application, swingUtils, widgetFactory, mainData);
+    }
+
     /**
-     * Returns previous dialog. It is used to get with the back button to
-     * the dialog before this one.
+     * Returns previous dialog. It is used to get with the back button to the dialog before this one.
      */
     public WizardDialog getPreviousDialog() {
         return previousDialog;

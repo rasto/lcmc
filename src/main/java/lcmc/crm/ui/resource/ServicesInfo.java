@@ -34,7 +34,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.CountDownLatch;
 
-import javax.inject.Inject;
 import javax.inject.Named;
 import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
@@ -46,12 +45,14 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import lcmc.cluster.ui.ClusterBrowser;
 import lcmc.cluster.ui.widget.Check;
 import lcmc.cluster.ui.widget.Widget;
+import lcmc.cluster.ui.widget.WidgetFactory;
 import lcmc.common.domain.AccessMode;
 import lcmc.common.domain.Application;
 import lcmc.common.domain.ResourceValue;
 import lcmc.common.domain.StringValue;
 import lcmc.common.domain.Value;
 import lcmc.common.domain.util.Tools;
+import lcmc.common.ui.Access;
 import lcmc.common.ui.Browser;
 import lcmc.common.ui.EditableInfo;
 import lcmc.common.ui.Info;
@@ -74,30 +75,37 @@ import lcmc.logger.Logger;
 import lcmc.logger.LoggerFactory;
 
 /**
- * This class holds info data for services view and global heartbeat
- * config.
+ * This class holds info data for services view and global heartbeat config.
  */
 @Named
 public class ServicesInfo extends EditableInfo {
     private static final Logger LOG = LoggerFactory.getLogger(ServicesInfo.class);
     static final ImageIcon CLUSTER_ICON = Tools.createImageIcon(Tools.getDefault("ClustersPanel.ClusterIcon"));
-    /** Cache for the info panel. */
+    /**
+     * Cache for the info panel.
+     */
     private JComponent infoPanel = null;
 
-    @Inject
-    private ServicesMenu servicesMenu;
-    @Inject
-    private ProgressIndicator progressIndicator;
-    @Inject
-    private Application application;
-    @Inject
-    private SwingUtils swingUtils;
-    @Inject
-    private ClusterTreeMenu clusterTreeMenu;
-    @Inject
-    private CrmServiceFactory crmServiceFactory;
-    @Inject
-    private Dialogs dialogs;
+    private final ServicesMenu servicesMenu;
+    private final ProgressIndicator progressIndicator;
+    private final Application application;
+    private final SwingUtils swingUtils;
+    private final ClusterTreeMenu clusterTreeMenu;
+    private final CrmServiceFactory crmServiceFactory;
+    private final Dialogs dialogs;
+
+    public ServicesInfo(Application application, SwingUtils swingUtils, Access access, MainData mainData,
+            WidgetFactory widgetFactory, ServicesMenu servicesMenu, ProgressIndicator progressIndicator,
+            ClusterTreeMenu clusterTreeMenu, CrmServiceFactory crmServiceFactory, Dialogs dialogs) {
+        super(application, swingUtils, access, mainData, widgetFactory);
+        this.servicesMenu = servicesMenu;
+        this.progressIndicator = progressIndicator;
+        this.application = application;
+        this.swingUtils = swingUtils;
+        this.clusterTreeMenu = clusterTreeMenu;
+        this.crmServiceFactory = crmServiceFactory;
+        this.dialogs = dialogs;
+    }
 
     public void einit(final String name, final Browser browser) {
         super.einit(Optional.of(new ResourceValue(name)), name, browser);

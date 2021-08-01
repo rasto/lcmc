@@ -21,7 +21,6 @@
  */
 package lcmc.drbd.ui.resource;
 
-import javax.inject.Inject;
 import javax.inject.Named;
 
 import lcmc.cluster.domain.Cluster;
@@ -29,24 +28,32 @@ import lcmc.cluster.ui.ClusterBrowser;
 import lcmc.cluster.ui.widget.Widget;
 import lcmc.cluster.ui.widget.WidgetFactory;
 import lcmc.common.domain.AccessMode;
+import lcmc.common.domain.Application;
 import lcmc.common.domain.Unit;
 import lcmc.common.domain.Value;
 import lcmc.common.domain.util.Tools;
+import lcmc.common.ui.Access;
 import lcmc.common.ui.EditableInfo;
+import lcmc.common.ui.main.MainData;
+import lcmc.common.ui.utils.SwingUtils;
 import lcmc.drbd.domain.DrbdProxy;
 import lcmc.drbd.domain.DrbdXml;
 import lcmc.host.domain.Host;
 
 /**
- * this class holds info data, menus and configuration
- * for a drbd resource.
+ * this class holds info data, menus and configuration for a drbd resource.
  */
 @Named
 public abstract class AbstractDrbdInfo extends EditableInfo {
     protected static final String DRBD_RES_PARAM_AFTER = "resync-after";
     protected static final String DRBD_RES_PARAM_AFTER_8_3 = "after";
-    @Inject
-    private WidgetFactory widgetFactory;
+    private final WidgetFactory widgetFactory;
+
+    public AbstractDrbdInfo(Application application, SwingUtils swingUtils, Access access, MainData mainData,
+            WidgetFactory widgetFactory) {
+        super(application, swingUtils, access, mainData, widgetFactory);
+        this.widgetFactory = widgetFactory;
+    }
 
     @Override
     public ClusterBrowser getBrowser() {

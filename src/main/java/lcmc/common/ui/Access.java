@@ -23,7 +23,6 @@ package lcmc.common.ui;
 import java.util.List;
 import java.util.Map;
 
-import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 import javax.swing.JComponent;
@@ -39,21 +38,24 @@ import lcmc.common.domain.AccessMode;
 @Named
 @Singleton
 public class Access {
-    @Inject
-    private Clusters allClusters;
+    private final Clusters allClusters;
 
     private boolean advancedMode = false;
     private AccessMode.Type accessType = AccessMode.ADMIN;
     private AccessMode.Type maxAccessType = AccessMode.ADMIN;
 
     private final Map<JComponent, AccessMode> visibleInAccessType = Maps.newHashMap();
-    /** Global elements like menus, that are enabled, disabled according to
-     * their access type. */
+    /**
+     * Global elements like menus, that are enabled, disabled according to their access type.
+     */
     private final Map<JComponent, AccessMode> enabledInAccessType = Maps.newHashMap();
 
+    public Access(Clusters allClusters) {
+        this.allClusters = allClusters;
+    }
+
     /**
-     * Add to the list of components that are visible only in specific access
-     * mode.
+     * Add to the list of components that are visible only in specific access mode.
      */
     void addToVisibleInAccessType(final JComponent c, final AccessMode accessMode) {
         c.setVisible(isAccessible(accessMode));

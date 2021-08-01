@@ -25,8 +25,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Provider;
 
 import lcmc.cluster.domain.Network;
 import lcmc.cluster.service.NetworkService;
@@ -34,26 +34,37 @@ import lcmc.cluster.ui.widget.Check;
 import lcmc.cluster.ui.widget.Widget;
 import lcmc.cluster.ui.widget.WidgetFactory;
 import lcmc.common.domain.AccessMode;
+import lcmc.common.domain.Application;
 import lcmc.common.domain.StringValue;
 import lcmc.common.domain.Value;
 import lcmc.common.domain.util.Tools;
+import lcmc.common.ui.Access;
+import lcmc.common.ui.main.MainData;
+import lcmc.common.ui.main.ProgressIndicator;
+import lcmc.common.ui.treemenu.ClusterTreeMenu;
+import lcmc.common.ui.utils.SwingUtils;
 
 /**
- * This class holds info about IPaddr/IPaddr2 heartbeat service. It adds a
- * better ip entering capabilities.
+ * This class holds info about IPaddr/IPaddr2 heartbeat service. It adds a better ip entering capabilities.
  */
 @Named
 final class IPaddrInfo extends ServiceInfo {
-    @Inject
-    private WidgetFactory widgetFactory;
-    @Inject
-    private NetworkService networkService;
+    private final WidgetFactory widgetFactory;
+    private final NetworkService networkService;
+
+    public IPaddrInfo(Application application, SwingUtils swingUtils, Access access, MainData mainData, WidgetFactory widgetFactory,
+            ProgressIndicator progressIndicator, ServiceMenu serviceMenu, Provider<CloneInfo> cloneInfoProvider,
+            ClusterTreeMenu clusterTreeMenu, CrmServiceFactory crmServiceFactory, NetworkService networkService) {
+        super(application, swingUtils, access, mainData, widgetFactory, progressIndicator, serviceMenu, cloneInfoProvider,
+                clusterTreeMenu, crmServiceFactory);
+        this.widgetFactory = widgetFactory;
+        this.networkService = networkService;
+    }
 
     /**
-     * Returns whether all the parameters are correct. If param is null,
-     * all paremeters will be checked, otherwise only the param, but other
-     * parameters will be checked only in the cache. This is good if only
-     * one value is changed and we don't want to check everything.
+     * Returns whether all the parameters are correct. If param is null, all paremeters will be checked, otherwise only the param,
+     * but other parameters will be checked only in the cache. This is good if only one value is changed and we don't want to check
+     * everything.
      */
     @Override
     public Check checkResourceFields(final String param, final String[] params) {

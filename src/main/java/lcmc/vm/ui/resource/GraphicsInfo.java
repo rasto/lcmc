@@ -30,7 +30,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 
-import javax.inject.Inject;
 import javax.inject.Named;
 import javax.swing.ImageIcon;
 import javax.swing.JComponent;
@@ -40,13 +39,17 @@ import org.w3c.dom.Node;
 
 import lcmc.cluster.service.NetworkService;
 import lcmc.cluster.ui.widget.Widget;
+import lcmc.cluster.ui.widget.WidgetFactory;
 import lcmc.common.domain.AccessMode;
 import lcmc.common.domain.Application;
 import lcmc.common.domain.StringValue;
 import lcmc.common.domain.Value;
 import lcmc.common.domain.util.Tools;
+import lcmc.common.ui.Access;
 import lcmc.common.ui.Browser;
+import lcmc.common.ui.main.MainData;
 import lcmc.common.ui.treemenu.ClusterTreeMenu;
+import lcmc.common.ui.utils.MenuFactory;
 import lcmc.common.ui.utils.SwingUtils;
 import lcmc.host.domain.Host;
 import lcmc.vm.domain.VmsXml;
@@ -128,8 +131,7 @@ public final class GraphicsInfo extends HardwareInfo {
                 new Value[]{PORT_AUTO, new StringValue("5900", "5900"), new StringValue("5901", "5901")});
     }
 
-    @Inject
-    private SwingUtils swingUtils;
+    private final SwingUtils swingUtils;
 
     /**
      * Combo box that can be made invisible.
@@ -159,22 +161,28 @@ public final class GraphicsInfo extends HardwareInfo {
      * Table panel.
      */
     private JComponent tablePanel = null;
-    @Inject
-    private ClusterTreeMenu clusterTreeMenu;
-    @Inject
-    private NetworkService networkService;
+    private final ClusterTreeMenu clusterTreeMenu;
+    private final NetworkService networkService;
+
+    public GraphicsInfo(Application application, SwingUtils swingUtils, Access access, MainData mainData,
+            WidgetFactory widgetFactory, MenuFactory menuFactory, ClusterTreeMenu clusterTreeMenu, NetworkService networkService) {
+        super(application, swingUtils, access, mainData, widgetFactory, menuFactory, clusterTreeMenu);
+        this.swingUtils = swingUtils;
+        this.clusterTreeMenu = clusterTreeMenu;
+        this.networkService = networkService;
+    }
 
     @Override
     void init(final String name, final Browser browser, final DomainInfo vmsVirtualDomainInfo) {
         super.init(name, browser, vmsVirtualDomainInfo);
     }
 
-    /** Adds disk table with only this disk to the main panel. */
+    /**
+     * Adds disk table with only this disk to the main panel.
+     */
     @Override
     protected void addHardwareTable(final JPanel mainPanel) {
-        tablePanel = getTablePanel("Displays",
-                                   DomainInfo.GRAPHICS_TABLE,
-                                   getVMSVirtualDomainInfo().getNewGraphicsBtn());
+        tablePanel = getTablePanel("Displays", DomainInfo.GRAPHICS_TABLE, getVMSVirtualDomainInfo().getNewGraphicsBtn());
         if (getResource().isNew()) {
             swingUtils.invokeLater(() -> tablePanel.setVisible(false));
         }

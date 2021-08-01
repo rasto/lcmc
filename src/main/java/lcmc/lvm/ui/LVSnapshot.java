@@ -24,7 +24,6 @@ package lcmc.lvm.ui;
 
 import java.util.Set;
 
-import javax.inject.Inject;
 import javax.inject.Named;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
@@ -39,6 +38,7 @@ import lcmc.common.domain.StringValue;
 import lcmc.common.domain.Value;
 import lcmc.common.ui.Browser;
 import lcmc.common.ui.SpringUtilities;
+import lcmc.common.ui.main.MainData;
 import lcmc.common.ui.utils.MyButton;
 import lcmc.common.ui.utils.SwingUtils;
 import lcmc.common.ui.utils.WidgetListener;
@@ -57,11 +57,15 @@ public final class LVSnapshot extends LV {
     private Widget lvNameWi;
     private Widget sizeWi;
     private Widget maxSizeWi;
-    @Inject
-    private SwingUtils swingUtils;
-    @Inject
-    private WidgetFactory widgetFactory;
+    private final SwingUtils swingUtils;
+    private final WidgetFactory widgetFactory;
     private MyButton snapshotButton;
+
+    public LVSnapshot(Application application, SwingUtils swingUtils, WidgetFactory widgetFactory, MainData mainData) {
+        super(application, swingUtils, widgetFactory, mainData);
+        this.swingUtils = swingUtils;
+        this.widgetFactory = widgetFactory;
+    }
 
     public void init(final BlockDevInfo blockDevInfo) {
         super.init(null);

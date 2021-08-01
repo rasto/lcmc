@@ -32,32 +32,43 @@ import java.util.Set;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
-import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Provider;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.SpringLayout;
 
 import lcmc.cluster.ui.widget.Check;
+import lcmc.cluster.ui.widget.WidgetFactory;
 import lcmc.common.domain.Application;
 import lcmc.common.domain.util.Tools;
+import lcmc.common.ui.Access;
 import lcmc.common.ui.Browser;
 import lcmc.common.ui.SpringUtilities;
+import lcmc.common.ui.main.MainData;
+import lcmc.common.ui.treemenu.ClusterTreeMenu;
+import lcmc.common.ui.utils.SwingUtils;
 import lcmc.common.ui.utils.UpdatableItem;
 import lcmc.crm.domain.CrmXml;
 import lcmc.crm.service.CRM;
 import lcmc.host.domain.Host;
 
 /**
- * This class describes a connection between two heartbeat services.
- * It can be order, colocation or both.
+ * This class describes a connection between two heartbeat services. It can be order, colocation or both.
  */
 @Named
 public class PcmkRscSetsInfo extends HbConnectionInfo {
     private final Collection<ConstraintPHInfo> constraintPHInfos = new LinkedHashSet<>();
     private final Lock mConstraintPHLock = new ReentrantLock();
-    @Inject
-    private Application application;
+    private final Application application;
+
+    public PcmkRscSetsInfo(Application application, SwingUtils swingUtils, Access access, MainData mainData,
+            WidgetFactory widgetFactory, Provider<HbColocationInfo> colocationInfoProvider, Provider<HbOrderInfo> orderInfoProvider,
+            HbConnectionMenu hbConnectionMenu, ClusterTreeMenu clusterTreeMenu) {
+        super(application, swingUtils, access, mainData, widgetFactory, colocationInfoProvider, orderInfoProvider, hbConnectionMenu,
+                clusterTreeMenu);
+        this.application = application;
+    }
 
     void init(final Browser browser, final ConstraintPHInfo cphi) {
         super.init(browser);

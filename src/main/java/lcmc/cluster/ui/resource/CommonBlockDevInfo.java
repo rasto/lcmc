@@ -26,7 +26,10 @@ import javax.swing.ImageIcon;
 
 import lcmc.common.domain.Application;
 import lcmc.common.domain.util.Tools;
+import lcmc.common.ui.Access;
 import lcmc.common.ui.Browser;
+import lcmc.common.ui.main.MainData;
+import lcmc.common.ui.utils.SwingUtils;
 import lcmc.crm.ui.resource.HbCategoryInfo;
 import lcmc.crm.ui.resource.ServiceInfo;
 import lcmc.drbd.domain.BlockDevice;
@@ -34,15 +37,18 @@ import lcmc.drbd.domain.CommonBlockDevice;
 import lcmc.drbd.ui.resource.BlockDevInfo;
 
 /**
- * This class holds info data for a block device that is common
- * in all hosts in the cluster and can be chosen in the scrolling list in
- * the filesystem service.
+ * This class holds info data for a block device that is common in all hosts in the cluster and can be chosen in the scrolling list
+ * in the filesystem service.
  */
 @Named
 public class CommonBlockDevInfo extends HbCategoryInfo implements CommonDeviceInterface {
     /** block devices of this common block device on all nodes. */
     private BlockDevice[] blockDevices;
     private CommonBlockDevice commonBlockDevice;
+
+    public CommonBlockDevInfo(Application application, SwingUtils swingUtils, Access access, MainData mainData) {
+        super(application, swingUtils, access, mainData);
+    }
 
     public void init(final String name, final BlockDevice[] blockDevices, final Browser browser) {
         super.init(name, browser);

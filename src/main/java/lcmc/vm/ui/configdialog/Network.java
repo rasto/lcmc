@@ -25,7 +25,6 @@ package lcmc.vm.ui.configdialog;
 
 import java.awt.Dimension;
 
-import javax.inject.Inject;
 import javax.inject.Named;
 import javax.swing.BoxLayout;
 import javax.swing.JComponent;
@@ -33,10 +32,12 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
 import lcmc.cluster.ui.widget.Widget;
+import lcmc.cluster.ui.widget.WidgetFactory;
 import lcmc.common.domain.Application;
 import lcmc.common.domain.StringValue;
 import lcmc.common.domain.util.Tools;
 import lcmc.common.ui.WizardDialog;
+import lcmc.common.ui.main.MainData;
 import lcmc.common.ui.utils.SwingUtils;
 import lcmc.vm.domain.data.InterfaceData;
 import lcmc.vm.ui.resource.InterfaceInfo;
@@ -46,23 +47,25 @@ import lcmc.vm.ui.resource.InterfaceInfo;
  */
 @Named
 final class Network extends VMConfig {
-    private static final String[] PARAMS = {InterfaceData.TYPE,
-                                            InterfaceData.MAC_ADDRESS,
-                                            InterfaceData.SOURCE_NETWORK,
-                                            InterfaceData.SOURCE_BRIDGE,
-                                            InterfaceData.SCRIPT_PATH,
-                                            InterfaceData.MODEL_TYPE};
+    private static final String[] PARAMS =
+            {InterfaceData.TYPE, InterfaceData.MAC_ADDRESS, InterfaceData.SOURCE_NETWORK, InterfaceData.SOURCE_BRIDGE,
+                    InterfaceData.SCRIPT_PATH, InterfaceData.MODEL_TYPE};
     private JComponent inputPane = null;
     private InterfaceInfo interfaceInfo = null;
     private VMConfig nextDialogObject = null;
-    @Inject
-    private Display displayDialog;
-    @Inject
-    private VMFinish VMFinishDialog;
-    @Inject
-    private Application application;
-    @Inject
-    private SwingUtils swingUtils;
+    private final Display displayDialog;
+    private final VMFinish VMFinishDialog;
+    private final Application application;
+    private final SwingUtils swingUtils;
+
+    public Network(Application application, SwingUtils swingUtils, WidgetFactory widgetFactory, MainData mainData,
+            Display displayDialog, VMFinish VMFinishDialog) {
+        super(application, swingUtils, widgetFactory, mainData);
+        this.displayDialog = displayDialog;
+        this.VMFinishDialog = VMFinishDialog;
+        this.application = application;
+        this.swingUtils = swingUtils;
+    }
 
     @Override
     public WizardDialog nextDialog() {

@@ -25,7 +25,6 @@ package lcmc.drbd.ui;
 
 import java.util.Set;
 
-import javax.inject.Inject;
 import javax.inject.Named;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
@@ -39,7 +38,9 @@ import lcmc.common.domain.Application;
 import lcmc.common.domain.util.Tools;
 import lcmc.common.ui.SpringUtilities;
 import lcmc.common.ui.WizardDialog;
+import lcmc.common.ui.main.MainData;
 import lcmc.common.ui.utils.MyButton;
+import lcmc.common.ui.utils.SwingUtils;
 import lcmc.drbd.service.DRBD;
 import lcmc.drbd.ui.configdialog.DrbdConfig;
 import lcmc.host.domain.Host;
@@ -54,15 +55,23 @@ import lcmc.logger.LoggerFactory;
 public final class SplitBrain extends DrbdConfig {
     private static final Logger LOG = LoggerFactory.getLogger(SplitBrain.class);
     private static final int COMBOBOX_WIDTH = 160;
-    /** Combo box with host that has more recent data. */
+    /**
+     * Combo box with host that has more recent data.
+     */
     private Widget hostWithBetterDataWidget;
-    @Inject
-    private WidgetFactory widgetFactory;
+    private final WidgetFactory widgetFactory;
     private MyButton resolveButton;
 
+    public SplitBrain(Application application, SwingUtils swingUtils, WidgetFactory widgetFactory, MainData mainData) {
+        super(application, swingUtils, widgetFactory, mainData);
+        this.widgetFactory = widgetFactory;
+    }
+
     private void resolve() {
-        final Host h1 = getDrbdVolumeInfo().getFirstBlockDevInfo().getHost();
-        final Host h2 = getDrbdVolumeInfo().getSecondBlockDevInfo().getHost();
+        final Host h1 = getDrbdVolumeInfo().getFirstBlockDevInfo()
+                                           .getHost();
+        final Host h2 = getDrbdVolumeInfo().getSecondBlockDevInfo()
+                                           .getHost();
         final String h = hostWithBetterDataWidget.getStringValue();
 
         final Runnable runnable = () -> {

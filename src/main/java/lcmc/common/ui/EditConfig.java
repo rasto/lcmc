@@ -27,7 +27,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-import javax.inject.Inject;
 import javax.inject.Named;
 import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
@@ -43,8 +42,11 @@ import javax.swing.text.Document;
 
 import lcmc.cluster.service.ssh.ExecCommandConfig;
 import lcmc.cluster.service.ssh.ExecCommandThread;
+import lcmc.cluster.ui.widget.WidgetFactory;
+import lcmc.common.domain.Application;
 import lcmc.common.domain.ExecCallback;
 import lcmc.common.domain.util.Tools;
+import lcmc.common.ui.main.MainData;
 import lcmc.common.ui.main.ProgressIndicator;
 import lcmc.common.ui.utils.SwingUtils;
 import lcmc.configs.DistResource;
@@ -66,13 +68,19 @@ public final class EditConfig extends ConfigDialog {
     private final JTextArea configArea = new JTextArea(Tools.getString("Dialog.EditConfig.Loading"));
 
     private final JLabel errorMessagePanel = new JLabel();
-    /** Whether config area is being filled so that save button,
-        doesn't get enabled. */
+    /**
+     * Whether config area is being filled so that save button, doesn't get enabled.
+     */
     private volatile boolean configInProgress = true;
-    @Inject
-    private ProgressIndicator progressIndicator;
-    @Inject
-    private SwingUtils swingUtils;
+    private final ProgressIndicator progressIndicator;
+    private final SwingUtils swingUtils;
+
+    public EditConfig(Application application, SwingUtils swingUtils, WidgetFactory widgetFactory, MainData mainData,
+            ProgressIndicator progressIndicator) {
+        super(application, swingUtils, widgetFactory, mainData);
+        this.progressIndicator = progressIndicator;
+        this.swingUtils = swingUtils;
+    }
 
     public void init(final String fileToEdit, final Set<Host> hosts) {
         this.fileToEdit = fileToEdit;
@@ -80,7 +88,9 @@ public final class EditConfig extends ConfigDialog {
         addToOptions(backupCheckBoxes);
     }
 
-    /** Returns the content of the edit config dialog. */
+    /**
+     * Returns the content of the edit config dialog.
+     */
     @Override
     protected JComponent getInputPane() {
         final JPanel pane = new JPanel();

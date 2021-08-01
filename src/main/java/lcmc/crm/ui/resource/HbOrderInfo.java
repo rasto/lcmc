@@ -34,13 +34,17 @@ import lcmc.Exceptions;
 import lcmc.cluster.ui.ClusterBrowser;
 import lcmc.cluster.ui.widget.Check;
 import lcmc.cluster.ui.widget.Widget;
+import lcmc.cluster.ui.widget.WidgetFactory;
 import lcmc.common.domain.AccessMode;
 import lcmc.common.domain.Application;
 import lcmc.common.domain.StringValue;
 import lcmc.common.domain.Value;
 import lcmc.common.domain.util.Tools;
+import lcmc.common.ui.Access;
 import lcmc.common.ui.Browser;
 import lcmc.common.ui.EditableInfo;
+import lcmc.common.ui.main.MainData;
+import lcmc.common.ui.utils.SwingUtils;
 import lcmc.crm.domain.ClusterStatus;
 import lcmc.crm.domain.CrmXml;
 import lcmc.crm.domain.Service;
@@ -58,13 +62,18 @@ final class HbOrderInfo extends EditableInfo implements HbConstraintInterface {
     public static final String NOT_AVAIL_FOR_PCMK_VERSION = Tools.getString("HbOrderInfo.NotAvailableForThisVersion");
     private ServiceInfo serviceInfoParent;
     private ServiceInfo serviceInfoChild;
-    /** Connection that keeps this constraint. */
+    /**
+     * Connection that keeps this constraint.
+     */
     private HbConnectionInfo connectionInfo;
 
-    void init(final HbConnectionInfo connectionInfo,
-              final ServiceInfo serviceInfoParent,
-              final ServiceInfo serviceInfoChild,
-              final Browser browser) {
+    public HbOrderInfo(Application application, SwingUtils swingUtils, Access access, MainData mainData,
+            WidgetFactory widgetFactory) {
+        super(application, swingUtils, access, mainData, widgetFactory);
+    }
+
+    void init(final HbConnectionInfo connectionInfo, final ServiceInfo serviceInfoParent, final ServiceInfo serviceInfoChild,
+            final Browser browser) {
         super.einit(Optional.of(new Service("Order")), "Order", browser);
         this.connectionInfo = connectionInfo;
         this.serviceInfoParent = serviceInfoParent;

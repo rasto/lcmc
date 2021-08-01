@@ -28,12 +28,18 @@ import java.util.TreeSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Provider;
 
+import lcmc.cluster.ui.widget.WidgetFactory;
 import lcmc.common.domain.Application;
 import lcmc.common.domain.StringValue;
 import lcmc.common.domain.Value;
+import lcmc.common.ui.Access;
+import lcmc.common.ui.main.MainData;
+import lcmc.common.ui.main.ProgressIndicator;
+import lcmc.common.ui.treemenu.ClusterTreeMenu;
+import lcmc.common.ui.utils.SwingUtils;
 import lcmc.common.ui.utils.UpdatableItem;
 import lcmc.host.domain.Host;
 import lcmc.vm.domain.VmsXml;
@@ -48,17 +54,24 @@ public class VirtualDomainInfo extends ServiceInfo {
     static final Pattern LIBVIRT_CONF_PATTERN = Pattern.compile(".*?([^/]+).xml$");
     private static final String CONFIG_PARAM = "config";
     private static final String HYPERVISOR_PARAM = "hypervisor";
-    private static final Value[] HYPERVISORS = {new StringValue("qemu:///system"),
-                                                new StringValue("xen:///"),
-                                                new StringValue("lxc:///"),
-                                                new StringValue("vbox:///"),
-                                                new StringValue("openvz:///system"),
-                                                new StringValue("uml:///system")};
+    private static final Value[] HYPERVISORS =
+            {new StringValue("qemu:///system"), new StringValue("xen:///"), new StringValue("lxc:///"), new StringValue("vbox:///"),
+                    new StringValue("openvz:///system"), new StringValue("uml:///system")};
     private static final String PARAM_ALLOW_MIGRATE = "allow-migrate";
-    /** VirtualDomain in the VMs menu. */
+    /**
+     * VirtualDomain in the VMs menu.
+     */
     private DomainInfo domainInfo = null;
-    @Inject
-    private VirtualDomainMenu virtualDomainMenu;
+    private final VirtualDomainMenu virtualDomainMenu;
+
+    public VirtualDomainInfo(Application application, SwingUtils swingUtils, Access access, MainData mainData,
+            WidgetFactory widgetFactory, ProgressIndicator progressIndicator, ServiceMenu serviceMenu,
+            Provider<CloneInfo> cloneInfoProvider, ClusterTreeMenu clusterTreeMenu, CrmServiceFactory crmServiceFactory,
+            VirtualDomainMenu virtualDomainMenu) {
+        super(application, swingUtils, access, mainData, widgetFactory, progressIndicator, serviceMenu, cloneInfoProvider,
+                clusterTreeMenu, crmServiceFactory);
+        this.virtualDomainMenu = virtualDomainMenu;
+    }
 
     VmsXml getVMSXML(final Host host) {
         return getBrowser().getVmsXml(host);

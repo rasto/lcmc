@@ -37,7 +37,6 @@ import java.util.TreeSet;
 import java.util.concurrent.CountDownLatch;
 import java.util.regex.Matcher;
 
-import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Provider;
 import javax.swing.BoxLayout;
@@ -49,14 +48,17 @@ import lcmc.Exceptions;
 import lcmc.cluster.ui.ClusterBrowser;
 import lcmc.cluster.ui.resource.CommonDeviceInterface;
 import lcmc.cluster.ui.widget.Check;
+import lcmc.cluster.ui.widget.WidgetFactory;
 import lcmc.cluster.ui.wizard.DrbdLogs;
 import lcmc.common.domain.AccessMode;
 import lcmc.common.domain.Application;
 import lcmc.common.domain.StringValue;
 import lcmc.common.domain.Value;
 import lcmc.common.domain.util.Tools;
+import lcmc.common.ui.Access;
 import lcmc.common.ui.Browser;
 import lcmc.common.ui.EditableInfo;
+import lcmc.common.ui.main.MainData;
 import lcmc.common.ui.treemenu.ClusterTreeMenu;
 import lcmc.common.ui.utils.ButtonCallback;
 import lcmc.common.ui.utils.ComponentWithTest;
@@ -148,20 +150,26 @@ public class VolumeInfo extends EditableInfo implements CommonDeviceInterface {
     private String createdFs = null;
     private JComponent infoPanel = null;
     private Set<Host> hosts;
-    @Inject
-    private AddDrbdSplitBrainDialog addDrbdSplitBrainDialog;
-    @Inject
-    private Provider<DrbdXml> drbdXmlProvider;
-    @Inject
-    private Application application;
-    @Inject
-    private SwingUtils swingUtils;
-    @Inject
-    private VolumeMenu volumeMenu;
-    @Inject
-    private Provider<DrbdLogs> drbdLogsProvider;
-    @Inject
-    private ClusterTreeMenu clusterTreeMenu;
+    private final AddDrbdSplitBrainDialog addDrbdSplitBrainDialog;
+    private final Provider<DrbdXml> drbdXmlProvider;
+    private final Application application;
+    private final SwingUtils swingUtils;
+    private final VolumeMenu volumeMenu;
+    private final Provider<DrbdLogs> drbdLogsProvider;
+    private final ClusterTreeMenu clusterTreeMenu;
+
+    public VolumeInfo(Application application, SwingUtils swingUtils, Access access, MainData mainData, WidgetFactory widgetFactory,
+            AddDrbdSplitBrainDialog addDrbdSplitBrainDialog, Provider<DrbdXml> drbdXmlProvider, VolumeMenu volumeMenu,
+            Provider<DrbdLogs> drbdLogsProvider, ClusterTreeMenu clusterTreeMenu) {
+        super(application, swingUtils, access, mainData, widgetFactory);
+        this.addDrbdSplitBrainDialog = addDrbdSplitBrainDialog;
+        this.drbdXmlProvider = drbdXmlProvider;
+        this.application = application;
+        this.swingUtils = swingUtils;
+        this.volumeMenu = volumeMenu;
+        this.drbdLogsProvider = drbdLogsProvider;
+        this.clusterTreeMenu = clusterTreeMenu;
+    }
 
     void init(final String name, final String device, final ResourceInfo resourceInfo, final List<BlockDevInfo> blockDevInfos,
             final Browser browser) {

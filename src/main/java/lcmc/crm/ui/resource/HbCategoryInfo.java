@@ -23,16 +23,24 @@ package lcmc.crm.ui.resource;
 
 import javax.inject.Named;
 import javax.swing.JPanel;
+
 import lcmc.cluster.ui.ClusterBrowser;
-import lcmc.common.ui.main.MainData;
+import lcmc.common.domain.Application;
+import lcmc.common.ui.Access;
 import lcmc.common.ui.CategoryInfo;
+import lcmc.common.ui.main.MainData;
+import lcmc.common.ui.utils.SwingUtils;
+
 /**
- * This class is used for all kind of categories in the heartbeat
- * hierarchy. Its point is to show heartbeat graph all the time, ane
+ * This class is used for all kind of categories in the heartbeat hierarchy. Its point is to show heartbeat graph all the time, ane
  * heartbeat category is clicked.
  */
 @Named
 public class HbCategoryInfo extends CategoryInfo {
+
+    public HbCategoryInfo(Application application, SwingUtils swingUtils, Access access, MainData mainData) {
+        super(application, swingUtils, access, mainData);
+    }
 
     @Override
     public ClusterBrowser getBrowser() {

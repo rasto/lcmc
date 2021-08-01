@@ -20,7 +20,6 @@
 
 package lcmc.drbd.ui.configdialog;
 
-import javax.inject.Inject;
 import javax.inject.Named;
 import javax.swing.ImageIcon;
 import javax.swing.JComponent;
@@ -36,6 +35,7 @@ import lcmc.common.domain.ExecCallback;
 import lcmc.common.domain.util.Tools;
 import lcmc.common.ui.SpringUtilities;
 import lcmc.common.ui.WizardDialog;
+import lcmc.common.ui.main.MainData;
 import lcmc.common.ui.utils.MyButton;
 import lcmc.common.ui.utils.SwingUtils;
 import lcmc.drbd.domain.DrbdInstallation;
@@ -57,11 +57,9 @@ final class ProxyCheckInstallation extends DialogHost {
     private WizardDialog nextDialogObject = null;
 
     /** Checking proxy label. */
-    private final JLabel checkingProxyLabel = new JLabel(": "
-                                                         + Tools.getString("ProxyCheckInstallation.CheckingProxy"));
+    private final JLabel checkingProxyLabel = new JLabel(": " + Tools.getString("ProxyCheckInstallation.CheckingProxy"));
 
-    @Inject
-    private WidgetFactory widgetFactory;
+    private final WidgetFactory widgetFactory;
     private MyButton installProxyButton;
     private Widget proxyInstallationMethodWidget;
 
@@ -69,18 +67,21 @@ final class ProxyCheckInstallation extends DialogHost {
     private Host proxyHost;
     private VolumeInfo volumeInfo;
     private WizardDialog origDialog;
-    @Inject
-    private ProxyInst proxyInstDialog;
-    @Inject
-    private Application application;
-    @Inject
-    private SwingUtils swingUtils;
+    private final ProxyInst proxyInstDialog;
+    private final Application application;
+    private final SwingUtils swingUtils;
 
-    void init(final WizardDialog previousDialog,
-              final Host proxyHost,
-              final VolumeInfo volumeInfo,
-              final WizardDialog origDialog,
-              final DrbdInstallation drbdInstallation) {
+    public ProxyCheckInstallation(Application application, SwingUtils swingUtils, WidgetFactory widgetFactory, MainData mainData,
+            ProxyInst proxyInstDialog) {
+        super(application, swingUtils, widgetFactory, mainData);
+        this.widgetFactory = widgetFactory;
+        this.proxyInstDialog = proxyInstDialog;
+        this.application = application;
+        this.swingUtils = swingUtils;
+    }
+
+    void init(final WizardDialog previousDialog, final Host proxyHost, final VolumeInfo volumeInfo, final WizardDialog origDialog,
+            final DrbdInstallation drbdInstallation) {
         super.init(previousDialog, proxyHost, drbdInstallation);
         installProxyButton = widgetFactory.createButton(Tools.getString("ProxyCheckInstallation.ProxyInstallButton"));
         this.proxyHost = proxyHost;

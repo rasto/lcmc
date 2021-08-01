@@ -22,18 +22,25 @@
 
 package lcmc.vm.ui.configdialog;
 
-import lcmc.common.ui.WizardDialog;
-import lcmc.vm.ui.resource.DomainInfo;
-
 import javax.inject.Named;
 
+import lcmc.cluster.ui.widget.WidgetFactory;
+import lcmc.common.domain.Application;
+import lcmc.common.ui.WizardDialog;
+import lcmc.common.ui.main.MainData;
+import lcmc.common.ui.utils.SwingUtils;
+import lcmc.vm.ui.resource.DomainInfo;
+
 /**
- * VMConfig super class from which all the vm wizards can be
- * extended.
+ * VMConfig super class from which all the vm wizards can be extended.
  */
 @Named
 public abstract class VMConfig extends WizardDialog {
     private DomainInfo domainInfo;
+
+    public VMConfig(Application application, SwingUtils swingUtils, WidgetFactory widgetFactory, MainData mainData) {
+        super(application, swingUtils, widgetFactory, mainData);
+    }
 
     public void init(final WizardDialog previousDialog, final DomainInfo domainInfo) {
         setPreviousDialog(previousDialog);

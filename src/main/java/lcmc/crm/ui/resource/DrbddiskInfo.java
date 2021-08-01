@@ -24,17 +24,30 @@ package lcmc.crm.ui.resource;
 import java.util.Map;
 
 import javax.inject.Named;
+import javax.inject.Provider;
 
+import lcmc.cluster.ui.widget.WidgetFactory;
 import lcmc.common.domain.Application;
+import lcmc.common.ui.Access;
+import lcmc.common.ui.main.MainData;
+import lcmc.common.ui.main.ProgressIndicator;
+import lcmc.common.ui.treemenu.ClusterTreeMenu;
+import lcmc.common.ui.utils.SwingUtils;
 import lcmc.drbd.ui.resource.ResourceInfo;
 import lcmc.host.domain.Host;
 
 /**
- * DrbddiskInfo class is used for drbddisk heartbeat service that is
- * treated in special way.
+ * DrbddiskInfo class is used for drbddisk heartbeat service that is treated in special way.
  */
 @Named
 public class DrbddiskInfo extends ServiceInfo {
+    public DrbddiskInfo(Application application, SwingUtils swingUtils, Access access, MainData mainData,
+            WidgetFactory widgetFactory, ProgressIndicator progressIndicator, ServiceMenu serviceMenu,
+            Provider<CloneInfo> cloneInfoProvider, ClusterTreeMenu clusterTreeMenu, CrmServiceFactory crmServiceFactory) {
+        super(application, swingUtils, access, mainData, widgetFactory, progressIndicator, serviceMenu, cloneInfoProvider,
+                clusterTreeMenu, crmServiceFactory);
+    }
+
     /** Returns string representation of the drbddisk service. */
     @Override
     public String toString() {

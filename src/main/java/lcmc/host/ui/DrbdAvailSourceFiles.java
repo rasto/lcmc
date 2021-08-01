@@ -25,7 +25,6 @@ package lcmc.host.ui;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.inject.Inject;
 import javax.inject.Named;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
@@ -42,6 +41,7 @@ import lcmc.common.domain.Value;
 import lcmc.common.domain.util.Tools;
 import lcmc.common.ui.SpringUtilities;
 import lcmc.common.ui.WizardDialog;
+import lcmc.common.ui.main.MainData;
 import lcmc.common.ui.utils.SwingUtils;
 import lcmc.common.ui.utils.WidgetListener;
 import lcmc.drbd.domain.DrbdInstallation;
@@ -49,27 +49,30 @@ import lcmc.logger.Logger;
 import lcmc.logger.LoggerFactory;
 
 /**
- * An implementation of a dialog where available versions of drbd will be
- * determined.
+ * An implementation of a dialog where available versions of drbd will be determined.
  */
 @Named
 final class DrbdAvailSourceFiles extends DialogHost {
     private static final String DRBD_VERSION_AFTER_UTIL_SPLIT = "8.4.5";
-    @Inject
-    private DrbdCommandInst drbdCommandInst = null;
+    private final DrbdCommandInst drbdCommandInst;
     private Widget drbdTarballCombo = null;
     private boolean listenersAdded = false;
-    @Inject
-    private Application application;
-    @Inject
-    private SwingUtils swingUtils;
-    @Inject
-    private WidgetFactory widgetFactory;
+    private final Application application;
+    private final SwingUtils swingUtils;
+    private final WidgetFactory widgetFactory;
     private static final Logger drbdVersions = LoggerFactory.getLogger(DrbdAvailSourceFiles.class);
 
+    public DrbdAvailSourceFiles(Application application, SwingUtils swingUtils, WidgetFactory widgetFactory, MainData mainData,
+            DrbdCommandInst drbdCommandInst) {
+        super(application, swingUtils, widgetFactory, mainData);
+        this.drbdCommandInst = drbdCommandInst;
+        this.application = application;
+        this.swingUtils = swingUtils;
+        this.widgetFactory = widgetFactory;
+    }
+
     /**
-     * Inits the dialog and starts detecting the available drbd source
-     * tarballs.
+     * Inits the dialog and starts detecting the available drbd source tarballs.
      */
     @Override
     protected void initDialogBeforeVisible() {

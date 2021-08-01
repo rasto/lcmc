@@ -26,10 +26,13 @@ final class ResourceInfoITest {
 
     @Test
     void testNotEqualNames() {
-        final ClusterBrowser clusterBrowser = integrationTestLauncher.getHosts().get(0).getBrowser().getClusterBrowser();
-        final ResourceInfo r1 = new ResourceInfo();
+        final ClusterBrowser clusterBrowser = integrationTestLauncher.getHosts()
+                                                                     .get(0)
+                                                                     .getBrowser()
+                                                                     .getClusterBrowser();
+        final ResourceInfo r1 = createResourceInfo();
         r1.init("name1", null, clusterBrowser);
-        final ResourceInfo r2 = new ResourceInfo();
+        final ResourceInfo r2 = createResourceInfo();
         r2.init("name2", null, clusterBrowser);
 
         assertThat(r1).isNotEqualTo(r2);
@@ -37,10 +40,13 @@ final class ResourceInfoITest {
 
     @Test
     void testEqualNames() {
-        final ClusterBrowser clusterBrowser = integrationTestLauncher.getHosts().get(0).getBrowser().getClusterBrowser();
-        final ResourceInfo r1 = new ResourceInfo();
+        final ClusterBrowser clusterBrowser = integrationTestLauncher.getHosts()
+                                                                     .get(0)
+                                                                     .getBrowser()
+                                                                     .getClusterBrowser();
+        final ResourceInfo r1 = createResourceInfo();
         r1.init("name", null, clusterBrowser);
-        final ResourceInfo r2 = new ResourceInfo();
+        final ResourceInfo r2 = createResourceInfo();
         r2.init("name", null, clusterBrowser);
 
         assertThat(r1).isEqualTo(r2);
@@ -48,8 +54,11 @@ final class ResourceInfoITest {
 
     @Test
     void testNameNull() {
-        final ClusterBrowser clusterBrowser = integrationTestLauncher.getHosts().get(0).getBrowser().getClusterBrowser();
-        final ResourceInfo r1 = new ResourceInfo();
+        final ClusterBrowser clusterBrowser = integrationTestLauncher.getHosts()
+                                                                     .get(0)
+                                                                     .getBrowser()
+                                                                     .getClusterBrowser();
+        final ResourceInfo r1 = createResourceInfo();
         r1.init("name", null, clusterBrowser);
 
         assertThat(r1.getName()).isNotNull();
@@ -57,14 +66,21 @@ final class ResourceInfoITest {
 
     @Test
     void testEqualNamesNotEqualsHosts() {
-        final ClusterBrowser clusterBrowser = integrationTestLauncher.getHosts().get(0).getBrowser().getClusterBrowser();
+        final ClusterBrowser clusterBrowser = integrationTestLauncher.getHosts()
+                                                                     .get(0)
+                                                                     .getBrowser()
+                                                                     .getClusterBrowser();
         final HostFactory hostFactory = AppContext.getBean(HostFactory.class);
 
-        final ResourceInfo r1 = new ResourceInfo();
+        final ResourceInfo r1 = createResourceInfo();
         r1.init("name", new LinkedHashSet<>(List.of(hostFactory.createInstance())), clusterBrowser);
-        final ResourceInfo r2 = new ResourceInfo();
+        final ResourceInfo r2 = createResourceInfo();
         r2.init("name", null, clusterBrowser);
 
         assertThat(r1).isEqualTo(r2);
+    }
+
+    private ResourceInfo createResourceInfo() {
+        return new ResourceInfo(null, null, null, null, null, null, null, null, null, null);
     }
 }
