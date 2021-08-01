@@ -28,7 +28,6 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionListener;
 
-import javax.inject.Inject;
 import javax.inject.Named;
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
@@ -42,23 +41,26 @@ import lcmc.common.ui.Browser;
 import lcmc.common.ui.utils.MyButton;
 
 /**
- * An implementation of a cluster tab, that contains host views of the hosts,
- * that are in the cluster.
+ * An implementation of a cluster tab, that contains host views of the hosts, that are in the cluster.
  */
 @Named
 public final class ClusterTab extends JPanel {
     private Cluster cluster;
     private JLabel labelTitle;
-    @Inject
-    private EmptyViewPanel emptyViewPanel;
-    @Inject
-    private ClusterPresenter clusterPresenter;
-    @Inject
-    private ClusterViewPanel clusterViewPanel;
+    private final EmptyViewPanel emptyViewPanel;
+    private final ClusterPresenter clusterPresenter;
+    private final ClusterViewPanel clusterViewPanel;
 
     public static final ImageIcon CLUSTER_ICON = Tools.createImageIcon(Tools.getDefault("ClustersPanel.ClusterIcon"));
-    @Inject
-    private WidgetFactory widgetFactory;
+    private final WidgetFactory widgetFactory;
+
+    public ClusterTab(EmptyViewPanel emptyViewPanel, ClusterPresenter clusterPresenter, ClusterViewPanel clusterViewPanel,
+            WidgetFactory widgetFactory) {
+        this.emptyViewPanel = emptyViewPanel;
+        this.clusterPresenter = clusterPresenter;
+        this.clusterViewPanel = clusterViewPanel;
+        this.widgetFactory = widgetFactory;
+    }
 
     public void initWithCluster(final Cluster cluster0) {
         cluster = cluster0;

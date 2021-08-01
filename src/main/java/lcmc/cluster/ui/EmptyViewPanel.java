@@ -27,7 +27,6 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 
-import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Provider;
 import javax.swing.BoxLayout;
@@ -56,30 +55,37 @@ import lcmc.host.ui.AddHostDialog;
  */
 @Named
 public final class EmptyViewPanel extends ViewPanel implements AllHostsUpdatable {
-    /** Background color of the status panel. */
+    /**
+     * Background color of the status panel.
+     */
     private static final Color STATUS_BACKGROUND = Tools.getDefaultColor("ViewPanel.Status.Background");
     private static final ImageIcon CLUSTER_ICON = Tools.createImageIcon(Tools.getDefault("ClusterTab.ClusterIcon"));
     private static final ImageIcon HOST_ICON = Tools.createImageIcon(Tools.getDefault("HostTab.HostIcon"));
     private static final Dimension BIG_BUTTON_DIMENSION = new Dimension(300, 100);
     private static final String LOGO_PANEL_STRING = "LOGO-STRING";
-    @Inject
-    private EmptyBrowser emptyBrowser;
-    @Inject
-    private Provider<AddClusterDialog> addClusterDialogProvider;
-    @Inject
-    private Provider<AddHostDialog> addHostDialogProvider;
-    @Inject
-    private HostFactory hostFactory;
-    @Inject
-    private MainData mainData;
-    @Inject
-    private MainPresenter mainPresenter;
-    @Inject
-    private Application application;
-    @Inject
-    private SwingUtils swingUtils;
-    @Inject
-    private WidgetFactory widgetFactory;
+    private final EmptyBrowser emptyBrowser;
+    private final Provider<AddClusterDialog> addClusterDialogProvider;
+    private final Provider<AddHostDialog> addHostDialogProvider;
+    private final HostFactory hostFactory;
+    private final MainData mainData;
+    private final MainPresenter mainPresenter;
+    private final Application application;
+    private final SwingUtils swingUtils;
+    private final WidgetFactory widgetFactory;
+
+    public EmptyViewPanel(EmptyBrowser emptyBrowser, Provider<AddClusterDialog> addClusterDialogProvider,
+            Provider<AddHostDialog> addHostDialogProvider, HostFactory hostFactory, MainData mainData, MainPresenter mainPresenter,
+            Application application, SwingUtils swingUtils, WidgetFactory widgetFactory) {
+        this.emptyBrowser = emptyBrowser;
+        this.addClusterDialogProvider = addClusterDialogProvider;
+        this.addHostDialogProvider = addHostDialogProvider;
+        this.hostFactory = hostFactory;
+        this.mainData = mainData;
+        this.mainPresenter = mainPresenter;
+        this.application = application;
+        this.swingUtils = swingUtils;
+        this.widgetFactory = widgetFactory;
+    }
 
     public void init() {
         emptyBrowser.init();

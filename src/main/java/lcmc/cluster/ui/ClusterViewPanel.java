@@ -21,16 +21,16 @@
  */
 package lcmc.cluster.ui;
 
+import java.awt.BorderLayout;
+
+import javax.inject.Named;
+import javax.swing.Box;
+
 import lcmc.cluster.domain.Cluster;
 import lcmc.common.domain.AllHostsUpdatable;
 import lcmc.common.ui.ViewPanel;
 import lcmc.common.ui.main.MainData;
 import lombok.val;
-
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.swing.*;
-import java.awt.*;
 
 /**
  * An implementation of a custer view with tree of services.
@@ -39,20 +39,26 @@ import java.awt.*;
 public class ClusterViewPanel extends ViewPanel implements AllHostsUpdatable {
     private Cluster cluster;
 
-    @Inject
-    private ClusterBrowser clusterBrowser;
-    @Inject
-    private MainData mainData;
+    private final ClusterBrowser clusterBrowser;
+    private final MainData mainData;
+
+    public ClusterViewPanel(ClusterBrowser clusterBrowser, MainData mainData) {
+        this.clusterBrowser = clusterBrowser;
+        this.mainData = mainData;
+    }
 
     public void init(final Cluster cluster) {
         this.cluster = cluster;
 
         clusterBrowser.init(cluster);
-        val tree = clusterBrowser.createTreeMenu((info, disableListeners) -> setRightComponentInView(clusterBrowser, info, disableListeners));
+        val tree = clusterBrowser.createTreeMenu(
+                (info, disableListeners) -> setRightComponentInView(clusterBrowser, info, disableListeners));
         cluster.setBrowser(clusterBrowser);
         createPanels(tree);
-        cluster.getBrowser().initClusterBrowser();
-        cluster.getBrowser().setClusterViewPanel(this);
+        cluster.getBrowser()
+               .initClusterBrowser();
+        cluster.getBrowser()
+               .setClusterViewPanel(this);
         add(Box.createVerticalStrut(4), BorderLayout.PAGE_START);
 
         allHostsUpdate();

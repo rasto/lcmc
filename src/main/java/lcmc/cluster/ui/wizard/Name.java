@@ -24,7 +24,6 @@ package lcmc.cluster.ui.wizard;
 
 import java.awt.BorderLayout;
 
-import javax.inject.Inject;
 import javax.inject.Named;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
@@ -53,24 +52,29 @@ public final class Name extends DialogCluster {
     private static final int NAME_FIELD_WIDTH = 120;
     private Widget nameField;
 
-    @Inject
-    private ClusterHosts clusterHostsDialog;
-    @Inject
-    private ClusterTabFactory clusterTabFactory;
-    @Inject
-    private MainPresenter mainPresenter;
-    @Inject
-    private Application application;
-    @Inject
-    private SwingUtils swingUtils;
-    @Inject
-    private Clusters allClusters;
-    @Inject
-    private WidgetFactory widgetFactory;
+    private final ClusterHosts clusterHostsDialog;
+    private final ClusterTabFactory clusterTabFactory;
+    private final MainPresenter mainPresenter;
+    private final Application application;
+    private final SwingUtils swingUtils;
+    private final Clusters allClusters;
+    private final WidgetFactory widgetFactory;
+
+    public Name(ClusterHosts clusterHostsDialog, ClusterTabFactory clusterTabFactory, MainPresenter mainPresenter,
+            Application application, SwingUtils swingUtils, Clusters allClusters, WidgetFactory widgetFactory) {
+        this.clusterHostsDialog = clusterHostsDialog;
+        this.clusterTabFactory = clusterTabFactory;
+        this.mainPresenter = mainPresenter;
+        this.application = application;
+        this.swingUtils = swingUtils;
+        this.allClusters = allClusters;
+        this.widgetFactory = widgetFactory;
+    }
 
     @Override
     protected void finishDialog() {
-        getCluster().setName(nameField.getStringValue().trim());
+        getCluster().setName(nameField.getStringValue()
+                                      .trim());
     }
 
     @Override

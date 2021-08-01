@@ -20,20 +20,22 @@
 
 package lcmc.cluster.ui;
 
-import lcmc.cluster.domain.Cluster;
-
-import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Provider;
 import javax.inject.Singleton;
 
+import lcmc.cluster.domain.Cluster;
+
 @Named
 @Singleton
 public class ClusterTabFactory {
-    @Inject
-    private ClustersPanel clustersPanel;
-    @Inject
-    private Provider<ClusterTab> clusterTabProvider;
+    private final ClustersPanel clustersPanel;
+    private final Provider<ClusterTab> clusterTabProvider;
+
+    public ClusterTabFactory(ClustersPanel clustersPanel, Provider<ClusterTab> clusterTabProvider) {
+        this.clustersPanel = clustersPanel;
+        this.clusterTabProvider = clusterTabProvider;
+    }
 
     public ClusterTab createClusterTab(final Cluster cluster) {
         final ClusterTab clusterTab = clusterTabProvider.get();

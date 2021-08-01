@@ -25,7 +25,6 @@ import java.util.TreeSet;
 import java.util.function.BiConsumer;
 
 import javax.annotation.Resource;
-import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 import javax.swing.JTree;
@@ -51,17 +50,22 @@ import lcmc.host.ui.HostBrowser;
 @Named
 @Singleton
 public final class EmptyBrowser extends Browser {
-    /** Menu's all hosts node. */
+    /**
+     * Menu's all hosts node.
+     */
     private DefaultMutableTreeNode allHostsNode;
     private DefaultMutableTreeNode treeTop;
-    @Inject
-    private AllHostsInfo allHostsInfo;
-    @Inject
-    private Hosts allHosts;
-    @Inject
-    private TreeMenuController treeMenuController;
-    @Resource(name="categoryInfo")
+    private final AllHostsInfo allHostsInfo;
+    private final Hosts allHosts;
+    private final TreeMenuController treeMenuController;
+    @Resource(name = "categoryInfo")
     private CategoryInfo resourcesCategory;
+
+    public EmptyBrowser(AllHostsInfo allHostsInfo, Hosts allHosts, TreeMenuController treeMenuController) {
+        this.allHostsInfo = allHostsInfo;
+        this.allHosts = allHosts;
+        this.treeMenuController = treeMenuController;
+    }
 
     void init() {
         allHostsInfo.init(this);
@@ -69,7 +73,9 @@ public final class EmptyBrowser extends Browser {
         treeTop = treeMenuController.createMenuTreeTop(resourcesCategory);
     }
 
-    /** Adds small box with cluster possibility to load it and remove it. */
+    /**
+     * Adds small box with cluster possibility to load it and remove it.
+     */
     public void addClusterBox(final Cluster cluster) {
         allHostsInfo.addClusterBox(cluster);
         allHostsInfo.setConnected(cluster);
