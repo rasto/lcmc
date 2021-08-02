@@ -56,6 +56,7 @@ import javax.swing.event.DocumentListener;
 
 import lcmc.cluster.domain.Cluster;
 import lcmc.cluster.domain.Clusters;
+import lcmc.cluster.service.ClusterStarter;
 import lcmc.cluster.ui.EmptyBrowser;
 import lcmc.cluster.ui.widget.GenericWidget.MTextField;
 import lcmc.cluster.ui.widget.WidgetFactory;
@@ -117,11 +118,13 @@ public final class AllHostsInfo extends Info {
     private final Application application;
     private final SwingUtils swingUtils;
     private final MenuFactory menuFactory;
+    private final ClusterStarter clusterStarter;
     private EmptyBrowser emptyBrowser;
 
     public AllHostsInfo(Application application, SwingUtils swingUtils, Access access, MainData mainData, UserConfig userConfig,
             WidgetFactory widgetFactory, Provider<AddHostDialog> addHostDialogProvider, HostFactory hostFactory,
-            MainPresenter mainPresenter, Provider<Cluster> clusterProvider, Clusters allClusters, MenuFactory menuFactory) {
+            MainPresenter mainPresenter, Provider<Cluster> clusterProvider, Clusters allClusters, MenuFactory menuFactory,
+            ClusterStarter clusterStarter) {
         super(application, swingUtils, access, mainData);
         this.userConfig = userConfig;
         this.widgetFactory = widgetFactory;
@@ -134,6 +137,7 @@ public final class AllHostsInfo extends Info {
         this.application = application;
         this.swingUtils = swingUtils;
         this.menuFactory = menuFactory;
+        this.clusterStarter = clusterStarter;
     }
 
     public void init(final EmptyBrowser emptyBrowser) {
@@ -353,7 +357,7 @@ public final class AllHostsInfo extends Info {
                 swingUtils.invokeAndWait(() -> loadClusterBtn.setEnabled(false));
                 final Collection<Cluster> selectedClusters = new ArrayList<>();
                 selectedClusters.add(cluster);
-                userConfig.startClusters(selectedClusters);
+                clusterStarter.startClusters(selectedClusters);
 
                 if (cluster.getClusterTab() == null) {
                     loadClusterBtn.setEnabled(true);
@@ -473,7 +477,7 @@ public final class AllHostsInfo extends Info {
                 application.addClusterToClusters(cluster);
                 final Collection<Cluster> selectedClusters = new ArrayList<>();
                 selectedClusters.add(cluster);
-                userConfig.startClusters(selectedClusters);
+                clusterStarter.startClusters(selectedClusters);
             });
             t.start();
         });
@@ -557,11 +561,12 @@ public final class AllHostsInfo extends Info {
                 }
             }
         }
-        userConfig.startClusters(selectedClusters);
+        clusterStarter.startClusters(selectedClusters);
         swingUtils.invokeLater(() -> {
             for (final Map.Entry<Cluster, JCheckBox> checkBoxEntry : allClusterCheckboxes.entrySet()) {
                 if (selectedClusters.contains(checkBoxEntry.getKey())) {
-                    checkBoxEntry.getValue().setSelected(false);
+                    checkBoxEntry.getValue()
+                                 .setSelected(false);
                 }
             }
         });

@@ -27,7 +27,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -57,10 +56,6 @@ import org.w3c.dom.NodeList;
 import lcmc.cluster.domain.Cluster;
 import lcmc.cluster.domain.Clusters;
 import lcmc.cluster.ui.ClusterBrowser;
-import lcmc.cluster.ui.ClusterTab;
-import lcmc.cluster.ui.ClusterTabFactory;
-import lcmc.cluster.ui.ClustersPanel;
-import lcmc.common.ui.utils.SwingUtils;
 import lcmc.host.domain.Host;
 import lcmc.host.domain.HostFactory;
 import lcmc.host.domain.Hosts;
@@ -87,24 +82,17 @@ public final class UserConfig extends XMLTools {
     private static final String ENCODING = "UTF-8";
     public static final boolean PROXY_HOST = true;
 
-    private final ClusterTabFactory clusterTabFactory;
     private final HostFactory hostFactory;
-    private final ClustersPanel clustersPanel;
     private final Provider<Cluster> clusterProvider;
     private final Application application;
-    private final SwingUtils swingUtils;
     private final Hosts allHosts;
     private final Clusters allClusters;
 
-    public UserConfig(ClusterTabFactory clusterTabFactory, HostFactory hostFactory, ClustersPanel clustersPanel,
-            Provider<Cluster> clusterProvider, Application application, SwingUtils swingUtils, Hosts allHosts,
+    public UserConfig(HostFactory hostFactory, Provider<Cluster> clusterProvider, Application application, Hosts allHosts,
             Clusters allClusters) {
-        this.clusterTabFactory = clusterTabFactory;
         this.hostFactory = hostFactory;
-        this.clustersPanel = clustersPanel;
         this.clusterProvider = clusterProvider;
         this.application = application;
-        this.swingUtils = swingUtils;
         this.allHosts = allHosts;
         this.allClusters = allClusters;
     }
@@ -136,17 +124,18 @@ public final class UserConfig extends XMLTools {
     }
 
 
-
-    /** Saves data about clusters and hosts to the supplied output stream. */
-    private String saveXML(final OutputStream outputStream, final boolean saveAll) throws IOException {
+    /**
+     * Saves data about clusters and hosts to the supplied output stream.
+     */
+    private void saveXML(final OutputStream outputStream, final boolean saveAll) throws IOException {
         LOG.debug1("saveXML: start");
         final DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
 
         final DocumentBuilder db;
         try {
-             db = dbf.newDocumentBuilder();
+            db = dbf.newDocumentBuilder();
         } catch (final ParserConfigurationException pce) {
-             throw new IOException("saveXML: cannot configure parser", pce);
+            throw new IOException("saveXML: cannot configure parser", pce);
         }
         final Document doc = db.newDocument();
         final Element root = (Element) doc.appendChild(doc.createElement("drbdgui"));
@@ -165,7 +154,7 @@ public final class UserConfig extends XMLTools {
                 continue;
             }
             host.setSavable(true);
-            addHostConfigNode(doc, hostsNode, HOST_NODE_STRING, host);
+            addHostConfigNode(doc, hostsNode, host);
         }
         final Node clusters = root.appendChild(doc.createElement("clusters"));
 
@@ -212,43 +201,6 @@ public final class UserConfig extends XMLTools {
             throw new IOException("saveXML: transform failed", te);
         }
         LOG.debug1("saveXML: end");
-        return "";
-    }
-
-    /**
-     * Starts specified clusters and connects to the hosts of this clusters.
-     */
-    public void startClusters(final Collection<Cluster> selectedClusters) {
-        final Set<Cluster> clusters = allClusters.getClusterSet();
-        /* clusters */
-        for (final Cluster cluster : clusters) {
-            if (selectedClusters != null && !selectedClusters.contains(cluster)) {
-                continue;
-            }
-            swingUtils.invokeLater(() -> clusterTabFactory.createClusterTab(cluster));
-            if (cluster.getHosts().isEmpty()) {
-                continue;
-            }
-            final boolean ok = cluster.connect(null, true, 1);
-            if (!ok) {
-                swingUtils.invokeLater(() -> clustersPanel.removeTabWithCluster(cluster));
-                continue;
-            }
-            final Runnable runnable = () -> {
-                for (final Host host : cluster.getHosts()) {
-                    host.waitOnLoading();
-                }
-                swingUtils.invokeLater(() -> {
-                    final ClusterTab clusterTab = cluster.getClusterTab();
-                    if (clusterTab != null) {
-                        clusterTab.addClusterView();
-                        clusterTab.requestFocus();
-                    }
-                });
-            };
-            final Thread thread = new Thread(runnable);
-            thread.start();
-        }
     }
 
     /**
@@ -394,14 +346,14 @@ public final class UserConfig extends XMLTools {
         }
     }
 
-    private void addHostConfigNode(final Document doc, final Node parent, final String nodeName, final Host host) {
+    private void addHostConfigNode(final Document doc, final Node parent, final Host host) {
         final String hostName = host.getHostname();
         final String ip = host.getIpAddress();
         final String username = host.getUsername();
         final String sshPort = host.getSSHPort();
         final Boolean useSudo = host.isUseSudo();
         final String color = host.getColor();
-        final Element hostNode = (Element) parent.appendChild(doc.createElement(nodeName));
+        final Element hostNode = (Element) parent.appendChild(doc.createElement(HOST_NODE_STRING));
         hostNode.setAttribute(HOST_NAME_ATTR, hostName);
         hostNode.setAttribute(HOST_SSHPORT_ATTR, sshPort);
         if (color != null) {

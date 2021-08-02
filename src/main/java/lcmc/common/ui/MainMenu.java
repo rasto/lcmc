@@ -59,6 +59,7 @@ import javax.swing.event.HyperlinkEvent;
 import javax.swing.filechooser.FileFilter;
 
 import lcmc.Exceptions;
+import lcmc.cluster.service.ClusterStarter;
 import lcmc.cluster.ui.ClusterBrowser;
 import lcmc.cluster.ui.wizard.AddClusterDialog;
 import lcmc.common.domain.AccessMode;
@@ -82,32 +83,13 @@ import lcmc.logger.LoggerFactory;
 @Singleton
 public final class MainMenu extends JPanel implements ActionListener {
     private static final Logger LOG = LoggerFactory.getLogger(MainMenu.class);
-    /**
-     * Look and feel map.
-     */
     private static final Map<String, String> LOOK_AND_FEEL_MAP = new HashMap<>();
     private static final ImageIcon HOST_ICON = Tools.createImageIcon(Tools.getDefault("MainMenu.HostIcon"));
     private JMenuBar menuBar;
-    /**
-     * because glassPane does not capture key events in my version of java, the menu must turned off explicitly.
-     */
     private boolean turnOff = false;
-    /**
-     * Combo box with operating modes.
-     */
     private JComboBox<String> operatingModesCB;
-    /**
-     * Advanced mode button.
-     */
-    private JCheckBox advancedModeCB;
-    /**
-     * Upgrade check text field.
-     */
     private final JEditorPane upgradeTextField = new JEditorPane(MainData.MIME_TYPE_TEXT_HTML, "");
     private final JEditorPane infoTextField = new JEditorPane(MainData.MIME_TYPE_TEXT_HTML, "");
-    /**
-     * Upgrade check text.
-     */
     private String upgradeCheck = "";
     private String infoText = null;
     private final JPanel infoTextPanel = new JPanel();
@@ -123,11 +105,12 @@ public final class MainMenu extends JPanel implements ActionListener {
     private final About aboutDialog;
     private final Dialogs dialogs;
     private final Access access;
+    private final ClusterStarter clusterStarter;
 
     public MainMenu(UserConfig userConfig, Provider<AddClusterDialog> addClusterDialogProvider,
             Provider<AddHostDialog> addHostDialogProvider, HostFactory hostFactory, MainData mainData, MainPresenter mainPresenter,
-            Application application, SwingUtils swingUtils, Access access, BugReport bugReport, About aboutDialog,
-            Dialogs dialogs) {
+            Application application, SwingUtils swingUtils, Access access, BugReport bugReport, About aboutDialog, Dialogs dialogs,
+            ClusterStarter clusterStarter) {
         this.userConfig = userConfig;
         this.addClusterDialogProvider = addClusterDialogProvider;
         this.addHostDialogProvider = addHostDialogProvider;
@@ -140,6 +123,7 @@ public final class MainMenu extends JPanel implements ActionListener {
         this.bugReport = bugReport;
         this.aboutDialog = aboutDialog;
         this.dialogs = dialogs;
+        this.clusterStarter = clusterStarter;
     }
 
     public void init() {
@@ -267,7 +251,7 @@ public final class MainMenu extends JPanel implements ActionListener {
         menuBar.add(submenu);
 
         /* advanced mode button */
-        advancedModeCB = createAdvancedModeButton();
+        final var advancedModeCB = createAdvancedModeButton();
         /* Operating mode */
         operatingModesCB = createOperationModeCb();
         final JPanel opModePanel = new JPanel(new FlowLayout(FlowLayout.TRAILING, 0, 0));
@@ -340,14 +324,14 @@ public final class MainMenu extends JPanel implements ActionListener {
         if (xml == null) {
             return;
         }
-        userConfig.startClusters(null);
+        clusterStarter.startClusters(null);
         mainPresenter.allHostsUpdate();
     }
 
     private ActionListener removeEverythingActionListener() {
         return e -> {
             LOG.debug1("actionPerformed: MENU ACTION: remove everything");
-            final Thread thread = new Thread(() -> mainPresenter.removeEverything());
+            final Thread thread = new Thread(mainPresenter::removeEverything);
             thread.start();
         };
     }
@@ -437,7 +421,7 @@ public final class MainMenu extends JPanel implements ActionListener {
     private ActionListener copyActionListener() {
         return e -> {
             LOG.debug1("actionPerformed: MENU ACTION: copy");
-            final Thread t = new Thread(() -> mainData.copy());
+            final Thread t = new Thread(mainData::copy);
             t.start();
         };
     }
@@ -445,7 +429,7 @@ public final class MainMenu extends JPanel implements ActionListener {
     private ActionListener pasteActionListener() {
         return e -> {
             LOG.debug1("actionPerformed: MENU ACTION: paste");
-            final Thread t = new Thread(() -> mainData.paste());
+            final Thread t = new Thread(mainData::paste);
             t.start();
         };
     }
@@ -453,7 +437,7 @@ public final class MainMenu extends JPanel implements ActionListener {
     private ActionListener aboutActionListener() {
         return e -> {
             LOG.debug1("actionPerformed: MENU ACTION: about");
-            final Thread t = new Thread(() -> aboutDialog.showDialog());
+            final Thread t = new Thread(aboutDialog::showDialog);
             t.start();
         };
     }
