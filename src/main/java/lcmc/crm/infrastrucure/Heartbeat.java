@@ -20,9 +20,9 @@
  * the Free Software Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-package lcmc.crm.service;
+package lcmc.crm.infrastrucure;
 
-import lcmc.cluster.service.ssh.ExecCommandConfig;
+import lcmc.cluster.infrastructure.ssh.ExecCommandConfig;
 import lcmc.common.domain.ConvertCmdCallback;
 import lcmc.common.domain.util.Tools;
 import lcmc.host.domain.Host;

@@ -50,9 +50,9 @@ import javax.swing.SpringLayout;
 
 import lcmc.Exceptions.IllegalVersionException;
 import lcmc.cluster.domain.Cluster;
-import lcmc.cluster.service.NetworkService;
-import lcmc.cluster.service.ssh.ExecCommandConfig;
-import lcmc.cluster.service.ssh.ExecCommandThread;
+import lcmc.cluster.domain.NetworkService;
+import lcmc.cluster.infrastructure.ssh.ExecCommandConfig;
+import lcmc.cluster.infrastructure.ssh.ExecCommandThread;
 import lcmc.cluster.ui.widget.Check;
 import lcmc.cluster.ui.widget.Widget;
 import lcmc.cluster.ui.widget.WidgetFactory;
@@ -72,8 +72,8 @@ import lcmc.common.ui.utils.MyButton;
 import lcmc.common.ui.utils.SwingUtils;
 import lcmc.common.ui.utils.WidgetListener;
 import lcmc.crm.domain.AisCastAddress;
-import lcmc.crm.service.Corosync;
-import lcmc.crm.service.Openais;
+import lcmc.crm.infrastrucure.Corosync;
+import lcmc.crm.infrastrucure.Openais;
 import lcmc.drbd.domain.NetInterface;
 import lcmc.host.domain.Host;
 import lcmc.logger.Logger;
@@ -334,7 +334,7 @@ final class CoroConfig extends DialogCluster {
      */
     private boolean updateOldAisConfig() { /* is run in a thread */
         final Host[] hosts = getCluster().getHostsArray();
-        final ExecCommandThread[] ts = new ExecCommandThread[hosts.length];
+        final var ts = new ExecCommandThread[hosts.length];
         configStatus.setText(Tools.getString("Dialog.Cluster.CoroConfig.Loading"));
 
         String cf = "/etc/corosync/corosync.conf";

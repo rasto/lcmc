@@ -91,7 +91,7 @@ import lcmc.crm.domain.PtestData;
 import lcmc.crm.domain.ResourceAgent;
 import lcmc.crm.domain.RscSetConnectionData;
 import lcmc.crm.domain.Service;
-import lcmc.crm.service.CRM;
+import lcmc.crm.infrastrucure.CRM;
 import lcmc.host.domain.Host;
 import lcmc.logger.Logger;
 import lcmc.logger.LoggerFactory;

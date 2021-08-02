@@ -44,8 +44,8 @@ import javax.swing.event.DocumentListener;
 import javax.swing.text.Document;
 
 import lcmc.cluster.domain.Cluster;
-import lcmc.cluster.service.ssh.ExecCommandConfig;
-import lcmc.cluster.service.ssh.Ssh;
+import lcmc.cluster.infrastructure.ssh.ExecCommandConfig;
+import lcmc.cluster.infrastructure.ssh.Ssh;
 import lcmc.cluster.ui.ClusterBrowser;
 import lcmc.cluster.ui.widget.WidgetFactory;
 import lcmc.common.domain.AccessMode;
@@ -65,7 +65,7 @@ import lcmc.common.ui.utils.SwingUtils;
 import lcmc.common.ui.utils.UpdatableItem;
 import lcmc.crm.domain.ClusterStatus;
 import lcmc.crm.domain.PtestData;
-import lcmc.crm.service.CRM;
+import lcmc.crm.infrastrucure.CRM;
 import lcmc.crm.ui.CrmGraph;
 import lcmc.host.domain.Host;
 import lcmc.host.ui.HostBrowser;
@@ -201,10 +201,10 @@ public class HostInfo extends Info {
                 command = "HostBrowser.getHostInfoHeartbeat";
             }
             host.execCommand(new ExecCommandConfig().commandString(command)
-                    .execCallback(execCallback)
-                    .silentCommand()
-                    .silentOutput()
-                    .sshCommandTimeout(Ssh.DEFAULT_COMMAND_TIMEOUT));
+                                                    .execCallback(execCallback)
+                                                    .silentCommand()
+                                                    .silentOutput()
+                                                    .sshCommandTimeout(Ssh.DEFAULT_COMMAND_TIMEOUT));
         });
         host.registerEnableOnConnect(hostInfoButton);
 

@@ -28,7 +28,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SpringLayout;
 
-import lcmc.cluster.service.ssh.ExecCommandConfig;
+import lcmc.cluster.infrastructure.ssh.ExecCommandConfig;
 import lcmc.cluster.ui.widget.Widget;
 import lcmc.cluster.ui.widget.WidgetFactory;
 import lcmc.common.domain.Application;
@@ -115,18 +115,18 @@ final class ProxyCheckInstallation extends DialogHost {
         });
 
         getHost().execCommand(new ExecCommandConfig().commandString("ProxyCheck.version")
-                .progressBar(getProgressBar())
-                .execCallback(new ExecCallback() {
-                    @Override
-                    public void done(final String answer) {
-                        checkProxyInstallation(answer);
-                    }
+                                                     .progressBar(getProgressBar())
+                                                     .execCallback(new ExecCallback() {
+                                                         @Override
+                                                         public void done(final String answer) {
+                                                             checkProxyInstallation(answer);
+                                                         }
 
-                    @Override
-                                                    public void doneError(final String answer, final int errorCode) {
-                                                        checkProxyInstallation(""); // not installed
-                                                    }
-                                                }));
+                                                         @Override
+                                                         public void doneError(final String answer, final int errorCode) {
+                                                             checkProxyInstallation(""); // not installed
+                                                         }
+                                                     }));
     }
 
     void checkProxyInstallation(final String ans) {

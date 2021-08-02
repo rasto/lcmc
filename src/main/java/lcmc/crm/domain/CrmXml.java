@@ -52,8 +52,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Table;
 
 import lcmc.Exceptions;
-import lcmc.cluster.service.ssh.ExecCommandConfig;
-import lcmc.cluster.service.ssh.SshOutput;
+import lcmc.cluster.infrastructure.ssh.ExecCommandConfig;
 import lcmc.cluster.ui.ClusterBrowser;
 import lcmc.cluster.ui.network.InfoPresenter;
 import lcmc.common.domain.AccessMode;
@@ -739,40 +738,41 @@ public class CrmXml {
         initResourceAgentsWithoutMetaData();
         initOCFMetaDataConfigured();
         LOG.debug("CRMXML: cluster loaded");
-        final Thread t = new Thread(new Runnable() {
-            @Override
-            public void run() {
-                initOCFMetaDataAll();
-                final String hn = host.getName();
-                final String text = Tools.getString("CRMXML.GetRAMetaData.Done");
-                progressIndicator.startProgressIndicator(hn, text);
-                final ClusterBrowser browser = allServicesInfo.getBrowser();
-                final ClusterStatus clusterStatus = browser.getClusterStatus();
-                if (clusterStatus != null) {
-                    resourceUpdaterProvider.get().updateAllResources(allServicesInfo, browser, clusterStatus, Application.RunMode.LIVE);
-                }
-                final InfoPresenter lastSelectedInfo = browser.getClusterViewPanel().getLastSelectedInfo();
-                if (lastSelectedInfo instanceof ServiceInfo || lastSelectedInfo instanceof ServicesInfo) {
-                    browser.getClusterViewPanel().reloadRightComponent();
-                }
-                progressIndicator.stopProgressIndicator(hn, text);
-                LOG.debug("CRMXML: RAs loaded");
-                final Test autoTest = application.getAutoTest();
-                if (autoTest != null) {
-                    startTests.startTest(autoTest, browser.getCluster());
-                }
+        final Thread t = new Thread(() -> {
+            initOCFMetaDataAll();
+            final String hn = host.getName();
+            final String text = Tools.getString("CRMXML.GetRAMetaData.Done");
+            progressIndicator.startProgressIndicator(hn, text);
+            final ClusterBrowser browser = allServicesInfo.getBrowser();
+            final ClusterStatus clusterStatus = browser.getClusterStatus();
+            if (clusterStatus != null) {
+                resourceUpdaterProvider.get()
+                                       .updateAllResources(allServicesInfo, browser, clusterStatus, Application.RunMode.LIVE);
+            }
+            final InfoPresenter lastSelectedInfo = browser.getClusterViewPanel()
+                                                          .getLastSelectedInfo();
+            if (lastSelectedInfo instanceof ServiceInfo || lastSelectedInfo instanceof ServicesInfo) {
+                browser.getClusterViewPanel()
+                       .reloadRightComponent();
+            }
+            progressIndicator.stopProgressIndicator(hn, text);
+            LOG.debug("CRMXML: RAs loaded");
+            final Test autoTest = application.getAutoTest();
+            if (autoTest != null) {
+                startTests.startTest(autoTest, browser.getCluster());
             }
         });
         t.start();
     }
 
     private void initResourceAgentsWithoutMetaData() {
-        final String command = host.getHostParser().getDistCommand("Heartbeat.getOCFParametersQuick", (ConvertCmdCallback) null);
-        final SshOutput ret = host.captureCommandProgressIndicator(Tools.getString("CRMXML.GetRAMetaData"),
-                                                                   new ExecCommandConfig().command(command)
-                                                                                          .silentCommand()
-                                                                                          .silentOutput()
-                                                                                          .sshCommandTimeout(60000));
+        final String command = host.getHostParser()
+                                   .getDistCommand("Heartbeat.getOCFParametersQuick", (ConvertCmdCallback) null);
+        final var ret = host.captureCommandProgressIndicator(Tools.getString("CRMXML.GetRAMetaData"),
+                new ExecCommandConfig().command(command)
+                                       .silentCommand()
+                                       .silentOutput()
+                                       .sshCommandTimeout(60000));
         boolean linbitDrbdPresent0 = false;
         boolean drbddiskPresent0 = false;
         if (ret.getExitCode() != 0) {
@@ -864,10 +864,10 @@ public class CrmXml {
     }
 
     private void initOCFResourceAgentsWithMetaData(final String command) {
-        final SshOutput ret = host.captureCommand(new ExecCommandConfig().command(command)
-                                                                         .silentCommand()
-                                                                         .silentOutput()
-                                                                         .sshCommandTimeout(300000));
+        final var ret = host.captureCommand(new ExecCommandConfig().command(command)
+                                                                   .silentCommand()
+                                                                   .silentOutput()
+                                                                   .sshCommandTimeout(300000));
         if (ret.getExitCode() != 0) {
             return;
         }
@@ -881,7 +881,7 @@ public class CrmXml {
         final Pattern bp = Pattern.compile("<resource-agent.*\\s+name=\"(.*?)\".*");
         final Pattern sp = Pattern.compile("^ra-name:\\s*(.*?)\\s*$");
         final Pattern ep = Pattern.compile("</resource-agent>");
-        final StringBuilder xml = new StringBuilder("");
+        final StringBuilder xml = new StringBuilder();
         String provider = null;
         String serviceName = null;
         boolean nextRA = false;

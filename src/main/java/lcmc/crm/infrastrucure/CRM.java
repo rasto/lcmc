@@ -20,7 +20,7 @@
  * the Free Software Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-package lcmc.crm.service;
+package lcmc.crm.infrastrucure;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -33,8 +33,8 @@ import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.regex.Matcher;
 
-import lcmc.cluster.service.ssh.ExecCommandConfig;
-import lcmc.cluster.service.ssh.SshOutput;
+import lcmc.cluster.infrastructure.ssh.ExecCommandConfig;
+import lcmc.cluster.infrastructure.ssh.SshOutput;
 import lcmc.common.domain.Application;
 import lcmc.common.domain.util.Tools;
 import lcmc.configs.DistResource;
@@ -341,28 +341,14 @@ public final class CRM {
         return ret.getExitCode() == 0;
     }
 
-    /** Replaces the whole group. */
-    public static boolean replaceGroup(final boolean createGroup,
-                                       final Host host,
-                                       final String cloneId,
-                                       final boolean master,
-                                       final Map<String, String> cloneMetaArgs,
-                                       final String cloneMetaAttrsRefId,
-                                       final Iterable<String> resourceIds,
-                                       final Map<String, String> groupMetaArgs,
-                                       final String groupId,
-                                       final Map<String, Map<String, String>> pacemakerResAttrs,
-                                       final Map<String, Map<String, String>> pacemakerResArgs,
-                                       final Map<String, Map<String, String>> pacemakerMetaArgs,
-                                       final Map<String, String> instanceAttrId,
-                                       final Map<String, Map<String, String>> nvpairIdsHash,
-                                       final Map<String, Map<String, Map<String, String>>> pacemakerOps,
-                                       final Map<String, String> operationsId,
-                                       final Map<String, String> metaAttrsRefId,
-                                       final String groupMetaAttrsRefId,
-                                       final Map<String, String> operationsRefId,
-                                       final Map<String, Boolean> stonith,
-                                       final Application.RunMode runMode) {
+    public static void replaceGroup(final boolean createGroup, final Host host, final String cloneId, final boolean master,
+            final Map<String, String> cloneMetaArgs, final String cloneMetaAttrsRefId, final Iterable<String> resourceIds,
+            final Map<String, String> groupMetaArgs, final String groupId, final Map<String, Map<String, String>> pacemakerResAttrs,
+            final Map<String, Map<String, String>> pacemakerResArgs, final Map<String, Map<String, String>> pacemakerMetaArgs,
+            final Map<String, String> instanceAttrId, final Map<String, Map<String, String>> nvpairIdsHash,
+            final Map<String, Map<String, Map<String, String>>> pacemakerOps, final Map<String, String> operationsId,
+            final Map<String, String> metaAttrsRefId, final String groupMetaAttrsRefId, final Map<String, String> operationsRefId,
+            final Map<String, Boolean> stonith, final Application.RunMode runMode) {
         final StringBuilder xml = new StringBuilder(720);
         xml.append('\'');
         if (cloneId != null) {
@@ -420,8 +406,7 @@ public final class CRM {
             cibadminOpt = CIB_OP_REPLACE;
         }
 
-        final SshOutput ret = execCommand(host, getCibCommand(cibadminOpt, "resources", xml.toString()), runMode);
-        return ret.getExitCode() == 0;
+        execCommand(host, getCibCommand(cibadminOpt, "resources", xml.toString()), runMode);
     }
 
     /**
@@ -669,11 +654,8 @@ public final class CRM {
         return ret.getExitCode() == 0;
     }
 
-    public static boolean setPingLocation(final Host host,
-                                          final String resId,
-                                          final String ruleType,
-                                          String locationId,
-                                          final Application.RunMode runMode) {
+    public static void setPingLocation(final Host host, final String resId, final String ruleType, String locationId,
+            final Application.RunMode runMode) {
         String op = null;
         String value = null;
         String score = null;
@@ -696,8 +678,7 @@ public final class CRM {
         }
         final String attribute = "pingd";
         final String xml = getLocationXML(resId, value, attribute, score, scoreAttribute, op, null, locationId);
-        final SshOutput ret = execCommand(host, getCibCommand(command, "constraints", xml), runMode);
-        return ret.getExitCode() == 0;
+        execCommand(host, getCibCommand(command, "constraints", xml), runMode);
     }
 
     public static boolean removeLocation(final Host host,

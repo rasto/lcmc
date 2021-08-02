@@ -48,8 +48,7 @@ import com.google.common.collect.Table;
 import com.google.common.collect.TreeBasedTable;
 
 import lcmc.Exceptions;
-import lcmc.cluster.service.ssh.ExecCommandConfig;
-import lcmc.cluster.service.ssh.SshOutput;
+import lcmc.cluster.infrastructure.ssh.ExecCommandConfig;
 import lcmc.common.domain.AccessMode;
 import lcmc.common.domain.ConvertCmdCallback;
 import lcmc.common.domain.StringValue;
@@ -409,10 +408,11 @@ public class DrbdXml {
     }
 
     public final String updateDrbdParameters(final Host host) {
-        final String command = host.getHostParser().getDistCommand("Drbd.getParameters", (ConvertCmdCallback) null);
-        final SshOutput ret = host.captureCommand(new ExecCommandConfig().command(command)
-                                                                         .silentCommand()
-                                                                         .silentOutput());
+        final String command = host.getHostParser()
+                                   .getDistCommand("Drbd.getParameters", (ConvertCmdCallback) null);
+        final var ret = host.captureCommand(new ExecCommandConfig().command(command)
+                                                                   .silentCommand()
+                                                                   .silentOutput());
         if (ret.getExitCode() != 0) {
             return null;
         }
@@ -460,10 +460,11 @@ public class DrbdXml {
         if (!host.isConnected()) {
             return null;
         }
-        final String command2 = host.getHostParser().getDistCommand("Drbd.getConfig", (ConvertCmdCallback) null);
-        final SshOutput ret = host.captureCommand(new ExecCommandConfig().command(command2)
-                                                                         .silentCommand()
-                                                                         .silentOutput());
+        final String command2 = host.getHostParser()
+                                    .getDistCommand("Drbd.getConfig", (ConvertCmdCallback) null);
+        final var ret = host.captureCommand(new ExecCommandConfig().command(command2)
+                                                                   .silentCommand()
+                                                                   .silentOutput());
         if (ret.getExitCode() == 0) {
             final StringBuffer confSB = new StringBuffer(ret.getOutput());
             return host.getHostParser().getOutput("drbd", confSB);

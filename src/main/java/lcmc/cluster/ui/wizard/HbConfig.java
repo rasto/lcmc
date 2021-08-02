@@ -52,9 +52,9 @@ import javax.swing.SpringLayout;
 
 import lcmc.Exceptions;
 import lcmc.cluster.domain.Cluster;
-import lcmc.cluster.service.NetworkService;
-import lcmc.cluster.service.ssh.ExecCommandConfig;
-import lcmc.cluster.service.ssh.ExecCommandThread;
+import lcmc.cluster.domain.NetworkService;
+import lcmc.cluster.infrastructure.ssh.ExecCommandConfig;
+import lcmc.cluster.infrastructure.ssh.ExecCommandThread;
 import lcmc.cluster.ui.widget.Check;
 import lcmc.cluster.ui.widget.Widget;
 import lcmc.cluster.ui.widget.WidgetFactory;
@@ -74,7 +74,7 @@ import lcmc.common.ui.utils.SwingUtils;
 import lcmc.common.ui.utils.WidgetListener;
 import lcmc.crm.domain.CastAddress;
 import lcmc.crm.domain.UcastLink;
-import lcmc.crm.service.Heartbeat;
+import lcmc.crm.infrastrucure.Heartbeat;
 import lcmc.drbd.domain.NetInterface;
 import lcmc.host.domain.Host;
 import lcmc.logger.Logger;
@@ -425,25 +425,26 @@ final class HbConfig extends DialogCluster {
      */
     private boolean updateOldHbConfig() { /* is run in a thread */
         final Host[] hosts = getCluster().getHostsArray();
-        final ExecCommandThread[] ts = new ExecCommandThread[hosts.length];
+        final var ts = new ExecCommandThread[hosts.length];
         configStatus.setText(Tools.getString("Dialog.Cluster.HbConfig.Loading"));
         int i = 0;
 
         for (final Host h : hosts) {
             final int index = i;
             ts[i] = h.execCommand(new ExecCommandConfig().commandString("Heartbeat.getHbConfig")
-                             .execCallback(new ExecCallback() {
-                                 @Override
-                                 public void done(final String answer) {
-                                     configs[index] = answer;
-                                 }
-                                 @Override
-                                 public void doneError(final String answer, final int errorCode) {
-                                     configs[index] = HA_CF_ERROR_STRING;
-                                 }
-                             })
-                             .silentCommand()
-                             .silentOutput());
+                                                         .execCallback(new ExecCallback() {
+                                                             @Override
+                                                             public void done(final String answer) {
+                                                                 configs[index] = answer;
+                                                             }
+
+                                                             @Override
+                                                             public void doneError(final String answer, final int errorCode) {
+                                                                 configs[index] = HA_CF_ERROR_STRING;
+                                                             }
+                                                         })
+                                                         .silentCommand()
+                                                         .silentOutput());
             i++;
         }
         for (final ExecCommandThread t : ts) {

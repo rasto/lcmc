@@ -68,7 +68,7 @@ import lcmc.crm.domain.ClusterStatus;
 import lcmc.crm.domain.CrmXml;
 import lcmc.crm.domain.PtestData;
 import lcmc.crm.domain.ResourceAgent;
-import lcmc.crm.service.CRM;
+import lcmc.crm.infrastrucure.CRM;
 import lcmc.crm.ui.CrmGraph;
 import lcmc.host.domain.Host;
 import lcmc.logger.Logger;

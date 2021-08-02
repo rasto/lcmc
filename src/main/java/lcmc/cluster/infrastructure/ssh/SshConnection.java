@@ -17,7 +17,7 @@
  * along with LCMC; see the file COPYING.  If not, write to
  * the Free Software Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
  */
-package lcmc.cluster.service.ssh;
+package lcmc.cluster.infrastructure.ssh;
 
 import com.trilead.ssh2.Connection;
 

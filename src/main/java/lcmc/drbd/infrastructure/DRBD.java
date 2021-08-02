@@ -20,7 +20,7 @@
  * the Free Software Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-package lcmc.drbd.service;
+package lcmc.drbd.infrastructure;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -31,8 +31,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import lcmc.Exceptions.IllegalVersionException;
-import lcmc.cluster.service.ssh.ExecCommandConfig;
-import lcmc.cluster.service.ssh.SshOutput;
+import lcmc.cluster.infrastructure.ssh.ExecCommandConfig;
+import lcmc.cluster.infrastructure.ssh.SshOutput;
 import lcmc.common.domain.Application;
 import lcmc.common.domain.ConvertCmdCallback;
 import lcmc.common.domain.ExecCallback;
@@ -84,9 +84,9 @@ public final class DRBD {
             if (cmd.contains("@DRYRUNCONF@")) {
                 cmd = cmd.replaceAll("@DRYRUNCONF@", "-c /var/lib/drbd/drbd.conf-lcmc-test");
             }
-            final SshOutput output = host.captureCommand(new ExecCommandConfig().command(cmd)
-                                                                                .silentCommand()
-                                                                                .silentOutput());
+            final var output = host.captureCommand(new ExecCommandConfig().command(cmd)
+                                                                          .silentCommand()
+                                                                          .silentOutput());
             M_DRBD_TEST_WRITELOCK.lock();
             try {
                 if (drbdtestOutput == null) {
@@ -162,7 +162,7 @@ public final class DRBD {
                                  final ExecCallback execCallback,
                                  final Application.RunMode runMode) {
         final String command = host.getDistCommand("DRBD.attach", getResVolReplaceHash(host, resource, volume));
-        final SshOutput ret = execCommand(host, command, execCallback, true, runMode);
+        final var ret = execCommand(host, command, execCallback, true, runMode);
         return ret.getExitCode() == 0;
     }
 
@@ -184,7 +184,7 @@ public final class DRBD {
                                  final ExecCallback execCallback,
                                  final Application.RunMode runMode) {
         final String command = host.getDistCommand("DRBD.detach", getResVolReplaceHash(host, resource, volume));
-        final SshOutput ret = execCommand(host, command, execCallback, true, runMode);
+        final var ret = execCommand(host, command, execCallback, true, runMode);
         return ret.getExitCode() == 0;
     }
 
@@ -206,7 +206,7 @@ public final class DRBD {
                                   final ExecCallback execCallback,
                                   final Application.RunMode runMode) {
         final String command = host.getDistCommand("DRBD.connect", getResVolReplaceHash(host, resource, volume));
-        final SshOutput ret = execCommand(host, command, execCallback, true, runMode);
+        final var ret = execCommand(host, command, execCallback, true, runMode);
         return ret.getExitCode() == 0;
     }
 
@@ -224,7 +224,7 @@ public final class DRBD {
     public static boolean disconnect(final Host host, final String resource, final String volume, final ExecCallback execCallback,
             final Application.RunMode runMode) {
         final String command = host.getDistCommand("DRBD.disconnect", getResVolReplaceHash(host, resource, volume));
-        final SshOutput ret = execCommand(host, command, execCallback, true, runMode);
+        final var ret = execCommand(host, command, execCallback, true, runMode);
         return ret.getExitCode() == 0;
     }
 
@@ -278,7 +278,7 @@ public final class DRBD {
                                      final ExecCallback execCallback,
                                      final Application.RunMode runMode) {
         final String command = host.getDistCommand("DRBD.setPrimary", getResVolReplaceHash(host, resource, volume));
-        final SshOutput ret = execCommand(host, command, execCallback, true, runMode);
+        final var ret = execCommand(host, command, execCallback, true, runMode);
         return ret.getExitCode() == 0;
     }
 
@@ -300,7 +300,7 @@ public final class DRBD {
                                        final ExecCallback execCallback,
                                        final Application.RunMode runMode) {
         final String command = host.getDistCommand("DRBD.setSecondary", getResVolReplaceHash(host, resource, volume));
-        final SshOutput ret = execCommand(host, command, execCallback, true, runMode);
+        final var ret = execCommand(host, command, execCallback, true, runMode);
         return ret.getExitCode() == 0;
     }
 
@@ -325,7 +325,7 @@ public final class DRBD {
                                    final ExecCallback execCallback,
                                    final Application.RunMode runMode) {
         final String command = host.getDistCommand("DRBD.initDrbd", getResVolReplaceHash(host, resource, volume));
-        final SshOutput ret = execCommand(host, command, execCallback, true, runMode);
+        final var ret = execCommand(host, command, execCallback, true, runMode);
         return ret.getExitCode() == 0;
     }
 
@@ -342,7 +342,7 @@ public final class DRBD {
         final Map<String, String> replaceHash = getResVolReplaceHash(host, resource, volume);
         replaceHash.put(DEVICE_PLACE_HOLDER, device);
         final String command = host.getDistCommand("DRBD.createMD", replaceHash);
-        final SshOutput ret = execCommand(host, command, execCallback, true, runMode);
+        final var ret = execCommand(host, command, execCallback, true, runMode);
         return ret.getExitCode() == 0;
     }
 
@@ -454,7 +454,7 @@ public final class DRBD {
                                      final ExecCallback execCallback,
                                      final Application.RunMode runMode) {
         final String command = host.getDistCommand("DRBD.invalidate", getResVolReplaceHash(host, resource, volume));
-        final SshOutput ret = execCommand(host, command, execCallback, true, runMode);
+        final var ret = execCommand(host, command, execCallback, true, runMode);
         return ret.getExitCode() == 0;
     }
 
@@ -492,7 +492,7 @@ public final class DRBD {
                                  final ExecCallback execCallback,
                                  final Application.RunMode runMode) {
         final String command = host.getDistCommand("DRBD.resize", getResVolReplaceHash(host, resource, volume));
-        final SshOutput ret = execCommand(host, command, execCallback, true, runMode);
+        final var ret = execCommand(host, command, execCallback, true, runMode);
         return ret.getExitCode() == 0;
     }
 
@@ -503,7 +503,7 @@ public final class DRBD {
                                  final String volume,
                                  final Application.RunMode runMode) {
         final String command = host.getDistCommand("DRBD.verify", getResVolReplaceHash(host, resource, volume));
-        final SshOutput ret = execCommand(host, command, null, true, runMode);
+        final var ret = execCommand(host, command, null, true, runMode);
         return ret.getExitCode() == 0;
     }
 
@@ -533,7 +533,7 @@ public final class DRBD {
                                   final ExecCallback execCallback,
                                   final Application.RunMode runMode) {
         final String command = host.getDistCommand("DRBD.adjust.apply", getResVolReplaceHash(host, resource, volume));
-        final SshOutput ret = execCommand(host, command, execCallback, false, runMode);
+        final var ret = execCommand(host, command, execCallback, false, runMode);
 
         final Pattern p = Pattern.compile(".*Failure: \\((\\d+)\\).*", Pattern.DOTALL);
         final Matcher m = p.matcher(ret.getOutput());
@@ -586,7 +586,7 @@ public final class DRBD {
                                final String volume,
                                final Application.RunMode runMode) {
         final String command = host.getDistCommand("DRBD.get-gi", getResVolReplaceHash(host, resource, volume));
-        final SshOutput ret = execCommand(host, command, null, false, runMode);
+        final var ret = execCommand(host, command, null, false, runMode);
         if (ret.getExitCode() == 0) {
             return ret.getOutput();
         }
@@ -611,7 +611,7 @@ public final class DRBD {
                                final ExecCallback execCallback,
                                final Application.RunMode runMode) {
         final String command = host.getDistCommand("DRBD.down", getResVolReplaceHash(host, resource, volume));
-        final SshOutput ret = execCommand(host, command, execCallback, true, runMode);
+        final var ret = execCommand(host, command, execCallback, true, runMode);
         return ret.getExitCode() == 0;
     }
 
@@ -633,7 +633,7 @@ public final class DRBD {
                              final ExecCallback execCallback,
                              final Application.RunMode runMode) {
         final String command = host.getDistCommand("DRBD.up", getResVolReplaceHash(host, resource, volume));
-        final SshOutput ret = execCommand(host, command, execCallback, true, runMode);
+        final var ret = execCommand(host, command, execCallback, true, runMode);
         return ret.getExitCode() == 0;
     }
 
@@ -648,7 +648,7 @@ public final class DRBD {
      */
     public static boolean start(final Host host, final ExecCallback execCallback, final Application.RunMode runMode) {
         final String command = host.getDistCommand("DRBD.start", (ConvertCmdCallback) null);
-        final SshOutput ret = execCommand(host, command, execCallback, true, runMode);
+        final var ret = execCommand(host, command, execCallback, true, runMode);
         return ret.getExitCode() == 0;
 
     }
@@ -663,7 +663,7 @@ public final class DRBD {
      */
     public static boolean load(final Host host, final ExecCallback execCallback, final Application.RunMode runMode) {
         final String command = host.getDistCommand("DRBD.load", (ConvertCmdCallback) null);
-        final SshOutput ret = execCommand(host, command, execCallback, true, runMode);
+        final var ret = execCommand(host, command, execCallback, true, runMode);
         return ret.getExitCode() == 0;
     }
 

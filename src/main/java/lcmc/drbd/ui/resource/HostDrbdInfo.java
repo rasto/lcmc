@@ -38,7 +38,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.SpringLayout;
 
-import lcmc.cluster.service.ssh.ExecCommandConfig;
+import lcmc.cluster.infrastructure.ssh.ExecCommandConfig;
 import lcmc.cluster.ui.widget.WidgetFactory;
 import lcmc.common.domain.Application;
 import lcmc.common.domain.ColorText;
@@ -137,9 +137,9 @@ public class HostDrbdInfo extends Info {
         host.registerEnableOnConnect(procDrbdButton);
         final MyButton drbdProcsButton = widgetFactory.createButton("DRBD Processes");
         drbdProcsButton.addActionListener(e -> host.execCommand(new ExecCommandConfig().commandString("DRBD.getProcesses")
-                .silentCommand()
-                .silentOutput()
-                .execCallback(execCallback)));
+                                                                                       .silentCommand()
+                                                                                       .silentOutput()
+                                                                                       .execCallback(execCallback)));
         host.registerEnableOnConnect(drbdProcsButton);
 
         final JPanel mainPanel = new JPanel();

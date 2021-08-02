@@ -25,8 +25,7 @@ package lcmc.vm.service;
 import java.util.HashMap;
 import java.util.Map;
 
-import lcmc.cluster.service.ssh.ExecCommandConfig;
-import lcmc.cluster.service.ssh.SshOutput;
+import lcmc.cluster.infrastructure.ssh.ExecCommandConfig;
 import lcmc.common.domain.util.Tools;
 import lcmc.configs.DistResource;
 import lcmc.host.domain.Host;
@@ -43,11 +42,9 @@ public final class VIRSH {
     /** Executes the specified virsh commands on the specified host. */
     private static boolean execCommand(final Host host, final String commands) {
         if (host.isConnected()) {
-            final SshOutput ret = host.captureCommandProgressIndicator(Tools.getString("VIRSH.ExecutingCommand")
-                                                                       + ' '
-                                                                       + commands.replaceAll(DistResource.SUDO, " ")
-                                                                       + "...",
-                                                                       new ExecCommandConfig().command(commands));
+            final var ret = host.captureCommandProgressIndicator(
+                    Tools.getString("VIRSH.ExecutingCommand") + ' ' + commands.replaceAll(DistResource.SUDO, " ") + "...",
+                    new ExecCommandConfig().command(commands));
             return ret.getExitCode() == 0;
         }
         return true;

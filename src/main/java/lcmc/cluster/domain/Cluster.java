@@ -34,7 +34,7 @@ import java.util.Set;
 import javax.inject.Named;
 
 import lcmc.Exceptions;
-import lcmc.cluster.service.storage.BlockDeviceService;
+import lcmc.cluster.domain.storage.BlockDeviceService;
 import lcmc.cluster.ui.ClusterBrowser;
 import lcmc.cluster.ui.ClusterTab;
 import lcmc.cluster.ui.SSHGui;

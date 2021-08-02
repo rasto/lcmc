@@ -48,10 +48,10 @@ import javax.swing.plaf.ColorUIResource;
 import javax.swing.plaf.metal.MetalLookAndFeel;
 import javax.swing.plaf.metal.OceanTheme;
 
-import lcmc.cluster.service.NetworkService;
-import lcmc.cluster.service.storage.BlockDeviceService;
-import lcmc.cluster.service.storage.FileSystemService;
-import lcmc.cluster.service.storage.MountPointService;
+import lcmc.cluster.domain.NetworkService;
+import lcmc.cluster.domain.storage.BlockDeviceService;
+import lcmc.cluster.domain.storage.FileSystemService;
+import lcmc.cluster.domain.storage.MountPointService;
 import lcmc.cluster.ui.ClusterBrowser;
 import lcmc.common.domain.Application;
 import lcmc.common.domain.util.Tools;

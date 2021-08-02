@@ -31,8 +31,8 @@ import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.SpringLayout;
 
-import lcmc.cluster.service.ssh.ExecCommandConfig;
-import lcmc.cluster.service.ssh.ExecCommandThread;
+import lcmc.cluster.infrastructure.ssh.ExecCommandConfig;
+import lcmc.cluster.infrastructure.ssh.ExecCommandThread;
 import lcmc.cluster.ui.widget.WidgetFactory;
 import lcmc.common.domain.Application;
 import lcmc.common.domain.ExecCallback;
@@ -99,24 +99,24 @@ public class Devices extends DialogHost {
     }
 
     protected final void getAllInfo() {
-        final ExecCommandThread t = getHost().execCommand(
-                         new ExecCommandConfig().commandString("GetHostAllInfo")
-                         .progressBar(getProgressBar())
-                         .execCallback(new ExecCallback() {
-                             @Override
-                             public void done(final String answer) {
-                                 checkAnswer(answer);
-                             }
+        final ExecCommandThread t = getHost().execCommand(new ExecCommandConfig().commandString("GetHostAllInfo")
+                                                                                 .progressBar(getProgressBar())
+                                                                                 .execCallback(new ExecCallback() {
+                                                                                     @Override
+                                                                                     public void done(final String answer) {
+                                                                                         checkAnswer(answer);
+                                                                                     }
 
-                             @Override
-                             public void doneError(final String answer, final int errorCode) {
-                                 printErrorAndRetry(Tools.getString("Dialog.Host.Devices.CheckError"),
-                                                    answer,
-                                                    errorCode);
-                             }
-                         })
-                         .silentCommand()
-                         .silentOutput());
+                                                                                     @Override
+                                                                                     public void doneError(final String answer,
+                                                                                             final int errorCode) {
+                                                                                         printErrorAndRetry(Tools.getString(
+                                                                                                         "Dialog.Host.Devices.CheckError"),
+                                                                                                 answer, errorCode);
+                                                                                     }
+                                                                                 })
+                                                                                 .silentCommand()
+                                                                                 .silentOutput());
         setCommandThread(t);
     }
 

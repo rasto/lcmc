@@ -48,8 +48,7 @@ import javax.swing.filechooser.FileSystemView;
 
 import org.w3c.dom.Node;
 
-import lcmc.cluster.service.ssh.ExecCommandConfig;
-import lcmc.cluster.service.ssh.SshOutput;
+import lcmc.cluster.infrastructure.ssh.ExecCommandConfig;
 import lcmc.cluster.ui.ClusterBrowser;
 import lcmc.cluster.ui.widget.Check;
 import lcmc.cluster.ui.widget.Widget;
@@ -481,8 +480,9 @@ public abstract class HardwareInfo extends EditableInfo {
                 } else {
                     dirSB.append("/*");
                 }
-                final SshOutput out = host.captureCommandProgressIndicator("executing...",
-                        new ExecCommandConfig().command("stat -c \"%A %a %Y %s %n\" " + dirSB + " 2>/dev/null").silentOutput());
+                final var out = host.captureCommandProgressIndicator("executing...",
+                        new ExecCommandConfig().command("stat -c \"%A %a %Y %s %n\" " + dirSB + " 2>/dev/null")
+                                               .silentOutput());
                 final List<LinuxFile> files = new ArrayList<>();
                 if (out.getExitCode() == 0) {
                     for (final String line : out.getOutput().split("\r\n")) {

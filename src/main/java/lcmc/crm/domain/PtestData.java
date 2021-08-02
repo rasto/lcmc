@@ -30,7 +30,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import lcmc.common.domain.util.Tools;
-import lcmc.crm.service.CRM;
+import lcmc.crm.infrastrucure.CRM;
 
 /**
  * This class holds data that were retrieved from ptest command.

@@ -47,7 +47,7 @@ import lcmc.common.ui.utils.SwingUtils;
 import lcmc.common.ui.utils.UpdatableItem;
 import lcmc.crm.domain.CrmXml;
 import lcmc.crm.domain.ResourceAgent;
-import lcmc.crm.service.CRM;
+import lcmc.crm.infrastrucure.CRM;
 import lcmc.crm.ui.ClusterLogs;
 import lcmc.crm.ui.CrmGraph;
 import lcmc.host.domain.Host;

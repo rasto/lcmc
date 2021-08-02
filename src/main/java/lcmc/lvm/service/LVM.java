@@ -26,8 +26,8 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
-import lcmc.cluster.service.ssh.ExecCommandConfig;
-import lcmc.cluster.service.ssh.SshOutput;
+import lcmc.cluster.infrastructure.ssh.ExecCommandConfig;
+import lcmc.cluster.infrastructure.ssh.SshOutput;
 import lcmc.common.domain.Application;
 import lcmc.common.domain.util.Tools;
 import lcmc.configs.DistResource;

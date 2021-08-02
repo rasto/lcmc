@@ -29,7 +29,7 @@ import javax.inject.Named;
 import javax.inject.Provider;
 
 import lcmc.cluster.domain.Network;
-import lcmc.cluster.service.NetworkService;
+import lcmc.cluster.domain.NetworkService;
 import lcmc.cluster.ui.widget.Check;
 import lcmc.cluster.ui.widget.Widget;
 import lcmc.cluster.ui.widget.WidgetFactory;

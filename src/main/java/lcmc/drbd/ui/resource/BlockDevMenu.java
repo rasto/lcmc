@@ -43,7 +43,7 @@ import lcmc.common.ui.utils.MyMenuItem;
 import lcmc.common.ui.utils.UpdatableItem;
 import lcmc.drbd.domain.BlockDevice;
 import lcmc.drbd.domain.DrbdXml;
-import lcmc.drbd.service.DRBD;
+import lcmc.drbd.infrastructure.DRBD;
 import lcmc.drbd.ui.DrbdLog;
 import lcmc.host.domain.Host;
 import lcmc.logger.Logger;

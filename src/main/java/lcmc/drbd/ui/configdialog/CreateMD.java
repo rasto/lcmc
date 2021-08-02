@@ -49,7 +49,7 @@ import lcmc.common.ui.main.ProgressIndicator;
 import lcmc.common.ui.utils.MyButton;
 import lcmc.common.ui.utils.SwingUtils;
 import lcmc.common.ui.utils.WidgetListener;
-import lcmc.drbd.service.DRBD;
+import lcmc.drbd.infrastructure.DRBD;
 import lcmc.drbd.ui.resource.BlockDevInfo;
 import lcmc.host.domain.Host;
 

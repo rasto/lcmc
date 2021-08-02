@@ -25,8 +25,8 @@ package lcmc.vm.domain;
 import java.io.File;
 import java.io.IOException;
 
-import lcmc.cluster.service.ssh.ExecCommandConfig;
-import lcmc.cluster.service.ssh.SshOutput;
+import lcmc.cluster.infrastructure.ssh.ExecCommandConfig;
+import lcmc.cluster.infrastructure.ssh.SshOutput;
 import lcmc.common.domain.util.Tools;
 import lcmc.configs.DistResource;
 import lcmc.host.domain.Host;
@@ -83,13 +83,9 @@ public final class LinuxFile extends File {
         if (existCache != null) {
             return existCache;
         }
-        final SshOutput out = host.captureCommandProgressIndicator(
-                                            "executing...",
-                                            new ExecCommandConfig().command(DistResource.SUDO
-                                                                            + "stat "
-                                                                            + Tools.getUnixPath(toString())
-                                                                            + " 2>/dev/null")
-                                                                    .silentOutput());
+        final SshOutput out = host.captureCommandProgressIndicator("executing...",
+                new ExecCommandConfig().command(DistResource.SUDO + "stat " + Tools.getUnixPath(toString()) + " 2>/dev/null")
+                                       .silentOutput());
         return out.getExitCode() == 0;
     }
 

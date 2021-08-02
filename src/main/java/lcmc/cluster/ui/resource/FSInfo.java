@@ -25,8 +25,7 @@ import javax.inject.Named;
 import javax.swing.ImageIcon;
 import javax.swing.JEditorPane;
 
-import lcmc.cluster.service.ssh.ExecCommandConfig;
-import lcmc.cluster.service.ssh.SshOutput;
+import lcmc.cluster.infrastructure.ssh.ExecCommandConfig;
 import lcmc.common.domain.Application;
 import lcmc.common.domain.util.Tools;
 import lcmc.common.ui.Access;
@@ -75,7 +74,7 @@ public final class FSInfo extends Info {
         final Runnable runnable = () -> {
             if (cachedModinfoOutput == null) {
                 final Host host = getBrowser().getHost();
-                final SshOutput ret = host.captureCommand(new ExecCommandConfig().command("/sbin/modinfo " + getName()));
+                final var ret = host.captureCommand(new ExecCommandConfig().command("/sbin/modinfo " + getName()));
                 cachedModinfoOutput = ret.getOutput();
             }
             ep.setText("<html><pre>" + cachedModinfoOutput + "</html></pre>");

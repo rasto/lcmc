@@ -47,7 +47,7 @@ import lcmc.common.ui.utils.MenuFactory;
 import lcmc.common.ui.utils.MyMenuItem;
 import lcmc.common.ui.utils.UpdatableItem;
 import lcmc.drbd.domain.BlockDevice;
-import lcmc.drbd.service.DRBD;
+import lcmc.drbd.infrastructure.DRBD;
 import lcmc.host.domain.Host;
 import lcmc.lvm.ui.LVCreate;
 import lcmc.lvm.ui.VGCreate;

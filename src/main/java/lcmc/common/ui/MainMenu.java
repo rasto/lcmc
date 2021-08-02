@@ -59,7 +59,7 @@ import javax.swing.event.HyperlinkEvent;
 import javax.swing.filechooser.FileFilter;
 
 import lcmc.Exceptions;
-import lcmc.cluster.service.ClusterStarter;
+import lcmc.cluster.domain.ClusterStarter;
 import lcmc.cluster.ui.ClusterBrowser;
 import lcmc.cluster.ui.wizard.AddClusterDialog;
 import lcmc.common.domain.AccessMode;

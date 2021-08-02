@@ -1,12 +1,10 @@
-package lcmc.cluster.service;
+package lcmc.cluster.domain;
 
 import java.util.Collection;
 import java.util.Set;
 
 import javax.inject.Named;
 
-import lcmc.cluster.domain.Cluster;
-import lcmc.cluster.domain.Clusters;
 import lcmc.cluster.ui.ClusterTab;
 import lcmc.cluster.ui.ClusterTabFactory;
 import lcmc.cluster.ui.ClustersPanel;

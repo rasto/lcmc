@@ -37,7 +37,7 @@ import javax.swing.JPanel;
 
 import org.w3c.dom.Node;
 
-import lcmc.cluster.service.NetworkService;
+import lcmc.cluster.domain.NetworkService;
 import lcmc.cluster.ui.widget.Widget;
 import lcmc.cluster.ui.widget.WidgetFactory;
 import lcmc.common.domain.AccessMode;

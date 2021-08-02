@@ -49,7 +49,7 @@ import lcmc.common.ui.utils.UpdatableItem;
 import lcmc.crm.domain.ClusterStatus;
 import lcmc.crm.domain.CrmXml;
 import lcmc.crm.domain.RscSetConnectionData;
-import lcmc.crm.service.CRM;
+import lcmc.crm.infrastrucure.CRM;
 import lcmc.host.domain.Host;
 import lcmc.logger.Logger;
 import lcmc.logger.LoggerFactory;

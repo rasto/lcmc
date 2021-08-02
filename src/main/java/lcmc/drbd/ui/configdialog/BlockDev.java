@@ -44,7 +44,7 @@ import lcmc.common.ui.SpringUtilities;
 import lcmc.common.ui.WizardDialog;
 import lcmc.common.ui.main.MainData;
 import lcmc.common.ui.utils.SwingUtils;
-import lcmc.drbd.service.DRBD;
+import lcmc.drbd.infrastructure.DRBD;
 import lcmc.drbd.ui.resource.BlockDevInfo;
 import lcmc.drbd.ui.resource.GlobalInfo;
 import lcmc.drbd.ui.resource.ResourceInfo;

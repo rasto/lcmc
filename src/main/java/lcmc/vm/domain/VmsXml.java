@@ -54,8 +54,8 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import lcmc.cluster.service.ssh.ExecCommandConfig;
-import lcmc.cluster.service.ssh.SshOutput;
+import lcmc.cluster.infrastructure.ssh.ExecCommandConfig;
+import lcmc.cluster.infrastructure.ssh.SshOutput;
 import lcmc.common.domain.ConvertCmdCallback;
 import lcmc.common.domain.StringValue;
 import lcmc.common.domain.Unit;

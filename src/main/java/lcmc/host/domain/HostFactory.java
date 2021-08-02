@@ -26,8 +26,8 @@ import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import lcmc.HwEventBus;
-import lcmc.cluster.service.ssh.Ssh;
-import lcmc.cluster.service.storage.BlockDeviceService;
+import lcmc.cluster.domain.storage.BlockDeviceService;
+import lcmc.cluster.infrastructure.ssh.Ssh;
 import lcmc.common.domain.Application;
 import lcmc.common.ui.main.MainData;
 import lcmc.common.ui.main.ProgressIndicator;

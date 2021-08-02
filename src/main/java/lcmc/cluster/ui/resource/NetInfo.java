@@ -26,8 +26,7 @@ import javax.inject.Named;
 import javax.swing.ImageIcon;
 import javax.swing.JEditorPane;
 
-import lcmc.cluster.service.ssh.ExecCommandConfig;
-import lcmc.cluster.service.ssh.SshOutput;
+import lcmc.cluster.infrastructure.ssh.ExecCommandConfig;
 import lcmc.common.domain.Application;
 import lcmc.common.domain.Value;
 import lcmc.common.domain.util.Tools;
@@ -69,7 +68,7 @@ public class NetInfo extends Info {
     public final void updateInfo(final JEditorPane ep) {
         final Runnable runnable = () -> {
             final Host host = getBrowser().getHost();
-            final SshOutput ret = host.captureCommand(new ExecCommandConfig().command("/sbin/ip a l " + getName()));
+            final var ret = host.captureCommand(new ExecCommandConfig().command("/sbin/ip a l " + getName()));
             ep.setText(ret.getOutput());
         };
         final Thread thread = new Thread(runnable);

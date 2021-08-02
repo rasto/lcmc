@@ -18,7 +18,7 @@
  * the Free Software Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-package lcmc.cluster.service.ssh;
+package lcmc.cluster.infrastructure.ssh;
 
 import lcmc.cluster.ui.SSHGui;
 import lcmc.common.domain.ConvertCmdCallback;

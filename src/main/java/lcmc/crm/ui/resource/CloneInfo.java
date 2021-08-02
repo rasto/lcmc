@@ -55,7 +55,7 @@ import lcmc.crm.domain.ClusterStatus;
 import lcmc.crm.domain.CrmXml;
 import lcmc.crm.domain.HostLocation;
 import lcmc.crm.domain.ResourceAgent;
-import lcmc.crm.service.CRM;
+import lcmc.crm.infrastrucure.CRM;
 import lcmc.host.domain.Host;
 import lombok.val;
 

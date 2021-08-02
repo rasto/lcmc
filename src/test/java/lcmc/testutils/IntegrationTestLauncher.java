@@ -35,8 +35,8 @@ import javax.inject.Singleton;
 
 import lcmc.LCMC;
 import lcmc.cluster.domain.Cluster;
-import lcmc.cluster.service.NetworkService;
-import lcmc.cluster.service.storage.FileSystemService;
+import lcmc.cluster.domain.NetworkService;
+import lcmc.cluster.domain.storage.FileSystemService;
 import lcmc.cluster.ui.ClusterTabFactory;
 import lcmc.common.domain.Application;
 import lcmc.common.domain.UserConfig;

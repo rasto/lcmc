@@ -74,7 +74,7 @@ import lcmc.crm.ui.resource.ServiceInfo;
 import lcmc.drbd.domain.DRBDtestData;
 import lcmc.drbd.domain.DrbdVolume;
 import lcmc.drbd.domain.DrbdXml;
-import lcmc.drbd.service.DRBD;
+import lcmc.drbd.infrastructure.DRBD;
 import lcmc.drbd.ui.AddDrbdSplitBrainDialog;
 import lcmc.host.domain.Host;
 import lcmc.logger.Logger;

@@ -30,7 +30,7 @@ import javax.inject.Named;
 import javax.inject.Provider;
 import javax.swing.JPanel;
 
-import lcmc.cluster.service.ssh.ExecCommandThread;
+import lcmc.cluster.infrastructure.ssh.ExecCommandThread;
 import lcmc.cluster.ui.widget.Check;
 import lcmc.cluster.ui.widget.Widget;
 import lcmc.cluster.ui.widget.WidgetFactory;

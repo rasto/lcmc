@@ -25,7 +25,7 @@ import javax.inject.Named;
 import lcmc.ClusterEventBus;
 import lcmc.cluster.domain.Cluster;
 import lcmc.cluster.domain.Network;
-import lcmc.cluster.service.NetworkService;
+import lcmc.cluster.domain.NetworkService;
 import lcmc.cluster.ui.ClusterBrowser;
 
 @Named

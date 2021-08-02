@@ -40,8 +40,8 @@ import javax.swing.SpringLayout;
 import javax.swing.border.TitledBorder;
 
 import lcmc.cluster.domain.Cluster;
-import lcmc.cluster.service.ssh.ExecCommandConfig;
-import lcmc.cluster.service.ssh.ExecCommandThread;
+import lcmc.cluster.infrastructure.ssh.ExecCommandConfig;
+import lcmc.cluster.infrastructure.ssh.ExecCommandThread;
 import lcmc.cluster.ui.widget.Check;
 import lcmc.cluster.ui.widget.Widget;
 import lcmc.cluster.ui.widget.WidgetFactory;
@@ -58,10 +58,10 @@ import lcmc.common.ui.WizardDialog;
 import lcmc.common.ui.main.MainData;
 import lcmc.common.ui.utils.MyButton;
 import lcmc.common.ui.utils.SwingUtils;
-import lcmc.crm.service.Corosync;
-import lcmc.crm.service.Heartbeat;
-import lcmc.crm.service.Openais;
-import lcmc.drbd.service.DRBD;
+import lcmc.crm.infrastrucure.Corosync;
+import lcmc.crm.infrastrucure.Heartbeat;
+import lcmc.crm.infrastrucure.Openais;
+import lcmc.drbd.infrastructure.DRBD;
 import lcmc.host.domain.Host;
 import lcmc.logger.Logger;
 import lcmc.logger.LoggerFactory;
@@ -210,7 +210,7 @@ public class InitCluster extends DialogCluster {
     private void checkCluster(final boolean periodic) {
         /* check if modules are loaded. */
         final Host[] hosts = getCluster().getHostsArray();
-        final ExecCommandThread[] infoThreads = new ExecCommandThread[hosts.length];
+        final var infoThreads = new ExecCommandThread[hosts.length];
         int i = 0;
         for (final Host h : hosts) {
             infoThreads[i] = h.execCommand(new ExecCommandConfig()

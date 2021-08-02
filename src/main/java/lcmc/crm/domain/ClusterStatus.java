@@ -36,8 +36,7 @@ import javax.inject.Named;
 
 import com.google.common.collect.Table;
 
-import lcmc.cluster.service.ssh.ExecCommandConfig;
-import lcmc.cluster.service.ssh.SshOutput;
+import lcmc.cluster.infrastructure.ssh.ExecCommandConfig;
 import lcmc.common.domain.Application;
 import lcmc.common.domain.ConvertCmdCallback;
 import lcmc.common.domain.Value;
@@ -80,10 +79,10 @@ public class ClusterStatus {
         this.crmXML = crmXML;
         final String command = host.getHostParser()
                                    .getDistCommand("Heartbeat.getClusterMetadata", (ConvertCmdCallback) null);
-        final SshOutput ret = host.captureCommandProgressIndicator(Tools.getString("Heartbeat.getClusterMetadata"),
-                                                                   new ExecCommandConfig().command(command)
-                                                                                          .silentCommand()
-                                                                                          .silentOutput());
+        final var ret = host.captureCommandProgressIndicator(Tools.getString("Heartbeat.getClusterMetadata"),
+                new ExecCommandConfig().command(command)
+                                       .silentCommand()
+                                       .silentOutput());
         final String output = ret.getOutput();
         if (ret.getExitCode() != 0) {
             return;

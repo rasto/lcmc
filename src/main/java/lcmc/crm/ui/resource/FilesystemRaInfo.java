@@ -36,11 +36,10 @@ import javax.swing.tree.TreeNode;
 import com.google.common.eventbus.Subscribe;
 
 import lcmc.ClusterEventBus;
-import lcmc.cluster.service.ssh.ExecCommandConfig;
-import lcmc.cluster.service.ssh.SshOutput;
-import lcmc.cluster.service.storage.BlockDeviceService;
-import lcmc.cluster.service.storage.FileSystemService;
-import lcmc.cluster.service.storage.MountPointService;
+import lcmc.cluster.domain.storage.BlockDeviceService;
+import lcmc.cluster.domain.storage.FileSystemService;
+import lcmc.cluster.domain.storage.MountPointService;
+import lcmc.cluster.infrastructure.ssh.ExecCommandConfig;
 import lcmc.cluster.ui.resource.CommonDeviceInterface;
 import lcmc.cluster.ui.widget.Check;
 import lcmc.cluster.ui.widget.Widget;
@@ -185,7 +184,7 @@ public class FilesystemRaInfo extends ServiceInfo {
             for (final Host host : getBrowser().getClusterHosts()) {
                 final String statCmd = DistResource.SUDO + "stat -c \"%F\" " + dir + "||true";
                 final String text = statCmd.replaceAll(DistResource.SUDO, "");
-                final SshOutput ret = host.captureCommandProgressIndicator(text, new ExecCommandConfig().command(statCmd));
+                final var ret = host.captureCommandProgressIndicator(text, new ExecCommandConfig().command(statCmd));
 
                 if (ret == null || !FS_RES_PARAM_DIRECTORY.equals(ret.getOutput().trim())) {
                     String title = Tools.getString("ClusterBrowser.CreateDir.Title");
@@ -200,8 +199,7 @@ public class FilesystemRaInfo extends ServiceInfo {
                                                        Tools.getString("ClusterBrowser.CreateDir.No"))) {
                         final String cmd = DistResource.SUDO + "/bin/mkdir " + dir;
                         final String progressText = cmd.replaceAll(DistResource.SUDO, "");
-                        final SshOutput out = host.captureCommandProgressIndicator(progressText,
-                                                                                   new ExecCommandConfig().command(cmd));
+                        host.captureCommandProgressIndicator(progressText, new ExecCommandConfig().command(cmd));
                         confirm = true;
                     }
                 }

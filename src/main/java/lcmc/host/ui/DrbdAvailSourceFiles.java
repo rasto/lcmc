@@ -32,8 +32,8 @@ import javax.swing.JPanel;
 import javax.swing.SpringLayout;
 
 import lcmc.Exceptions;
-import lcmc.cluster.service.ssh.ExecCommandConfig;
-import lcmc.cluster.service.ssh.SshOutput;
+import lcmc.cluster.infrastructure.ssh.ExecCommandConfig;
+import lcmc.cluster.infrastructure.ssh.SshOutput;
 import lcmc.cluster.ui.widget.Widget;
 import lcmc.cluster.ui.widget.WidgetFactory;
 import lcmc.common.domain.AccessMode;
@@ -91,8 +91,9 @@ final class DrbdAvailSourceFiles extends DialogHost {
 
     private void findAvailTarballs() {
         final SshOutput ret = getHost().captureCommand(new ExecCommandConfig().commandString("DrbdAvailVersionsSource")
-                .convertCmdCallback(getDrbdInstallationConvertCmdCallback())
-                .silentOutput());
+                                                                              .convertCmdCallback(
+                                                                                      getDrbdInstallationConvertCmdCallback())
+                                                                              .silentOutput());
         final int exitCode = ret.getExitCode();
         final String output = ret.getOutput();
         if (exitCode == 0) {

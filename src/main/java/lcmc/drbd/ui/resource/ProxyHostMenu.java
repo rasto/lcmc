@@ -35,7 +35,7 @@ import lcmc.common.ui.main.MainPresenter;
 import lcmc.common.ui.utils.MenuFactory;
 import lcmc.common.ui.utils.MyMenuItem;
 import lcmc.common.ui.utils.UpdatableItem;
-import lcmc.drbd.service.DRBD;
+import lcmc.drbd.infrastructure.DRBD;
 import lcmc.drbd.ui.DrbdsLog;
 import lcmc.drbd.ui.ProxyHostWizard;
 import lcmc.host.domain.Host;

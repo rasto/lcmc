@@ -36,8 +36,8 @@ import org.junit.jupiter.api.Test;
 
 import lcmc.AppContext;
 import lcmc.cluster.domain.Cluster;
-import lcmc.cluster.service.NetworkService;
-import lcmc.cluster.service.storage.FileSystemService;
+import lcmc.cluster.domain.NetworkService;
+import lcmc.cluster.domain.storage.FileSystemService;
 import lcmc.common.domain.util.Tools;
 import lcmc.testutils.IntegrationTestLauncher;
 import lombok.val;

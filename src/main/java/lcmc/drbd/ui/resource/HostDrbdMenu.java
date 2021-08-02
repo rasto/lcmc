@@ -42,7 +42,7 @@ import lcmc.common.ui.utils.MyMenu;
 import lcmc.common.ui.utils.MyMenuItem;
 import lcmc.common.ui.utils.UpdatableItem;
 import lcmc.drbd.domain.BlockDevice;
-import lcmc.drbd.service.DRBD;
+import lcmc.drbd.infrastructure.DRBD;
 import lcmc.drbd.ui.DrbdsLog;
 import lcmc.drbd.ui.ProxyHostWizard;
 import lcmc.host.domain.Host;

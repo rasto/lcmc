@@ -42,7 +42,7 @@ import com.google.common.eventbus.Subscribe;
 
 import lcmc.ClusterEventBus;
 import lcmc.cluster.domain.Cluster;
-import lcmc.cluster.service.ssh.ExecCommandConfig;
+import lcmc.cluster.infrastructure.ssh.ExecCommandConfig;
 import lcmc.cluster.ui.ClusterBrowser;
 import lcmc.cluster.ui.resource.ClusterViewFactory;
 import lcmc.cluster.ui.resource.FSInfo;

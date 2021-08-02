@@ -34,7 +34,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SpringLayout;
 
-import lcmc.cluster.service.ssh.ExecCommandConfig;
+import lcmc.cluster.infrastructure.ssh.ExecCommandConfig;
 import lcmc.cluster.ui.widget.Widget;
 import lcmc.cluster.ui.widget.WidgetFactory;
 import lcmc.common.domain.Application;
@@ -197,18 +197,18 @@ final class CheckInstallation extends DialogHost {
         });
 
         getHost().execCommand(new ExecCommandConfig().commandString("DrbdCheck.version")
-                .progressBar(getProgressBar())
-                .execCallback(new ExecCallback() {
-                    @Override
-                    public void done(final String answer) {
-                        checkDrbd(answer);
-                    }
+                                                     .progressBar(getProgressBar())
+                                                     .execCallback(new ExecCallback() {
+                                                         @Override
+                                                         public void done(final String answer) {
+                                                             checkDrbd(answer);
+                                                         }
 
-                    @Override
-                    public void doneError(final String answer, final int errorCode) {
-                        checkDrbd(""); // not installed
-                    }
-                })
+                                                         @Override
+                                                         public void doneError(final String answer, final int errorCode) {
+                                                             checkDrbd(""); // not installed
+                                                         }
+                                                     })
                                                      .silentCommand()
                                                      .silentOutput());
     }

@@ -50,7 +50,7 @@ import javax.swing.JScrollPane;
 import javax.swing.SpringLayout;
 
 import lcmc.Exceptions;
-import lcmc.cluster.service.NetworkService;
+import lcmc.cluster.domain.NetworkService;
 import lcmc.cluster.ui.ClusterBrowser;
 import lcmc.cluster.ui.resource.ClusterViewFactory;
 import lcmc.cluster.ui.resource.NetInfo;
@@ -82,7 +82,7 @@ import lcmc.drbd.domain.DrbdResource;
 import lcmc.drbd.domain.DrbdXml;
 import lcmc.drbd.domain.DrbdXml.HostProxy;
 import lcmc.drbd.domain.NetInterface;
-import lcmc.drbd.service.DRBD;
+import lcmc.drbd.infrastructure.DRBD;
 import lcmc.host.domain.Host;
 import lcmc.host.ui.HostBrowser;
 import lcmc.logger.Logger;

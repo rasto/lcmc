@@ -18,7 +18,7 @@
  * the Free Software Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-package lcmc.cluster.service;
+package lcmc.cluster.domain;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -38,8 +38,6 @@ import com.google.common.eventbus.Subscribe;
 
 import lcmc.ClusterEventBus;
 import lcmc.HwEventBus;
-import lcmc.cluster.domain.Cluster;
-import lcmc.cluster.domain.Network;
 import lcmc.common.domain.Value;
 import lcmc.drbd.domain.NetInterface;
 import lcmc.event.HwBridgesChangedEvent;

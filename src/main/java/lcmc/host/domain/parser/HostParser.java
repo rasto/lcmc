@@ -49,8 +49,8 @@ import com.google.common.collect.Sets;
 import lcmc.Exceptions;
 import lcmc.HwEventBus;
 import lcmc.cluster.domain.Cluster;
-import lcmc.cluster.service.ssh.ExecCommandConfig;
-import lcmc.cluster.service.ssh.ExecCommandThread;
+import lcmc.cluster.infrastructure.ssh.ExecCommandConfig;
+import lcmc.cluster.infrastructure.ssh.ExecCommandThread;
 import lcmc.cluster.ui.ClusterBrowser;
 import lcmc.common.domain.Application;
 import lcmc.common.domain.ConvertCmdCallback;
@@ -783,30 +783,32 @@ public class HostParser {
             cmd = "GetHostHWInfo";
         }
         host.execCommand(new ExecCommandConfig().commandString(cmd)
-                .execCallback(new ExecCallback() {
-                    @Override
-                    public void done(final String ans) {
-                        parseHostInfo(ans);
-                        for (final CategoryInfo ci : infosToUpdate) {
-                            ci.updateTable(CategoryInfo.MAIN_TABLE);
-                        }
-                        for (final ResourceGraph g : graphs) {
-                            if (g != null) {
-                                g.repaint();
-                            }
-                        }
-                        host.setLoadingDone();
-                    }
+                                                .execCallback(new ExecCallback() {
+                                                    @Override
+                                                    public void done(final String ans) {
+                                                        parseHostInfo(ans);
+                                                        for (final CategoryInfo ci : infosToUpdate) {
+                                                            ci.updateTable(CategoryInfo.MAIN_TABLE);
+                                                        }
+                                                        for (final ResourceGraph g : graphs) {
+                                                            if (g != null) {
+                                                                g.repaint();
+                                                            }
+                                                        }
+                                                        host.setLoadingDone();
+                                                    }
 
-                    @Override
-                    public void doneError(final String ans, final int exitCode) {
-                        host.setLoadingError();
-                        host.getSSH().forceReconnect();
-                    }
-                })
-                .sshCommandTimeout(HW_INFO_TIMEOUT)
-                .silentCommand()
-                .silentOutput()).block();
+                                                    @Override
+                                                    public void doneError(final String ans, final int exitCode) {
+                                                        host.setLoadingError();
+                                                        host.getSSH()
+                                                            .forceReconnect();
+                                                    }
+                                                })
+                                                .sshCommandTimeout(HW_INFO_TIMEOUT)
+                                                .silentCommand()
+                                                .silentOutput())
+            .block();
     }
 
     /** Gets and stores hardware info about the host. */
@@ -986,7 +988,7 @@ public class HostParser {
 
     /** Stops server (hw) status background process. */
     public void stopServerStatus() {
-        final ExecCommandThread sst = serverStatusThread;
+        final var sst = serverStatusThread;
         if (sst == null) {
             LOG.appWarning("trying to stop stopped server status");
             return;

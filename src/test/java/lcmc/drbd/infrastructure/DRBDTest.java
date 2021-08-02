@@ -1,4 +1,4 @@
-package lcmc.drbd.service;
+package lcmc.drbd.infrastructure;
 
 import static org.assertj.core.api.Assertions.assertThat;
 

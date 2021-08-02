@@ -28,8 +28,8 @@ import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.SpringLayout;
 
-import lcmc.cluster.service.ssh.ExecCommandConfig;
-import lcmc.cluster.service.ssh.Ssh;
+import lcmc.cluster.infrastructure.ssh.ExecCommandConfig;
+import lcmc.cluster.infrastructure.ssh.Ssh;
 import lcmc.cluster.ui.ClusterBrowser;
 import lcmc.cluster.ui.widget.WidgetFactory;
 import lcmc.common.domain.Application;

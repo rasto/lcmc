@@ -55,8 +55,8 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
 import lcmc.cluster.domain.Cluster;
+import lcmc.cluster.domain.ClusterStarter;
 import lcmc.cluster.domain.Clusters;
-import lcmc.cluster.service.ClusterStarter;
 import lcmc.cluster.ui.EmptyBrowser;
 import lcmc.cluster.ui.widget.GenericWidget.MTextField;
 import lcmc.cluster.ui.widget.WidgetFactory;

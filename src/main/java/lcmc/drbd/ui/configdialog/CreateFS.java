@@ -33,7 +33,7 @@ import javax.swing.JPanel;
 import javax.swing.SpringLayout;
 
 import lcmc.Exceptions;
-import lcmc.cluster.service.storage.FileSystemService;
+import lcmc.cluster.domain.storage.FileSystemService;
 import lcmc.cluster.ui.widget.Widget;
 import lcmc.cluster.ui.widget.WidgetFactory;
 import lcmc.common.domain.AccessMode;
