@@ -82,13 +82,13 @@ public final class UserConfig extends XMLTools {
     private static final String ENCODING = "UTF-8";
     public static final boolean PROXY_HOST = true;
 
-    private final HostFactory hostFactory;
+    private final Provider<HostFactory> hostFactory;
     private final Provider<Cluster> clusterProvider;
     private final Application application;
     private final Hosts allHosts;
     private final Clusters allClusters;
 
-    public UserConfig(HostFactory hostFactory, Provider<Cluster> clusterProvider, Application application, Hosts allHosts,
+    public UserConfig(Provider<HostFactory> hostFactory, Provider<Cluster> clusterProvider, Application application, Hosts allHosts,
             Clusters allClusters) {
         this.hostFactory = hostFactory;
         this.clusterProvider = clusterProvider;
@@ -277,7 +277,8 @@ public final class UserConfig extends XMLTools {
                         final boolean sudo,
                         final boolean savable) {
         application.setLastEnteredUser(username);
-        final Host host = hostFactory.createInstance();
+        final Host host = hostFactory.get()
+                                     .createInstance();
         host.setSavable(savable);
         host.setHostname(nodeName);
         if (sshPort == null) {

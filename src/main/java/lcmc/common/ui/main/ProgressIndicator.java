@@ -20,12 +20,13 @@
 
 package lcmc.common.ui.main;
 
-import lcmc.common.ui.MainMenu;
-
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Provider;
 import javax.inject.Singleton;
-import javax.swing.*;
+import javax.swing.JComponent;
+
+import lcmc.common.ui.MainMenu;
 
 @Named
 @Singleton
@@ -34,7 +35,7 @@ public class ProgressIndicator {
     @Inject
     private ProgressIndicatorPanel progressIndicatorPanel;
     @Inject
-    private MainMenu mainMenu;
+    private Provider<MainMenu> mainMenu;
 
     public void init() {
         progressIndicatorPanel.init();
@@ -86,9 +87,11 @@ public class ProgressIndicator {
     }
 
     private void turnOffMainMenu() {
-        mainMenu.turnOff();
+        mainMenu.get()
+                .turnOff();
     }
     private void turnOnMainMenu() {
-        mainMenu.turnOn();
+        mainMenu.get()
+                .turnOn();
     }
 }

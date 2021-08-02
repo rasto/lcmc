@@ -51,6 +51,7 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
 import javax.inject.Named;
+import javax.inject.Provider;
 import javax.inject.Singleton;
 import javax.swing.ImageIcon;
 import javax.swing.JComponent;
@@ -162,10 +163,10 @@ class ProgressIndicatorPanel extends JComponent implements MouseListener, KeyLis
      * Beginning position of the bar.
      */
     private double barPos = -1;
-    private final MainPanel mainPanel;
+    private final Provider<MainPanel> mainPanel;
     private final MainData mainData;
 
-    public ProgressIndicatorPanel(WidgetFactory widgetFactory, MainPanel mainPanel, MainData mainData) {
+    public ProgressIndicatorPanel(WidgetFactory widgetFactory, Provider<MainPanel> mainPanel, MainData mainData) {
         this.widgetFactory = widgetFactory;
         this.mainPanel = mainPanel;
         this.mainData = mainData;
@@ -297,7 +298,8 @@ class ProgressIndicatorPanel extends JComponent implements MouseListener, KeyLis
             g2.setColor(new Color(VEIL_COLOR.getRed(), VEIL_COLOR.getGreen(), VEIL_COLOR.getBlue(), newAlphaLevel));
             final int barHeight = 40;
             final int startAtHeight = getHeight() / 2 - barHeight / 2;
-            g2.fillRect(0, 20, width, mainPanel.getTerminalPanelPos() - 20);
+            g2.fillRect(0, 20, width, mainPanel.get()
+                                               .getTerminalPanelPos() - 20);
             if (barPos < 0) {
                 barPos = width / 2.0;
             }
