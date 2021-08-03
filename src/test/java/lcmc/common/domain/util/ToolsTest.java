@@ -22,9 +22,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.MethodSource;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import lcmc.Exceptions;
@@ -46,7 +44,6 @@ import lcmc.vm.domain.VmsXml;
 
 @ExtendWith(MockitoExtension.class)
 final class ToolsTest {
-    @InjectMocks
     private HostFactory hostFactory;
     @Mock
     private HwEventBus hwEventBus;
@@ -88,8 +85,9 @@ final class ToolsTest {
 
     @BeforeEach
     void setUp() {
-        MockitoAnnotations.initMocks(this);
         Tools.init();
+        hostFactory = new HostFactory(mainData, hwEventBus, swingUtils, application, progressIndicator, allHosts, roboTest,
+                blockDeviceService, vmsXmlProvider, drbdXmlProvider, sshProvider, hostBrowserProvider, terminalPanelProvider);
     }
 
     @Test

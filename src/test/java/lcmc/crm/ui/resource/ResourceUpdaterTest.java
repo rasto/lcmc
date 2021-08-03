@@ -42,7 +42,6 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -95,8 +94,7 @@ class ResourceUpdaterTest {
             return mock(PcmkRscSetsInfo.class);
         }
     };
-    @InjectMocks
-    private final ResourceUpdater resourceUpdater = new ResourceUpdater();
+    private ResourceUpdater resourceUpdater;
     public static final Map<String, String> EXAMPLE_PARAMS = new HashMap<>() {{
         put("param1", "value1");
     }};
@@ -106,6 +104,7 @@ class ResourceUpdaterTest {
 
     @BeforeEach
     void setUp() {
+        resourceUpdater = new ResourceUpdater(constraintPHInfoProvider, pcmkRscSetsInfoProvider, application, crmServiceFactory);
         when(clusterBrowser.getCrmGraph()).thenReturn(crmGraph);
     }
 

@@ -27,7 +27,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
-import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Provider;
 import javax.swing.tree.DefaultMutableTreeNode;
@@ -64,18 +63,22 @@ public class ResourceUpdater {
     private ClusterStatus clusterStatus;
     private Application.RunMode runMode;
     private ServicesInfo servicesInfo;
-    @Inject
-    private Provider<ConstraintPHInfo> constraintPHInfoProvider;
-    @Inject
-    private Provider<PcmkRscSetsInfo> pcmkRscSetsInfoProvider;
-    @Inject
-    private Application application;
-    @Inject
-    private CrmServiceFactory crmServiceFactory;
+    private final Provider<ConstraintPHInfo> constraintPHInfoProvider;
+    private final Provider<PcmkRscSetsInfo> pcmkRscSetsInfoProvider;
+    private final Application application;
+    private final CrmServiceFactory crmServiceFactory;
     private CrmGraph crmGraph;
     private Set<String> allGroupsAndClones;
     private final List<ServiceInfo> groupServiceIsPresent = Lists.newArrayList();
     private final List<ServiceInfo> serviceIsPresent = Lists.newArrayList();
+
+    public ResourceUpdater(Provider<ConstraintPHInfo> constraintPHInfoProvider, Provider<PcmkRscSetsInfo> pcmkRscSetsInfoProvider,
+            Application application, CrmServiceFactory crmServiceFactory) {
+        this.constraintPHInfoProvider = constraintPHInfoProvider;
+        this.pcmkRscSetsInfoProvider = pcmkRscSetsInfoProvider;
+        this.application = application;
+        this.crmServiceFactory = crmServiceFactory;
+    }
 
     /**
      * This functions goes through all services, constrains etc. in clusterStatus and updates the internal structures and graph.

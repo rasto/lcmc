@@ -23,7 +23,6 @@ package lcmc.common.ui.main;
 import java.awt.Dimension;
 import java.util.regex.Matcher;
 
-import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 import javax.swing.JComponent;
@@ -48,26 +47,32 @@ public class MainPresenter {
     private static final int DIALOG_PANEL_HEIGHT = 300;
     private static final Dimension DIALOG_PANEL_SIZE = new Dimension(DIALOG_PANEL_WIDTH, DIALOG_PANEL_HEIGHT);
 
-    @Inject
-    private SwingUtils swingUtils;
-    @Inject
-    private Application application;
-    @Inject
-    private ProgressIndicator progressIndicator;
-    @Inject
-    private UserConfig userConfig;
-    @Inject
-    private MainData mainData;
+    private final SwingUtils swingUtils;
+    private final Application application;
+    private final ProgressIndicator progressIndicator;
+    private final UserConfig userConfig;
+    private final MainData mainData;
+
+    public MainPresenter(SwingUtils swingUtils, Application application, ProgressIndicator progressIndicator, UserConfig userConfig,
+            MainData mainData) {
+        this.swingUtils = swingUtils;
+        this.application = application;
+        this.progressIndicator = progressIndicator;
+        this.userConfig = userConfig;
+        this.mainData = mainData;
+    }
 
     public void renameSelectedClusterTab(final String newName) {
-        swingUtils.invokeLater(() -> mainData.getClustersPanel().renameSelectedTab(newName));
+        swingUtils.invokeLater(() -> mainData.getClustersPanel()
+                                             .renameSelectedTab(newName));
     }
 
     /**
      * This is used, if cluster was added, but than it was canceled.
      */
     public void removeSelectedClusterTab() {
-        swingUtils.invokeLater(() -> mainData.getClustersPanel().removeTab());
+        swingUtils.invokeLater(() -> mainData.getClustersPanel()
+                                             .removeTab());
     }
 
     /** Revalidates and repaints clusters panel. */

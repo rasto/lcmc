@@ -27,8 +27,8 @@ import java.awt.Graphics;
 import java.awt.GridLayout;
 import java.awt.Insets;
 
-import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Provider;
 import javax.inject.Singleton;
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
@@ -56,24 +56,29 @@ import lcmc.logger.LoggerFactory;
 @Singleton
 public final class ClustersPanel extends JPanel {
     private static final Logger LOG = LoggerFactory.getLogger(ClustersPanel.class);
-    private static final ImageIcon ALL_CLUSTERS_ICON = Tools.createImageIcon(
-                                                            Tools.getDefault("ClustersPanel.ClustersIcon"));
+    private static final ImageIcon ALL_CLUSTERS_ICON = Tools.createImageIcon(Tools.getDefault("ClustersPanel.ClustersIcon"));
     private static final String ALL_CLUSTERS_LABEL = Tools.getString("ClustersPanel.ClustersTab");
     private static final int TAB_BORDER_WIDTH = 3;
     private JTabbedPane tabbedPane;
-    @Inject
-    private ClusterTabFactory clusterTabFactory;
+    private final Provider<ClusterTabFactory> clusterTabFactory;
     private ClusterTab previouslySelectedTab = null;
-    @Inject
-    private UserConfig userConfig;
-    @Inject
-    private MainData mainData;
-    @Inject
-    private MainPresenter mainPresenter;
-    @Inject
-    private Application application;
+    private final UserConfig userConfig;
+    private final MainData mainData;
+    private final MainPresenter mainPresenter;
+    private final Application application;
 
-    /** Shows the tabbed pane. */
+    public ClustersPanel(Provider<ClusterTabFactory> clusterTabFactory, UserConfig userConfig, MainData mainData,
+            MainPresenter mainPresenter, Application application) {
+        this.clusterTabFactory = clusterTabFactory;
+        this.userConfig = userConfig;
+        this.mainData = mainData;
+        this.mainPresenter = mainPresenter;
+        this.application = application;
+    }
+
+    /**
+     * Shows the tabbed pane.
+     */
     public void init() {
         mainData.setClustersPanel(this);
         tabbedPane = new JTabbedPane();
@@ -123,10 +128,9 @@ public final class ClustersPanel extends JPanel {
 
     /** Adds an epmty tab, that opens new cluster dialogs. */
     void addClustersTab(final String label) {
-        tabbedPane.addTab(label,
-                          ALL_CLUSTERS_ICON,
-                          clusterTabFactory.createClusterTab(null),
-                          Tools.getString("ClustersPanel.ClustersTabTip"));
+        tabbedPane.addTab(label, ALL_CLUSTERS_ICON, clusterTabFactory.get()
+                                                                     .createClusterTab(null),
+                Tools.getString("ClustersPanel.ClustersTabTip"));
     }
 
     public void removeTab() {

@@ -20,7 +20,6 @@
 
 package lcmc.host.domain;
 
-import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Provider;
 import javax.inject.Singleton;
@@ -45,32 +44,38 @@ import lombok.val;
 @Named
 @Singleton
 public class HostFactory {
-    @Inject
-    private HwEventBus hwEventBus;
-    @Inject
-    private SwingUtils swingUtils;
-    @Inject
-    private Application application;
-    @Inject
-    private MainData mainData;
-    @Inject
-    private ProgressIndicator progressIndicator;
-    @Inject
-    private Hosts allHosts;
-    @Inject
-    private RoboTest roboTest;
-    @Inject
-    private BlockDeviceService blockDeviceService;
-    @Inject
-    private Provider<VmsXml> vmsXmlProvider;
-    @Inject
-    private Provider<DrbdXml> drbdXmlProvider;
-    @Inject
-    private Provider<TerminalPanel> terminalPanelProvider;
-    @Inject
-    private Provider<Ssh> sshProvider;
-    @Inject
-    private Provider<HostBrowser> hostBrowserProvider;
+    private final HwEventBus hwEventBus;
+    private final SwingUtils swingUtils;
+    private final Application application;
+    private final MainData mainData;
+    private final ProgressIndicator progressIndicator;
+    private final Hosts allHosts;
+    private final RoboTest roboTest;
+    private final BlockDeviceService blockDeviceService;
+    private final Provider<VmsXml> vmsXmlProvider;
+    private final Provider<DrbdXml> drbdXmlProvider;
+    private final Provider<TerminalPanel> terminalPanelProvider;
+    private final Provider<Ssh> sshProvider;
+    private final Provider<HostBrowser> hostBrowserProvider;
+
+    public HostFactory(MainData mainData, HwEventBus hwEventBus, SwingUtils swingUtils, Application application,
+            ProgressIndicator progressIndicator, Hosts allHosts, RoboTest roboTest, BlockDeviceService blockDeviceService,
+            Provider<VmsXml> vmsXmlProvider, Provider<DrbdXml> drbdXmlProvider, Provider<Ssh> sshProvider,
+            Provider<HostBrowser> hostBrowserProvider, Provider<TerminalPanel> terminalPanelProvider) {
+        this.mainData = mainData;
+        this.hwEventBus = hwEventBus;
+        this.swingUtils = swingUtils;
+        this.application = application;
+        this.progressIndicator = progressIndicator;
+        this.allHosts = allHosts;
+        this.roboTest = roboTest;
+        this.blockDeviceService = blockDeviceService;
+        this.vmsXmlProvider = vmsXmlProvider;
+        this.drbdXmlProvider = drbdXmlProvider;
+        this.sshProvider = sshProvider;
+        this.hostBrowserProvider = hostBrowserProvider;
+        this.terminalPanelProvider = terminalPanelProvider;
+    }
 
     public Host createInstance() {
         val drbdHost = new DrbdHost();
@@ -78,9 +83,7 @@ public class HostFactory {
         val terminalPanel = terminalPanelProvider.get();
         val ssh = sshProvider.get();
 
-        val host = new Host(
-                drbdHost,
-                terminalPanel,
+        val host = new Host(drbdHost, terminalPanel,
                 mainData,
                 progressIndicator,
                 ssh,
