@@ -37,6 +37,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
@@ -57,7 +58,6 @@ import javax.swing.SwingUtilities;
 import javax.swing.event.MenuEvent;
 import javax.swing.event.MenuListener;
 
-import lcmc.cluster.domain.Cluster;
 import lcmc.cluster.ui.ClusterTab;
 import lcmc.cluster.ui.ClustersPanel;
 import lcmc.common.domain.AllHostsUpdatable;
@@ -150,45 +150,26 @@ public class MainData {
     }
 
     /**
-     * Adds a component from the list of components that have allHostsUpdate
-     * method that must be called when a host is added.
+     * Adds a component from the list of components that have allHostsUpdate method that must be called when a host is added.
      */
     public void unregisterAllHostsUpdate(final AllHostsUpdatable component) {
         allHostsUpdateList.remove(component);
     }
 
-    private ServicesInfo getSelectedServicesInfo() {
-        final ClustersPanel csp = clustersPanel;
-        if (csp == null) {
-            return null;
-        }
-        final ClusterTab selected = csp.getClusterTab();
-        if (selected == null) {
-            return null;
-        }
-        //TODO: or drbd
-        final Cluster c = selected.getCluster();
-        if (c == null) {
-            return null;
-        }
-        return c.getBrowser().getServicesInfo();
+    private Optional<ServicesInfo> getSelectedServicesInfo() {
+        return Optional.ofNullable(clustersPanel)
+                       .flatMap(ClustersPanel::getClusterTab)
+                       .flatMap(ClusterTab::getCluster)
+                       .map(c -> c.getBrowser()
+                                  .getServicesInfo());
     }
 
-    private ResourceGraph getSelectedGraph() {
-        final ClustersPanel csp = clustersPanel;
-        if (csp == null) {
-            return null;
-        }
-        final ClusterTab selected = csp.getClusterTab();
-        if (selected == null) {
-            return null;
-        }
-        //TODO: or drbd
-        final Cluster c = selected.getCluster();
-        if (c == null) {
-            return null;
-        }
-        return c.getBrowser().getCrmGraph();
+    private Optional<ResourceGraph> getSelectedGraph() {
+        return Optional.ofNullable(clustersPanel)
+                       .flatMap(ClustersPanel::getClusterTab)
+                       .flatMap(ClusterTab::getCluster)
+                       .map(c -> c.getBrowser()
+                                  .getCrmGraph());
     }
 
     /**
@@ -258,30 +239,21 @@ public class MainData {
         return allHostsUpdateList;
     }
 
-    /** Copy / paste function. */
     public void copy() {
-        final ResourceGraph g = getSelectedGraph();
-        if (g == null) {
-            return;
-        }
-        selectedComponents = g.getSelectedComponents();
+        getSelectedGraph().ifPresent(g -> selectedComponents = g.getSelectedComponents());
     }
 
-    /** Copy / paste function. */
     public void paste() {
         final List<Info> scs = selectedComponents;
         if (scs == null) {
             return;
         }
-        final ServicesInfo ssi = getSelectedServicesInfo();
-        if (ssi == null) {
-            return;
-        }
-        final Thread t = new Thread(() -> ssi.pasteServices(scs));
-        t.start();
+        getSelectedServicesInfo().ifPresent(servicesInfo -> {
+            final Thread t = new Thread(() -> servicesInfo.pasteServices(scs));
+            t.start();
+        });
     }
 
-    /** Returns a popup in a scrolling pane. */
     public boolean getScrollingMenu(final String name,
                                     final JPanel optionsPanel,
                                     final MyMenu menu,

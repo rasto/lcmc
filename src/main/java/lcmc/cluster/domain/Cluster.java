@@ -142,11 +142,13 @@ public class Cluster implements Comparable<Cluster> {
         this.clusterTab = clusterTab;
     }
 
-    public ClusterTab getClusterTab() {
-        return clusterTab;
+    public Optional<ClusterTab> getClusterTab() {
+        return Optional.ofNullable(clusterTab);
     }
 
-    /** Returns block device objects of all hosts. */
+    /**
+     * Returns block device objects of all hosts.
+     */
     public BlockDevice[] getHostBlockDevices(final String device) {
         final List<BlockDevice> list = new ArrayList<>();
         for (final Host host : hosts) {

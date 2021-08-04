@@ -84,7 +84,8 @@ public final class AddClusterDialog {
                     return;
                 }
             } else if (dialog.isPressedFinishButton()) {
-                LOG.debug1("showDialogs: dialog: " + dialog.getClass().getName() + " finished");
+                LOG.debug1("showDialogs: dialog: " + dialog.getClass()
+                                                           .getName() + " finished");
                 break;
             }
             if (newDialog != null) {
@@ -92,12 +93,11 @@ public final class AddClusterDialog {
             }
         }
         mainPanel.expandTerminalSplitPane(MainPanel.TerminalSize.COLLAPSE);
-        swingUtils.invokeLater(() -> {
-            cluster.getClusterTab()
-                   .addClusterView();
-            cluster.getClusterTab()
-                   .requestFocus();
-        });
+        swingUtils.invokeLater(() -> cluster.getClusterTab()
+                                            .ifPresent(clusterTab -> {
+                                                clusterTab.addClusterView();
+                                                clusterTab.requestFocus();
+                                            }));
         swingUtils.invokeLater(mainPresenter::checkAddClusterButtons);
         cluster.setClusterTabClosable(true);
     }

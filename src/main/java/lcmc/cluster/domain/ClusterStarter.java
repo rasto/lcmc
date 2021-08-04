@@ -5,7 +5,6 @@ import java.util.Set;
 
 import javax.inject.Named;
 
-import lcmc.cluster.ui.ClusterTab;
 import lcmc.cluster.ui.ClusterTabFactory;
 import lcmc.cluster.ui.ClustersPanel;
 import lcmc.common.ui.utils.SwingUtils;
@@ -46,13 +45,11 @@ public class ClusterStarter {
                 for (final Host host : cluster.getHosts()) {
                     host.waitOnLoading();
                 }
-                swingUtils.invokeLater(() -> {
-                    final ClusterTab clusterTab = cluster.getClusterTab();
-                    if (clusterTab != null) {
-                        clusterTab.addClusterView();
-                        clusterTab.requestFocus();
-                    }
-                });
+                swingUtils.invokeLater(() -> cluster.getClusterTab()
+                                                    .ifPresent(clusterTab -> {
+                                                        clusterTab.addClusterView();
+                                                        clusterTab.requestFocus();
+                                                    }));
             };
             final Thread thread = new Thread(runnable);
             thread.start();

@@ -27,6 +27,7 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionListener;
+import java.util.Optional;
 
 import javax.inject.Named;
 import javax.swing.ImageIcon;
@@ -86,8 +87,8 @@ public final class ClusterTab extends JPanel {
         repaint();
     }
 
-    public Cluster getCluster() {
-        return cluster;
+    public Optional<Cluster> getCluster() {
+        return Optional.ofNullable(cluster);
     }
 
     @Override

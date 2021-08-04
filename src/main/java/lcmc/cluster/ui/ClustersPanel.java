@@ -26,13 +26,13 @@ import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.GridLayout;
 import java.awt.Insets;
+import java.util.Optional;
 
 import javax.inject.Named;
 import javax.inject.Provider;
 import javax.inject.Singleton;
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
-import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 import javax.swing.UIManager;
@@ -99,31 +99,26 @@ public final class ClustersPanel extends JPanel {
                 return;
             }
 
-            final ClusterTab clusterTab = getClusterTab();
-            if (clusterTab == null) {
-                return;
-            }
-
-            final Cluster cluster = clusterTab.getCluster();
-            if (cluster != null) {
-                refreshView();
-            }
+            getClusterTab().flatMap(ClusterTab::getCluster)
+                           .ifPresent(it -> refreshView());
         });
         add(tabbedPane);
     }
 
     public void addClusterTab(final ClusterTab clusterTab) {
-        final Cluster cluster = clusterTab.getCluster();
-        LOG.debug2("addTab: cluster: " + cluster.getName());
-        if (tabbedPane.getTabCount() == 1) {
-           removeAllTabs();
-        }
-        final String title = Tools.join(" ", cluster.getHostNames());
-        tabbedPane.addTab(cluster.getName(), ClusterTab.CLUSTER_ICON, clusterTab, title);
+        clusterTab.getCluster()
+                  .ifPresent(cluster -> {
+                      LOG.debug2("addTab: cluster: " + cluster.getName());
+                      if (tabbedPane.getTabCount() == 1) {
+                          removeAllTabs();
+                      }
+                      final String title = Tools.join(" ", cluster.getHostNames());
+                      tabbedPane.addTab(cluster.getName(), ClusterTab.CLUSTER_ICON, clusterTab, title);
 
-        addTabComponentWithCloseButton(clusterTab);
-        tabbedPane.setSelectedComponent(clusterTab);
-        refreshView();
+                      addTabComponentWithCloseButton(clusterTab);
+                      tabbedPane.setSelectedComponent(clusterTab);
+                      refreshView();
+                  });
     }
 
     /** Adds an epmty tab, that opens new cluster dialogs. */
@@ -134,11 +129,12 @@ public final class ClustersPanel extends JPanel {
     }
 
     public void removeTab() {
-        removeSelectedTab(getClusterTab());
+        getClusterTab().ifPresent(this::removeTab);
     }
 
     public void removeTabWithCluster(final Cluster cluster) {
-        removeSelectedTab(cluster.getClusterTab());
+        cluster.getClusterTab()
+               .ifPresent(this::removeTab);
     }
 
     public void removeAllTabs() {
@@ -147,10 +143,8 @@ public final class ClustersPanel extends JPanel {
     }
 
     public void renameSelectedTab(final String newName) {
-        final JLabel label = getClusterTab().getLabelTitle();
-        if (label != null) {
-            label.setText(newName);
-        }
+        getClusterTab().map(ClusterTab::getLabelTitle)
+                       .ifPresent(label -> label.setText(newName));
         refreshView();
     }
 
@@ -160,13 +154,9 @@ public final class ClustersPanel extends JPanel {
         tabbedPane.repaint();
     }
 
-    public ClusterTab getClusterTab() {
-        final java.awt.Component sp = tabbedPane.getSelectedComponent();
-        if (sp == null) {
-            return null;
-        } else  {
-            return (ClusterTab) sp;
-        }
+    public Optional<ClusterTab> getClusterTab() {
+        return Optional.ofNullable(tabbedPane.getSelectedComponent())
+                       .map(sp -> (ClusterTab) sp);
     }
 
     private void setTabLook() {
@@ -191,29 +181,32 @@ public final class ClustersPanel extends JPanel {
         tabbedPane.setTabComponentAt(index, tabPanel);
     }
 
-    /**
-     * Removes selected tab, after clicking on the cancel button in the config
-     * dialogs.
-     */
-    private void removeSelectedTab(final ClusterTab selectedTab) {
-        if (selectedTab != null) {
-            selectedTab.getCluster().setClusterTab(null);
-            tabbedPane.remove(selectedTab);
-        }
+    private void removeTab(ClusterTab selectedTab) {
+        selectedTab.getCluster()
+                   .ifPresent(it -> it.setClusterTab(null));
+        tabbedPane.remove(selectedTab);
+        handleOneTab();
+    }
+
+    private void handleOneTab() {
         if (tabbedPane.getTabCount() == 1) {
             tabbedPane.removeAll();
             addClustersTab(ALL_CLUSTERS_LABEL);
         }
     }
 
-    /** This class is used to override the tab look. */
+    /**
+     * This class is used to override the tab look.
+     */
     private static class BorderlessTabbedPaneUI extends BasicTabbedPaneUI {
         @Override
         protected final Insets getContentBorderInsets(final int tabPlacement) {
             return new Insets(0, 0, 0, 0);
         }
 
-        /** Overrides the content border painting with nothing. */
+        /**
+         * Overrides the content border painting with nothing.
+         */
         @Override
         protected void paintContentBorder(final Graphics g, final int tabPlacement, final int selectedIndex) {
             /* No border */

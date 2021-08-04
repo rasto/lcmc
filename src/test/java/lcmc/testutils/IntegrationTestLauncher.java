@@ -148,17 +148,21 @@ public class IntegrationTestLauncher {
         }
         application.addClusterToClusters(cluster);
         swingUtils.invokeAndWait(() -> clusterTabFactory.createClusterTab(cluster));
-        
+
         final String saveFile = application.getDefaultSaveFile();
         userConfig.saveConfig(saveFile, false);
         mainPresenter.refreshClustersPanel();
-        
+
         mainPanel.expandTerminalSplitPane(MainPanel.TerminalSize.COLLAPSE);
-        cluster.getClusterTab().addClusterView();
-        cluster.getClusterTab().requestFocus();
+        cluster.getClusterTab()
+               .ifPresent(clusterTab -> {
+                   clusterTab.addClusterView();
+                   clusterTab.requestFocus();
+               });
         mainPresenter.checkAddClusterButtons();
         for (final Host host : hosts) {
-            host.getHostParser().waitForServerStatusLatch();
+            host.getHostParser()
+                .waitForServerStatusLatch();
         }
         clusterLoaded = true;
     }
