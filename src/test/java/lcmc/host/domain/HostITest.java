@@ -219,6 +219,7 @@ final class HostITest {
             assertThat(hostParser.getDistFromDistVersion("centos")).isEqualTo("rhel");
             assertThat(hostParser.getDistFromDistVersion("xy")).isEqualTo("xy");
             assertThat(hostParser.getDistFromDistVersion("almalinux")).isEqualTo("redhat");
+            assertThat(hostParser.getDistFromDistVersion("rocky")).isEqualTo("redhat");
         }
     }
 
