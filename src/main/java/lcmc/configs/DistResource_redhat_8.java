@@ -52,7 +52,7 @@ public final class DistResource_redhat_8 extends ListResourceBundle {
         {"DrbdInst.install.3",
          "dnf -y install https://www.elrepo.org/elrepo-release-8.el8.elrepo.noarch.rpm"
                 + " && rpm --import https://www.elrepo.org/RPM-GPG-KEY-elrepo.org"
-                + " && dnf -y install drbd90-utils kmod-drbd90"},
+                + " && dnf -y install drbd84-utils kmod-drbd84"},
     };
 
     @Override
