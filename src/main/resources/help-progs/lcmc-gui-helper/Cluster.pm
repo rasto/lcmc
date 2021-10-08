@@ -274,15 +274,8 @@ sub get_cluster_info {
 sub get_cluster_metadata {
     print "<metadata>\n";
     my $libpath = Host_software::get_hb_lib_path();
-    my $crmd_libpath = Host_software::get_crmd_lib_path();
-    # pengine moved in pcmk 1.1.7
-    my $pengine = Command::_exec("$crmd_libpath/pengine metadata 2>/dev/null || $libpath/pengine metadata 2>/dev/null");
-    if ($pengine) {
-        # remove first line
-        substr $pengine, 0, index($pengine, "\n") + 1, '';
-        print $pengine;
-    }
-    my $crmd = Command::_exec("$crmd_libpath/crmd metadata 2>/dev/null");
+    my $pacemaker_controld = Host_software::get_pacemaker_controld();
+    my $crmd = Command::_exec("$pacemaker_controld metadata 2>/dev/null");
     if ($crmd) {
         # remove first line
         substr $crmd, 0, index($crmd, "\n") + 1, '';

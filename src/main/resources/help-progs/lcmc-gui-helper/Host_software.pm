@@ -7,7 +7,7 @@ sub init() {
 
 sub get_cluster_versions {
     my $libpath = get_hb_lib_path();
-    my $crmd_libpath = get_crmd_lib_path();
+    my $pacemaker_controld = find_pacemaker_controld();
     my $hb_version = Command::_exec("$libpath/heartbeat -V 2>/dev/null") || "";
     if ($hb_version) {
         $hb_version =~ s/\s+.*//;
@@ -20,7 +20,7 @@ sub get_cluster_versions {
             $hb_version = "2.1.4";
         }
     }
-    my $pm_version = Command::_exec("$crmd_libpath/crmd version 2>/dev/null") || "";
+    my $pm_version = Command::_exec("$pacemaker_controld version 2>/dev/null") || "";
     if ($pm_version) {
         $pm_version =~ s/CRM Version:\s+//;
         $pm_version =~ s/\s+.*//;
@@ -279,15 +279,21 @@ sub get_hb_lib_path {
     return "/usr/lib/heartbeat";
 }
 
-sub get_crmd_lib_path {
+sub find_pacemaker_controld {
     my $hb_lib_path = get_hb_lib_path();
     for ("/usr/lib64/pacemaker",
         "/usr/libexec/pacemaker",
         "/usr/lib/x86_64-linux-gnu/pacemaker",
         "/usr/lib/pacemaker",
         $hb_lib_path) {
-        if (-e "$_/crmd") {
-            return $_;
+        if (-e "$_/pacemaker-controld") {
+            return "$_/pacemaker-controld";
+        } 
+		if (-e "$_/crmd") {
+            return "$_/crmd";
+        }
+		if (-e "$_/pengine") {
+            return "$_/pengine";
         }
     }
 }
