@@ -305,22 +305,14 @@ final class CheckInstallation extends DialogHost {
             });
         } else {
             heartbeatPacemakerInstallationOk = true;
-            final String text;
-            if ("2.1.3".equals(hbVersion) && "sles10".equals(hostParser.getDistributionVersion())) {
-                /* sles10 heartbeat 2.1.3 looks like hb 2.1.4 */
-                hbVersion = "2.1.4";
-                text = "2.1.3 (2.1.4)";
-            } else {
-                text = hbVersion;
-            }
             hostParser.setHeartbeatVersion(hbVersion);
             swingUtils.invokeLater(() -> {
                 if (hostParser.getPacemakerVersion() == null || hostParser.getHeartbeatVersion()
                         .equals(hostParser.getPacemakerVersion())) {
                     heartbeatPacemakerLabel.setText("Heartbeat");
-                    checkingHeartbeatPacemakerLabel.setText(": " + text);
+                    checkingHeartbeatPacemakerLabel.setText(": " + hbVersion);
                 } else {
-                    checkingHeartbeatPacemakerLabel.setText(": " + hostParser.getPacemakerVersion() + '/' + text);
+                    checkingHeartbeatPacemakerLabel.setText(": " + hostParser.getPacemakerVersion() + '/' + hbVersion);
                 }
                 heartbeatPacemakerIcon.setIcon(ALREADY_INSTALLED_ICON);
             });

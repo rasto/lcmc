@@ -13,21 +13,11 @@ sub get_cluster_versions {
         $hb_version =~ s/\s+.*//;
         chomp $hb_version;
     }
-    if ($hb_version eq "2.1.3") {
-        # sles10 hb 2.1.3 looks like 2.1.4 to me
-        my $desc = Command::_exec("/usr/bin/lsb_release -d 2>/dev/null");
-        if ($desc && $desc =~ /SUSE Linux Enterprise Server 10/) {
-            $hb_version = "2.1.4";
-        }
-    }
     my $pm_version = Command::_exec("$pacemaker_controld version 2>/dev/null") || "";
     if ($pm_version) {
         $pm_version =~ s/CRM Version:\s+//;
         $pm_version =~ s/\s+.*//;
         chomp $pm_version;
-        if ($pm_version =~ /^2\.1\./) {
-            $pm_version = "";
-        }
     }
 
     # there is no reliable way to find the installed corosync and openais

@@ -51,7 +51,6 @@ import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Table;
 
-import lcmc.Exceptions;
 import lcmc.cluster.infrastructure.ssh.ExecCommandConfig;
 import lcmc.cluster.ui.ClusterBrowser;
 import lcmc.cluster.ui.network.InfoPresenter;
@@ -74,10 +73,8 @@ import lcmc.robotest.StartTests;
 import lcmc.robotest.Test;
 
 /**
- * This class parses ocf crm xml, stores information like
- * short and long description, data types etc. for defined types
- * of services in the hashes and provides methods to get this
- * information.
+ * This class parses ocf crm xml, stores information like short and long description, data types etc. for defined types of services
+ * in the hashes and provides methods to get this information.
  */
 @Named
 public class CrmXml {
@@ -99,25 +96,17 @@ public class CrmXml {
     private static final String PARAM_TYPE_STRING = "string";
     private static final String PARAM_TYPE_TIME = "time";
     private static final String FAIL_COUNT_PREFIX = "fail-count-";
-    private static final Value[] ATTRIBUTE_ROLES = {new StringValue(),
-                                                    new StringValue("Stopped"),
-                                                    new StringValue("Started")};
+    private static final Value[] ATTRIBUTE_ROLES = {new StringValue(), new StringValue("Stopped"), new StringValue("Started")};
 
-    private static final Value[] ATTRIBUTE_ROLES_MASTER_SLAVE = {new StringValue(),
-                                                                 new StringValue("Stopped"),
-                                                                 new StringValue("Started"),
-                                                                 new StringValue("Master"),
-                                                                 new StringValue("Slave")};
+    private static final Value[] ATTRIBUTE_ROLES_MASTER_SLAVE =
+            {new StringValue(), new StringValue("Stopped"), new StringValue("Started"), new StringValue("Master"),
+                    new StringValue("Slave")};
 
-    private static final Value[] ATTRIBUTE_ACTIONS = {new StringValue(),
-                                                      new StringValue( "start"),
-                                                      new StringValue( "stop")};
+    private static final Value[] ATTRIBUTE_ACTIONS = {new StringValue(), new StringValue("start"), new StringValue("stop")};
 
-    private static final Value[] ATTRIBUTE_ACTIONS_MASTER_SLAVE = {new StringValue(),
-                                                                   new StringValue("start"),
-                                                                   new StringValue("promote"),
-                                                                   new StringValue("demote"),
-                                                                   new StringValue("stop")};
+    private static final Value[] ATTRIBUTE_ACTIONS_MASTER_SLAVE =
+            {new StringValue(), new StringValue("start"), new StringValue("promote"), new StringValue("demote"),
+                    new StringValue("stop")};
     public static final String TARGET_ROLE_STOPPED = "stopped";
     private static final String TARGET_ROLE_STARTED = "started";
     private static final String TARGET_ROLE_MASTER = "master";
@@ -125,18 +114,14 @@ public class CrmXml {
     public static final Value INFINITY_VALUE = new StringValue("INFINITY");
     public static final Value PLUS_INFINITY_VALUE = new StringValue("+INFINITY");
     public static final Value MINUS_INFINITY_VALUE = new StringValue("-INFINITY");
-    private static final Value[] INTEGER_VALUES = {new StringValue(),
-                                                   new StringValue("0"),
-                                                   new StringValue("2"),
-                                                   new StringValue("100"),
-                                                   INFINITY_VALUE,
-                                                   MINUS_INFINITY_VALUE,
-                                                   PLUS_INFINITY_VALUE};
+    private static final Value[] INTEGER_VALUES =
+            {new StringValue(), new StringValue("0"), new StringValue("2"), new StringValue("100"), INFINITY_VALUE,
+                    MINUS_INFINITY_VALUE, PLUS_INFINITY_VALUE};
     private static final String STONITH_TIMEOUT_INSTANCE_ATTR = "stonith-timeout";
-    /** Name of the stonith priority instance attribute.
-        It is actually only "priority" but it clashes with priority meta
-        attribute. It is converted, wenn it is parsed and when it is stored to
-        cib. */
+    /**
+     * Name of the stonith priority instance attribute. It is actually only "priority" but it clashes with priority meta attribute.
+     * It is converted, wenn it is parsed and when it is stored to cib.
+     */
     public static final String STONITH_PRIORITY_INSTANCE_ATTR = "stonith-priority";
     public static final String SCORE_CONSTRAINT_PARAM = "score";
     private static final String PRIORITY_META_ATTR = "priority";
@@ -226,9 +211,8 @@ public class CrmXml {
         META_ATTR_TYPE.put(ALLOW_MIGRATE_META_ATTR, PARAM_TYPE_BOOLEAN);
 
         /* priority */
-        META_ATTR_COMBO_BOX_CHOICES.put(PRIORITY_META_ATTR, new Value[]{new StringValue("0"),
-                new StringValue("5"),
-                new StringValue("10")});
+        META_ATTR_COMBO_BOX_CHOICES.put(PRIORITY_META_ATTR,
+                new Value[]{new StringValue("0"), new StringValue("5"), new StringValue("10")});
         META_ATTR_SHORT_DESC.put(PRIORITY_META_ATTR, Tools.getString("CRMXML.Priority.ShortDesc"));
         META_ATTR_LONG_DESC.put(PRIORITY_META_ATTR, Tools.getString("CRMXML.Priority.LongDesc"));
         META_ATTR_DEFAULT.put(PRIORITY_META_ATTR, new StringValue("0"));
@@ -244,10 +228,7 @@ public class CrmXml {
 
         /* migration-threshold */
         META_ATTR_COMBO_BOX_CHOICES.put(MIGRATION_THRESHOLD_META_ATTR,
-                new Value[]{DISABLED_IN_COMBOBOX,
-                        new StringValue("0"),
-                        new StringValue("5"),
-                        new StringValue("10")});
+                new Value[]{DISABLED_IN_COMBOBOX, new StringValue("0"), new StringValue("5"), new StringValue("10")});
         META_ATTR_SHORT_DESC.put(MIGRATION_THRESHOLD_META_ATTR, Tools.getString("CRMXML.MigrationThreshold.ShortDesc"));
         META_ATTR_LONG_DESC.put(MIGRATION_THRESHOLD_META_ATTR, Tools.getString("CRMXML.MigrationThreshold.LongDesc"));
         META_ATTR_DEFAULT.put(MIGRATION_THRESHOLD_META_ATTR, DISABLED_IN_COMBOBOX);
@@ -259,9 +240,8 @@ public class CrmXml {
         META_ATTR_TYPE.put(FAILURE_TIMEOUT_META_ATTR, PARAM_TYPE_TIME);
 
         /* multiple-active */
-        META_ATTR_COMBO_BOX_CHOICES.put(MULTIPLE_ACTIVE_META_ATTR, new Value[]{new StringValue("stop_start"),
-                new StringValue("stop_only"),
-                new StringValue("block")});
+        META_ATTR_COMBO_BOX_CHOICES.put(MULTIPLE_ACTIVE_META_ATTR,
+                new Value[]{new StringValue("stop_start"), new StringValue("stop_only"), new StringValue("block")});
         META_ATTR_SHORT_DESC.put(MULTIPLE_ACTIVE_META_ATTR, Tools.getString("CRMXML.MultipleActive.ShortDesc"));
         META_ATTR_LONG_DESC.put(MULTIPLE_ACTIVE_META_ATTR, Tools.getString("CRMXML.MultipleActive.LongDesc"));
         META_ATTR_DEFAULT.put(MULTIPLE_ACTIVE_META_ATTR, new StringValue("stop_start"));
@@ -444,7 +424,8 @@ public class CrmXml {
         final Value hbBooleanFalse = booleanValues[1];
         /* hostlist choices for stonith */
         stonithHostlistChoices.add(new StringValue());
-        final String[] hosts = host.getCluster().getHostNames();
+        final String[] hosts = host.getCluster()
+                                   .getHostNames();
         if (hosts != null && hosts.length < 8) {
             stonithHostlistChoices.add(new StringValue(Tools.join(" ", hosts)));
             for (final String h : hosts) {
@@ -518,10 +499,9 @@ public class CrmXml {
         globalLongDescMap.put("no-quorum-policy", "No Quorum Policy");
         globalTypeMap.put("no-quorum-policy", PARAM_TYPE_STRING);
         globalDefaultMap.put("no-quorum-policy", new StringValue("stop"));
-        globalComboBoxChoices.put("no-quorum-policy", new Value[]{new StringValue("ignore"),
-                new StringValue("stop"),
-                new StringValue("freeze"),
-                new StringValue("suicide")});
+        globalComboBoxChoices.put("no-quorum-policy",
+                new Value[]{new StringValue("ignore"), new StringValue("stop"), new StringValue("freeze"),
+                        new StringValue("suicide")});
         globalRequiredParams.add("no-quorum-policy");
         globalNotAdvancedParams.add("no-quorum-policy");
 
@@ -534,109 +514,88 @@ public class CrmXml {
         globalDefaultMap.put("default-resource-failure-stickiness", new StringValue("0"));
         globalRequiredParams.add("default-resource-failure-stickiness");
 
-        globalComboBoxChoices.put("placement-strategy", new Value[]{new StringValue("default"),
-                new StringValue("utilization"),
-                new StringValue("minimal"),
-                new StringValue("balanced")});
+        globalComboBoxChoices.put("placement-strategy",
+                new Value[]{new StringValue("default"), new StringValue("utilization"), new StringValue("minimal"),
+                        new StringValue("balanced")});
 
-        final String hbV = host.getHostParser().getHeartbeatVersion();
-        final String pcmkV = host.getHostParser().getPacemakerVersion();
-        try {
-            if (pcmkV != null || Tools.compareVersions(hbV, "2.1.3") >= 0) {
-                String clusterRecheckInterval = "cluster-recheck-interval";
-                String dcDeadtime = "dc-deadtime";
-                String electionTimeout = "election-timeout";
-                String shutdownEscalation = "shutdown-escalation";
-                if (Tools.versionBeforePacemaker(host)) {
-                    clusterRecheckInterval = "cluster_recheck_interval";
-                    dcDeadtime = "dc_deadtime";
-                    electionTimeout = "election_timeout";
-                    shutdownEscalation = "shutdown_escalation";
-                }
-                final String[] params = {"stonith-action",
-                                         "is-managed-default",
-                                         "cluster-delay",
-                                         "batch-limit",
-                                         "stop-orphan-resources",
-                                         "stop-orphan-actions",
-                                         "remove-after-stop",
-                                         "pe-error-series-max",
-                                         "pe-warn-series-max",
-                                         "pe-input-series-max",
-                                         "startup-fencing",
-                                         "start-failure-is-fatal",
-                                         dcDeadtime,
-                                         clusterRecheckInterval,
-                                         electionTimeout,
-                                         shutdownEscalation,
-                                         "crmd-integration-timeout",
-                                         "crmd-finalization-timeout",
-                                         "expected-quorum-votes",
-                                         "maintenance-mode",
-                };
-                globalParams.add("dc-version");
-                globalShortDescMap.put("dc-version", "DC Version");
-                globalTypeMap.put("dc-version", PARAM_TYPE_LABEL);
-                paramGlobalAccessTypes.put("dc-version", AccessMode.NEVER);
-                globalParams.add("cluster-infrastructure");
-                globalShortDescMap.put("cluster-infrastructure", "Cluster Infrastructure");
-                globalTypeMap.put("cluster-infrastructure", PARAM_TYPE_LABEL);
-                paramGlobalAccessTypes.put("cluster-infrastructure", AccessMode.NEVER);
-
-                globalNotAdvancedParams.add("no-quorum-policy");
-                globalNotAdvancedParams.add("maintenance-mode");
-                paramGlobalAccessTypes.put("maintenance-mode", AccessMode.OP);
-                globalNotAdvancedParams.add(clusterRecheckInterval);
-
-                for (final String param : params) {
-                    globalParams.add(param);
-                    final String[] parts = param.split("[-_]");
-                    for (int i = 0; i < parts.length; i++) {
-                        if ("dc".equals(parts[i])) {
-                            parts[i] = "DC";
-                        }
-                        if ("crmd".equals(parts[i])) {
-                            parts[i] = "CRMD";
-                        } else {
-                            parts[i] = Tools.ucfirst(parts[i]);
-                        }
-                    }
-                    final String name = Tools.join(" ", parts);
-                    globalShortDescMap.put(param, name);
-                    globalLongDescMap.put(param, name);
-                    globalTypeMap.put(param, PARAM_TYPE_STRING);
-                    globalDefaultMap.put(param, new StringValue());
-                }
-                globalDefaultMap.put("stonith-action", new StringValue("reboot"));
-                globalComboBoxChoices.put("stonith-action", new Value[]{new StringValue("reboot"),
-                        new StringValue("poweroff")});
-
-                globalTypeMap.put("is-managed-default", PARAM_TYPE_BOOLEAN);
-                globalDefaultMap.put("is-managed-default", hbBooleanFalse);
-                globalComboBoxChoices.put("is-managed-default", booleanValues);
-
-                globalTypeMap.put("stop-orphan-resources", PARAM_TYPE_BOOLEAN);
-                globalDefaultMap.put("stop-orphan-resources", hbBooleanFalse);
-                globalComboBoxChoices.put("stop-orphan-resources", booleanValues);
-
-                globalTypeMap.put("stop-orphan-actions", PARAM_TYPE_BOOLEAN);
-                globalDefaultMap.put("stop-orphan-actions", hbBooleanFalse);
-                globalComboBoxChoices.put("stop-orphan-actions", booleanValues);
-
-                globalTypeMap.put("remove-after-stop", PARAM_TYPE_BOOLEAN);
-                globalDefaultMap.put("remove-after-stop", hbBooleanFalse);
-                globalComboBoxChoices.put("remove-after-stop", booleanValues);
-
-                globalTypeMap.put("startup-fencing", PARAM_TYPE_BOOLEAN);
-                globalDefaultMap.put("startup-fencing", hbBooleanFalse);
-                globalComboBoxChoices.put("startup-fencing", booleanValues);
-
-                globalTypeMap.put("start-failure-is-fatal", PARAM_TYPE_BOOLEAN);
-                globalDefaultMap.put("start-failure-is-fatal", hbBooleanFalse);
-                globalComboBoxChoices.put("start-failure-is-fatal", booleanValues);
+        final String pcmkV = host.getHostParser()
+                                 .getPacemakerVersion();
+        if (pcmkV != null) {
+            String clusterRecheckInterval = "cluster-recheck-interval";
+            String dcDeadtime = "dc-deadtime";
+            String electionTimeout = "election-timeout";
+            String shutdownEscalation = "shutdown-escalation";
+            if (Tools.versionBeforePacemaker(host)) {
+                clusterRecheckInterval = "cluster_recheck_interval";
+                dcDeadtime = "dc_deadtime";
+                electionTimeout = "election_timeout";
+                shutdownEscalation = "shutdown_escalation";
             }
-        } catch (final Exceptions.IllegalVersionException e) {
-            LOG.appWarning("CRMXML: " + e.getMessage(), e);
+            final String[] params =
+                    {"stonith-action", "is-managed-default", "cluster-delay", "batch-limit", "stop-orphan-resources",
+                            "stop-orphan-actions", "remove-after-stop", "pe-error-series-max", "pe-warn-series-max",
+                            "pe-input-series-max", "startup-fencing", "start-failure-is-fatal", dcDeadtime, clusterRecheckInterval,
+                            electionTimeout, shutdownEscalation, "crmd-integration-timeout", "crmd-finalization-timeout",
+                            "expected-quorum-votes", "maintenance-mode",};
+            globalParams.add("dc-version");
+            globalShortDescMap.put("dc-version", "DC Version");
+            globalTypeMap.put("dc-version", PARAM_TYPE_LABEL);
+            paramGlobalAccessTypes.put("dc-version", AccessMode.NEVER);
+            globalParams.add("cluster-infrastructure");
+            globalShortDescMap.put("cluster-infrastructure", "Cluster Infrastructure");
+            globalTypeMap.put("cluster-infrastructure", PARAM_TYPE_LABEL);
+            paramGlobalAccessTypes.put("cluster-infrastructure", AccessMode.NEVER);
+
+            globalNotAdvancedParams.add("no-quorum-policy");
+            globalNotAdvancedParams.add("maintenance-mode");
+            paramGlobalAccessTypes.put("maintenance-mode", AccessMode.OP);
+            globalNotAdvancedParams.add(clusterRecheckInterval);
+
+            for (final String param : params) {
+                globalParams.add(param);
+                final String[] parts = param.split("[-_]");
+                for (int i = 0; i < parts.length; i++) {
+                    if ("dc".equals(parts[i])) {
+                        parts[i] = "DC";
+                    }
+                    if ("crmd".equals(parts[i])) {
+                        parts[i] = "CRMD";
+                    } else {
+                        parts[i] = Tools.ucfirst(parts[i]);
+                    }
+                }
+                final String name = Tools.join(" ", parts);
+                globalShortDescMap.put(param, name);
+                globalLongDescMap.put(param, name);
+                globalTypeMap.put(param, PARAM_TYPE_STRING);
+                globalDefaultMap.put(param, new StringValue());
+            }
+            globalDefaultMap.put("stonith-action", new StringValue("reboot"));
+            globalComboBoxChoices.put("stonith-action", new Value[]{new StringValue("reboot"), new StringValue("poweroff")});
+
+            globalTypeMap.put("is-managed-default", PARAM_TYPE_BOOLEAN);
+            globalDefaultMap.put("is-managed-default", hbBooleanFalse);
+            globalComboBoxChoices.put("is-managed-default", booleanValues);
+
+            globalTypeMap.put("stop-orphan-resources", PARAM_TYPE_BOOLEAN);
+            globalDefaultMap.put("stop-orphan-resources", hbBooleanFalse);
+            globalComboBoxChoices.put("stop-orphan-resources", booleanValues);
+
+            globalTypeMap.put("stop-orphan-actions", PARAM_TYPE_BOOLEAN);
+            globalDefaultMap.put("stop-orphan-actions", hbBooleanFalse);
+            globalComboBoxChoices.put("stop-orphan-actions", booleanValues);
+
+            globalTypeMap.put("remove-after-stop", PARAM_TYPE_BOOLEAN);
+            globalDefaultMap.put("remove-after-stop", hbBooleanFalse);
+            globalComboBoxChoices.put("remove-after-stop", booleanValues);
+
+            globalTypeMap.put("startup-fencing", PARAM_TYPE_BOOLEAN);
+            globalDefaultMap.put("startup-fencing", hbBooleanFalse);
+            globalComboBoxChoices.put("startup-fencing", booleanValues);
+
+            globalTypeMap.put("start-failure-is-fatal", PARAM_TYPE_BOOLEAN);
+            globalDefaultMap.put("start-failure-is-fatal", hbBooleanFalse);
+            globalComboBoxChoices.put("start-failure-is-fatal", booleanValues);
         }
 
         /* Hardcoding colocation params */
@@ -822,17 +781,16 @@ public class CrmXml {
                     ra = drbddiskResourceAgent;
                     ra.setMetaDataLoaded(true);
                     setLsbResourceAgent(serviceName, resourceClass, ra);
-                } else if ("drbd".equals(serviceName)
-                           && ResourceAgent.OCF_CLASS_NAME.equals(resourceClass)
-                           && "linbit".equals(provider)) {
+                } else if ("drbd".equals(serviceName) && ResourceAgent.OCF_CLASS_NAME.equals(resourceClass) && "linbit".equals(
+                        provider)) {
                     ra = linbitDrbdResourceAgent;
                 } else {
                     ra = new ResourceAgent(serviceName, provider, resourceClass);
                     if (IGNORE_RA_DEFAULTS_FOR.contains(serviceName)) {
                         ra.setIgnoreDefaults(true);
                     }
-                    if (ResourceAgent.SERVICE_CLASSES.contains(resourceClass)
-                        || ResourceAgent.HEARTBEAT_CLASS_NAME.equals(resourceClass)) {
+                    if (ResourceAgent.SERVICE_CLASSES.contains(resourceClass) || ResourceAgent.HEARTBEAT_CLASS_NAME.equals(
+                            resourceClass)) {
                         ra.setMetaDataLoaded(true);
                         setLsbResourceAgent(serviceName, resourceClass, ra);
                     }
@@ -849,18 +807,19 @@ public class CrmXml {
     }
 
     /**
-     * Initialize resource agents with their meta data, the configured ones.
-     * For faster start up.
+     * Initialize resource agents with their meta data, the configured ones. For faster start up.
      */
     private void initOCFMetaDataConfigured() {
-        initOCFResourceAgentsWithMetaData(host.getHostParser().getDistCommand("Heartbeat.getOCFParametersConfigured",
-                                          (ConvertCmdCallback) null));
+        initOCFResourceAgentsWithMetaData(host.getHostParser()
+                                              .getDistCommand("Heartbeat.getOCFParametersConfigured", (ConvertCmdCallback) null));
     }
 
-    /** Initialize resource agents with their meta data. */
+    /**
+     * Initialize resource agents with their meta data.
+     */
     private void initOCFMetaDataAll() {
-        initOCFResourceAgentsWithMetaData(host.getHostParser().getDistCommand("Heartbeat.getOCFParameters",
-                                          (ConvertCmdCallback) null));
+        initOCFResourceAgentsWithMetaData(host.getHostParser()
+                                              .getDistCommand("Heartbeat.getOCFParameters", (ConvertCmdCallback) null));
     }
 
     private void initOCFResourceAgentsWithMetaData(final String command) {
@@ -928,16 +887,17 @@ public class CrmXml {
         }
     }
 
-    /** Returns choices for check box. (True, False). */
+    /**
+     * Returns choices for check box. (True, False).
+     */
     public Value[] getCheckBoxChoices(final ResourceAgent resourceAgent, final String param) {
         final String paramDefault = getDefaultValue(resourceAgent, param);
         return getCheckBoxChoices(paramDefault);
     }
 
     /**
-     * Returns choices for check box. (True, False).
-     * The problem is, that heartbeat/pacemaker kept changing the lower and upper case in
-     * the true and false values.
+     * Returns choices for check box. (True, False). The problem is, that heartbeat/pacemaker kept changing the lower and upper case
+     * in the true and false values.
      */
     private Value[] getCheckBoxChoices(final String paramDefault) {
         if (paramDefault != null) {
@@ -945,8 +905,9 @@ public class CrmXml {
                 return new Value[]{new StringValue("yes"), new StringValue("no")};
             } else if ("Yes".equals(paramDefault) || "No".equals(paramDefault)) {
                 return new Value[]{new StringValue("Yes"), new StringValue("No")};
-            } else if (PCMK_TRUE_VALUE.getValueForConfig().equals(paramDefault)
-                       || PCMK_FALSE_VALUE.getValueForConfig().equals(paramDefault)) {
+            } else if (PCMK_TRUE_VALUE.getValueForConfig()
+                                      .equals(paramDefault) || PCMK_FALSE_VALUE.getValueForConfig()
+                                                                               .equals(paramDefault)) {
                 return PCMK_BOOLEAN_VALUES.clone();
             } else if ("True".equals(paramDefault) || "False".equals(paramDefault)) {
                 return new Value[]{new StringValue("True"), new StringValue("False")};
@@ -956,15 +917,16 @@ public class CrmXml {
     }
 
     /**
-     * Returns all services as array of strings, sorted, with filesystem and
-     * ipaddr in the beginning.
+     * Returns all services as array of strings, sorted, with filesystem and ipaddr in the beginning.
      */
     public List<ResourceAgent> getServices(final String raClass) {
         final List<ResourceAgent> services = classToServicesMap.get(raClass);
         if (services == null) {
             return new ArrayList<>();
         }
-        Lists.newArrayList(services).sort((ra1, ra2) -> ra1.getServiceName().compareToIgnoreCase(ra2.getServiceName()));
+        Lists.newArrayList(services)
+             .sort((ra1, ra2) -> ra1.getServiceName()
+                                    .compareToIgnoreCase(ra2.getServiceName()));
         return services;
     }
 
@@ -977,7 +939,9 @@ public class CrmXml {
         return globalParams.toArray(new String[globalParams.size()]);
     }
 
-    /** Return version of the service ocf script. */
+    /**
+     * Return version of the service ocf script.
+     */
     public String getOcfScriptVersion(final ResourceAgent resourceAgent) {
         return resourceAgent.getServiceVersion();
     }
@@ -1027,7 +991,9 @@ public class CrmXml {
         return globalTypeMap.get(param);
     }
 
-    /** Returns type of the parameter. It can be string, integer, boolean... */
+    /**
+     * Returns type of the parameter. It can be string, integer, boolean...
+     */
     public String getParamType(final ResourceAgent resourceAgent, final String param) {
         return resourceAgent.getParamType(param);
     }
@@ -1052,9 +1018,7 @@ public class CrmXml {
         return globalComboBoxChoices.get(param);
     }
 
-    public Value[] getComboBoxChoices(final ResourceAgent resourceAgent,
-                                      final String param,
-                                      final boolean masterSlave) {
+    public Value[] getComboBoxChoices(final ResourceAgent resourceAgent, final String param, final boolean masterSlave) {
         if (masterSlave) {
             return resourceAgent.getComboBoxChoicesMasterSlave(param);
         } else {
@@ -1174,8 +1138,7 @@ public class CrmXml {
     }
 
     /**
-     * Converts rsc default parameter to the internal representation, that can
-     * be different on older cluster software.
+     * Converts rsc default parameter to the internal representation, that can be different on older cluster software.
      */
     private String convertRscDefaultsParam(final String param) {
         final String newParam = resourceDefaultsMetaAttrs.get(param);
@@ -1207,7 +1170,9 @@ public class CrmXml {
         return META_ATTR_DEFAULT.get(newParam);
     }
 
-    /** Returns preferred of the meta attribute. */
+    /**
+     * Returns preferred of the meta attribute.
+     */
     public Value getRscDefaultsPreferred(final String param) {
         return null;
     }
@@ -1217,7 +1182,9 @@ public class CrmXml {
         return META_ATTR_COMBO_BOX_CHOICES.get(newParam);
     }
 
-    /** Returns choices for check box. (True, False). */
+    /**
+     * Returns choices for check box. (True, False).
+     */
     public Value[] getRscDefaultsCheckBoxChoices(final String param) {
         final String newParam = convertRscDefaultsParam(param);
         final Value paramDefault = getRscDefaultsMetaAttrDefault(newParam);
@@ -1287,8 +1254,7 @@ public class CrmXml {
     }
 
     /**
-     * Checks parameter of the specified ra according to its type.
-     * Returns false if value does not fit the type.
+     * Checks parameter of the specified ra according to its type. Returns false if value does not fit the type.
      */
     public boolean checkParam(final ResourceAgent resourceAgent, final String param, final Value value) {
         final String type = getParamType(resourceAgent, param);
@@ -1298,24 +1264,16 @@ public class CrmXml {
     }
 
     /**
-     * Checks parameter according to its type. Returns false if value does
-     * not fit the type.
+     * Checks parameter according to its type. Returns false if value does not fit the type.
      */
-    private boolean checkParam(final String type,
-                               final boolean required,
-                               final boolean metaAttr,
-                               final String param,
-                               Value value) {
+    private boolean checkParam(final String type, final boolean required, final boolean metaAttr, final String param, Value value) {
         if (metaAttr && isRscDefaultsInteger(param) && DISABLED_IN_COMBOBOX.equals(value)) {
             value = new StringValue();
         }
         boolean correctValue = true;
         if (PARAM_TYPE_BOOLEAN.equals(type)) {
-            if (!PCMK_YES.equals(value) && !PCMK_NO.equals(value)
-                && !PCMK_TRUE_VALUE.equals(value)
-                && !PCMK_FALSE_VALUE.equals(value)
-                && !PCMK_TRUE_2.equals(value)
-                && !PCMK_FALSE_2.equals(value)) {
+            if (!PCMK_YES.equals(value) && !PCMK_NO.equals(value) && !PCMK_TRUE_VALUE.equals(value) && !PCMK_FALSE_VALUE.equals(
+                    value) && !PCMK_TRUE_2.equals(value) && !PCMK_FALSE_2.equals(value)) {
                 correctValue = false;
             }
         } else if (PARAM_TYPE_INTEGER.equals(type)) {
@@ -1341,18 +1299,14 @@ public class CrmXml {
     }
 
     /**
-     * Checks global parameter according to its type. Returns false if value
-     * does not fit the type.
+     * Checks global parameter according to its type. Returns false if value does not fit the type.
      */
     public boolean checkGlobalParam(final String param, final Value value) {
         final String type = getGlobalType(param);
         boolean correctValue = true;
         if (PARAM_TYPE_BOOLEAN.equals(type)) {
-            if (!PCMK_YES.equals(value) && !PCMK_NO.equals(value)
-                && !PCMK_TRUE_VALUE.equals(value)
-                && !PCMK_FALSE_VALUE.equals(value)
-                && !PCMK_TRUE_2.equals(value)
-                && !PCMK_FALSE_2.equals(value)) {
+            if (!PCMK_YES.equals(value) && !PCMK_NO.equals(value) && !PCMK_TRUE_VALUE.equals(value) && !PCMK_FALSE_VALUE.equals(
+                    value) && !PCMK_TRUE_2.equals(value) && !PCMK_FALSE_2.equals(value)) {
 
                 correctValue = false;
             }
@@ -1378,10 +1332,8 @@ public class CrmXml {
         return correctValue;
     }
 
-    private void addMetaAttributeToResourceAgent(final ResourceAgent resourceAgent,
-                                                 final String name,
-                                                 String newName,
-                                                 final boolean masterSlave) {
+    private void addMetaAttributeToResourceAgent(final ResourceAgent resourceAgent, final String name, String newName,
+            final boolean masterSlave) {
         if (newName == null) {
             newName = name;
         }
@@ -1402,8 +1354,8 @@ public class CrmXml {
     }
 
     /**
-     * Returns meta attribute parameters. The key is always, how the parameter
-     * is called in the cluster manager and value how it is stored in the GUI.
+     * Returns meta attribute parameters. The key is always, how the parameter is called in the cluster manager and value how it is
+     * stored in the GUI.
      */
     private Map<String, String> getMetaAttrParameters() {
         if (metaAttrParams != null) {
@@ -1421,22 +1373,18 @@ public class CrmXml {
         metaAttrParams.put(PRIORITY_META_ATTR, null);
         metaAttrParams.put(MULTIPLE_ACTIVE_META_ATTR, null);
         metaAttrParams.put(ALLOW_MIGRATE_META_ATTR, null);
-        final String hbV = host.getHostParser().getHeartbeatVersion();
-        final String pcmkV = host.getHostParser().getPacemakerVersion();
-        try {
-            if (pcmkV != null || Tools.compareVersions(hbV, "2.1.4") >= 0) {
-                metaAttrParams.put(RESOURCE_STICKINESS_META_ATTR, null);
-                metaAttrParams.put(FAILURE_TIMEOUT_META_ATTR, null);
-            }
-        } catch (final Exceptions.IllegalVersionException e) {
-            LOG.appWarning("getMetaAttrParameters: " + e.getMessage(), e);
+        final String pcmkV = host.getHostParser()
+                                 .getPacemakerVersion();
+        if (pcmkV != null) {
+            metaAttrParams.put(RESOURCE_STICKINESS_META_ATTR, null);
+            metaAttrParams.put(FAILURE_TIMEOUT_META_ATTR, null);
         }
         return metaAttrParams;
     }
 
     /**
-     * Returns meta attribute parameters. The key is always, how the parameter
-     * is called in the cluster manager and value how it is stored in the GUI.
+     * Returns meta attribute parameters. The key is always, how the parameter is called in the cluster manager and value how it is
+     * stored in the GUI.
      */
     public Map<String, String> getRscDefaultsParameters() {
         if (resourceDefaultsMetaAttrs != null) {
@@ -1452,10 +1400,10 @@ public class CrmXml {
             resourceDefaultsMetaAttrs.put(param, getMetaAttrParameters().get(param));
         }
         /* Master / Slave */
-        resourceDefaultsMetaAttrs.put(MASTER_MAX_META_ATTR,      null);
+        resourceDefaultsMetaAttrs.put(MASTER_MAX_META_ATTR, null);
         resourceDefaultsMetaAttrs.put(MASTER_NODE_MAX_META_ATTR, null);
         /* Clone */
-        resourceDefaultsMetaAttrs.put(CLONE_MAX_META_ATTR,       null);
+        resourceDefaultsMetaAttrs.put(CLONE_MAX_META_ATTR, null);
         resourceDefaultsMetaAttrs.put(CLONE_NODE_MAX_META_ATTR, null);
         resourceDefaultsMetaAttrs.put(NOTIFY_META_ATTR, null);
         resourceDefaultsMetaAttrs.put(GLOBALLY_UNIQUE_META_ATTR, null);
@@ -1469,7 +1417,8 @@ public class CrmXml {
 
         for (int i = 0; i < parameters.getLength(); i++) {
             final Node parameterNode = parameters.item(i);
-            if (parameterNode.getNodeName().equals("parameter")) {
+            if (parameterNode.getNodeName()
+                             .equals("parameter")) {
                 final String param = XMLTools.getAttribute(parameterNode, "name");
                 final String required = XMLTools.getAttribute(parameterNode, "required");
                 resourceAgent.addParameter(param);
@@ -1489,7 +1438,8 @@ public class CrmXml {
                 final Node shortdescParamNode = XMLTools.getChildNode(parameterNode, "shortdesc");
                 if (shortdescParamNode != null) {
                     String shortDesc = XMLTools.getText(shortdescParamNode);
-                    if (shortDesc.trim().equals("")) {
+                    if (shortDesc.trim()
+                                 .equals("")) {
                         shortDesc = param;
                     }
                     resourceAgent.setParamShortDesc(param, shortDesc);
@@ -1500,8 +1450,7 @@ public class CrmXml {
                 if (contentParamNode != null) {
                     final String type = XMLTools.getAttribute(contentParamNode, "type");
                     String defaultValue = XMLTools.getAttribute(contentParamNode, "default");
-                    if (defaultValue == null && resourceAgent.isStonith()
-                        && PARAM_TYPE_BOOLEAN.equals(type)) {
+                    if (defaultValue == null && resourceAgent.isStonith() && PARAM_TYPE_BOOLEAN.equals(type)) {
                         defaultValue = PCMK_FALSE_VALUE.getValueForConfig();
                     }
                     if (resourceAgent.isIPaddr() && "nic".equals(param)) {
@@ -1524,14 +1473,12 @@ public class CrmXml {
                     } else {
                         resourceAgent.setParamType(param, type);
                     }
-                    if (resourceAgent.isStonith() && PARAM_TYPE_BOOLEAN.equals(type)
-                        && defaultValue == null) {
+                    if (resourceAgent.isStonith() && PARAM_TYPE_BOOLEAN.equals(type) && defaultValue == null) {
                     }
                     resourceAgent.setParamDefault(param, defaultValue);
                 }
                 if (resourceAgent.isStonith() && ("hostlist".equals(param))) {
-                    resourceAgent.setParamPossibleChoices(
-                            param,
+                    resourceAgent.setParamPossibleChoices(param,
                             stonithHostlistChoices.toArray(new Value[stonithHostlistChoices.size()]));
                 }
                 final String section = RA_NON_ADVANCED_PARAM.get(resourceAgent.getServiceName(), param);
@@ -1543,57 +1490,43 @@ public class CrmXml {
         if (resourceAgent.isStonith()) {
             /* stonith-timeout */
             resourceAgent.addParameter(STONITH_TIMEOUT_INSTANCE_ATTR);
-            resourceAgent.setParamShortDesc(STONITH_TIMEOUT_INSTANCE_ATTR,
-                                 Tools.getString("CRMXML.stonith-timeout.ShortDesc"));
-            resourceAgent.setParamLongDesc(STONITH_TIMEOUT_INSTANCE_ATTR,
-                                Tools.getString("CRMXML.stonith-timeout.LongDesc"));
+            resourceAgent.setParamShortDesc(STONITH_TIMEOUT_INSTANCE_ATTR, Tools.getString("CRMXML.stonith-timeout.ShortDesc"));
+            resourceAgent.setParamLongDesc(STONITH_TIMEOUT_INSTANCE_ATTR, Tools.getString("CRMXML.stonith-timeout.LongDesc"));
             resourceAgent.setParamType(STONITH_TIMEOUT_INSTANCE_ATTR, PARAM_TYPE_TIME);
             resourceAgent.setParamDefault(STONITH_TIMEOUT_INSTANCE_ATTR, "");
             /* priority */
             // TODO: priority or stonith-priority?
             resourceAgent.addParameter(STONITH_PRIORITY_INSTANCE_ATTR);
 
-            resourceAgent.setParamShortDesc(STONITH_PRIORITY_INSTANCE_ATTR,
-                                 Tools.getString("CRMXML.stonith-priority.ShortDesc"));
-            resourceAgent.setParamLongDesc(STONITH_PRIORITY_INSTANCE_ATTR,
-                                Tools.getString("CRMXML.stonith-priority.LongDesc"));
+            resourceAgent.setParamShortDesc(STONITH_PRIORITY_INSTANCE_ATTR, Tools.getString("CRMXML.stonith-priority.ShortDesc"));
+            resourceAgent.setParamLongDesc(STONITH_PRIORITY_INSTANCE_ATTR, Tools.getString("CRMXML.stonith-priority.LongDesc"));
             resourceAgent.setParamPossibleChoices(STONITH_PRIORITY_INSTANCE_ATTR,
-                                                  new Value[]{new StringValue("0"),
-                                                              new StringValue("5"),
-                                                              new StringValue("10")});
+                    new Value[]{new StringValue("0"), new StringValue("5"), new StringValue("10")});
             resourceAgent.setParamType(STONITH_PRIORITY_INSTANCE_ATTR, PARAM_TYPE_INTEGER);
             resourceAgent.setParamDefault(STONITH_PRIORITY_INSTANCE_ATTR, "0");
 
             /* pcmk_host_check for stonithd */
             resourceAgent.addParameter(STONITH_PARAM_PCMK_HOST_CHECK);
             resourceAgent.setParamPossibleChoices(STONITH_PARAM_PCMK_HOST_CHECK,
-                                                  new Value[]{new StringValue(),
-                                                              new StringValue(PCMK_HOST_CHECK_DYNAMIC),
-                                                              new StringValue(PCMK_HOST_CHECK_STATIC)});
-            resourceAgent.setParamShortDesc(STONITH_PARAM_PCMK_HOST_CHECK,
-                                            Tools.getString("CRMXML.pcmk_host_check.ShortDesc"));
-            resourceAgent.setParamLongDesc(STONITH_PARAM_PCMK_HOST_CHECK,
-                                           Tools.getString("CRMXML.pcmk_host_check.LongDesc"));
+                    new Value[]{new StringValue(), new StringValue(PCMK_HOST_CHECK_DYNAMIC),
+                            new StringValue(PCMK_HOST_CHECK_STATIC)});
+            resourceAgent.setParamShortDesc(STONITH_PARAM_PCMK_HOST_CHECK, Tools.getString("CRMXML.pcmk_host_check.ShortDesc"));
+            resourceAgent.setParamLongDesc(STONITH_PARAM_PCMK_HOST_CHECK, Tools.getString("CRMXML.pcmk_host_check.LongDesc"));
             resourceAgent.setParamDefault(STONITH_PARAM_PCMK_HOST_CHECK, PCMK_HOST_CHECK_DYNAMIC);
             resourceAgent.setParamType(STONITH_PARAM_PCMK_HOST_CHECK, PARAM_TYPE_STRING);
 
             /* pcmk_host_list for stonithd */
             resourceAgent.addParameter(STONITH_PARAM_PCMK_HOST_LIST);
-            resourceAgent.setParamShortDesc(STONITH_PARAM_PCMK_HOST_LIST,
-                                            Tools.getString("CRMXML.pcmk_host_list.ShortDesc"));
-            resourceAgent.setParamLongDesc(STONITH_PARAM_PCMK_HOST_LIST,
-                                           Tools.getString("CRMXML.pcmk_host_list.LongDesc"));
+            resourceAgent.setParamShortDesc(STONITH_PARAM_PCMK_HOST_LIST, Tools.getString("CRMXML.pcmk_host_list.ShortDesc"));
+            resourceAgent.setParamLongDesc(STONITH_PARAM_PCMK_HOST_LIST, Tools.getString("CRMXML.pcmk_host_list.LongDesc"));
             resourceAgent.setParamType(STONITH_PARAM_PCMK_HOST_LIST, PARAM_TYPE_STRING);
-            resourceAgent.setParamPossibleChoices(
-                                            STONITH_PARAM_PCMK_HOST_LIST,
-                                            stonithHostlistChoices.toArray(new Value[stonithHostlistChoices.size()]));
+            resourceAgent.setParamPossibleChoices(STONITH_PARAM_PCMK_HOST_LIST,
+                    stonithHostlistChoices.toArray(new Value[stonithHostlistChoices.size()]));
 
             /* pcmk_host_map for stonithd */
             resourceAgent.addParameter(STONITH_PARAM_PCMK_HOST_MAP);
-            resourceAgent.setParamShortDesc(STONITH_PARAM_PCMK_HOST_MAP,
-                                            Tools.getString("CRMXML.pcmk_host_map.ShortDesc"));
-            resourceAgent.setParamLongDesc(STONITH_PARAM_PCMK_HOST_MAP,
-                                           Tools.getString("CRMXML.pcmk_host_map.LongDesc"));
+            resourceAgent.setParamShortDesc(STONITH_PARAM_PCMK_HOST_MAP, Tools.getString("CRMXML.pcmk_host_map.ShortDesc"));
+            resourceAgent.setParamLongDesc(STONITH_PARAM_PCMK_HOST_MAP, Tools.getString("CRMXML.pcmk_host_map.LongDesc"));
             resourceAgent.setParamType(STONITH_PARAM_PCMK_HOST_MAP, PARAM_TYPE_STRING);
         }
         final Map<String, String> maParams = getMetaAttrParameters();
@@ -1606,7 +1539,8 @@ public class CrmXml {
         final NodeList actions = actionsNode.getChildNodes();
         for (int i = 0; i < actions.getLength(); i++) {
             final Node actionNode = actions.item(i);
-            if (actionNode.getNodeName().equals("action")) {
+            if (actionNode.getNodeName()
+                          .equals("action")) {
                 final String name = XMLTools.getAttribute(actionNode, "name");
                 if ("status ".equals(name)) {
                     /* workaround for iSCSITarget RA */
@@ -1614,14 +1548,14 @@ public class CrmXml {
                 }
                 final String depth = XMLTools.getAttribute(actionNode, "depth");
 
-                final Value timeout = parseValue(resourceAgent + ": " + name + " timeout",
-                                                 XMLTools.getAttribute(actionNode, "timeout"));
+                final Value timeout =
+                        parseValue(resourceAgent + ": " + name + " timeout", XMLTools.getAttribute(actionNode, "timeout"));
 
-                final Value interval = parseValue(resourceAgent + ": " + name + " interval",
-                                                  XMLTools.getAttribute(actionNode, "interval"));
+                final Value interval =
+                        parseValue(resourceAgent + ": " + name + " interval", XMLTools.getAttribute(actionNode, "interval"));
 
-                final Value startDelay = parseValue(resourceAgent + ": " + name + " start-delay",
-                        XMLTools.getAttribute(actionNode, "start-delay"));
+                final Value startDelay =
+                        parseValue(resourceAgent + ": " + name + " start-delay", XMLTools.getAttribute(actionNode, "start-delay"));
 
                 final String role = XMLTools.getAttribute(actionNode, "role");
                 resourceAgent.addOperationDefault(name, "depth", new StringValue(depth));
@@ -1634,13 +1568,16 @@ public class CrmXml {
         resourceAgent.addOperationDefault("monitor", PARAM_OCF_CHECK_LEVEL, new StringValue(""));
     }
 
-    /** Parses the actions node that is list of values for action param. */
+    /**
+     * Parses the actions node that is list of values for action param.
+     */
     private void parseStonithActions(final ResourceAgent ra, final Node actionsNode) {
         final NodeList actionNodes = actionsNode.getChildNodes();
         final List<Value> actions = new ArrayList<>();
         for (int i = 0; i < actionNodes.getLength(); i++) {
             final Node actionNode = actionNodes.item(i);
-            if (actionNode.getNodeName().equals("action")) {
+            if (actionNode.getNodeName()
+                          .equals("action")) {
                 final String name = XMLTools.getAttribute(actionNode, "name");
                 actions.add(new StringValue(name));
             }
@@ -1649,13 +1586,9 @@ public class CrmXml {
     }
 
     /**
-     * Parses meta-data xml for parameters for service and fills up the hashes
-     * "CRM Daemon"s are global config options.
+     * Parses meta-data xml for parameters for service and fills up the hashes "CRM Daemon"s are global config options.
      */
-    void parseMetaDataAndFillHashes(final String serviceName,
-                                    final String provider,
-                                    final String xml,
-                                    final boolean masterSlave) {
+    void parseMetaDataAndFillHashes(final String serviceName, final String provider, final String xml, final boolean masterSlave) {
         final Document document = XMLTools.getXMLDocument(xml);
         if (document == null) {
             return;
@@ -1674,17 +1607,13 @@ public class CrmXml {
         }
         final ResourceAgent resourceAgent = serviceToResourceAgentMap.get(serviceName, provider, resourceClass);
         if (resourceAgent == null) {
-            LOG.appWarning("parseMetaData: cannot save meta-data for: "
-                           + resourceClass
-                           + ':' + provider
-                           + ':' + serviceName);
+            LOG.appWarning("parseMetaData: cannot save meta-data for: " + resourceClass + ':' + provider + ':' + serviceName);
             return;
         }
         if (resourceAgent.isMetaDataLoaded()) {
             return;
         }
-        if (ResourceAgent.SERVICE_CLASSES.contains(resourceClass)
-            || ResourceAgent.HEARTBEAT_CLASS_NAME.equals(resourceClass)) {
+        if (ResourceAgent.SERVICE_CLASSES.contains(resourceClass) || ResourceAgent.HEARTBEAT_CLASS_NAME.equals(resourceClass)) {
             setLsbResourceAgent(serviceName, resourceClass, resourceAgent);
         } else {
             /* <version> */
@@ -1713,8 +1642,7 @@ public class CrmXml {
             /* <actions> */
             final Node actionsNode = XMLTools.getChildNode(raNode, "actions");
             if (actionsNode != null) {
-                if (resourceAgent.isStonith()
-                    && resourceAgent.hasParameter(FENCING_ACTION_PARAM)) {
+                if (resourceAgent.isStonith() && resourceAgent.hasParameter(FENCING_ACTION_PARAM)) {
                     parseStonithActions(resourceAgent, actionsNode);
                 } else {
                     parseActionsNode(resourceAgent, actionsNode);
@@ -1725,10 +1653,10 @@ public class CrmXml {
         resourceAgent.setMetaDataLoaded(true);
     }
 
-    /** Set resource agent to be used as LSB script. */
-    private void setLsbResourceAgent(final String serviceName,
-                                     final String raClass,
-                                     final ResourceAgent resourceAgent) {
+    /**
+     * Set resource agent to be used as LSB script.
+     */
+    private void setLsbResourceAgent(final String serviceName, final String raClass, final ResourceAgent resourceAgent) {
         resourceAgent.setServiceVersion("0.0");
         if (ResourceAgent.LSB_CLASS_NAME.equals(raClass)) {
             resourceAgent.setServiceLongDesc("LSB resource.");
@@ -1760,14 +1688,11 @@ public class CrmXml {
     }
 
     /**
-     * Parses crm meta data, only to get long descriptions and default values
-     * for advanced options.
-     * Strange stuff
-     *
+     * Parses crm meta data, only to get long descriptions and default values for advanced options. Strange stuff
+     * <p>
      * which can be pengine or crmd
      */
-    void parseClusterMetaData(
-        final String xml) {
+    void parseClusterMetaData(final String xml) {
         final Document document = XMLTools.getXMLDocument(xml);
         if (document == null) {
             return;
@@ -1784,7 +1709,8 @@ public class CrmXml {
 
         for (int i = 0; i < resAgents.getLength(); i++) {
             final Node resAgentNode = resAgents.item(i);
-            if (!resAgentNode.getNodeName().equals("resource-agent")) {
+            if (!resAgentNode.getNodeName()
+                             .equals("resource-agent")) {
                 continue;
             }
 
@@ -1797,7 +1723,8 @@ public class CrmXml {
             final NodeList parameters = parametersNode.getChildNodes();
             for (int j = 0; j < parameters.getLength(); j++) {
                 final Node parameterNode = parameters.item(j);
-                if (parameterNode.getNodeName().equals("parameter")) {
+                if (parameterNode.getNodeName()
+                                 .equals("parameter")) {
                     final String param = XMLTools.getAttribute(parameterNode, "name");
                     final String required = XMLTools.getAttribute(parameterNode, "required");
                     if (!globalParams.contains(param)) {
@@ -1848,7 +1775,7 @@ public class CrmXml {
             }
         }
         /* stonith timeout, workaround, because of param type comming wrong
-        * from pacemaker */
+         * from pacemaker */
         globalTypeMap.put("stonith-timeout", PARAM_TYPE_TIME);
     }
 
@@ -1856,13 +1783,10 @@ public class CrmXml {
         final ResourceAgent resourceAgent = serviceToResourceAgentMap.get(serviceName, provider, raClass);
         if (resourceAgent == null) {
             final ResourceAgent notInstalledRA = new ResourceAgent(serviceName, provider, raClass);
-            if (ResourceAgent.SERVICE_CLASSES.contains(raClass)
-                || ResourceAgent.HEARTBEAT_CLASS_NAME.equals(raClass)) {
+            if (ResourceAgent.SERVICE_CLASSES.contains(raClass) || ResourceAgent.HEARTBEAT_CLASS_NAME.equals(raClass)) {
                 setLsbResourceAgent(serviceName, raClass, notInstalledRA);
             } else {
-                LOG.appWarning("getResourceAgent: " + raClass
-                               + ':' + provider + ':' + serviceName
-                               + " RA does not exist");
+                LOG.appWarning("getResourceAgent: " + raClass + ':' + provider + ':' + serviceName + " RA does not exist");
             }
             serviceToResourceAgentMap.put(serviceName, provider, raClass, notInstalledRA);
             return notInstalledRA;
@@ -1883,15 +1807,16 @@ public class CrmXml {
         return groupResourceAgent;
     }
 
-    /** Returns the heartbeat service object of the heartbeat clone set. */
+    /**
+     * Returns the heartbeat service object of the heartbeat clone set.
+     */
     public ResourceAgent getCloneResourceAgent() {
         return cloneResourceAgent;
     }
 
-    String parseResourceDefaults(final Node rscDefaultsNode,
-                                 final Map<String, String> rscDefaultsParams,
-                                 final Map<String, String> rscDefaultsParamsNvpairIds) {
-        
+    String parseResourceDefaults(final Node rscDefaultsNode, final Map<String, String> rscDefaultsParams,
+            final Map<String, String> rscDefaultsParamsNvpairIds) {
+
         /* <meta_attributtes> */
         final Node metaAttrsNode = XMLTools.getChildNode(rscDefaultsNode, "meta_attributes");
         String rscDefaultsId = null;
@@ -1909,7 +1834,8 @@ public class CrmXml {
             /* target-role and is-managed */
             for (int l = 0; l < nvpairsMA.getLength(); l++) {
                 final Node maNode = nvpairsMA.item(l);
-                if (maNode.getNodeName().equals("nvpair")) {
+                if (maNode.getNodeName()
+                          .equals("nvpair")) {
                     final String nvpairId = XMLTools.getAttribute(maNode, "id");
                     final String name = XMLTools.getAttribute(maNode, "name");
                     String value = XMLTools.getAttribute(maNode, "value");
@@ -1925,7 +1851,7 @@ public class CrmXml {
     }
 
     void parseOpDefaults(final Node opDefaultsNode, final Map<String, Value> opDefaultsParams) {
-        
+
         /* <meta_attributtes> */
         final Node metaAttrsNode = XMLTools.getChildNode(opDefaultsNode, "meta_attributes");
         if (metaAttrsNode != null) {
@@ -1940,7 +1866,8 @@ public class CrmXml {
             /* <nvpair...> */
             for (int l = 0; l < nvpairsMA.getLength(); l++) {
                 final Node maNode = nvpairsMA.item(l);
-                if (maNode.getNodeName().equals("nvpair")) {
+                if (maNode.getNodeName()
+                          .equals("nvpair")) {
                     final String name = XMLTools.getAttribute(maNode, "name");
                     final String value = XMLTools.getAttribute(maNode, "value");
                     opDefaultsParams.put(name, parseValue(name, value));
@@ -1978,7 +1905,8 @@ public class CrmXml {
             }
             for (int j = 0; j < nvpairsRes.getLength(); j++) {
                 final Node optionNode = nvpairsRes.item(j);
-                if (optionNode.getNodeName().equals("nvpair")) {
+                if (optionNode.getNodeName()
+                              .equals("nvpair")) {
                     final String nvpairId = XMLTools.getAttribute(optionNode, "id");
                     String name = XMLTools.getAttribute(optionNode, "name");
                     final String value = XMLTools.getAttribute(optionNode, "value");
@@ -2006,7 +1934,8 @@ public class CrmXml {
                 final NodeList ops = operationsNode.getChildNodes();
                 for (int k = 0; k < ops.getLength(); k++) {
                     final Node opNode = ops.item(k);
-                    if (opNode.getNodeName().equals("op")) {
+                    if (opNode.getNodeName()
+                              .equals("op")) {
                         final String opId = XMLTools.getAttribute(opNode, "id");
                         final String name = XMLTools.getAttribute(opNode, "name");
                         final String timeout = XMLTools.getAttribute(opNode, "timeout");
@@ -2049,7 +1978,8 @@ public class CrmXml {
                 /* target-role and is-managed */
                 for (int l = 0; l < nvpairsMA.getLength(); l++) {
                     final Node maNode = nvpairsMA.item(l);
-                    if (maNode.getNodeName().equals("nvpair")) {
+                    if (maNode.getNodeName()
+                              .equals("nvpair")) {
                         final String nvpairId = XMLTools.getAttribute(maNode, "id");
                         final String name = XMLTools.getAttribute(maNode, "name");
                         String value = XMLTools.getAttribute(maNode, "value");
@@ -2066,7 +1996,9 @@ public class CrmXml {
         }
     }
 
-    /** OCF_CHECK_LEVEL */
+    /**
+     * OCF_CHECK_LEVEL
+     */
     private String parseCheckLevelMonitorAttribute(final Node opNode) {
         final Node iaNode = XMLTools.getChildNode(opNode, "instance_attributes");
         if (iaNode == null) {
@@ -2086,21 +2018,14 @@ public class CrmXml {
         }
     }
 
-    private void parseGroupNode(final Node groupNode,
-                                final Collection<String> resList,
-                                final Map<String, List<String>> groupsToResourcesMap,
-                                final Map<String, Map<String, String>> parametersMap,
-                                final Map<String, ResourceAgent> resourceTypeMap,
-                                final Map<String, Map<String, String>> parametersNvpairsIdsMap,
-                                final Map<String, String> resourceInstanceAttrIdMap,
-                                final MultiKeyMap<String, Value> operationsMap,
-                                final Map<String, String> metaAttrsIdMap,
-                                final Map<String, String> operationsIdMap,
-                                final Map<String, Map<String, String>> resOpIdsMap,
-                                final Map<String, String> operationsIdRefs,
-                                final Map<String, String> operationsIdtoCRMId,
-                                final Map<String, String> metaAttrsIdRefs,
-                                final Map<String, String> metaAttrsIdToCRMId) {
+    private void parseGroupNode(final Node groupNode, final Collection<String> resList,
+            final Map<String, List<String>> groupsToResourcesMap, final Map<String, Map<String, String>> parametersMap,
+            final Map<String, ResourceAgent> resourceTypeMap, final Map<String, Map<String, String>> parametersNvpairsIdsMap,
+            final Map<String, String> resourceInstanceAttrIdMap, final MultiKeyMap<String, Value> operationsMap,
+            final Map<String, String> metaAttrsIdMap, final Map<String, String> operationsIdMap,
+            final Map<String, Map<String, String>> resOpIdsMap, final Map<String, String> operationsIdRefs,
+            final Map<String, String> operationsIdtoCRMId, final Map<String, String> metaAttrsIdRefs,
+            final Map<String, String> metaAttrsIdToCRMId) {
         final NodeList primitives = groupNode.getChildNodes();
         final String groupId = XMLTools.getAttribute(groupNode, "id");
         final Map<String, String> params = new HashMap<>();
@@ -2114,21 +2039,11 @@ public class CrmXml {
 
         for (int j = 0; j < primitives.getLength(); j++) {
             final Node primitiveNode = primitives.item(j);
-            if (primitiveNode.getNodeName().equals("primitive")) {
-                parsePrimitiveNode(primitiveNode,
-                        groupResList,
-                        resourceTypeMap,
-                        parametersMap,
-                        parametersNvpairsIdsMap,
-                        resourceInstanceAttrIdMap,
-                        operationsMap,
-                        metaAttrsIdMap,
-                        operationsIdMap,
-                        resOpIdsMap,
-                        operationsIdRefs,
-                        operationsIdtoCRMId,
-                        metaAttrsIdRefs,
-                        metaAttrsIdToCRMId);
+            if (primitiveNode.getNodeName()
+                             .equals("primitive")) {
+                parsePrimitiveNode(primitiveNode, groupResList, resourceTypeMap, parametersMap, parametersNvpairsIdsMap,
+                        resourceInstanceAttrIdMap, operationsMap, metaAttrsIdMap, operationsIdMap, resOpIdsMap, operationsIdRefs,
+                        operationsIdtoCRMId, metaAttrsIdRefs, metaAttrsIdToCRMId);
             }
         }
 
@@ -2152,7 +2067,8 @@ public class CrmXml {
                 /* target-role and is-managed */
                 for (int l = 0; l < nvpairsMA.getLength(); l++) {
                     final Node maNode = nvpairsMA.item(l);
-                    if (maNode.getNodeName().equals("nvpair")) {
+                    if (maNode.getNodeName()
+                              .equals("nvpair")) {
                         final String nvpairId = XMLTools.getAttribute(maNode, "id");
                         String name = XMLTools.getAttribute(maNode, "name");
                         String value = XMLTools.getAttribute(maNode, "value");
@@ -2172,20 +2088,13 @@ public class CrmXml {
         }
     }
 
-    private void parsePrimitiveNode(final Node primitiveNode,
-                                    final Collection<String> groupResList,
-                                    final Map<String, ResourceAgent> resourceTypeMap,
-                                    final Map<String, Map<String, String>> parametersMap,
-                                    final Map<String, Map<String, String>> parametersNvpairsIdsMap,
-                                    final Map<String, String> resourceInstanceAttrIdMap,
-                                    final MultiKeyMap<String, Value> operationsMap,
-                                    final Map<String, String> metaAttrsIdMap,
-                                    final Map<String, String> operationsIdMap,
-                                    final Map<String, Map<String, String>> resOpIdsMap,
-                                    final Map<String, String> operationsIdRefs,
-                                    final Map<String, String> operationsIdtoCRMId,
-                                    final Map<String, String> metaAttrsIdRefs,
-                                    final Map<String, String> metaAttrsIdToCRMId) {
+    private void parsePrimitiveNode(final Node primitiveNode, final Collection<String> groupResList,
+            final Map<String, ResourceAgent> resourceTypeMap, final Map<String, Map<String, String>> parametersMap,
+            final Map<String, Map<String, String>> parametersNvpairsIdsMap, final Map<String, String> resourceInstanceAttrIdMap,
+            final MultiKeyMap<String, Value> operationsMap, final Map<String, String> metaAttrsIdMap,
+            final Map<String, String> operationsIdMap, final Map<String, Map<String, String>> resOpIdsMap,
+            final Map<String, String> operationsIdRefs, final Map<String, String> operationsIdtoCRMId,
+            final Map<String, String> metaAttrsIdRefs, final Map<String, String> metaAttrsIdToCRMId) {
         final String templateId = XMLTools.getAttribute(primitiveNode, "template");
         final String crmId = XMLTools.getAttribute(primitiveNode, "id");
         if (templateId != null) {
@@ -2200,27 +2109,17 @@ public class CrmXml {
         final String type = XMLTools.getAttribute(primitiveNode, "type");
         resourceTypeMap.put(crmId, getResourceAgent(type, provider, raClass));
         groupResList.add(crmId);
-        parseAttributes(primitiveNode,
-                        crmId,
-                        parametersMap,
-                        parametersNvpairsIdsMap,
-                        resourceInstanceAttrIdMap,
-                        operationsMap,
-                        metaAttrsIdMap,
-                        operationsIdMap,
-                        resOpIdsMap,
-                        operationsIdRefs,
-                        operationsIdtoCRMId,
-                        metaAttrsIdRefs,
-                        metaAttrsIdToCRMId,
-                        ResourceAgent.STONITH_CLASS_NAME.equals(raClass));
+        parseAttributes(primitiveNode, crmId, parametersMap, parametersNvpairsIdsMap, resourceInstanceAttrIdMap, operationsMap,
+                metaAttrsIdMap, operationsIdMap, resOpIdsMap, operationsIdRefs, operationsIdtoCRMId, metaAttrsIdRefs,
+                metaAttrsIdToCRMId, ResourceAgent.STONITH_CLASS_NAME.equals(raClass));
     }
 
     private Map<String, String> parseAllocationScores(final NodeList scores) {
         final Map<String, String> allocationScores = new LinkedHashMap<>();
         for (int i = 0; i < scores.getLength(); i++) {
             final Node scoreNode = scores.item(i);
-            if (scoreNode.getNodeName().equals("score")) {
+            if (scoreNode.getNodeName()
+                         .equals("score")) {
                 final String h = XMLTools.getAttribute(scoreNode, "host");
                 final String score = XMLTools.getAttribute(scoreNode, "score");
                 allocationScores.put(h, score);
@@ -2229,7 +2128,9 @@ public class CrmXml {
         return allocationScores;
     }
 
-    /** Returns a hash with resource information. (running_on) */
+    /**
+     * Returns a hash with resource information. (running_on)
+     */
     Map<String, ResourceStatus> parseResStatus(final String resStatus) {
         final Map<String, ResourceStatus> resStatusMap = new HashMap<>();
         final Document document = XMLTools.getXMLDocument(resStatus);
@@ -2246,7 +2147,8 @@ public class CrmXml {
         final NodeList resources = statusNode.getChildNodes();
         for (int i = 0; i < resources.getLength(); i++) {
             final Node resourceNode = resources.item(i);
-            if (resourceNode.getNodeName().equals("resource")) {
+            if (resourceNode.getNodeName()
+                            .equals("resource")) {
                 final String id = XMLTools.getAttribute(resourceNode, "id");
                 final String isManaged = XMLTools.getAttribute(resourceNode, "managed");
                 final NodeList statusList = resourceNode.getChildNodes();
@@ -2279,21 +2181,15 @@ public class CrmXml {
                         allocationScores = parseAllocationScores(setNode.getChildNodes());
                     }
                 }
-                resStatusMap.put(id, new ResourceStatus(runningOnList,
-                                                   masterOnList,
-                                                   slaveOnList,
-                                                   allocationScores,
-                                                   managed));
+                resStatusMap.put(id, new ResourceStatus(runningOnList, masterOnList, slaveOnList, allocationScores, managed));
             }
         }
         return resStatusMap;
     }
 
-    private void parseTransientAttributes(final String uname,
-                                          final Node transientAttrNode,
-                                          final Table<String, String, String> failedMap,
-                                          final Table<String, String, Set<String>> failedClonesMap,
-                                          final Map<String, String> pingCountMap) {
+    private void parseTransientAttributes(final String uname, final Node transientAttrNode,
+            final Table<String, String, String> failedMap, final Table<String, String, Set<String>> failedClonesMap,
+            final Map<String, String> pingCountMap) {
         /* <instance_attributes> */
         final Node instanceAttrNode = XMLTools.getChildNode(transientAttrNode, "instance_attributes");
         /* <nvpair...> */
@@ -2308,7 +2204,8 @@ public class CrmXml {
             }
             for (int j = 0; j < nvpairsRes.getLength(); j++) {
                 final Node optionNode = nvpairsRes.item(j);
-                if (optionNode.getNodeName().equals("nvpair")) {
+                if (optionNode.getNodeName()
+                              .equals("nvpair")) {
                     final String name = XMLTools.getAttribute(optionNode, "name");
                     final String value = XMLTools.getAttribute(optionNode, "value");
                     /* TODO: last-failure-" */
@@ -2336,8 +2233,10 @@ public class CrmXml {
         }
     }
 
-    /** Parses node, to get info like if it is in stand by. */
-    void parseNode(final String node, final Node nodeNode, final Table<String ,String, String> nodeParametersMap) {
+    /**
+     * Parses node, to get info like if it is in stand by.
+     */
+    void parseNode(final String node, final Node nodeNode, final Table<String, String, String> nodeParametersMap) {
         /* <instance_attributes> */
         final Node instanceAttrNode = XMLTools.getChildNode(nodeNode, "instance_attributes");
         /* <nvpair...> */
@@ -2352,7 +2251,8 @@ public class CrmXml {
             }
             for (int j = 0; j < nvpairsRes.getLength(); j++) {
                 final Node optionNode = nvpairsRes.item(j);
-                if (optionNode.getNodeName().equals("nvpair")) {
+                if (optionNode.getNodeName()
+                              .equals("nvpair")) {
                     final String name = XMLTools.getAttribute(optionNode, "name");
                     final String value = XMLTools.getAttribute(optionNode, "value");
                     nodeParametersMap.put(node.toLowerCase(Locale.US), name, value);
@@ -2361,11 +2261,8 @@ public class CrmXml {
         }
     }
 
-    private void parseResourceSets(final Node node,
-                                   final String colId,
-                                   final String ordId,
-                                   final Collection<RscSet> rscSets,
-                                   final List<RscSetConnectionData> rscSetConnections) {
+    private void parseResourceSets(final Node node, final String colId, final String ordId, final Collection<RscSet> rscSets,
+            final List<RscSetConnectionData> rscSetConnections) {
         final NodeList nodes = node.getChildNodes();
         RscSet prevRscSet = null;
         int rscSetCount = 0;
@@ -2373,7 +2270,8 @@ public class CrmXml {
         int colPos = 0;
         for (int i = 0; i < nodes.getLength(); i++) {
             final Node rscSetNode = nodes.item(i);
-            if (rscSetNode.getNodeName().equals("resource_set")) {
+            if (rscSetNode.getNodeName()
+                          .equals("resource_set")) {
                 final String id = XMLTools.getAttribute(rscSetNode, "id");
                 final String sequential = XMLTools.getAttribute(rscSetNode, "sequential");
                 final String requireAll = XMLTools.getAttribute(rscSetNode, REQUIRE_ALL_ATTR);
@@ -2383,7 +2281,8 @@ public class CrmXml {
                 final List<String> rscIds = new ArrayList<>();
                 for (int j = 0; j < rscNodes.getLength(); j++) {
                     final Node rscRefNode = rscNodes.item(j);
-                    if (rscRefNode.getNodeName().equals("resource_ref")) {
+                    if (rscRefNode.getNodeName()
+                                  .equals("resource_ref")) {
                         final String rscId = XMLTools.getAttribute(rscRefNode, "id");
                         rscIds.add(rscId);
                     }
@@ -2422,7 +2321,9 @@ public class CrmXml {
         }
     }
 
-    /** Returns CibQuery object with information from the cib node. */
+    /**
+     * Returns CibQuery object with information from the cib node.
+     */
     CibQuery parseCibQuery(final String query) {
         final Document document = XMLTools.getXMLDocument(query);
         final CibQuery cibQueryData = new CibQuery();
@@ -2444,7 +2345,8 @@ public class CrmXml {
             final NodeList nodes = fencedNode.getChildNodes();
             for (int i = 0; i < nodes.getLength(); i++) {
                 final Node hostNode = nodes.item(i);
-                if (hostNode.getNodeName().equals("node")) {
+                if (hostNode.getNodeName()
+                            .equals("node")) {
                     final String h = XMLTools.getText(hostNode);
                     if (h != null) {
                         fencedNodes.add(h.toLowerCase(Locale.US));
@@ -2485,8 +2387,8 @@ public class CrmXml {
         if (opDefaultsNode != null) {
             parseOpDefaults(opDefaultsNode, opDefaultsParams);
         }
-        
-        
+
+
         /* <crm_config> */
         final Node crmConfNode = XMLTools.getChildNode(confNode, "crm_config");
         if (crmConfNode == null) {
@@ -2511,7 +2413,8 @@ public class CrmXml {
             /*              <nvpair...> */
             for (int i = 0; i < nvpairs.getLength(); i++) {
                 final Node optionNode = nvpairs.item(i);
-                if (optionNode.getNodeName().equals("nvpair")) {
+                if (optionNode.getNodeName()
+                              .equals("nvpair")) {
                     final String name = XMLTools.getAttribute(optionNode, "name");
                     final String value = XMLTools.getAttribute(optionNode, "value");
                     crmConfMap.put(name, value);
@@ -2532,7 +2435,8 @@ public class CrmXml {
             final NodeList nodes = nodesNode.getChildNodes();
             for (int i = 0; i < nodes.getLength(); i++) {
                 final Node nodeNode = nodes.item(i);
-                if (nodeNode.getNodeName().equals("node")) {
+                if (nodeNode.getNodeName()
+                            .equals("node")) {
                     /* TODO: doing nothing with the info, just getting the dc,
                      * for now.
                      */
@@ -2594,72 +2498,28 @@ public class CrmXml {
                         resourceInstanceAttrIdMap, operationsMap, metaAttrsIdMap, operationsIdMap, resOpIdsMap, operationsIdRefs,
                         operationsIdtoCRMId, metaAttrsIdRefs, metaAttrsIdToCRMId);
             } else if ("group".equals(nodeName)) {
-                parseGroupNode(primitiveGroupNode,
-                               null,
-                               groupsToResourcesMap,
-                               parametersMap,
-                               resourceTypeMap,
-                               parametersNvpairsIdsMap,
-                               resourceInstanceAttrIdMap,
-                               operationsMap,
-                               metaAttrsIdMap,
-                               operationsIdMap,
-                               resOpIdsMap,
-                               operationsIdRefs,
-                               operationsIdtoCRMId,
-                               metaAttrsIdRefs,
-                               metaAttrsIdToCRMId);
+                parseGroupNode(primitiveGroupNode, null, groupsToResourcesMap, parametersMap, resourceTypeMap,
+                        parametersNvpairsIdsMap, resourceInstanceAttrIdMap, operationsMap, metaAttrsIdMap, operationsIdMap,
+                        resOpIdsMap, operationsIdRefs, operationsIdtoCRMId, metaAttrsIdRefs, metaAttrsIdToCRMId);
             } else if ("master".equals(nodeName) || "master_slave".equals(nodeName) || "clone".equals(nodeName)) {
                 final NodeList primitives = primitiveGroupNode.getChildNodes();
                 final String cloneId = XMLTools.getAttribute(primitiveGroupNode, "id");
                 List<String> resList = groupsToResourcesMap.computeIfAbsent(cloneId, k -> new ArrayList<>());
-                parseAttributes(primitiveGroupNode,
-                                cloneId,
-                                parametersMap,
-                                parametersNvpairsIdsMap,
-                                resourceInstanceAttrIdMap,
-                                operationsMap,
-                                metaAttrsIdMap,
-                                operationsIdMap,
-                                resOpIdsMap,
-                                operationsIdRefs,
-                                operationsIdtoCRMId,
-                                metaAttrsIdRefs,
-                                metaAttrsIdToCRMId,
-                                false);
+                parseAttributes(primitiveGroupNode, cloneId, parametersMap, parametersNvpairsIdsMap, resourceInstanceAttrIdMap,
+                        operationsMap, metaAttrsIdMap, operationsIdMap, resOpIdsMap, operationsIdRefs, operationsIdtoCRMId,
+                        metaAttrsIdRefs, metaAttrsIdToCRMId, false);
                 for (int j = 0; j < primitives.getLength(); j++) {
                     final Node primitiveNode = primitives.item(j);
-                    if (primitiveNode.getNodeName().equals("primitive")) {
-                        parsePrimitiveNode(primitiveNode,
-                                           resList,
-                                           resourceTypeMap,
-                                           parametersMap,
-                                           parametersNvpairsIdsMap,
-                                           resourceInstanceAttrIdMap,
-                                           operationsMap,
-                                           metaAttrsIdMap,
-                                           operationsIdMap,
-                                           resOpIdsMap,
-                                           operationsIdRefs,
-                                           operationsIdtoCRMId,
-                                           metaAttrsIdRefs,
-                                           metaAttrsIdToCRMId);
-                    } else if (primitiveNode.getNodeName().equals("group")) {
-                        parseGroupNode(primitiveNode,
-                                       resList,
-                                       groupsToResourcesMap,
-                                       parametersMap,
-                                       resourceTypeMap,
-                                       parametersNvpairsIdsMap,
-                                       resourceInstanceAttrIdMap,
-                                       operationsMap,
-                                       metaAttrsIdMap,
-                                       operationsIdMap,
-                                       resOpIdsMap,
-                                       operationsIdRefs,
-                                       operationsIdtoCRMId,
-                                       metaAttrsIdRefs,
-                                       metaAttrsIdToCRMId);
+                    if (primitiveNode.getNodeName()
+                                     .equals("primitive")) {
+                        parsePrimitiveNode(primitiveNode, resList, resourceTypeMap, parametersMap, parametersNvpairsIdsMap,
+                                resourceInstanceAttrIdMap, operationsMap, metaAttrsIdMap, operationsIdMap, resOpIdsMap,
+                                operationsIdRefs, operationsIdtoCRMId, metaAttrsIdRefs, metaAttrsIdToCRMId);
+                    } else if (primitiveNode.getNodeName()
+                                            .equals("group")) {
+                        parseGroupNode(primitiveNode, resList, groupsToResourcesMap, parametersMap, resourceTypeMap,
+                                parametersNvpairsIdsMap, resourceInstanceAttrIdMap, operationsMap, metaAttrsIdMap, operationsIdMap,
+                                resOpIdsMap, operationsIdRefs, operationsIdtoCRMId, metaAttrsIdRefs, metaAttrsIdToCRMId);
                     }
                 }
                 if (!resList.isEmpty()) {
@@ -2854,24 +2714,16 @@ public class CrmXml {
                     /* transient attributes. */
                     for (int j = 0; j < nodeStates.getLength(); j++) {
                         final Node nodeStateChild = nodeStates.item(j);
-                        if ("transient_attributes".equals(
-                            nodeStateChild.getNodeName())) {
+                        if ("transient_attributes".equals(nodeStateChild.getNodeName())) {
                             parseTransientAttributes(uname, nodeStateChild, failedMap, failedClonesMap, pingCountMap);
                         }
                     }
-                    final List<String> resList =
-                        groupsToResourcesMap.get("none");
+                    final List<String> resList = groupsToResourcesMap.get("none");
                     for (int j = 0; j < nodeStates.getLength(); j++) {
                         final Node nodeStateChild = nodeStates.item(j);
                         if ("lrm".equals(nodeStateChild.getNodeName())) {
-                            parseLrmResources(uname.toLowerCase(Locale.US),
-                                    nodeStateChild,
-                                    resList,
-                                    resourceTypeMap,
-                                    parametersMap,
-                                    inLRMList,
-                                    orphanedList,
-                                    failedClonesMap);
+                            parseLrmResources(uname.toLowerCase(Locale.US), nodeStateChild, resList, resourceTypeMap, parametersMap,
+                                    inLRMList, orphanedList, failedClonesMap);
                         }
                     }
                 }
@@ -2930,8 +2782,9 @@ public class CrmXml {
         return resourceSetOrderParams.toArray(new String[resourceSetOrderParams.size()]);
     }
 
-    /** Returns order parameters for resource sets. (Shown when an edge
-     * is clicked, resource_set tag). */
+    /**
+     * Returns order parameters for resource sets. (Shown when an edge is clicked, resource_set tag).
+     */
     public String[] getRscSetOrdConnectionParameters() {
         return resourceSetOrderConnectionParams.toArray(new String[resourceSetOrderConnectionParams.size()]);
     }
@@ -2973,8 +2826,7 @@ public class CrmXml {
     }
 
     /**
-     * Returns possible choices for a order parameter, that will be displayed
-     * in the combo box.
+     * Returns possible choices for a order parameter, that will be displayed in the combo box.
      */
     public Value[] getOrderParamPossibleChoices(final String param, final boolean masterSlave) {
         if (masterSlave) {
@@ -3009,19 +2861,14 @@ public class CrmXml {
     }
 
     /**
-     * Checks order parameter according to its type. Returns false if value
-     * does not fit the type.
+     * Checks order parameter according to its type. Returns false if value does not fit the type.
      */
     public boolean checkOrderParam(final String param, final Value value) {
         final String type = getOrderParamType(param);
         boolean correctValue = true;
         if (PARAM_TYPE_BOOLEAN.equals(type)) {
-            if (!PCMK_YES.equals(value)
-                && !PCMK_NO.equals(value)
-                && !PCMK_TRUE_VALUE.equals(value)
-                && !PCMK_FALSE_VALUE.equals(value)
-                && !PCMK_TRUE_2.equals(value)
-                && !PCMK_FALSE_2.equals(value)) {
+            if (!PCMK_YES.equals(value) && !PCMK_NO.equals(value) && !PCMK_TRUE_VALUE.equals(value) && !PCMK_FALSE_VALUE.equals(
+                    value) && !PCMK_TRUE_2.equals(value) && !PCMK_FALSE_2.equals(value)) {
 
                 correctValue = false;
             }
@@ -3051,14 +2898,16 @@ public class CrmXml {
         return colocationParams.toArray(new String[colocationParams.size()]);
     }
 
-    /** Returns colocation parameters for resource sets. (Shown when a
-     * placeholder is clicked, rsc_colocation tag). */
+    /**
+     * Returns colocation parameters for resource sets. (Shown when a placeholder is clicked, rsc_colocation tag).
+     */
     public String[] getResourceSetColocationParameters() {
         return resourceSetColocationParams.toArray(new String[resourceSetColocationParams.size()]);
     }
 
-    /** Returns colocation parameters for resource sets. (Shown when an edge
-     * is clicked, resource_set tag). */
+    /**
+     * Returns colocation parameters for resource sets. (Shown when an edge is clicked, resource_set tag).
+     */
     public String[] getResourceSetColConnectionParameters() {
         return resourceSetColocationConnectionParams.toArray(new String[resourceSetColocationConnectionParams.size()]);
     }
@@ -3132,11 +2981,8 @@ public class CrmXml {
         final String type = getColocationParamType(param);
         boolean correctValue = true;
         if (PARAM_TYPE_BOOLEAN.equals(type)) {
-            if (!PCMK_YES.equals(value) && !PCMK_NO.equals(value)
-                && !PCMK_TRUE_VALUE.equals(value)
-                && !PCMK_FALSE_VALUE.equals(value)
-                && !PCMK_TRUE_2.equals(value)
-                && !PCMK_FALSE_2.equals(value)) {
+            if (!PCMK_YES.equals(value) && !PCMK_NO.equals(value) && !PCMK_TRUE_VALUE.equals(value) && !PCMK_FALSE_VALUE.equals(
+                    value) && !PCMK_TRUE_2.equals(value) && !PCMK_FALSE_2.equals(value)) {
 
                 correctValue = false;
             }
@@ -3162,24 +3008,24 @@ public class CrmXml {
         return correctValue;
     }
 
-    /** Returns whether drbddisk ra is present. */
+    /**
+     * Returns whether drbddisk ra is present.
+     */
     public boolean isDrbddiskResourceAgentPresent() {
         return drbddiskResourceAgentPresent;
     }
 
-    /** Returns whether linbit::drbd ra is present. */
+    /**
+     * Returns whether linbit::drbd ra is present.
+     */
     public boolean isLinbitDrbdResourceAgentPresent() {
         return linbitDrbdResourceAgentPresent;
     }
 
-    void parseLrmResources(final String unameLowerCase,
-                           final Node lrmNode,
-                           final Collection<String> resList,
-                           final Map<String, ResourceAgent> resourceTypeMap,
-                           final Map<String, Map<String, String>> parametersMap,
-                           final Map<String, Set<String>> inLRMList,
-                           final Collection<String> orphanedList,
-                           final Table<String, String, Set<String>> failedClonesMap) {
+    void parseLrmResources(final String unameLowerCase, final Node lrmNode, final Collection<String> resList,
+            final Map<String, ResourceAgent> resourceTypeMap, final Map<String, Map<String, String>> parametersMap,
+            final Map<String, Set<String>> inLRMList, final Collection<String> orphanedList,
+            final Table<String, String, Set<String>> failedClonesMap) {
         final Node lrmResourcesNode = XMLTools.getChildNode(lrmNode, "lrm_resources");
         final NodeList lrmResources = lrmResourcesNode.getChildNodes();
         for (int j = 0; j < lrmResources.getLength(); j++) {
@@ -3259,14 +3105,13 @@ public class CrmXml {
         private final List<String> masterOnNodes;
         private final List<String> slaveOnNodes;
         private final Map<String, String> allocationScores;
-        /** Is managed by CRM. */
+        /**
+         * Is managed by CRM.
+         */
         private final boolean managedByCrm;
 
-        ResourceStatus(final List<String> runningOnNodes,
-                       final List<String> masterOnNodes,
-                       final List<String> slaveOnNodes,
-                       final Map<String, String> allocationScores,
-                       final boolean managedByCrm) {
+        ResourceStatus(final List<String> runningOnNodes, final List<String> masterOnNodes, final List<String> slaveOnNodes,
+                final Map<String, String> allocationScores, final boolean managedByCrm) {
             this.runningOnNodes = runningOnNodes;
             this.masterOnNodes = masterOnNodes;
             this.slaveOnNodes = slaveOnNodes;
@@ -3295,7 +3140,9 @@ public class CrmXml {
         }
     }
 
-    /** Class that holds colocation data. */
+    /**
+     * Class that holds colocation data.
+     */
     public static final class ColocationData {
         private final String id;
         private final String rsc;
@@ -3304,12 +3151,8 @@ public class CrmXml {
         private final String withRscRole;
         private final String score;
 
-        public ColocationData(final String id,
-                              final String rsc,
-                              final String withRsc,
-                              final String rscRole,
-                              final String withRscRole,
-                              final String score) {
+        public ColocationData(final String id, final String rsc, final String withRsc, final String rscRole,
+                final String withRscRole, final String score) {
             this.id = id;
             this.rsc = rsc;
             this.withRsc = withRsc;
@@ -3352,13 +3195,8 @@ public class CrmXml {
         private final String firstAction;
         private final String thenAction;
 
-        public OrderData(final String id,
-                         final String rscFirst,
-                         final String rscThen,
-                         final String score,
-                         final String symmetrical,
-                         final String firstAction,
-                         final String thenAction) {
+        public OrderData(final String id, final String rscFirst, final String rscThen, final String score, final String symmetrical,
+                final String firstAction, final String thenAction) {
             this.id = id;
             this.rscFirst = rscFirst;
             this.rscThen = rscThen;
@@ -3397,7 +3235,9 @@ public class CrmXml {
         }
     }
 
-    /** Class that holds resource set data. */
+    /**
+     * Class that holds resource set data.
+     */
     public static final class RscSet {
         private final String id;
         private final List<String> rscIds;
@@ -3409,12 +3249,8 @@ public class CrmXml {
         private final String orderAction;
         private final String colocationRole;
 
-        public RscSet(final String id,
-                      final List<String> rscIds,
-                      final String sequential,
-                      final String requireAll,
-                      final String orderAction,
-                      final String colocationRole) {
+        public RscSet(final String id, final List<String> rscIds, final String sequential, final String requireAll,
+                final String orderAction, final String colocationRole) {
             this.id = id;
             this.rscIds = rscIds;
             this.sequential = sequential;
@@ -3467,8 +3303,9 @@ public class CrmXml {
             return true;
         }
 
-        /** Returns whether this resource set is equal to the supplied
-         * resource set. The order of ids doesn't matter. */
+        /**
+         * Returns whether this resource set is equal to the supplied resource set. The order of ids doesn't matter.
+         */
         boolean equals(final RscSet oRscSet) {
             if (oRscSet == null) {
                 return false;
@@ -3490,7 +3327,9 @@ public class CrmXml {
             return true;
         }
 
-        /** Adds one id to rsc ids. */
+        /**
+         * Adds one id to rsc ids.
+         */
         public void addRscId(final String id) {
             mRscIdsWriteLock.lock();
             try {
@@ -3526,10 +3365,12 @@ public class CrmXml {
             return sequential == null || "true".equals(sequential);
         }
 
-        /** Returns whether the resouce set requires all resources to be
-         *  started . */
+        /**
+         * Returns whether the resouce set requires all resources to be started .
+         */
         public boolean isRequireAll() {
-            return requireAll == null || REQUIRE_ALL_TRUE_VALUE.getValueForConfig().equals(requireAll);
+            return requireAll == null || REQUIRE_ALL_TRUE_VALUE.getValueForConfig()
+                                                               .equals(requireAll);
         }
     }
 

@@ -38,13 +38,17 @@ sub do_cluster_events {
     my $libpath = Host_software::get_hb_lib_path();
     my $hb_version = Command::_exec("$libpath/heartbeat -V 2>/dev/null") || "";
     my $info = get_cluster_info($hb_version);
-    my $pcmk_path = "/usr/libexec/pacemaker:/usr/lib/heartbeat:/usr/lib64/heartbeat:/usr/lib/pacemaker:/usr/lib64/pacemaker:/usr/lib/x86_64-linux-gnu/pacemaker";
-    my $command =
-        "PATH=$pcmk_path exec cibmon -udVVVV -m1 2>&1";
-    if ($hb_version && (Host_software::compare_versions($hb_version, "2.1.4") <= 0)) {
-        $command =
-            " PATH=$pcmk_path exec cibmon -dV -m1 2>&1";
+    my $pcmk_path = "/usr/libexec/pacemaker:/usr/lib/heartbeat:/usr/lib64/heartbeat:/usr/lib/pacemaker:/usr/lib64/pacemaker:/usr/lib/x86_64-linux-gnu/pacemaker
+";
+    my $command;
+    if (system("PATH=$pcmk_path /usr/bin/which cibmon") == 0) {
+        $command = "PATH=$pcmk_path exec cibmon -udVVVV -m1 2>&1";
+    } elsif (-e "/var/log/pacemaker.log") {
+        $command = 'tail -F /var/log/pacemaker.log';
+    } else {
+        $command = 'tail -F /var/log/pacemaker/pacemaker.log';
     }
+
     if ($info) {
         print "---start---\n";
         print $info;
@@ -96,16 +100,7 @@ sub get_resource_status {
     my $errors = ""; # TODO: error handling
     my $ptest_prog = "/usr/sbin/ptest";
     if (!-e $crm_simulate_prog && -e $ptest_prog) {
-        if ($hb_version
-            && (Host_software::compare_versions($hb_version, "2.1.4") <= 0)) {
-            $prog = "$ptest_prog -S -VVVVV -L 2>&1";
-        }
-        else {
-            $prog = "$ptest_prog -s -S -VVVVV -L 2>&1";
-        }
-        # default, because crm_simulate
-        # crashes sometimes
-        # older ptest versions don't have -s option
+        $prog = "$ptest_prog -s -S -VVVVV -L 2>&1";
     }
     elsif (!-e $ptest_prog) {
         $errors .= "could not find $prog\n";
