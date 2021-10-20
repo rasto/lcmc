@@ -63,7 +63,7 @@ public final class DistResource_ubuntu extends ListResourceBundle {
         {"PmInst.install.1",
          "apt-get update && DEBIAN_FRONTEND=noninteractive /usr/bin/apt-get -y install -o"
          + " 'DPkg::Options::force=--force-confnew' pacemaker crmsh corosync "
-         + " && mkdir /var/log/cluster"
+         + " && mkdir -p /var/log/cluster"
          + " && (grep 'START=no' /etc/default/corosync && echo 'START=yes'>>/etc/default/corosync; true)"
          + " && if [ -e /etc/corosync/corosync.conf ];then"
          + " mv /etc/corosync/corosync.conf /etc/corosync/corosync.conf.orig; fi"},
