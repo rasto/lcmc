@@ -45,9 +45,11 @@ sub do_cluster_events {
         $command = "PATH=$pcmk_path exec cibmon -udVVVV -m1 2>&1";
     } elsif (-e "/var/log/pacemaker.log") {
         $command = 'tail -F /var/log/pacemaker.log';
-    } else {
+    } elsif (-e "/var/log/pacemaker/pacemaker.log") {
         $command = 'tail -F /var/log/pacemaker/pacemaker.log';
-    }
+    } else {
+		$command = "echo 'pacemaker.log not found'"
+	}
 
     if ($info) {
         print "---start---\n";
