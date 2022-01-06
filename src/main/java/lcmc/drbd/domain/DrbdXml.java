@@ -1006,6 +1006,10 @@ public class DrbdXml {
         return resourceHostDiskMap.get(resName, volumeNr);
     }
 
+    public void addHostDiskMap(String resName, String volumeNr, Map<String, String> hostDiskMap) {
+        resourceHostDiskMap.put(resName, volumeNr, hostDiskMap);
+    }
+
     public String getVirtualInterfacePort(final String hostName, final String resName) {
         if (resourceHostPortMap.containsKey(resName)) {
             return resourceHostPortMap.get(resName).get(hostName);
@@ -1238,6 +1242,10 @@ public class DrbdXml {
             return drbdGraph.findBlockDevInfo(hostName, disk);
         }
         return null;
+    }
+
+    public void addDeviceAddResource(String device, String resource) {
+        deviceResourceMap.put(device, resource);
     }
 
     /** Return backing disk from device number. Can return null. */

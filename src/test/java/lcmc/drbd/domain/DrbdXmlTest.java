@@ -24,6 +24,7 @@ import static com.google.common.collect.Lists.newArrayList;
 import static java.util.Arrays.asList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.when;
 
 import java.io.IOException;
 
@@ -34,12 +35,17 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import com.google.common.base.Charsets;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.google.common.io.Resources;
 
 import lcmc.common.domain.AccessMode;
 import lcmc.common.domain.StringValue;
 import lcmc.common.domain.Value;
+import lcmc.drbd.ui.DrbdGraph;
+import lcmc.drbd.ui.resource.BlockDevInfo;
 import lcmc.host.domain.Host;
 import lombok.val;
 
@@ -57,6 +63,10 @@ class DrbdXmlTest {
     private Host host1;
     @Mock
     private Host host2;
+    @Mock
+    private DrbdGraph drbdGraph;
+    @Mock
+    private BlockDevInfo blockDevInfo;
 
     @BeforeEach
     void setUp() {
@@ -200,6 +210,31 @@ class DrbdXmlTest {
         assertThat(newArrayList(drbdXml.getSectionParams("COMMAND"))).isEqualTo(
                 asList(OPTION1, OPTION2, OPTION3, OPTION4, "fence-peer", "after-resync-target", "split-brain", "become-primary-on",
                         "verify-alg"));
+    }
+
+    @Test
+    void shouldParseDrbdEvent() {
+        drbdXml.addDeviceAddResource("/dev/drbd0", "r0");
+        drbdXml.addHostDiskMap("r0", "0", ImmutableMap.of("host1", "/dev/sda1", "host2", "/dev/sda1"));
+        val blockDevice = new BlockDevice(host1, "/dev/sda1");
+        when(blockDevInfo.getBlockDevice()).thenReturn(blockDevice);
+        when(drbdGraph.findBlockDevInfo("host1", "/dev/sda1")).thenReturn(blockDevInfo);
+
+        boolean ret = drbdXml.parseDrbdEvent("host1", drbdGraph, "40 ST 0,r0[0] { cs:WFReportParams ro:Secondary/Unknown ds:Attaching/DUnknown r--- }");
+
+        assertThat(blockDevice.isSyncing()).isFalse();
+        assertThat(blockDevice.isPrimary()).isFalse();
+        assertThat(blockDevice.isSecondary()).isTrue();
+        assertThat(blockDevice.isAttached()).isTrue();
+        assertThat(blockDevice.isAvailable()).isTrue();
+        assertThat(blockDevice.isConnected()).isFalse();
+        assertThat(blockDevice.isWFConnection()).isFalse();
+        assertThat(blockDevice.isConnectedOrWF()).isFalse();
+        assertThat(blockDevice.getNodeState()).isEqualTo("Secondary");
+        assertThat(blockDevice.getConnectionState()).isEqualTo("WFReportParams");
+        assertThat(blockDevice.getDiskState()).isEqualTo("Attaching");
+        assertThat(blockDevice.getDiskStateOther()).isEqualTo("DUnknown");
+        assertThat(ret).isTrue();
     }
 
     private String readFile(final String resourceName) {
