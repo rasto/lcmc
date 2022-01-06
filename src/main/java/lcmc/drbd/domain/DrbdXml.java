@@ -1248,6 +1248,14 @@ public class DrbdXml {
         deviceResourceMap.put(device, resource);
     }
 
+    private String getBackingDiskByResName(String resName, String volumeNr, String hostName) {
+        final Map<String, String> hostDiskMap = resourceHostDiskMap.get(resName, volumeNr);
+        if (hostDiskMap != null) {
+            return hostDiskMap.get(hostName);
+        }
+        return null;
+    }
+
     /** Return backing disk from device number. Can return null. */
     private String getBackingDisk(final String devNr, final String hostName) {
         final String device = "/dev/drbd" + devNr;
@@ -1380,6 +1388,105 @@ public class DrbdXml {
                         bdi.updateInfo();
                         return true;
                     }
+                }
+            }
+            return false;
+        }
+
+        p = Pattern.compile("^(?:create|change|exists) resource name:(\\S+)\\s+role:(\\S+).*");
+        m = p.matcher(output);
+        if (m.matches()) {
+            final String resName = m.group(1);
+            final String ro1 = m.group(2);
+            /* get blockdevice object from device */
+            final String disk = getBackingDiskByResName(resName, "0", hostName);
+            if (disk != null) {
+                final BlockDevInfo bdi = drbdGraph.findBlockDevInfo(hostName, disk);
+                if (bdi != null) {
+                    bdi.getBlockDevice().setDrbdBackingDisk(disk);
+//                    bdi.getBlockDevice().setConnectionState(cs);
+                    bdi.getBlockDevice().setNodeState(ro1);
+//                    bdi.getBlockDevice().setDiskState(ds1);
+//                    bdi.getBlockDevice().setNodeStateOther(ro2);
+//                    bdi.getBlockDevice().setDiskStateOther(ds2);
+//                    bdi.getBlockDevice().setDrbdFlags(flags);
+                    bdi.updateInfo();
+                    return true;
+                }
+            }
+            return false;
+        }
+        p = Pattern.compile("^(?:create|change|exists) device name:(\\S+)\\s+volume:(\\S+)\\s+minor(\\S+)\\s+backing_dev:(\\S+)\\s+disk:(\\S+).*");
+        m = p.matcher(output);
+        if (m.matches()) {
+            final String resName = m.group(1);
+            final String volume = m.group(2);
+            final String minor = m.group(3);
+            final String backingDev = m.group(4);
+            final String ds1 = m.group(5);
+            /* get blockdevice object from device */
+            final String disk = getBackingDiskByResName(resName, volume, hostName);
+            if (disk != null) {
+                final BlockDevInfo bdi = drbdGraph.findBlockDevInfo(hostName, disk);
+                if (bdi != null) {
+                    bdi.getBlockDevice().setDrbdBackingDisk(disk);
+//                    bdi.getBlockDevice().setConnectionState(cs);
+//                    bdi.getBlockDevice().setNodeState(ro1);
+                    bdi.getBlockDevice().setDiskState(ds1);
+//                    bdi.getBlockDevice().setNodeStateOther(ro2);
+//                    bdi.getBlockDevice().setDiskStateOther(ds2);
+//                    bdi.getBlockDevice().setDrbdFlags(flags);
+                    bdi.updateInfo();
+                    return true;
+                }
+            }
+            return false;
+        }
+        p = Pattern.compile("^(?:create|change|exists) connection name:(\\S+).*?\\s+connection:(\\S+)\\s+role:(\\S+).*");
+        m = p.matcher(output);
+        if (m.matches()) {
+            final String resName = m.group(1);
+            final String cs = m.group(2);
+            final String ro1 = m.group(3);
+            /* get blockdevice object from device */
+            final String disk = getBackingDiskByResName(resName, "0", hostName);
+            if (disk != null) {
+                final BlockDevInfo bdi = drbdGraph.findBlockDevInfo(hostName, disk);
+                if (bdi != null) {
+                    bdi.getBlockDevice().setDrbdBackingDisk(disk);
+                    bdi.getBlockDevice().setConnectionState(cs);
+//                    bdi.getBlockDevice().setNodeState(ro1);
+//                    bdi.getBlockDevice().setDiskState(ds1);
+//                    bdi.getBlockDevice().setNodeStateOther(ro2);
+//                    bdi.getBlockDevice().setDiskStateOther(ds2);
+//                    bdi.getBlockDevice().setDrbdFlags(flags);
+                    bdi.updateInfo();
+                    return true;
+                }
+            }
+            return false;
+        }
+        p = Pattern.compile("^(?:create|change|exists) peer-device name:(\\S+).*?\\s+volume:(\\S+).*\\s+peer-disk:(\\S+).*");
+        m = p.matcher(output);
+        if (m.matches()) {
+            final String resName = m.group(1);
+            final String volume = m.group(2);
+            final String ds2 = m.group(3);
+            /* get blockdevice object from device */
+            final String disk = getBackingDiskByResName(resName, volume, hostName);
+            if (disk != null) {
+                final BlockDevInfo bdi = drbdGraph.findBlockDevInfo(hostName, disk);
+                if (bdi != null) {
+                    bdi.getBlockDevice()
+                       .setDrbdBackingDisk(disk);
+//                    bdi.getBlockDevice().setConnectionState(cs);
+//                    bdi.getBlockDevice().setNodeState(ro1);
+//                    bdi.getBlockDevice().setDiskState(ds1);
+//                    bdi.getBlockDevice().setNodeStateOther(ro2);
+                    bdi.getBlockDevice().setDiskStateOther(ds2);
+//                    bdi.getBlockDevice().setDrbdFlags(flags);
+                    bdi.updateInfo();
+                    return true;
                 }
             }
             return false;

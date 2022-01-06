@@ -38,9 +38,10 @@ sub do_drbd_events {
     my $command;
     if ($v1 < 7 || ($v1 == 8 && $v2 < 4)) { # < 8.4.0
         $command = "/sbin/drbdsetup /dev/drbd0 events -a -u";
-    }
-    else {
+    } elsif ($v1 < 9) {
         $command = "/sbin/drbdsetup all events";
+    } else {
+        $command = "/sbin/drbdsetup all events2";
     }
     my $prev_drbd_info = 0;
     if (!open EVENTS, "$command|") {
