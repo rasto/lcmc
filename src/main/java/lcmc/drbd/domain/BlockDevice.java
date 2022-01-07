@@ -363,7 +363,7 @@ public class BlockDevice extends ResourceValue {
     }
 
     public boolean isSyncing() {
-        if (nodeState == null) {
+        if (nodeState == null || connectionState == null) {
             syncedProgress = null;
             return false;
         }

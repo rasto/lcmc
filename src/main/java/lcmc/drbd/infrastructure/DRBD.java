@@ -50,6 +50,7 @@ public final class DRBD {
     private static final Logger LOG = LoggerFactory.getLogger(DRBD.class);
     private static final String DEVICE_PLACE_HOLDER = "@DEVICE@";
     private static final String RESOURCE_VOLUME_PLACE_HOLDER = "@RES-VOL@";
+    private static final String RESOURCE_PLACE_HOLDER = "@RES@";
     private static final String DRBDDEV_PLACE_HOLDER = "@DRBDDEV@";
     private static final String FILESYSTEM_PLACE_HOLDER = "@FILESYSTEM@";
     private static volatile String drbdtestOutput = null;
@@ -149,6 +150,7 @@ public final class DRBD {
         } else {
             replaceHash.put(RESOURCE_VOLUME_PLACE_HOLDER, resource);
         }
+        replaceHash.put(RESOURCE_PLACE_HOLDER, resource);
         return replaceHash;
     }
 

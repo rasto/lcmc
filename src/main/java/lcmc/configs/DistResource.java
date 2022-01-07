@@ -245,8 +245,8 @@ public final class DistResource extends ListResourceBundle {
         {"DRBD.disconnect",    "echo|" + SUDO + "/sbin/drbdadm @DRYRUN@ disconnect @RES-VOL@"},
         {"DRBD.pauseSync",     "echo|" + SUDO + "/sbin/drbdadm @DRYRUN@ pause-sync @RES-VOL@"},
         {"DRBD.resumeSync",    "echo|" + SUDO + "/sbin/drbdadm @DRYRUN@ resume-sync @RES-VOL@"},
-        {"DRBD.setPrimary",    "echo|" + SUDO + "/sbin/drbdadm @DRYRUN@ primary @RES-VOL@"},
-        {"DRBD.setSecondary",  "echo|" + SUDO + "/sbin/drbdadm @DRYRUN@ secondary @RES-VOL@"},
+        {"DRBD.setPrimary",    "echo|" + SUDO + "/sbin/drbdadm @DRYRUN@ primary @RES@"},
+        {"DRBD.setSecondary",  "echo|" + SUDO + "/sbin/drbdadm @DRYRUN@ secondary @RES@"},
         {"DRBD.createMDDestroyData",
          SUDO + "dd if=/dev/zero of=@DEVICE@ bs=1024 count=8;"
          + " echo -e \"yes\\nyes\"|" + SUDO + "/sbin/drbdadm @DRYRUN@ create-md @RES-VOL@"},
@@ -254,9 +254,9 @@ public final class DistResource extends ListResourceBundle {
          "echo -e \"yes\\nyes\"|" + SUDO + "/sbin/drbdadm @DRYRUN@ create-md @RES-VOL@"},
 
         {"DRBD.forcePrimary",
-         "echo|" + SUDO + "/sbin/drbdadm @DRYRUN@ primary @RES-VOL@ --force"},
+         "echo|" + SUDO + "/sbin/drbdadm @DRYRUN@ primary @RES@ --force"},
         {"DRBD.forcePrimary.8.3",
-         "echo|" + SUDO + "/sbin/drbdadm @DRYRUN@ -- --force primary @RES-VOL@"},
+         "echo|" + SUDO + "/sbin/drbdadm @DRYRUN@ -- --force primary @RES@"},
 
         {"DRBD.forcePrimary.8.3.7",
          "echo|" + SUDO + "/sbin/drbdadm @DRYRUN@ -- --overwrite-data-of-peer primary @RES-VOL@"},
