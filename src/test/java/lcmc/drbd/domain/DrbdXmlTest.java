@@ -309,6 +309,21 @@ class DrbdXmlTest {
         assertThat(blockDevice.getDiskStateOther()).isEqualTo("Inconsistent");
     }
 
+    @Test
+    void shouldParseSplitBrainDrbdEvent() {
+        drbdXml.addDeviceAddResource("/dev/drbd0", "r0");
+        drbdXml.addHostDiskMap("r0", "0", ImmutableMap.of("host1", "/dev/sda1", "host2", "/dev/sda1"));
+        val blockDevice = new BlockDevice(host1, "/dev/sda1");
+        when(blockDevInfo.getBlockDevice()).thenReturn(blockDevice);
+        when(drbdGraph.findBlockDevInfo("host1", "/dev/sda1")).thenReturn(blockDevInfo);
+        drbdEventsConnect();
+
+        val ret = drbdXml.parseDrbdEvent("host1", drbdGraph, "call helper name:r0 peer-node-id:1 conn-name:centos8-b volume:0 minor:0 helper:split-brain");
+
+        assertThat(ret).isTrue();
+        assertThat(blockDevice.isSplitBrain()).isTrue();
+    }
+
     private boolean drbdEventsConnect() {
         boolean ret = drbdXml.parseDrbdEvent("host1", drbdGraph, "create resource name:r0 role:Secondary suspended:no may_promote:no promotion_score:0");
         drbdXml.parseDrbdEvent("host1", drbdGraph, "create device name:r0 volume:0 minor:0 backing_dev:none disk:Diskless client:no quorum:yes");

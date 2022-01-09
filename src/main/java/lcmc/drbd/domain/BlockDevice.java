@@ -44,6 +44,7 @@ public class BlockDevice extends ResourceValue {
                     "WFSyncUUID", "PausedSyncS", "PausedSyncT", "VerifyS", "VerifyT");
 
     private static final Set<String> SYNCING_STATES = Set.of("SyncTarget", "SyncSource", "PausedSyncS", "PausedSyncT");
+    private static final Set<String> VERIFYING_STATES = Set.of("VerifyS", "VerifyT");
 
     private String blockSize;
     private String diskUuid;
@@ -210,8 +211,15 @@ public class BlockDevice extends ResourceValue {
     }
 
     public void setConnectionState(final String connectionState) {
-        if ("Off".equals(connectionState) || "Established".equals(connectionState)) {
+        if ("Off".equals(connectionState)) {
             return;
+        }
+        if ("Established".equals(connectionState)) {
+            this.connectionState = "Connected";
+            return;
+        }
+        if (!SYNCING_STATES.contains(connectionState) && !VERIFYING_STATES.contains(connectionState)) {
+            syncedProgress = null;
         }
         this.connectionState = connectionState;
     }
@@ -367,21 +375,19 @@ public class BlockDevice extends ResourceValue {
 
     public boolean isSyncing() {
         if (nodeState == null || connectionState == null) {
-            syncedProgress = null;
             return false;
         }
-        if (SYNCING_STATES.contains(connectionState)) {
-            return true;
-        }
-        syncedProgress = null;
-        return false;
+        return SYNCING_STATES.contains(connectionState);
     }
 
     public boolean isVerifying() {
+        if (nodeState == null || connectionState == null) {
+            return false;
+        }
         if (nodeState == null) {
             return false;
         }
-        return "VerifyS".equals(connectionState) || "VerifyT".equals(connectionState);
+        return VERIFYING_STATES.contains(connectionState);
     }
 
 

@@ -1533,6 +1533,32 @@ public class DrbdXml {
                 }
             }
         }
+        p = Pattern.compile("^(?:response|call) helper name:(\\S+).*?\\s+volume:(\\S+).*?\\s+helper:(\\S+).*");
+        m = p.matcher(output);
+        if (m.matches()) {
+            final String resName = m.group(1);
+            final String volume = m.group(2);
+            final String helper = m.group(3);
+            final String disk = getBackingDiskByResName(resName, volume, hostName);
+            if (disk != null) {
+                final BlockDevInfo bdi = drbdGraph.findBlockDevInfo(hostName, disk);
+                if (bdi != null) {
+                    bdi.getBlockDevice()
+                       .setDrbdBackingDisk(disk);
+
+                    if ("split-brain".equals(helper)) {
+                        bdi.getBlockDevice().setSplitBrain(true);
+                    }
+//                    bdi.getBlockDevice().setNodeState(ro1);
+//                    bdi.getBlockDevice().setDiskState(ds1);
+//                    bdi.getBlockDevice().setNodeStateOther(ro2);
+//                    bdi.getBlockDevice().setDiskStateOther(ds2);
+//                    bdi.getBlockDevice().setDrbdFlags(flags);
+                    bdi.updateInfo();
+                    updateInfo = true;
+                }
+            }
+        }
         return updateInfo;
     }
 

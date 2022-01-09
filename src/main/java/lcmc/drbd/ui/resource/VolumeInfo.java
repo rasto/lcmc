@@ -560,7 +560,6 @@ public class VolumeInfo extends EditableInfo implements CommonDeviceInterface {
         this.createdFs = createdFs;
     }
 
-    /** Returns sync progress in percent. */
     public String getSyncedProgress() {
         return getFirstBlockDevInfo().getBlockDevice().getSyncedProgress();
     }

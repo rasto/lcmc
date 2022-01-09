@@ -408,7 +408,11 @@ public class DrbdGraph extends ResourceGraph {
             } else if (!dvi.isConnected(runMode)) {
                 l.append(" (disconnected)");
             } else if (dvi.isVerifying()) {
-                l.append(" (verify)");
+                String verifyProgress = dvi.getSyncedProgress();
+                if (verifyProgress == null) {
+                    verifyProgress = "?.?";
+                }
+                l.append(" (verify " + verifyProgress + "%)");
             }
             return l.toString();
         }
