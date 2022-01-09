@@ -1393,6 +1393,7 @@ public class DrbdXml {
             return false;
         }
 
+        boolean updateInfo = false;
         p = Pattern.compile("^(?:create|change|exists) resource name:(\\S+)\\s+role:(\\S+).*");
         m = p.matcher(output);
         if (m.matches()) {
@@ -1411,10 +1412,9 @@ public class DrbdXml {
 //                    bdi.getBlockDevice().setDiskStateOther(ds2);
 //                    bdi.getBlockDevice().setDrbdFlags(flags);
                     bdi.updateInfo();
-                    return true;
+                    updateInfo = true;
                 }
             }
-            return false;
         }
         p = Pattern.compile("^(?:create|change|exists) device name:(\\S+)\\s+volume:(\\S+)\\s+minor(\\S+)\\s+backing_dev:(\\S+)\\s+disk:(\\S+).*");
         m = p.matcher(output);
@@ -1437,10 +1437,9 @@ public class DrbdXml {
 //                    bdi.getBlockDevice().setDiskStateOther(ds2);
 //                    bdi.getBlockDevice().setDrbdFlags(flags);
                     bdi.updateInfo();
-                    return true;
+                    updateInfo = true;
                 }
             }
-            return false;
         }
         p = Pattern.compile("^(?:create|change|exists) connection name:(\\S+).*?\\s+connection:(\\S+).*");
         m = p.matcher(output);
@@ -1460,10 +1459,9 @@ public class DrbdXml {
 //                    bdi.getBlockDevice().setDiskStateOther(ds2);
 //                    bdi.getBlockDevice().setDrbdFlags(flags);
                     bdi.updateInfo();
-                    return true;
+                    updateInfo = true;
                 }
             }
-            return false;
         }
         p = Pattern.compile("^(?:create|change|exists) peer-device name:(\\S+).*?\\s+volume:(\\S+).*\\s+peer-disk:(\\S+).*");
         m = p.matcher(output);
@@ -1485,12 +1483,57 @@ public class DrbdXml {
                     bdi.getBlockDevice().setDiskStateOther(ds2);
 //                    bdi.getBlockDevice().setDrbdFlags(flags);
                     bdi.updateInfo();
-                    return true;
+                    updateInfo = true;
                 }
             }
-            return false;
         }
-        return false;
+        p = Pattern.compile("^(?:create|change|exists) peer-device name:(\\S+).*?\\s+volume:(\\S+).*?\\s+replication:(\\S+).*");
+        m = p.matcher(output);
+        if (m.matches()) {
+            final String resName = m.group(1);
+            final String volume = m.group(2);
+            final String replication = m.group(3);
+            final String disk = getBackingDiskByResName(resName, volume, hostName);
+            if (disk != null) {
+                final BlockDevInfo bdi = drbdGraph.findBlockDevInfo(hostName, disk);
+                if (bdi != null) {
+                    bdi.getBlockDevice()
+                       .setDrbdBackingDisk(disk);
+                    bdi.getBlockDevice().setConnectionState(replication);
+//                    bdi.getBlockDevice().setNodeState(ro1);
+//                    bdi.getBlockDevice().setDiskState(ds1);
+//                    bdi.getBlockDevice().setNodeStateOther(ro2);
+//                    bdi.getBlockDevice().setDiskStateOther(ds2);
+//                    bdi.getBlockDevice().setDrbdFlags(flags);
+                    bdi.updateInfo();
+                    updateInfo = true;
+                }
+            }
+        }
+        p = Pattern.compile("^(?:create|change|exists) peer-device name:(\\S+).*?\\s+volume:(\\S+).*?\\s+done:(\\S+).*");
+        m = p.matcher(output);
+        if (m.matches()) {
+            final String resName = m.group(1);
+            final String volume = m.group(2);
+            final String synced = m.group(3);
+            final String disk = getBackingDiskByResName(resName, volume, hostName);
+            if (disk != null) {
+                final BlockDevInfo bdi = drbdGraph.findBlockDevInfo(hostName, disk);
+                if (bdi != null) {
+                    bdi.getBlockDevice()
+                       .setDrbdBackingDisk(disk);
+                    bdi.getBlockDevice().setSyncedProgressInPercents(synced);
+//                    bdi.getBlockDevice().setNodeState(ro1);
+//                    bdi.getBlockDevice().setDiskState(ds1);
+//                    bdi.getBlockDevice().setNodeStateOther(ro2);
+//                    bdi.getBlockDevice().setDiskStateOther(ds2);
+//                    bdi.getBlockDevice().setDrbdFlags(flags);
+                    bdi.updateInfo();
+                    updateInfo = true;
+                }
+            }
+        }
+        return updateInfo;
     }
 
     /** Removes the resource from resources, so that it does not reappear. */

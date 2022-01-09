@@ -210,6 +210,9 @@ public class BlockDevice extends ResourceValue {
     }
 
     public void setConnectionState(final String connectionState) {
+        if ("Off".equals(connectionState) || "Established".equals(connectionState)) {
+            return;
+        }
         this.connectionState = connectionState;
     }
 
