@@ -1405,12 +1405,7 @@ public class DrbdXml {
                 final BlockDevInfo bdi = drbdGraph.findBlockDevInfo(hostName, disk);
                 if (bdi != null) {
                     bdi.getBlockDevice().setDrbdBackingDisk(disk);
-//                    bdi.getBlockDevice().setConnectionState(cs);
                     bdi.getBlockDevice().setNodeState(ro1);
-//                    bdi.getBlockDevice().setDiskState(ds1);
-//                    bdi.getBlockDevice().setNodeStateOther(ro2);
-//                    bdi.getBlockDevice().setDiskStateOther(ds2);
-//                    bdi.getBlockDevice().setDrbdFlags(flags);
                     bdi.updateInfo();
                     updateInfo = true;
                 }
@@ -1430,12 +1425,7 @@ public class DrbdXml {
                 final BlockDevInfo bdi = drbdGraph.findBlockDevInfo(hostName, disk);
                 if (bdi != null) {
                     bdi.getBlockDevice().setDrbdBackingDisk(disk);
-//                    bdi.getBlockDevice().setConnectionState(cs);
-//                    bdi.getBlockDevice().setNodeState(ro1);
                     bdi.getBlockDevice().setDiskState(ds1);
-//                    bdi.getBlockDevice().setNodeStateOther(ro2);
-//                    bdi.getBlockDevice().setDiskStateOther(ds2);
-//                    bdi.getBlockDevice().setDrbdFlags(flags);
                     bdi.updateInfo();
                     updateInfo = true;
                 }
@@ -1453,11 +1443,23 @@ public class DrbdXml {
                 if (bdi != null) {
                     bdi.getBlockDevice().setDrbdBackingDisk(disk);
                     bdi.getBlockDevice().setConnectionState(cs);
-//                    bdi.getBlockDevice().setNodeState(ro1);
-//                    bdi.getBlockDevice().setDiskState(ds1);
-//                    bdi.getBlockDevice().setNodeStateOther(ro2);
-//                    bdi.getBlockDevice().setDiskStateOther(ds2);
-//                    bdi.getBlockDevice().setDrbdFlags(flags);
+                    bdi.updateInfo();
+                    updateInfo = true;
+                }
+            }
+        }
+        p = Pattern.compile("^(?:create|change|exists) connection name:(\\S+).*?\\s+role:(\\S+).*");
+        m = p.matcher(output);
+        if (m.matches()) {
+            final String resName = m.group(1);
+            final String ro1 = m.group(2);
+            /* get blockdevice object from device */
+            final String disk = getBackingDiskByResName(resName, "0", hostName);
+            if (disk != null) {
+                final BlockDevInfo bdi = drbdGraph.findBlockDevInfo(hostName, disk);
+                if (bdi != null) {
+                    bdi.getBlockDevice().setDrbdBackingDisk(disk);
+                    bdi.getBlockDevice().setNodeStateOther(ro1);
                     bdi.updateInfo();
                     updateInfo = true;
                 }
@@ -1476,12 +1478,7 @@ public class DrbdXml {
                 if (bdi != null) {
                     bdi.getBlockDevice()
                        .setDrbdBackingDisk(disk);
-//                    bdi.getBlockDevice().setConnectionState(cs);
-//                    bdi.getBlockDevice().setNodeState(ro1);
-//                    bdi.getBlockDevice().setDiskState(ds1);
-//                    bdi.getBlockDevice().setNodeStateOther(ro2);
                     bdi.getBlockDevice().setDiskStateOther(ds2);
-//                    bdi.getBlockDevice().setDrbdFlags(flags);
                     bdi.updateInfo();
                     updateInfo = true;
                 }
@@ -1497,14 +1494,8 @@ public class DrbdXml {
             if (disk != null) {
                 final BlockDevInfo bdi = drbdGraph.findBlockDevInfo(hostName, disk);
                 if (bdi != null) {
-                    bdi.getBlockDevice()
-                       .setDrbdBackingDisk(disk);
+                    bdi.getBlockDevice().setDrbdBackingDisk(disk);
                     bdi.getBlockDevice().setConnectionState(replication);
-//                    bdi.getBlockDevice().setNodeState(ro1);
-//                    bdi.getBlockDevice().setDiskState(ds1);
-//                    bdi.getBlockDevice().setNodeStateOther(ro2);
-//                    bdi.getBlockDevice().setDiskStateOther(ds2);
-//                    bdi.getBlockDevice().setDrbdFlags(flags);
                     bdi.updateInfo();
                     updateInfo = true;
                 }
@@ -1523,11 +1514,6 @@ public class DrbdXml {
                     bdi.getBlockDevice()
                        .setDrbdBackingDisk(disk);
                     bdi.getBlockDevice().setSyncedProgressInPercents(synced);
-//                    bdi.getBlockDevice().setNodeState(ro1);
-//                    bdi.getBlockDevice().setDiskState(ds1);
-//                    bdi.getBlockDevice().setNodeStateOther(ro2);
-//                    bdi.getBlockDevice().setDiskStateOther(ds2);
-//                    bdi.getBlockDevice().setDrbdFlags(flags);
                     bdi.updateInfo();
                     updateInfo = true;
                 }
@@ -1549,11 +1535,6 @@ public class DrbdXml {
                     if ("split-brain".equals(helper)) {
                         bdi.getBlockDevice().setSplitBrain(true);
                     }
-//                    bdi.getBlockDevice().setNodeState(ro1);
-//                    bdi.getBlockDevice().setDiskState(ds1);
-//                    bdi.getBlockDevice().setNodeStateOther(ro2);
-//                    bdi.getBlockDevice().setDiskStateOther(ds2);
-//                    bdi.getBlockDevice().setDrbdFlags(flags);
                     bdi.updateInfo();
                     updateInfo = true;
                 }
