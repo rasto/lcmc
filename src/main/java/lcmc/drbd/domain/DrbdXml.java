@@ -1442,12 +1442,11 @@ public class DrbdXml {
             }
             return false;
         }
-        p = Pattern.compile("^(?:create|change|exists) connection name:(\\S+).*?\\s+connection:(\\S+)\\s+role:(\\S+).*");
+        p = Pattern.compile("^(?:create|change|exists) connection name:(\\S+).*?\\s+connection:(\\S+).*");
         m = p.matcher(output);
         if (m.matches()) {
             final String resName = m.group(1);
             final String cs = m.group(2);
-            final String ro1 = m.group(3);
             /* get blockdevice object from device */
             final String disk = getBackingDiskByResName(resName, "0", hostName);
             if (disk != null) {
