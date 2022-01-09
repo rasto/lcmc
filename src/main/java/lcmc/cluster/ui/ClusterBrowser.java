@@ -43,6 +43,7 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.function.BiConsumer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import javax.annotation.Resource;
 import javax.inject.Named;
@@ -55,6 +56,7 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import org.apache.commons.collections15.map.LinkedMap;
 import org.apache.commons.collections15.map.MultiKeyMap;
 
+import com.google.common.collect.Lists;
 import com.google.common.collect.Table;
 import com.google.common.eventbus.Subscribe;
 
@@ -772,7 +774,8 @@ public class ClusterBrowser extends Browser {
     void startDrbdStatusOnAllHosts() {
         final Host[] hosts = cluster.getHostsArray();
         for (final Host host : hosts) {
-            final Thread thread = new Thread(() -> startDrbdStatus(host));
+            final var otherHosts = Lists.newArrayList(hosts).stream().filter(h -> !h.equals(host)).collect(Collectors.toList());
+            final Thread thread = new Thread(() -> startDrbdStatus(host, otherHosts));
             thread.start();
         }
     }
@@ -788,7 +791,7 @@ public class ClusterBrowser extends Browser {
         }
     }
 
-    void startDrbdStatus(final Host host) {
+    void startDrbdStatus(final Host host, final List<Host> otherHosts) {
         final CountDownLatch firstTime = new CountDownLatch(1);
         host.setDrbdStatusOk(false);
         final String hostName = host.getName();
@@ -887,7 +890,8 @@ public class ClusterBrowser extends Browser {
                                 host.drbdStatusUnlock();
                                 event = host.getHostParser()
                                             .getOutput("event", outputBuffer);
-                                if (event != null && drbdXml.parseDrbdEvent(host.getName(), drbdGraph, event)) {
+                                if (event != null && drbdXml.parseDrbdEvent(host.getName(), otherHosts.stream().map(it -> it.getName()).collect(
+                                        Collectors.toList()), drbdGraph, event)) {
                                     host.setDrbdStatusOk(true);
                                     eventUpdate = true;
                                 }

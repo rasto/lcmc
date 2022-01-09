@@ -1277,7 +1277,7 @@ public class DrbdXml {
      * Parses events from drbd kernel module obtained via drbdsetup .. events
      * command and stores the values in the BlockDevice object.
      */
-    public boolean parseDrbdEvent(final String hostName, final DrbdGraph drbdGraph, final String rawOutput) {
+    public boolean parseDrbdEvent(final String hostName, final List<String> otherHostNames, final DrbdGraph drbdGraph, final String rawOutput) {
         if (rawOutput == null || hostName == null) {
             return false;
         }
@@ -1452,14 +1452,14 @@ public class DrbdXml {
         m = p.matcher(output);
         if (m.matches()) {
             final String resName = m.group(1);
-            final String ro1 = m.group(2);
+            final String ro2 = m.group(2);
             /* get blockdevice object from device */
-            final String disk = getBackingDiskByResName(resName, "0", hostName);
+            final String disk = getBackingDiskByResName(resName, "0", otherHostNames.get(0));
             if (disk != null) {
-                final BlockDevInfo bdi = drbdGraph.findBlockDevInfo(hostName, disk);
+                val bdi = drbdGraph.findBlockDevInfo(otherHostNames.get(0), disk);
                 if (bdi != null) {
                     bdi.getBlockDevice().setDrbdBackingDisk(disk);
-                    bdi.getBlockDevice().setNodeStateOther(ro1);
+                    bdi.getBlockDevice().setNodeState(ro2);
                     bdi.updateInfo();
                     updateInfo = true;
                 }
@@ -1472,13 +1472,13 @@ public class DrbdXml {
             final String volume = m.group(2);
             final String ds2 = m.group(3);
             /* get blockdevice object from device */
-            final String disk = getBackingDiskByResName(resName, volume, hostName);
-            if (disk != null) {
-                final BlockDevInfo bdi = drbdGraph.findBlockDevInfo(hostName, disk);
+            final String otherDisk = getBackingDiskByResName(resName, volume, otherHostNames.get(0));
+            if (otherDisk != null) {
+                final BlockDevInfo bdi = drbdGraph.findBlockDevInfo(otherHostNames.get(0), otherDisk);
                 if (bdi != null) {
                     bdi.getBlockDevice()
-                       .setDrbdBackingDisk(disk);
-                    bdi.getBlockDevice().setDiskStateOther(ds2);
+                       .setDrbdBackingDisk(otherDisk);
+                    bdi.getBlockDevice().setDiskState(ds2);
                     bdi.updateInfo();
                     updateInfo = true;
                 }

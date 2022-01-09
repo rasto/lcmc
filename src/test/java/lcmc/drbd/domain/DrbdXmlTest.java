@@ -27,6 +27,7 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.when;
 
 import java.io.IOException;
+import java.util.List;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -218,7 +219,7 @@ class DrbdXmlTest {
         when(blockDevInfo.getBlockDevice()).thenReturn(blockDevice);
         when(drbdGraph.findBlockDevInfo("host1", "/dev/sda1")).thenReturn(blockDevInfo);
 
-        boolean ret = drbdXml.parseDrbdEvent("host1", drbdGraph, "40 ST 0,r0[0] { cs:WFReportParams ro:Secondary/Unknown ds:Attaching/DUnknown r--- }");
+        boolean ret = drbdXml.parseDrbdEvent("host1", List.of("host2"), drbdGraph, "40 ST 0,r0[0] { cs:WFReportParams ro:Secondary/Unknown ds:Attaching/DUnknown r--- }");
 
         assertThat(ret).isTrue();
         assertThat(blockDevice.isSyncing()).isFalse();
@@ -243,11 +244,10 @@ class DrbdXmlTest {
         when(blockDevInfo.getBlockDevice()).thenReturn(blockDevice);
         when(drbdGraph.findBlockDevInfo("host1", "/dev/sda1")).thenReturn(blockDevInfo);
 
-//        boolean ret = drbdXml.parseDrbdEvent("host1", drbdGraph, "40 ST 0,r0[0] { cs:WFReportParams ro:Secondary/Unknown ds:Attaching/DUnknown r--- }");
-        boolean ret = drbdXml.parseDrbdEvent("host1", drbdGraph, "create resource name:r0 role:Secondary suspended:no may_promote:no promotion_score:0");
-        drbdXml.parseDrbdEvent("host1", drbdGraph, "create device name:r0 volume:0 minor:0 backing_dev:none disk:Diskless client:no quorum:yes");
-        drbdXml.parseDrbdEvent("host1", drbdGraph, "create connection name:r0 peer-node-id:1 conn-name:centos8-b connection:StandAlone role:Unknown");
-        drbdXml.parseDrbdEvent("host1", drbdGraph, "create peer-device name:r0 peer-node-id:1 conn-name:centos8-b volume:0 replication:Off peer-disk:DUnknown peer-client:no resync-suspended:no");
+        boolean ret = drbdXml.parseDrbdEvent("host1", List.of("host2"), drbdGraph, "create resource name:r0 role:Secondary suspended:no may_promote:no promotion_score:0");
+        drbdXml.parseDrbdEvent("host1", List.of("host2"), drbdGraph, "create device name:r0 volume:0 minor:0 backing_dev:none disk:Diskless client:no quorum:yes");
+        drbdXml.parseDrbdEvent("host1", List.of("host2"), drbdGraph, "create connection name:r0 peer-node-id:1 conn-name:centos8-b connection:StandAlone role:Unknown");
+        drbdXml.parseDrbdEvent("host1", List.of("host2"), drbdGraph, "create peer-device name:r0 peer-node-id:1 conn-name:centos8-b volume:0 replication:Off peer-disk:DUnknown peer-client:no resync-suspended:no");
 
         assertThat(ret).isTrue();
         assertThat(blockDevice.isSyncing()).isFalse();
@@ -261,7 +261,6 @@ class DrbdXmlTest {
         assertThat(blockDevice.getNodeState()).isEqualTo("Secondary");
         assertThat(blockDevice.getConnectionState()).isEqualTo("StandAlone");
         assertThat(blockDevice.getDiskState()).isEqualTo("Diskless");
-        assertThat(blockDevice.getDiskStateOther()).isEqualTo("DUnknown");
     }
 
     @Test
@@ -273,9 +272,8 @@ class DrbdXmlTest {
         when(drbdGraph.findBlockDevInfo("host1", "/dev/sda1")).thenReturn(blockDevInfo);
         drbdEventsConnect();
 
-//        boolean ret = drbdXml.parseDrbdEvent("host1", drbdGraph, "40 ST 0,r0[0] { cs:WFReportParams ro:Secondary/Unknown ds:Attaching/DUnknown r--- }");
-        boolean ret = drbdXml.parseDrbdEvent("host1", drbdGraph, "exists peer-device name:r0 peer-node-id:1 conn-name:centos8-b volume:0 replication:SyncSource peer-disk:Inconsistent peer-client:no resync-suspended:no done:1.84");
-        drbdXml.parseDrbdEvent("host1", drbdGraph, "change peer-device name:r0 peer-node-id:0 conn-name:centos8-a volume:0 done:1.14");
+        boolean ret = drbdXml.parseDrbdEvent("host1", List.of("host2"), drbdGraph, "exists peer-device name:r0 peer-node-id:1 conn-name:centos8-b volume:0 replication:SyncSource peer-disk:Inconsistent peer-client:no resync-suspended:no done:1.84");
+        drbdXml.parseDrbdEvent("host1", List.of("host2"), drbdGraph, "change peer-device name:r0 peer-node-id:0 conn-name:centos8-a volume:0 done:1.14");
 
         assertThat(ret).isTrue();
         assertThat(blockDevice.isSyncing()).isTrue();
@@ -291,7 +289,6 @@ class DrbdXmlTest {
         when(blockDevInfo.getBlockDevice()).thenReturn(blockDevice);
         when(drbdGraph.findBlockDevInfo("host1", "/dev/sda1")).thenReturn(blockDevInfo);
 
-//        boolean ret = drbdXml.parseDrbdEvent("host1", drbdGraph, "40 ST 0,r0[0] { cs:WFReportParams ro:Secondary/Unknown ds:Attaching/DUnknown r--- }");
         boolean ret = drbdEventsConnect();
 
         assertThat(ret).isTrue();
@@ -306,7 +303,6 @@ class DrbdXmlTest {
         assertThat(blockDevice.getNodeState()).isEqualTo("Secondary");
         assertThat(blockDevice.getConnectionState()).isEqualTo("Connected");
         assertThat(blockDevice.getDiskState()).isEqualTo("Inconsistent");
-        assertThat(blockDevice.getDiskStateOther()).isEqualTo("Inconsistent");
     }
 
     @Test
@@ -318,26 +314,26 @@ class DrbdXmlTest {
         when(drbdGraph.findBlockDevInfo("host1", "/dev/sda1")).thenReturn(blockDevInfo);
         drbdEventsConnect();
 
-        val ret = drbdXml.parseDrbdEvent("host1", drbdGraph, "call helper name:r0 peer-node-id:1 conn-name:centos8-b volume:0 minor:0 helper:split-brain");
+        val ret = drbdXml.parseDrbdEvent("host1", List.of("host2"), drbdGraph, "call helper name:r0 peer-node-id:1 conn-name:centos8-b volume:0 minor:0 helper:split-brain");
 
         assertThat(ret).isTrue();
         assertThat(blockDevice.isSplitBrain()).isTrue();
     }
 
     private boolean drbdEventsConnect() {
-        boolean ret = drbdXml.parseDrbdEvent("host1", drbdGraph, "create resource name:r0 role:Secondary suspended:no may_promote:no promotion_score:0");
-        drbdXml.parseDrbdEvent("host1", drbdGraph, "create device name:r0 volume:0 minor:0 backing_dev:none disk:Diskless client:no quorum:yes");
-        drbdXml.parseDrbdEvent("host1", drbdGraph, "create connection name:r0 peer-node-id:1 conn-name:centos8-b connection:StandAlone role:Unknown");
-        drbdXml.parseDrbdEvent("host1", drbdGraph, "create peer-device name:r0 peer-node-id:1 conn-name:centos8-b volume:0 replication:Off peer-disk:DUnknown peer-client:no resync-suspended:no");
+        boolean ret = drbdXml.parseDrbdEvent("host1", List.of("host2"), drbdGraph, "create resource name:r0 role:Secondary suspended:no may_promote:no promotion_score:0");
+        drbdXml.parseDrbdEvent("host1", List.of("host2"), drbdGraph, "create device name:r0 volume:0 minor:0 backing_dev:none disk:Diskless client:no quorum:yes");
+        drbdXml.parseDrbdEvent("host1", List.of("host2"), drbdGraph, "create connection name:r0 peer-node-id:1 conn-name:centos8-b connection:StandAlone role:Unknown");
+        drbdXml.parseDrbdEvent("host1", List.of("host2"), drbdGraph, "create peer-device name:r0 peer-node-id:1 conn-name:centos8-b volume:0 replication:Off peer-disk:DUnknown peer-client:no resync-suspended:no");
 
-        drbdXml.parseDrbdEvent("host1", drbdGraph, "change device name:r0 volume:0 minor:0 backing_dev:none disk:Attaching client:no quorum:yes");
-        drbdXml.parseDrbdEvent("host1", drbdGraph, "change device name:r0 volume:0 minor:0 backing_dev:/dev/sdb disk:Inconsistent client:no quorum:yes");
-        drbdXml.parseDrbdEvent("host1", drbdGraph, "change connection name:r0 peer-node-id:1 conn-name:centos8-b connection:Unconnected");
-        drbdXml.parseDrbdEvent("host1", drbdGraph, "change connection name:r0 peer-node-id:1 conn-name:centos8-b connection:Connecting");
-        drbdXml.parseDrbdEvent("host1", drbdGraph, "change path name:r0 peer-node-id:1 conn-name:centos8-b local:ipv4:192.168.133.80:7788 peer:ipv4:192.168.133.83:7788 established:yes");
-        drbdXml.parseDrbdEvent("host1", drbdGraph, "change peer-device name:r0 peer-node-id:1 conn-name:centos8-b volume:0");
-        drbdXml.parseDrbdEvent("host1", drbdGraph, "change connection name:r0 peer-node-id:1 conn-name:centos8-b connection:Connected role:Secondary");
-        drbdXml.parseDrbdEvent("host1", drbdGraph, "change peer-device name:r0 peer-node-id:1 conn-name:centos8-b volume:0 replication:Established peer-disk:Inconsistent peer-client:no");
+        drbdXml.parseDrbdEvent("host1", List.of("host2"), drbdGraph, "change device name:r0 volume:0 minor:0 backing_dev:none disk:Attaching client:no quorum:yes");
+        drbdXml.parseDrbdEvent("host1", List.of("host2"), drbdGraph, "change device name:r0 volume:0 minor:0 backing_dev:/dev/sdb disk:Inconsistent client:no quorum:yes");
+        drbdXml.parseDrbdEvent("host1", List.of("host2"), drbdGraph, "change connection name:r0 peer-node-id:1 conn-name:centos8-b connection:Unconnected");
+        drbdXml.parseDrbdEvent("host1", List.of("host2"), drbdGraph, "change connection name:r0 peer-node-id:1 conn-name:centos8-b connection:Connecting");
+        drbdXml.parseDrbdEvent("host1", List.of("host2"), drbdGraph, "change path name:r0 peer-node-id:1 conn-name:centos8-b local:ipv4:192.168.133.80:7788 peer:ipv4:192.168.133.83:7788 established:yes");
+        drbdXml.parseDrbdEvent("host1", List.of("host2"), drbdGraph, "change peer-device name:r0 peer-node-id:1 conn-name:centos8-b volume:0");
+        drbdXml.parseDrbdEvent("host1", List.of("host2"), drbdGraph, "change connection name:r0 peer-node-id:1 conn-name:centos8-b connection:Connected role:Secondary");
+        drbdXml.parseDrbdEvent("host1", List.of("host2"), drbdGraph, "change peer-device name:r0 peer-node-id:1 conn-name:centos8-b volume:0 replication:Established peer-disk:Inconsistent peer-client:no");
         return ret;
     }
 
