@@ -444,9 +444,7 @@ public class VolumeInfo extends EditableInfo implements CommonDeviceInterface {
         if (getDrbdVolume().isCommited()) {
             for (final Host host : hosts0) {
                 DRBD.setSecondary(host, getDrbdResourceInfo().getName(), getName(), runMode);
-                if (!host.hasVolumes()) {
-                    DRBD.disconnect(host, getDrbdResourceInfo().getName(), null, runMode);
-                }
+                DRBD.disconnect(host, getDrbdResourceInfo().getName(), null, runMode);
                 for (final BlockDevInfo bdi : getBlockDevInfos()) {
                     if (bdi.getHost() == host) {
                         if (bdi.getBlockDevice().isAttached()) {
