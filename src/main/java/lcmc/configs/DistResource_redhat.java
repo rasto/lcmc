@@ -36,12 +36,15 @@ public final class DistResource_redhat extends ListResourceBundle {
         {"version:Red Hat Enterprise Linux ES release 4 (Nahant Update 2)", "4_Nahant_2"},
         {"version:CentOS release 5*", "5"},
         {"version:CentOS Linux release 6*", "6"},
+        {"version:CentOS release 6*", "6"},
+        {"version:Red Hat Enterprise Linux Server release 6*", "6"},
         {"version:CentOS Linux release 7*", "7"},
         {"version:CentOS Linux release 8*", "8"},
         {"version:AlmaLinux release 8*", "8"},
         {"version:Rocky Linux release 8*", "8"},
-        {"version:CentOS release 6*", "6"},
-        {"version:Red Hat Enterprise Linux Server release 6*", "6"},
+        {"version:CentOS Linux release 9*", "9"},
+        {"version:AlmaLinux release 9*", "9"},
+        {"version:Rocky Linux release 9*", "9"},
         /* directory capturing regexp on the website from the kernel version */
         {"kerneldir", "(\\d+\\.\\d+\\.\\d+-\\d+.*?el\\d+).*"},
 
