@@ -53,7 +53,7 @@ public final class DistResource_ubuntu extends ListResourceBundle {
 
         {"HbPmInst.install.1",
          "apt-get update && DEBIAN_FRONTEND=noninteractive DEBIAN_FRONTEND=noninteractive /usr/bin/apt-get -y install -o"
-         + " 'DPkg::Options::force=--force-confnew' pacemaker crmsh heartbeat"
+         + " 'DPkg::Options::force=--force-confnew' pacemaker crmsh heartbeat resource-agents"
          + " && /usr/sbin/update-rc.d -f corosync remove"},
 
         /* pacemaker corosync install method 1 */
@@ -62,7 +62,7 @@ public final class DistResource_ubuntu extends ListResourceBundle {
 
         {"PmInst.install.1",
          "apt-get update && DEBIAN_FRONTEND=noninteractive /usr/bin/apt-get -y install -o"
-         + " 'DPkg::Options::force=--force-confnew' pacemaker crmsh corosync "
+         + " 'DPkg::Options::force=--force-confnew' pacemaker crmsh corosync resource-agents"
          + " && mkdir -p /var/log/cluster"
          + " && (grep 'START=no' /etc/default/corosync && echo 'START=yes'>>/etc/default/corosync; true)"
          + " && if [ -e /etc/corosync/corosync.conf ];then"
