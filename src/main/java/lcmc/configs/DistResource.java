@@ -249,9 +249,9 @@ public final class DistResource extends ListResourceBundle {
         {"DRBD.setSecondary",  "echo|" + SUDO + "/sbin/drbdadm @DRYRUN@ secondary @RES@"},
         {"DRBD.createMDDestroyData",
          SUDO + "dd if=/dev/zero of=@DEVICE@ bs=1024 count=8;"
-         + " echo -e \"yes\\nyes\"|" + SUDO + "/sbin/drbdadm @DRYRUN@ create-md @RES-VOL@"},
+         + " echo -e \"yes\\nyes\"|" + SUDO + "/sbin/drbdadm @DRYRUN@ -- --force create-md @RES-VOL@"},
         {"DRBD.createMD",
-         "echo -e \"yes\\nyes\"|" + SUDO + "/sbin/drbdadm @DRYRUN@ create-md @RES-VOL@"},
+         "echo -e \"yes\\nyes\"|" + SUDO + "/sbin/drbdadm @DRYRUN@ -- --force create-md @RES-VOL@"},
 
         {"DRBD.forcePrimary",
          "echo|" + SUDO + "/sbin/drbdadm @DRYRUN@ primary @RES@ --force"},
