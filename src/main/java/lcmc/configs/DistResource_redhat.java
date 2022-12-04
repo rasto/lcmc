@@ -94,7 +94,7 @@ public final class DistResource_redhat extends ListResourceBundle {
          "dnf install: 9.x.x"},
 
         {"DrbdInst.install.3",
-         "/bin/dnf -y install kmod-drbd* drbd*"},
+         "/bin/dnf -y install kmod-drbd* drbd* drbd-pacemaker"},
 
         {"HbCheck.version",
          DistResource.SUDO + "@GUI-HELPER@ get-cluster-versions;"
