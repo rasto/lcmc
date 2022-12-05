@@ -111,6 +111,8 @@ public class CrmXml {
     private static final String TARGET_ROLE_STARTED = "started";
     private static final String TARGET_ROLE_MASTER = "master";
     public static final String TARGET_ROLE_SLAVE = "slave";
+    public static final String TARGET_ROLE_PROMOTED = "Promoted";
+    public static final String TARGET_ROLE_UNPROMOTED = "Unpromoted";
     public static final Value INFINITY_VALUE = new StringValue("INFINITY");
     public static final Value PLUS_INFINITY_VALUE = new StringValue("+INFINITY");
     public static final Value MINUS_INFINITY_VALUE = new StringValue("-INFINITY");
@@ -2165,13 +2167,13 @@ public class CrmXml {
                             runningOnList = new ArrayList<>();
                         }
                         runningOnList.add(node);
-                    } else if (TARGET_ROLE_MASTER.equalsIgnoreCase(setNode.getNodeName())) {
+                    } else if (TARGET_ROLE_PROMOTED.equalsIgnoreCase(setNode.getNodeName()) || TARGET_ROLE_MASTER.equalsIgnoreCase(setNode.getNodeName())) {
                         final String node = XMLTools.getText(setNode);
                         if (masterOnList == null) {
                             masterOnList = new ArrayList<>();
                         }
                         masterOnList.add(node);
-                    } else if (TARGET_ROLE_SLAVE.equalsIgnoreCase(setNode.getNodeName())) {
+                    } else if (TARGET_ROLE_UNPROMOTED.equalsIgnoreCase(setNode.getNodeName()) || TARGET_ROLE_SLAVE.equalsIgnoreCase(setNode.getNodeName())) {
                         final String node = XMLTools.getText(setNode);
                         if (slaveOnList == null) {
                             slaveOnList = new ArrayList<>();
