@@ -1,0 +1,4 @@
+ Master/Slave Set: ms_Stateful_1 [res_Stateful_1]
+     Stopped (disabled): [ host host ]
+ Master/Slave Set: ms_Stateful_2 [res_Stateful_2]
+     Stopped (disabled): [ host host ]

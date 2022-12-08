@@ -1,0 +1,3 @@
+ Master/Slave Set: ms_drbd_xy [res_drbd_xy]
+     Stopped: [ host host ]
+ res_Filesystem_xy	(ocf::heartbeat:Filesystem):	(target-role:stopped) Stopped

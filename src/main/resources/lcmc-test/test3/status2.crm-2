@@ -1,0 +1,4 @@
+ Clone Set: ms_drbd_1 [res_drbd_1] (promotable)
+     Masters: [ host ]
+     Slaves: [ host ]
+ res_Filesystem_1	(ocf::heartbeat:Filesystem):	Started

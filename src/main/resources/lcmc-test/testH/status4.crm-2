@@ -1,0 +1,2 @@
+ stonith_external_ipmi_1	(stonith:external/ipmi):	Stopped (disabled)
+ stonith_external_ipmi_2	(stonith:external/ipmi):	Stopped (disabled)

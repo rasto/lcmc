@@ -1,0 +1,4 @@
+ Resource Group: grp_1
+     res_Dummy_1	(ocf::heartbeat:Dummy):	(target-role:stopped) Stopped
+ Resource Group: grp_2
+     res_Dummy_2	(ocf::heartbeat:Dummy):	(target-role:stopped) Stopped

@@ -1,0 +1,3 @@
+Full List of Resources:
+  * res_Dummy_1	(ocf:heartbeat:Dummy):	 Started
+  * res_Dummy_2	(ocf:heartbeat:Dummy):	 Started

@@ -1,0 +1,6 @@
+ res_Dummy_1	(ocf::heartbeat:Dummy):	(target-role:stopped) Stopped
+ res_Dummy_2	(ocf::heartbeat:Dummy):	(target-role:stopped) Stopped
+ res_Dummy_3	(ocf::heartbeat:Dummy):	(target-role:stopped) Stopped
+ res_Dummy_4	(ocf::heartbeat:Dummy):	(target-role:stopped) Stopped
+ res_Dummy_5	(ocf::heartbeat:Dummy):	(target-role:stopped) Stopped
+ res_Dummy_6	(ocf::heartbeat:Dummy):	(target-role:stopped) Stopped

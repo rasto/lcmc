@@ -1,0 +1,4 @@
+Full List of Resources:
+  * Clone Set: ms_drbd_xy [res_drbd_xy] (promotable, disabled):
+    * Stopped (disabled): [ host host ]
+  * res_Filesystem_xy	(ocf:heartbeat:Filesystem):	 Stopped (disabled)
