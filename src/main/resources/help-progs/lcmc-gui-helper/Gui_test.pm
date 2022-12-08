@@ -8,7 +8,7 @@ sub gui_test_compare {
     my $try = 0;
     do {
         my $testfile;
-        if ($try > 1) {
+        if ($try > 0) {
             $testfile = "$testfile_part-$try";
         }
         else {
@@ -37,6 +37,8 @@ sub gui_test_compare {
         print TEST $test;
         close TEST;
         $diff .= Command::_exec("diff -u $testfile.error.file $testfile.error") . "\n";
+		unlink "$testfile.error" or die "$!";
+        unlink "$testfile.error.file" or die "$!";
         $try++;
     } until ($realconf eq $test || !-e "$testfile_part-$try");
     if ($realconf eq $test) {
@@ -46,6 +48,17 @@ sub gui_test_compare {
         print "error\n";
         print "-------------\n";
         print $diff;
+        my $testfile;
+        if ($try > 0) {
+            $testfile = "$testfile_part-$try";
+        }
+        else {
+            $testfile = $testfile_part;
+        }
+        open TEST, ">$testfile" or print "$!";
+        print TEST $realconf;
+        close TEST;
+
         exit 1;
     }
 }
