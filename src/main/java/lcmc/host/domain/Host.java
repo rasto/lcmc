@@ -933,23 +933,11 @@ public class Host implements Comparable<Host>, Value {
             h++;
         }
         command.append(" 2>&1");
-        int i = 0;
-        SshOutput out;
-        do {
-            out = getSSH().execCommandAndWait(new ExecCommandConfig().command(command.toString())
+        SshOutput out = getSSH().execCommandAndWait(new ExecCommandConfig().command(command.toString())
                                                                      .sshCommandTimeout(60000));
-            if (out.getExitCode() == 0 || out.getExitCode() == 10) {
-                break;
-            }
-            i++;
-            roboTest.sleepNoFactor(i * 2000);
-        } while (i < 5);
         String nameS = ' ' + name;
         if (name == null) {
             nameS = "";
-        }
-        if (i > 0) {
-            roboTest.info(getName() + ' ' + test + ' ' + index + nameS + " tries: " + (i + 1));
         }
         roboTest.info(getName() + ' ' + test + ' ' + index + nameS + ' ' + out.getOutput());
     }

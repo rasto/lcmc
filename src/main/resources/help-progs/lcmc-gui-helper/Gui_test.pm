@@ -1,17 +1,48 @@
 package Gui_Test;
 
+our $suffix;
+
 sub gui_test_compare {
+    my $testfile_part = shift;
+    my $realconf = shift;
+
+	my $try = 0;
+	my $res;
+    do {
+		sleep($try * 10);
+        $suffix = 0;
+        $res = gui_test_compare_once($testfile_part, $realconf);
+		$try++;
+    } until ($res == 0 || $try > 3);
+
+    if ($res == 0) {
+        print "ok ";
+    } else {
+        my $testfile;
+        if ($suffix > 0) {
+            $testfile = "$testfile_part-$suffix";
+        }
+        else {
+            $testfile = $testfile_part;
+        }
+        open TEST, ">$testfile" or print "$!";
+        print TEST $realconf;
+        close TEST;
+        print "failed ";
+		exit 1;
+    }
+}
+
+sub gui_test_compare_once {
     my $testfile_part = shift;
     my $realconf = remove_spaces(shift);
     my $test = "";
     my $diff = "";
-    my $try = 0;
     do {
         my $testfile;
-        if ($try > 0) {
-            $testfile = "$testfile_part-$try";
-        }
-        else {
+        if ($suffix > 0) {
+            $testfile = "$testfile_part-$suffix";
+        } else {
             $testfile = $testfile_part;
         }
         my $notestfile;
@@ -22,8 +53,7 @@ sub gui_test_compare {
             print TEST $test;
             close TEST;
             $notestfile++;
-        }
-        else {
+        } else {
             {
                 local $/;
                 $test = remove_spaces(<TEST>);
@@ -39,27 +69,15 @@ sub gui_test_compare {
         $diff .= Command::_exec("diff -u $testfile.error.file $testfile.error") . "\n";
 		unlink "$testfile.error" or die "$!";
         unlink "$testfile.error.file" or die "$!";
-        $try++;
-    } until ($realconf eq $test || !-e "$testfile_part-$try");
+        $suffix++;
+    } until ($realconf eq $test || !-e "$testfile_part-$suffix");
     if ($realconf eq $test) {
-        print "ok ";
-    }
-    else {
+		return 0;
+    } else {
         print "error\n";
         print "-------------\n";
         print $diff;
-        my $testfile;
-        if ($try > 0) {
-            $testfile = "$testfile_part-$try";
-        }
-        else {
-            $testfile = $testfile_part;
-        }
-        open TEST, ">$testfile" or print "$!";
-        print TEST $realconf;
-        close TEST;
-
-        exit 1;
+        return 1;
     }
 }
 
