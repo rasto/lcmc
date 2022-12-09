@@ -117,8 +117,8 @@ sub strip_crm_config {
     $crm_config =~ s/^node .*//mg;
     $crm_config =~ s/^\s*attributes .*//mg;
     $crm_config =~ s/\\$//mg;
-    $crm_config =~ s/^\s+//mg;
-    $crm_config =~ s/\s+$//mg;
+    $crm_config =~ s/^\s+//g;
+    $crm_config =~ s/\s+$//g;
     # older crm shell had _rsc_set_
     $crm_config =~ s/_rsc_set_ //g;
     $crm_config =~ s/(start-delay=\d+) (timeout=\d+)/$2 $1/g;
