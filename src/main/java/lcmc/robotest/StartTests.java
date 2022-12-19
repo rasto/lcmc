@@ -372,7 +372,7 @@ public class StartTests {
                 if (roboTest.isAborted()) {
                     break;
                 }
-                pcmkTest3.start(4);
+                pcmkTest3.start(2);
                 if (roboTest.isAborted()) {
                     break;
                 }
@@ -380,39 +380,39 @@ public class StartTests {
                 if (roboTest.isAborted()) {
                     break;
                 }
-                pcmkTest5.start(5);
+                pcmkTest5.start(2);
                 if (roboTest.isAborted()) {
                     break;
                 }
-                pcmkTest6.start(5);
+                pcmkTest6.start(2);
                 if (roboTest.isAborted()) {
                     break;
                 }
-                pcmkTest7.start(5);
+                pcmkTest7.start(2);
                 if (roboTest.isAborted()) {
                     break;
                 }
-                pcmkTest8.start(10);
+                pcmkTest8.start(2);
                 if (roboTest.isAborted()) {
                     break;
                 }
-                pcmkTestA.start(5);
+                pcmkTestA.start(2);
                 if (roboTest.isAborted()) {
                     break;
                 }
-                pcmkTestB.start(5);
+                pcmkTestB.start(2);
                 if (roboTest.isAborted()) {
                     break;
                 }
-                pcmkTestC.start(5);
+                pcmkTestC.start(2);
                 if (roboTest.isAborted()) {
                     break;
                 }
-                pcmkTestD.start(5);
+                pcmkTestD.start(2);
                 if (roboTest.isAborted()) {
                     break;
                 }
-                pcmkTestE.start(5);
+                pcmkTestE.start(2);
                 if (roboTest.isAborted()) {
                     break;
                 }
@@ -424,7 +424,7 @@ public class StartTests {
                 if (roboTest.isAborted()) {
                     break;
                 }
-                pcmkTestH.start(5);
+                pcmkTestH.start(2);
                 if (roboTest.isAborted()) {
                     break;
                 }
