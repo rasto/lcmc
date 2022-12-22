@@ -200,9 +200,6 @@ class DistributionDetectorTest {
 
     private static Stream<Arguments> parametersForDistVersionShouldBeReturned() {
         return Stream.of(Arguments.of("LENNY", "debian", "5.0.8"), Arguments.of("SQUEEZE", "debian", "6.0"),
-                Arguments.of("12", "fedora", "Fedora release 12 (Constantine)"),
-                Arguments.of("13", "fedora", "Fedora release 13 (Goddard)"),
-                Arguments.of("14", "fedora", "Fedora release 14 (Laughlin)"),
                 Arguments.of("5", "redhat", "CentOS release 5.5 (Final)"),
                 Arguments.of("5", "redhat", "CentOS release 5.5 (Final)"),
                 Arguments.of("6", "redhatenterpriseserver", "Red Hat Enterprise Linux Server release 6.0 (Santiago)"),
