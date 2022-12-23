@@ -1,0 +1,41 @@
+Cluster Name: 
+Corosync Nodes:
+Pacemaker Nodes:
+ host host
+
+Resources:
+ Clone: ms_Stateful_1
+  Meta Attrs: clone-max=2 interleave=true notify=true promotable=true target-role=stopped
+  Resource: res_Stateful_1 (class=ocf provider=heartbeat type=Stateful)
+   Operations: start interval=0 timeout=20 (op-res_Stateful_1-start)
+               promote interval=0 timeout=20 (op-res_Stateful_1-promote)
+               demote interval=0 timeout=20 (op-res_Stateful_1-demote)
+               stop interval=0 timeout=20 (op-res_Stateful_1-stop)
+               monitor interval=10 timeout=20 start-delay=0 (op-res_Stateful_1-monitor)
+ Clone: ms_Stateful_2
+  Meta Attrs: clone-max=2 interleave=true notify=true promotable=true target-role=stopped
+  Resource: res_Stateful_2 (class=ocf provider=heartbeat type=Stateful)
+   Operations: start interval=0 timeout=20 (op-res_Stateful_2-start)
+               promote interval=0 timeout=20 (op-res_Stateful_2-promote)
+               demote interval=0 timeout=20 (op-res_Stateful_2-demote)
+               stop interval=0 timeout=20 (op-res_Stateful_2-stop)
+               monitor interval=10 timeout=20 start-delay=0 (op-res_Stateful_2-monitor)
+
+Stonith Devices:
+Fencing Levels:
+
+Location Constraints:
+Ordering Constraints:
+Colocation Constraints:
+Ticket Constraints:
+
+Alerts:
+ No alerts defined
+
+Resources Defaults:
+  Meta Attrs: rsc-options
+Operations Defaults:
+  No defaults set
+
+Cluster Properties:
+ cluster-infrastructure: corosync

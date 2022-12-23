@@ -1,0 +1,41 @@
+Cluster Name: 
+Corosync Nodes:
+Pacemaker Nodes:
+ host host
+
+Resources:
+ Resource: res_Dummy_1 (class=ocf provider=heartbeat type=Dummy)
+  Operations: start interval=0 timeout=200 (op-res_Dummy_1-start)
+              stop interval=0 timeout=192 (op-res_Dummy_1-stop)
+              monitor interval=121 timeout=154 start-delay=0 (op-res_Dummy_1-monitor)
+              migrate_to interval=0 timeout=123 (op-res_Dummy_1-migrate_to)
+              migrate_from interval=0 timeout=122 (op-res_Dummy_1-migrate_from)
+ Resource: res_Dummy_2 (class=ocf provider=heartbeat type=Dummy)
+  Operations: start interval=0 timeout=200 (op-res_Dummy_2-start)
+              stop interval=0 timeout=192 (op-res_Dummy_2-stop)
+              monitor interval=121 timeout=154 start-delay=0 (op-res_Dummy_2-monitor)
+              migrate_to interval=0 timeout=123 (op-res_Dummy_2-migrate_to)
+              migrate_from interval=0 timeout=122 (op-res_Dummy_2-migrate_from)
+
+Stonith Devices:
+Fencing Levels:
+
+Location Constraints:
+Ordering Constraints:
+  Resource Sets:
+    set res_Dummy_2 sequential=false (id:o1-0) setoptions score=INFINITY (id:o1)
+Colocation Constraints:
+  Resource Sets:
+    set res_Dummy_2 sequential=false (id:c1-0) setoptions score=INFINITY (id:c1)
+Ticket Constraints:
+
+Alerts:
+ No alerts defined
+
+Resources Defaults:
+  Meta Attrs: rsc-options
+Operations Defaults:
+  No defaults set
+
+Cluster Properties:
+ cluster-infrastructure: corosync

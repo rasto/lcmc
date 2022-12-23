@@ -1,0 +1,566 @@
+Cluster Name: 
+Corosync Nodes:
+Pacemaker Nodes:
+ host host
+
+Resources:
+  Resource: res_Dummy_1 (class=ocf provider=heartbeat type=Dummy)
+    Operations:
+      start: op-res_Dummy_1-start
+        interval=0
+        timeout=200
+      stop: op-res_Dummy_1-stop
+        interval=0
+        timeout=192
+      monitor: op-res_Dummy_1-monitor
+        interval=121
+        start-delay=0
+        timeout=154
+      migrate_to: op-res_Dummy_1-migrate_to
+        interval=0
+        timeout=123
+      migrate_from: op-res_Dummy_1-migrate_from
+        interval=0
+        timeout=122
+  Resource: res_Dummy_2 (class=ocf provider=heartbeat type=Dummy)
+    Operations:
+      start: op-res_Dummy_2-start
+        interval=0
+        timeout=200
+      stop: op-res_Dummy_2-stop
+        interval=0
+        timeout=192
+      monitor: op-res_Dummy_2-monitor
+        interval=121
+        start-delay=0
+        timeout=154
+      migrate_to: op-res_Dummy_2-migrate_to
+        interval=0
+        timeout=123
+      migrate_from: op-res_Dummy_2-migrate_from
+        interval=0
+        timeout=122
+  Resource: res_Dummy_3 (class=ocf provider=heartbeat type=Dummy)
+    Operations:
+      start: op-res_Dummy_3-start
+        interval=0
+        timeout=200
+      stop: op-res_Dummy_3-stop
+        interval=0
+        timeout=192
+      monitor: op-res_Dummy_3-monitor
+        interval=121
+        start-delay=0
+        timeout=154
+      migrate_to: op-res_Dummy_3-migrate_to
+        interval=0
+        timeout=123
+      migrate_from: op-res_Dummy_3-migrate_from
+        interval=0
+        timeout=122
+  Resource: res_Dummy_4 (class=ocf provider=heartbeat type=Dummy)
+    Operations:
+      start: op-res_Dummy_4-start
+        interval=0
+        timeout=200
+      stop: op-res_Dummy_4-stop
+        interval=0
+        timeout=192
+      monitor: op-res_Dummy_4-monitor
+        interval=121
+        start-delay=0
+        timeout=154
+      migrate_to: op-res_Dummy_4-migrate_to
+        interval=0
+        timeout=123
+      migrate_from: op-res_Dummy_4-migrate_from
+        interval=0
+        timeout=122
+  Resource: res_Dummy_5 (class=ocf provider=heartbeat type=Dummy)
+    Operations:
+      start: op-res_Dummy_5-start
+        interval=0
+        timeout=200
+      stop: op-res_Dummy_5-stop
+        interval=0
+        timeout=192
+      monitor: op-res_Dummy_5-monitor
+        interval=121
+        start-delay=0
+        timeout=154
+      migrate_to: op-res_Dummy_5-migrate_to
+        interval=0
+        timeout=123
+      migrate_from: op-res_Dummy_5-migrate_from
+        interval=0
+        timeout=122
+  Resource: res_Dummy_6 (class=ocf provider=heartbeat type=Dummy)
+    Operations:
+      start: op-res_Dummy_6-start
+        interval=0
+        timeout=200
+      stop: op-res_Dummy_6-stop
+        interval=0
+        timeout=192
+      monitor: op-res_Dummy_6-monitor
+        interval=121
+        start-delay=0
+        timeout=154
+      migrate_to: op-res_Dummy_6-migrate_to
+        interval=0
+        timeout=123
+      migrate_from: op-res_Dummy_6-migrate_from
+        interval=0
+        timeout=122
+  Resource: res_Dummy_7 (class=ocf provider=heartbeat type=Dummy)
+    Operations:
+      start: op-res_Dummy_7-start
+        interval=0
+        timeout=200
+      stop: op-res_Dummy_7-stop
+        interval=0
+        timeout=192
+      monitor: op-res_Dummy_7-monitor
+        interval=121
+        start-delay=0
+        timeout=154
+      migrate_to: op-res_Dummy_7-migrate_to
+        interval=0
+        timeout=123
+      migrate_from: op-res_Dummy_7-migrate_from
+        interval=0
+        timeout=122
+  Resource: res_Dummy_8 (class=ocf provider=heartbeat type=Dummy)
+    Operations:
+      start: op-res_Dummy_8-start
+        interval=0
+        timeout=200
+      stop: op-res_Dummy_8-stop
+        interval=0
+        timeout=192
+      monitor: op-res_Dummy_8-monitor
+        interval=121
+        start-delay=0
+        timeout=154
+      migrate_to: op-res_Dummy_8-migrate_to
+        interval=0
+        timeout=123
+      migrate_from: op-res_Dummy_8-migrate_from
+        interval=0
+        timeout=122
+  Resource: res_Dummy_9 (class=ocf provider=heartbeat type=Dummy)
+    Operations:
+      start: op-res_Dummy_9-start
+        interval=0
+        timeout=200
+      stop: op-res_Dummy_9-stop
+        interval=0
+        timeout=192
+      monitor: op-res_Dummy_9-monitor
+        interval=121
+        start-delay=0
+        timeout=154
+      migrate_to: op-res_Dummy_9-migrate_to
+        interval=0
+        timeout=123
+      migrate_from: op-res_Dummy_9-migrate_from
+        interval=0
+        timeout=122
+  Resource: res_Dummy_10 (class=ocf provider=heartbeat type=Dummy)
+    Operations:
+      start: op-res_Dummy_10-start
+        interval=0
+        timeout=200
+      stop: op-res_Dummy_10-stop
+        interval=0
+        timeout=192
+      monitor: op-res_Dummy_10-monitor
+        interval=121
+        start-delay=0
+        timeout=154
+      migrate_to: op-res_Dummy_10-migrate_to
+        interval=0
+        timeout=123
+      migrate_from: op-res_Dummy_10-migrate_from
+        interval=0
+        timeout=122
+  Resource: res_Dummy_11 (class=ocf provider=heartbeat type=Dummy)
+    Operations:
+      start: op-res_Dummy_11-start
+        interval=0
+        timeout=200
+      stop: op-res_Dummy_11-stop
+        interval=0
+        timeout=192
+      monitor: op-res_Dummy_11-monitor
+        interval=121
+        start-delay=0
+        timeout=154
+      migrate_to: op-res_Dummy_11-migrate_to
+        interval=0
+        timeout=123
+      migrate_from: op-res_Dummy_11-migrate_from
+        interval=0
+        timeout=122
+  Resource: res_Dummy_12 (class=ocf provider=heartbeat type=Dummy)
+    Operations:
+      start: op-res_Dummy_12-start
+        interval=0
+        timeout=200
+      stop: op-res_Dummy_12-stop
+        interval=0
+        timeout=192
+      monitor: op-res_Dummy_12-monitor
+        interval=121
+        start-delay=0
+        timeout=154
+      migrate_to: op-res_Dummy_12-migrate_to
+        interval=0
+        timeout=123
+      migrate_from: op-res_Dummy_12-migrate_from
+        interval=0
+        timeout=122
+  Resource: res_Dummy_13 (class=ocf provider=heartbeat type=Dummy)
+    Operations:
+      start: op-res_Dummy_13-start
+        interval=0
+        timeout=200
+      stop: op-res_Dummy_13-stop
+        interval=0
+        timeout=192
+      monitor: op-res_Dummy_13-monitor
+        interval=121
+        start-delay=0
+        timeout=154
+      migrate_to: op-res_Dummy_13-migrate_to
+        interval=0
+        timeout=123
+      migrate_from: op-res_Dummy_13-migrate_from
+        interval=0
+        timeout=122
+  Resource: res_Dummy_14 (class=ocf provider=heartbeat type=Dummy)
+    Operations:
+      start: op-res_Dummy_14-start
+        interval=0
+        timeout=200
+      stop: op-res_Dummy_14-stop
+        interval=0
+        timeout=192
+      monitor: op-res_Dummy_14-monitor
+        interval=121
+        start-delay=0
+        timeout=154
+      migrate_to: op-res_Dummy_14-migrate_to
+        interval=0
+        timeout=123
+      migrate_from: op-res_Dummy_14-migrate_from
+        interval=0
+        timeout=122
+  Resource: res_Dummy_15 (class=ocf provider=heartbeat type=Dummy)
+    Operations:
+      start: op-res_Dummy_15-start
+        interval=0
+        timeout=200
+      stop: op-res_Dummy_15-stop
+        interval=0
+        timeout=192
+      monitor: op-res_Dummy_15-monitor
+        interval=121
+        start-delay=0
+        timeout=154
+      migrate_to: op-res_Dummy_15-migrate_to
+        interval=0
+        timeout=123
+      migrate_from: op-res_Dummy_15-migrate_from
+        interval=0
+        timeout=122
+  Resource: res_Dummy_16 (class=ocf provider=heartbeat type=Dummy)
+    Operations:
+      start: op-res_Dummy_16-start
+        interval=0
+        timeout=200
+      stop: op-res_Dummy_16-stop
+        interval=0
+        timeout=192
+      monitor: op-res_Dummy_16-monitor
+        interval=121
+        start-delay=0
+        timeout=154
+      migrate_to: op-res_Dummy_16-migrate_to
+        interval=0
+        timeout=123
+      migrate_from: op-res_Dummy_16-migrate_from
+        interval=0
+        timeout=122
+  Resource: res_Dummy_17 (class=ocf provider=heartbeat type=Dummy)
+    Operations:
+      start: op-res_Dummy_17-start
+        interval=0
+        timeout=200
+      stop: op-res_Dummy_17-stop
+        interval=0
+        timeout=192
+      monitor: op-res_Dummy_17-monitor
+        interval=121
+        start-delay=0
+        timeout=154
+      migrate_to: op-res_Dummy_17-migrate_to
+        interval=0
+        timeout=123
+      migrate_from: op-res_Dummy_17-migrate_from
+        interval=0
+        timeout=122
+  Resource: res_Dummy_18 (class=ocf provider=heartbeat type=Dummy)
+    Operations:
+      start: op-res_Dummy_18-start
+        interval=0
+        timeout=200
+      stop: op-res_Dummy_18-stop
+        interval=0
+        timeout=192
+      monitor: op-res_Dummy_18-monitor
+        interval=121
+        start-delay=0
+        timeout=154
+      migrate_to: op-res_Dummy_18-migrate_to
+        interval=0
+        timeout=123
+      migrate_from: op-res_Dummy_18-migrate_from
+        interval=0
+        timeout=122
+  Resource: res_Dummy_19 (class=ocf provider=heartbeat type=Dummy)
+    Operations:
+      start: op-res_Dummy_19-start
+        interval=0
+        timeout=200
+      stop: op-res_Dummy_19-stop
+        interval=0
+        timeout=192
+      monitor: op-res_Dummy_19-monitor
+        interval=121
+        start-delay=0
+        timeout=154
+      migrate_to: op-res_Dummy_19-migrate_to
+        interval=0
+        timeout=123
+      migrate_from: op-res_Dummy_19-migrate_from
+        interval=0
+        timeout=122
+  Resource: res_Dummy_20 (class=ocf provider=heartbeat type=Dummy)
+    Operations:
+      start: op-res_Dummy_20-start
+        interval=0
+        timeout=200
+      stop: op-res_Dummy_20-stop
+        interval=0
+        timeout=192
+      monitor: op-res_Dummy_20-monitor
+        interval=121
+        start-delay=0
+        timeout=154
+      migrate_to: op-res_Dummy_20-migrate_to
+        interval=0
+        timeout=123
+      migrate_from: op-res_Dummy_20-migrate_from
+        interval=0
+        timeout=122
+  Resource: res_Dummy_21 (class=ocf provider=heartbeat type=Dummy)
+    Operations:
+      start: op-res_Dummy_21-start
+        interval=0
+        timeout=200
+      stop: op-res_Dummy_21-stop
+        interval=0
+        timeout=192
+      monitor: op-res_Dummy_21-monitor
+        interval=121
+        start-delay=0
+        timeout=154
+      migrate_to: op-res_Dummy_21-migrate_to
+        interval=0
+        timeout=123
+      migrate_from: op-res_Dummy_21-migrate_from
+        interval=0
+        timeout=122
+  Resource: res_Dummy_22 (class=ocf provider=heartbeat type=Dummy)
+    Operations:
+      start: op-res_Dummy_22-start
+        interval=0
+        timeout=200
+      stop: op-res_Dummy_22-stop
+        interval=0
+        timeout=192
+      monitor: op-res_Dummy_22-monitor
+        interval=121
+        start-delay=0
+        timeout=154
+      migrate_to: op-res_Dummy_22-migrate_to
+        interval=0
+        timeout=123
+      migrate_from: op-res_Dummy_22-migrate_from
+        interval=0
+        timeout=122
+  Resource: res_Dummy_23 (class=ocf provider=heartbeat type=Dummy)
+    Operations:
+      start: op-res_Dummy_23-start
+        interval=0
+        timeout=200
+      stop: op-res_Dummy_23-stop
+        interval=0
+        timeout=192
+      monitor: op-res_Dummy_23-monitor
+        interval=121
+        start-delay=0
+        timeout=154
+      migrate_to: op-res_Dummy_23-migrate_to
+        interval=0
+        timeout=123
+      migrate_from: op-res_Dummy_23-migrate_from
+        interval=0
+        timeout=122
+  Resource: res_Dummy_24 (class=ocf provider=heartbeat type=Dummy)
+    Operations:
+      start: op-res_Dummy_24-start
+        interval=0
+        timeout=200
+      stop: op-res_Dummy_24-stop
+        interval=0
+        timeout=192
+      monitor: op-res_Dummy_24-monitor
+        interval=121
+        start-delay=0
+        timeout=154
+      migrate_to: op-res_Dummy_24-migrate_to
+        interval=0
+        timeout=123
+      migrate_from: op-res_Dummy_24-migrate_from
+        interval=0
+        timeout=122
+  Resource: res_Dummy_25 (class=ocf provider=heartbeat type=Dummy)
+    Operations:
+      start: op-res_Dummy_25-start
+        interval=0
+        timeout=200
+      stop: op-res_Dummy_25-stop
+        interval=0
+        timeout=192
+      monitor: op-res_Dummy_25-monitor
+        interval=121
+        start-delay=0
+        timeout=154
+      migrate_to: op-res_Dummy_25-migrate_to
+        interval=0
+        timeout=123
+      migrate_from: op-res_Dummy_25-migrate_from
+        interval=0
+        timeout=122
+  Resource: res_Dummy_26 (class=ocf provider=heartbeat type=Dummy)
+    Operations:
+      start: op-res_Dummy_26-start
+        interval=0
+        timeout=200
+      stop: op-res_Dummy_26-stop
+        interval=0
+        timeout=192
+      monitor: op-res_Dummy_26-monitor
+        interval=121
+        start-delay=0
+        timeout=154
+      migrate_to: op-res_Dummy_26-migrate_to
+        interval=0
+        timeout=123
+      migrate_from: op-res_Dummy_26-migrate_from
+        interval=0
+        timeout=122
+  Resource: res_Dummy_27 (class=ocf provider=heartbeat type=Dummy)
+    Operations:
+      start: op-res_Dummy_27-start
+        interval=0
+        timeout=200
+      stop: op-res_Dummy_27-stop
+        interval=0
+        timeout=192
+      monitor: op-res_Dummy_27-monitor
+        interval=121
+        start-delay=0
+        timeout=154
+      migrate_to: op-res_Dummy_27-migrate_to
+        interval=0
+        timeout=123
+      migrate_from: op-res_Dummy_27-migrate_from
+        interval=0
+        timeout=122
+  Resource: res_Dummy_28 (class=ocf provider=heartbeat type=Dummy)
+    Operations:
+      start: op-res_Dummy_28-start
+        interval=0
+        timeout=200
+      stop: op-res_Dummy_28-stop
+        interval=0
+        timeout=192
+      monitor: op-res_Dummy_28-monitor
+        interval=121
+        start-delay=0
+        timeout=154
+      migrate_to: op-res_Dummy_28-migrate_to
+        interval=0
+        timeout=123
+      migrate_from: op-res_Dummy_28-migrate_from
+        interval=0
+        timeout=122
+  Resource: res_Dummy_29 (class=ocf provider=heartbeat type=Dummy)
+    Operations:
+      start: op-res_Dummy_29-start
+        interval=0
+        timeout=200
+      stop: op-res_Dummy_29-stop
+        interval=0
+        timeout=192
+      monitor: op-res_Dummy_29-monitor
+        interval=121
+        start-delay=0
+        timeout=154
+      migrate_to: op-res_Dummy_29-migrate_to
+        interval=0
+        timeout=123
+      migrate_from: op-res_Dummy_29-migrate_from
+        interval=0
+        timeout=122
+  Resource: res_Dummy_30 (class=ocf provider=heartbeat type=Dummy)
+    Operations:
+      start: op-res_Dummy_30-start
+        interval=0
+        timeout=200
+      stop: op-res_Dummy_30-stop
+        interval=0
+        timeout=192
+      monitor: op-res_Dummy_30-monitor
+        interval=121
+        start-delay=0
+        timeout=154
+      migrate_to: op-res_Dummy_30-migrate_to
+        interval=0
+        timeout=123
+      migrate_from: op-res_Dummy_30-migrate_from
+        interval=0
+        timeout=122
+
+Stonith Devices:
+Fencing Levels:
+
+Location Constraints:
+Ordering Constraints:
+Colocation Constraints:
+Ticket Constraints:
+
+Alerts:
+ No alerts defined
+
+Resources Defaults:
+  Meta Attrs: build-resource-defaults
+    resource-stickiness=1
+Operations Defaults:
+  No defaults set
+
+Cluster Properties:
+ cluster-infrastructure: corosync

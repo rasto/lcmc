@@ -1,0 +1,118 @@
+Cluster Name: 
+Corosync Nodes:
+Pacemaker Nodes:
+ host host
+
+Resources:
+  Resource: res_IPaddr2_1 (class=ocf provider=heartbeat type=IPaddr2)
+    Attributes: res_IPaddr2_1-instance_attributes
+      cidr_netmask=24
+      ip=192.168.133.100
+    Operations:
+      start: op-res_IPaddr2_1-start
+        interval=0
+        timeout=200
+      stop: op-res_IPaddr2_1-stop
+        interval=0
+        timeout=192
+      monitor: op-res_IPaddr2_1-monitor
+        interval=121
+        start-delay=0
+        timeout=154
+  Resource: res_Stateful_1 (class=ocf provider=pacemaker type=Stateful)
+    Meta Attributes: res_Stateful_1-meta_attributes
+      is-managed=false
+      target-role=started
+    Operations:
+      start: op-res_Stateful_1-start
+        interval=0
+        timeout=200
+      stop: op-res_Stateful_1-stop
+        interval=0
+        timeout=192
+      monitor: op-res_Stateful_1-monitor
+        interval=121
+        start-delay=0
+        timeout=154
+      notify: op-res_Stateful_1-notify
+        interval=0
+        timeout=5
+      reload-agent: op-res_Stateful_1-reload-agent
+        interval=0
+        timeout=10
+  Group: grp_1
+    Resource: res_Dummy_1 (class=ocf provider=heartbeat type=Dummy)
+      Operations:
+        start: op-res_Dummy_1-start
+          interval=0
+          timeout=200
+        stop: op-res_Dummy_1-stop
+          interval=0
+          timeout=192
+        monitor: op-res_Dummy_1-monitor
+          interval=121
+          start-delay=0
+          timeout=154
+        migrate_to: op-res_Dummy_1-migrate_to
+          interval=0
+          timeout=123
+        migrate_from: op-res_Dummy_1-migrate_from
+          interval=0
+          timeout=122
+    Resource: res_Dummy_2 (class=ocf provider=heartbeat type=Dummy)
+      Operations:
+        start: op-res_Dummy_2-start
+          interval=0
+          timeout=200
+        stop: op-res_Dummy_2-stop
+          interval=0
+          timeout=192
+        monitor: op-res_Dummy_2-monitor
+          interval=121
+          start-delay=0
+          timeout=154
+        migrate_to: op-res_Dummy_2-migrate_to
+          interval=0
+          timeout=123
+        migrate_from: op-res_Dummy_2-migrate_from
+          interval=0
+          timeout=122
+    Resource: res_Dummy_3 (class=ocf provider=heartbeat type=Dummy)
+      Operations:
+        start: op-res_Dummy_3-start
+          interval=0
+          timeout=200
+        stop: op-res_Dummy_3-stop
+          interval=0
+          timeout=192
+        monitor: op-res_Dummy_3-monitor
+          interval=121
+          start-delay=0
+          timeout=154
+        migrate_to: op-res_Dummy_3-migrate_to
+          interval=0
+          timeout=123
+        migrate_from: op-res_Dummy_3-migrate_from
+          interval=0
+          timeout=122
+
+Stonith Devices:
+Fencing Levels:
+
+Location Constraints:
+Ordering Constraints:
+  grp_1 then res_IPaddr2_1 (score:INFINITY) (id:ord_grp_1_res_IPaddr2_1)
+Colocation Constraints:
+  res_IPaddr2_1 with grp_1 (score:INFINITY) (id:col_res_IPaddr2_1_grp_1)
+Ticket Constraints:
+
+Alerts:
+ No alerts defined
+
+Resources Defaults:
+  Meta Attrs: rsc-options
+Operations Defaults:
+  No defaults set
+
+Cluster Properties:
+ cluster-infrastructure: corosync

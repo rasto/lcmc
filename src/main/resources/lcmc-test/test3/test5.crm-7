@@ -1,0 +1,44 @@
+Cluster Name: 
+Corosync Nodes:
+Pacemaker Nodes:
+ host host
+
+Resources:
+ Master: ms_drbd_xy
+  Meta Attrs: clone-max=2 interleave=true notify=true
+  Resource: res_drbd_xy (class=ocf provider=linbit type=drbd)
+   Attributes: drbd_resource=r0 unfence_extra_args=false
+   Operations: start interval=0 timeout=240 (op-res_drbd_xy-start)
+               promote interval=0 timeout=90 (op-res_drbd_xy-promote)
+               demote interval=0 timeout=90 (op-res_drbd_xy-demote)
+               stop interval=0 timeout=100 (op-res_drbd_xy-stop)
+               monitor interval=10 timeout=20 start-delay=0 (op-res_drbd_xy-monitor)
+               reload interval=0 timeout=30 (op-res_drbd_xy-reload)
+               notify interval=0 timeout=90 (op-res_drbd_xy-notify)
+ Resource: res_Filesystem_xy (class=ocf provider=heartbeat type=Filesystem)
+  Attributes: device=/dev/drbd/by-res/r0/0 directory=/mnt/ fstype=ext3
+  Operations: start interval=0 timeout=60 (op-res_Filesystem_xy-start)
+              stop interval=0 timeout=60 (op-res_Filesystem_xy-stop)
+              monitor interval=20 timeout=40 start-delay=0 (op-res_Filesystem_xy-monitor)
+              notify interval=0 timeout=60 (op-res_Filesystem_xy-notify)
+
+Stonith Devices:
+Fencing Levels:
+
+Location Constraints:
+Ordering Constraints:
+  promote ms_drbd_xy then start res_Filesystem_xy (score:INFINITY) (id:ord_ms_drbd_xy_res_Filesystem_xy)
+Colocation Constraints:
+  res_Filesystem_xy with ms_drbd_xy (score:INFINITY) (with-rsc-role:Master) (id:col_res_Filesystem_xy_ms_drbd_xy)
+Ticket Constraints:
+
+Alerts:
+ No alerts defined
+
+Resources Defaults:
+ No defaults set
+Operations Defaults:
+ No defaults set
+
+Cluster Properties:
+ cluster-infrastructure: corosync

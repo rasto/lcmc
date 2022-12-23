@@ -1,0 +1,50 @@
+Cluster Name: 
+Corosync Nodes:
+Pacemaker Nodes:
+ host host
+
+Resources:
+ Resource: res_IPaddr2_1 (class=ocf provider=heartbeat type=IPaddr2)
+  Attributes: cidr_netmask=24 ip=192.168.133.100
+  Operations: start interval=0 timeout=200 (op-res_IPaddr2_1-start)
+              stop interval=0 timeout=192 (op-res_IPaddr2_1-stop)
+              monitor interval=121 timeout=154 start-delay=0 (op-res_IPaddr2_1-monitor)
+ Group: grp_1
+  Resource: res_Dummy_1 (class=ocf provider=heartbeat type=Dummy)
+   Operations: start interval=0 timeout=200 (op-res_Dummy_1-start)
+               stop interval=0 timeout=192 (op-res_Dummy_1-stop)
+               monitor interval=121 timeout=154 start-delay=0 (op-res_Dummy_1-monitor)
+               migrate_to interval=0 timeout=123 (op-res_Dummy_1-migrate_to)
+               migrate_from interval=0 timeout=122 (op-res_Dummy_1-migrate_from)
+  Resource: res_Dummy_2 (class=ocf provider=heartbeat type=Dummy)
+   Operations: start interval=0 timeout=200 (op-res_Dummy_2-start)
+               stop interval=0 timeout=192 (op-res_Dummy_2-stop)
+               monitor interval=121 timeout=154 start-delay=0 (op-res_Dummy_2-monitor)
+               migrate_to interval=0 timeout=123 (op-res_Dummy_2-migrate_to)
+               migrate_from interval=0 timeout=122 (op-res_Dummy_2-migrate_from)
+  Resource: res_Dummy_3 (class=ocf provider=heartbeat type=Dummy)
+   Operations: start interval=0 timeout=200 (op-res_Dummy_3-start)
+               stop interval=0 timeout=192 (op-res_Dummy_3-stop)
+               monitor interval=121 timeout=154 start-delay=0 (op-res_Dummy_3-monitor)
+               migrate_to interval=0 timeout=123 (op-res_Dummy_3-migrate_to)
+               migrate_from interval=0 timeout=122 (op-res_Dummy_3-migrate_from)
+
+Stonith Devices:
+Fencing Levels:
+
+Location Constraints:
+Ordering Constraints:
+  res_IPaddr2_1 then res_Dummy_2 (score:INFINITY) (id:ord_res_IPaddr2_1_res_Dummy_2)
+Colocation Constraints:
+Ticket Constraints:
+
+Alerts:
+ No alerts defined
+
+Resources Defaults:
+ No defaults set
+Operations Defaults:
+ No defaults set
+
+Cluster Properties:
+ cluster-infrastructure: corosync

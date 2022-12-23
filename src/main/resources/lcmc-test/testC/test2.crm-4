@@ -1,0 +1,45 @@
+Cluster Name: 
+Corosync Nodes:
+Pacemaker Nodes:
+ host host
+
+Resources:
+  Resource: res_Stateful_1 (class=ocf provider=pacemaker type=Stateful)
+    Meta Attributes: res_Stateful_1-meta_attributes
+      target-role=stopped
+    Operations:
+      start: op-res_Stateful_1-start
+        interval=0
+        timeout=20
+      stop: op-res_Stateful_1-stop
+        interval=0
+        timeout=20
+      monitor: op-res_Stateful_1-monitor
+        interval=11
+        start-delay=0
+        timeout=20
+      notify: op-res_Stateful_1-notify
+        interval=0
+        timeout=5
+      reload-agent: op-res_Stateful_1-reload-agent
+        interval=0
+        timeout=10
+
+Stonith Devices:
+Fencing Levels:
+
+Location Constraints:
+Ordering Constraints:
+Colocation Constraints:
+Ticket Constraints:
+
+Alerts:
+ No alerts defined
+
+Resources Defaults:
+  Meta Attrs: rsc-options
+Operations Defaults:
+  No defaults set
+
+Cluster Properties:
+ cluster-infrastructure: corosync

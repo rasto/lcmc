@@ -1,0 +1,3 @@
+Full List of Resources:
+  * Resource Group: grp_1:
+    * res_Dummy_1	(ocf::heartbeat:Dummy):	 Stopped (disabled)

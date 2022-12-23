@@ -1,0 +1,78 @@
+Cluster Name: 
+Corosync Nodes:
+Pacemaker Nodes:
+ host host
+
+Resources:
+  Resource: res_Filesystem_xy (class=ocf provider=heartbeat type=Filesystem)
+    Attributes: res_Filesystem_xy-instance_attributes
+      device=/dev/drbd/by-res/r0/0
+      directory=/mnt/
+      force_unmount=false
+      fstype=ext2
+    Operations:
+      start: op-res_Filesystem_xy-start
+        interval=0
+        timeout=60
+      stop: op-res_Filesystem_xy-stop
+        interval=0
+        timeout=60
+      monitor: op-res_Filesystem_xy-monitor
+        interval=20
+        start-delay=0
+        timeout=40
+  Clone: ms_drbd_xy
+    Meta Attributes: ms_drbd_xy-meta_attributes
+      clone-max=2
+      interleave=true
+      notify=true
+      promotable=true
+    Resource: res_drbd_xy (class=ocf provider=linbit type=drbd)
+      Attributes: res_drbd_xy-instance_attributes
+        drbd_resource=r0
+        unfence_extra_args=false
+      Operations:
+        start: op-res_drbd_xy-start
+          interval=0
+          timeout=240
+        promote: op-res_drbd_xy-promote
+          interval=0
+          timeout=90
+        demote: op-res_drbd_xy-demote
+          interval=0
+          timeout=90
+        stop: op-res_drbd_xy-stop
+          interval=0
+          timeout=100
+        monitor: op-res_drbd_xy-monitor
+          interval=10
+          start-delay=0
+          timeout=20
+        reload: op-res_drbd_xy-reload
+          interval=0
+          timeout=30
+        notify: op-res_drbd_xy-notify
+          interval=0
+          timeout=90
+
+Stonith Devices:
+Fencing Levels:
+
+Location Constraints:
+Ordering Constraints:
+  promote ms_drbd_xy then start res_Filesystem_xy (score:INFINITY) (id:ord_ms_drbd_xy_res_Filesystem_xy)
+Colocation Constraints:
+  res_Filesystem_xy with ms_drbd_xy (score:INFINITY) (with-rsc-role:Promoted) (id:col_res_Filesystem_xy_ms_drbd_xy)
+Ticket Constraints:
+
+Alerts:
+ No alerts defined
+
+Resources Defaults:
+  Meta Attrs: build-resource-defaults
+    resource-stickiness=1
+Operations Defaults:
+  No defaults set
+
+Cluster Properties:
+ cluster-infrastructure: corosync

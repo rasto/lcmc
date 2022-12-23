@@ -1,0 +1,59 @@
+Cluster Name: 
+Corosync Nodes:
+Pacemaker Nodes:
+ host host
+
+Resources:
+ Resource: res_IPaddr2_1 (class=ocf provider=heartbeat type=IPaddr2)
+  Attributes: cidr_netmask=24 ip=192.168.133.100
+  Operations: start interval=0 timeout=200 (op-res_IPaddr2_1-start)
+              stop interval=0 timeout=192 (op-res_IPaddr2_1-stop)
+              monitor interval=121 timeout=154 start-delay=0 (op-res_IPaddr2_1-monitor)
+ Group: grp_1
+  Resource: res_Dummy_1 (class=ocf provider=heartbeat type=Dummy)
+   Operations: start interval=0 timeout=200 (op-res_Dummy_1-start)
+               stop interval=0 timeout=192 (op-res_Dummy_1-stop)
+               monitor interval=121 timeout=154 start-delay=0 (op-res_Dummy_1-monitor)
+               migrate_to interval=0 timeout=123 (op-res_Dummy_1-migrate_to)
+               migrate_from interval=0 timeout=122 (op-res_Dummy_1-migrate_from)
+  Resource: res_Dummy_2 (class=ocf provider=heartbeat type=Dummy)
+   Operations: start interval=0 timeout=200 (op-res_Dummy_2-start)
+               stop interval=0 timeout=192 (op-res_Dummy_2-stop)
+               monitor interval=121 timeout=154 start-delay=0 (op-res_Dummy_2-monitor)
+               migrate_to interval=0 timeout=123 (op-res_Dummy_2-migrate_to)
+               migrate_from interval=0 timeout=122 (op-res_Dummy_2-migrate_from)
+  Resource: res_Dummy_3 (class=ocf provider=heartbeat type=Dummy)
+   Operations: start interval=0 timeout=200 (op-res_Dummy_3-start)
+               stop interval=0 timeout=192 (op-res_Dummy_3-stop)
+               monitor interval=121 timeout=154 start-delay=0 (op-res_Dummy_3-monitor)
+               migrate_to interval=0 timeout=123 (op-res_Dummy_3-migrate_to)
+               migrate_from interval=0 timeout=122 (op-res_Dummy_3-migrate_from)
+ Clone: ms_Stateful_1
+  Meta Attrs: clone-max=1 interleave=true notify=true promotable=true
+  Resource: res_Stateful_1 (class=ocf provider=heartbeat type=Stateful)
+   Operations: start interval=0 timeout=200 (op-res_Stateful_1-start)
+               promote interval=0 timeout=20 (op-res_Stateful_1-promote)
+               demote interval=0 timeout=20 (op-res_Stateful_1-demote)
+               stop interval=0 timeout=192 (op-res_Stateful_1-stop)
+               monitor interval=121 timeout=154 start-delay=0 (op-res_Stateful_1-monitor)
+
+Stonith Devices:
+Fencing Levels:
+
+Location Constraints:
+Ordering Constraints:
+  grp_1 then res_IPaddr2_1 (score:INFINITY) (id:ord_grp_1_res_IPaddr2_1)
+Colocation Constraints:
+  res_IPaddr2_1 with grp_1 (score:INFINITY) (id:col_res_IPaddr2_1_grp_1)
+Ticket Constraints:
+
+Alerts:
+ No alerts defined
+
+Resources Defaults:
+  Meta Attrs: rsc-options
+Operations Defaults:
+  No defaults set
+
+Cluster Properties:
+ cluster-infrastructure: corosync

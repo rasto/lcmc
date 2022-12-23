@@ -1,0 +1,50 @@
+Cluster Name: 
+Corosync Nodes:
+Pacemaker Nodes:
+ host host
+
+Resources:
+  Clone: cl_Dummy_1
+    Meta Attributes: cl_Dummy_1-meta_attributes
+      clone-max=2
+      interleave=true
+      notify=true
+      target-role=stopped
+    Resource: res_Dummy_1 (class=ocf provider=heartbeat type=Dummy)
+      Operations:
+        start: op-res_Dummy_1-start
+          interval=0
+          timeout=200
+        stop: op-res_Dummy_1-stop
+          interval=0
+          timeout=192
+        monitor: op-res_Dummy_1-monitor
+          interval=121
+          start-delay=0
+          timeout=154
+        migrate_to: op-res_Dummy_1-migrate_to
+          interval=0
+          timeout=123
+        migrate_from: op-res_Dummy_1-migrate_from
+          interval=0
+          timeout=122
+
+Stonith Devices:
+Fencing Levels:
+
+Location Constraints:
+Ordering Constraints:
+Colocation Constraints:
+Ticket Constraints:
+
+Alerts:
+ No alerts defined
+
+Resources Defaults:
+  Meta Attrs: build-resource-defaults
+    resource-stickiness=1
+Operations Defaults:
+  No defaults set
+
+Cluster Properties:
+ cluster-infrastructure: corosync

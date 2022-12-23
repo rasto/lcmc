@@ -1,0 +1,33 @@
+Cluster Name: 
+Corosync Nodes:
+Pacemaker Nodes:
+ host host
+
+Resources:
+ Group: grp_1
+  Resource: res_Dummy_1 (class=ocf provider=heartbeat type=Dummy)
+   Meta Attrs: target-role=stopped
+   Operations: start interval=0 timeout=200 (op-res_Dummy_1-start)
+               stop interval=0 timeout=192 (op-res_Dummy_1-stop)
+               monitor interval=121 timeout=154 start-delay=0 (op-res_Dummy_1-monitor)
+               migrate_to interval=0 timeout=123 (op-res_Dummy_1-migrate_to)
+               migrate_from interval=0 timeout=122 (op-res_Dummy_1-migrate_from)
+
+Stonith Devices:
+Fencing Levels:
+
+Location Constraints:
+Ordering Constraints:
+Colocation Constraints:
+Ticket Constraints:
+
+Alerts:
+ No alerts defined
+
+Resources Defaults:
+ No defaults set
+Operations Defaults:
+ No defaults set
+
+Cluster Properties:
+ cluster-infrastructure: corosync

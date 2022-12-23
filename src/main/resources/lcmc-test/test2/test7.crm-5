@@ -1,0 +1,99 @@
+Cluster Name: 
+Corosync Nodes:
+Pacemaker Nodes:
+ host host
+
+Resources:
+  Resource: res_Dummy_1 (class=ocf provider=heartbeat type=Dummy)
+    Operations:
+      start: op-res_Dummy_1-start
+        interval=0
+        timeout=200
+      stop: op-res_Dummy_1-stop
+        interval=0
+        timeout=192
+      monitor: op-res_Dummy_1-monitor
+        interval=121
+        start-delay=0
+        timeout=154
+      migrate_to: op-res_Dummy_1-migrate_to
+        interval=0
+        timeout=123
+      migrate_from: op-res_Dummy_1-migrate_from
+        interval=0
+        timeout=122
+  Resource: res_Dummy_2 (class=ocf provider=heartbeat type=Dummy)
+    Operations:
+      start: op-res_Dummy_2-start
+        interval=0
+        timeout=200
+      stop: op-res_Dummy_2-stop
+        interval=0
+        timeout=192
+      monitor: op-res_Dummy_2-monitor
+        interval=121
+        start-delay=0
+        timeout=154
+      migrate_to: op-res_Dummy_2-migrate_to
+        interval=0
+        timeout=123
+      migrate_from: op-res_Dummy_2-migrate_from
+        interval=0
+        timeout=122
+  Resource: res_Dummy_3 (class=ocf provider=heartbeat type=Dummy)
+    Operations:
+      start: op-res_Dummy_3-start
+        interval=0
+        timeout=200
+      stop: op-res_Dummy_3-stop
+        interval=0
+        timeout=192
+      monitor: op-res_Dummy_3-monitor
+        interval=121
+        start-delay=0
+        timeout=154
+      migrate_to: op-res_Dummy_3-migrate_to
+        interval=0
+        timeout=123
+      migrate_from: op-res_Dummy_3-migrate_from
+        interval=0
+        timeout=122
+  Resource: res_Dummy_4 (class=ocf provider=heartbeat type=Dummy)
+    Operations:
+      start: op-res_Dummy_4-start
+        interval=0
+        timeout=200
+      stop: op-res_Dummy_4-stop
+        interval=0
+        timeout=192
+      monitor: op-res_Dummy_4-monitor
+        interval=121
+        start-delay=0
+        timeout=154
+      migrate_to: op-res_Dummy_4-migrate_to
+        interval=0
+        timeout=123
+      migrate_from: op-res_Dummy_4-migrate_from
+        interval=0
+        timeout=122
+
+Stonith Devices:
+Fencing Levels:
+
+Location Constraints:
+Ordering Constraints:
+  Resource Sets:
+    set res_Dummy_1 sequential=false (id:o1-0) setoptions score=INFINITY (id:o1)
+Colocation Constraints:
+Ticket Constraints:
+
+Alerts:
+ No alerts defined
+
+Resources Defaults:
+  Meta Attrs: rsc-options
+Operations Defaults:
+  No defaults set
+
+Cluster Properties:
+ cluster-infrastructure: corosync

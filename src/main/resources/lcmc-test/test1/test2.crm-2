@@ -1,0 +1,41 @@
+Cluster Name: 
+Corosync Nodes:
+Pacemaker Nodes:
+ host host
+
+Resources:
+  Resource: res_IPaddr2_1 (class=ocf provider=heartbeat type=IPaddr2)
+    Attributes: res_IPaddr2_1-instance_attributes
+      cidr_netmask=24
+      ip=192.168.133.100
+    Operations:
+      start: op-res_IPaddr2_1-start
+        interval=0
+        timeout=200
+      stop: op-res_IPaddr2_1-stop
+        interval=0
+        timeout=192
+      monitor: op-res_IPaddr2_1-monitor
+        interval=121
+        start-delay=0
+        timeout=154
+
+Stonith Devices:
+Fencing Levels:
+
+Location Constraints:
+Ordering Constraints:
+Colocation Constraints:
+Ticket Constraints:
+
+Alerts:
+ No alerts defined
+
+Resources Defaults:
+  Meta Attrs: build-resource-defaults
+    resource-stickiness=1
+Operations Defaults:
+  No defaults set
+
+Cluster Properties:
+ cluster-infrastructure: corosync
