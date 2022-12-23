@@ -91,7 +91,7 @@ sub gui_pcmk_config_test {
     my $testname = shift;
     my $index = shift;
     my @hosts = @_;
-    my $crm_config = Command::_exec_or_die("TERM=dumb PATH=\$PATH:/usr/sbin /usr/sbin/crm configure show");
+    my $crm_config = Command::_exec_or_die("TERM=dumb PATH=\$PATH:/usr/sbin /usr/sbin/crm configure show 2>/dev/null| /usr/sbin/pcs config");
     for my $host (@hosts) {
         $crm_config =~ s/$host\b/host/gi;
     }
@@ -112,6 +112,7 @@ sub gui_pcmk_status_test {
 
 sub strip_crm_config {
     my $crm_config = shift;
+    $crm_config =~ s/^ dc-version: .*//ms; # pcs
     $crm_config =~ s/^property.*//ms;
     $crm_config =~ s/^rsc_defaults .*//ms;
     $crm_config =~ s/^node .*//mg;
