@@ -55,7 +55,7 @@ public final class DistResource_fedora extends ListResourceBundle {
         {"PmInst.install.text.1",
          "dnf install: 1.1.x/1.4.x"},
         {"PmInst.install.1",
-         "dnf -y install pacemaker corosync pcs"
+         "dnf -y install pacemaker corosync pcs fence-agents"
          + "&& " + DistResource.SUDO + "/bin/systemctl enable corosync.service"
          + "&& if ( rpm -qa|grep drbd ); then"
          + " dnf -y install drbd-pacemaker; fi"
