@@ -42,7 +42,8 @@ public final class DistResource_redhat_7 extends ListResourceBundle {
         /* pacamker / corosync / yum */
         {"PmInst.install.text.2", "yum install" },
 
-        {"PmInst.install.2", "/usr/bin/yum -y install corosync pacemaker"},
+        {"PmInst.install.2", "/usr/bin/yum -y install corosync pacemaker pcs"
+                + " && systemctl enable --now pcsd"},
 
         /* Corosync/Pacemaker clusterlabs */
         {"PmInst.install.text.3", "clusterlabs repo: 1.1.x/1.4.x" },
