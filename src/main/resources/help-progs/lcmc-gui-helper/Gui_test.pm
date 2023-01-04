@@ -177,20 +177,16 @@ sub gui_drbd_test {
         }
     }
 
-    if (!open PROC, "/proc/drbd") {
-        return;
+	my $proc = `drbdsetup status`;
+
+    for ($proc) {
+        my $i = 1;
+        for my $host (@hosts) {
+            s/$host\b/host$i/gi;
+            $i++;
+        }
     }
-    my $proc = "";
-    while (<PROC>) {
-        next if /^version:/;
-        next if /^GIT-hash:/;
-        next if /^srcversion:/;
-        next if /^\s+ns:/;
-        next if /^\s+\d+:\s+cs:Unconfigured/;
-        s/(\s\S\sr----)$/$1-/;
-        $proc .= $_;
-    }
-    close PROC;
+
     for ($conf) {
         my $i = 1;
         for my $host (@hosts) {
