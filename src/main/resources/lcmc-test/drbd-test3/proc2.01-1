@@ -1,0 +1,10 @@
+r0 role:Secondary
+  disk:Diskless
+  peer role:Secondary
+    replication:Established peer-disk:Diskless
+
+r1 role:Secondary
+  disk:Diskless
+  peer role:Secondary
+    replication:Established peer-disk:Diskless
+

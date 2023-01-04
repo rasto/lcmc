@@ -1,0 +1,5 @@
+r0 role:Secondary
+  disk:UpToDate
+  peer role:Secondary
+    replication:Established peer-disk:UpToDate
+

@@ -1,0 +1,5 @@
+r0 role:Secondary
+  disk:UpToDate
+  host2 role:Secondary
+    peer-disk:UpToDate
+

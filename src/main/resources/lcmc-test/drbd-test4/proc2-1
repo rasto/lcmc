@@ -1,0 +1,7 @@
+r0 role:Secondary
+  volume:0 disk:UpToDate
+  volume:1 disk:UpToDate
+  peer role:Secondary
+    volume:0 replication:Established peer-disk:UpToDate
+    volume:1 replication:Established peer-disk:UpToDate
+
