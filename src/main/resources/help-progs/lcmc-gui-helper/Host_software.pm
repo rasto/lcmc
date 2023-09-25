@@ -13,12 +13,15 @@ sub get_cluster_versions {
         $hb_version =~ s/\s+.*//;
         chomp $hb_version;
     }
-    my $pm_version = Command::_exec("$pacemaker_controld version 2>/dev/null") || "";
+    my $pm_version = Command::_exec("$pacemaker_controld --version 2>/dev/null") || "";
     if ($pm_version) {
         $pm_version =~ s/CRM Version:\s+//;
-        $pm_version =~ s/\s+.*//;
-        chomp $pm_version;
+    } else {
+        $pm_version = Command::_exec("$pacemaker_controld version 2>/dev/null") || "";
+        $pm_version =~ s/Pacemaker\s+//;
     }
+    $pm_version =~ s/\s+.*//;
+    chomp $pm_version;
 
     # there is no reliable way to find the installed corosync and openais
     # version, so it is best effort or just "ok" if it is installed
