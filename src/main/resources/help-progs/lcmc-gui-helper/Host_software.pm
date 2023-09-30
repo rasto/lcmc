@@ -14,12 +14,11 @@ sub get_cluster_versions {
         chomp $hb_version;
     }
     my $pm_version = Command::_exec("$pacemaker_controld --version 2>/dev/null") || "";
-    if ($pm_version) {
-        $pm_version =~ s/CRM Version:\s+//;
-    } else {
+    if (!$pm_version) {
         $pm_version = Command::_exec("$pacemaker_controld version 2>/dev/null") || "";
-        $pm_version =~ s/Pacemaker\s+//;
     }
+    $pm_version =~ s/^Pacemaker\s+//;
+    $pm_version =~ s/^CRM Version:\s+//;
     $pm_version =~ s/\s+.*//;
     chomp $pm_version;
 
