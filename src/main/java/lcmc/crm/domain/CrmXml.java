@@ -2704,7 +2704,7 @@ public class CrmXml {
                     final String join = XMLTools.getAttribute(nodeStateNode, "join");
                     final String inCCM = XMLTools.getAttribute(nodeStateNode, "in_ccm");
                     final String crmd = XMLTools.getAttribute(nodeStateNode, "crmd");
-                    if ("member".equals(join) && "true".equals(inCCM) && !"offline".equals(crmd)) {
+                    if ("member".equals(join) && !"false".equals(inCCM) && !"offline".equals(crmd)) {
                         nodeOnline.put(uname.toLowerCase(Locale.US), "yes");
                     } else {
                         nodeOnline.put(uname.toLowerCase(Locale.US), "no");
