@@ -184,7 +184,7 @@ sub get_drbd_xml {
     }
     my $from = "";
 
-    for my $section ("global", "handlers", "startup") {
+    for my $section ("global", "handlers", "startup", "options") {
         my ($part) = $manpage =~ /^\\fB$section\\fR$(.*?)\.[TPs][Pp]/sm;
         my @options = map {s/\\-/-/g;
             $_} $part =~ /\\fB(.*?)\\fR(?!\()/g;
