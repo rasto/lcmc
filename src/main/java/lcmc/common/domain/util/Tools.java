@@ -655,7 +655,7 @@ public final class Tools {
         final int randomInfo = (int) (Math.random() * 100);
         String info = null;
         try {
-            final String url = "http://lcmc.sourceforge.net/version.html?lcmc-check-" + getRelease();
+            final String url = "https://lcmc.sourceforge.net/version.html?lcmc-check-" + getRelease();
             final BufferedReader reader =
                     new BufferedReader(new InputStreamReader(new URL(url).openStream(), StandardCharsets.UTF_8));
             int rate = 0;
