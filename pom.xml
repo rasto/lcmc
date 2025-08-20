@@ -195,6 +195,10 @@
             <id>org.jenkins-ci</id>
             <url>https://repo.jenkins-ci.org/releases</url>
         </repository>
+        <repository>
+            <id>jenkins-public</id>
+            <url>https://repo.jenkins-ci.org/public/</url>
+        </repository>
     </repositories>
 
     <build>
