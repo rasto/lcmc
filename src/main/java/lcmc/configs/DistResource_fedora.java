@@ -42,9 +42,13 @@ public final class DistResource_fedora extends ListResourceBundle {
          "dnf install"},
 
         {"DrbdInst.install.1",
-         "dnf -y install drbd-utils drbd-udev "
-         + "&& if ( rpm -qa|grep pacemaker ); then"
-         + " dnf -y install drbd-pacemaker; fi"},
+         "dnf -y install drbd-utils"
+         + " && (dnf -y install drbd-udev ||"
+         + " if [ -e /lib/udev/65-drbd.rules ]; then"
+         + " cp /lib/udev/65-drbd.rules /lib/udev/rules.d/; fi)"
+         + " && if ( rpm -qa|grep pacemaker ); then"
+         + " dnf -y install drbd-pacemaker; fi"
+         + " && " + DistResource.SUDO + "udevadm control --reload-rules"},
         {"DrbdInst.install.method.1",       ""},
 
         /* Heartbeat/Pacemaker native */
